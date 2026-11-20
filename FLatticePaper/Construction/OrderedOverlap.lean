@@ -31,13 +31,12 @@ theorem contactShift_le_difference (old incoming : HeightTile α)
 
 /-- The ordered minimum: at every common site the old value wins after normalization. -/
 def insert (old incoming : HeightTile α)
-    (contact : (old.sites ∩ incoming.sites).Nonempty) : HeightTile α where
-  sites := old.sites ∪ incoming.sites
-  height site :=
-    if hold : site.val ∈ old.sites then old.height ⟨site, hold⟩
-    else
-      incoming.height ⟨site, (Finset.mem_union.mp site.property).resolve_left hold⟩ -
-        old.contactShift incoming contact
+    (contact : (old.sites ∩ incoming.sites).Nonempty) : HeightTile α :=
+  let shift := old.contactShift incoming contact
+  { sites := old.sites ∪ incoming.sites
+    height := fun site =>
+      if hold : site.val ∈ old.sites then old.height ⟨site, hold⟩
+      else incoming.height ⟨site, (Finset.mem_union.mp site.property).resolve_left hold⟩ - shift }
 
 @[simp]
 theorem insert_sites (old incoming : HeightTile α) (contact) :
@@ -196,9 +195,10 @@ def maxHeight (tile : HeightTile α) (hne : tile.sites.Nonempty) : ℤ :=
   (tile.sites.attach.image tile.height).max' ((Finset.attach_nonempty_iff.mpr hne).image _)
 
 /-- The normalization at the end of an L-correction, without changing its support. -/
-def maxZero (tile : HeightTile α) (hne : tile.sites.Nonempty) : HeightTile α where
-  sites := tile.sites
-  height site := tile.height site - tile.maxHeight hne
+def maxZero (tile : HeightTile α) (hne : tile.sites.Nonempty) : HeightTile α :=
+  let shift := tile.maxHeight hne
+  { sites := tile.sites
+    height := fun site => tile.height site - shift }
 
 omit [DecidableEq α] in
 theorem maxZero_agrees (tile : HeightTile α) (hne : tile.sites.Nonempty)

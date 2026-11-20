@@ -58,10 +58,6 @@ def Digit.swapTwoThree : Digit → Digit
 theorem Digit.swapTwoThree_swapTwoThree (digit : Digit) :
     digit.swapTwoThree.swapTwoThree = digit := by cases digit <;> rfl
 
-def Parity.flip : Parity → Parity
-  | .odd => .even
-  | .even => .odd
-
 theorem Parents.ValidFrame.rotate_current_even {parents : Parents} (h : parents.ValidFrame) :
     (parents.current .even).rotate = parents.rotate.current .odd := by
   rw [Fraction.rotate_of_even h.current_even_parity]

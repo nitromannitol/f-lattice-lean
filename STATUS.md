@@ -21,6 +21,9 @@ The November 20 corrected edition and its supporting constructor are pinned by [
 - [Tie-band burn](FLatticePaper/Plane/BandBurn.lean): `FLatticePaper.exists_leftThreshold_bandBurnOrder` and `exists_rightThreshold_bandBurnOrder` burn any finite family of classes given the respective rank factorization on the band. They count the two actual input slots even if projected classes coincide. [The diagonal consumer](checks/ThresholdMinimum.lean) proves finite comparison and a band burn for the concrete pair `0` and `x₁ + x₂`. The true ancestor pairs, their signed choices, and their rank periodicity remain separate proof obligations.
 - [Arithmetic and physical rotations](FLatticePaper/Plane/RecurrenceRotation.lean): `Farey.rotate_parentsAt` swaps digits 2 and 3, preserving depth and exchanging parity registers. `Recurrent.quarterTurn` uses the exact recurrence criterion to prove superharmonicity and recurrence across the parity-correct physical rotation and arbitrary integer harmonic correction. `IsConstrainedBurningRank.quarterTurn` also transports rank choices. [The consumer](checks/QuarterTurn.lean) checks the rotated mixed birth and checks physical recurrence and finite comparison on a rotated endpoint with a nonzero correction.
 
+- [Unbounded native evaluator](FLatticePaper/Construction/Native.lean): exact ordinary and corrected standard/alternate schedules, both lengths and sides of correction, seventh-source restoration, actual pre-update saved payloads, and final occupied lower-left centering. `evaluateNative_base` proves all literal initial runs succeed; `evaluateNativeState_history` proves saved chronology on successful evaluations. [The check](checks/Native.lean) matches the occupied sites and heights of all 31 pinned fixtures. This is not a proof of all-word mixed success.
+- [Schedule consumers](FLatticePaper/Construction/PlacedSchedule.lean): `eval_ok_iff`, `eval_tile_agrees` and `eval_correction_agrees` link the exact assembled output to chronological contact and ordered height comparison, including trim and the correction's max-zero gauge.
+
 Run these checks from the sandbox repository root.
 
 ```sh
@@ -34,6 +37,7 @@ lake env lean checks/Initializers.lean
 lake env lean checks/FareyBirth.lean
 lake env lean checks/ThresholdMinimum.lean
 lake env lean checks/QuarterTurn.lean
+lake env lean checks/Native.lean
 sha256sum --quiet -c paper.sha256
 ```
 
@@ -57,6 +61,6 @@ The bootstrap, ordered-height, alternate-midpoint, placement, initializer, Farey
 
 ## Open
 
-The two headline theorems, the literal unbounded mixed-word constructor, the general plane ranks, source-specific finite-tile height comparisons, and occupied-domain period coverage remain open. The ordered height lemma does not supply the actual shifted sources or their geometric comparisons. The exact endpoint fields still need quadratic growth at their respective matrices. The root and pure-word plane ranks and the general signed rank and band induction are separate obligations.
+The two headline theorems, all-word success of mixed evaluation, general plane ranks, source-specific finite-tile height comparisons, and occupied-domain period coverage remain open. The ordered height lemma does not prove the geometric comparisons of the actual shifted sources. The exact endpoint fields still need quadratic growth at their respective matrices. The root and pure-word plane ranks and the general signed rank and band induction are separate obligations.
 
-Next constructor dependencies: use the Farey registers and distinct saved histories in the slot offsets, and connect the ordinary and corrected source lists to placed assembly. For the plane proof, connect the threshold calculation to the actual earlier harmonically conjugate parent pair, and obtain its unit bounds and both signed ranks from the genuine boundary and cut arguments, not as hypotheses on a final source root.
+Next constructor dependencies: prove the geometric comparisons of the actual schedules and coverage of their native occupied sites, starting with the literal outputs. For the plane proof, connect the threshold calculation to the actual earlier harmonically conjugate parent pair, and obtain its unit bounds and both signed ranks from the genuine boundary and cut arguments, not as hypotheses on a final source root.

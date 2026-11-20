@@ -45,6 +45,9 @@ theorem splitInitial_word (word : Word) :
     · exact key .two
     · exact key .three
 
+theorem splitInitial_base (run : BaseRun) : splitInitial run.word = (run, []) := by
+  cases run <;> simp [splitInitial, BaseRun.word, List.replicate_succ]
+
 /-- Word components of the exact saved-ancestor registers. The current
 constructor's correction reads these before pushing the new digit. -/
 structure AncestorHistory where

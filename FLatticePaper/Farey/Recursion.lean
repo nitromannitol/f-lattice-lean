@@ -50,6 +50,10 @@ inductive Parity
   | odd | even
   deriving DecidableEq, Repr
 
+def Parity.flip : Parity → Parity
+  | .odd => .even
+  | .even => .odd
+
 /-- The last two registers of a Farey quadruple determine its first two. -/
 structure Parents where
   odd : Fraction
