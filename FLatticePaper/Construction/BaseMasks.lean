@@ -114,7 +114,8 @@ private def entry : BaseMask → ℤ → Site → Option ℤ
         else some value
     else none
 
-private def raw (kind : BaseMask) (den : ℤ) : HeightTile Site :=
+/-- The literal mask before the constructor's rectangular trim. -/
+def raw (kind : BaseMask) (den : ℤ) : HeightTile Site :=
   maskedTile (kind.window den).1 (kind.window den).2 (kind.entry den)
 
 private def witness : BaseMask → Site
@@ -137,6 +138,32 @@ def tile (kind : BaseMask) (den : ℤ) (hden : kind.Valid den) : HeightTile Site
 theorem tile_nonempty (kind : BaseMask) (den : ℤ) (hden : kind.Valid den) :
     (kind.tile den hden).sites.Nonempty :=
   (kind.raw den).trim_sites_nonempty (kind.raw_nonempty den hden)
+
+theorem mem_stairEven_body {den : ℤ} {point : Site}
+    (hx : 2 - den ≤ point.1 ∧ point.1 ≤ den)
+    (hy : 0 ≤ point.2 ∧ point.2 ≤ den + 1)
+    (hband : 1 ≤ point.1 + point.2 ∧ point.1 + point.2 ≤ den + 2) :
+    point ∈ (BaseMask.stairEven.raw den).sites := by
+  rw [raw, mem_maskedTile_sites]
+  refine ⟨hx, hy, ?_⟩
+  obtain ⟨col, row⟩ := point
+  simp only [entry]
+  split <;> rfl
+
+theorem mem_stairEvenAlt_body_or_rail {den : ℤ} {point : Site}
+    (hx : 4 - 2 * den ≤ point.1 ∧ point.1 ≤ den)
+    (hy : -1 ≤ point.2 ∧ point.2 ≤ den + 1)
+    (hbody : (2 - den ≤ point.1 + point.2 ∧ point.1 + point.2 ≤ den + 2 ∧
+      0 ≤ point.2 ∧ point.2 ≤ den) ∨ (point.2 = den + 1 ∧ 4 - den ≤ point.1 ∧ point.1 ≤ 3)) :
+    point ∈ (BaseMask.stairEvenAlt.raw den).sites := by
+  rw [raw, mem_maskedTile_sites]
+  refine ⟨hx, hy, ?_⟩
+  obtain ⟨col, row⟩ := point
+  simp only [entry]
+  split
+  · rfl
+  · rw [if_pos (hbody.imp_right Or.inr)]
+    rfl
 
 end BaseMask
 

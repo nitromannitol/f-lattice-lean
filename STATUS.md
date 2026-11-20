@@ -28,6 +28,8 @@ The November 20 corrected edition and its supporting constructor are pinned by [
 - [Affine period and growth](FLatticePaper/Plane/PeriodCocycle.lean): `generator_period_formula`, `generator_periods_affine` and `generator_periods_growth` derive the exact law, bounded tilted remainder and uniform quadratic error from the two prescribed generator identities. `eq_of_covered_generator_periods` proves uniqueness from actual native support coverage and equal generator increments.
 - [Endpoint odometers](FLatticePaper/Plane/EndpointGrowth.lean): `checkerboard_endpoints` checks superharmonicity, recurrence and quadratic growth of both literal endpoint fields at their prescribed matrices. [The consumers](checks/Periods.lean) use the matrix-lattice equality for an arbitrary generated birth and the growth theorem at the even root slope.
 
+- [Symbolic reciprocal staircase coverage](FLatticePaper/Construction/StaircaseCoverage.lean): `stairEven_cover` and `stairEvenAlt_cover` prove the two covers for every odd denominator at least three, using the half-shifted real cell and the literal occupied mask, with the $d=3$ alternate rail exception handled by a true transverse period. `evaluateNative_threes_even_covers` consumes both results for the actual even outputs of every nonempty pure-3 run; [the consumer](checks/StaircaseCoverage.lean) instantiates a 200-letter word without enumerating its support.
+
 Run these checks from the sandbox repository root.
 
 ```sh
@@ -43,6 +45,7 @@ lake env lean checks/ThresholdMinimum.lean
 lake env lean checks/QuarterTurn.lean
 lake env lean checks/Native.lean
 lake env lean checks/Periods.lean
+lake env lean checks/StaircaseCoverage.lean
 sha256sum --quiet -c paper.sha256
 ```
 
@@ -62,12 +65,12 @@ The threshold ranks, band orders and concrete consumers report `[propext, Classi
 
 The exact recurrence criterion, rotation transports, and endpoint recurrence consumers report `[propext, Classical.choice, Quot.sound]`. The $1/1$ Laplacian uses `[propext, Quot.sound]`, and the birth rotation involution only `[propext]`.
 
-The constructor schedule checks, exact lattice and period proofs, kernel-checked root coverage, and endpoint odometer consumers report only `[propext, Classical.choice, Quot.sound]`.
+The constructor schedule checks, exact lattice and period proofs, kernel-checked root coverage, endpoint odometer consumers and symbolic reciprocal staircase covers report only `[propext, Classical.choice, Quot.sound]`.
 
 The bootstrap, ordered-height, alternate-midpoint, placement, initializer, Farey chronology, threshold, recurrence/rotation and native evaluator milestones landed on `main` at `4dbc1eb`, `dd24414`, `a0df1d2`, `7056241`, `d08b018`, `acea381`, `ab4c8ca`, `f2cf9be` and `2546d52`. With the worker's read-only `.git` mount, submit tested named paths via `python3 scripts/checkpoint.py request` and wait for its receipt before editing those paths again.
 
 ## Open
 
-The two headline theorems, all-word success of mixed evaluation, general plane ranks, source-specific finite-tile height comparisons, and occupied-domain period coverage away from the verified empty word remain open. The ordered height lemma does not prove the geometric comparisons of the actual shifted sources. The root and pure-word plane ranks and the general signed rank and band induction are separate obligations.
+The two headline theorems, all-word success of mixed evaluation, general plane ranks, source-specific finite-tile height comparisons, and the remaining pure and mixed occupied-domain coverage stay open. The ordered height lemma does not prove the geometric comparisons of the actual shifted sources. The root and pure-word plane ranks and the general signed rank and band induction are separate obligations.
 
-Next constructor dependencies: use the literal pure-boundary arguments to prove coverage for all nonempty pure runs, then the actual native support and height comparisons for each mixed schedule. For the plane proof, establish the literal plane initializers and connect the threshold calculation to the actual earlier harmonically conjugate parent pair, deriving its unit bounds and both signed ranks from the boundary and cut arguments.
+Next constructor dependencies: transfer the staircase covers by exact raw-mask rotations, prove the doubled-ladder covers, and then use the native support and height comparisons for each mixed schedule. For the plane proof, establish the literal plane initializers and connect the threshold calculation to the actual earlier harmonically conjugate parent pair, deriving its unit bounds and both signed ranks from the boundary and cut arguments.

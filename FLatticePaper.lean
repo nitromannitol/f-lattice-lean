@@ -5,6 +5,7 @@ import FLatticePaper.Construction.CorrectionHeight
 import FLatticePaper.Construction.Native
 import FLatticePaper.Construction.NativeCoverage
 import FLatticePaper.Construction.PlacedAssembly
+import FLatticePaper.Construction.StaircaseCoverage
 import FLatticePaper.Plane.AlternatePeriods
 import FLatticePaper.Plane.BandBurn
 import FLatticePaper.Plane.EndpointGrowth
