@@ -137,11 +137,14 @@ The smaller arithmetic critical family has an admission result in the source, a 
 
 [Harmonic.lean](FLatticePaper/GeneralK/Harmonic.lean) proves `phasePrimitive_secondDifference`, giving the phase-zero indicator. For every integer $k\ge2$ and integers $m,t$, `laplacian_harmonicField` and `quadraticGrowth_harmonicField` check the integer harmonic field of matrix $H(m/k,t)$. `add_harmonicMatrix_mem_growthSet_iff` gives translation invariance in both directions. The consumer checks admission of $A(-2/3,1/3,1/3)$ at $k=3$. The rational endpoint formula and its translation identity require the remaining classification steps.
 
+[Trace.lean](FLatticePaper/GeneralK/Trace.lean) proves `trace_le_zero_of_mem_growthSet` for arbitrary real entries and every $k\ge2$. Its comparison height has constant physical Laplacian after a harmonic-grid correction. At $k=3$ the consumer excludes all real $a>-2/3$ on the slice $b=c=1/3$, whose endpoint is attained by the checked harmonic field.
+
 The $k=2$ operator specialization is axiom-free. The interpolation, Laplacian, lift equivalence, growth and harmonic results and the consumers report only `[propext, Classical.choice, Quot.sound]`.
 
 ```sh
 export PATH="$HOME/.elan/bin:$PATH"
 lake build FLatticePaper.GeneralK.Harmonic
+lake build FLatticePaper.GeneralK.Trace
 lake build FLatticePaper.GeneralK.ColumnLift
 lake env lean checks/GeneralKColumns.lean
 ```
