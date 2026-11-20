@@ -1,0 +1,20 @@
+word="" fields=8 finite_sites=122
+word="1" fields=8 finite_sites=508
+word="2" fields=8 finite_sites=291
+word="3" fields=8 finite_sites=295
+word="11" fields=8 finite_sites=2576
+word="12" fields=8 finite_sites=1382
+word="13" fields=8 finite_sites=1382
+word="21" fields=8 finite_sites=1332
+word="22" fields=8 finite_sites=555
+word="23" fields=8 finite_sites=944
+word="31" fields=8 finite_sites=1332
+word="32" fields=8 finite_sites=948
+word="33" fields=8 finite_sites=559
+word="113" fields=8 finite_sites=7594
+word="123" fields=8 finite_sites=5114
+word="232" fields=8 finite_sites=3230
+word="323" fields=8 finite_sites=3240
+Test Summary:                                                                           | Pass  Total     Time
+Julia exact sparse versus archival dense original: every native key and absolute height |  136    136  2m38.4s
+TOTAL words=17 arrays=136 finite_sites=31404

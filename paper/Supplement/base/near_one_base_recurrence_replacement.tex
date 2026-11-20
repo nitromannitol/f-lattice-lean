@@ -1,0 +1,522 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,array,longtable,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\ind}{\mathbf1}
+\title{Doubled staircases and their near-one rotations:\\replacement base recurrence proofs}
+\author{Audited integration of the 20 October base proofs}
+\date{26 October 2026}
+\begin{document}\maketitle
+
+\begin{sloppypar}
+\paragraph{Scope and provenance.}
+The first two theorems replace Lemmas 6.15 and 6.16 of
+\texttt{revised\_version2/farey\_recursion.tex}. Their explicit ranks and
+uniform case proofs were already established in
+\path{flattice-thm13-20261019/BASE-B5-ANALYSIS.md}, section 7, and
+\texttt{BASE-B7-RANK.md}. The latter has the separate
+\texttt{BASE-B7-RANK-AUDIT.md}. The period extensions and complete
+Laplacian tables used below are prior results of
+\texttt{BASE-B5-ANALYSIS.md}, sections 1--5, and
+\texttt{BASE-B7-ANALYSIS.md}; the harmonic rotation is from
+\texttt{BASE-DUALITY-PROOF.md}. These files lie under
+\path{thm13-recurrence-agents/flattice-thm13-20261019/}.
+This is an integration of proved base results, not a new discovery or an
+arbitrary-word recurrence argument. The exact imported extension facts
+are stated below; the decreasing-rank proofs and phase transfer are
+included. The final section corrects a domain typo and a necessary phase
+convention in the rotated alternate statement, Lemma 6.10.
+\end{sloppypar}
+
+Throughout $d\ge4$ is even. Set
+\[
+ T=d^2+2d-1,\quad U=(2d,2),\quad V=(1-d,d+1),\quad L=\Z U+\Z V,
+ \quad p=(x+y)\bmod2,\quad t=x+y.
+\]
+Bit $0$ denotes the original graph: inputs are horizontal at even
+coordinate sum and vertical at odd sum. Bit $1$ reverses these choices.
+For $s=1+\Delta g\in\{0,1\}$, a forbidden set must contain both inputs
+at an occupied $s=1$ point and at least one input at an occupied $s=0$
+point. Consequently an integer rank decreasing to one input when $s=1$
+and to both when $s=0$ excludes every nonempty finite forbidden set.
+This is the forbidden-set characterization of recurrence, not a
+uniqueness or maximality hypothesis.
+
+\section*{1. Standard doubled staircase: the exact base data}
+Let $D_5$ be the integer points in
+\[
+ 2-d\le x\le2d,\quad0\le y\le d+2,\quad1\le x+y\le2d+3,
+\]
+with $y=0,x\ge d$ and $y=d+2,x\le2$ deleted, and with
+$a=(0,0)$ and $b=(d+2,d+2)$ added. Put
+\[
+ J_5=\ind_{\{x+y=d+2,\ 2\le y\le d\}\cup\{a,b\}},
+\]\[
+ g_5=-\frac{y(y-1)}2+\min(x-1,0)+\min(d+1-x,0)
+            +\max(x+y-d-2,0)+J_5.                         \tag{1}
+\]
+These are exactly the paper's standard tile and values. The prior
+extension calculation proves that $D_5$ represents every $L$ class and
+that (1) has a unique compatible integer extension with
+\[
+ g_5(z+U)-g_5(z)=0,\qquad
+ g_5(z+V)-g_5(z)=x-dy-\frac{d(d+3)}2.                       \tag{2}
+\]
+Its growth is $T^{-1}\left(\begin{smallmatrix}-1&d\\d&-d^2\end{smallmatrix}\right)$.
+For precision, the exhaustive positive overlap sources are
+\[
+\begin{array}{c|l}
+U&a;\ (1-y,y),\ 1\le y\le d-1;\ (2-d,d)\\
+V&(x,0),\ 1\le x\le d-1;\ (x,1),\ d+2\le x\le2d.
+\end{array}                                                   \tag{3}
+\]
+There are no other nonzero overlaps, up to reversing endpoints, and no
+triple classes. The tile has $2d^2+7d-3$ points; subtracting its
+$3d-1$ repeated pairs gives $2T=\det(U,V)$ classes. Thus (3), together
+with the directly substituted increments (2), also explains the covering
+and compatibility dependency without a hidden tiling assertion.
+
+The extension is binary superharmonic. Its even $s=0$ points in $D_5$
+are exactly
+\[
+\begin{split}
+ A_1&=\{(1,y):1\le y\le d-1,\ y\text{ odd}\},\\
+ A_2&=\{(d+1,y):3\le y\le d+1,\ y\text{ odd}\},\\
+ A_3&=\{(x,y):x+y=d+2,\ 2\le y\le d\}.
+\end{split}                                                   \tag{4}
+\]
+To state its odd $s=1$ points, set $w=(d+2,d+2)$ and
+\[
+\begin{split}
+ B_-={}&\{(x,1-x):2-d\le x\le-1\}
+ \cup\{(x,0):1\le x\le d-1,\ x\text{ odd}\}\\
+ &\cup\{(x,1):d\le x\le2d,\ x\text{ even}\},\qquad B_+=w-B_-,\\
+ Z_1={}&\{x+y=d+1,\ 1\le y\le d-1\},\quad
+ Z_2=\{x+y=d+3,\ 3\le y\le d+1\},\\
+ Z_3={}&\{(0,1),(d+2,d+1)\}.
+\end{split}
+\]
+The odd $s=1$ set is exactly $B_-\cup B_+\cup Z_1\cup Z_2\cup Z_3$;
+all remaining odd points have $s=0$. These complete tables include
+physical stars crossing the tile boundary. They are obtained in the
+cited base analysis by direct second differences of (1), substituting
+(2) at exits. In particular the subsequent proof imports no unproved
+statement about recurrence on embedded copies in a different field.
+
+\section*{2. Standard decreasing rank}
+Write $c=(2d,2)$, $e=(2d,1)$, $f=(d+1,d+2)$. Define $\rho_5$ on $D_5$
+by the first applicable clause:
+\[
+\begin{array}{c|l}
+\rho_5&\text{condition}\\\hline
+4&z=a\text{ or }c\\
+5&z=e\text{ or }f\\
+0&z=b\\
+p&y=0\text{ or }x\le0\\
+8+p&y=d+2,\ \text{or }y=1,x\ge d+2,\ \text{or }x\le d,t\ge d+3\\
+8(d+1-x)+p&t\le d+1\\
+8&t=d+2,\ x\in\{1,d+1\}\\
+8d&t=d+2,\ x\notin\{1,d+1\}\\
+8(2d-x)+p&t\le2d+1\\
+8&t=2d+2\\
+1&t=2d+3.
+\end{array}                                                    \tag{5}
+\]
+The clauses cover $D_5$. On the successive $U$ overlaps in (3), the
+paired values are $4$, $1$, and $0$. On the bottom $V$ overlaps they
+are $p$; on the row-one $V$ overlaps they are $8+p$, except for the last
+pair $e,f$, where they are $5$. Therefore $\rho_5$ extends periodically.
+
+\begin{theorem}[Replacement for Lemma 6.15]
+For every even $d\ge4$, the extension (1)--(2) is integer superharmonic
+and recurrent. The rank $R_5(x,y)=6x+\rho_5(x,y)$ decreases by at least
+one to both inputs at $s=0$ and to one specified input at $s=1$.
+\end{theorem}
+\begin{proof}
+For even $s=0$ points, the two differences
+$R_5(\text{input})-R_5(\text{center})$, in left--right order, are
+\[
+\begin{array}{c|c}
+A_1&-6+1-8d,\ -1\\
+A_2,\ y\le d-1&3-8(d-1),\ -1\\
+(d+1,d+1)&-5,\ -1\\
+A_3,\ x\le d-1&11-8x,\ 15-8d\\
+A_3,\ x=d&11-8d,\ -1.
+\end{array}                                                    \tag{6}
+\]
+All are negative, and all these inputs lie inside the tile.
+For even $s=1$ points use the following exhaustive ordered list, after
+removing (4). Each chosen move has difference at most $-1$.
+\[
+\begin{array}{l|c|c}
+\text{center}&\text{move}&\text{difference}\\\hline
+ a,c,b,(2-d,d)&\text{left}&-1\\
+ x\le0\text{ otherwise}&\text{left}&-5\\
+ y=0,\ 2\le x\le d-2&\text{left}&-5\\
+ y=d+2,\ 4\le x\le d&\text{left}&-5\\
+ y=1,\ d+3\le x\le2d-1&\text{left}&-5\\
+ x\ge2,\ y\ge1,\ t\le d&\text{right}&-1\\
+ (1,d+1)&\text{left}&-13\\
+ (d+1,1)&\text{left}&-5\\
+ x\le d,\ y\le d+1,\ t\ge d+4&\text{left}&-5\\
+ x\ge d+2,\ y\ge2,\ t\le2d&\text{right}&-1\\
+ t=2d+2,\ x\ge d+2,\ y\ge3&\text{right}&-1.
+\end{array}                                                    \tag{7}
+\]
+The only outside chosen inputs are the left input of $a$, represented
+by $(2d-1,2)$ with correction $9$, and the left input of $(2-d,d)$,
+represented by $f$ with correction $5$. Actual input coordinates,
+not representative coordinates, are used in the linear term $6x$.
+Exhaustiveness follows by first removing the exceptional points, the
+nonpositive region and the bottom/top/shelf rows. The remaining even
+sums are $t\le d$, $t=d+2$, and $t\ge d+4$; the last region splits at
+$x=d$, with spine $x=d+1$ already in (4).
+
+Every odd $s=0$ point has both inputs inside $D_5$. There are four
+possibilities. If $x\le0$, its correction is $1$ and both inputs have
+correction zero; the only exceptional possible input $a$ would require
+center $(0,1)$, which has $s=1$. In the left high region, the center
+correction is $8(d+1-x)+1$ and both inputs have correction at most
+$8(d+1-x)$. The only $s=0$ center on $t=d+1$ is $(1,d)$; its upper
+input has correction $8\le8d$. In the middle region, an odd $s=0$
+center has $t\ge d+5$, correction $9$, and both input corrections $8$.
+In the right high region its correction is $8(2d-x)+1$ and both inputs
+have correction at most $8(2d-x)$; the possible shelf or diagonal input
+has correction $8$, with $x\le2d-1$. The exceptional point $c$ cannot
+be such an input. Thus both vertical rank differences are negative.
+
+For odd $s=1$ points the following table supplies a correction exactly
+one smaller. Entries are read in order. The two repetitions
+$B_-\cap Z_1=\{(d,1)\}$ and $B_+\cap Z_2=\{(2,d+1)\}$ are omitted
+from the later diagonal rows.
+\begin{center}\small
+\begin{longtable}{lcl}
+center&move&outside representative, when required\\\hline
+$(x,1-x),\ 2-d\le x\le-1$&up&\\
+$(x,0),\ x\text{ odd},\ 1\le x\le d-1$&down&$(x+1-d,d)$\\
+$(d,1)$&down&$(1,d+1)$\\
+$(x,1),\ x\text{ even},\ d+2\le x\le2d-2$&down&$(x+1-d,d+1)$\\
+$e$&up&\\
+$t=2d+3,\ d+3\le x\le2d$&up&$(x-2d,y-1)$\\
+$(x,d+2),\ x\text{ odd},\ 3\le x\le d-1$&down&\\
+$f$&up&$c$\\
+$(x,d+1),\ x\text{ even},\ 2-d\le x\le0$&down&\\
+$(2,d+1)$&up&$(d+1,1)$\\
+$Z_1\setminus\{(d,1)\}$&down&\\
+$Z_2\setminus\{(2,d+1)\}$&up&\\
+$(0,1),(d+2,d+1)$&up&
+\end{longtable}\end{center}
+The correction differences follow immediately from (5). These are all
+odd $s=1$ points by the displayed exact classification. Periodicity
+transports every physical star inequality to the plane. A minimal-rank
+point of a finite nonempty forbidden set now gives a contradiction.
+\end{proof}
+
+\section*{3. Alternate doubled staircase: the exact base data}
+Let $D_7$ be the integer points in
+\[
+ 1-d\le x\le2d-2,\quad-1\le y\le d+2,\quad-1\le x+y\le2d+1,
+\]
+with $y\le0,x\ge d$ and $y\ge d+1,x\le-1$ deleted, and with
+$a=(-1,-1)$, $b=(d,d+2)$ added. Put
+\[
+ J_7=\ind_{\{x+y=d,\ 1\le x\le d-2\}\cup\{a,b\}},
+\]\[
+ g_7=-\frac{y(y+1)}2+\min(x,0)+\min(d-1-x,0)
+                  +\max(x+y-d,0)+J_7.                     \tag{8}
+\]
+These agree literally with the paper's alternate tile and heights.
+The prior complete extension proof gives
+\[
+ g_7(z+U)-g_7(z)=-1,\qquad
+ g_7(z+V)-g_7(z)=x-dy-\frac{d^2+5d-2}{2},                 \tag{9}
+\]
+and growth $M(1,d)$. The exhaustive positive overlap sources are
+\[
+\begin{array}{c|l}
+U&(-1-y,y),\ 1\le y\le d-2\\
+V&(j,-1),\ 0\le j\le d-1;\ (d-1,0);\ (j,1),\ d-1\le j\le2d-2\\
+U+V&a.
+\end{array}                                                   \tag{10}
+\]
+Only these vectors and their negatives occur. There are no triple classes:
+a possible triangle would contain the unique $U+V$ pair $a,b$, but both
+candidate third points are outside the tile. The tile has $2d^2+7d-2$
+points and $3d$ repeated pairs, hence represents all $2T$ classes.
+Substitution in (8) gives (9) on all overlaps. These facts justify the
+compatible extension independently of any recurrence assertion.
+
+The exact binary Laplacian table has the even $s=0$ set
+\[
+ \{x=0,\ 0\le y\le d-2\}\ \cup\
+ \{x=d-1,\ 3\le y\le d+1\}\ \cup\
+ \{x+y=d,\ 1\le x\le d-2\},                              \tag{11}
+\]
+with even parity imposed. The odd $s=1$ set comprises the following
+disjoint lists, with odd parity imposed:
+\[
+\begin{array}{ll}
+y=-1,\ 0\le x\le d-2;&y=d+2,\ 1\le x\le d-1;\\
+x+y=-1,\ 1\le y\le d-2;&x+y=2d+1,\ d+1\le x\le2d-2;\\
+y=1,\ d\le x\le2d-2;&y=d,\ 1-d\le x\le-1;\\
+x+y=d-1\text{ or }d+1,\ 1\le x\le d-2;&(-1,0),(d,d+1).
+\end{array}                                                   \tag{12}
+\]
+All remaining even points have $s=1$, and remaining odd points $s=0$.
+The imported proof of (11)--(12) uses the ordinary second differences
+of (8), its even correction points and the full boundary-exit table,
+with (9) supplying every outside value. It covers $d=4$, where the
+middle range of the row table is empty.
+
+\section*{4. Alternate decreasing rank}
+Define $\rho_7$ by these disjoint regions in $D_7$:
+\[
+\begin{array}{c|l|l}
+\text{region}&\text{condition}&\rho_7\\\hline
+C&z=a\text{ or }b&4\\
+E&z=(d,d+1)&5\\
+T_0&y=d+2,\ 0\le x\le d-1&8(d-x)+p\\
+S&y=d+1,\ 0\le x\le d-1&8d-4x+p\\
+B&x+y=2d,\ d\le x\le2d-2&8\\
+D_0&x+y=d,\ 1\le x\le d-2&8(d+y)-4\\
+L_0&x\ge0,\ y\ge0,\ x+y\le d-1&8(2d-1-x)+p\\
+R_0&x\ge d-1,\ 1\le y\le d,\ x+y\le2d-1&8(2d-1-x)+p\\
+M&1\le x\le d-2,\ y\le d,\ x+y\ge d+1&8d-4x+p\\
+Z&\text{all other points}&p.
+\end{array}                                                    \tag{13}
+\]
+On the $U$ overlaps both corrections are $1$. The bottom-row $V$
+overlaps join two $Z$ points, with correction $p$; the isolated $V$
+pair joins $(d-1,0)$ to $(0,d+1)$, both of correction $8d+1$.
+The row-one $V$ pairs join $R_0$ to $T_0$, with common correction
+$8(2d-1-j)+p$. The $U+V$ pair has correction $4$.
+Thus (10) gives a well-defined periodic extension of $\rho_7$.
+
+\begin{theorem}[Replacement for Lemma 6.16]
+For every even $d\ge4$, the extension (8)--(9) is integer superharmonic
+and recurrent. The rank $R_7(x,y)=6x+\rho_7(x,y)$ has the same one/both
+decreasing-input property as $R_5$.
+\end{theorem}
+\begin{proof}
+At the even $s=0$ points of (11), the left--right rank differences are
+\[
+\begin{array}{c|c}
+x=0&3-16d,\ -1\\
+x=d-1,\ y\le d-1&3-4d,\ -1\\
+(d-1,d+1)&-1,\ 7-4d\\
+x+y=d,\ x\le d-3&-1,\ 4x-8d+7\\
+(d-2,2)&-1,\ -5.
+\end{array}                                                    \tag{14}
+\]
+They are strictly negative even at the minimum parameter $d=4$.
+For even $s=1$ points choose left in $C,S,M,Z$ and right in
+$T_0,B,L_0,R_0$. There are no such points in $D_0$, and $E$ is odd.
+In each high region the difference is $-1$; in $Z$ it is $-5$, except
+at the sole left exit $(1-d,d-1)$, where it is $-1$.
+The complete outside choices are: from $a$, its left input is represented
+by $(2d-2,1)$ with correction $9$; from $(2d-2,2)$ in $B$, its right
+input is represented by $(-1,0)$ with correction $1$; and the just
+mentioned $Z$ exit is represented by $E$, with correction $5$.
+At $b$ the left correction is $9$. The region inequalities ensure that
+all other chosen inputs stay in their stated region. For example even
+$M$ points satisfy $x\ge2$, so their left input remains in $M$.
+
+Odd $s=0$ points lie only in $S,L_0,R_0,M,Z$. In $S$, their correction
+is $8d-4x+1$. At $x=0$ the lower and upper corrections are $0,8d$;
+at $x\ge2$ they are $8d-4x,8d-8x$, both smaller. In $L_0$ put
+$H=16d-8-8x$. Every $s=0$ center has correction $H+1$ and its inputs
+are $L_0$ of correction $H$, $Z$ of correction zero, or $(d-1,1)$ of
+correction $H=8d$. A possible transition to $D_0$ would lie on the
+excluded $s=1$ diagonal in (12).
+In $R_0$ the same $H$ applies. An odd $s=0$ point has $y\ge2$; the
+lower input has correction $H$. Its upper input has correction $H$
+unless it crosses to $B$, of correction $8\le H$, or to $(d-1,d+1)$
+in $S$, of correction $4d+4\le8d=H$. The former inequality uses
+$x\le2d-3$, forced by $y\ge2$ and odd sum at most $2d-1$.
+In $M$, excluding the $s=1$ diagonal gives $x+y\ge d+3$, so both inputs
+are in $M$ or $S$ with correction $8d-4x$, one less than the center.
+Finally, an odd $Z$ point with $s=0$ has $x<0$, $1\le y\le d-1$;
+(12) excludes every exit and exceptional neighbor. Both inputs have
+correction zero, one less than its correction $1$.
+
+The odd $s=1$ cases are exactly these choices; every chosen correction
+is one less, and every move is vertical:
+\begin{center}\small
+\begin{longtable}{lcl}
+center&move&outside representative, when required\\\hline
+$E=(d,d+1)$&up&\\
+$T_0:\ y=d+2,\ x\text{ odd},\ 1\le x\le d-1$&up&$(x+d-1,2)$\\
+$L_0:\ x+y=d-1,\ 1\le x\le d-2$&down&\\
+$R_0:\ y=1,\ x\text{ even},\ d\le x\le2d-2$&up&\\
+$M:\ x+y=d+1,\ 1\le x\le d-2$&up&\\
+$Z:\ y=-1,\ x\text{ even},\ 0\le x\le d-2$&down&$(x+1-d,d-1)$\\
+$Z:\ x+y=-1,\ 1\le y\le d-2$&up&\\
+$Z:\ x+y=2d+1,\ d+1\le x\le2d-2$&up&$(x-2d,y-1)$\\
+$Z:\ y=d,\ x\text{ odd},\ 1-d\le x\le-1$&down&\\
+$Z:\ (-1,0)$&up&
+\end{longtable}\end{center}
+These statements follow by substitution in (13), including all endpoints.
+For example the last odd $T_0$ point maps to a $B$ representative of
+correction $8$, while the others map to $R_0$; and the first $M$
+diagonal point moves into $S$ with the same stated correction.
+Periodicity extends all inequalities globally. The minimal-rank
+forbidden-set argument proves recurrence.
+\end{proof}
+
+\section*{5. Stronger directional consequences and endpoints}
+The corrections satisfy
+\[
+ 0\le\rho_5\le8d+1,\qquad 0\le\rho_7\le16d-7.
+\]
+Thus neither field admits a nonempty forbidden set whose $x$ coordinate
+is bounded below, even if the set is infinite. For a domain of finite
+horizontal span $W$, synchronous burning from its complement finishes
+within $6W+8d+2$ rounds for B5, and $6W+16d-6$ for B7. Indeed the
+integer rank range has that length minus one, and a point surviving
+$t$ rounds forces a decreasing sequence of length $t$ inside the domain.
+This also applies to an infinite vertical strip.
+
+No formula here asserts B5 or B7 at $d=2$. In the actual algorithm the
+$1/2$ outputs belong to the separately defined B2/B4 families (duals of
+the $d=3$ ordinary staircases); the near-one value at $d=2$ is $1/3$,
+already covered by the ordinary staircase theorem. The minimum doubled
+parameter is $d=4$; every interval and inequality above is valid there.
+The correspondence to pure words is $d=2k+2$ with $k\ge1$.
+
+\section*{6. Harmonic rotation, with the physical phase retained}
+Set
+\[
+ \mathcal R(x,y)=(y,-x),\qquad
+ K(X,Y)=\frac{X(X-1)}2-\left\lfloor\frac{(X-Y)^2}{4}\right\rfloor,
+ \qquad H=\frac12\begin{pmatrix}1&1\\1&-1\end{pmatrix}.
+\]
+Writing $p=(X+Y)\bmod2$ gives
+$4K=X^2+2XY-Y^2-2X+p$. At an odd center the horizontal second
+difference is $1/2-1/2=0$; at an even center the vertical one is
+$-1/2+1/2=0$. Hence $K$ is harmonic on bit $1$, with growth matrix $H$.
+An even translation after $\mathcal R$ preserves coordinate parity,
+whereas the rotation interchanges horizontal and vertical directions.
+It is therefore a directed graph isomorphism from bit $0$ to bit $1$,
+not from bit $0$ to itself.
+
+Define, in formula coordinates,
+\[
+\begin{split}
+ F_6(X,Y)&=g_5(2d+1-Y,X+1)+K(X,Y),\\
+ F_8(X,Y)&=g_7(2d-1-Y,X+1)+K(X,Y)+X+1.
+\end{split}                                              \tag{15}
+\]
+The translation vectors in these rotations are $(-1,2d+1)$ and
+$(-1,2d-1)$, both even. Thus $\Delta_1F_i$ is the corresponding
+$\Delta_0g_j$ composed with the inverse rotation. Affine additions and
+$K$ do not change this identity, so the complete forbidden-set rule,
+including both incoming alternatives, is transported bijectively.
+Consequently $F_6,F_8$ are recurrent superharmonic functions on bit $1$.
+The ranks are exactly $R_j$ composed with the same inverse maps;
+their linear parts are $-6Y$ plus constants.
+
+The target fraction is $r^*=(d-1)/(d+1)$, already reduced for even $d$.
+Its periods and directional slope are
+\[
+ U^*=(d+1,d-1)=\mathcal R V,\qquad
+ V^*=(-2,2d)=-\mathcal R U,\qquad a^*=(d-1,-d-1).
+\]
+Direct substitution in (2), (9), and (15) gives
+\[
+\begin{array}{c|cc}
+&F_i(z+U^*)-F_i(z)&F_i(z+V^*)-F_i(z)\\\hline
+F_6&0&a^*\!\cdot z+1-T\\
+F_8&0&a^*\!\cdot z-T.
+\end{array}                                                   \tag{16}
+\]
+The matrix identity
+$M(r^*)=\mathcal R M(1,d)\mathcal R^T+H$ proves the required growth.
+The affine rotation bijects quotient classes and tile representatives,
+so covering and uniqueness transfer with these specified increments.
+To obtain functions on the original physical graph put
+\[
+ G_i(x,y)=F_i(x+1,y).                                       \tag{17}
+\]
+Translation by $(1,0)$ reverses parity without interchanging axes:
+$\Delta_0G_i(z)=\Delta_1F_i(z+(1,0))$. It is a graph isomorphism
+between these two phases, so $G_6,G_8$ are integer superharmonic and
+recurrent on the original graph. Their native domains are those of
+$F_i$ shifted by $-(1,0)$; growth is unchanged. Their $U^*$ constants
+remain zero, while their $V^*$ constants are respectively
+$1-d^2-d$ and $-d^2-d$. This is a convenient physical representative. The literal lower-left
+placement instead uses $F_i(z+(0,1))$; it differs from (17) by the
+even translation $(1,-1)$ and has the same recurrence and growth.
+The transformed ranks exclude nonempty forbidden
+sets with $y$ bounded above, and give the same strip bounds using
+vertical span. No parity-changing operation has been silently treated
+as a symmetry of the original graph.
+
+\section*{7. Corrected rotated alternate statement and an exact source typo}
+The following is the precise extension-and-recurrence portion of a
+corrected Lemma 6.10, label \texttt{lemma:basecase\_2k\_even\_alt}.
+It does not separately certify that lemma's boundary-word assertion.
+For every even $d\ge4$ define
+\[
+\begin{split}
+ A^*&=\{(-2,2d),(d+1,d-1)\},\\
+ B^*&=\{(X,Y):Y-X=d,\ 0<X<d-1\},\\
+ C^*&=\{(X,Y):-2\le X\le d+1,\ 1\le Y\le3d-2,
+                         \ -1\le Y-X\le2d+1\},\\
+ D^*_{\rm del}&=\{X\le-1,\ Y\le d-1\}
+                  \cup\{X\ge d,\ Y\ge2d\},\\
+ \widehat D^*&=(A^*\cup B^*\cup C^*)\setminus D^*_{\rm del}.
+\end{split}                                                   \tag{18}
+\]
+There is a unique integer function $F_8$ with native values
+\[
+ -\left\lfloor\frac{(Y-X)^2}{4}\right\rfloor
+ +\min(d-Y,0)+\min(2d-1-Y,0)+\max(Y-X-d,0)
+ +\ind_{A^*\cup B^*}                                       \tag{19}
+\]
+and the specified periods (16). It is superharmonic and recurrent on
+bit $1$; $G_8$ in (17) is so on the original bit $0$ graph.
+
+To verify the domain and values, substitute
+$(x,y)=(2d-1-Y,X+1)$ in (8). The lower deleted strip
+$y\le0,x\ge d$ becomes $X\le-1,Y\le d-1$, and the upper one
+becomes $X\ge d,Y\ge2d$. The rectangle, diagonal band, correction
+line and corners become exactly (18). The elementary identities
+$\min(-a,0)-\min(a,0)=-a$ and
+$\max(a,0)-\max(-a,0)=a$ give (19) from (15).
+This proves the corrected statement using the already established
+extension and rank, with specified constants rather than an unspecified
+periodicity condition.
+
+The paper's line 2497 instead uses $Y\le d+1$ in the first deleted
+strip. This removes valid points: for every even $d\ge4$, the point
+$(-1,d)$ belongs to (18), and maps to the valid B7 point $(d-1,0)$.
+It is not one of the exceptional corners, so the wrong deletion cannot
+be repaired by re-adding a corner. The exact correction is
+$Y\le d+1\longrightarrow Y\le d-1$ in that strip.
+The same original statement also has an unhatted $g_{q_1}(x)$ on the
+right of its alternate periodicity equation; the corrected equation
+must use the same alternate function on both sides, as in (16).
+
+The phase correction is substantive. Put $d=2m$. At the three points
+$(-1,d),(0,d),(1,d)$, formula (19) has values
+\[
+ -m^2-m+1,\qquad -m^2,\qquad -m^2+m.
+\]
+Their horizontal second difference is $+1$ at the even center $(0,d)$.
+Thus the unshifted formula is not superharmonic on the original bit $0$
+graph, for any permitted $d$. It is correct on bit $1$, and the explicit
+odd translation (17) fixes the physical phase. At the smallest parameter
+$d=4$ the values are $-5,-4,-2$, making the defect concrete.
+
+\begin{sloppypar}
+The inventory identifiers of the recurrence replacements remain
+Lemma 6.15, \texttt{lemma:doubled-staircase-recurrent}, and Lemma 6.16,
+\texttt{lemma:doubled-alt-staircase-recurrent}; their stated fractions,
+parameters and bit-$0$ formulas require no change. The auxiliary defect
+belongs to Lemma 6.10, not to those two statements. None of these base
+proofs establishes the final general recurrence argument's hereditary
+column claims or a safe rule for using a parent rank across a child seam.
+\end{sloppypar}
+\end{document}

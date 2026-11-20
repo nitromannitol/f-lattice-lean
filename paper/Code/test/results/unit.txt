@@ -1,0 +1,6 @@
+Test Summary:                                                            | Pass  Total  Time
+No coordinate clipping, no floating arithmetic, no silent disjoint joins |   13     13  0.0s
+Test Summary:                                                   | Pass  Total  Time
+Archived original Julia TSVs: whole support and absolute height |   32     32  0.5s
+Test Summary:                              | Pass  Total  Time
+constructor dispatch and saved-state smoke |  252    252  0.5s

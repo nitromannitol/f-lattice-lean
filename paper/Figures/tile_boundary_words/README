@@ -1,0 +1,4 @@
+these correspond to the four degenerate base case tiles 
+3^k 2^k and even and odd child. e.g. 3_(5)_o is the odd child for the string 33333:
+
+3_5_b is 3_5_o modified to include the boundary word

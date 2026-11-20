@@ -1,0 +1,2561 @@
+--- a/farey_recursion.tex
++++ b/farey_recursion.tex
+@@ -1,6 +1,7 @@
+ \documentclass[12pt]{amsart}
+ \usepackage{fullpage,graphicx,psfrag,amsmath,amsfonts,verbatim, amssymb, hyperref, caption, subcaption, tikz,enumitem,longtable}
+ 
++\hypersetup{pdftitle={Integer superharmonic matrices on the F-lattice},pdfauthor={Ahmed Bou-Rabee}}
+ \bibliographystyle{alpha}
+ \input defs.tex
+ 
+@@ -12,7 +13,7 @@
+ 	
+ 	
+ 	\begin{abstract}
+-	We prove that the set of quadratic growths achievable by integer superharmonic functions on the $F$-lattice, a periodic subgraph of $\Z^2$ with oriented edges, has the structure of an overlapping circle packing. The proof recursively constructs a distinct pair of recurrent functions for each rational point on a hyperbola. This proves a conjecture of Smart (2013) and completely describes the scaling limit of the Abelian sandpile on the $F$-lattice.
++	We prove that the set of quadratic growths achievable by integer superharmonic functions on the $F$-lattice, a periodic subgraph of the square lattice with oriented edges, has the structure of an overlapping circle packing. The proof recursively constructs a distinct pair of recurrent functions for each rational point on a hyperbola. This proves a conjecture of Smart (2013) and completely describes the scaling limit of the Abelian sandpile on the $F$-lattice.
+ 		
+ 		
+ 	\end{abstract}
+@@ -20,7 +21,12 @@
+ 	
+ 	
+ 	\section{Introduction}
+-	The $F$-lattice is a directed, periodic, planar graph $(\Z^2, E)$, where
++	\begin{figure}
++		\input{tikz/flattice_2.tikz}
++		\caption{A $5 \times 5$ section of the $F$-lattice}
++	\end{figure}
++	
++	The $F$-lattice is a directed periodic planar graph $(\Z^2, E)$, where
+ 	\[
+ 	\begin{cases}
+ 	(x \pm e_1,x) \in E &\mbox{ if $x_1 + x_2  \equiv 0 \pmod 2$} \\
+@@ -31,8 +37,8 @@
+ 	\begin{equation} \label{eq:superharmonic}
+ 	\Delta g(x) := \sum_{(y,x) \in E} (g(y) - g(x)) \leq 0,
+ 	\end{equation}
+-	for all $x \in \Z^2$. Let $S_2$ denote the set of $2 \times 2$ symmetric matrices. The {\it quadratic growth} of $g$ 
+-	is specified by $A \in S_2$, 
++	for all $x \in \Z^2$.  When it exists, the {\it quadratic growth} of $g$ 
++	is specified by a $2 \times 2$ symmetric matrix $A \in S_2$, 
+ 	\begin{equation} \label{eq:quadratic_growth}
+ 	g(x) = \frac{1}{2} x^T A x + o(|x|^2).
+ 	\end{equation}
+@@ -41,22 +47,21 @@
+ 	\begin{equation}
+ 	\sup_{X} (g - f) \leq \sup_{\partial X} (g - f),
+ 	\end{equation}
+-	where $\partial X = \{ y \in \Z^2 : \mbox{there is $x \in X$ with $(y,x) \in E$}\}$. 
++	where $\partial X = \{ y \in \Z^2 \setminus X : \mbox{there is $x \in X$ with $(y,x) \in E$}\}$. 
+ 	We call an integer superharmonic representative of $A$ which is recurrent an {\it odometer} 
+ 	for $A$. 
+ 	
+ 		
+-	\begin{figure}[!ht]
+-		\input{tikz/flattice_2.tikz}
+-		\caption{A $5 \times 5$ section of the $F$-lattice}
+-	\end{figure}
++
+ 	
+ 	In this article we demonstrate an explicit characterization of integer superharmonic matrices on the $F$-lattice
+ 	via a recursive construction of their odometers.
+ 
+ 
+ 	\subsection{Background}
+-	Any periodic Euclidean directed graph, $(V, E)$, defines a set of integer superharmonic matrices. The study of these matrices was initiated by Pegden and Smart \cite{pegden2013convergence} in the context of the Abelian sandpile model of Bak, Tang and Wiesenfeld and Dhar  \cite{bak1987self, dhar1990self}.
++		A {\it periodic Euclidean graph} is a graph embedded into $\R^d$ such that there exists a basis of $\R^d$
++		whose translations leave the graph unchanged.  Any such graph, $(V, E)$, defines a set of integer superharmonic matrices.   
++	The study of these matrices was initiated by Pegden and Smart \cite{pegden2013convergence} in the context of the Abelian sandpile model of Bak, Tang and Wiesenfeld and Dhar  \cite{bak1987self, dhar1990self}.
+ 	We briefly describe the model, 	referring the interested reader to the surveys \cite{redig2005mathematical, holroyd2008chip, jarai2018sandpile} and books
+ 	\cite{klivans2018mathematics, corry2018divisors}.
+ 	
+@@ -67,10 +72,17 @@
+ 	
+ 	Levine-Pegden-Smart's proof in \cite{levine2017apollonian} involved explicitly constructing an odometer
+ 	for each circle in an Apollonian band packing.  Their construction mirrored the Soddy recursive generation 
+-	of Apollonian circle packings - it pieced together later odometers from earlier ones. Our strategy in this article is similar but with several key differences which we detail in Section \ref{sec:proof_overview}. 
+-
++	of Apollonian circle packings - it pieced together later odometers from earlier ones. In this article, we also recursively construct
++	odometers, but the recursion follows rational points on a hyperbola rather than curvatures in an Apollonian packing.
++	Our choice of lattice also highlights several other coincidences which occur for $\Z^2$ and forces us to develop 
++	 new proof techniques which may generalize.  We discuss these possible generalizations in Section \ref{subsec:fk_lattice}  and provide a detailed proof overview in Section \ref{sec:proof_overview}.
++		
++
++
++
++	
+ 	The patterns which appear in $s_n$ on the $F$-lattice have also been investigated by mathematical physicists
+-	with notable contributions made by Caracciolo, Paoletti, and Sportiello \cite{caracciolo2008explicit, paoletti2012deterministic} and Dhar, Sadhu, Chandra \cite{dhar2009pattern, dhar2013sandpile, sadhu2010pattern, sadhu2011effect}. This article provides a new perspective on their results. For example, the patterns which appear in their experiments correspond empirically to the Laplacians of our constructed odometers. In fact, an immediate consequence of Theorems \ref{theorem:circle_packing} and \ref{theorem:hyperbola} is that the weak-* limit 
++	with notable contributions made by Caracciolo, Paoletti, Sportiello \cite{caracciolo2008explicit, paoletti2012deterministic} and Dhar, Sadhu, Chandra \cite{dhar2009pattern, dhar2013sandpile, sadhu2010pattern, sadhu2011effect}. This article provides a new perspective on their results. For example, the patterns which appear in their experiments correspond empirically to the Laplacians of our constructed odometers. In fact, an immediate consequence of Theorems \ref{theorem:circle_packing} and \ref{theorem:hyperbola} is that the weak-* limit 
+ 	of the sandpile identity on ellipsoidal domains is constant \cite{melchionna2020sandpile}. We leave open, but expect that these results can also be used to construct more elaborate sandpile fractals as in \cite{levine2016apollonian}. Moreover, it is a difficult open problem 
+ 	to construct the weak-* limit of the single-source sandpile on the square lattice. It would be interesting to see if the relatively simple structure of the sandpile PDE here can be used to make progress on this for the $F$-lattice.
+ 	 
+@@ -85,7 +97,7 @@
+ \end{theorem}
+   	We explain the connection to circles.  
+ 	Denote the set of integer superharmonic matrices on the $F$-lattice by $\Gamma_F$. 
+-	The boundary of $\Gamma_F$ may be viewed as a surface by taking the parameterization $M: S_2 \to \R^3$,
++	The boundary of $\Gamma_F$ may be viewed as a surface by taking the parameterization $M: \R^3 \to S_2$,
+ 	\[
+ 	M(a,b,c) := \frac{1}{2} \begin{bmatrix} c+a & b \\ b & c-a \end{bmatrix}.
+ 	\]
+@@ -131,7 +143,7 @@
+ 	
+ 	
+ 	\begin{figure}
+-		\includegraphics[width=0.5\textwidth]{Figures/flattice_hyperbola_outline_redo.png}
++		\includegraphics[width=0.5\textwidth]{Figures/flattice-hyperbola.png}
+ 		\caption{The first three iterations of the hyperbola recursion defined in Section \ref{sec:hyperbola}. The two visible hyperbolas are outlined by dashed lines.} \label{fig:f_recursion}
+ 	\end{figure}
+ 
+@@ -148,36 +160,36 @@
+ 	and which have periodic Laplacians. However, the $F$-lattice is not transitive.  In particular, if $h:\Z^2 \to \Z$ is $L(n,d)$ periodic, then $\Delta h$ may not be $L(n,d)$ periodic unless its period is even. To circumvent this, we must pass to a sub-lattice by doubling along the kernel of $M(n,d)$. 
+ 	We show in Section \ref{sec:hyperbola} that $L(n,d)$ is equal to the integer span of 
+ 	\begin{equation}
+-	v_{n/d, 1} := \begin{bmatrix} d  \\ n \end{bmatrix}
++	\mathfrak{v}_{n/d, 1} := \begin{bmatrix} d  \\ n \end{bmatrix}
+ 	\qquad
+-	v_{n/d,2}  := \begin{bmatrix} n -d \\ n + d \end{bmatrix},
+-	\end{equation}
+-	and $v_{n/d,1}$ generates the kernel of $M(n,d)$. 
++	\mathfrak{v}_{n/d,2}  := \begin{bmatrix} n -d \\ n + d \end{bmatrix},
++	\end{equation}
++	and $\mathfrak{v}_{n/d,1}$ generates the kernel of $M(n,d)$. 
+ 	Our modified lattice is 
+ 	\begin{equation}
+ 	L'(n,d) = 
+ 	\begin{cases}
+ 	L(n,d) &\mbox{if $(n+d)$ is even } \\
+-	2 \Z v_{n/d,1} + \Z v_{n/d,2}  &\mbox{if $(n+d)$ is odd}.
++	2 \Z \mathfrak{v}_{n/d,1} + \Z \mathfrak{v}_{n/d,2}  &\mbox{if $(n+d)$ is odd}.
+ 	\end{cases}
+ 	\end{equation}
+ 	We then derive Theorem \ref{theorem:hyperbola} from the following. 
+ 	\begin{theorem} \label{theorem:odometers}
+-	For each reduced fraction $0 < n/d < 1$ there exists two distinct odometers 
+-	$g_{n,d}, \hat{g}_{n,d}$ both of which satisfy the periodicity condition
++	For each reduced fraction $0 < n/d < 1$ there exist two distinct odometers 
++	$g_{n,d}, \hat{g}_{n,d}$ with quadratic growth $M(n,d)$ both of which satisfy the periodicity condition
+ 	\begin{equation}\label{eq:periodicity}
+-	g(x + v) = g(x) + x^T M(n,d) x + c_v
+-	\end{equation}
+-	for all $v \in L'(n,d)$ where $c_v$ is a constant depending on $v$.
++	g(x + v) = g(x) + x^T M(n,d) v + c_v
++	\end{equation}
++	for all $v \in L'(n,d)$ where $c_v$ depends on $v$ and on the odometer. The two odometers do not differ by an integer affine function in these coordinates.
+ 	\end{theorem}
+-	As in \cite{levine2017apollonian}, the periodicity condition \eqref{eq:periodicity} implies that $g_{n,d}$ and $\hat{g}_{n,d}$ 
++	As in \cite{levine2017apollonian}, superharmonicity together with \eqref{eq:periodicity} implies that $g_{n,d}$ and $\hat{g}_{n,d}$ 
+ 	are each integer superharmonic representatives for $M(n,d)$. Moreover, integer superharmonic matrices with odometers are on $\partial \Gamma_F$. Indeed, if $g$ were recurrent but not on the boundary of $\Gamma_F$ there would exist an integer superharmonic $f \geq g + \delta |x|^2$ for some $\delta > 0$. However, on the boundary of 
+ 	a lattice ball of radius $n$, $B_n$, $\sup_{\partial B_n} (g-f) \leq -n \delta$ for all $n$ sufficiently large, contradicting the definition of recurrent as $\sup_{B_n}(g - f) \geq g(0) - f(0)$, a constant. 
+ 		
+ 	\begin{figure}
+ 		\includegraphics[width=0.35\textwidth]{Figures/tiling_2_5.png}
+ 		\includegraphics[width=0.35\textwidth]{Figures/alt_tiling_2_5.png}
+-		\caption{One $L'(2,5)$ period of $\Delta g_{2,5}$ and $\Delta \hat{g}_{2,5}$. White and black are values of 0 and 1 respectively.
++		\caption{One $L'(2,5)$ period of $\Delta g_{2,5}$ and $\Delta \hat{g}_{2,5}$. The two Laplacian values are $0$ and $-1$.
+ 		These are used to construct the odometers seen in Figure \ref{fig:need_two_odometers}. }
+ 		\label{fig:standard_and_alternate}
+ 	\end{figure}
+@@ -193,7 +205,6 @@
+ 	
+ 	
+ 	
+-	\bibliographystyle{alpha}
+  
+ 
+ 
+@@ -201,12 +212,9 @@
+ 
+ 
+ \subsection{Kleinian bugs} \label{subsec:fk_lattice}
+-We briefly mention a connection and possible extensions of this work.  The overlapping circle packing in Figure \ref{fig:overlapping_packing} is an example of an object recently coined 
+-as a {\it Kleinian bug} \cite{kapovich2021superintegral}. Kleinian bugs may be thought of as a generalization
+-of Apollonian circle packings in which circles are allowed to have prescribed overlaps. In particular, 
+-the Appolonian band packing from \cite{levine2017apollonian} is a Kleinian bug. 
+-An important aspect of \cite{levine2017apollonian} is an analogue of Descartes rule 
+-for integer superharmonic functions - Kleinian bugs share a similar rule. 
++We briefly mention a connection and possible extensions of this work.  The overlapping circle packing in Figure \ref{fig:overlapping_packing} is an object known as a {\it Kleinian bug} \cite{kapovich2021superintegral}. Kleinian bugs were recently introduced by Kapovich-Kontorovich \cite{kapovich2021superintegral} and generalize Apollonian circle packings.
++An important aspect of \cite{levine2017apollonian} is an analogue of Descartes' rule \cite{graham2005apollonian, stange2016sensual}
++for integer superharmonic functions --- Kleinian bugs share a similar rule. 
+ 
+ The symmetry group of the Kleinian bug for the $F$-lattice is trivial (the difficult aspect of the argument in this manuscript is in accounting for the intersections between adjacent cones). However, numerical evidence suggests that the set of integer superharmonic matrices on other planar lattices may also be described by nontrivial symmetries of Kleinian bugs. 
+ 
+@@ -232,7 +240,7 @@
+ \end{equation}
+ where
+ \[
+-q_k(n) = \frac{(k-1)}{2 k} (n^2 - s^2) + \frac{ s (s-1)}{2} \qquad \mbox{where $s \equiv n \pmod k$ },
++q_k(n) = \frac{(k-1)}{2 k} (n^2 - s^2) + \frac{ s (s-1)}{2} \qquad \mbox{where $s := n \pmod k$ },
+ \]
+ (note the Laplacian is that of the $F^{(k)}$ lattice). In particular, $h_1 := r_1 - r_2$ is integer valued and harmonic, $\Delta h_1 = 0$. 
+ The function $h_2(x_1,x_2) := x_1 x_2$ is also harmonic.  This together with \eqref{eq:turan_odometers} and the standard argument in
+@@ -240,11 +248,13 @@
+ These odometers lie on the hyperbolas between the largest cones in Figure \ref{fig:fk_lattices} and the harmonic functions explain the apparent 
+ periodicity of $\Gamma_k$. 
+ 
++When $k=2$ the odometers $s'h_1 + t' h_2$ with $s' = 2(t-s), t' = 2t$ correspond to the peak matrices $M(s-t,s+t,0)$ of Theorem \ref{theorem:circle_packing}.
++
+ %\input{extra_arguments/fk_lattice.tex}
+ 
+ 
+ \begin{remark}
+-Interestingly, the function $q_k(n)$ also counts the number of edges in a $k$-partite Turán graph of order $n$.
++Interestingly, the function $q_k(n)$ also counts the number of edges in a $k$-partite Turan graph of order $n$.
+ We note that $q_k(n)$ has a simple closed form when $k$ is small,
+ \[
+ q_k(n) = \lfloor \frac{(k-1)}{2k} n^2 \rfloor \quad \mbox{only for $k \leq 7$},
+@@ -290,10 +300,11 @@
+ 
+ 
+ \subsection{Code}
+-A Julia implementation of the below recursive algorithm to compute standard and alternate tile odometers is included in the arXiv upload. 
++The Julia program in the accompanying \texttt{Code} directory computes the standard and alternate tile odometers on the $F$-lattice. It stores an integer height at each occupied lattice point and translates every such point. A finite rectangular work array can lose sites during an $L$-correction. For example, at the word consisting of $1$ followed by $37$ twos, the earlier implementation omitted five of the $41{,}966$ period classes of the odd alternate at $39/116$. The exact implementation retains all of them. The file \texttt{run\_code.jl} draws all four patterns for a specified word. 
+ 
+ \subsection*{Acknowledgments}
+-Thank you to Charles K. Smart for valuable feedback throughout this project. A.B. was partially supported by Charles K. Smart’s NSF grant DMS-2137909.
++Thank you to an anonymous referee for careful, detailed comments on a previous version of this manuscript. Thank you to Charles K. Smart for valuable feedback throughout this project. A.B. was partially supported by NSF grant DMS-2202940 and Charles K. Smart's NSF grant DMS-2137909.
++
+ 
+ 
+ \section{Proof outline and comparison to previous work} \label{sec:proof_overview}
+@@ -305,9 +316,10 @@
+ The odd odometer does not have a perfect decomposition into parents or grandparents; the decomposition requires multiple copies of the standard and alternate odometers of the distant ancestor pair $(2/5, 3/7)$.  } \label{fig:need_two_odometers}
+ \end{figure}
+ 
+-Our method at a high level follows the outline of \cite{levine2017apollonian}: 
+-the proof recursively constructs odometers which then identify $\Gamma_F$. The implementation of this outline,
+-however, requires several new ideas, the most significant being the recursive algorithm itself. 
++Our method at a high level follows the program of \cite{levine2017apollonian}: 
++the proof recursively constructs odometers which then identify $\Gamma_F$. The implementation of this program,
++however, requires several new ideas, the most significant being the recursive algorithm itself. Moreover,  
++our techniques - in particular the zero-one boundary string construction -  may extend to other lattices. 
+ 
+ In order to make the comparison, we briefly recall Levine-Pegden-Smart's construction in \cite{levine2017apollonian}. 
+ On the square lattice, odometers were built by first specifying a {\it tile odometer}, a
+@@ -335,7 +347,8 @@
+ A notable one being distant ancestor dependence precludes a finite step inductive proof. 
+ We address this by augmenting the recursion and associating a binary {\it boundary string} to each odometer.
+ These strings encapsulate certain compatibility properties across the recursive tree and show it is possible to glue 
+-distinct tile odometers together in a well-defined way. 
++distinct tile odometers together in a well-defined way.   These strings allow us to run, in some sense, an analogue of the Euclidean algorithm. 
++
+ 
+ Our proof that the functions which we construct are recurrent also differs from the 
+ corresponding proof on the square lattice. There, the odometers were shown to be {\it maximal}, a property
+@@ -349,9 +362,8 @@
+ \item Associate to each such word a {\it boundary string} which carries additional function and domain data.
+ \item Augment the rational recursion to produce two distinct tile odometers, a standard and an alternate
+ by piecing together combinations of earlier standard and alternate odometers.
+-\item Show the recursion is well-defined by reducing every interface
+-into a pair of boundary strings. 
+-\item Prove that the functions constructed are recurrent and have the correct growth.  
++\item Use boundary strings to locate the interfaces and the ordered overlap comparisons to determine the height on their union. 
++\item Construct recurrent fields on the plane, identify their values on the finite tiles in the order of insertion, and use their period increments to obtain the growth.  
+ \end{enumerate}
+ We start in Section  \ref{sec:hyperbola} by precisely defining the modified Farey recursion on the hyperbola. 
+ We then prove a technical `almost' tiling lemma in Section \ref{sec:almost_tilings}; this is 
+@@ -377,7 +389,7 @@
+ \end{bmatrix}
+ \end{equation}
+ and the hyperbola matrices in the statement of Theorem \ref{theorem:hyperbola}, $M(t, 1-t, -\sqrt{t^2 + (1-t)^2})$. 
+-By solving for the intersection point of rank 1 perturbations of two adjacent cones and then subtracting a harmonic matrix, we can label $(t,c) \in \Q \cap \mathcal{H}$ by 
++By solving for the intersection point of rank 1 perturbations of two adjacent cones and then subtracting a matrix corresponding to the quadratic growth of a harmonic polynomial, we can label $(t,c) \in \Q^2 \cap \mathcal{H}$ by 
+ \begin{equation} \label{eq:hyperbola_param}
+ f(n,d) := \frac{1}{T(n,d)} ((d^2-n^2), -(d^2+n^2)),
+ \end{equation}
+@@ -391,44 +403,44 @@
+ \begin{equation} \label{eq:modified_lattice}
+ L'(n,d) = 
+ \begin{cases}
+-\Z v_{n/d,1} + \Z v_{n/d,2} &\mbox{if $(n+d)$ is even } \\
+-2 \Z v_{n/d,1} + \Z v_{n/d,2}  &\mbox{if $(n+d)$ is odd}.
++\Z \mathfrak{v}_{n/d,1} + \Z \mathfrak{v}_{n/d,2} &\mbox{if $(n+d)$ is even } \\
++2 \Z \mathfrak{v}_{n/d,1} + \Z \mathfrak{v}_{n/d,2}  &\mbox{if $(n+d)$ is odd}.
+ \end{cases}
+ \end{equation}
+ where
+ \begin{equation} \label{eq:translation_terms}
+-v_{n/d, 1} := \begin{bmatrix} d  \\ n \end{bmatrix}
++\mathfrak{v}_{n/d, 1} := \begin{bmatrix} d  \\ n \end{bmatrix}
+ \qquad
+-v_{n/d,2}  := \begin{bmatrix} n -d \\ n + d \end{bmatrix}.
+-\end{equation}
+-Setting $a_i := M(n,d) v_i$, we note
++\mathfrak{v}_{n/d,2}  := \begin{bmatrix} n -d \\ n + d \end{bmatrix}.
++\end{equation}
++Setting $a_{n/d,i} := M(n,d) \mathfrak{v}_{n/d,i}$, we note
+ \begin{equation} \label{eq:affine_terms}
+-a_1 :=  \begin{bmatrix} 0  \\ 0 \end{bmatrix}
++a_{n/d,1} :=  \begin{bmatrix} 0  \\ 0 \end{bmatrix}
+ \qquad
+-a_2 := \begin{bmatrix} n \\ -d \end{bmatrix}.
++a_{n/d,2} := \begin{bmatrix} n \\ -d \end{bmatrix} \, . 
+ \qquad
+ \end{equation}
+-We first observe that $v_{n/d,1}$ and $v_{n/d,2}$ generate the lattice of the matrix $M(n,d)$. 
++We first observe that $\mathfrak{v}_{n/d,1}$ and $\mathfrak{v}_{n/d,2}$ generate the lattice of the matrix $M(n,d)$. 
+ \begin{lemma}
+ 	For each reduced fraction $t = n/d$,  
+ 	\[
+-	L(n,d) := \{ v \in \Z^2 :  M(n,d) v \in \Z^2 \} = \Z  v_{n/d,1} + \Z v_{n/d,2}.
++	L(n,d) := \{ v \in \Z^2 :  M(n,d) v \in \Z^2 \} = \Z  \mathfrak{v}_{n/d,1} + \Z \mathfrak{v}_{n/d,2}.
+ 	\]
+ \end{lemma}
+ \begin{proof}
+-	Suppose $M(n,d) x = y$ for $x, y \in \Z^2$.  For convenience, write $v_{n/d, i} =: v_i$. Since $\R^2 = \R v_1 + \R v_2$, we may write 
++	Suppose $M(n,d) x = y$ for $x, y \in \Z^2$.  For convenience, write $\mathfrak{v}_{n/d, i} =: v_i$. Since $\R^2 = \R v_1 + \R v_2$, we may write 
+ 	\[
+ 	x = c v_1 + c' v_2
+ 	\]
+ 	for $c,c' \in \Q$. We show that $c,c'$ must be in $\Z$, starting with $c'$. By \eqref{eq:affine_terms}, 
+ 	\[
+-	M(n,d) x = c M(n,d) v_1 + c' M(n,d) v_2 = c' a_2
++	M(n,d) x = c M(n,d) v_1 + c' M(n,d) v_2 = c' a_{n/d,2}
+ 	\]
+ 	where by supposition
+ 	\[
+-	c' a_2 := \begin{bmatrix} z_1 \\ z_2 \end{bmatrix},
+-	\]
+-	for integers $z_1,z_2$. Since $\gcd(n,-d) = 1$, by Bézout's identity, there exists $w_1, w_2 \in \Z$ so that
++	c' a_{n/d,2} := \begin{bmatrix} z_1 \\ z_2 \end{bmatrix},
++	\]
++	for integers $z_1,z_2$. Since $\gcd(n,-d) = 1$, by Bezout's identity, there exists $w_1, w_2 \in \Z$ so that
+ 	\[
+ 	w_1 n - w_2 d = 1.
+ 	\]
+@@ -438,9 +450,6 @@
+ 	\]
+ 	in particular, since the left-hand side is integer-valued, $c' \in \Z$. The exact same argument
+ 	then shows that $c \in \Z$ once we observe $c v_1 = x - c' v_2$ is integer valued. 
+-	
+-	
+-	
+ \end{proof}
+ 
+ We then check that the map in \eqref{eq:hyperbola_param} is indeed dense in $\mathcal{H}$
+@@ -452,17 +461,14 @@
+ 	Suppose $0 < n/d < 1$ and rewrite
+ 	\[
+ 	\frac{d^2-n^2}{d^2 +2 d n - n^2} = 1 - \frac{1}{1 + \frac{1}{2}(\frac{d}{n} - \frac{n}{d})}.
+-	%&= 1 - \frac{1}{1 + \frac{1}{2}(\frac{1}{p} - p)}.
+ 	\]
+ 	Conclude after observing that $\frac{d}{n} - \frac{n}{d}$ is dense in $[0,\infty)$. 
+-	%Indeed,$f(x) = \frac{1}{2}(\frac{1}{x} - x)$ is continuous in $(0,1]$, $f(1) = 0$ and $\lim_{x \to 0} f(x) = \infty$. 
+-	%solve for 1/(1+x) = y , set x = 
+ \end{proof}
+ 
+ 
+ \subsection{Modified Farey recursion} \label{subsec:modified_farey_recursion}
+ As evident from \eqref{eq:modified_lattice}, the recursion which we specify must be parity-aware. To that end, 
+-we say a reduced fraction $p_n/p_d$ is {\it even} if $p_n + p_d$ is even and otherwise is {\it odd}. We exhibit a modified Farey recursion which generates all rationals in $[0,1]$ and associates to each rational a unique set of odd-even parents and a sibling of the opposite parity. 
++we say a reduced fraction $n/d$ is {\it even} if $n + d$ is even and otherwise is {\it odd}. We exhibit a modified Farey recursion which generates all rationals in $[0,1]$ and associates to each rational a unique set of odd-even parents and a sibling of the opposite parity. 
+ 
+ An odd reduced fraction $p = o_n/o_d$ and an even reduced fraction $q = e_n/e_d$ produce an odd-even child pair by
+ \begin{equation} \label{eq:child_operator}
+@@ -482,8 +488,8 @@
+ \begin{equation} \label{eq:base_quadruple}
+ \q_{()} = \left( \frac{1}{2}, \frac{1}{3}, \frac{0}{1}, \frac{1}{1} \right) 
+ \end{equation}
+-and generates descendants which are labeled by {\it recursion words} in the free monoid $F_3^{*}$ generated by $\{1,2,3\}$. The empty word $\{\}$ corresponds to the base quadruple. Each letter in a recursion word corresponds to the type of the child chosen in each step. 
+-For example $\q_{(12)}$ refers to the resulting quadruple after taking the Type 1 child of the root, then the Type 2 child of that child. 
++and generates descendants which are labeled by {\it recursion words} in the free monoid $F_3^{*}$ generated by $\{1,2,3\}$. The empty word $\{\}$ corresponds to the base quadruple. Each letter in a recursion word corresponds to the type of children chosen in each step. 
++For example $\q_{(12)}$ refers to the resulting quadruple after taking the Type 1 children of the root, then the Type 2 children. 
+ 
+ We will also use regex notation: $w = *w'$ for $w' \in F_3^*$ refers to any recursion word $w \in F_3^*$ which ends in $w'$.  
+ The notation $s^k$ refers to $s \in F_3^*$ concatenated $k$ times, \eg, $3^2 = 3*3$. 
+@@ -528,9 +534,9 @@
+ \begin{equation} \label{eq:rotation_tuples}
+ \mathcal{R}\left(n,d\right) = (d-n,n+d)
+ \end{equation}
+-rotates $\partial \Gamma_F$. The goal of this section is to show that an extension of $\mathcal{R}$
++rotates $\partial \Gamma_F \cap \mathbb{Q}^2 \cap \mathcal{H}$. The goal of this section is to show that an extension of $\mathcal{R}$
+ to Farey quadruples preserves the depth of the modified Farey recursion.  We start by observing a parity flipping property of $\mathcal{R}$. 
+-\begin{lemma} \label{lemma:rot_parity}
++\begin{lemma} \label{lemma:rot_parity-laplace}
+ 	If $0 \leq n/d \leq 1$ is an even reduced fraction then $\gcd( (d-n)/2,(n+d)/2) = 1$, otherwise 
+ 	$\gcd(d-n,n+d) = 1$. Therefore, in the even case, the reduction of $\frac{d-n}{n+d}$ is odd and vice versa. 
+ \end{lemma}
+@@ -548,7 +554,7 @@
+ 	&= \gcd( 2 n, d - n).
+ 	\end{align*}
+ 	If $(n+d)$ is even or odd, then $(d-n)$ is respectively even or odd. 
+-	By Bézout's identity, there exist integers $a_i, b_i$ so that
++	By Bezout's identity, there exist integers $a_i, b_i$ so that
+ 	\begin{align*}
+ 	a_1 (d-n) + b_1 2 &= c  \\ 
+ 	a_2 (d-n) + b_2 n &= 1
+@@ -564,7 +570,7 @@
+ 	If $(n+d)$ is odd, then Step 1 shows $ \frac{d-n}{d+n} $ is in reduced form and therefore is even. 
+ 	Otherwise, reduce $\frac{d-n}{d+n} = \frac{ (d-n)/2}{ (d+n)/2}$ and note $( d-n + d + n)/2 = d$. Since $(n+d)$ is even and $\gcd(n,d) = 1$, both $n$ and $d$ must be odd, concluding the proof.
+ \end{proof}
+-In light of Lemma \ref{lemma:rot_parity}, we extend $\mathcal{R}$ to act on reduced fractions $n/d$ by: 
++In light of Lemma \ref{lemma:rot_parity-laplace}, we extend $\mathcal{R}$ to act on reduced fractions $n/d$ by: 
+ \begin{equation} \label{eq:rotation_reduced_tuples}
+ \mathcal{R}(n,d) = 
+ \begin{cases}
+@@ -665,58 +671,49 @@
+ 	= T_n,
+ 	\]
+ 	concluding the proof. 
+-	
+-	
+-	
+ \end{proof}
+ 
+-We conclude the section by observing that $\mathcal{R}$ is also a rotation of the lattice vectors given by \eqref{eq:translation_terms}
+-and \eqref{eq:affine_terms}. 
++We conclude the section by observing that $\mathcal{R}$ is also a rotation of the lattice vectors given by \eqref{eq:translation_terms}.
+ By identifying $\Z^2$ with $\Z[\I]$ we may write
+ \begin{equation}
+-v_{n/d,1} = d  + n \I \qquad v_{n/d, 2} = (n-d) + (n+d) \I
+-\end{equation}
+-and
+-\begin{equation}
+-a_{n/d,1} = 0 \qquad a_{n/d, 2} = n - d \I
+-\end{equation}
++\mathfrak{v}_{n/d,1} = d  + n \I \qquad \mathfrak{v}_{n/d, 2} = (n-d) + (n+d) \I \, . 
++\end{equation}
++
+ 
+ \begin{lemma} \label{lemma:lattice_rotation}
+-	For even $p$ and odd $q$, 
++	For odd $p$ and even $q$, 
+ 	\begin{equation}
+-	v_{\mathcal{R}(p), 1} =  - \I v_{p,2} \qquad 	v_{\mathcal{R}(p),2} = \I 2 v_{p,1} 
++	\mathfrak{v}_{\mathcal{R}(p), 1} =  - \I \mathfrak{v}_{p,2} \qquad 	\mathfrak{v}_{\mathcal{R}(p),2} = \I 2 \mathfrak{v}_{p,1} 
+ 	\end{equation}
+ 	and
+ 	\begin{equation}
+-	2 v_{\mathcal{R}(q),1} = -\I v_{q,2} \qquad v_{\mathcal{R}(q),2} = \I v_{q,1}
++	2 \mathfrak{v}_{\mathcal{R}(q),1} = -\I \mathfrak{v}_{q,2} \qquad \mathfrak{v}_{\mathcal{R}(q),2} = \I \mathfrak{v}_{q,1}
+ 	\end{equation}
+ \end{lemma}
+ 
+ \begin{proof}
+ 	Note that if $n/d$ is odd, then
+ 	\begin{align*}
+-	v_{\mathcal{R}(n/d), 1} &= (n+d) + (d-n) \I \\
+-	&=  - \I v_{n/d,2} 
++	\mathfrak{v}_{\mathcal{R}(n/d), 1} &= (n+d) + (d-n) \I \\
++	&=  - \I \mathfrak{v}_{n/d,2} 
+ 	\end{align*}
+ 	and
+ 	\begin{align*}
+-	v_{\mathcal{R}(n/d), 2} &= (d-n) - (n+d) + ( d- n + n + d) \I  \\
++	\mathfrak{v}_{\mathcal{R}(n/d), 2} &= (d-n) - (n+d) + ( d- n + n + d) \I  \\
+ 	&= 2( -n + d \I) \\
+-	&= \I 2 v_{n/d,1}.
+-	\end{align*}
+-	The equation for $n/d$ even follows once we recall $\mathcal{R}$ is an involution,   $\mathcal{R} \circ \mathcal{R}(q) = q$
++	&= \I 2 \mathfrak{v}_{n/d,1}.
++	\end{align*}
++	The equation for $n/d$ even follows once we recall $\mathcal{R}$ is an involution,   $\mathcal{R} \circ \mathcal{R}(q) = q$.
+ \end{proof}
+ 
+-For the remainder of the paper write
++For the remainder of the paper write 
+ \begin{equation}
+ v_{n/d,1} = \begin{cases}
+-2 v_{n/d,1} &\mbox{ if $n/d$ is odd} \\
+-v_{n/d,1} &\mbox{ otherwise}.
++2 \mathfrak{v}_{n/d,1} &\mbox{ if $n/d$ is odd} \\
++\mathfrak{v}_{n/d,1} &\mbox{ otherwise}
+ \end{cases}
+ \end{equation}
+-%unless it is made explicit. 
+- 
+-
++and $v_{n/d,2} = \mathfrak{v}_{n/d,2}$.
+ 
+ 
+ 
+@@ -726,10 +723,10 @@
+ cover $\Z^2$ periodically. 
+ 
+ We identify $\Z^2$ with $\Z[\I]$. A {\it cell} is a unit square $s_x = \{x, x+1, x+\I, x+1 + \I\} \subset \Z[\I]$ and a {\it tile} 
+-is a simply connected union of cells whose boundary is a simple closed curve. The {\it vertices} of a tile 
++is a union of cells, which, when viewed as union squares in the plane, is simply connected union of cells and has a boundary which is a simple closed curve. The {\it vertices} of a tile 
+ are the Gaussian integers on its boundary. Let $(F_2, *)$ be the free group generated by $\{1, \I \}$.
+ For $w \in F_2$, let $\hat{w}$ denote its involution, \ie, $\hat{w}*w = \{\}$. Let $\rev(w)$ denote the reversal of $w \in F_2$, $w[j]$ the $j$-th letter 
+-of $w$, and $|w|$ the number of letters in $w$. The {\it boundary word} of a tile is a word $w \in F_2$ which represents a vertex walk around the boundary of the tile. In particular, $\sum w = 0$ and $\sum w' \not= 0$ for any non-empty sub-word $w'$ of $w$, where $\sum$ denotes the abelianization of $F_2$.
++of $w$, and $|w|$ the number of letters in $w$. The {\it boundary word} of a tile is a word $w \in F_2$ which represents a vertex walk around the boundary of the tile in counterclockwise order. In particular, $\sum w = 0$ and $\sum w' \not= 0$ for any non-empty sub-word $w'$ of $w$, where $\sum$ denotes the abelianization of $F_2$.
+ 
+ A {\it tiling} of the plane is an infinite set of translations of a tile $T$ where every cell is contained in exactly 
+ one copy of $T$. A tiling of $T$ is $(v_1,v_2)$-{\it regular} if every tile $T'$ in the tiling can be expressed as $T + k v_1 + k' v_2$
+@@ -756,8 +753,7 @@
+ In our main argument, we require a technical modification of the notion of tiling in which bounded gaps are allowed. That is, 
+ we cannot use Proposition \ref{prop:tiling_criteria} and are thus forced to modify it.
+ An {\it almost} tiling $\mathcal{T}$, is an infinite set of translations of a tile $T$ where every cell is contained 
+-in at most one tile and every $x \in \Z^2$ is a vertex of a cell in $\mathcal{T}$, \ie, there is $s_y \in \mathcal{T}$
+-with $x \in s_y$. The notion of regular with respect to a lattice is also extended to almost tilings. 
++in at most one tile and every $x \in \Z^2$ is a vertex of a cell in $\mathcal{T}$, \ie,  there is an $s_y \in \text{tile} \in \mathcal{T}$ such that $x \in s_y$. The notion of regular with respect to a lattice is also extended to almost tilings. 
+ 
+ \iffalse
+ Recall that the dual $T^*$ of a tile $T$ are the centers of the cells $s_x \subset T$ in the dual lattice $(\Z^2)^*$ of $\Z^2$. 
+@@ -780,9 +776,8 @@
+ Roughly, this condition allows for slight gaps between cells in the surrounding of a tile. 
+ We will refer to the almost tiling from Lemma \ref{lemma:almost_square_tiling} as an {\it almost pseudo-square tiling}. See Figure \ref{fig:almost_tiling}
+ for an illustration of this. 
+-
+ \begin{lemma}\label{lemma:almost_square_tiling}
+-	Suppose	$w = w_1 * w_2 * \widehat{\rev(w_1)} * \widehat{\rev(w_2)}$ is the boundary word of a tile $T$. 
++	Suppose	$w' = w_1 * w_2 * \widehat{\rev(w_1)} * \widehat{\rev(w_2)}$ is the boundary word of a tile $T$. 
+ 	Further suppose the following conditions on $w \in \{ w_1, -\I w_2\}$.
+ 	\begin{enumerate}
+ 		\item 
+@@ -790,9 +785,7 @@
+ 		and $w[1] = w[|w|] = 1$
+ 		\item At least one of the following three cases concerning the form of $w$ and its reversal is satisfied:
+ 		\begin{enumerate}
+-			\item $w$ is a palindrome, $w = \rev(w)$
+-			
+-			
++			\item $w$ is a palindrome, $w = \rev(w)$.			
+ 			
+ 			\item $w = (1*1*\I) * \tilde{w} * 1$, where $\tilde{w}$ is a palindrome.
+ 			Moreover, every $\I$ in $w$ is followed by at least one 1.
+@@ -800,15 +793,12 @@
+ 			\item $w = 1*\tilde{w}*(1*1*1)$ where $\tilde{w}$ is a palindrome. 
+ 			Moreover, every $\I$ in $w$ is followed by at least three 1s.
+ 			
+-			
+ 			%old version which doesn't close
+ 			%\item $w = q*\tilde{w}*p$ where $\tilde{w}$ is a palindrome, 
+ 			%\[
+ 			%q = (1*1)^k*(1*\I) \qquad p = (1 *1)^{k+1}*1
+ 			%\]
+ 			%for $k > 0$. Moreover, every $\I$ in $w$ is followed by at least three 1s.
+-			
+-			
+ 		\end{enumerate}
+ 	\end{enumerate}
+ 	%where 
+@@ -827,11 +817,9 @@
+ 	see Figure \ref{fig:almost_tiling}. 
+ 	Specifically we show that the closure, 
+ 	\[
+-	\bar{S} = \{ s_x : x \in S \cap \Z^2\}.
+-	\]
+-	is simply connected and no two cells in the decomposition of $S$ overlap. 
+-	
+-	%% check this? 
++	\bar{S} = \{ s_x : x \in S \cap \Z^2\},
++	\]
++	where each cell $s_x$ is viewed as a unit square in the plane, is simply connected and no two cells in the decomposition of $S$ overlap. 
+ 	
+ 	Observe that the boundary word of $T$ implies it is 180-degree symmetric. Hence, $S$ is 180-degree symmetric and we may reduce to analyzing the interfaces between $T$ and its lower, right, and lower-right neighbors,  
+ 	\[
+@@ -866,7 +854,7 @@
+ 	Therefore, any vertex $y_j$ along the top edge of $T_{v}$ is distance at most one from $x_j$, the lower left-corner of a cell in $T$. 
+ 	
+ 	To see that the top edge of $T_v$ does not cross above the bottom edge of $T$, we use monotonicity.
+-	Suppose for sake of contradiction a crossing occurs. Since $w_1 = 1$, $x_1 = y_0$ and therefore there is a first $j,j' \geq 1$ at which
++	Suppose for sake of contradiction a crossing occurs. Since $w_1 = 1$, $x_1 = y_0$ and therefore there is a first, in the lexicographical order, $j,j' \geq 1$ at which
+ 	$y_j = x_{j'}$ and $y_{j+1} = x_{j'} + \I$. By \eqref{eq:bounded_gap}, $y_j = x_{j} + 1$ and so by monotonicity, $j' = (j+1)$.
+ 	However, by  \eqref{eq:bounded_gap} $y_{j+1} = x_{j+1} + 1 \neq x_{j+1} +  \I$, a contradiction. 
+ 	
+@@ -889,7 +877,7 @@
+ 	y_{1+ |\tilde{w}|} &= (2) + \sum \tilde{w} \qquad y_{2+ |\tilde{w}|} = (2+ \I) + \sum \tilde{w} \\
+ 	y_{3+ |\tilde{w}|} &= (3+ \I) + \sum \tilde{w} \quad y_{4+ |\tilde{w}|} = (4+ \I) + \sum \tilde{w}.
+ 	\end{align*}
+-	%Also, by the moreover clause, $y_2 = 3$. 
++	Also, by the moreover clause, $y_2 = 3$. 
+ 	Thus, it suffices to consider $1 \leq j \leq 1 + |\tilde{w}|$
+ 	for which the above computations show 
+ 	\begin{equation} \label{eq:bounded_gap_a}
+@@ -942,10 +930,7 @@
+ 	After rotating, the arguments in Step 1 apply to the interface between $T$ and $T_h$.  We then check $T$ and $T_d$. Let $z_0 = \sum w_1$ and note that the top left vertex of $T_{d}$ is $z_0 + 1 + \I$. By the assumption on the first and last letter of $w_2$, the next vertices on the top and left edges of $T_{d}$ are $z_0 + 2 + \I$ and $z_0 + 1$ respectively while the next vertex on the right edge of $T$ is $z_0 + \I$. 
+ 	This implies that no cell of $T$ overlaps a cell of $T_d$ and that the gap between the two tiles is of unit size. 
+ 	
+-	Finally, by monotonicity, for any other pair of cells in $S$ to overlap, there must first be a crossing on the horizontal or vertical edges which we have just shown to be impossible. 
+-	
+-	
+-	
++	Finally, by monotonicity, for any other pair of cells in $S$ to overlap, there must first be a crossing on the horizontal or vertical edges which we have just shown to be impossible. 	
+ \end{proof}
+ 
+ \begin{remark}
+@@ -979,7 +964,7 @@
+ \end{cases}
+ \end{equation}
+ 
+-Let $w_0 \in F_3^*$ describe the Farey pair $(p,q)$ and $\mathbf{Q}_{(w_0)} = ( \mathcal{C}_{w_0}(p,q), p, q)$
++Let $w_0 \in F_3^*$ be the first word for which the Farey pair $(p,q)$ appear as Farey children and let $\mathbf{Q}_{(w_0)} = ( \mathcal{C}_{w_0}(p,q), p, q)$
+ be the initial binary word quadruple with each term in $F_2^*$. Then, recursively, given $w \in F_3^*$ and $\mathbf{Q}_{(w)} = (p_{t+1}, q_{t+1}, p_t, q_t)$,
+ each child binary word quadruple is defined by 
+ \begin{equation} \label{eq:child_farey_quad_continuedfrac}
+@@ -989,6 +974,7 @@
+ \mathbf{Q}_{(w*3)}  &= \left(\mathcal{C}_{(w*3)}(p_t,q_{t+1}), p_t, q_{t+1} \right).
+ \end{aligned}	
+ \end{equation}
++In particular, $\mathbf{Q}_{(w)}$ is only defined for words which are extensions of $w_0$. 
+ 
+ 
+ Recall that a palindrome $\tilde{w} \in F_2^*$ is a word that is equal to its reversal, $\tilde{w} = \rev(\tilde{w})$. 
+@@ -998,21 +984,25 @@
+ 
+ 
+ \begin{lemma} \label{lemma:almost_palindrome}
+-	The following hold for every subsequent pair of binary words $(p_t,q_t)$ produced by \eqref{eq:child_farey_quad_continuedfrac}.
++	For every $w_0 \in F_3^*$ and $t \geq 1$, the following holds for every pair of binary words, $(p_t,q_t)$, produced by \eqref{eq:child_farey_quad_continuedfrac}.
+ 	\begin{enumerate}
+-		\item Both $p_t$ and $q_t$ are almost palindromes
+-				\item If $\sum 1\{ {w_{0}}_j = 1\}$ is even then all subsequent binary words begin with $q$ and end with $p$
++		\item Both $p_t$ and $q_t$ are almost palindromes.
++		\item If $\sum 1\{ {w_{0}}_j = 1\}$ is even then $p_t$ and $q_t$ begin with $q$ and end with $p$
+ 		and otherwise begin with $p$ and end with $q$. 
+-		\item Let $n = \min(|p_t|, |q_t|)$ and $m = \min(|p_t|, 2|q_t|)$. Then,
++		\item Let $n = \min(|p_t|, |q_t|)$, $m = \min(|p_t|, 2|q_t|)$, and $w$ denote the current word. Then, 
++		if $\sum 1\{ w_j = 1\}$ is even,
+ 		\[
+-		p_t[2:n] = \rev(q_t)[2:n] \qquad p_t[2:m] = \rev(q_tq_t)[2:m].
++		p_t[2:n] = \rev(q_t)[2:n] \qquad p_t[2:m] = \rev(q_tq_t)[2:m],
++		\]
++		otherwise,
++		\[
++		\rev(p_t)[2:n] = q_t[2:n] \qquad \rev(p_t)[2:m] = (q_tq_t)[2:m].
+ 		\]
+ 
+ 	\end{enumerate}
+ \end{lemma}
+ 
+ \begin{proof}
+-	%The Moreover clause follows immediately by induction. 
+ 	We may suppose without loss of generality that $\sum 1\{w_{{0}_j}=1\}$ is even, otherwise, reverse the subsequent statements. 
+ 	
+ 	Let $\mathbf{Q}_{(w)} = (p_{t+1}, q_{t+1}, p_{t}, q_{t})$ be given and we will verify claims (1) and (2) for 
+@@ -1022,48 +1012,43 @@
+ 	\]
+ 	defined by \eqref{eq:child_farey_quad_continuedfrac}.  %Suppose $\sum w_j$ is even, otherwise reverse each of the expressions below. 
+ 	To do so, we must eliminate the degenerate cases $p'_{t+1} = p$ or $q'_{t+1} = q$. Fortunately, 
+-	these can only occur if $w' = 3^k$ or $w' = 2^k$ for $k \geq 0 $ respectively. An induction shows that
++	these can only occur if $w' = 3^k$ or $w' = 2^k$ for $k \geq 0 $ respectively --- in which case $w_0 = ()$. An induction shows that
+ 	\begin{equation} \label{eq:words_degenerate_cases}
+ 	\begin{aligned}
+ 	\mathbf{Q}_{(3^k)} &= (q p^k q p^{k+1}, q p^{k+1}, p, q p^k) \\
+ 	\mathbf{Q}_{(2^k)} &= (q^{2(k+1)} p, q^{2k + 1} p, q ^{2 k} p , q),
+ 	\end{aligned}
+ 	\end{equation}
+-	and we can verify the claim directly in these cases by inspection. We can then use \eqref{eq:words_degenerate_cases} to also handle the cases $w' = 3^k*\{1 \mbox{ or } 2\}$ or $w' = 2^k*\{1 \mbox{ or }3\}$.
+-	\iffalse
+-	We check 
++	and we can verify the claim directly in these cases by inspection. We can then use \eqref{eq:words_degenerate_cases} to also handle the cases $w' = 3^k*\{1 \mbox{ or } 2\}$ or $w' = 2^k*\{1 \mbox{ or }3\}$. Indeed, we compute, using  \eqref{eq:words_degenerate_cases}, that 
+ 	\[
+ 	\begin{aligned}
+-	\mathbf{Q}_{(3^k 1)}(1) &= q (p^k q p^{k+1} q p^k q p^{k+1} q p^{k}) p \\
+-	\mathbf{Q}_{(3^k 1)}(2) &= q (p^k q p^{k+1} q p^{k}) p 
++	\mathbf{Q}_{(3^k*1)}(1) &= q (p^k q p^{k+1} q p^{k+1} q p^{k} )p \\
++	\mathbf{Q}_{(3^k*1)}(2) &= q (p^k q p^{k+1} q p^{k}) p 
+ 	\end{aligned}
+ 	\]
+ 	and
+ 	\[
+ 	\begin{aligned}
+-	\mathbf{Q}_{(3^k 2)}(1) &= q (p^k q p^k q p^k q p^k ) p  \\
+-	\mathbf{Q}_{(3^k 2)}(2) &= q (p^k q p^k q p^k ) p 
++	\mathbf{Q}_{(3^k*2)}(1) &= q (p^k q p^k q p^k q p^k ) p  \\
++	\mathbf{Q}_{(3^k*2)}(2) &= q (p^k q p^k q p^k ) p 
+ 	\end{aligned}
+ 	\]
+ 	also
+ 	\[
+ 	\begin{aligned}
+-	\mathbf{Q}_{(2^k 1)}(1) &=  q ( q^{2 k + 1} p q^{2 k + 1} p q^{2 k + 1} ) p \\
+-	\mathbf{Q}_{(2^k 1)}(2) &=  q  (q^{2k+1} p q^{2k+1} ) p 
++	\mathbf{Q}_{(2^k*1)}(1) &=  q ( q^{2 k + 1} p q^{2 k + 1} p q^{2 k + 1} ) p \\
++	\mathbf{Q}_{(2^k*1)}(2) &=  q  (q^{2k+1} p q^{2k+1} ) p 
+ 	\end{aligned}
+ 	\]
+ 	and
+ 	\[
+ 	\begin{aligned}
+-	\mathbf{Q}_{(2^k 3)}(1) &=  q ( q^{2k} p q^{2 k + 1} p q^{2k}) p \\
+-	\mathbf{Q}_{(2^k 3)}(2) &= q (q^{2 k} p q^{2k}) p 
++	\mathbf{Q}_{(2^k*3)}(1) &=  q ( q^{2k} p q^{2 k + 1} p q^{2k}) p \\
++	\mathbf{Q}_{(2^k*3)}(2) &= q (q^{2 k} p q^{2k}) p.
+ 	\end{aligned}
+ 	\]
+-	\fi
+-	
+-	
+ 	Hence, we may assume none of $p_t,q_t, p_{t+1}, q_{t+1}$ are singletons, that is the induction hypotheses hold for each of them.
+-	We also suppose $\sum 1\{w_j = 1\}$ is even. By the induction hypotheses
++	We also suppose $\sum 1\{w_j = 1\}$ is even, the odd case having symmetric arguments. By the induction hypotheses
+ 	\[
+ 	p_t = q w^{1} p \quad q_t = q w^2 p  
+ 	\]
+@@ -1087,7 +1072,6 @@
+ 		p_{t+1} &= q w^1 q p w^2 q p w^2 p \\
+ 		\rev(q_{t+1} q_{t+1}) &= p w^1 q p w^2 q p w^2 p q w^1 q.
+ 	\end{align*}
+-	
+ 	For claims (1) and (2),  the possible decompositions of $(p_{t+2}, q_{t+2})$ are 
+ 	\begin{align*}
+ 	( p_{t+1} q_{t+1} q_{t+1}, p_{t+1} q_{t+1})  \qquad &\mbox{ Type 1} \\
+@@ -1112,7 +1096,8 @@
+ 
+ \subsection{Basic definitions} \label{subsec:basic_definitions}
+ We next associate tile and function data to the binary word recursion. But in order to do so, we must recall and modify
+-some definitions from \cite{levine2017apollonian}. A {\it tile} $T$ is now, depending on the context, either a finite subset of $\Z^2$ or a finite union of simply connected cells. Let $c(T)$ denote the coordinate-wise minimum of $T$ - geometrically the lower-left vertex. A {\it partial odometer} is a function $h:T \to \Z$. The domain of $h$ is $T(h)$ and $s(h) \in \C$ is the {\it slope} of $T$,
++some definitions from \cite{levine2017apollonian}. A {\it tile} $T$ is now, depending on the context, either a finite subset of $\Z^2$ or a finite union of simply connected cells. Let $c(T)$ denote 
++the lower-left vertex of $T$, specifically, the vertex of $T$ which has the smallest imaginary coordinate followed by the smallest real coordinate. A {\it partial odometer} is a function $h:T \to \Z$. The domain of $h$ is $T(h)$ and $s(h) \in \C$ is the {\it slope} of $T$,
+ the average of
+ \begin{equation}
+ \begin{aligned}
+@@ -1120,20 +1105,22 @@
+ \frac{\I}{2}\left(h(x+\I)-h(x)+h(x+1+\I)-h(x+1)\right)
+ \end{aligned}
+ \end{equation}
+-for $x \in T$. Two partial odometers $o_{1}$ and $o_2$ are {\it translations} of one another if 
++over squares $\{x, x+1, x + \I, x + 1 + \I\} \subset T$. The slope is not defined when $T$ is a singleton. Two partial odometers $o_{1}$ and $o_2$ are {\it translations} of one another if 
+ \begin{equation}
+-T(o_{1}) = T(o_2) + v \quad \mbox{ and } \quad o_{1}(x) = o_{1}(x+v) + a^T x + b 
++T(o_{1}) = T(o_2) + v \quad \mbox{ and } \quad o_{1}(x) = o_{2}(x-v) + a^T x + b 
+ \end{equation}
+ for some $v,a \in \Z^2$ and $b \in \Z$.  
+ 
+ Partial odometers $o_{1}$ and $o_2$ are {\it compatible} if 
+ $o_{1} - o_2 = c$ on $T(o_{1}) \cap T(o_2)$ for some {\it offset constant} $c \in \Z$.  As in \cite{levine2017apollonian}, if the offset constant is
+ 0 or the tiles do not overlap then $o_{1} \cup o_2$ is the common extension to $T(o_{1}) \cup T(o_2)$. We recall for later reference the following lemma 
+-which will allow us to construct global odometers from pairwise compatible partial odometers. 
+-\begin{lemma}[Lemma 9.2 in \cite{levine2017apollonian}] \label{lemma:pairwise_compatibility}
+-	If $\mathcal{S} = \{o_i\}$ is a collection of pairwise compatible partial odometers such that $\{T(o_i)\}$ forms an almost pseudo-square
+-	tiling then there is a function $g:\Z^2 \to \Z$ unique up to adding a constant that is compatible with every $o_i \in \mathcal{S}$. 
++which specifies when local additive constants give a global odometer. 
++\begin{lemma}[Gluing by overlap constants]\label{lemma:pairwise_compatibility}
++Suppose the domains of a collection of partial odometers cover $\Z^2$ and their overlap graph is connected. On each nonempty overlap let $c_{ij}=o_i-o_j$ be constant. There is a function, unique up to an additive constant, compatible with every $o_i$ if and only if the sum of $c_{ij}$ around each finite closed path of the overlap graph is zero.
+ \end{lemma}
++\begin{proof}
++Fix a starting tile and assign it offset zero. Along a path add $c_{ij}$ to the offset on passing from $i$ to $j$. The zero-sum condition gives path independence. The adjusted functions now agree on every overlap and so define a function on the plane. Conversely, the offsets of any such function telescope around a closed path. Connectedness gives uniqueness up to a common additive constant.
++\end{proof}
+ 
+ \subsection{Even-odd boundary strings}
+ We now associate additional data to each binary word constructed in the first subsection. The result in this subsection
+@@ -1164,18 +1151,18 @@
+ 
+ A horizontal or vertical {\it stacked boundary string} for $w \in F_2$ is a union of $\{T_i^+\} := \mathcal{B}_w$ and $\{T_i^-\} := \mathcal{B}^r_{\rev(w)}$ both oriented in the same direction. The first tiles $T_1^+$ and $T_1^-$ in each string and the shared direction dictate the relative positions,
+ \begin{equation} \label{eq:stacked_boundary_string}
+-c(T_1^+) - c(T_1^-) = v_{n/d', j'}
+-\end{equation}
+-where $j' \in \{1,2\}$ is the perpendicular direction and $n/d' \in \{p,q\}$ is the type of $T_1^-$. See Figure \ref{fig:stacked_boundary_string}.
++c(T_1^+) - c(T_1^-) = v_{n'/d', j'}
++\end{equation}
++where $j' \in \{1,2\}$ is the perpendicular direction and $n'/d' \in \{p,q\}$ is the type of $T_1^-$. See Figure \ref{fig:stacked_boundary_string}.
+ 
+ We now observe that tile offsets between perpendicular adjacent tiles in a stacked boundary string
+ are given by a simple formula if the binary word describing the string is an almost palindrome. 
+ \begin{lemma} \label{lemma:almost_palindrome_offset}
+ 	If $w$ is an almost palindrome, then for all $1 < i \leq |w|$
+ 	\[
+-	c(T_i^{+}) - c(T_i^{-}) = v_{n/d', j'} +  (v_{a,j} - v_{b,j})
+-	\]
+-	where $j' \in \{1,2\}$ is the perpendicular direction, $n/d', a,b \in \{p,q\}$ is the type of $T_i^-$,
++	c(T_i^{+}) - c(T_i^{-}) = v_{n'/d', j'} +  (v_{a,j} - v_{b,j})
++	\]
++	where $j' \in \{1,2\}$ is the perpendicular direction, $n'/d', a,b \in \{p,q\}$ is the type of $T_i^-$,
+ 	$T_1^+$ and $T_1^-$ respectively.  
+ 	%and 
+ 	%\[
+@@ -1195,10 +1182,7 @@
+ 	c(T_2^+) - c(T_2^-) = v_{p,1} + v_{q,2} - v_{q,1}.
+ 	\]
+ 	Conclude by similar computations together with an induction on $1 < i \leq |w|$. 
+-	
+-	
+ 	\iffalse
+-	
+ 	For concreteness and since $w$ is an almost palindrome, take $j = 1$, $T_1^+ = T_p$ and $T_1^- = T_q$.
+ 	If $T_2^-$ and $T_2^+$ are both of type $p$, then 
+ 	\begin{align*}
+@@ -1231,17 +1215,15 @@
+ 	(v_{i-1,1} +  v_{i-1,2}) + (v_{p,1} - v_{q,1}) - (v_{i-1,1}+v_{i-1,2}-v_{i,2}) = v_{i,2} + v_{p,1} - v_{q,1},
+ 	\]
+ 	\fi
+-	
+-	
+ \end{proof}
+ 
+ 
+ \iffalse
+ If $j = 1$, 
+ \[
+-c(T^{+,1})-c(T^{-,1}) =  v_{n/d', j'} 
++c(T^{+,1})-c(T^{-,1}) =  v_{n'/d', j'} 
+ \]
+-where $n/d' \in \{p,q\}$ is the type of $T^{-,2}$
++where $n'/d' \in \{p,q\}$ is the type of $T^{-,2}$
+ and if $j = 2$, 
+ \[
+ c(T^{-,1}) - c(T^{+,1}) = (-1)^{j} v_{n/d, j'} 
+@@ -1281,8 +1263,8 @@
+ with offsets given by 
+ \begin{equation} \label{eq:zero-one-bs}
+ c(T_i) - c(T_{i-1}) = \begin{cases}
+-v_{q,1} &\mbox{ if $T_{i-1} = T_q$} \\
+-v_{p,1} &\mbox{ if $T_{i-1} = T_p$},
++v_{q,1} &\mbox{ if $T_{i} = T_q$} \\
++v_{p,1} &\mbox{ if $T_{i} = T_p$},
+ \end{cases}
+ \end{equation}
+ and in the reversed case 
+@@ -1296,7 +1278,8 @@
+ \end{equation}
+ where the right column denotes the tile tuple.
+ We further impose that a (resp. reversed) horizontal zero-one boundary string begins with (resp. $T_{0/1}$) $T_{1/1}$.  
+-We also label horizontal zero-one boundary strings by binary words. 
++We also label horizontal zero-one boundary strings by binary words. See Table \ref{table:zero-one-single-overlaps} for an illustration 
++of tiles associated to boundary strings of length two. 
+ 
+ 
+ 
+@@ -1340,7 +1323,7 @@
+ \end{figure}
+ 
+ 
+-To define vertical strings, we simply rotate each of the above conditions by 90 degrees but exclude the doubled tiles. To be specific, 
++To define vertical strings, we roughly rotate horizontal tiles by 90 degrees but exclude the doubled tiles. To be specific, 
+ a {\it zero-one vertical} boundary string is also a collection of tiles $T_i \in \{T_{0/1}, T_{1/1}\}$ 
+ but with rotated offsets: 
+ \begin{equation} \label{eq:zero-one-bs-vertical}
+@@ -1431,12 +1414,6 @@
+ 	\end{align*}
+ 	
+ 	Checking the interior is similar. 
+-	
+-	
+-	
+-	
+-	
+-	
+ \end{proof}
+ 
+ 
+@@ -1475,8 +1452,8 @@
+ 
+ 		\includegraphics[width=0.2\textwidth]{Figures/bs_cases/horizontal/qq_0.png} &
+ 		\includegraphics[width=0.2\textwidth]{Figures/bs_cases/horizontal/qq_1.png} &
+-		\includegraphics[width=0.2\textwidth]{Figures/bs_cases/vertical/qq_0.png} &
+-		\includegraphics[width=0.2\textwidth]{Figures/bs_cases/vertical/qq_1.png}  \\
++		$-$ &
++		$-$  \\
+ 		
+ 		\includegraphics[width=0.2\textwidth]{Figures/bs_cases/horizontal/d_qq_0.png} &
+ 		\includegraphics[width=0.2\textwidth]{Figures/bs_cases/horizontal/d_qq_1.png} &
+@@ -1486,6 +1463,46 @@
+ 	\caption{Possible pairwise overlaps in a zero-one boundary string with labeling as Figure \ref{fig:zero_one_gap}.}
+ 	\label{table:zero-one-single-overlaps}
+ \end{table}
++
++
++
++\begin{table}
++	\begin{tabular}{cccc}
++		Horizontal non-reversed & Horizontal reversed & Vertical non-reversed & Vertical reversed   \\
++		\includegraphics[width=15mm,height=15mm]{Figures/boundary_strings_odometer_ipe/horizontal/pp_0.pdf} &
++		\includegraphics[width=15mm,height=15mm]{Figures/boundary_strings_odometer_ipe/horizontal/pp_1.pdf} &
++		\includegraphics[width=8mm,height=15mm]{Figures/boundary_strings_odometer_ipe/vertical/pp_0.pdf} &
++		\includegraphics[width=8mm,height=15mm]{Figures/boundary_strings_odometer_ipe/vertical/pp_1.pdf} \\
++		
++		\includegraphics[width=15mm,height=15mm]{Figures/boundary_strings_odometer_ipe/horizontal/pq_0.pdf} &
++		\includegraphics[width=15mm,height=15mm]{Figures/boundary_strings_odometer_ipe/horizontal/pq_1.pdf} &
++		\includegraphics[width=8mm,height=15mm]{Figures/boundary_strings_odometer_ipe/vertical/pq_0.pdf} &
++		\includegraphics[width=8mm,height=15mm]{Figures/boundary_strings_odometer_ipe/vertical/pq_1.pdf}  \\
++		
++		\includegraphics[width=15mm,height=15mm]{Figures/boundary_strings_odometer_ipe/horizontal/qp_0.pdf} &
++		\includegraphics[width=15mm,height=15mm]{Figures/boundary_strings_odometer_ipe/horizontal/qp_1.pdf} &
++		\includegraphics[width=8mm,height=15mm]{Figures/boundary_strings_odometer_ipe/vertical/qp_0.pdf} &
++		\includegraphics[width=8mm,height=15mm]{Figures/boundary_strings_odometer_ipe/vertical/qp_1.pdf} \\
++		
++		\includegraphics[width=15mm,height=15mm]{Figures/boundary_strings_odometer_ipe/horizontal/q2p_0.pdf} &
++		\includegraphics[width=15mm,height=15mm]{Figures/boundary_strings_odometer_ipe/horizontal/q2p_1.pdf} &
++		$-$ & $-$  \\		
++		
++		\includegraphics[width=15mm,height=15mm]{Figures/boundary_strings_odometer_ipe/horizontal/qq2_0.pdf} &
++		\includegraphics[width=15mm,height=15mm]{Figures/boundary_strings_odometer_ipe/horizontal/qq2_1.pdf} &
++		$-$ &
++		$-$  \\
++		
++		\includegraphics[width=15mm,height=15mm]{Figures/boundary_strings_odometer_ipe/horizontal/q2q2_0.pdf} &
++		\includegraphics[width=15mm,height=15mm]{Figures/boundary_strings_odometer_ipe/horizontal/q2q2_1.pdf} &
++		\includegraphics[width=8mm,height=15mm]{Figures/boundary_strings_odometer_ipe/vertical/qq_0.pdf} &
++		\includegraphics[width=8mm,height=15mm]{Figures/boundary_strings_odometer_ipe/vertical/qq_1.pdf} 
++	\end{tabular}
++	\caption{As Table \ref{table:zero-one-single-overlaps} except with the values of the odometer.}
++	\label{table:zero-one-single-overlaps-odometer}
++\end{table}
++
++
+ 
+ 
+ 
+@@ -1520,25 +1537,38 @@
+ for $p,q = 0/1, 1/1$. 
+ 
+ 
+-The {\it zero-odometer} is any translation of $o_{0/1}:T_{0/1} \to \Z$, defined by $o_{0/1}(0)=o_{0/1}(1) = o_{0/1}(i) = o_{0/1}(1+ \I) = 0$ and $o_{0/1}(2 i) = o_{0/1}(1 + 2 \I) = -1$.  The {\it one-odometer} is any translation of $o_{1/1}:T_{1/1} \to \Z$, defined by $o_{1/1}(0)=o_{1/1}(1)=o_{1/1}(1+ \I)=0$ and $o_{1/1}(\I) = -1$. The {\it enlarged one-odometer} is any translation of $o_{1/1}^d : T_{1/1}^d \to \Z$ defined by $o_{1/1}^d = o_{1/1}$ on $T_1$ and $o_{1/1}^d(\I-1)=-2$, $o_{1/1}^d(1-\I) = 0$. 
++The {\it zero-odometer} is any translation of $o_{0/1}:T_{0/1} \to \Z$, defined by $o_{0/1}(0)=o_{0/1}(1) = o_{0/1}(i) = o_{0/1}(1+ \I) = 0$ and $o_{0/1}(2 i) = o_{0/1}(1 + 2 \I) = -1$.  The {\it one-odometer} is any translation of $o_{1/1}:T_{1/1} \to \Z$, defined by $o_{1/1}(0)=o_{1/1}(1)=o_{1/1}(1+ \I)=0$ and $o_{1/1}(\I) = -1$. The {\it enlarged one-odometer} is any translation of $o_{1/1}^d : T_{1/1}^d \to \Z$ defined by $o_{1/1}^d = o_{1/1}$ on $T_{1/1}$ and $o_{1/1}^d(\I-1)=-2$, $o_{1/1}^d(1-\I) = 0$. 
+ 
+ 
+ A sequence of zero/one-odometers $\{o_i\}$ {\it respects} a zero-one boundary string $\{T_i\}$ if each successive tile $T_i$ 
+ is the domain of $o_i$ and 
+-\begin{equation} \label{eq:zero-one-odometer_slopes}
+-\begin{aligned}
+-s(o_{i+1}) - s(o_{i}) &= a_{i,j}  \quad \mbox{ non-reversed case} \\
+-s(o_{i+1}) - s(o_{i}) &= a_{i,j} + (a_{i, j'} - a_{i+1,j'}) \quad \mbox{ reversed case},
+-\end{aligned}
+-\end{equation}
+-where $(j,j') \in \{1,2\}$ are the direction and its perpendicular respectively.
++\begin{equation} \label{eq:zero-one-odometer_slopes-horizontal}
++s(o_{i+1}) - s(o_{i}) = 
++\begin{cases}
++	0 	 &\quad\mbox{horizontal $p p$} \\
++	0 	 &\quad\mbox{horizontal $q q$} \\
++	-1/2 	 &\quad\mbox{horizontal $p q$} \\
++	1/2 	 &\quad\mbox{horizontal $q p$} 
++\end{cases} 
++\end{equation}
++and
++\begin{equation} \label{eq:zero-one-odometer_slopes-vert}
++	s(o_{i+1}) - s(o_{i}) = 
++	\begin{cases}
++		-\I 	 &\quad\mbox{vertical $p p$ } \\
++		1-\I 	 &\quad\mbox{vertical $q q$ } \\
++		1/2 - \I 	 &\quad\mbox{vertical $p q$ } \\
++		1/2 - \I 	 &\quad\mbox{vertical $q p$ } 
++	\end{cases} 
++\end{equation}
++where, for example, `vertical $pq$' indicates that the string is vertical, $i = p$, and $i+1$ is $q$. 
+ 
+ From Table \ref{table:zero-one-single-overlaps}, one can see some consecutive 
+ pairs of tiles do not overlap. This means odometers corresponding to such tiles may blow up across the boundary. We fix this by requiring a further compatibility relation between pairs of non-overlapping 
+-tiles. We assume that if $T_1, T_2$ are a consecutive sequence of horizontal tiles that do not overlap %pp qp non-reversed pp pq reversed
++tiles. We assume that if $T_i, T_{i+1}$ are a consecutive sequence of horizontal tiles that do not overlap %pp qp non-reversed pp pq reversed
+ then, after a shared translation, $o_i$ and $o_{i+1}$ are constant across the shared boundary. That is, after the translation, $o_i(x) = o_{i+1}(y)$
+-for all $|y-x| =1$.  In the vertical case, if $T_i$ and $T_{i+1}$ do not overlap, then they must both be type $1/1$;
+-we assume that after a shared translation, $o_{i+1}(y)-o_{i}(x) =-1$ for $|y-x| = 1$.  
++for all $|y-x| =1$.  In the vertical case, if $T_i$ and $T_{i+1}$ do not overlap
++we assume that after a shared translation, $o_{i+1}(y)-o_{i}(x) =-1$ for $|y-x| = 1$ (in this case they must be one-tiles).   
+ 
+ 
+ We now check existence, using Lemma \ref{lemma:zero-one-fixed-offsets}. 
+@@ -1546,33 +1576,30 @@
+ 	Given any word $w$, a sequence of zero-one odometers with a common extension which respects its boundary string or its reversal exists. 
+ 	Moreover, if $w$ is an almost palindrome, then there exists a sequence of odometers $\{o_i^+\}$, and $\{o_i^-\}$
+ 	respecting $\mathcal{B}_w = \{T_i^+\}$ and a sequence $\{o_i^-\}$ respecting the reversed string 
+-	$\mathcal{B}^r_{\rev(w)}$ which have a common extension to the stacked string  where $s(o_{1/1}^+) - s(o_{1/1}^-) = 0$ in the vertical case and $s(o_{1/1}^+) - s(o_{1/1}^-) = a_{p,2}$ in the horizontal case.
++	$\mathcal{B}^r_{\rev(w)}$ which have a common extension to the stacked string  where $s(o_{1/1}^+) - s(o_{1/1}^-) = 0$ in the vertical case and $s(o_{0/1}^+) - s(o_{0/1}^-) = a_{p,2}$ in the horizontal case.
+ \end{lemma}
+ 
+ \begin{proof}
++	We note the forms of the odometers after translation.  The zero-odometer translated by $-a_{p,2}$,  $\hat{o}_0: T_{0/1} \to \Z$ is given by $o_{0/1}(0)=o_{0/1}(1) = -1$ and $o_{0/1}(i) = o_{0/1}(1+ \I) = 0 = o_{0/1}(2 \I) = o_{0/1}(1 + 2\I) = 0$.  The one-odometer translated by $-a_{q,2}$,  $\hat{o}_q:T_{1/1} \to \Z$ is given by 
++	$\hat{o}_q(0)=\hat{o}_q(\I) = \hat{o}_q(1+ \I)=0$ and $\hat{o}_q(1) = -1$. Similarly, the enlarged one-odometer translated
++	by $-a_{q,2}$, $\hat{o}^d:T_{1/1}^d \to \Z$ is given by $\hat{o}^d = \hat{o}$ on $T_{1/1}$ and $\hat{o}(1-\I)=-2$, $\hat{o}(\I-1)=0$. 
++	
++	
+ 	From the definitions, one can see that no three consecutive pairs of tiles in a boundary string can overlap - 
+ 	only two consecutive pairs can. Therefore, existence of a sequence of zero/one odometers respecting a boundary string reduces to checking 
+ 	compatibility between partial odometers for pairwise consecutive tiles. Since compatibility is an affine invariant relationship, 
+-	we can translate so that the first odometer is exactly $o_{1/1}$ or $o_{0/1}$. This then reduces the compatibility check to a finite one, 
+-	see Table \ref{table:zero-one-single-overlaps}.  
++	we can translate so that the first odometer is exactly $o_{1/1}$, $o_{0/1}$, $\hat{o}_{1/1}$, or $\hat{o}_{0/1}$. This then reduces the compatibility check to a finite one, 
++	see Table \ref{table:zero-one-single-overlaps} and Table \ref{table:zero-one-single-overlaps-odometer}. 
+ 	
+ 	The existence problem for a stacked string is similar - by Lemma \ref{lemma:zero-one-fixed-offsets}, there 
+ 	are only ten possible cases for overlaps between tiles in a stacked string. We have enumerated these cases in 
+ 	Figures \ref{fig:horizontal-zero-one-overlaps} and \ref{fig:vertical-zero-one-overlaps}.
+ 	
+-	\iffalse
+-	 Since $s(o_{1/1}^+) = s(o_{1/1}^-)$ in the vertical case, the check is straightforward here. 
+-	In the horizontal case, it is useful to note the forms of the odometers after translation.  The zero-odometer translated by $-a_{p,2}$,  $\hat{o}_0: T_{0/1} \to \Z$ is given by $o_{0/1}(0)=o_{0/1}(1) = -1$ and $o_{0/1}(i) = o_{0/1}(1+ \I) = 0 = o_{0/1}(2 i) = o_{0/1}(1 + 2i) = 0$  The one-odometer translated by $-a_{q,2}$,  $\hat{o}_q:T_1 \to \Z$ is given by 
+-	$\hat{o}_q(0)=\hat{o}_q(i) = \hat{o}_q(1+ \I)$ and $\hat{o}_q(1) = -1$. Similarly, the enlarged one-odometer translated
+-	by $-a_{q,2}$, $\hat{o}^d:T_1^d \to \Z$ is given by $\hat{o}^d = \hat{o}$ on $T_1$ and $\hat{o}(1-\I)=-2$, $\hat{o}(i-1)=0$. 
+-	Since $w$ is an almost palindrome by the
+-	argument as in Lemma \ref{lemma:almost_palindrome}, slopes between $o_i^+$ and $o_i^-$ are fixed.
+-	From this and the above formula, one can see that in every case in Figure \ref{fig:horizontal-zero-one-overlaps}, the reversed and non-reversed 
+-	odometers are exactly 0 on the shared overlaps. 
+-	\fi
+-	
+-	
+-	
++	Since $s(o_{1/1}^+) = s(o_{1/1}^-)$ in the vertical case, the compatibility check follows by inspecting Table \ref{table:zero-one-single-overlaps-odometer} and Figure \ref{fig:vertical-zero-one-overlaps}.
++
++	In the horizontal case, since $w$ is an almost palindrome, by the
++	argument as in Lemma \ref{lemma:almost_palindrome}, the slopes between $o_i^+$ and $o_i^-$ are fixed.
++	From this and inspecting Table \ref{table:zero-one-single-overlaps-odometer} and Figure \ref{fig:horizontal-zero-one-overlaps}, we see that the reversed and non-reversed odometers are exactly 0 on the shared overlaps. 
+ \end{proof}
+ 
+ 
+@@ -1580,9 +1607,9 @@
+ 
+ \iffalse
+ We record now a vertical translation of the odometers by their respective affine factors.
+-The zero-odometer translated by $-a_{p,2}$,  $\hat{o}_0: T_{0/1} \to \Z$ is given by $o_{0/1}(0)=o_{0/1}(1) = -1$ and $o_{0/1}(i) = o_{0/1}(1+ \I) = 0 = o_{0/1}(2 i) = o_{0/1}(1 + 2i) = 0$  The one-odometer translated by $-a_{q,2}$,  $\hat{o}_q:T_1 \to \Z$ is given by 
++The zero-odometer translated by $-a_{p,2}$,  $\hat{o}_0: T_{0/1} \to \Z$ is given by $o_{0/1}(0)=o_{0/1}(1) = -1$ and $o_{0/1}(i) = o_{0/1}(1+ \I) = 0 = o_{0/1}(2 i) = o_{0/1}(1 + 2i) = 0$  The one-odometer translated by $-a_{q,2}$,  $\hat{o}_q:T_{1/1} \to \Z$ is given by 
+ $\hat{o}_q(0)=\hat{o}_q(i) = \hat{o}_q(1+ \I)$ and $\hat{o}_q(1) = -1$. Similarly, the enlarged one-odometer translated
+-by $-a_{q,2}$, $\hat{o}^d:T_1^d \to \Z$ is given by $\hat{o}^d = \hat{o}$ on $T_1$ and $\hat{o}(1-\I)=-2$, $\hat{o}(i-1)=0$. 
++by $-a_{q,2}$, $\hat{o}^d:T_{1/1}^d \to \Z$ is given by $\hat{o}^d = \hat{o}$ on $T_{1/1}$ and $\hat{o}(1-\I)=-2$, $\hat{o}(i-1)=0$. 
+ \fi
+ 
+ 
+@@ -1597,15 +1624,14 @@
+ \end{figure}
+ 
+ 
+-We now associate horizontal and vertical boundary strings to tiles and partial odometers. 
+-	Let $(w_h, w_v)$ denote almost palindromes which define zero-one horizontal and vertical boundary strings respectively. 
++We now associate horizontal and vertical boundary strings to tiles and partial odometers. Let $(w_h, w_v)$ denote almost palindromes which define zero-one horizontal and vertical boundary strings respectively. 
+ 
+ \begin{definition} \label{def:tile_boundary_strings}
+ 	A $(w_h, w_v)$-pseudo-square is a tile, $T$, which can be decomposed along its boundary into a sequence of subtiles 
+ 	\[
+ 	 \mathcal{T}_{h,v} := \{T_{i,h}^+\} \cup \{ T_{i,h}^-\} \cup \{ T_{i,v}^+\} \cup \{ T_{i,v}^-\}
+ 	\]
+-	each of which respectively form a $w_h$, $\rev(w_h)$, $w_v$, and $\rev(w_v)$ zero-one horizontal, reversed horizontal, vertical, and reversed vertical boundary string. 	That is, $\mathcal{T}_{h,v} \subset T$, $c(T_{1,h}^+) = c(T_{1,v}^-) =  c(T)$ and $\partial T \cap \mathcal{T}_{h,v} = \partial T$. 
++	each of which respectively form a $w_h$, $\rev(w_h)$, $w_v$, and $\rev(w_v)$ zero-one horizontal, reversed horizontal, vertical, and reversed vertical boundary string. 	That is, $\mathcal{T}_{h,v} \subset T$, $c(T_{1,h}^+) = c(T_{1,v}^-) =  c(T)$ and $\partial^{-} T \cap \mathcal{T}_{h,v} = \partial^{-} T$. 
+ 	
+ 	A partial odometer $o: T \to \Z$ respects $(w_h, w_v)$
+ 	if its restrictions to $\mathcal{T}_{h,v}$ respect $w_h$-horizontal, $w_v$-vertical, and $\rev(w_h)$-reversed-horizontal
+@@ -1625,15 +1651,15 @@
+ \end{equation}
+ where $T_r$ is a $\mathcal{R}(w_h, w_v) $-pseudo-square with $c(T_r) = c(T)$. 
+ 
+-We now define a map  $G(w_h,w_v) \in F_2^*$ to $(w_1,w_2) \in F_2$. We start by defining it for pairs of horizontal zero-one tiles (strings),
++We now define a map  $G: (w_h, w_v) \mapsto (w_1, w_2)$. We start by defining it for pairs of horizontal zero-one tiles (strings),
+ \begin{equation} \label{eq:g_boundary_word_pairwise}
+ \begin{cases}
+ g(p*q) &\to 1*\I \\
+ g(q*p) &\to 1*1 \\
+ g(q_d*p)&\to \I*1 \\
+ g(p*p) &\to  1*1 \\
+-g(q*q) &\to  \I*1 \\
+-g(q_d*q) &\to  \I*1,
++g(q*q_d) &\to  1*1 \\
++g(q_d*q_d) &\to  \I*1,
+ \end{cases}
+ \end{equation}
+ where $q_d$ indicates a $T^d_{1/1}$ tile. Next extend the map to $w_h$ by, 
+@@ -1642,7 +1668,7 @@
+ \end{equation}
+ and extend this to $w_v$ by 
+ \begin{equation}
+-G(w_v) = \I G(\mathcal{F}(w_h)),
++G(w_v) = \I G(\mathcal{F}(w_v)),
+ \end{equation}
+ where $\I \cdot w_1$ denotes component multiplication in $\Z[\I]$ (for example, $\I \cdot (\I*1) = -1*\I$). And finally, extend the map pairwise $G(w_h,w_v) = (G(w_h), G(w_v))$.
+ 
+@@ -1663,12 +1689,11 @@
+ \end{lemma} \label{lemma:pseudo-square-boundary-word}
+ \begin{proof}
+ 	We first check that $G(w_h)$ traces out the lower boundary of $w_1$. By checking Table \ref{table:zero-one-single-overlaps}, 
+-	we see that the \eqref{eq:g_boundary_word_pairwise} does traces out the lower boundary for each pair of tiles. Indeed, 
++	we see that the \eqref{eq:g_boundary_word_pairwise} does trace out the lower boundary for each pair of tiles. Indeed, 
+ 	if neither tile in the pair $(T^1, T^2)$ is $T_{1/1}^d$, the path starts at $c(T^1)$ and ends at $c(T^2)$. Otherwise, the path 
+ 	starts or ends at $c(T_{1/1}^d) + (1 - \I)$. The extra $*1$ in \eqref{eq:g_boundary_word_w_h} ensures 
+ 	the path ends at the lower right corner of $T_{0/1}$. The lower right corner of $T_{0/1}$, after a 90-degree clockwise rotation 
+ 	maps to the lower-left corner of $T_{1/1}$. In general, the lower boundary of every pair of horizontal tiles in Table \ref{table:zero-one-single-overlaps} maps to the right boundary of the flipped pair of vertical tiles. We can also use the table to check that the reversed string $\rev(w_h)$ is a 180-degree rotation of $w_h$, thus $\rev(w_1)$ traces the top boundary of $\rev(w_h)$.  
+-	
+ \end{proof}
+ 
+ %The rotation operator sends the boundary words $(w_1, w_2)$ to $(-\I w_2, -i w_1)$. 
+@@ -1680,7 +1705,7 @@
+ \begin{lemma}
+ Let $T$ be a $(w_h,w_v)$-pseudo-square,  $(w_1,w_2) = G(w_h, w_v)$, and suppose $o: T \to \Z$ respects $(w_h, w_v)$. If the conditions in Lemma \ref{lemma:almost_square_tiling} on $(w_1,w_2)$ are met, $T$ generates a $(v_1, v_2) := (\sum w_1 + \I, \sum w_2 - 1)$ regular almost-tiling.
+ 
+-Further suppose $(v_{1}, v_2) = v_{n/d, 1}, v_{n/d,2}$ for some reduced fraction $0 < n/d < 1$. Then, the surrounding of $T$ with respect to $(v_{n/d, 1}, v_{n/d, 2})$ consists of two stacked zero-one horizontal and two vertical boundary strings and the translation condition,
++Further suppose $(v_{1}, v_2) = (v_{n/d, 1}, v_{n/d,2})$ for some reduced fraction $0 < n/d < 1$. Then, the surrounding of $T$ with respect to $(v_{n/d, 1}, v_{n/d, 2})$ consists of two stacked zero-one horizontal and two vertical boundary strings and the translation condition,
+ \begin{equation} \label{eq:translation_condition}
+ o(x \pm v_{n/d,i}) = o(x) \pm a_{n/d,i}^T x + k_{n/d, \pm i}  \quad \mbox{for $x \in \Z^2$},
+ \end{equation}
+@@ -1697,12 +1722,11 @@
+ Similarly if $C$ is the vertical string for $T$ and $D$ the reversed vertical string for $T + v_{n/d,1}$, then 
+ the offset between the respective first tiles in $C$ and $D$ is $(\I+1) = -v_{1/1,1}$. The other two interfaces are stacked strings by the above arguments for $T - v_{n/d,1}$ and $T + v_{n/d,2}$.  
+ 
+-Let $\mathcal{T} = \{ T + \I v_{n/d, 1} + j v_{n/d,2}\} $ denote the almost tiling of $T$ and for $T_{i,j} \in T$, let 
++Let $\mathcal{T} = \{ T + i v_{n/d, 1} + j v_{n/d,2}\} $ denote the almost tiling of $T$ and for $T_{i,j} \in T$, let 
+ $o_{i,j}:T_{i,j} \to \Z$ denote the translations of $o$ by $(i v_{n/d,1} + j v_{n/d,2}, i a_{n/d,1} + j a_{n/d, 2})$.
+ By definition, each $o_{i,j}$ respects $(w_h,w_v)$ on $T_{i,j}$. Restrict the $o_{i,j}$ to 
+-the stacked boundary strings and check, by repeating the above argument, that the slope difference between the first two perpendicular tiles in the stacked horizontal strings are $-a_{p,2}$. Similarly, the slope difference for the stacked vertical strings is $a_{q,1} = 0$.
+-Therefore, by Lemma \ref{lemma:stacked_zero_one_string}, each pair of odometers is compatible. This together with Lemma \ref{lemma:pairwise_compatibility} implies there is a common extension of $o_{i,j}$
+-tp the plane. 
++the stacked boundary strings and check, by repeating the above argument, that the slope differences between the first two perpendicular tiles in the stacked horizontal strings are $-a_{p,2}$. Similarly, the slope difference for the stacked vertical strings are $a_{q,1} = 0$.
++Thus Lemma~\ref{lemma:stacked_zero_one_string} gives a constant difference on either generator interface. The translates are indexed by $(i,j)\in\Z^2$. Reversing the order of the two generator steps changes their total offset by $a_{n/d,1}\cdot v_{n/d,2}-a_{n/d,2}\cdot v_{n/d,1}=0$, since $a_{n/d,i}=M(n,d)v_{n/d,i}$ and $M(n,d)$ is symmetric. Hence the offsets sum to zero around each elementary square and around every path of generator steps that closes. The corner description at the end of Lemma~\ref{lemma:almost_square_tiling} separates the opposite tiles by a unit gap. Shared vertices on adjacent generator interfaces use the same value. The covering and Lemma~\ref{lemma:pairwise_compatibility} now give the extension in \eqref{eq:translation_condition}.
+ \end{proof}
+ 
+ 
+@@ -1738,9 +1762,10 @@
+ \subsubsection{Horizontal boundary strings} \label{subsubsec:horizontal_bs_explicit}
+ 
+ We first note the form of the odometers after a translation. 
+-The zero-odometer translated by $-a_{p,2}$,  $\hat{o}_{0/1}: T_{0/1} \to \Z$ is given by $\hat{o}_{0/1}(0)=\hat{o}_{0/1}(1) = -1$ and $\hat{o}_{0/1}(\I) = \hat{o}_{0/1}(1+ \I) = 0 = \hat{o}_{0/1}(2 \I) = \hat{o}_{0/1}(1 + 2 \I) = 0$.  The one-odometer translated by $-a_{q,2}$,  $\hat{o}_{1/1}:T_{1/1} \to \Z$ is given by 
++The zero-odometer translated by vector $v = 0$, affine factor $a = -a_{p,2}$, and constant $b = -1$,  $\hat{o}_{0/1}: T_{0/1} \to \Z$ is given by $\hat{o}_{0/1}(0)=\hat{o}_{0/1}(1) = -1$ and $\hat{o}_{0/1}(\I) = \hat{o}_{0/1}(1+ \I) = 0 = \hat{o}_{0/1}(2 \I) = \hat{o}_{0/1}(1 + 2 \I) = 0$.  The one-odometer translated by
++$v = 0$, $a =-a_{q,2}$, and $b = 0$,  $\hat{o}_{1/1}:T_{1/1} \to \Z$ is given by 
+ $\hat{o}_{1/1}(0)=\hat{o}_{1/1}(\I) = \hat{o}_{1/1}(1+ \I)=0$ and $\hat{o}_{1/1}(1) = -1$. Similarly, the enlarged one-odometer translated
+-by $-a_{q,2}$, $\hat{o}_{1/1}^d:T_{1/1}^d \to \Z$ is given by $\hat{o}_{1/1}^d = \hat{o}_{1/1}$ on $T_{1/1}$ and $\hat{o}_{1/1}(1-\I)=-2$, $\hat{o}_{1/1}(\I-1)=0$. 
++by the same parameters, $\hat{o}_{1/1}^d:T_{1/1}^d \to \Z$ is given by $\hat{o}_{1/1}^d = \hat{o}_{1/1}$ on $T_{1/1}$ and $\hat{o}_{1/1}(1-\I)=-2$, $\hat{o}_{1/1}(\I-1)=0$. 
+ 
+ 
+ Now, let  $\{o_i^+\}$ (resp. $\{o_i^-\}$) respect an arbitrary (resp. reversed) horizontal boundary string.
+@@ -1762,7 +1787,7 @@
+ In each case, let $\{o_i^+\}$  (resp. $\{o_i^-\}$) respect the indicated (resp. reversed) vertical boundary string.
+ 
+ \subsubsection*{Case 1: $p^{k} q$ and its reversal}
+-Suppose $o^+_1 = o_{0/1}$ on $T_{1/1}$, the first tile in $p^k q$. Then,  for $ 1 \leq j \leq k$
++Suppose $o^+_1 = o_{0/1}$ on $T_{0/1}$, the first tile in $p^k q$. Then,  for $1 \leq j \leq k$
+ \begin{equation} \label{eq:explicit-forms-bs-1-a}
+ o^+_{j} = 
+ \begin{bmatrix}
+@@ -1779,7 +1804,7 @@
+ t(k) &t(k)
+ \end{bmatrix}.
+ \end{equation}
+-If $o^-_1 = o_{0/1}$ on $T_{0/1}$, the first tile in $\rev(p^k q)$, then
++If $o^-_1 = o_{1/1}$ on $T_{1/1}$, the first tile in $\rev(p^k q)$, then
+ \begin{equation} \label{eq:explicit-forms-bs-1-c}
+ o^-_{j} = 
+ \begin{bmatrix}
+@@ -1802,7 +1827,7 @@
+ q(j'+1) +1 & q(j')
+ \end{bmatrix}.
+ \end{equation}
+-If $o_{1/1}^- = o_{1/1}$ on $T_{1/1}$, the first tile in $\rev(p q^k)$ then for $1 \leq j \leq k$
++If $o_1^{-} = o_{1/1}$ on $T_{1/1}$, the first tile in $\rev(p q^k)$ then for $1 \leq j \leq k$
+ \begin{equation}\label{eq:explicit-forms-bs-2-b}
+ o_j^- = 
+ \begin{bmatrix}
+@@ -1839,7 +1864,7 @@
+ q(j''+3) + 3 & q(j''+2) + 1 
+ \end{bmatrix}.
+ \end{equation}
+-If $o_{1/1}^- = o_{1/1}$ on $T_{1/1}$, the first tile in $\rev(p q^{k} p q^{k+1})$ then $o_{j}^-$ for $1 \leq j \leq (k+2)$ the first $(k+2)$ are as Case 2 above. 
++If $o_1^{-} = o_{1/1}$ on $T_{1/1}$, the first tile in $\rev(p q^{k} p q^{k+1})$ then $o_{j}^-$ for $1 \leq j \leq (k+2)$ the first $(k+2)$ are as Case 2 above. 
+ Then, for $(k+3) \leq j \leq 2k+2$, 
+ \begin{equation}\label{eq:explicit-forms-bs-3-c}
+ o^-_{j} = 
+@@ -1880,7 +1905,7 @@
+ (o_{p_1}, o_{q_1}, o_{p_2}, o_{q_2}) \quad \mbox{ and } \quad (\hat{o}_{p_1}, \hat{o}_{q_1}, \hat{o}_{p_2}, \hat{o}_{q_2}) 
+ \]
+ with finite domains, $T(o_{n/d}) = T_{n/d}$ and $T(\hat{o}_{n/d}) = \hat{T}_{n/d}$. 
+-The tile odometers of each such child Farey pair satisfy the following properties. 
++For each such $w$, the tile odometers of the child Farey pair satisfy the following properties. 
+ \begin{enumerate}[label=(\alph*)]
+ 	\item Under the lattice $L'(n/d)$, $T(n/d)$ generates an almost pseudo-square tiling.
+ 	\item $\hat{T}(n/d)$ covers $\Z^2$ under $L'(n/d)$.
+@@ -1892,8 +1917,8 @@
+ 			Standard case &  &$w_h$ &  $w_v$ \\ 
+ 			\hline
+ 			$3^k$ odd, $k \geq 1$  & $1/d$, $d \geq 4$ even & $qp^kqp^{k+1}$ & $p^{2k+1}q$  \\ 
+-			$3^k$ even, $k \geq 0$ & $1/d$, $d \geq 3$ even & $qp^{k+1}$ & $p^{2(k+1)}q$ \\ 
+-			$2^k$ odd,  $k \geq 0$& $\mathcal{R}(1/d)$ $d \geq 3$ even & $q^{2(k+1)}p$ & $pq^{k+1}$ \\ 
++			$3^k$ even, $k \geq 0$ & $1/d$, $d \geq 3$ odd & $qp^{k+1}$ & $p^{2(k+1)}q$ \\ 
++			$2^k$ odd,  $k \geq 0$& $\mathcal{R}(1/d)$ $d \geq 3$ odd & $q^{2(k+1)}p$ & $pq^{k+1}$ \\ 
+ 			$2^k$ even, $k \geq 1$ &  $\mathcal{R}(1/d)$, $d \geq 4$ even  & $q^{2k+1}p$ & $pq^kpq^{k+1}$
+ 		\end{tabular}
+ 	\end{center}
+@@ -1904,14 +1929,14 @@
+ 			Alternate case &  &$w_h$ &  $w_v$ \\ 
+ 			\hline
+ 			$3^k$ odd, $k \geq 1$  & $1/d$, $d \geq 4$ even & - &$p^{2k+1}q$  \\ 
+-			$3^k$ even, $k \geq 0$ & $1/d$, $d \geq 3$ even & $qp^{k+1}$ & - \\ 
+-			$2^k$ odd,  $k \geq 0$& $\mathcal{R}(1/d)$ $d \geq 3$ even & - & $pq^{k+1}$ \\ 
++			$3^k$ even, $k \geq 0$ & $1/d$, $d \geq 3$ odd & $qp^{k+1}$ & - \\ 
++			$2^k$ odd,  $k \geq 0$& $\mathcal{R}(1/d)$ $d \geq 3$ odd & - & $pq^{k+1}$ \\ 
+ 			$2^k$ even, $k \geq 1$ &  $\mathcal{R}(1/d)$, $d \geq 4$ even  & $q^{2k+1}p$ & - 
+ 		\end{tabular}
+ 	\end{center}
+ 	In particular, the alternates coincide with the standards on one set of boundaries. 
+ 	\item  Some later odometers contain exact translations of earlier odometers. To state this succinctly, 
+-	write $w(p,q)$ for the even and odd reduced fraction in the child Farey pair of $\q_{(w)}$
++	write $w(p)$ and $w(q)$, respectively, for the odd and even reduced fraction in the child Farey pair of $\q_{(w)}$
+ 	and let $T(n/d)(v) = T(n/d) \cup (T(n/d) + v)$ for $v \in \Z[\I]$ and $n/d \in \{p,q\}$. 
+ 	The following holds for all $k \geq 1$: 
+ 	\begin{equation} \label{eq:3^k_decomp}
+@@ -1986,11 +2011,12 @@
+ a vertex $v$ of $H$ where $s(v)$ is at least the in-degree of $v$ in $H$ and otherwise is {\it forbidden}. 
+ 
+ \begin{prop} \label{prop:recurrence} \cite{holroyd2008chip}
+-	An integer superharmonic function $g$ is recurrent if and only if every nonempty induced subgraph 
++	An integer superharmonic function $g$ is recurrent if and only if every nonempty finite induced subgraph 
+ 	of the $F$-lattice is allowed for $s := \Delta g+1$. 
+ \end{prop}
+ In particular, Proposition \ref{prop:recurrence} reduces verifying recurrence of a function to checking a condition on its Laplacian
+ (which is no surprise given the function $s$ in the statement is usually referred to as a recurrent sandpile \cite{levine2010sandpile}). 
++Here is the argument for this graph, also given in \cite[Proposition 3.3]{bou2021convergence}. Write $I(x)$ for the two incoming neighbors of $x$. In a finite forbidden set take a source strongly connected component $X$. Every $x\in X$ has $|I(x)\cap X|\ge\Delta g(x)+2$. Thus $f=g-1_X$ is superharmonic on $X$ and on its complement, while $g-f$ is one on $X$ and zero on its incoming boundary. Conversely, suppose $g-f$ achieves a larger maximum in a finite $X$ than on its incoming boundary, and let $K$ be the set of maximizers. At $x\in K$ every input from outside $K$ lowers the integer difference by at least one. Hence $\Delta g(x)\le\Delta(g-f)(x)\le |I(x)\cap K|-2$, so $K$ is forbidden. 
+ 
+ 
+ 
+@@ -2004,12 +2030,11 @@
+ 
+ \begin{proof}
+ The growth condition can be checked using the definition \eqref{eq:quadratic_growth}.
+-Moreover, $\Delta g_{0/1}(x) = \Delta g_{1/1}(x) = - 1\{ (x_1+x_2) \mbox{ is even}\}$. 
+-By Proposition \ref{prop:recurrence} it remains to check that every nonempty induced subgraph $H$ of the $F$-lattice is allowed 
+-for $s = 1\{ (x_1+x_2) \mbox{ is odd}\}$. Let $x$ denote the lower left vertex of $H$. That is $x$ has minimal $x_2$ coordinate 
+-and of all other $y \in H$ with $y_2 = x_2$, $x_1$ is minimal. This implies the only possible neighbors of $x$ in $H$ are $x+e_1$ or $x+e_2$.  If $(x_1 + x_2)$ is odd, then $s(x) = 1$ so we may suppose otherwise.
+-If $(x+e_1) \in H$, then $s(x+e_1) = 1$ and by our choice of $x$,  $(x+e_1 - e_2) \not \in H$, thus $s(x+e_1)$ is larger
+-than its in-degree in $H$, completing the proof.  
++Moreover, $\Delta g_{0/1}(x) = \Delta g_{1/1}(x) = - 1\{ (x_1+x_2) \mbox{ is odd}\}$. 
++By Proposition \ref{prop:recurrence} it remains to check that every nonempty finite induced subgraph $H$ of the $F$-lattice is allowed 
++for $s = 1\{ (x_1+x_2) \mbox{ is even}\}$. Let $x$ denote the lower left vertex of $H$. That is $x$ has minimal $x_1$ coordinate 
++and of all other $y \in H$ with $y_1 = x_1$, $x_2$ is minimal. This implies the only possible neighbors of $x$ in $H$ are $x+e_1$ or $x+e_2$.  If $(x_1 + x_2)$ is even, then $s(x) = 1$ so we may suppose otherwise.
++If $(x+e_2) \in H$, then $s(x+e_2) = 1$ and by our choice of $x$,  $(x+e_2 - e_1) \not \in H$, thus $s(x+e_2)$ is at least its in-degree in $H$. If $x+e_2\notin H$, then $x$ itself has in-degree zero in $H$.  
+ \end{proof}
+ 
+ 
+@@ -2030,8 +2055,8 @@
+ 
+ 
+ The {\it staircase} fractions are the reduced fractions of the form $\frac{1}{d}$ for $d$ odd and their rotations, 
+-$\mathcal{R}(1,d) = (\frac{d-1}{2}, \frac{d+1}{2})$. These fractions are the even or odd child in Farey quadruples 
+-$\q_{3}^k$ or $\q_{2}^k$ for $k \geq 0$ respectively. The constructed tiles and Laplacians 
++$\mathcal{R}(1,d) = (\frac{d-1}{2}, \frac{d+1}{2})$. These fractions are the even (resp. odd child) in Farey quadruples 
++$\q_{3}^k$  (resp. $\q_{2}^k$) for $k \geq 0$. The constructed tiles and Laplacians 
+ will respect the rotational invariance inherited from Lemma \ref{lemma:rot_invariance}. 
+ 
+ \iffalse
+@@ -2062,7 +2087,7 @@
+ 	 \[
+ 	 g_{1/d}(x) = -\frac{1}{2} x_2 (x_2 + 1) + (x_2 + \min(x_1-1,0)) + 1\{x \in \{ (0, 0), (2 , d+1)\} \} \
+ 	 \]
+-	 respects.
++	 respects. Recall that $d = 2k + 3$. 
+ 	  
+ \end{lemma}
+ 
+@@ -2073,7 +2098,7 @@
+ \]
+ is a $q p^{k+1}$ horizontal boundary string: 
+ \[
+-A_1 = T_{1/1} \quad A_2 = v_{p,1} + \cup_{j=1}^{k+1} ( T_{0/1} + j v_{p,1}\}   
++A_1 = T_{1/1} \quad A_2 = v_{p,1} + \cup_{j=1}^{k+1} ( T_{0/1} + (j-1) v_{p,1}\}   . 
+ \]
+ Moreover an inspection of the formula shows that $g_{1/d} = o_{1/1}$ on $A_1$ 
+ and $g_{1/d} = o_{0/1}$ on the translations of $T_{0/1}$ which form $A_2$.
+@@ -2148,7 +2173,6 @@
+ 	\end{bmatrix} 
+ 	\]
+ 	which is exactly \eqref{eq:explicit-forms-bs-1-c}.
+-
+ \end{proof}
+ 
+ 
+@@ -2162,13 +2186,12 @@
+ 	\[
+ 	g_{p_1}(x) = -\lfloor \frac{(x_2-x_1)^2}{4} \rfloor + \min(d-x_2,0) + 1\{x \in \{ (0, d+1), (d+1, d-1)\} \} 
+ 	\]
+-	respects.
++	respects. 
+ \end{lemma}
+ 
+ \begin{proof}
+ The computations are identical to that of previous Lemma. In this case, the vertical strings match the formula
+ given by \eqref{eq:explicit-forms-bs-2-a}, \eqref{eq:explicit-forms-bs-2-b}, \eqref{eq:explicit-forms-bs-2-c}.
+-	
+ %The argument is a rotation of the previous Lemma. We start by checking that the bottom boundary of $T_{1/d}$ is a $q^{2(k+1)}p$ zero-one horizontal boundary string. First, 
+ %\[
+ %T_{p_1} \supset A_1 \cup A_2 := T_{1/1} \cup \cup_{j=2}^{2(k+1)} (T_{1/1}^d + (j-1) v_{q,1}) \cup (T_{0/1} + (2(k+1)-1)v_{q,1} + v_{p,1})
+@@ -2190,8 +2213,6 @@
+ %g_{1/d}^r( [1,2] \times [d,d+1]) = \hat{o}_{1/1} = \begin{bmatrix} 0 & 0 \\ 0 & -1 \end{bmatrix}
+ %\]
+ %and $g_{1/d}^r([2-d,0] \times [d-1,d+1]) = 0$ and $g_{1/d}^r([2-d,0], d-1) = -1$ which coincides with copies of $\hat{o}_{0/1}$. 
+-
+-	
+ \end{proof}
+ 
+ We next construct the alternate staircase odometers. By Lemma \ref{lemma:common-extension-pseudo-square}, each of the tile odometers defined in the previous two lemmas extend to $\Z^2$ under $L'(n/d)$ with the correct growth \eqref{eq:periodicity_growth}. However, in the next two cases, we require a different argument as the tiling of alternate tiles will result in overlaps.  We start with the alternate even child of $\q_{3^k}$
+@@ -2207,24 +2228,24 @@
+ 	\begin{align*}
+ 	A &= \{ -(d-1) \times [-1,0]\} \cup \{ 3 \times [d,d+1]\} \\
+ 	B &=  \{ (x_1,x_2) :  (x_1+x_2) = 2 \mbox{ and } 0 < x_2 < d \}    \\ 
+-	C &= \{  -1 \times [1-d,0] \} \cup \{ (d+1) \times [4-d,3]\} \\ 
++	C &= \{  [1-d,0] \times -1  \} \cup \{ [4-d,3] \times (d+1) \} \\ 
+ 	D&=  \{ (x_1, x_2) \in [ 4-2d, d] \times [0, d]:  -d + 2 \leq x_1 + x_2 \leq d+2 \}  \\
+ 	\hat{T}_{1/d} &=  A \cup B \cup C \cup D
+ 	\end{align*}
+ 	and
+ 	\[
+ 	\begin{aligned}
+-	\hat{g}_{1/d}(x \pm v_{1/d,i}) &= \hat{g}_{1/d}(x) \pm a_{1/d,i}^T x + k_{1/d,i}  \quad \mbox{for $x \in \Z^2$},
++	\hat{g}_{1/d}(x \pm v_{1/d,i}) &= \hat{g}_{1/d}(x) \pm a_{1/d,i}^T x + k_{1/d,\pm i}  \quad \mbox{for $x \in \Z^2$},
+ 	\end{aligned}
+ 	\]
+-	where $k_{p,\pm i} \in \Z$ is a constant and $i \in \{1,2\}$ selects the lattice vector.
++	where $k_{1/d,\pm i} \in \Z$ is a constant and $i \in \{1,2\}$ selects the lattice vector.
+ 	Moreover, $\hat{T}_{1/d}$ is a $w_h = q p^{k+1}$ pseudo-square which $\hat{g}_{1/d}$ respects. 
+ \end{lemma}
+ \begin{proof}
+ 	Consistency of the first condition and translation by $(v_{1/d,1}, a_{1/d,1})$ comes after checking that
+ 	$\hat{g}_{1/d}(x) = \hat{g}_{1/d}(x + v_{1/d,1})$ for $x, (x+ v_{1/d,1}) \in \hat{T}_{1/d}$. In particular, this shows the constant 
+-	$k_{1/d,i} = 0$ for $i = 1$. Write $\hat{g}_{1/d}: \mathbf{T}_h \to \Z$ for the common extension of $\hat{g}_{1/d}:T\ \to \Z$
+-	to $\mathbf{T}_h := \cup _{i \in \Z} (T + \I v_{1/d,1})$. Note that since there are no gaps between $T$ and $T \pm v_{1/d,1}$, 
++	$k_{1/d,\pm 1} = 0$. Write $\hat{g}_{1/d}: \mathbf{T}_h \to \Z$ for the common extension of $\hat{g}_{1/d}:T\ \to \Z$
++	to $\mathbf{T}_h := \bigcup_{j \in \Z} (\hat T_{1/d} + j v_{1/d,1})$. Note that since there are no gaps between $T$ and $T \pm v_{1/d,1}$, 
+ 	$\mathbf{T}_h$ is simply connected. 
+ 	
+ 	
+@@ -2232,64 +2253,6 @@
+ 	is a repeating sequence of $w_h$ and $\hat{g}_{1/d}$ respects both infinite strings. This implies $( \pm v_{1/d,2}, \pm a_{1/d,2})$ translations of $\hat{g}_{1/d}$ form stacked boundary strings and thus have a common extension to $\cup_{j \in \Z} (\mathbf{T}_{h} + j v_{1/d,2})$. 
+ 	
+ 	Vertical translations of $\mathbf{T}_{h}$ cover the plane since $\mathbf{T}_{h}$ is simply connected and each $\pm v_{1/d,2}$ interface is a stacked zero-one boundary string which is simply connected by Lemma \ref{lemma:zero-one-fixed-offsets}. 
+-	
+-	
+-	
+-	
+-	 
+-	
+-
+-	
+-%	First note that if $x, (x+ (d,1)) \in \hat{T}_{1/d}$, then 
+-%	\[
+-%	x \in A' \cup B' \cup C' \cup D'
+-%	\]
+-%	where
+-%	\begin{align*}
+-%	A' &= \{ -(d-1) \times [-1,0]\}  \\
+-%	B' &=  (-(d-2), d) \cup (-(d-3), d) \cup (-(d-3), d-1)    \\ 
+-%	C' &= \{  -1 \times [1-d,0] \} \\ 
+-%	D'&=  \{ (x_1, x_2) \in [ 4-2d, 0] \times [0, d]:  -d + 2 \leq x_1 + x_2 \leq 1 \}.  
+-%	\end{align*}
+-%	For $x \in A'$, $\hat{g}_{1/d}(x) = \hat{g}_{1/d}(x+(d,1)) = 0$.
+-%	For $x \in B'$,  
+-%	
+-%	For $x \in A'$, 
+-%		\begin{align*}
+-%		\min(0, 2-x_1) = 0  &\qquad \min(0, 2 -d-x_1) =  \\
+-%		\min(0, d-2+x_1) =  &\qquad \max(x_1+x_2-2,0) =   \\
+-%		\max(x_1+x_2-2,0) =  &\qquad \max(x_1+x_2-2,0) =  
+-%		\end{align*}
+-
+-
+-
+-	
+-%	So, we check that 
+-	%	\begin{align*}
+-	%	\min(0, 2-x_1) =  &\qquad \min(0, 2 -d-x_1) =  \\
+-	%	\min(0, d-2+x_1) =  &\qquad \max(x_1+x_2-2,0) =   \\
+-	%	\max(x_1+x_2-2,0) =  &\qquad \max(x_1+x_2-2,0) =  
+-	%	\end{align*}
+-	
+-	
+-
+-	
+-
+-%$\hat{g}_{1/d}(x + (d + \I)
+-	
+-	
+-%	Let $g_{i}:(\hat{T}_{1/d} + \I v_{1/d,1}) \to \Z$ denote the translation of $g_i$ 
+-	
+-%	Let $\hat{g}_{1/d}(x \pm v_{1/d,i})$
+-	
+-%	From the formula, one can check that $\hat{g}_{1/d} = g_{3^k(q)}$ coincides with
+-	
+-%	From the formula, we may check there is a $w_h$ horizontal boundary string starting at $(0,0)$
+-%	and a $\rev(w_h)$ reversed horizontal boundary string starting at $(4-2d,d-2)$. 
+-	
+-%	Also, $\hat{g}_{1/d} = g_{3^k(q)}$ on $XX$. Therefore, 
+-	
+-%	Moreover, 
+ \end{proof}
+ 
+ 
+@@ -2313,7 +2276,7 @@
+ 	and
+ 	\[
+ 	\begin{aligned}
+-	\hat{g}_{p_1}(x \pm v_{p,i}) &= \hat{g}_{p_1}(x) \pm a_{p_1,i}^T x + k_{p_1,i}  \quad \mbox{for $x \in \Z^2$},
++	\hat{g}_{p_1}(x \pm v_{p_1,i}) &= \hat{g}_{p_1}(x) \pm a_{p_1,i}^T x + k_{p_1,\pm i}  \quad \mbox{for $x \in \Z^2$},
+ 	\end{aligned}
+ 	\]
+ 	where $k_{p_1,\pm i} \in \Z$ is a constant and $i \in \{1,2\}$ selects the lattice vector.
+@@ -2321,16 +2284,16 @@
+ \end{lemma}
+ 
+ \begin{proof}
+-	Consistency of the first condition and translation by $(v_{p_1,2}, a_{p_1,2})$ comes after checking that
+-	\[
+-	\hat{g}_{p_1}(x) = \hat{g}_{p_1}(x + v_{p_1,2}) +  a_{p_1,2}^T x - (\frac{d-3}{2})^2
+-	\]
+-	for $x, (x+ v_{p_1,2}) \in \hat{T}_{p_1}$ and  
+-	\[
+-	\hat{g}_{p_1}(x) = \hat{g}_{p_1}(x - v_{p_1,2}) -  a_{p_1,2}^T x - (\frac{d-3}{2})^2 + 1
+-	\]
+-	for $x, (x- v_{p_,1}) \in \hat{T}_{p_1}$. Write $\hat{g}_{p_1}: \mathbf{T}_v$ for the common extension of $\hat{g}_{p_1}:T \to \Z$ to $\mathbf{T}_v := \cup_{i \in \Z} (T + \I v_{p_1,2})$. As $\mathbf{T}_v$ is a rotation of $\mathbf{T}_h$ from the previous lemma, 
+-	it is also simply connected. 
++	Put $P(X,Y)=(d+1-Y,X)$ and $K(X,Y)=X(X-1)/2-\lfloor (X-Y)^2/4\rfloor$.
++	Substitution in the two displayed tile formulas gives $\hat g_{p_1}=\hat g_{1/d}\circ P+K$ on $P^{-1}(\hat T_{1/d})=\hat T_{p_1}$.
++	In particular, $P$ takes the correction line $Y-X=d-1$ to $x_1+x_2=2$ and pairs the four exceptional corners.
++	For $V=v_{p_1,2}=(-1,d)$, we have $P(z+V)=P(z)-(d,1)$. The period $(d,1)$ has zero height increment in the preceding lemma.
++	With $a=((d-1)/2,-(d+1)/2)$ and $c=1-(d+1)^2/4$, direct subtraction in $K$ gives
++	\[
++	\hat g_{p_1}(z+V)-\hat g_{p_1}(z)=a^Tz+c,\qquad
++	\hat g_{p_1}(z-V)-\hat g_{p_1}(z)=-a^T(z-V)-c.
++	\]
++	These increments agree on each overlap. The resulting strip $\mathbf T_v=\bigcup_{j\in\Z}(\hat T_{p_1}+jV)=P^{-1}(\mathbf T_h)$ is simply connected.
+ 
+ 	By checking the formula for $\hat{g}_{p_1}$ against \eqref{eq:explicit-forms-bs-2-a}, \eqref{eq:explicit-forms-bs-2-b}, \eqref{eq:explicit-forms-bs-2-c},
+ 	we see that there is a $\rev(w_v)$ boundary string starting at $(0,1)$ in $\hat{T}_{p_1}$ which $\hat{g}_{p_1}$ respects. 
+@@ -2339,18 +2302,14 @@
+ 	%\[
+ 	%b^T(x) := b(x) + (a_{p_1,2} - a_{1/1,2})^T x -  \frac{1}{4}(d-3)(d+3). %this is coordinate dependent
+ 	%\]
+-	Actually, a stronger statement holds: $\hat{g}_{p_1}$ on $\mathbf{T}_v$ respects infinite repeating $p q^{k+1}$ strings on both sides. Thus, we may combine the strips to extend $\hat{g}_{p_1}$ to the plane. The tiling by $\mathbf{T}_v$ leaves no gaps by the same argument as the previous lemma. 
+-
+-	
+-	
++	Actually, a stronger statement holds: $\hat{g}_{p_1}$ on $\mathbf{T}_v$ respects infinite repeating $p q^{k+1}$ strings on both sides. Thus, we may combine the strips to extend $\hat{g}_{p_1}$ to the plane. The tiling by $\mathbf{T}_v$ leaves no gaps by the same argument as the previous lemma. 	
+ \end{proof}
+ 
+ 
+ 
+-We next record the formula for the Laplacians.  Recall that $\partial T = \{ x \in \Z^2 : \exists y \not \in T \mbox{ such that } |y-x|=1\}$.
+-For $x \in T$, write $\mathcal{R}(x)$ for the image of $x$ under $\mathcal{R}(T)$, defined in \eqref{eq:rotate_tile}. 
+-If $T$ generates a tiling, this definition extends $\mathcal{R}(x)$ to $x \in \Z^2$. 
+-
++The same substitution gives $g_{p_1}=g_{1/d}\circ P+K$ for the standard tiles. In the reciprocal tile coordinates of Lemmas~\ref{lemma:basecase_2k_odd_std} and~\ref{lemma:basecase_2k_odd_alt}, the incoming edges are horizontal at odd coordinate sum. Indeed $P$ exchanges the coordinate axes and preserves coordinate-sum parity, and $4K=X^2+2XY-Y^2-2X+((X+Y)\bmod 2)$ has zero incoming Laplacian on that checkerboard. For either reciprocal formula $f$, its physical placement is $z\mapsto f(z+(0,1))$ on the correspondingly translated domain.
++
++We next record the formula for the Laplacians.  Write  $\partial^{-} T = \{ x \in T : \exists y \not \in T \mbox{ such that } |y-x|=1\}$.
+ \begin{lemma} \label{lemma:staircase_laplacian}
+ 	For $d \geq 3$ odd, let $T_{1/d}$, $\hat{T}_{1/d}$ be the tiles and $g_{1/d}$, $\hat{g}_{1/d}$ the plane extensions of the objects given in Lemmas \ref{lemma:basecase_3k_even_std}
+ 	and \ref{lemma:basecase_3k_even_alt}. The Laplacian, $\Delta g_{1/d}$, satisfies
+@@ -2358,9 +2317,9 @@
+ 	\begin{aligned}
+ 		\Delta g_{1/d}(x)  &=  \Delta g_{1/d}(x \pm v_{1/d, *})  \mbox{ for all $x \in \Z^2$} \\
+ 		\Delta g_{1/d}(x) &= -1\{ (x_1+x_2) \mbox{ is odd } \} \\
+-		&-1\{ (x_1+x_2) \mbox{ is even and $x_1 = 1$} \} \qquad \mbox{ on $T_d \backslash \partial T_{1/d}$} \\
+-	%	& + 1_{\{ (0,1) \cup (2,d)\}}  \qquad \mbox{ on $T_d \backslash \partial T_{1/d}$} \\
+-		\Delta g_{1/d}(x) &= 0 \qquad \mbox{ on $\partial T_{1/d}$}
++		&-1\{ (x_1+x_2) \mbox{ is even and $x_1 = 1$} \} \qquad \mbox{ on $T_{1/d} \backslash \partial^{-}T_{1/d}$} \\
++	%	& + 1_{\{ (0,1) \cup (2,d)\}}  \qquad \mbox{ on $T_{1/d} \backslash \partial^{-}T_{1/d}$} \\
++		\Delta g_{1/d}(x) &= 0 \qquad \mbox{ on $\partial^{-}T_{1/d}$}
+ 	\end{aligned}
+ 	\end{equation}
+ 	
+@@ -2368,21 +2327,21 @@
+ 	The Laplacian of the alternate, $\Delta \hat{g}_{1/d}$ satisfies 
+ 	\begin{equation}
+ 	\begin{aligned}
+-	\Delta \hat{g}_{1/d}(x)  &=  \Delta \hat{g}_{1/d}(x \pm v_{1/d, *})  \mbox{ for all $x \in \Z^2$} \\
++	\Delta \hat{g}_{1/d}(x)  &=  \Delta \hat{g}_{1/d}(x \pm v_{1/d, i})  \mbox{for $i = 1,2$, for all $x \in \Z^2$} \\
+ 	\Delta \hat{g}_{1/d}(x) &= -1\{ (x_1+x_2) \mbox{ is odd } \}\\
+ 	&  -1\{ (x_1+x_2) \mbox{ is even and $x \in \{-(d-2) \times [0,d-1]\} \cup \{2 \times [1, d] \}$} \} \\
+ 	&  -1\{ (x_1 +x_2) = 2  \mbox{ and $1 \leq x_2 \leq d-1$} \}\\
+ 	&+ 1 \{ (x_1 + x_2) = 1 \mbox{ and $1 \leq x_2 \leq d-2$} \} \\
+-	&+ 1 \{ (x_1 + x_2) = 3 \mbox{ and $2 \leq x_2 \leq d-1$} \} \qquad \mbox{ on $T_d \backslash \partial T_{1/d}$} \\
+-%	& + 1\{d > 3\} 1_{(1-d,1) \cup (3,d-1)}  \qquad \mbox{ on $T_d \backslash \partial T_{1/d}$} \\
+-	\Delta \hat{g}_{1/d}(x) &= -1_{ (1-d,0) \cup (3,d)} \qquad \mbox{ on $\partial T_{1/d}$}.
++	&+ 1 \{ (x_1 + x_2) = 3 \mbox{ and $2 \leq x_2 \leq d-1$} \} \qquad \mbox{ on $\hat T_{1/d} \backslash \partial^{-}\hat T_{1/d}$} \\
++%	& + 1\{d > 3\} 1_{(1-d,1) \cup (3,d-1)}  \qquad \mbox{ on $\hat T_{1/d} \backslash \partial^{-}\hat T_{1/d}$} \\
++	\Delta \hat{g}_{1/d}(x) &= -1_{ (1-d,0) \cup (3,d)} \qquad \mbox{ on $\partial^{-}\hat T_{1/d}$}.
+ 	\end{aligned}
+ 	\end{equation}
+ 	
+ 	In both cases, the Laplacians are 180-degree symmetric and  
+ 	\begin{align*}
+-	\Delta g_{\mathcal{R}(1/d)}(x) &= \Delta g_{1/d}(\mathcal{R}(x)) \\
+-	\Delta \hat{g}_{\mathcal{R}(1/d)}(x) &= \Delta \hat{g}_{1/d}(\mathcal{R}(x)).
++	\Delta g_{\mathcal{R}(1/d)}(x_1,x_2) &= \Delta g_{1/d}(d-x_2,x_1) \\
++	\Delta \hat{g}_{\mathcal{R}(1/d)}(x_1,x_2) &= \Delta \hat{g}_{1/d}(d-x_2,x_1).
+ 	\end{align*}
+ 
+ 	
+@@ -2520,27 +2479,27 @@
+ 	For each $q_1 = \frac{d-1}{d+1}$, $d \geq 4$ even, there is a unique function $\hat{g}_{q_1}: \Z^2 \to \Z$ with
+ 	\[
+ 	\begin{aligned}
+-	\hat{g}_{q_1}(x) &= -\lfloor \frac{(x_2-x_1)^2}{4} \rfloor + \min(0, d-x_2) + \min(0, 2d-1-x_2) \quad \mbox{ for $x \in T_{q_1}$} \\
++	\hat{g}_{q_1}(x) &= -\lfloor \frac{(x_2-x_1)^2}{4} \rfloor + \min(0, d-x_2) + \min(0, 2d-1-x_2) \quad \mbox{ for $x \in \hat T_{q_1}$} \\
+ 	&+ \max(0, x_2-x_1-d) + 1_{A \cup B}
+ 	\end{aligned}
+ 	\]
+ 	where
+ 	\begin{align*}
+ 	A &=  (-2,2d) \cup (d+1,d-1) \\
+-	B &= \{ (x_1, x_2) : (x_2-x_1) = d \mbox{ and } 0 < x_1 < d\} \\
++	B &= \{ (x_1, x_2) : (x_2-x_1) = d \mbox{ and } 0 < x_1 < d-1\} \\
+ 	C &=  \{ (x_1, x_2) \in [-2, d+1] \times [1, 3d-2] : -1 \leq (x_2 -x_1) \leq 2d + 1\} \\ 
+-	D &= \{ (x_1, x_2) : x_1 \leq -1 \mbox{ and } x_2 \leq d+1 \mbox{ or } x_1 \geq d \mbox{ and } x_2 \geq 2d \}  \\
+-	T_{q_1} &:=  \{A \cup B \cup C \} \backslash D
++	D &= \{ (x_1, x_2) : x_1 \leq -1 \mbox{ and } x_2 \leq d-1 \mbox{ or } x_1 \geq d \mbox{ and } x_2 \geq 2d \}  \\
++	\hat T_{q_1} &:=  \{A \cup B \cup C \} \backslash D
+ 	\end{align*}
+ 	and
+ 	\[
+-	\hat{g}_{q_1}(x \pm v_{q_1,i}) = g_{q_1}(x) \pm a_{q_1,i}^T x + k_{q_1, \pm i}  \quad \mbox{for $x \in \Z^2$},
+-	\]
+-	where $\hat{k}_{d, \pm i}$ is a constant and $i \in \{1,2\}$ selects the lattice vectors. Moreover, $\hat{T}_{1/d}$ is a $w_h = q^{(2k+1)} p$ pseudo-square which $\hat{g}_{q_1}$ respects.
++	\hat{g}_{q_1}(x \pm v_{q_1,i}) = \hat g_{q_1}(x) \pm a_{q_1,i}^T x + k_{q_1, \pm i}  \quad \mbox{for $x \in \Z^2$},
++	\]
++	where $k_{q_1, \pm i}$ is a constant and $i \in \{1,2\}$ selects the lattice vectors. Moreover, $\hat{T}_{q_1}$ is a $w_h = q^{(2k+1)} p$ pseudo-square which $\hat{g}_{q_1}$ respects.
+ \end{lemma}
+ 
+ \begin{proof}
+-	The proof is similar to Lemma \ref{lemma:basecase_2k_even_alt}.  First, we check that there is a $q^{(2k+1)} p$ horizontal boundary string
++	The change of variables $(x,y)=(2d-1-Y,X+1)$ maps the displayed domain to the preceding doubled alternate.  First, we check that there is a $q^{(2k+1)} p$ horizontal boundary string
+ 	starting $(0,1)$ which $\hat{g}_{q_1}$ respects. As in Lemma \ref{lemma:basecase_3k_even_std}, there is a 
+ 	$\rev(q^{(2k+1)} p)$ reversed horizontal boundary string starting at $(-2, 2(d-1))$ which $\hat{g}_{q_1}$ respects. This implies 
+ 	compatibility and no gaps in the vertical direction. 
+@@ -2560,17 +2519,13 @@
+ 	\]
+ 	for $x \in L$. Similarly, 
+ 	\[
+-	\hat{g}_{q_1}(x-v_{q_1,2}) = \hat{g}_{q_1}(x) 
++	\hat{g}_{q_1}(x-v_{q_1,1}) = \hat{g}_{q_1}(x) 
+ 	\]
+ 	for $x \in R$. This shows compatibility of $\hat{g}_{q_1}$ with its horizontal translates and that $\cup_{j \in \Z} (\hat{T}_{q_1} + j v_{q_1,1})$ has no gaps. 
+-	
+-	
+-	
+-	
+-	%After translation by  $-a_{q_1, 2}$, the$\hat{g}_{q_1}$  
+-	 
+ \end{proof}
+ 
++
++The reciprocal formulas in Lemmas~\ref{lemma:basecase_2k_even_std} and~\ref{lemma:basecase_2k_even_alt} are written in tile coordinates. There the horizontal inputs occur at odd coordinate sum. To use either formula $f$ on the physical $F$-lattice, use $z\mapsto f(z+(0,1))$ and translate its domain by $-(0,1)$. The reciprocal Laplacians below use this physical placement. For example, when $d=4$ the unshifted alternate values at $(-1,4),(0,4),(1,4)$ are $-5,-4,-2$. Their horizontal second difference is $+1$, which explains the choice of checkerboard.
+ 
+ \begin{lemma} \label{lemma:doubled_staircase_laplacian}
+ 	For $d \geq 4$ even, let $T_{1/d}$, $\hat{T}_{1/d}$ be the tiles and $g_{1/d}$, $\hat{g}_{1/d}$ the plane extensions of the objects given in Lemmas \ref{lemma:basecase_3k_odd_std} and \ref{lemma:basecase_3k_odd_alt}. The Laplacian, $\Delta g_{1/d}$, satisfies
+@@ -2581,8 +2536,8 @@
+ 	&  -1\{ (x_1+x_2) \mbox{ is even and $x \in \{1 \times [1,d]\} \cup \{d+1 \times [2, d+1] \}$} \} \\
+ 	&  -1\{ (x_1 +x_2) = d+2  \mbox{ and $2 \leq x_2 \leq d$} \}\\
+ 	&+ 1 \{ (x_1 + x_2) =d+3 \mbox{ and $3 \leq x_2 \leq d$} \} \\
+-	&+ 1 \{ (x_1 + x_2) =d+1 \mbox{ and $2 \leq x_2 \leq d-1$} \} \qquad \mbox{ on $T_d \backslash \partial T_{1/d}$} \\
+-	\Delta g_{1/d}(x) &= 0 \qquad \mbox{ on $\partial T_{1/d}$}
++	&+ 1 \{ (x_1 + x_2) =d+1 \mbox{ and $2 \leq x_2 \leq d-1$} \} \qquad \mbox{ on $T_{1/d} \backslash \partial^{-}T_{1/d}$} \\
++	\Delta g_{1/d}(x) &= 0 \qquad \mbox{ on $\partial^{-}T_{1/d}$}
+ 	\end{aligned}
+ 	\end{equation}
+ 	
+@@ -2595,16 +2550,16 @@
+ 	&  -1\{ (x_1+x_2) \mbox{ is even and $x \in \{0 \times [-1,d-1]\} \cup \{d-1 \times [2, d+2] \}$} \} \\
+ 	&  -1\{ (x_1 +x_2) = d  \mbox{ and $2 \leq x_2 \leq d-1$} \}\\
+ 	&+ 1 \{ (x_1 + x_2) =d+1 \mbox{ and $3 \leq x_2 \leq d$} \} \\
+-	&+ 1 \{ (x_1 + x_2) =d-1 \mbox{ and $1 \leq x_2 \leq d-2$} \} \qquad \mbox{ on $T_d \backslash \partial T_{1/d}$} \\
+-%	& + 1_{ (-1,0) \cup (d,d+1)  }  \qquad \mbox{ on $T_d \backslash \partial T_{1/d}$} \\
+-	\Delta \hat{g}_{1/d}(x) &= -1_{ (d-1,0) \cup (0,d+1)} \qquad \mbox{ on $\partial T_{1/d}$}
++	&+ 1 \{ (x_1 + x_2) =d-1 \mbox{ and $1 \leq x_2 \leq d-2$} \} \qquad \mbox{ on $\hat T_{1/d} \backslash \partial^{-}\hat T_{1/d}$} \\
++%	& + 1_{ (-1,0) \cup (d,d+1)  }  \qquad \mbox{ on $\hat T_{1/d} \backslash \partial^{-}\hat T_{1/d}$} \\
++	\Delta \hat{g}_{1/d}(x) &= -1_{ (d-1,0) \cup (0,d+1)} \qquad \mbox{ on $\partial^{-}\hat T_{1/d}$}
+ 	\end{aligned}
+ 	\end{equation}
+ 	
+ 	In both cases, the Laplacians are 180-degree symmetric and  
+ 	\begin{align*}
+-	\Delta g_{\mathcal{R}(1/d)}(x) &= \Delta g_{1/d}(\mathcal{R}(x)) \\
+-	\Delta \hat{g}_{\mathcal{R}(1/d)}(x) &= \Delta \hat{g}_{1/d}(\mathcal{R}(x)).
++	\Delta g_{\mathcal{R}(1/d)}(x_1,x_2) &= \Delta g_{1/d}(2d-x_2,x_1+1) \\
++	\Delta \hat{g}_{\mathcal{R}(1/d)}(x_1,x_2) &= \Delta \hat{g}_{1/d}(2d-2-x_2,x_1+1).
+ 	\end{align*}
+ 	
+ 	
+@@ -2612,293 +2567,56 @@
+ \end{lemma}
+ 
+ \subsection{One-sided recurrence}
+-In this section we prove that the constructed functions are recurrent. 
+-In fact, we prove a sufficient property which we later use to prove recurrence in the general construction. 
+-First, we observe that recurrence is preserved under rotations which flip parity. 
+-\begin{lemma}
+-	Suppose $v: \Z^2 \to \Z$ is integer superharmonic and recurrent and 
+-	\[
+-	\Delta v = \Delta (v \circ \mathcal{R})
+-	\]
+-	for a 90-degree rotation and translation $\mathcal{R}(\Z^2) = \Z^2$ which flips parity: if $(x_1+x_2)$ is even and $y = \mathcal{R}(x)$
+-	then $(y_1 + y_2)$ is odd. Then $v \circ \mathcal{R}$ is integer superharmonic and recurrent. 
+-\end{lemma} \label{lemma:rot_recurrence_invariance}
++We prove recurrence of the pure families using ranks on the plane. The explicit rank formulas and their incoming-edge comparisons are reproduced in the base-case appendix to the accompanying \emph{Supplement on the Farey induction}.
++\begin{lemma}\label{lemma:rot_recurrence_invariance}
++Let $\mathcal R$ be a quarter-turn followed by a translation which interchanges the two checkerboard parities. If $g$ is integer superharmonic and recurrent, then so is $g\circ\mathcal R$. One may also add an integer harmonic function.
++\end{lemma}
+ \begin{proof}
+-	This is an immediate consequence of the definition. Indeed, let $s_1 = 	\Delta v + 1$ and $s_2 = \Delta (v\circ \mathcal{R}) + 1$.
+-	Since $\mathcal{R}$ is a bijection, every finite induced subgraph of the rotated $F$-lattice can be written 
+-	as $\mathcal{R} \circ H$, for $H$ a finite induced subgraph of the $F$-lattice. Since $v$ is recurrent, 
+-	there is a vertex $x \in H$ with $s_1(x)$ larger than its in-degree in $H$. Let $y = \mathcal{R}(x)$. By assumption, $s_2(y) = s_1(x)$ 
+-	and as $\mathcal{R}$ is a rotation and flips the parity of $x$, the horizontal/vertical neighbors of $x$ become the vertical/horizontal neighbors of $y$ and the edges between either pair of neighbors are preserved.
++A quarter-turn exchanges the coordinate directions, so $I(\mathcal Rx)=\mathcal R I(x)$. Consequently $\Delta(g\circ\mathcal R)(x)=(\Delta g)(\mathcal Rx)$ and $\mathcal R$ preserves the internal incoming degrees of a finite set. A forbidden set for $g\circ\mathcal R$ would map to one for $g$. Adding a harmonic function preserves the Laplacian.
+ \end{proof}
+ 
+-In light of Lemma \ref{lemma:rot_recurrence_invariance} and the observed rotational invariance of the Laplacians, we need only prove recurrence for $\q_{3^k}$, $k \geq 0$. 
+-
++The explicit rotations of the Laplacians, with the physical placement specified above, reduce the calculation to the two staircase families at $1/d$.
+ 
+ We start with the standard even child.  Figure \ref{fig:staircase_even} will be a useful 
+-reference in the next two proofs. 
++reference for the next two lemmas. 
+ 
+ \begin{lemma} \label{lemma:staircase_recurrent}
+ For each $d \geq 3$ odd, the extension of $g_{1/d}:Z^2 \to \Z$ defined in Lemma \ref{lemma:basecase_3k_even_std}
+ is integer superharmonic and recurrent.  
+ \end{lemma}
+ \begin{proof}
+-	By the explicit formula of the Laplacian, Lemma \ref{lemma:staircase_laplacian}, it suffices to check recurrence. 	
+-		
+-	Let $s = \Delta g_{1/d} + 1$ and suppose, for sake of contradiction, that there is an induced subgraph of the $F$-lattice, $H$,
+-	which is forbidden for $s$. Let $c^{0} = -\infty$ and for $j \geq 1$, let 
+-	\begin{equation}
+-	\begin{aligned}
+-	c^{j} &= \min\{ x_1 > c^{j-1} : x \in H\}  \\ 
+-	V^{j} &= \{ x \in H : x_1 = c^j\}.
+-	\end{aligned}
+-	\end{equation}
+-	In words, sets of possibly disjoint vertical lines enumerated from left to right. Since $H$ is forbidden, it is nonempty, hence
+-	$V^{1}$ exists.
+-	
+-	Write $\partial^h T(1/d) := \partial T(1/d) \cap \{ x_2 \in \{0, d+1\}\}$. We prove the following by induction on $j \geq 1$ for all $L'(1/d)$ translations of $T(1/d)$:
+-	\begin{enumerate}
+-		\item If $\bigcup_{j' < j} V^{j'} \cap T(1/d) = \emptyset$ but $V^{j} \cap T(1/d) \not=\emptyset$ then $c_j = 1$, 
+-		otherwise $c_j > 1$. 
+-		\item If $V^{j} \cap T(1/d) \not=\emptyset$, then $V^{j} \cap \partial^h T(1/d) = \emptyset$.
+-		\item If $V^{j} \cap T(1/d) \not=\emptyset$ then $V^{j+1} \cap T(1/d) \not=\emptyset$.
+-	\end{enumerate}
+-	The third condition will result in a contradiction as $T(1/d)$ is finite. The idea is to continually use the fact that $H$ is forbidden.
+-	
+-	
+-	{\it Proof of (1)}\\
+-	Suppose $V^j \cap T(1/d) \not = \emptyset$ but $c_j \not = 1$. 
+-	If $y \in V^j$ and is even, then, since $c_j \not = 1$, $s(y) = 1$ and therefore
+-	$y-e_1 \in H$, since $H$ is forbidden. This contradicts either the assumption $\bigcup_{j' < j} V^{j'} \cap T(1/d) = \emptyset$
+-	or $y-e_1 \not \in T(1/d)$. In the latter case, there are two subcases, (i) $y = (2-d,d)$ 
+-	or (ii) $y = (0,0)$. In case (i), $s(y-e_1) = 1$ and so $y-e_1-e_2 \in H$, contradicting inductive (2). 
+-	In case (ii), $s(y-e_1) = 0$ and either $y-e_1-e_2 \in H$, contradicting inductive (2) or $y-e_1 + e_2 \in H$. 
+-	In the latter case, $s(y-e_1+e_2) = 1$ and there is an even-odd chain of points all with $s(x_i) = 1$ 
+-	ending at $x_k \in \partial^h T(1/d) - v_{1/d,1}$, contradicting inductive (1). (In other words, the vertical boundaries
+-	of $T(1/d)$ are $F$-lattice connected).  
+-	
+-	
+-	
+-	Otherwise if $y$ is odd and $s(y) = 1$, then $y \pm e_2 \in H$ and at least one such neighbor is in $T(1/d)$, a contradiction by the above. If $y$ is odd and $s(y) = 0$, then both $y \pm e_2$ are in $T(1/d)$ and at least one neighbor is in $V^{j}$ as $H$ is forbidden.
+-	
+-	{\it Proof of (2)}\\
+-	Suppose there is $y \in \partial^h T(1/d) \cap V^j$. By the explicit formula, $s(y) = 1$. If $c_j = 1$, then $y \in \{(1,0), (1,d+1)\}$. 
+-	If $y = (1,0)$, then $y' \in \{y-e_2, y-e_2-e_1\}$ satisfies $s(y') = 1$ and $y' \in H$, contradicting the inductive hypothesis as $y-e_2-e_1$ is on $\partial^h (T(1/d)-v_{1/d,1})$.
+-	If $y = (1,d+1)$, then $y+e_2$ and $y+e_2-e_1 \in H$ and $s(y+e_2) = 1$ and $s(y+e_2-e_1)  = 0$. Since $H$ is forbidden at least one of $(y+e_2-e_1 \pm e_2)$ 
+-	must be in $H$, contradicting inductive (2) as in the Proof of (1). 
+-	
+-	If $y = (2,d+1)$, then $s(y) = 1$ and $y-e_1 \in H \cap \partial^h T(1/d)$, contradicting inductive 2. Otherwise, by inductive (1), $c_{j} > 1$ and so $x_2 = 0$. If $x$ is even, then $x-e_1 \in H$, contradicting inductive (2). Otherwise if $x$ is odd, then $x \pm e_2 \in H$ 
+-	and $x-e_2 \in T'^{1/d} := T(1/d) - v_{1/d,2}$.  Since $x-e_2 + v_{1/d,2} \leq 1$, by inductive (1) applied to $T'^{1/d}$, $x-e_2 + v_{1/d,2} = 1$  and $x = (d,0)$. In this case, $s(x+e_2) = 1$ and so $x+e_2-e_1 \in H$. However, $s(x+e_2-e_1) = 0$ and since $x$ is odd, this means $x+e_2-e_1 \pm e_2 \in H$, however, by the same argument as the Proof of (1) this contradicts inductive (2).
+-
+-	
+-	
+-	
+-	{\it Proof of (3)} \\	
+-	We may suppose by the above arguments that $x \in V^{j} \cap \{ T(1/d) \backslash \partial T(1/d)\}$ and $x_1 \geq 1$. 
+-	
+-	If $c^{j} = 1$, then there are no $y \in H \cap T(1/d)$ with $y_1 < 1$.
+-	Therefore if $x$ is even, $x + e_1 \in H$. If $x$ is odd, at least one neighbor $x \pm e_2 \in H$ and that neighbor is even.
+-	
+-	Otherwise, suppose $c^j > 1$. By the same argument, there must be an even $x \in H \cap T(1/d)$. However,
+-	since $c^j > 1$, $s(x) = 1$, meaning $x \pm e_1 \in H$. 
+-	
++For the standard staircase use $R(x,y)=6x+\rho(x,y)$, with the periodic correction $\rho$ given in the first theorem in the odd-denominator base supplement, formula (2). The tables there evaluate the two incoming edges in their physical coordinates, including the period increments at the boundary. They give $R(y)<R(x)$ for both inputs when $1+\Delta g(x)=0$, and for at least one input when $1+\Delta g(x)=1$, where $g$ denotes this odometer. A finite forbidden set would contain a point of least $R$ and one of those lower-ranked inputs. Apply Proposition~\ref{prop:recurrence}.
+ \end{proof}
+ 
+ Next is the alternate even child.
+ \begin{lemma} \label{lemma:alt-staircase-recurrent}
+-	For each $d \geq 3$ odd, the extension of $\hat{g}_{1/d}:Z^2 \to \Z$ defined in Lemma \ref{lemma:basecase_3k_odd_alt}
++	For each $d \geq 3$ odd, the extension of $\hat{g}_{1/d}:Z^2 \to \Z$ defined in Lemma \ref{lemma:basecase_3k_even_alt}
+ 	is integer superharmonic and recurrent. 
+ \end{lemma}
+ \begin{proof}
+-	Let $\hat{s} = \Delta \hat{g}_{1/d} + 1$ and begin the proof as in Lemma \ref{lemma:staircase_recurrent}
+-	except modify the induction hypotheses as follows. 
+-	
+-	Write $\partial^h \hat{T}(1/d) := \partial \hat{T}(1/d) \cap \{ x_2 \in \{-1, 0, d, d+1\}\}$. 
+-	We claim following holds for all $L'(1/d)$-translations of $\hat{T}(1/d)$ and all $j \geq 1$:
+-	
+-	\begin{enumerate}
+-		\item If $\bigcup_{j' < j} V^{j'} \cap \hat{T}(1/d) = \emptyset$ but $V^{j} \cap \hat{T}(1/d) \not=\emptyset$ then $c^{j} \in \{ 2-d, 2 \}$
+-		or $V^{j}$ is a singleton, $\{  (1-d,0), (1,1) \}$.   
+-		Moreover, if $c_j \in \{2-d, 2\}$, then $V^{j'} \cap \hat{T}(1/d) = \emptyset$ for $j' < j$. 
+-		
+-		\item If $V^{j} \cap \hat{T}(1/d) \not=\emptyset$, then $V^{j} \cap \partial^h \hat{T}(1/d) = \emptyset$. 
+-		\item If $V^{j} \cap \hat{T}(1/d) \not=\emptyset$ then $V^{j+1} \cap \hat{T}(1/d) \not=\emptyset$.
+-	\end{enumerate}
+-	
+-	
+-	{\it Proof of (1)}	\\
+-	Suppose $\bigcup_{j' < j} V^{j'} \cap \hat{T}(1/d) = \emptyset$ and $V^{j} \cap \hat{T}(1/d) \not=\emptyset$ but $c^{j} \not \in \{ 2-d, 2 \}$ and take $x \in V^{j}$
+-	for $x \not \in \{ (1-d,0), (1,1)\}$. 
+-	
+-	If $x = (3,d)$, then since $x$ is even and there are no points before it (by the case we're in),
+-	$x + e_1 \in H$. However, $x+e_1$ is odd and $\hat{s}(x+e_1)=1$, so we can build an odd-even chain all with $\hat{s}(x') = 1$ and in $H$: $\{x+e_1, x+e_1+e_2, x+e_2, x+2e_2, x+2e_2-e_1\}$, 
+-	contradicting inductive (2) as $(x+2e_2 -e_1) \in (\partial^h \hat{T}(1/d) + v_{1/d,2}) \cap V^{j-1}$. 
+-		
+-	Next, if $(x_1 + x_2) = 2$ and $1 \leq x_2 \leq d-1$, then $\hat{s}(x) =0$ 
+-	and $x + e_1 \in H$. By our assumption, in this case, $x_2 \geq 2$, so $\hat{s}(x+e_1) = 1$ and hence $x+e_1, x+e_1 + e_2 , x+e_2, x+ 2 e_2 \in H$.
+-	However, $\hat{s}(x+2 e_2) = 1$ and even, a contradiction if $(x + 2 e_2 - e_1) \in \hat{T}(1/d)$ as its in-degree is at most one by the case we are in.
+-	Otherwise $x + 2 e_2 - e_1 \in \partial^h \hat{T}(1/d) + v_{n/d,2}$, contradicting inductive (2).  
+-
+-	
+-	Otherwise, if $x$ is odd, either $\hat{s}(x) = 1$ and one of $s(x \pm e_2) = 1$
+-	or $\hat{s}(x) = 0$ and both $\hat{s}(x \pm e_2) = 1$. If $x$ is even, then $\hat{s}(x) = 1$. 
+-	Both cases lead to a contradiction as we cannot have even $x \in V^{j}$ with $\hat{s}(x) = 1$. 
+-	
+-	Now, suppose $c_j = 2$ but $\cup_{j'<j} V^{j'} \cap \hat{T}(1/d) \not = \emptyset$. 
+-	By inductive (3),  there is some $y \in V^{j'}$, $j' < j$ with $(y_1 + y_2) = 1$. 
+-	If $y = (2-d,d-1)$, then by inductive (1),  $y-e_2, y-e_2+e_1 \in H$ so we may assume $y_2 \leq d-2$.
+-	In fact, iterating this shows that $(1,0) \in H$, contradicting inductive (2) 
+-	as $(1,0) \in V^{j-1} \cap \partial^h \hat{T}(1/d)$. 
+-	
+-	
+-	{\it Proof of (2)}\\
+-	Suppose not and take $y \in V^{j} \cap \{ \partial^h \hat{T}(1/d) \}$ so that $\hat{s}(y) = 1$.
+-	We divide into subcases (i) $y_2 \in \{-1, 0\}$ and (ii) $y_2 \in  \{d, d+1\}$.
+-	
+-	In case (i), if $y$ is even, then $y-e_1 \in H \cap \partial^h \hat{T}(1/d) \cap V^{j-1}$, a contradiction. 
+-	Otherwise, $y$ is odd and there are three subcases. In the first subcase $y-e_2 \in \hat{T}(1/d) - v_{1/d,2}$ and 
+-	$y-e_2 + v_{1/d,2} < 2$, contradicting (1). In the second subcase $y-e_2 \in \hat{T}(1/d) - v_{1/d,2} + v_{1/d,1}$
+-	and $y-e_2 + v_{1/d,2} - v_{1/d,1} < 2$ contradicting (1).  In the third subcase,  $\hat{s}(y) = \hat{s}(y-e_2) = \hat{s}(y-e_2-e_1) = 1$, 
+-	so $y-e_1 \in H$, contradicting inductive (2) for $V^{j-1}$. 
+-	
+-	In case (ii), we may similarly assume $y$ is odd, in which case by (1) applied to all of $\hat{T}(1/d) + \I_1 v_{1/d,1} + \I_2 v_{1/d,2}$ for $|i_j| \leq 1$, $y \in  \{ (3-d,d), (3,d+1)\}$
+-	and $\hat{s}(y) = \hat{s}(y+e_2) = \hat{s}(y+e_2-e_1)=1$ and all points are in $H$, contradicting inductive (2) for $V^{j-1}$. 
+-	
+-	{\it Proof of (3)} \\
+-	Take $y \in V^{j} \cap \hat{T}(1/d) \backslash \partial^{h} \hat{T}(1/d)$ and argue, as in the proof of (3) in Lemma \ref{lemma:staircase_recurrent}, that either $y + e_1 \in H$ or one of $y \pm e_2 + e_1 \in H$. If $c_j \in \{2-d, 2\}$, since $V^{j-1} \cap \hat{T}(1/d) = \emptyset$, 
+-	then there must be even $y' \in V^{j-1} \cap \hat{T}(1/d)$ with $y'+e_1 \in V^{j} \cap \hat{T}(1/d)$. 
+-	Similarly, if $y \in \{(1-d,0), (1,1)\}$ then $y$ is even and so $y + e_1 \in V^{j}$. 
+-	
+-	Otherwise, if $y$ is odd and $\hat{s}(y) = 0$, then $s(y \pm e_2) = 1$ and so at least one of $(y \pm e_2 + e_1) \in H$. 
+-	If $y$ is odd and $\hat{s}(y) = 1$ then both $y' \in \{y \pm e_2\} \in H$ and at least one $\hat{s}(y') = 1$ with $y' \in \hat{T}(1/d)$
+-	or $y' \in \partial^{H} \hat{T}(1/d) \pm v_{1/d,2}$, the latter case contradicting (1). 
+-	
+-	If $y$ is even and $\hat{s}(y) = 0$ but $y+e_1 \not \in H$, then $y-e_1 \in H$. 
+-	If $y = (3-d,d)$, then by inductive (1) and the formula of $\hat{s}$, $\{y-e_1, y-e_1-e_2, y-e_2, y-2e_2, y-2e_2+e_1, y - e_2 + e_1\} \subset H$.
+-	Otherwise, $\hat{s}(y-e_1) = 1$ and similarly $\{y-e_1 -e_2, y-e_2, y-2 e_2, y- 2 e_2 + e_1, y - e_2 + e_1\} \subset H$.
++For the alternate staircase use $R(x,y)=6x+\rho(x,y)$, with the periodic correction $\rho$ given in the second theorem in the odd-denominator base supplement, formula (7). The tables there evaluate the two incoming edges in their physical coordinates, including the period increments at the boundary. They give $R(y)<R(x)$ for both inputs when $1+\Delta g(x)=0$, and for at least one input when $1+\Delta g(x)=1$, where $g$ denotes this odometer. A finite forbidden set would contain a point of least $R$ and one of those lower-ranked inputs. Apply Proposition~\ref{prop:recurrence}.
+ \end{proof}
+ 
+ 
+ 
+-Next is the standard odd child. Figure \ref{fig:doubled_staircase_even} will be a reference in the next two proofs. 
++Next is the standard odd child. Figure \ref{fig:doubled_staircase_even} will be a reference for the next two lemmas. 
+ \begin{lemma} \label{lemma:doubled-staircase-recurrent}
+-	For each $d \geq 4$ even, the extension of $g_{1/d}$ defined in Lemma \ref{lemma:basecase_3k_even_std} is
++	For each $d \geq 4$ even, the extension of $g_{1/d}$ defined in Lemma \ref{lemma:basecase_3k_odd_std} is
+ 	integer superharmonic and recurrent. 
+ \end{lemma}
+ \begin{proof}
+-	Let $s = \Delta g_{1/d} + 1$ and begin the proof as Lemma \ref{lemma:alt-staircase-recurrent}
+-	modifying the inductive hypotheses as follows. 
+-	
+-	Write $\partial^h T(1/d) := \partial T(1/d) \cap \{ x_2 \in \{0, 1, d+1, d+2\}\}$
+-	and $T^1, T^2$ for the two copies of $T(1/(d-1))$ contained within $T(1/d)$: $T^1 = T(1/(d-1))$ and $T^2 = T(1/(d-1)) + v_{1/(d-1),1} + 1 + \I$
+-		
+-	
+-	
+-	We claim following holds for all $L'(1/d)$ translations of $T(1/d)$ and all $j \geq 1$:
+-	\begin{enumerate}
+-		\item If $\bigcup_{j' < j} V^{j'} \cap T(1/d) = \emptyset$ but $V^{j} \cap T(1/d) \not=\emptyset$ then $c^{j} \in \{ 1, d+1 \}$
+-		or $V^{j} = (d,2)$.  Moreover, $c_j \in \{1, d+1\}$, then $V^{j'} \cap T(1/d) = \emptyset$ for $j' < j$. 
+-		If $V^{j} \cap T^1 \neq \emptyset$, then $V^{j'} \cap T(1/d) = \emptyset$ for $c_{j'} < 1$.
+-		If $V^{j} \cap T^2 \neq \emptyset$, then $V^{j'} \cap \{ T(1/d) \backslash (d,2)\} = \emptyset$ for $c_{j'}  < d+1$. 
+-		\item If $V^{j} \cap T(1/d) \not=\emptyset$, then $V^{j} \cap \partial^h T(1/d) = \emptyset$. 
+-		\item If $V^{j} \cap T(1/d) \not=\emptyset$ then $V^{j+1} \cap T(1/d) \not=\emptyset$.
+-	\end{enumerate}
+-	
+-	
+-	{\it Proof of (1)}	\\
+-	Suppose $\bigcup_{j' < j} V^{j'} \cap T(1/d) = \emptyset$ and $V^{j} \cap T(1/d) \not=\emptyset$ but $c^{j} \not \in \{ 1, d+1 \}$ and take $x \in V^{j}$
+-	for $x \not \in \{ (1-d,0), (1,1)\}$.  
+-	
+-	If $(x_1 + x_2) = (d+2)$ and $2 \leq x_2 \leq d$, then $s(x) = 0$ and $x+e_1 \in H$.
+-	By assumption, in this case, $x_2 \geq 3$, so $s(x+e_1) =1$ and  $x+e_1, x+e_1 + e_2 , x+e_2, x + 2 e_2 \in H$.
+-	However, $s(x+ e_2) = 1$ and even, a contradiction. 
+-
+-	The rest of the proof proceeds along the same lines as the corresponding proof of (1) in Lemma \ref{lemma:alt-staircase-recurrent}. Indeed, if $V^{j} \cap T^2 \not = \emptyset$, but $V^{j'} \cap T(1/d) \neq \emptyset$ for $c_{j'}  < d+1$, then $V^{j-1} \cap T(1/d) \not = \emptyset$, in which case by inductive (3) there is some $y \in V^{j'}$, $j' < j$ with $(y_1 + y_2) = d+1$.
+-	
+-
+-	{\it Proof of (2)} \\
+-	The proof is similar to the corresponding proof of (2) in Lemma \ref{lemma:alt-staircase-recurrent}
+-	except here instead of comparing to just the translations of $T(1/d)$, compare to the embedded subtiles $T^1$ 
+-	and $T^2$ also. 
+-	
+-	
+-	Suppose not and take $y \in V^{j} \cap \{ \partial^h T(1/d) \}$ so that $s(y) = 1$.
+-	We divide into subcases (i) $y_2 \in \{0, 1\}$ and (ii) $y_2 \in  \{d+1, d+2\}$.
+-	
+-	In case (i), if $y$ is even, then $y-e_1 \in H \cap \partial^h T(1/d) \cap V^{j-1}$, a contradiction. 
+-	Otherwise, $y$ is odd and there are three subcases. In the first subcase $y-e_2 \in T(1/d) - v_{1/d,2}$ and 
+-	$y-e_2 + v_{1/d,2} < 1$, contradicting (1). In the second subcase $y-e_2 \in T^2$
+-	and $y-e_2 + v_{1/d,2} - v_{1/d,1} < d+1$ contradicting (1).  In the third subcase,  $s(y) = s(y-e_2) = s(y-e_2-e_1) = 1$, 
+-	so $y-e_1 \in H$, contradicting inductive (2) for $V^{j-1}$. 
+-	
+-	In case (ii), we may similarly assume $y$ is odd, in which case we apply (1) to all of $T' + v_{1/d,2}$ for $T' \in \{T(1/d), T^1, T^2\}$, $y \in  \{ (2,d+1), (d+1,d+2)\}$.
+-	In the first subcase,  $s(y) = s(y+e_2) = s(y+e_2-e_1)=1$ and all are in $H$, contradicting inductive (2) for $V^{j-1}$. 
+-	In the second subcase, $s(y) = s(y+e_2) = 1$ and $s(y+e_2-e_1) = 0$. By inductive (2), $y+2 e_2-e_1 \in H$.
+-	However, by iterating, this means we can build a chain of points $y_i$ with $s(y_i) = 1$ and $y_i \in H$
+-	that eventually intersects $\partial^h T(1/d) + v_{1/d,2}$, contradicting inductive (2).  
+-
+-	{\it Proof of (3)} \\
+-	The argument repeats the proof of (3) in Lemma \ref{lemma:alt-staircase-recurrent}. 
+-	
+-	
+-
+-	
++For the standard doubled staircase use $R(x,y)=6x+\rho(x,y)$, with the periodic correction $\rho$ given in the even-denominator base supplement, Sections 1 and 2. The tables there evaluate the two incoming edges in their physical coordinates, including the period increments at the boundary. They give $R(y)<R(x)$ for both inputs when $1+\Delta g(x)=0$, and for at least one input when $1+\Delta g(x)=1$, where $g$ denotes this odometer. A finite forbidden set would contain a point of least $R$ and one of those lower-ranked inputs. Apply Proposition~\ref{prop:recurrence}.
+ \end{proof}
+ 
+ 
+ We conclude with the alternate odd child. The key difference/simplification here is that the vertical boundaries 
+-in the $L'(n/s)$ tiling of $\hat{T}(1/d)$ are connected with respect to the $F$-lattice. 
++in the $L'(1,d)$ tiling of $\hat{T}(1/d)$ are connected with respect to the $F$-lattice. 
+ \begin{lemma} \label{lemma:doubled-alt-staircase-recurrent}
+-	For each $d \geq 4$ even, the extension of $\hat{g}_{1/d}$ defined in Lemma \ref{lemma:basecase_3k_even_alt}
++	For each $d \geq 4$ even, the extension of $\hat{g}_{1/d}$ defined in Lemma \ref{lemma:basecase_3k_odd_alt}
+ 	is integer superharmonic and recurrent. 
+ \end{lemma}
+ \begin{proof}
+-	Let $\hat{s} = \Delta \hat{g}_{1/d} + 1$ and begin the proof as Lemma \ref{lemma:alt-staircase-recurrent}
+-	modifying the inductive hypotheses as follows.
+-	
+-	Write $\partial^h \hat{T}(1/d) := \partial \hat{T}(1/d) \cap (T^1 \cup T^2) \cap \{x_2 \in \{-1,1,d,d+2\}\}$
+-	where $T^1, T^2$ are the two copies of $T(1/(d-1))$ contained within $\hat{T}(1/d)$: $T^1 = T(1/(d-1))$ and $T^2 = T(1/(d-1)) + v_{1/(d-1),1} + 2 \I$
+-	
+-	We claim the following holds for all $L'(1/d)$ translations of $\hat{T}(1/d)$ and all $j \geq 1$:
+-	\begin{enumerate}
+-		\item If $\bigcup_{j' < j} V^{j'} \cap \hat{T}(1/d) = \emptyset$ but $V^{j} \cap \hat{T}(1/d) \not=\emptyset$ then $c^{j} \in \{ 0, d-1 \}$
+-		or $V^{j} = (d-3,1)$.  Moreover, if $c_j = (d-1)$, then $V^{j'} \cap \hat{T}(1/d) \cap T^2 \cap \{x_2 > 3\} = \emptyset$ for $j' < j$. 
+-		\item If $V^{j} \cap \hat{T}(1/d) \not=\emptyset$, then $V^{j} \cap \partial^h \hat{T}(1/d) = \emptyset$
+-		\item If $V^{j} \cap \hat{T}(1/d) \not=\emptyset$ then $V^{j+1} \cap \hat{T}(1/d) \not=\emptyset$.
+-	\end{enumerate}
+-	
+-	
+-	{\it Proof of (1)}	\\
+-	Suppose $\bigcup_{j' < j} V^{j'} \cap \hat{T}(1/d) = \emptyset$ and $V^{j} \cap \hat{T}(1/d) \not=\emptyset$ but $c^{j} \not \in \{0, d-1 \}$ and take $x \in V^{j}$
+-	for $x \neq (d-2,1)$. By a similar argument as in Lemma \ref{lemma:doubled-staircase-recurrent} this contradicts either the assumption or inductive (2).
+-	In this case since $\partial^h$ is smaller, there's an extra step which uses the connected path of 1s on the left boundary. 
+-
+-	Now, suppose $c_j = (d-1)$ but $y \in V^{j'} \cap \hat{T}(1/d) \cap T_2 \cap \{x_2 > 3\} \neq \emptyset$.
+-	If $\hat{s}(y) = 1$, then $y-e_1 \in H$. 
+-	If $\hat{s}(y) = 0$ then both $\hat{s}(y \pm e_2) = 1$ and at least one such neighbor $y \pm e_2$ is in $H$. Iterating,
+-	this means there is $y \in H$ on $\partial T^2$. This either immediately contradicts inductive (2) or there is an $F$-lattice path of $\hat{s}(y_i)=1$
+-	from $y$ to $(0,d+1)$. This implies either $(0, d) \in H$ and $(-1,d) \in H$, contradicting inductive (1) or $(0,d+2) \in H$ and $(1,d+2) \in H$ which contradicts inductive (2). 
+-	
+-
+-	
+-	{\it Proof of (2)} \\
+-	Suppose not and take $y \in V^{j} \cap \partial^h T(1/d)$. We divide into subcases (i) $y_2 = -1$ and (ii) $y_2 = d+2$. 
+-	
+-	Case (i) is identical to the previous proof. In case (ii), by (1),  $y \in \{ (d-1,d+2), (d,d+2\}$. 
+-	Since $(d,d+2) \in H$ implies $(d-1,d+2)$ in $H$, we may take $y = (d-1,d+2)$. In this case, $y \in H$ implies the existence of a chain of points $\{y_i\} \subset H$ with $\hat{s}(y_i) = 1$ ending at $y + v_{1/d,2}$, contradicting inductive (2) for $T(1/d) + v_{1/d,2}$.  
+-	
+-
+-	{\it Proof of (3)} \\
+-	The argument is almost identical to the proof of (3) in Lemma \ref{lemma:alt-staircase-recurrent}
+-	in which we argue case by case. The only new cases are case (i) $y \in \{ (1-d,0), (3,d)\}$ and case (ii) 
+-	$y = (d-3,1)$. 
+-	
+-	In case (i), both $\hat{s}(y\pm e_2) = 1$ hence one of $y \pm e_2 + e_1$ is in $H$. 
+-	
+-	In case (ii), if $y + e_1 \not \in H$, then $\{y -e_1, y-e_1-e_2, y-e_2, y-2e_2, y-2e_2 + e_1\} \subset H$. 
+-	
+-	
+-	
+-	
++For the alternate doubled staircase use $R(x,y)=6x+\rho(x,y)$, with the periodic correction $\rho$ given in the even-denominator base supplement, Sections 3 and 4. The tables there evaluate the two incoming edges in their physical coordinates, including the period increments at the boundary. They give $R(y)<R(x)$ for both inputs when $1+\Delta g(x)=0$, and for at least one input when $1+\Delta g(x)=1$, where $g$ denotes this odometer. A finite forbidden set would contain a point of least $R$ and one of those lower-ranked inputs. Apply Proposition~\ref{prop:recurrence}.
+ \end{proof}
+ 
+ 
+@@ -2974,7 +2692,7 @@
+ 	c(T) - c(T(q_0)) &= 
+ 	\begin{cases}
+ 	0 &\mbox{if $T = T(q_1)^+$} \\
+-	v_{p_1,1} + v_{p_1,2} &\mbox{if $T = T(q_1)^-$} \\
++	v_{p_1, 1} + 2 v_{p_1,2} &\mbox{if $T = T(q_1)^-$} \\
+ 	v_{q_1,1} &\mbox{if $T = T^d(p_1)^+$} \\
+ 	v_{q_1,2} &\mbox{if $T = T^d(p_1)^-$},
+ 	\end{cases}
+@@ -3057,7 +2775,7 @@
+ 	1*(1*\I)^{2k} (1*1)
+ 	\end{pmatrix} &\mbox{ $\q_{2^k}$ for $k \geq 0$ } \\ \\
+ 	\begin{pmatrix} 
+-	(1*1)^k (1*\I) *(1*1)^{k+1}*1  \\
++	(1*1)^k *(1*\I) *(1*1)^{k+1}*1  \\
+ 	1*(1*1)^{k+1}
+ 	\end{pmatrix} &\mbox{ $\q_{3^k}$ for $k > 0$.} 
+ 	\end{cases}
+@@ -3076,7 +2794,7 @@
+ 	\end{pmatrix} &\mbox{ if $\sum (str[i]=1)$ is odd} \\ \\
+ 	
+ 	\begin{pmatrix} 
+-	v_t*\I*v_t*w_t  \\
++	v_t*\I*v_t*\I*w_t  \\
+ 	v_t*\I*w_t
+ 	\end{pmatrix} 
+ 	&\mbox{ if $\sum (str[i]=1)$ is even,} 
+@@ -3118,8 +2836,8 @@
+ 	\tilde{v}_t*\tilde{v}_t*\tilde{w}_t  \\
+ 	\tilde{v}_t*\tilde{w}_t
+ 	\end{pmatrix} 
+-	&\mbox{ if $\sum (str[i]=1)$ is even }
+-	\end{cases},
++	&\mbox{ if $\sum (str[i]=1)$ is even, }
++	\end{cases}
+ 	\end{equation}
+ 	where similarly $\tilde{w}_t,\tilde{v}_t$ are the augmented edges of the odd-even parents of str. 
+ 	Use induction and compute using \eqref{eq:tiling_recursion} to show that the augmented words sum to the desired lattice vectors. 
+@@ -3142,7 +2860,8 @@
+ 	1*(1*\I)^{2k} (1*1*\I)
+ 	\end{pmatrix}.
+ 	\]
+-	By Lemma \ref{lemma:almost_palindrome} both $w_t$ and $v_t$ are of the form $p*\tilde{w}*q$ where $\tilde{w}$ is a palindrome in the letters $p,q$
++	By Lemma \ref{lemma:almost_palindrome} applied with initial string corresponding to either $(p_k,q_k)$ or $(q_k, p_{k-1})$
++	we have that for all $t \geq 1$, both $w_t$ and $v_t$ are of the form $p*\tilde{w}*q$ where $\tilde{w}$ is a palindrome in the letters $p,q$
+ 	where 
+ 	\[
+ 	(p,q) = \begin{cases} (p_k, q_k) &\mbox{ if $s = 1$} \\
+@@ -3221,7 +2940,6 @@
+ 	\end{equation}
+ 	The rest of the argument is similar to Case 1: when $s = 1$ use \eqref{eq:letter_reversal_case2}
+ 	and when $s = 2$ use \eqref{eq:letter_reversal_case3}. 
+-	
+ %	When $s = 1$, we use the following word relations and an argument
+ %	
+ %	Compute to see that
+@@ -3272,14 +2990,8 @@
+ %	&= (1*1)^k*\I *\tilde{w}*(1*1)^{k+1}*(1*\I)*(1*1)^k 
+ %	\end{align*}
+ %	
+-	
+-	
+-	
+ 	%Also check that, $\tilde{p} i = i p$, in the letters $1, i$. This also holds for $q$.So, similar to the last 
+ 	%part, we are in case (c). 
+-	
+-	
+-	
+ \end{proof}
+ 
+ 
+@@ -3296,9 +3008,9 @@
+ 	\begin{enumerate}[label=(\alph*)]
+ 		\item $T(n/d)$ generates a $(v_{n/d,1}, v_{n/d,2})$-regular almost pseudo-square tiling. 
+ 		\item Each $T(n/d)$ is a $(w_{h}(n/d), w_v(n/d))$-pseudo-square with offsets respecting the tiling: 
+-			\begin{enumerate}
++			\begin{enumerate}[label=(\roman*)]
+ 				\item $c(T) - c(T(n/d)) = v_{n/d,1} - (\I+1)$ where $T$ is the last tile of $w_{h}(n/d)$
+-				\item $c(T') - c(T(n/d)) = v_{n/d,2} - (2 \I-1)$ where $T'$ is the last tile of $\rev(w_{v}(n/d))$
++				\item $c(T') - c(T(n/d)) = v_{n/d,2} - (2 \I-1)$ where $T'$ is the last tile of $\rev(w_{v}(n/d))$.
+ 			\end{enumerate}
+ 		\item The surrounding of $T(n/d)$ with respect to $(v_{n/d,1}, v_{n/d,2})$ consists of two stacked zero-one horizontal and two vertical boundary strings.
+ 		\item When $T(n/d)$ has a standard decomposition, the shared boundary between neighboring subtiles is part of or is a stacked horizontal or vertical zero-one boundary string. 
+@@ -3308,7 +3020,7 @@
+ \begin{proof}
+ 	In light of Proposition \ref{prop:base_cases}, we may assume $T(n/d)$ has a standard decomposition 
+ 	and the statements are true for its parents, $T(p_1)$ and $T(q_1)$.  Also, by Lemma \ref{lemma:standard_boundary_word_recursion}
+-	to prove part (a) it suffices to show that $T(n/d)$ is a topological disk, \ie, does not have any internal holes. This however follows from part (c) and Lemma \ref{lemma:zero-one-fixed-offsets}, 
++	to prove part (a) it suffices to show that $T(n/d)$ is a topological disk, \ie, does not have any internal holes. This however follows from parts (c) and (d) and Lemma \ref{lemma:zero-one-fixed-offsets}, 
+ 	hence it remains to prove (b), (c), and (d). We assume that the decomposition given is in the even-first orientation, 
+ 	otherwise flip the subsequent statements. 
+ 	
+@@ -3318,7 +3030,7 @@
+ 	By the inductive hypothesis, $T(p_1)$ and $T(q_1)$ are $(w_h(p_1), w_v(p_1))$ and $(w_h(q_1), w_v(q_1))$
+ 	pseudo-squares. By rotation, we may assume $T(n/d)$ is odd. Let $T$ be the last tile in $T(q_1)^{+,1}$ and $T'$ the first tile in $T(q_1)^{+,2}$. 
+ 	By definition $T$ is a translation of $T_{0/1}$ and $T'$ a translation of $T_{1/1}$. Moreover, 
+-	by the definition of the standard decomposition and the inductive hypothesis on the offsets, $c(T')-c(T) = (1+ \I)$, 
++	by the definition of the standard decomposition and the inductive hypothesis on the offsets, $c(T')-c(T) = -(1+ \I)$, 
+ 	in particular, we can glue the two boundary strings together. A similar argument applies to the interface between 
+ 	$T(q_1)^{+,2}$ and $T(p_1)$. This shows if $(n/d)$ is odd, then $T(n/d)$ respects $w_h(q_1)*w_h(q_1)*w_h(p_1)$ otherwise
+ 	it respects $w_h(q_1)*w_h(p_1)$. A symmetric argument applies to the vertical boundary strings and a computation
+@@ -3367,6 +3079,7 @@
+ 	\rev(w_v(n/d)) &\mbox{ case $v^-$}.
+ 	\end{cases}
+ 	\end{equation}	
++	That is, for example, $T^{h^+}$ contains the zero-one subtiles of $T(n/d)$'s horizontal boundary string, $w_h(n/d)$, with $w_h$ as in Definition \ref{def:tile_boundary_strings}. 
+ 	A boundary tile $T^b(n/d)$ coincides with $T(n/d)$ on every side: 
+ 	\begin{equation}
+ 	T^b(n/d) \cap T(n/d)
+@@ -3420,7 +3133,7 @@
+ 	 a partial doubled tile where $v_{n/d} = v_{p_0,2}$ or $v_{n/d} = v_{q_0,1}$ for $n/d = p_0$ odd or $n/d=q_0$ even respectively.
+ 	 
+ 	 The weak doubling of a partial odometer $o_{n/d}$ with domain $T^b(n/d)$  
+-	 is a partial odometer $d(o)^{\pm}_{n/d}:T^{d,p}(n/d) \to \Z$ with the decomposition
++	 is a partial odometer $d(o)^{\pm}_{n/d}:T^{d,p,\pm}(n/d) \to \Z$ with the decomposition
+ 	 \begin{equation} \label{eq:doubled_odometer}
+ 	 d(o)^{\pm}_{n/d} = o_{n/d} \cup o_{n/d}^*
+ 	 \end{equation}
+@@ -3451,7 +3164,7 @@
+ We say weak standard tile odometers $o_{n/d}$ and $o_{n/d}'$ are {\it lattice adjacent} if 
+ \begin{align*}
+ c(T(o_{n/d})) - c(T(o_{n/d})') &=  v_{n/d,i} \\
+-s(o_{n/d}) - s(o_{n/d}') &= \pm a_{n/d,i},
++s(o_{n/d}) - s(o_{n/d}') &= a_{n/d,i},
+ \end{align*}
+ for $i \in \{1,2\}$. We now prove an analogue of Lemma \ref{lemma:standard_tile_properties}
+ for weak standard odometers.  
+@@ -3488,14 +3201,6 @@
+ 	{\it Step 2. Inductive hypotheses} \\
+ 	We copy the proof of parts (b) and (c) of Lemma \ref{lemma:standard_tile_properties}. To check that the affine offsets
+ 	are the ones required in Lemma \ref{lemma:stacked_zero_one_string}, we use the fact that the subodometers respect the tiling together with an inductive application of (b). 
+-	
+-
+-	 	
+-	
+-
+-
+-	
+-	
+ \end{proof}
+ 
+ 
+@@ -3611,7 +3316,7 @@
+ \end{equation}
+ 
+ 
+-\begin{figure}[]
++\begin{figure}
+ 	\centering
+ 	\includegraphics[scale=0.37]{Figures/tiles/alt_tile/e1_p.png}
+ 	\includegraphics[scale=0.37]{Figures/tiles/alt_tile/e1_q.png} \\
+@@ -3622,7 +3327,7 @@
+ 	\caption{As Figure \ref{fig:standard_tile_overlaps} (even-first) but for alternate tiles with labels from Definition \ref{def:alternate_tiles}.} \label{fig:alt_tile_overlaps}
+ \end{figure}
+ 
+-\begin{figure}[]
++\begin{figure}
+ 	\includegraphics[scale=0.38]{Figures/tiles/alt_tile/o1_p.png}
+ 	\includegraphics[scale=0.38]{Figures/tiles/alt_tile/o1_q.png} \\
+ 	\includegraphics[scale=0.38]{Figures/tiles/alt_tile/o2_p.png}
+@@ -3669,12 +3374,15 @@
+ 	Consider the enlarged tile, $T^e(n/d)$ with boundary word $w_1 = w_{q_1,1}*w_{q_1,1}*w_{p_1,1}$
+ 	and $w_2 = w_{p_1,2}*w_{q_1,2}*w_{p_1,2}$. Translate the enlarged tile so that $c(T^e(n/d)) - c(\hat{T}(n/d)) = -v_{q_1,1}$. 
+ 	
+-	By Lemma \ref{lemma:almost_square_tiling}, $T^e(n/d)$ generates a regular $(\sum v_{n/d,1}+v_{q,1}, \sum v_{n/d,2})$ almost pseudo-square tiling. We use this to show there are no gaps in the $(\sum v_{n/d,1}+v_{q,1}, \sum v_{n/d,2})$-regular tiling of $\hat{T}(n/d)$
++	By Lemma \ref{lemma:almost_square_tiling}, $T^e(n/d)$ generates a regular $(v_{n/d,1}+v_{q,1}, \sum v_{n/d,2})$ almost pseudo-square tiling.  (To see that $w_2$ satisfies
++	the conditions needed in the Lemma, observe that $w_{p_1,2}*w_{q_1,2}*w_{p_1,2}*w_{q_1,2}$ consists of two concatenated vertical boundary strings of a standard tile.)
++	
++	We use this to show there are no gaps in the $(v_{n/d,1}, v_{n/d,2})$-regular tiling of $\hat{T}(n/d)$
+ 	and the only subtiles which overlap are $T(q_1)^{-,1}$ and $T(q_1)^{+,2}$.	The proof proceeds along the lines of Figure \ref{fig:shifted_overlap}.
+ 	
+  	By 180-degree symmetry, it suffices to analyze the lower-right corner of a surrounding. Take the shifted tiling of $\hat{T}(n/d)$ with respect to  $(\sum v_{n/d,1}+v_{q,1}, \sum v_{n/d,2})$ and compare the lower-right surrounding: 
+ 	\begin{align*}
+-	S^{s} := \hat{T}(n/d) \cup (\hat{T}(n/d) + v_{n/d,1} + v_{q_1,1}) \cup (\hat{T}(n/d) - v_{n/d,2}) \cup (\hat{T}(n/d) + v_{n/d,1} + v_{q_1,1})
++	S^{s} := \hat{T}(n/d) \cup (\hat{T}(n/d) + v_{n/d,1} + v_{q_1,1}) \cup (\hat{T}(n/d) - v_{n/d,2}) \cup (\hat{T}(n/d) + v_{n/d,1} - v_{n/d,2} + v_{q_1,1})
+ %	=: \hat{T}(n/d) \cup T^{r} \cup T^{d} \cup T^{dr}
+ 	\end{align*}
+  	to the corresponding corner of the non-shifted tiling
+@@ -3684,7 +3392,7 @@
+ 	\end{align*}
+ 	Since $T^e(n/d)$ generates a $(v_{n/d,1}+v_{q,1}, v_{n/d,2})$ almost pseudo-square tiling, each 
+ 	pair of tiles in $S^{s}$ can only overlap on their boundaries and by definition of $T^e(n/d)$, there 
+-	are only two gaps in $S^{s}$ both of which are squares with a $(w_{q_1,1}, w_{p_1,2})$ boundary word. 
++	are only two gaps in $S^{s}$ both of which are pseudosquares with a $(w_{q_1,1}, w_{p_1,2})$ boundary word. 
+ 	Using the alternate decomposition, these two gaps are filled in the non-shifted tiling and $T(q_1)^{-,1}$ and $T(q_1)^{+,2}$ overlap
+ 	completely, concluding the proof of this step. 
+ 	
+@@ -3693,13 +3401,6 @@
+ 	Indeed, we can use the alternate decomposition to concatenate boundary strings of the standard subtiles 
+ 	which make up the boundary of $\hat{T}(n/d)$. See Figures \ref{fig:alt_tile_overlaps}, \ref{fig:odd-first_alt_tile_overlaps},
+ 	and the bottom of Figure \ref{fig:shifted_overlap}.
+-
+-	
+-	
+-	
+-	
+-	
+-	
+ \end{proof}
+ 
+ 
+@@ -3707,7 +3408,7 @@
+ 	\includegraphics[width=0.6\textwidth]{Figures/alt_tile_tiling/1_small.png}
+ 	\includegraphics[width=0.6\textwidth]{Figures/alt_tile_tiling/2_small.png}
+ 	\caption{A visual explanation of the proof of Lemma \ref{lemma:alternate_tile_properties}. 
+-On the top is a lower-right surrounding of shifted tiling and on the bottom is a lower-right surrounding of the non-shifted tiling. 
++On the top is a lower-right surrounding of the shifted tiling and on the bottom is a lower-right surrounding of the non-shifted tiling. 
+ } \label{fig:shifted_overlap}
+ \end{figure}
+ 
+@@ -3784,10 +3485,11 @@
+ 
+ 
+ In this section we define a partial tile, Definition \ref{def:partial_tile}, for every standard tile which will aid us in fully defining doubled weak odometers which don't overlap on a common ancestor. The construction of this partial tile will involve a chain of ancestor tiles. Let $(p_0, q_0) = \mathcal{C}(p_1, q_1)$ be a Farey child pair in quadruple $\q_{w}$ with recursion word $w \in F_3^*$.
+-Recall the standard tile decomposition from Definition \ref{def:standard_tiles}.
++Recall the standard tile decomposition from Definition \ref{def:standard_tiles}. 	See Figure \ref{fig:l_corrections_orientations_odd}. 
+ 
+ 
+ \begin{definition}[Odd $L$-correction] \label{def:odd_l_correction}
++
+ 
+ 	Suppose $w = w_1 * s * 2^k$ where $|w_1| \geq 0$, $s \in \{1,3\}$, and $k \geq 0$.
+ 	Let $(p_2, q_2)$ be the parent Farey pair corresponding to the string $w = w_1*s$ and let $(T(p_2), T(q_2))$ be standard tiles for $(p_2,q_2)$ and $\hat{T}(q_2)$ an alternate tile for $q_2$. 
+@@ -3797,7 +3499,7 @@
+ 	\begin{equation}\label{eq:l_correction_odd}
+ 	T^{L,\pm}(p_0) = \bigcup_{j=0}^{k} (T(q_2) + K_1 j) \cup  (T(p_2) + K_2) \cup \left(K_3 + \bigcup_{i=1}^{2(k+1)-z} (\hat{T}(q_2) +  K_4 i)\right)
+ 	\end{equation}
+-	where the initial offset is specified by requiring $T(q_2)$ match an outer $T(q_1)$ tile in the standard decomposition of $T(p_0)$:
++	where $c(T(p_2)) = c(T(q_2)) + K_1 k$ and $c(\hat{T}(q_2)) = c(T(p_2)) + K_2$ and the initial offset of $T(q_2)$ is specified by requiring $c(T(q_2)) = c(T(q_1))$ for an outer tile $T(q_1)$ in the standard decomposition of $T(p_0)$:
+ 	\[
+ 	\begin{cases}
+ 	T(q_1)^{+,2}  &\mbox{ $10$} \\
+@@ -3810,18 +3512,18 @@
+ 	\[
+ 	[K_1,K_2] = 
+ 	\begin{cases}
+-	[v_{q_2,2}, v_{q_2,2} + (v_{q_2,1} - 2 v_{p_2,1} )]  &\mbox{ $ 1 0 $} \\
++	[v_{q_2,2}, v_{q_2,2} + (v_{q_2,1} - v_{p_2,1} )]  &\mbox{ $ 1 0 $} \\
+ 	[v_{q_2,2}, -v_{p_2,2}] &\mbox{ $1 1$} \\
+ 	[v_{q_2,2},v_{q_2,2}] &\mbox{ $0 0$} \\
+-	[-v_{q_2,2},-v_{p_2,2}-(2 v_{p_2,1} - v_{q_2,1})] &\mbox{ $0 1$} 
++	[-v_{q_2,2},-v_{p_2,2}-(v_{p_2,1} - v_{q_2,1})] &\mbox{ $0 1$} 
+ 	\end{cases}
+ 	\]
+ 	and
+ 	\[
+ 	[K_3,K_4] =
+ 	\begin{cases}
+-	[(-v_{q_2,2}+v_{p_2,2}) + (2v_{p_2,1} - v_{q_2,1}), -v_{q_2,1}]  &\mbox{ $ 1 0 $} \\
+-	[2v_{p_2,1}-v_{q_2,1}, v_{q_2,1}] &\mbox{ $1 1$} \\
++	[(-v_{q_2,2}+v_{p_2,2}) + (v_{p_2,1} - v_{q_2,1}), -v_{q_2,1}]  &\mbox{ $ 1 0 $} \\
++	[v_{p_2,1}-v_{q_2,1}, v_{q_2,1}] &\mbox{ $1 1$} \\
+ 	[-(v_{q_2,2}+v_{p_2,2}), v_{q_2,1}] &\mbox{ $0 0$} \\
+ 	[0, -v_{q_2,1}] &\mbox{ $0 1$},
+ 	\end{cases}
+@@ -3840,10 +3542,11 @@
+ 
+ 
+ The correction in the even-case is similar but the offsets are slightly different 
+-due to the lack of rotational symmetry in the parameterization. 
+-
++due to the lack of rotational symmetry in the parameterization. 	See Figure \ref{fig:l_corrections_orientations} and Figure \ref{fig:l_corrections_overlaps}. 
+ 
+ \begin{definition}[Even $L$-correction] \label{def:even_l_correction}
++
++	
+ 	Suppose $w = w_1 * s * 3^k$ where $|w_1| \geq 0$, $s \in \{1,2\}$, and $k \geq 0$.
+ 	Let $(p_2, q_2)$ be the parent Farey pair corresponding to the string $w = w_1*s$ and let $(T(p_2), T(q_2))$ be standard tiles for $(p_2,q_2)$ and $\hat{T}(p_2)$ an alternate tile for $p_2$. 
+ 	
+@@ -3852,7 +3555,7 @@
+ 	\begin{equation}\label{eq:l_correction_even}
+ 	T^{L,\pm}(q_0) = \bigcup_{j=0}^{k} (T(p_2) + K_1 j) \cup  (T(q_2) + K_2) \cup \left(K_3 + \bigcup_{i=1}^{2(k+1)-z} (\hat{T}(p_2) +  K_4 i)\right)
+ 	\end{equation}
+-	where the initial offset is specified by requiring $T(p_2)$ match an outer $T(p_1)$ tile in the standard decomposition of $T(p_0)$:
++	where $c(T(q_2)) = c(T(p_2)) + K_1 k$, $\hat{T}(p_2) = c(T(q_2)) + K_2$ and the initial offset is specified by requiring $c(T(p_2)) = c(T(p_1))$ for an outer $T(p_1)$ tile in the standard decomposition of $T(p_0)$:
+ 	\[
+ 	\begin{cases}
+ 	T(p_1)^{+,1}  &\mbox{ $\{0 \mbox{ or } 1\}0$} \\
+@@ -3863,23 +3566,23 @@
+ 	 \[
+ 	 [K_1,K_2,K_4] = 
+ 	 \begin{cases}
+-	[2 v_{p_2,1}, 2 v_{p_2,1}, v_{p_2,2}] &\mbox{ $1 0$  } \\
+-	[-2 v_{p_2,1}, -v_{q_2,1}, v_{p_2,2}]  &\mbox{ $0 0$ } \\
+-	[-2 v_{p_2,1}, -v_{q_2,1}+v_{p_2,1}-v_{q_2,1}, -v_{p_2,2}]  &\mbox{ $1 1$ } \\
+-	[2 v_{p_2,1}, 2v_{p_2,1} + v_{p_2,2} -v_{q_2,2}, -v_{p_2,2}] &\mbox{ $0 1$ } 
++	[v_{p_2,1}, v_{p_2,1}, v_{p_2,2}] &\mbox{ $1 0$  } \\
++	[-v_{p_2,1}, -v_{q_2,1}, v_{p_2,2}]  &\mbox{ $0 0$ } \\
++	[-v_{p_2,1}, -v_{q_2,1}+v_{p_2,1}-v_{q_2,1}, -v_{p_2,2}]  &\mbox{ $1 1$ } \\
++	[v_{p_2,1}, v_{p_2,1} + v_{p_2,2} -v_{q_2,2}, -v_{p_2,2}] &\mbox{ $0 1$ } 
+ 	 \end{cases}
+ 	 \]
+ 	 and
+ 	 \[
+ 	 K_3 = 
+ 	 \begin{cases}
+-	 v_{q_2,1}-2 v_{p_2,1}  + (v_{q_2,2} - v_{p_2,2} + v_{q_2,1} )  &\mbox{ $1 0$ and $s=2$} \\
+-	 v_{q_2,1}-2 v_{p_2,1}  	&\mbox{ $1 0$ and $s=1$} \\
++	 v_{q_2,1}-v_{p_2,1}  + (v_{q_2,2} - v_{p_2,2} + v_{q_2,1} )  &\mbox{ $1 0$ and $s=2$} \\
++	 v_{q_2,1}-v_{p_2,1}  	&\mbox{ $1 0$ and $s=1$} \\
+ 	 v_{q_2,2} - v_{p_2,2}  &\mbox{ $0 0$ and $s=2$} \\
+-	 2 v_{p_2,1} - v_{q_2,1} &\mbox{ $0 0$ and $s=1$} \\
++	 v_{p_2,1} - v_{q_2,1} &\mbox{ $0 0$ and $s=1$} \\
+ 	 v_{q_2,2} - v_{p_2,2} + v_{q_2,1} &\mbox{ $1 1$ and $s=2$} \\
+ 	 0 &\mbox{ $1 1$ and $s=1$ }\\
+-	 v_{q_2,2} - v_{p_2,2} - 2 v_{p_2,1} + v_{q_2,1} &\mbox{ $0 1$ and $s=2$} \\
++	 v_{q_2,2} - v_{p_2,2} - v_{p_2,1} + v_{q_2,1} &\mbox{ $0 1$ and $s=2$} \\
+ 	 	0 &\mbox{ $0 1$ and $s=2$},
+ 	 \end{cases}
+ 	 \]
+@@ -3906,8 +3609,9 @@
+ 		\mathcal{R}^1(T^{L, +}(q_0)) &= T^{L, -}(\mathcal{R}(q_0)) \\
+ 		\mathcal{R}^2(T^{L, +}(q_0)) &= T^{L,-}(q_0) \\
+ 		\mathcal{R}^3(T^{L, +}(q_0)) &=  T^{L, +}(\mathcal{R}(q_0)) \\
+-		\mathcal{R}^4(T^{L, +}(q_0)) &= T^{L, +}(q_0).
++		\mathcal{R}^4(T^{L, +}(q_0)) &= T^{L, +}(q_0) \, ,
+ 		\end{align*}
++		where $\mathcal{R}^i$ represents applying the rotation $\mathcal{R}$ repeatedly $i$ times.
+ 		\item  The elongated $T^{L,\pm}(q_0)$ coincides with $T(q_0)$ on two sides
+ 		\[
+ 		T^{L, \pm}(q_0) \cap T(q_0) \supset
+@@ -3925,7 +3629,7 @@
+ 	The stated rotation invariance follows from the decomposition and rotation invariance of standard and alternate tiles.
+ 	To prove the second claim, we rotate and flip to assume we are in case `10' and $w = w_1 *s*3^k$ from Definition \eqref{def:even_l_correction}. We then proceed by induction on $k \geq 0$
+ 	
+-	If $k = 0$, the claim follows by the standard decomposition of $T(q_0)$ and the definition of the $L$-correction Indeed, the elongated $T^{L,+}(q_0) \cap T(q_0)\supset T(p_1)^{+,1} \cup T(q_1)^+$ which shows $T^{L, \pm}(q_0) \cap T(q_0) \supset w_h(q_0)$. 
++	If $k = 0$, the claim follows by the standard decomposition of $T(q_0)$ and the definition of the $L$-correction. Indeed, the elongated $T^{L,+}(q_0) \cap T(q_0)\supset T(p_1)^{+,1} \cup T(q_1)^+$ which shows $T^{L, \pm}(q_0) \cap T(q_0) \supset w_h(q_0)$. 
+ 	For the vertical direction, since $\hat{T}(p_1)$ is a $w_v(p_1)$-pseudo-square, it agrees with $T(p_1)$ on the vertical boundaries. 
+ 	
+ 	Now, suppose $k \geq 1$ is given and let $q_0'$ be the even child in $\q_{w[1:|w|-1]}$. By the inductive hypothesis, the elongated $T^{L, +}(q_0')$ coincides with $T(q_0')$ on the bottom and left boundaries. Also, by definition, we may write the elongated correction for $q_0$ as  
+@@ -3967,16 +3671,16 @@
+ 
+ 
+ \begin{figure}[!ht]
+-	\includegraphics[scale=0.35]{Figures/tiles/corrected_tiles/even_tile/00_1.png}
+-	\includegraphics[scale=0.35]{Figures/tiles/corrected_tiles/even_tile/00_2.png}
++	\includegraphics[width=0.49\textwidth]{Figures/tiles/corrected_tiles/even_tile/00_1.png}
++	\includegraphics[width=0.49\textwidth]{Figures/tiles/corrected_tiles/even_tile/00_2.png}
+ 	\caption{The two possible odd-even overlaps for an even $L$-correction as described in Definition \ref{def:even_l_correction}: 
+ 		$s = 1$ on the left (elongated) and $s = 2$ on the right.} \label{fig:l_corrections_overlaps}
+ \end{figure}
+ 
+ \begin{figure}
+-		\includegraphics[scale=0.35]{Figures/l_correct/s1_double_small.png}
+-			\includegraphics[scale=0.35]{Figures/l_correct/s2_double_small.png}
+-	\caption{Decompositions of the triple $(\hat{T}(p_2)^1, T(q_2), T(p_2)^2)$, in Figure \ref{fig:l_corrections_overlaps}: $s=1$ on the left and $s=2$ on the right.	
++		\includegraphics[width=0.49\textwidth]{Figures/l_correct/s1_double_small.png}
++			\includegraphics[width=0.49\textwidth]{Figures/l_correct/s2_double_small.png}
++	\caption{Decompositions of the triple $(\hat{T}(p_2)^1, T(q_2), T(p_2)^2)$ in Figure \ref{fig:l_corrections_overlaps}: $s=1$ on the left and $s=2$ on the right.	
+ }\label{fig:l_corrections_dd}
+ 	
+ \end{figure}
+@@ -4042,27 +3746,20 @@
+ 
+ 
+ \end{definition}
++For the height function of a full tile, take each union in its specified insertion order. If $P$ has already been assigned on $S$ and $Q$ is the next placed copy on $B$, subtract $\min_{S\cap B}(Q-P)$ from $Q$, then take the pointwise minimum on the overlap. Both domains are retained. In an $L$-correction use this rule from the first standard copy through the last alternate copy, then subtract the maximum of the completed correction to fix its additive constant. The permutations of the ordinary copies and the two placements of a correction are specified in the supplement and in the accompanying Julia implementation.
++
+ Before proving existence of tile odometers, we prove that $L$-corrected odometers exist, assuming existence up to a
+ certain depth. An important tool in the remaining proofs will be the {\it double decomposition}, a decomposition of all or select subtiles
+ in the standard or alternate decomposition. In the figures, grandparent subtiles are indicated with a 2 subscript. 
+ 
+ \begin{lemma} \label{lemma:l_correct_existence}
+ 	Suppose tile odometers exist for all $n/d \in \mathcal{T}_m$, for $m \leq m_0$, some $m_0 \geq 1$, 
+-	then partial odometers which respect the $L$-correction $o^{L,\pm}_{n/d}$ exist for all $n/d \in \mathcal{T}_{m_0+1}$ and respect
++	then each short or elongated $L$-correction $o^{L,\pm}_{n/d}$ used in constructing a child $n/d\in\mathcal T_{m_0+1}$ exists and respects
+ 	the appropriate zero-one boundary strings from Lemma \ref{lemma:l_correc_properties}.
+ \end{lemma} 
+ 
+ \begin{proof}
+-	We show that the $L$-corrected odometer, $o^{L,\pm}_{n/d}$ exists by showing each pair of overlapping subodometers in the $L$-correction
+-	is compatible. The decomposition of $o^{L,\pm}_{n/d}$ consists of lattice adjacent tile odometers and one of two possible new types of intersection seen in Figure \ref{fig:l_corrections_overlaps}. 
+-	Since we have shown lattice adjacent odometers to be compatible (and that there are no gaps between lattice adjacent odometers), 
+-	it suffices deal with the new intersection. This can be dealt with by the double decomposition see Figure \ref{fig:l_corrections_dd}. In particular, in the double decomposition, every pair 
+-	of interfaces between the triple are part of or are a complete stacked zero-one boundary string. 
+-	In case the triple comes from the base cases, compatibility is a consequence of Proposition \ref{prop:base_cases}. 
+-	
+-	To see that  $o^{L,\pm}_{n/d}$ coincides with the standard odometer on the appropriate zero-one boundary strings, we induct on $k \geq 0$ 
+-	from Definitions \eqref{def:even_l_correction} or \eqref{def:odd_l_correction} as in the proof of Lemma \ref{lemma:l_correc_properties}.   
+-	%A straightforward induction on $k$ together with a double decomposition (from Definitions \eqref{def:even_l_correction} or %\eqref{def:odd_l_correction}) verifies that the appropriate zero-one boundary strings match that of the standard odometer.
++Start with the first standard copy, insert the remaining copies of that standard, then the second standard, and finally the earlier alternate copies in order. The two signs use their respective prescribed placements. The contact and boundary comparisons in part II of the supplement give a nonempty intersection with the earlier union at every insertion, for both lengths of the correction. On a new site the normalized copy has the prescribed height, and on an old site it is at least that height, with equality somewhere on the overlap. The minimum therefore takes the prescribed value on the union, as shown in Section~\ref{sec:global_odometers}. The comparisons include the ends of the boundary strings in Lemma~\ref{lemma:l_correc_properties}. Subtracting the maximum changes only the additive constant.
+ \end{proof}
+ 
+ 
+@@ -4074,176 +3771,13 @@
+ \end{lemma}
+ 
+ \begin{proof}
+-	We proceed by induction. Start by using Lemma \ref{lemma:l_correct_existence} to see that tile odometers are indeed weak tile odometers.
+-	It remains to verify the internal odometer decomposition is well-defined. That is, we check that 
+-	each pair of overlapping subodometers is pairwise consistent. As compatibility is affine invariant, 
+-	and the decompositions are, up to affine factors, rotationally invariant, it suffices to show compatibility
+-	for either $n/d$ or $\mathcal{R}(n/d)$.  Let $\q_w$ denote the quadruple for which $n/d$ is a child.
+-	We split the remainder of proof into cases. In each case, we use the double decomposition displayed in the indicated Figure
+-	to show that the subodometers either overlap on stacked boundary strings or on grandparent tiles. Also, assume the even-first orientation, otherwise flip the subsequent arguments. 
+-	
+-	
+-	
+-{\it Case 1: Odd standard odometer: $w = *\mbox{\{1 or 2\}}$; Figure \ref{fig:std_double_decomp_no_correction}} \\
+-The interfaces between every non-overlapping tile consist of stacked zero-one boundary strings therefore
+-those odometers are compatible. If $w = *1$, the tiles $T(q_1)^{+,2}$ and $T(q_1)^{-,1}$ overlap, by the double decomposition, 
+-exactly on $T(p_2)^{+, 1/2}$, and therefore those subodometers are compatible. Similarly, if $w=*2$, $T(p_1)^-$ and $T(p_1)^+$
+-overlap on $T(p_2)^{+, 1/2}$ and so those subodometers are compatible. 
+-
+-{\it Case 2: Odd standard odometer: $w = *3$; Figure \ref{fig:std_double_decomp_correction}} \\
+-In this case, due to the $L$-correction, the only overlaps are that of lattice adjacent $\hat{T}(p_2)$ (subsubtiles). The rest of the interfaces are part of or are stacked zero-one boundary strings.  By previous arguments, 
+-the $(T(q_1)^{+,1}, T(p_1)^-)$ and $T(q_1)^{-,2}$ interfaces are parts of stacked boundary strings. 
+-The interface between $T(p_1)^{\pm}$ and $T^{L, \pm}(q_1)$ corresponds to full stacked vertical boundary strings -- the interfaces are that of lattice adjacent
+-standard tiles $T(p_1)$. 
+-
+- It remains to analyze the interface between $T^{L, \pm}(q_1)$ and $T(q_1){+,1}, T(q_1)^{-,2}$. By Lemma \ref{lemma:l_correct_existence}
+- $(T^{L, +}(q_1), T(q_1)^{+,1})$ each intersect on a $w_v(q_1)$ stacked boundary string. By induction on 
+- $k$ in the recursion word for the $L$ correction, similar to the proof of Lemma \ref{lemma:l_correct_existence}, 
+- the interface between $(T^{L,+}(q_1), T(q_1)^{-,2})$ and $(T^{L,-}(q_1), T(q_1)^{+,1})$ consists of a sequence
+- of lattice adjacent standard odometers for $T(p_1)^+$ followed by a $(q_2, p_2)$ interface which is an almost palindrome by
+- Lemma \ref{lemma:almost_palindrome}. 
+- 
+-  
+-
+-{\it Case 3: Even alternate odometer: $w = *\mbox{\{1 or 2\}}$; Figure \ref{fig:alt_double_decomp_no_correction}} \\
+-The overlap argument is similar to Case 1. If $w = *1$,  $T(q_1)^{+,1}$ and $T(q_1)^{-,2}$ overlap $\hat{T}(p_1)$ on 
+-$T(p_2)^{\pm, 1/2}$. The interfaces between  $(T(p_1)^{+}, T(q_1)^{-,1})$, $(T(p_1)^{-}, T(q_1)^{+,2})$, $(T(p_1)^{+}, T(q_1)^{+,1})$, $(T(p_1)^{-}, T(q_1)^{-,2})$ are part of stacked zero-one boundary strings by the same argument as given previously in the weak standard case. 
+-
+-%The interface between $(T(p_1)^{+}, T(q_1)^{-,1})$ and  $(T(p_1)^{-}, T(q_1)^{+,2})$
+-%are part of stacked horizontal zero-one-boundary strings. The interface between $(T(p_1)^{+}, T(q_1)^{+,1})$ and  $(T(p_1)^{-}, T(q_1)^{-,2})$
+-%are part of stacked vertical zero-one boundary strings.
+-
+-The new interfaces are 
+-\[
+-(T(q_1)^{\pm,1}, T(q_1)^{\pm,2}, \hat{T}(p_1))
+-\]
+-and 
+-\[
+-(T(p_1), \hat{T}(p_1)).
+-\]
+-In the latter case, by the double decomposition, $(T(p_1), \hat{T}(p_1))$ intersect on the boundary of lattice adjacent standard tile odometers for $T(q_2)$. 
+-In the former case, the interface between $(T(q_1)^{+,1}, T(q_1)^{+,2}, \hat{T}(p_1))$ is part of a stacked vertical zero-one boundary string. Indeed, augment the vertical boundary string of $T(q_1)^{+,2}$ by concatenating $w_v(p_1)$ at the start. Then, since $\hat{T}(p_1)$ 
+-is a $w_v(p_1)$ pseudo-square, the augmented interface is exactly $w_v(p_1) \cup w_v(q_1)$ and $\rev(w_v(q_1)) \cup \rev(w_v(p_1))$. 
+-This is exactly stacked boundary string for $p_0$ and therefore, the odometers which intersect on it are compatible. 
+-The argument for $w = *2$ is identical. 
+-
+-
+-{\it Case 4: Even alternate odometer: $w = *3$; Figure \ref{fig:alt_double_decomp_correction}} \\
+-This is almost identical to Case 2. The only difference is in the overlaps $(T^{L, +}(q_1), T(q_1)^{+,2})$
+-and $(T^{L,-}(q_1), T^(q_1)^{-,1})$. In this case, we need to augment the vertical boundary strings 
+-as in Case 3 for $T(q_1)$. Once augmented, those interfaces then become exactly stacked vertical boundary string for $p_0$.
+-
++Use the base tiles of Proposition~\ref{prop:base_cases}. At a proper step the ordinary sources are earlier tiles. When an $L$-correction is prescribed, its two placements exist by Lemma~\ref{lemma:l_correct_existence} applied to the saved earlier ancestors. By the ordinary and corrected contact comparisons in part II of the supplement, each remaining insertion meets the preceding union and has the required normalized height on its new sites. The ordered minimum gives the height function on the full domain and preserves its specified boundary values. Section~\ref{sec:global_odometers} identifies it with a function on the plane. The latter construction uses the parent fields and their boundary data independently of this finite-tile argument.
+ \end{proof}
+ 
+ 
+ \section{Global odometers} \label{sec:global_odometers}
+ 
+-We now observe that both standard and alternate tile odometers can be extended to global odometers
+-with the correct growth. 
+-
+-\begin{lemma} \label{lemma:global_odometers}
+-	For every reduced fraction $0 < n/d < 1$, there are two functions, $g_{n/d}, \hat{g}_{n/d}$ on $\Z^2$ whose
+-	restriction to a standard or alternate tile are alternate and standard tile odometers
+-	for which the periodicity condition \eqref{eq:periodicity} holds and for which 
+-	\begin{equation} \label{eq:periodicity_growth}
+-		x \to f(x) - \frac{1}{2} x^T M(n,d) x - b^T x 
+-	\end{equation}
+-	is $L'(n/d)$-periodic for some $b \in \R^2$, for each $f \in \{g_{n/d},\hat{g}_{n/d}\}$.
+-\end{lemma}
+-\begin{proof}
+-	Given that we have proved standard and alternate tile odometers which are lattice adjacent
+-	are compatible, the proof is identical to Lemma 10.1 in \cite{levine2017apollonian}. 	
+-\end{proof}
+-
+-
+-
+-
+-
+-
+-
+-It remains to check that the functions which we have constructed are recurrent, which we do by induction. 
+-We first check that the constructed functions are indeed integer superharmonic. 
+-
+-\begin{lemma}
+-		For each $0 < n/d < 1$, $g_{n/d}$ and $\hat{g}_{n/d}$ are integer superharmonic. 
+-\end{lemma}
+-\begin{proof}
+-	Let $s \in  \{ \Delta g_{n/d}+1, \Delta \hat{g}_{n/d}+1\}$ and proceed by induction. By Lemma \ref{lemma:rot_recurrence_invariance} and Proposition \ref{prop:base_cases}
+-	it suffices to take $n/d$ odd and suppose $T(n/d)$ and $\hat{T}(n/d)$ have double decompositions. 
+-	
+-
+-	
+-	{\it Case 1: Standard odometer.} 
+-	
+-	If $x$ lies in the intersection of two neighboring tiles, $T(n/d) \cap T(n/d')$ then, by Lemma \ref{lemma:standard_tile_properties}, it must be contained 
+-	within a zero-one stacked boundary string. In this case $s(x) = 1$ by the explicit formulae in Section \ref{sec:zero-one_strings}. 
+-	Otherwise, $x$ is in the interior of $T(n/d)$. If $x$ is in the interior of a subtile in the double decomposition, we conclude by induction. 
+-	Otherwise, by considering the cases in Figures  \ref{fig:std_double_decomp_no_correction}
+-	and \ref{fig:std_double_decomp_correction} as in the proof of Lemma \ref{lemma:tile-odometer-existence},
+-	$x$ either lies within a zero-one stacked boundary string or in the interior of an ancestor tile. In the latter case we can use induction and in the former $s(x) = 1$. 
+-	
+-	{\it Case 2: Alternate odometer.}
+-	
+-	If $x$ is in the interior of $\hat{T}(n/d)$, the argument is similar to Step 1;  as in Lemma \ref{lemma:tile-odometer-existence} check the cases in Figures \ref{fig:alt_double_decomp_correction} and Figure \ref{fig:alt_double_decomp_no_correction} to see that $x$ must be on a stacked zero-one boundary string or within the interior of a subtile. If $x \in \partial \hat{T}(n/d)$, then, by Lemma \ref{lemma:alternate_tile_properties}, $x$ is within a stacked zero-one boundary string or in the interior of a subtile. 
+-	
+-\end{proof}
+-
+-
+-We conclude by checking recurrence.  
+-
+-\begin{lemma}
+-	For each $0 < n/d < 1$, $g_{n/d}$ and $\hat{g}_{n/d}$ are recurrent. 
+-\end{lemma}
+-\begin{proof}
+-	Let $s \in  \{ \Delta g_{n/d}+1, \Delta \hat{g}_{n/d}+1\}$ and suppose the claim is true for all Farey quadruples $\q_{|w|}$ with 
+-	$|w| \leq n$. By Lemma \ref{lemma:rot_recurrence_invariance} and Proposition \ref{prop:base_cases}, it suffices to check $w = 3^k w'$, for $k \geq 0$ and $|w'| \geq 1$, where, if $k = 0$, $w'[1] = 1$. 
+-	
+-	Therefore, $T(n/d)$ and $\hat{T}(n/d)$ have double decompositions and each of the interfaces in the tiling of $T(n/d)$ consist of
+-	stacked $q-p$ boundary strings where $(q,p)$ depend on the first letter of $w'$. 
+-	If $w'[1] = 1$, $(q,p)$ is the Farey child of $\q_{3^k}$. Otherwise, $p$ is the odd child in $\q_{3^k}$
+-	and $q$ is the even child in $\q_{3^{k-1}}$.  In either case, the explicit forms of the odometers 
+-	and their Laplacians are given in Section \ref{sec:degenerate_cases}. 
+-	
+-	Let $T \in \{T(n/d), \hat{T}(n/d)\}$ and write $T^i, s^i$ for the subtiles and ancestor Laplacians in the double decomposition. 
+-		
+-	The inductive proof starts as in the proof of Lemma \ref{lemma:staircase_recurrent}: suppose for sake of contradiction there is an induced subgraph of the $F$-lattice, $H$, which is forbidden for $s$. 
+-	Let $c^{0} = -\infty$ and for $j \geq 1$, let 
+-	\begin{equation}
+-	\begin{aligned}
+-	c^{j} &= \min\{ x_1 > c^{j-1} : x \in H\}  \\ 
+-	V^{j} &= \{ x \in H : x_1 = c^j\}.
+-	\end{aligned}
+-	\end{equation}
+-	In words, sets of possibly disjoint vertical lines enumerated from left to right. Since $H$ is forbidden, it is nonempty, hence
+-	$V^{1}$ exists.
+-	
+-	
+-	We prove the following inductive hypotheses by induction on $j \geq 1$ for all translations of $T$ and all ancestor tiles $\mathrm{T}_a := \{ T(p), T(q), \hat{T}(p), \hat{T}(q)\}$. 
+-	
+-	\begin{enumerate}
+-		\item The hypotheses listed in Lemmas \ref{lemma:staircase_recurrent}, \ref{lemma:alt-staircase-recurrent}, \ref{lemma:doubled-staircase-recurrent}, \ref{lemma:doubled-alt-staircase-recurrent}
+-		for $T(p), \hat{T}(p), T(q)$ and $\hat{T}(q)$ respectively. 
+-		\item If for some subtile $T^i$, $V^j \cap T^i \neq \emptyset$ then $V^j \cap \partial T^i = \emptyset$. 
+-	\end{enumerate}
+-	In fact, we suppose, by induction, that the inductive hypotheses are satisfied for every parent.  
+-	Indeed, the cases $\q_{\tilde{w}}$ for $\tilde{w} = 3^k*\{1 \mbox{ or } 2^{k'}\}$ for $k \geq 0, k' \geq 1$ may be checked directly using the explicit formulae in Section \ref{sec:degenerate_cases}
+-	following the outline in Lemma \ref{lemma:staircase_recurrent}. Thus, we may suppose that the boundary of each subtile $T^i$, including grandparent subtiles, 
+-	consists of a $q-p$ boundary string and that the inductive hypotheses hold for each subtile. 
+-
+-	Hypothesis (2) implies the existence of a forbidden subconfiguration strictly contained in some $T^i$, contradicting inductive recurrence. Thus it remains to verify the hypotheses. 
+-	
+-	{\it Proof of (1) and (2).} \\
+-	Suppose $y \in V^j \cap T'$ for some $T' \in \mathrm{T}_a$. By construction, $y \in T' \cap T^i$ for some subtile $T^i$ of $T$ in the double decomposition. 
+-	If $V^j \cap \partial T^i = \emptyset$, then we may conclude by induction. 
+-	
+-	Otherwise, if there is $y \in V^j \cap \partial T^i$, then, $y$ must be contained in a stacked $q-p$ boundary string. However, the fixed interfaces in Lemma \ref{lemma:almost_palindrome_offset} allow 
+-	for the arguments of Lemmas \ref{lemma:staircase_recurrent} and Lemma \ref{lemma:doubled-staircase-recurrent} to be repeated, resulting in a contradiction. 
+-	
+-		
+-	
+-
+-
+-\end{proof}
++\input{global_recurrence}
+ 
+ 	\bibliography{farey_recursion}
+ 	 
+@@ -4258,19 +3792,19 @@
+ 	
+ 	\appendix
+ 	
+-%	\section{Table of Odometer Patterns}
+-%	
+-%The table below displays a Farey quadruple $(p_0,q_0, p_1,q_1) = (\mathcal{C}(p_1, q_1), p_1,q_1)$ and the Laplacian of the odd child's standard and alternate tile odometers. We only draw the Laplacian of $p_0$ since the Laplacian of any odd $(\frac{n}{d})$ is the rotated Laplacian of even $(\frac{d-n}{d+n})$. All quadruples with $14 \leq \det(L'(p_0)) \leq 1000$ are displayed. 
+-%
+-%\setlength{\tabcolsep}{2pt}
+-%\begin{longtable}[c]{rcc}
+-%	\hline
+-%	$(p_0,q_0,p_1,q_1)$  \hspace{1 em} & standard tile odometer \hspace{1 em} &  alternate tile odometer
+-%	\ \\
+-%	\hline
+-%	\input{app_small.tex}
+-
+-%\end{longtable}
++	\section{Table of Odometer Patterns}
++	
++The table below displays a Farey quadruple $(p_0,q_0, p_1,q_1) = (\mathcal{C}(p_1, q_1), p_1,q_1)$ and the Laplacian of the odd child's standard and alternate tile odometers. We only draw the Laplacian of $p_0$ since the Laplacian of any odd $(\frac{n}{d})$ is the rotated Laplacian of even $(\frac{d-n}{d+n})$. All quadruples with $14 \leq \det(L'(p_0)) \leq 1000$ are displayed. 
++
++\setlength{\tabcolsep}{2pt}
++\begin{longtable}[c]{rcc}
++	\hline
++	$(p_0,q_0,p_1,q_1)$  \hspace{1 em} & standard tile odometer \hspace{1 em} &  alternate tile odometer
++	\ \\
++	\hline
++	\input{app_small.tex}
++
++\end{longtable}
+ 	
+ 	
+ 	
+--- /dev/null
++++ b/global_recurrence.tex
+@@ -0,0 +1,101 @@
++Write $I(x)=\{y:(y,x)\in E\}$. We first construct a function on the plane and then identify its restriction to the finite tile. This order matters at points whose two incoming edges cross different tile boundaries.
++
++\subsection*{The induction on the plane}
++For a field $F$ with $\Delta F\in\{-1,0\}$, choose both inputs at a point with $\Delta F=-1$ and one input at a point with $\Delta F=0$. Call $R$ a \emph{rank} for these choices if it takes values in a totally ordered set and $R(y)<R(x)$ at every chosen input $y\in I(x)$. A nonempty finite forbidden set would have a point of least rank. At that point it must contain at least one input in the first case and both in the second, by Proposition~\ref{prop:recurrence}. In either case it contains a point of smaller rank. Thus a rank on the plane proves recurrence.
++
++We use three sets of geometric estimates for the Farey construction. Their proofs and case tables are in the accompanying \href{./Supplement/farey_induction.pdf}{\emph{Supplement on the Farey induction}}, parts I--III (\path{Supplement/farey_induction.pdf}). Part I concerns functions on the plane, part II the values assigned by the finite construction, and part III the domains of those finite functions. We describe how the estimates enter the proof.
++
++At a standard child carry the boundary heights on its four polygonal arcs, the ranks for the two signs of the comparison, and the following assertion for each prescribed pair of fields $A,B$ occurring in the chain of translated ancestors. For every $k\in\Z$, $\min(A,B+k)$ is binary superharmonic and recurrent. On the set $A-B=k$, after the inputs off this set have burned, the remaining inputs required for a burn have a decreasing rank periodic in the direction of the band. A site of value $s=1+\Delta F$ burns when $2-s$ of its inputs have burned. The assertion uses the specified positions, slopes and additive constants of the copies.
++
++The pure words and the common empty word supply the initial data, including the boundary values and ranks on the bands (part I, \emph{Pure initializers}). At a proper even child the two prescribed standard parent functions, in the coordinates of the earlier quarter-turned parent, have difference $A-B$ up to sign and an integer constant. Their minimum is the pullback, with harmonic correction, of one of the earlier threshold minima. The values on the four arcs allow its restriction to the closed fundamental polygon to be continued with the prescribed affine period increments. Denote this field by $F$. The four seam comparisons in part I give $\Delta F\in\{-1,0\}$ on those arcs as well as in the interior. Equality of $F$ to the parent minimum is used on this closed polygon.
++
++The order of the next steps is important. Apply recurrent comparison for the \emph{earlier threshold minimum} against the translated superharmonic competitor. The boundary inequalities then hold throughout the polygon. In particular, the differences with the two short translates take values in $[0,2]$ and $[-2,0]$, respectively, on the polygon. The two additional zero levels needed at the ends of the boundary arcs come from the opposite parent. With these bounds the cut argument in part I (\emph{All-slope standard step}) constructs decreasing inputs and ranks on the physical plane. The interior choices lead to the boundary arcs, where the estimates force escape across the chosen cut from a putative forbidden set of minimum level. Both inputs are retained at a site with $\Delta F=-1$.
++
++Only after constructing these ranks do we restore the threshold assertion for the next child. The estimates for the two translated fields now hold on the chosen edges. On a band $\Phi=A-B=k$, the remaining number of inputs needed at $x$ is
++\[
++  1-\Delta\min(A,B+k)(x)-\#\{y\in I(x):\Phi(y)\ne k\}.
++\]
++At a tie with opposite increments $-1,+1$ both inputs have already burned. At the other ties each required input of equal level has smaller rank. The rank used on the band has zero increment in its period direction, so this ordering also burns the finite set of band classes. The physical ranks for the two signs, including their use at strict winners, precede this quotient argument. At each word length first construct the even standards. The quarter-turn of the even standard at the word with digits $2$ and $3$ interchanged gives the odd standard with its prescribed shift and harmonic correction. The pair used to form the parent minimum belongs to a strictly smaller word length.
++
++For the even alternate one can make the remaining calculation locally. If the proper even child is $n/d$ and its odd parent is $N/D$, set $\epsilon=Nd-Dn\in\{-1,1\}$ and $\sigma=2\epsilon(D,N)$. In the canonical coordinates put
++\[
++   G(x)=F(x+\sigma),\quad D_0=F-G,\qquad
++   H(x)=\left\lceil\tfrac12(F(x)+G(x))\right\rceil
++       =F(x)-\left\lfloor D_0(x)/2\right\rfloor .
++\]
++The pure formulas give the starting instances. Part I gives three estimates on the incoming star. The increments $e_i=D_0(y_i)-D_0(x)$ have absolute value at most one. For even $D_0(x)$ they cannot be $-1,+1$ together. On a chosen $F$ input one has $e_i\le0$. With $r=D_0(x)\bmod 2$, subtraction gives
++\[
++ \Delta G=\Delta F-e_1-e_2,\qquad
++ \Delta H=\Delta F-\left\lfloor(r+e_1)/2\right\rfloor
++                   -\left\lfloor(r+e_2)/2\right\rfloor .
++\]
++Here is the complete list up to exchanging the inputs, with the last two columns read in the same order.
++\[
++\begin{array}{c|c|c|c}
++r&\Delta F&(e_1,e_2)&\Delta H\\ \hline
++0&-1&(-1,0),(0,0)&0,\ -1\\
++0&0 &(0,0),(0,1)&0,\ 0\\
++1&-1&(-1,0),(0,0)&-1,\ -1\\
++1&0 &(-1,1),(0,0),(0,1)&-1,\ 0,\ -1
++\end{array}
++\]
++Indeed $\Delta F,\Delta G\in\{-1,0\}$ restrict the sum $e_1+e_2$, and the chosen inputs impose the sign restrictions above. At even $r$ the required inputs can be taken among the zero increments retained by $F$. At odd $r$ every nonzero increment goes to even parity of $D_0$. When both inputs are required, every zero increment in that row is retained by $F$. When only one is required, both increments vanish and the chosen $F$ input works. Hence $(D_0\bmod2,R)$ in lexicographic order is a strict rank for $H$. The odd alternate is its harmonic quarter-turn in the prescribed coordinates and inherits recurrence by Lemma~\ref{lemma:rot_recurrence_invariance}.
++
++\subsection*{Recovering the finite tiles}\label{subsec:ordered_identification}
++Suppose that the assembled function is $P$ on $S$ and that the incoming translated copy is $Q$ on $B$. Lower the incoming copy by
++\[
++       \delta=\min_{x\in S\cap B}\bigl(Q(x)-P(x)\bigr).
++\]
++Keep $P$ on $S$ and assign $Q-\delta$ on $B\setminus S$. This is the pointwise minimum on the intersection. Suppose $P=T+c$ on $S$. To identify the result on $S\cup B$, it suffices to find a scalar $b$ such that $Q-b=T+c$ on $B\setminus S$, $Q-b\ge T+c$ on the intersection, and equality holds at one point of the intersection. Then $\delta=b$ and the result is $T+c$ throughout $S\cup B$. A change of constant on a completed correction is absorbed by the same rule at its next insertion.
++
++Apply this observation in the insertion order of Section~\ref{subsec:full_recursion}. Part II establishes the three comparisons just stated for the actual translated sources, including a point of equality with the already assembled portion at each insertion. An ordinary standard uses six copies. An ordinary alternate also uses one earlier alternate. A corrected output has four ordinary copies and two $L$-corrections. Each correction uses copies of one earlier standard, a second standard at the join, and copies of an earlier alternate. The elongated correction uses one more copy of that alternate. Both lengths use the ancestors saved before the new digit is processed.
++
++There is an instance where the weak inequality is essential. For the reciprocal pure ancestor with vector $(e,1)$, $e\ge3$ odd, put $Y=(1-e,e+1)$. In the right correction with run parameter $k+1$ the first alternate is one unit above the preceding standard at $kY+(0,1)$ and $kY+(0,2)$. The preceding standard gives the required value at both points. The incoming copy attains equality elsewhere on the overlap and has the required value at every new point. Part II checks that these are exactly the two exceptions in this orientation and gives the corresponding reflected placements. For proper ancestors the comparisons are with the common minimum on the actual incoming domain. The comparison for the \emph{current} alternate is made on its own domain, where that minimum equals its rounded field. Thus induction, first through the pieces of a correction and then through the pieces of the tile, identifies the entire finite tile with the appropriate field up to one additive constant.
++
++\subsection*{Extension, growth and recurrence}
++\begin{lemma}\label{lemma:global_odometers}
++For each reduced fraction $0<n/d<1$ the standard and alternate tile odometers extend to functions $g_{n/d},\hat g_{n/d}$, respectively, satisfying \eqref{eq:periodicity}. For each of these functions $f$ there is a $b\in\R^2$ for which
++\begin{equation}\label{eq:periodicity_growth}
++     f(x)-\tfrac12 x^TM(n,d)x-b^Tx
++\end{equation}
++is $L'(n,d)$-periodic.
++\end{lemma}
++\begin{proof}
++Use the field identified with the finite tile and choose its additive constant to agree there. Part III proves that the actual finite tile meets every class of $L'(n,d)$, for each of the four outputs separately. Its induction uses the following cases.
++\[
++\begin{array}{c|cccc}
++\text{last digit}&\text{standard odd}&\text{standard even}
++                 &\text{alternate odd}&\text{alternate even}\\ \hline
++1&\text{ordinary}&\text{ordinary}&\text{ordinary}&\text{ordinary}\\
++2&\text{ordinary}&\text{short }L&\text{long }L&\text{ordinary}\\
++3&\text{short }L&\text{ordinary}&\text{ordinary}&\text{long }L
++\end{array}
++\]
++The induction hypothesis is coverage by the earlier standard and alternate \emph{tiles}. The short and long cases use the actual finite pieces of the correction. The empty word and pure runs use their explicit domains. Coverage together with the height identification shows that translating the finite output with the field's period constants assigns a consistent value at every site.
++
++Explicitly, put $U=\mu(d,n)$, $V=(n-d,n+d)$, $a=(n,-d)$ and $T=d^2+2dn-n^2$, where $\mu=2$ for odd $n+d$ and $1$ otherwise. Then $M U=0$, $M V=a$, $a\cdot U=0$ and $a\cdot V=-T$. The two generator increments give, for every $i,j\in\Z$,
++\[
++ f(x+iU+jV)=f(x)+i c_U+j(a\cdot x+c_V)-T\,j(j-1)/2 .
++\]
++The two translations commute. Choose $b$ by $b\cdot v=c_v-\tfrac12 v^TMv$ for $v=U,V$. The independence of $U,V$ determines $b$, and subtraction proves the claimed periodicity. Boundedness on a period cell gives \eqref{eq:quadratic_growth}.
++\end{proof}
++
++\begin{lemma}
++For each $0<n/d<1$, the Laplacians of $g_{n/d}$ and $\hat g_{n/d}$ take values in $\{-1,0\}$.
++\end{lemma}
++\begin{proof}
++The standard seam comparisons and the midpoint calculation give the binary Laplacians of the whole-plane fields. Lemma~\ref{lemma:global_odometers} identifies the extensions of the finite tiles with those fields on every incoming star.
++\end{proof}
++
++\begin{lemma}
++For each $0<n/d<1$, $g_{n/d}$ and $\hat g_{n/d}$ are recurrent.
++\end{lemma}
++\begin{proof}
++Use the standard rank and the lexicographic alternate rank, transported by the parity-correct quarter-turn for the odd type. The least-rank argument excludes every nonempty finite forbidden set for each of the two fields. Apply Proposition~\ref{prop:recurrence}.
++\end{proof}
++
++To finish Theorem~\ref{theorem:odometers}, distinguish the two functions.
++For an even fraction, translation by $U$ leaves $H-F$ unchanged. Translation by $V$ changes it by $-1$, since $a\cdot\sigma=-2$ in the midpoint formula. An integer affine function with zero increment on $(d,n)$ has gradient $m(n,-d)$ for $m\in\Z$. Its $V$ increment is $-mT$, which cannot be $-1$ at an interior fraction. For odd type the quarter-turn takes the doubled kernel period $U=2(d,n)$ to a signed transverse period of the even partner. In the reflected orientation use the standard's reflection identity before comparing with the alternate. The two standard placements have the same kernel increment, and the difference of the alternate and standard has $U$ increment $+1$ or $-1$. The literal odd initializers have increment $-1$ (part II, \emph{Period increments and distinctness}). An integer affine function has even increment on $2(d,n)$. This proves the asserted distinctness in the fixed coordinates of \eqref{eq:periodicity}.
++
++
++In particular the two Laplacians differ in these fixed coordinates. Otherwise the difference of the two odometers would be harmonic and would have constant increments on $U,V$. Subtract a real linear function with those increments. The result is periodic and harmonic, hence constant by the maximum principle on the finite strongly connected quotient. The odometer difference would then be affine with integer gradient, which the preceding period computation excludes.

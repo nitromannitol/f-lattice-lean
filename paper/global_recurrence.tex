@@ -1,0 +1,101 @@
+Write $I(x)=\{y:(y,x)\in E\}$. We first construct a function on the plane and then identify its restriction to the finite tile. This order matters at points whose two incoming edges cross different tile boundaries.
+
+\subsection*{The induction on the plane}
+For a field $F$ with $\Delta F\in\{-1,0\}$, choose both inputs at a point with $\Delta F=-1$ and one input at a point with $\Delta F=0$. Call $R$ a \emph{rank} for these choices if it takes values in a totally ordered set and $R(y)<R(x)$ at every chosen input $y\in I(x)$. A nonempty finite forbidden set would have a point of least rank. At that point it must contain at least one input in the first case and both in the second, by Proposition~\ref{prop:recurrence}. In either case it contains a point of smaller rank. Thus a rank on the plane proves recurrence.
+
+We use three sets of geometric estimates for the Farey construction. Their proofs and case tables are in the accompanying \href{./Supplement/farey_induction.pdf}{\emph{Supplement on the Farey induction}}, parts I--III (\path{Supplement/farey_induction.pdf}). Part I concerns functions on the plane, part II the values assigned by the finite construction, and part III the domains of those finite functions. We describe how the estimates enter the proof.
+
+At a standard child carry the boundary heights on its four polygonal arcs, the ranks for the two signs of the comparison, and the following assertion for each prescribed pair of fields $A,B$ occurring in the chain of translated ancestors. For every $k\in\Z$, $\min(A,B+k)$ is binary superharmonic and recurrent. On the set $A-B=k$, after the inputs off this set have burned, the remaining inputs required for a burn have a decreasing rank periodic in the direction of the band. A site of value $s=1+\Delta F$ burns when $2-s$ of its inputs have burned. The assertion uses the specified positions, slopes and additive constants of the copies.
+
+The pure words and the common empty word supply the initial data, including the boundary values and ranks on the bands (part I, \emph{Pure initializers}). At a proper even child the two prescribed standard parent functions, in the coordinates of the earlier quarter-turned parent, have difference $A-B$ up to sign and an integer constant. Their minimum is the pullback, with harmonic correction, of one of the earlier threshold minima. The values on the four arcs allow its restriction to the closed fundamental polygon to be continued with the prescribed affine period increments. Denote this field by $F$. The four seam comparisons in part I give $\Delta F\in\{-1,0\}$ on those arcs as well as in the interior. Equality of $F$ to the parent minimum is used on this closed polygon.
+
+The order of the next steps is important. Apply recurrent comparison for the \emph{earlier threshold minimum} against the translated superharmonic competitor. The boundary inequalities then hold throughout the polygon. In particular, the differences with the two short translates take values in $[0,2]$ and $[-2,0]$, respectively, on the polygon. The two additional zero levels needed at the ends of the boundary arcs come from the opposite parent. With these bounds the cut argument in part I (\emph{All-slope standard step}) constructs decreasing inputs and ranks on the physical plane. The interior choices lead to the boundary arcs, where the estimates force escape across the chosen cut from a putative forbidden set of minimum level. Both inputs are retained at a site with $\Delta F=-1$.
+
+Only after constructing these ranks do we restore the threshold assertion for the next child. The estimates for the two translated fields now hold on the chosen edges. On a band $\Phi=A-B=k$, the remaining number of inputs needed at $x$ is
+\[
+  1-\Delta\min(A,B+k)(x)-\#\{y\in I(x):\Phi(y)\ne k\}.
+\]
+At a tie with opposite increments $-1,+1$ both inputs have already burned. At the other ties each required input of equal level has smaller rank. The rank used on the band has zero increment in its period direction, so this ordering also burns the finite set of band classes. The physical ranks for the two signs, including their use at strict winners, precede this quotient argument. At each word length first construct the even standards. The quarter-turn of the even standard at the word with digits $2$ and $3$ interchanged gives the odd standard with its prescribed shift and harmonic correction. The pair used to form the parent minimum belongs to a strictly smaller word length.
+
+For the even alternate one can make the remaining calculation locally. If the proper even child is $n/d$ and its odd parent is $N/D$, set $\epsilon=Nd-Dn\in\{-1,1\}$ and $\sigma=2\epsilon(D,N)$. In the canonical coordinates put
+\[
+   G(x)=F(x+\sigma),\quad D_0=F-G,\qquad
+   H(x)=\left\lceil\tfrac12(F(x)+G(x))\right\rceil
+       =F(x)-\left\lfloor D_0(x)/2\right\rfloor .
+\]
+The pure formulas give the starting instances. Part I gives three estimates on the incoming star. The increments $e_i=D_0(y_i)-D_0(x)$ have absolute value at most one. For even $D_0(x)$ they cannot be $-1,+1$ together. On a chosen $F$ input one has $e_i\le0$. With $r=D_0(x)\bmod 2$, subtraction gives
+\[
+ \Delta G=\Delta F-e_1-e_2,\qquad
+ \Delta H=\Delta F-\left\lfloor(r+e_1)/2\right\rfloor
+                   -\left\lfloor(r+e_2)/2\right\rfloor .
+\]
+Here is the complete list up to exchanging the inputs, with the last two columns read in the same order.
+\[
+\begin{array}{c|c|c|c}
+r&\Delta F&(e_1,e_2)&\Delta H\\ \hline
+0&-1&(-1,0),(0,0)&0,\ -1\\
+0&0 &(0,0),(0,1)&0,\ 0\\
+1&-1&(-1,0),(0,0)&-1,\ -1\\
+1&0 &(-1,1),(0,0),(0,1)&-1,\ 0,\ -1
+\end{array}
+\]
+Indeed $\Delta F,\Delta G\in\{-1,0\}$ restrict the sum $e_1+e_2$, and the chosen inputs impose the sign restrictions above. At even $r$ the required inputs can be taken among the zero increments retained by $F$. At odd $r$ every nonzero increment goes to even parity of $D_0$. When both inputs are required, every zero increment in that row is retained by $F$. When only one is required, both increments vanish and the chosen $F$ input works. Hence $(D_0\bmod2,R)$ in lexicographic order is a strict rank for $H$. The odd alternate is its harmonic quarter-turn in the prescribed coordinates and inherits recurrence by Lemma~\ref{lemma:rot_recurrence_invariance}.
+
+\subsection*{Recovering the finite tiles}\label{subsec:ordered_identification}
+Suppose that the assembled function is $P$ on $S$ and that the incoming translated copy is $Q$ on $B$. Lower the incoming copy by
+\[
+       \delta=\min_{x\in S\cap B}\bigl(Q(x)-P(x)\bigr).
+\]
+Keep $P$ on $S$ and assign $Q-\delta$ on $B\setminus S$. This is the pointwise minimum on the intersection. Suppose $P=T+c$ on $S$. To identify the result on $S\cup B$, it suffices to find a scalar $b$ such that $Q-b=T+c$ on $B\setminus S$, $Q-b\ge T+c$ on the intersection, and equality holds at one point of the intersection. Then $\delta=b$ and the result is $T+c$ throughout $S\cup B$. A change of constant on a completed correction is absorbed by the same rule at its next insertion.
+
+Apply this observation in the insertion order of Section~\ref{subsec:full_recursion}. Part II establishes the three comparisons just stated for the actual translated sources, including a point of equality with the already assembled portion at each insertion. An ordinary standard uses six copies. An ordinary alternate also uses one earlier alternate. A corrected output has four ordinary copies and two $L$-corrections. Each correction uses copies of one earlier standard, a second standard at the join, and copies of an earlier alternate. The elongated correction uses one more copy of that alternate. Both lengths use the ancestors saved before the new digit is processed.
+
+There is an instance where the weak inequality is essential. For the reciprocal pure ancestor with vector $(e,1)$, $e\ge3$ odd, put $Y=(1-e,e+1)$. In the right correction with run parameter $k+1$ the first alternate is one unit above the preceding standard at $kY+(0,1)$ and $kY+(0,2)$. The preceding standard gives the required value at both points. The incoming copy attains equality elsewhere on the overlap and has the required value at every new point. Part II checks that these are exactly the two exceptions in this orientation and gives the corresponding reflected placements. For proper ancestors the comparisons are with the common minimum on the actual incoming domain. The comparison for the \emph{current} alternate is made on its own domain, where that minimum equals its rounded field. Thus induction, first through the pieces of a correction and then through the pieces of the tile, identifies the entire finite tile with the appropriate field up to one additive constant.
+
+\subsection*{Extension, growth and recurrence}
+\begin{lemma}\label{lemma:global_odometers}
+For each reduced fraction $0<n/d<1$ the standard and alternate tile odometers extend to functions $g_{n/d},\hat g_{n/d}$, respectively, satisfying \eqref{eq:periodicity}. For each of these functions $f$ there is a $b\in\R^2$ for which
+\begin{equation}\label{eq:periodicity_growth}
+     f(x)-\tfrac12 x^TM(n,d)x-b^Tx
+\end{equation}
+is $L'(n,d)$-periodic.
+\end{lemma}
+\begin{proof}
+Use the field identified with the finite tile and choose its additive constant to agree there. Part III proves that the actual finite tile meets every class of $L'(n,d)$, for each of the four outputs separately. Its induction uses the following cases.
+\[
+\begin{array}{c|cccc}
+\text{last digit}&\text{standard odd}&\text{standard even}
+                 &\text{alternate odd}&\text{alternate even}\\ \hline
+1&\text{ordinary}&\text{ordinary}&\text{ordinary}&\text{ordinary}\\
+2&\text{ordinary}&\text{short }L&\text{long }L&\text{ordinary}\\
+3&\text{short }L&\text{ordinary}&\text{ordinary}&\text{long }L
+\end{array}
+\]
+The induction hypothesis is coverage by the earlier standard and alternate \emph{tiles}. The short and long cases use the actual finite pieces of the correction. The empty word and pure runs use their explicit domains. Coverage together with the height identification shows that translating the finite output with the field's period constants assigns a consistent value at every site.
+
+Explicitly, put $U=\mu(d,n)$, $V=(n-d,n+d)$, $a=(n,-d)$ and $T=d^2+2dn-n^2$, where $\mu=2$ for odd $n+d$ and $1$ otherwise. Then $M U=0$, $M V=a$, $a\cdot U=0$ and $a\cdot V=-T$. The two generator increments give, for every $i,j\in\Z$,
+\[
+ f(x+iU+jV)=f(x)+i c_U+j(a\cdot x+c_V)-T\,j(j-1)/2 .
+\]
+The two translations commute. Choose $b$ by $b\cdot v=c_v-\tfrac12 v^TMv$ for $v=U,V$. The independence of $U,V$ determines $b$, and subtraction proves the claimed periodicity. Boundedness on a period cell gives \eqref{eq:quadratic_growth}.
+\end{proof}
+
+\begin{lemma}
+For each $0<n/d<1$, the Laplacians of $g_{n/d}$ and $\hat g_{n/d}$ take values in $\{-1,0\}$.
+\end{lemma}
+\begin{proof}
+The standard seam comparisons and the midpoint calculation give the binary Laplacians of the whole-plane fields. Lemma~\ref{lemma:global_odometers} identifies the extensions of the finite tiles with those fields on every incoming star.
+\end{proof}
+
+\begin{lemma}
+For each $0<n/d<1$, $g_{n/d}$ and $\hat g_{n/d}$ are recurrent.
+\end{lemma}
+\begin{proof}
+Use the standard rank and the lexicographic alternate rank, transported by the parity-correct quarter-turn for the odd type. The least-rank argument excludes every nonempty finite forbidden set for each of the two fields. Apply Proposition~\ref{prop:recurrence}.
+\end{proof}
+
+To finish Theorem~\ref{theorem:odometers}, distinguish the two functions.
+For an even fraction, translation by $U$ leaves $H-F$ unchanged. Translation by $V$ changes it by $-1$, since $a\cdot\sigma=-2$ in the midpoint formula. An integer affine function with zero increment on $(d,n)$ has gradient $m(n,-d)$ for $m\in\Z$. Its $V$ increment is $-mT$, which cannot be $-1$ at an interior fraction. For odd type the quarter-turn takes the doubled kernel period $U=2(d,n)$ to a signed transverse period of the even partner. In the reflected orientation use the standard's reflection identity before comparing with the alternate. The two standard placements have the same kernel increment, and the difference of the alternate and standard has $U$ increment $+1$ or $-1$. The literal odd initializers have increment $-1$ (part II, \emph{Period increments and distinctness}). An integer affine function has even increment on $2(d,n)$. This proves the asserted distinctness in the fixed coordinates of \eqref{eq:periodicity}.
+
+
+In particular the two Laplacians differ in these fixed coordinates. Otherwise the difference of the two odometers would be harmonic and would have constant increments on $U,V$. Subtract a real linear function with those increments. The result is periodic and harmonic, hence constant by the maximum principle on the finite strongly connected quotient. The odometer difference would then be affine with integer gradient, which the preceding period computation excludes.

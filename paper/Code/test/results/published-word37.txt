@@ -1,0 +1,15 @@
+Julia 1.12.5. Published code at commit 551746cfde3ccd9f9ece6afa0a8117721871e5e9.
+literal child k=37 standard odd  sites=42125  reference=42125  missing=0  extra=0  changed_heights=0
+literal child k=37 standard even  sites=82011  reference=82011  missing=0  extra=0  changed_heights=0
+literal child k=37 alternate odd  sites=82023  reference=82028  missing=5  extra=0  changed_heights=0
+  missing in lower-left coordinates: [(123, 217), (123, 218), (123, 219), (123, 220), (123, 221)]
+odd alternate fraction=39//116
+  period classes represented=41961/41966  missing native sites with another representative=0/5
+  lost (123, 217)  surviving representative=nothing
+  lost (123, 218)  surviving representative=nothing
+  lost (123, 219)  surviving representative=nothing
+  lost (123, 220)  surviving representative=nothing
+  lost (123, 221)  surviving representative=nothing
+  public native array fails the period fit: coverage 41961 of 41966
+same periodic pattern=false
+literal child k=37 alternate even  sites=82028  reference=82028  missing=0  extra=0  changed_heights=0

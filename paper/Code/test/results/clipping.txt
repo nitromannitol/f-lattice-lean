@@ -1,0 +1,7 @@
+scalar demo: original support=0; sparse support=1; exact height=8+5*10^100
+Test Summary:                                                     | Pass  Total  Time
+enormous displacement: original fixed canvas versus exact support |    3      3  1.6s
+k=78 next=2 odd_ALT_LONG=true canvas=(684, 576) full=3814 clipped=3799 discarded_placement_entries=15 common_height_differences=BigInt[0]
+k=200 next=2 odd_ALT_LONG=true canvas=(684, 576) full=9670 fixed_canvas_required_overlap_lost=true
+Test Summary:                                          | Pass  Total  Time
+consumed corrected helper: ancestor1, odd flipped LONG |    6      6  2.1s

@@ -1,0 +1,167 @@
+\newcommand{\etalchar}[1]{$^{#1}$}
+\begin{thebibliography}{GLM{\etalchar{+}}05}
+
+\bibitem[BN91]{beauquier1991translating}
+Daniele Beauquier and Maurice Nivat.
+\newblock On translating one polyomino to tile the plane.
+\newblock {\em Discrete \& Computational Geometry}, 6(4):575--592, 1991.
+
+\bibitem[BR21]{bou2021convergence}
+Ahmed Bou-Rabee.
+\newblock Convergence of the random abelian sandpile.
+\newblock {\em The Annals of Probability}, 49(6):3168--3196, 2021.
+
+\bibitem[BTW87]{bak1987self}
+Per Bak, Chao Tang, and Kurt Wiesenfeld.
+\newblock Self-organized criticality: An explanation of the 1/f noise.
+\newblock {\em Physical review letters}, 59(4):381, 1987.
+
+\bibitem[CP18]{corry2018divisors}
+Scott Corry and David Perkinson.
+\newblock {\em Divisors and sandpiles}, volume 114.
+\newblock American Mathematical Soc., 2018.
+
+\bibitem[CPS08]{caracciolo2008explicit}
+Sergio Caracciolo, Guglielmo Paoletti, and Andrea Sportiello.
+\newblock Explicit characterization of the identity configuration in an abelian
+  sandpile model.
+\newblock {\em Journal of physics A: mathematical and theoretical},
+  41(49):495003, 2008.
+
+\bibitem[Dha90]{dhar1990self}
+Deepak Dhar.
+\newblock Self-organized critical state of sandpile automaton models.
+\newblock {\em Physical Review Letters}, 64(14):1613--1616, 1990.
+
+\bibitem[DS10]{sadhu2010pattern}
+Deepak Dhar and Tridib Sadhu.
+\newblock Pattern formation in growing sandpiles with multiple sources or
+  sinks.
+\newblock {\em Journal of Statistical Physics}, 138(4-5):815--837, 2010.
+
+\bibitem[DS11]{sadhu2011effect}
+Deepak Dhar and Tridib Sadhu.
+\newblock The effect of noise on patterns formed by growing sandpiles.
+\newblock {\em Journal of Statistical Mechanics: Theory and Experiment},
+  2011(03):P03001, 2011.
+
+\bibitem[DS13]{dhar2013sandpile}
+Deepak Dhar and Tridib Sadhu.
+\newblock A sandpile model for proportionate growth.
+\newblock {\em Journal of Statistical Mechanics: Theory and Experiment},
+  2013(11):P11006, 2013.
+
+\bibitem[DSC09]{dhar2009pattern}
+Deepak Dhar, Tridib Sadhu, and Samarth Chandra.
+\newblock Pattern formation in growing sandpiles.
+\newblock {\em EPL (Europhysics Letters)}, 85(4):48002, 2009.
+
+\bibitem[GLM{\etalchar{+}}05]{graham2005apollonian}
+Ronald~L. Graham, Jeffrey~C. Lagarias, Colin~L. Mallows, Allan~R. Wilks, and
+  Catherine~H Yan.
+\newblock Apollonian circle packings: geometry and group theory i. the
+  apollonian group.
+\newblock {\em Discrete \& Computational Geometry}, 34(4):547--585, 2005.
+
+\bibitem[HLM{\etalchar{+}}08]{holroyd2008chip}
+Alexander~E. Holroyd, Lionel Levine, Karola M{\'e}sz{\'a}ros, Yuval Peres,
+  James Propp, and David~B. Wilson.
+\newblock Chip-firing and rotor-routing on directed graphs.
+\newblock In {\em In and out of equilibrium 2}, pages 331--364. Springer, 2008.
+
+\bibitem[J{\'a}r18]{jarai2018sandpile}
+Antal~A J{\'a}rai.
+\newblock Sandpile models.
+\newblock {\em Probability surveys}, 15:243--306, 2018.
+
+\bibitem[KK21]{kapovich2021superintegral}
+Michael Kapovich and Alex Kontorovich.
+\newblock On superintegral kleinian sphere packings, bugs, and arithmetic
+  groups.
+\newblock {\em arXiv preprint arXiv:2104.13838}, 2021.
+
+\bibitem[Kli18]{klivans2018mathematics}
+Caroline~J. Klivans.
+\newblock {\em The mathematics of chip-firing}.
+\newblock CRC Press, 2018.
+
+\bibitem[LBR02]{le2002identity}
+Yvan Le~Borgne and Dominique Rossin.
+\newblock On the identity of the sandpile group.
+\newblock {\em Discrete mathematics}, 256(3):775--790, 2002.
+
+\bibitem[LKG90]{liu1990geometry}
+S.H. Liu, Theodore Kaplan, and L.J. Gray.
+\newblock Geometry and dynamics of deterministic sand piles.
+\newblock {\em Physical Review A}, 42(6):3207, 1990.
+
+\bibitem[LP10]{levine2010sandpile}
+Lionel Levine and James Propp.
+\newblock What is... a sandpile.
+\newblock In {\em Notices Amer. Math. Soc}, 2010.
+
+\bibitem[LPS16]{levine2016apollonian}
+Lionel Levine, Wesley Pegden, and Charles~K. Smart.
+\newblock Apollonian structure in the abelian sandpile.
+\newblock {\em Geometric and Functional Analysis}, 26(1):306--336, 2016.
+
+\bibitem[LPS17]{levine2017apollonian}
+Lionel Levine, Wesley Pegden, and Charles~K. Smart.
+\newblock The apollonian structure of integer superharmonic matrices.
+\newblock {\em Annals of Mathematics}, pages 1--67, 2017.
+
+\bibitem[Mel20]{melchionna2020sandpile}
+Andrew Melchionna.
+\newblock The sandpile identity element on an ellipse.
+\newblock {\em arXiv preprint arXiv:2007.05792}, 2020.
+
+\bibitem[Ost03]{ostojic2003patterns}
+Srdjan Ostojic.
+\newblock Patterns formed by addition of grains to only one site of an abelian
+  sandpile.
+\newblock {\em Physica A: Statistical Mechanics and its Applications},
+  318(1-2):187--199, 2003.
+
+\bibitem[Pao12]{paoletti2012deterministic}
+Guglielmo Paoletti.
+\newblock Deterministic abelian sandpile models and patterns.
+\newblock 2012.
+
+\bibitem[Peg]{pegdensandpile}
+Wesley Pegden.
+\newblock Sandpile galleries.
+\newblock \url{http://www.math.cmu.edu/~wes/sandgallery.html}.
+
+\bibitem[PS13]{pegden2013convergence}
+Wesley Pegden and Charles~K. Smart.
+\newblock Convergence of the abelian sandpile.
+\newblock {\em Duke mathematical journal}, 162(4):627--642, 2013.
+
+\bibitem[PS20]{pegden2020stability}
+Wesley Pegden and Charles~K. Smart.
+\newblock Stability of patterns in the abelian sandpile.
+\newblock In {\em Annales Henri Poincar{\'e}}, volume~21, pages 1383--1399.
+  Springer, 2020.
+
+\bibitem[Red05]{redig2005mathematical}
+Frank Redig.
+\newblock Mathematical aspects of the abelian sandpile model.
+\newblock {\em Les Houches lecture notes}, 83:657--659, 2005.
+
+\bibitem[Sma13]{smart2013aim}
+Charles~K. Smart.
+\newblock Aim chip firing 2013: The $f$-lattice.
+\newblock 2013.
+\newblock \url{https://www.aimath.org/WWN/chipfiring/flattice.pdf}.
+
+\bibitem[Sta16]{stange2016sensual}
+Katherine~E Stange.
+\newblock The sensual apollonian circle packing.
+\newblock {\em Expositiones Mathematicae}, 34(4):364--395, 2016.
+
+\bibitem[Tan96]{tan1996group}
+Lin Tan.
+\newblock The group of rational points on the unit circle.
+\newblock {\em Mathematics Magazine}, 69(3):163--171, 1996.
+
+\end{thebibliography}

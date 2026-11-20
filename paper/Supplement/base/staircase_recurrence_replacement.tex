@@ -1,0 +1,274 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,array,longtable}
+\newtheorem{theorem}{Theorem}
+\newcommand{\Z}{\mathbb Z}
+\title{Replacement recurrence proofs for the two odd-denominator staircases}
+\author{Audited integration of the 20 October base-family proofs}
+\date{26 October 2026}
+\begin{document}\maketitle
+
+\paragraph{Scope and provenance.}
+This replaces the recurrence arguments of Lemmas 6.13 and 6.14 in
+\texttt{revised\_version2/farey\_recursion.tex}. The explicit ranks and
+their symbolic case analysis were already proved in
+\texttt{flattice-thm13-20261019/BASE-ANALYSIS.md}; they are not new
+discoveries of this thread. That note also proves the period extensions,
+covering and complete Laplacian formulas used below directly from the
+base height formulas. The present proof isolates the rank argument,
+retains every incoming alternative, and derives a uniform quantitative
+consequence. It does not assert inheritance inside a different child field.
+
+Fix an odd integer $d\ge3$ and write
+\[
+ U=(d,1),\quad V=(1-d,d+1),\quad L=\Z U+\Z V,\quad
+ T=d^2+2d-1.
+\]
+The incoming neighbors are horizontal at even coordinate sum and vertical
+at odd coordinate sum. Write $s=1+\Delta_F g$. A forbidden set contains
+both inputs at an occupied $s=1$ site and at least one at an occupied
+$s=0$ site. Thus it is enough to exhibit a rank decreasing to one
+input when $s=1$ and to both when $s=0$.
+
+\section*{The standard staircase}
+Let
+\[
+ D=\{(x,y):2-d\le x\le d,\ 0\le y\le d+1,\ 1\le x+y\le d+2\}
+       \cup\{(0,0),(2,d+1)\}.
+\]
+The prescribed tile values are
+$-y(y-1)/2+\min(x-1,0)$, with an additional $1$ at the two displayed
+extra points. Their compatible global extension has constants
+$c_U=0,c_V=-d(d+3)/2$. On $D$, its Laplacian is $-1$ precisely at
+\[
+ \{x+y\text{ even},\ x=1\}
+ \ \cup\
+ \{x+y\text{ odd},\ 0<y<d+1,\ 1<x+y<d+2\},                 \tag{1}
+\]
+and is zero elsewhere. All formulas in this note are restricted to the
+stated tile unless extended periodically.
+
+Set $p=(x+y)\bmod2$. Define $\rho_D$ by the first applicable clause:
+\[
+\begin{array}{c|l}
+\rho_D&\text{condition}\\\hline
+4&(x,y)=(0,0)\text{ or }(d,1)\\
+5&(x,y)=(d,0)\text{ or }(1,d+1)\\
+p&y=0,\ y=d+1,\text{ or }x\le0\\
+8(d-x)+p&x\ge1,\ 1\le y\le d,\ x+y\le d\\
+8&x+y=d+1\\
+1&x+y=d+2.
+\end{array}                                                    \tag{2}
+\]
+These clauses cover $D$. The only nonzero differences between two tile
+points congruent modulo $L$ are $\pm U,\pm V$. The $U$ overlaps have
+upper endpoints $x+y=d+2$, $2\le x\le d$, and the two additional
+points $(d,1),(2,d+1)$. Their paired $\rho_D$ values are respectively
+$1,4,0$. The $V$ overlaps have lower endpoints $(j,0)$,
+$1\le j\le d$; the paired values are $j\bmod2$ for $j<d$, and $5$
+for $j=d$. Thus (2) descends to a well-defined $L$-periodic $\rho$.
+
+\begin{theorem}\label{thm:standard}
+For the standard staircase, $A(x,y)=6x+\rho(x,y)$ decreases by at
+least one to both inputs when $s=0$, and to a selected input when
+$s=1$. Consequently the global staircase is recurrent for every odd
+$d\ge3$.
+\end{theorem}
+\begin{proof}
+At an even $s=0$ site $(1,y)$ with $y<d$, the two rank differences
+are $-6+1-8(d-1)$ and $-1$; at $(1,d)$ they are $-13,-1$.
+For even $s=1$ sites, the following list is exhaustive:
+\[
+\begin{array}{l|c|c}
+\text{center}&\text{chosen input}&A(\text{input})-A(\text{center})\\\hline
+(0,0),(d,1),(2,d+1)&\text{left}&-1\\
+x\le0\text{ otherwise}&\text{left}&-5\text{ or }-1\\
+y=0,\ 2\le x\le d-1&\text{left}&-5\\
+1\le y\le d,\ x\ge2,\ x+y\le d&\text{right}&-1\\
+1\le y\le d,\ x\ge2,\ x+y=d+1&\text{right}&-1.
+\end{array}                                                    \tag{3}
+\]
+The last row omits $(d,1)$, already treated. The only left exits in
+the first two rows use representatives $(d-1,1)$ and $(1,d+1)$,
+of corrections $9$ and $5$; hence the same differences apply outside
+the tile.
+
+At an odd $s=0$ site, $3\le x+y\le d$ and $1\le y\le d$.
+If $x\le0$, its correction is $1$ and both vertical neighbors have
+correction zero. If $x\ge1$, its correction is $8(d-x)+1$, and both
+neighbors have correction at most $8(d-x)$: they are in the same
+interior region, on the bottom row, or on $x+y=d+1$ with correction
+$8\le8(d-x)$. The exceptional height-$4$ sites cannot be such
+neighbors. Both rank differences are therefore at most $-1$.
+
+The odd $s=1$ sites are the boundary lists in this table. Each displayed
+move decreases $\rho$ by exactly one and does not change $x$:
+\[
+\begin{array}{l|c|l}
+\text{center}&\text{move}&\text{outside input representative, if needed}\\\hline
+(x,0),\ 1\le x<d&\text{down}&(x+1-d,d)\\
+(d,0)&\text{up}&\\
+(x,d+1),\ 2-d\le x<1&\text{down}&\\
+(1,d+1)&\text{up}&(d,1)\\
+x+y=1,\ 1\le y\le d-1&\text{up}&\\
+x+y=d+2,\ 2\le y<d&\text{up}&(2-y,y)\\
+(2,d)&\text{up}&
+\end{array}                                                    \tag{4}
+\]
+Parity is imposed in each row. These checks establish every incoming
+inequality on the tile. Since $\rho$ and $s$ are periodic and $6x$
+changes by a constant under period translation, they hold globally.
+A minimum-rank point of a nonempty finite forbidden set would force
+another point of smaller rank in that set, a contradiction.
+\end{proof}
+
+\section*{The alternate staircase}
+Let $\widehat D$ have main region
+\[
+ 4-2d\le x\le d,\quad 0\le y\le d,\quad 2-d\le x+y\le d+2,
+\]
+bottom strip $\{(x,-1):1-d\le x\le0\}$, top strip
+$\{(x,d+1):4-d\le x\le3\}$, and extra points
+$(1-d,0),(3,d)$. Its height formula is
+\[
+ -\frac{y(y+1)}2+\min(0,2-x)+\min(0,d-2+x)+\max(x+y-2,0),
+\]
+with an additional $1$ on $x+y=2$, $1\le y\le d-1$, and at
+$(1-d,0),(3,d),(1-d,-1),(3,d+1)$.
+The compatible extension has $c_U=0,c_V=-d(d+3)/2-1$.
+
+At an even site its Laplacian is $-1$ precisely on
+\[
+\begin{split}
+ &1\le y\le d-1,\qquad x=2-d\text{ or }x=2\text{ or }x+y=2,\\
+ &\text{or at }(1-d,0),(3,d).
+\end{split}                                                     \tag{5}
+\]
+At an odd site its Laplacian is zero precisely on these six lists,
+and is $-1$ elsewhere:
+\[
+\begin{array}{ll}
+y=-1\text{ or }d+1;&y=0,x\ge1\text{ or }y=d,x\le3-d;\\
+x+y=2-d,\ 1\le y\le d-2;&x+y=d+2,\ 2\le y\le d-1;\\
+x+y=1,\ 0\le y\le d-2;&x+y=3,\ 2\le y\le d.
+\end{array}                                                     \tag{6}
+\]
+Define $\widehat\rho_D$ by ordered clauses:
+\[
+\begin{array}{c|l}
+8d&(x,y)=(1-d,0)\text{ or }(1,1)\\
+8d-12&(x,y)=(3,d)\\
+8y-4&x+y=2,\ 2\le y\le d-1\\
+8(1-x)+p&0\le y\le d-1,\ 2-d\le x\le0,\ x+y\le1\\
+8(d+1-x)+p&1\le y\le d,\ x\ge2\\
+p&\text{otherwise}.
+\end{array}                                                     \tag{7}
+\]
+Call the fourth and fifth clauses the left and right high regions.
+
+For completeness, rank consistency is checked on the following full
+overlap lists. The lower endpoints of $V$ overlaps are $(x,0)$,
+$3\le x\le d$, and $(x,-1)$, $3-d\le x\le0$; both endpoint
+values are the default $p$. The $U$ overlaps split into five types:
+\begin{enumerate}
+\item $y=-1$, $1-d\le x\le0$: both values are $p$.
+\item $y=0$, $1-d\le x\le0$: the first pair has values $8d$;
+the rest match because $8(1-x)=8(d+1-(x+d))$.
+\item Both endpoints in the main region, $1\le y\le d-1$:
+necessarily $x\le0$ and $x+y\le1$. If $x\ge2-d$, the same
+left/right equality applies; otherwise both values are $p$.
+\item $(3-d,d-1)\leftrightarrow(3,d)$: both values are $8d-12$.
+\item $y=d$, $4-2d\le x\le3-d$: both values are $p$.
+\end{enumerate}
+These checks suffice for all congruent points. Indeed a fixed level
+$x-dy$ has at most two representatives, differing by $U$. A class with
+two levels has exactly the four representatives
+\[
+ (j-d,-1),\ (j,0),\ (j-2d+1,d),\ (j-d+1,d+1),\quad 3\le j\le d,
+\]
+whose $U,V$ adjacency graph is a rectangle. To verify the bound of two
+representatives per level, a possible pair separated by $2U$ would start
+at sum $-d,1-d$, or $2-d$. The first two choices give an upper
+$x$ coordinate greater than $d$; the third would end at $(3,d+1)$,
+whose inverse image $(3-2d,d-1)$ is outside the domain. Larger multiples
+are excluded by the full coordinate-sum width. Thus (7) defines a
+periodic $\widehat\rho$ on the plane.
+
+\begin{theorem}\label{thm:alternate}
+For the alternate staircase, $\widehat A(x,y)=6x+\widehat\rho(x,y)$
+has the same decreasing-input property. Its global extension is
+recurrent for every odd $d\ge3$.
+\end{theorem}
+\begin{proof}
+For even $s=0$ sites, subtract $6x$ at the center. The two effective
+input heights and center correction are:
+\[
+\begin{array}{l|c|c}
+\text{center}&\text{input heights}&\widehat\rho_D\\\hline
+(1-d,0),(1,1)&3,\ 8d-1&8d\\
+(3,d)&8d-13,\ 7&8d-12\\
+x=2-d\text{ or }2\text{ in (5)}&-5,\ 8(d-1)-1&8(d-1)\\
+x+y=2,\ 2\le y\le d-1&8y-5,\ 7&8y-4.
+\end{array}                                                     \tag{8}
+\]
+Every comparison is strict, including $d=3$ and $y=2$.
+Even $s=1$ sites in either high region choose right, decreasing rank
+by one; the possible right exit from $(d,1)$ is represented by $(1,0)$,
+of correction $1$. All other even $s=1$ sites have correction zero
+and choose left, of correction $1$, for rank drop $5$. The possible
+left exit from $(4-2d,d-1)$ is represented by $(3-d,d)$.
+
+Odd $s=0$ sites in either high region have correction $H+1$, with
+both vertical neighbors of correction at most $H$. A transition from
+the left region to the correction diagonal occurs only on the sum-$1$
+list of (6), except its final point whose upper neighbor has correction
+zero. A transition from the right region to $(3,d)$ occurs only on
+an outer-diagonal list of (6). For a default-height odd $s=0$ site,
+both inputs have correction zero: all transitions from default height
+to a high region, the correction line, or an exceptional even point
+belong to the boundary lists (6). These observations exhaust the
+region interfaces and prove the two required decreases.
+
+Odd $s=1$ sites in the left high region lie on sum $1$ and choose
+down; those in the right high region lie on the outer upper diagonal
+and also choose down. The correction drops by one. Default-height
+odd $s=1$ sites have correction $1$ and use these height-zero inputs:
+\begin{itemize}
+\item Bottom strip and bottom row: down, represented respectively by
+$(x+1,d)$ and $(x+1-d,d)$ if outside the tile.
+\item Top strip with $x\le1$: down; its remaining odd endpoint
+$(3,d+1)$: up, represented by $(2,0)$.
+\item Top row with $x\le1-d$: down; its remaining odd endpoint
+$(3-d,d)$: up, represented by $(2,0)$.
+\item Outer lower diagonal: up inside the tile.
+\item Inner sum-$3$ diagonal: up inside the tile, except the already
+listed endpoint $(3-d,d)$.
+\end{itemize}
+These are exactly the remaining cases of (6). Since every move is
+vertical, each drops the rank by one. Periodicity transports all
+inequalities globally. A minimum-rank point in a finite forbidden set
+gives the same contradiction as in Theorem~\ref{thm:standard}.
+\end{proof}
+
+\section*{A uniform stronger consequence}
+Both proofs exclude every nonempty forbidden set whose first coordinate
+is bounded below, even if it is infinite: the rank is bounded below on
+such a set, whereas the forcing rules repeatedly decrease it by at
+least one. For an arbitrary nonempty domain of horizontal coordinate span
+$W=\sup x-\inf x<\infty$,
+synchronous burning finishes in at most
+\[
+ 6W+8d-6\quad\text{(standard)},\qquad
+ 6W+8d+1\quad\text{(alternate)}.                               \tag{9}
+\]
+Indeed $0\le\rho\le8(d-1)+1$ and $0\le\widehat\rho\le8d$.
+At each retained input step the rank drops by at least one. A point
+surviving $t$ rounds forces a length-$t$ sequence within the original
+domain; this is impossible once $t$ exceeds its rank range. The argument
+also applies to infinite vertical strips. Empty domains are immediate.
+
+These bounds and ranks belong to the parents' actual periodic fields.
+Using them on a piece of a child still requires equality on the complete
+incoming stars and control of every exit. Neither this replacement nor
+the old base proof establishes the final paper's hereditary column claim.
+\end{document}
