@@ -68,6 +68,7 @@ lake env lean checks/Placement.lean
 lake env lean checks/Initializers.lean
 lake env lean checks/FareyBirth.lean
 lake env lean checks/ThresholdMinimum.lean
+lake env lean checks/BellmanRank.lean
 lake env lean checks/QuarterTurn.lean
 lake env lean checks/Native.lean
 lake env lean checks/Periods.lean
@@ -94,13 +95,15 @@ The exact recurrence criterion, rotation transports, and endpoint recurrence con
 
 The constructor schedule checks, exact lattice and period proofs, endpoint odometer consumers, all literal initializer covers, the B1–B10 native recurrence consumers, and the alternate chart and distinctness checks report only `[propext, Classical.choice, Quot.sound]`.
 
+[BellmanRank.lean](FLatticePaper/Plane/BellmanRank.lean) proves the general Part I rank construction from the absence of forts in grade half-spaces. It uses the two physical inputs to obtain uniform exit depth, bounds all obstacle iterates, and stabilizes their bounded correction on the finite period deck. The [physical endpoint consumer](checks/BellmanRank.lean) checks the hypotheses and derives recurrence from the resulting rank. The source-specific fort elimination remains open.
+
 The bootstrap, ordered-height, alternate-midpoint, placement, initializer, Farey chronology, threshold, recurrence/rotation and native evaluator milestones landed on `main` at `4dbc1eb`, `dd24414`, `a0df1d2`, `7056241`, `d08b018`, `acea381`, `ab4c8ca`, `f2cf9be` and `2546d52`. The matrix and period laws, root coverage and endpoint growth landed at `8501715`. The reciprocal and near-one staircase covers landed at `68e33d2` and `980b4b2`. Complete native initializer coverage landed at `c2606db`. The B1 height extension landed at `5d5e799`, its binary Laplacian and symmetry at `05a6538`, and its recurrence and centered native agreement at `2152670`. B2 recurrence landed at `048f7d0`, and B3 heights and reflection landed at `66ef919`. The B3 rank overlap and physical Laplacian landed at `bb44dcb` and `39d28ae`. With the worker's read-only `.git` mount, submit tested named paths via `python3 scripts/checkpoint.py request` and wait for its receipt before editing those paths again.
 
 ### Open
 
 The two headline theorems, all-word success of mixed evaluation, general plane ranks, source-specific finite-tile height comparisons, and mixed occupied-domain coverage stay open. The mixed ordered-height proof needs the geometric comparisons of the actual shifted sources. B1–B10 have native height identifications and recurrence. The signed ranks, boundary values and band induction for actual parent pairs remain open.
 
-The next constructor dependencies are native support and height comparisons for the mixed schedules. For the plane proof, establish the literal plane initializers and connect the threshold calculation to the actual earlier harmonically conjugate parent pair, deriving its unit bounds and both signed ranks from the boundary and cut arguments.
+The next constructor dependencies are native support and height comparisons for the mixed schedules. For the plane proof, connect the threshold calculation to the actual earlier harmonically conjugate parent pair, deriving its unit bounds and both signed ranks from the boundary and cut arguments. `chronology/PURE_COMPLETE_INTERFACE_AUDIT.md` in the pinned supplement specifies the remaining pure interfaces, including the exceptional plus boundary trace at the reciprocal root.
 
 ## GeneralK track · Recurrence on the F-lattice and its generalizations
 
