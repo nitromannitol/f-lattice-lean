@@ -14,6 +14,8 @@ The November 20 corrected edition and its supporting constructor are pinned by [
 - [Even distinctness calculation](FLatticePaper/Plane/AlternatePeriods.lean): the midpoint-minus-standard increments are $0,-1$ on the two generators, and `FLatticePaper.not_integerAffine_roundedMidpoint_sub_standard` rules out an integer-affine difference from those increments. The standard's period jet, unit Farey determinant and interior slope are explicit inputs; this is not a native-tile identification.
 - [Sparse placement and assembly](FLatticePaper/Construction/PlacedAssembly.lean): exact destination-slope placement, distinct rectangular trim and occupied lower-left centering, and placed list assembly with trim followed by max normalization for a correction. `HeightTile.meldCorrection_agrees` consumes ordered agreement and tracks the actual spatial shift and additive gauge. [The placement check](checks/Placement.lean) tests the different origins and a large translation without clipping.
 - [Literal initializers](FLatticePaper/Construction/BaseRegisters.lean): `FLatticePaper.Construction.BaseRun.registers` gives both four-register tuples at the empty word and positive pure runs. Each of the eight masks is supported only on its specified occupied integer sites, with nonemptiness proved for all valid denominators. [The initializer check](checks/Initializers.lean) compares all four current occupied height sets at each of the empty, `22` and `33` words against pinned TSV fixtures. These are finite masks, not proofs of the plane initializers.
+- [Farey registers and unique birth](FLatticePaper/Farey/RationalBirth.lean): `FLatticePaper.Farey.parentsAt_valid` gives denominator, parity and unit determinant invariants; `existsUnique_rational_birth` proves coverage and uniqueness across both current slots. The inverse is computable, with no denominator cutoff. [Lineage](FLatticePaper/Farey/Lineage.lean) proves that each non-endpoint retained birth lies at a strict prefix of the same word.
+- [Correction chronology](FLatticePaper/Construction/Chronology.lean): `splitInitial_word` and `ancestorHistory_current` verify the pure prefix and chronological suffix fold. The two saved histories have their specified constant-digit suffixes and are nonempty at a nonempty prefix. [The consumer](checks/FareyBirth.lean) checks the actual inverse computation, both retained births, and the distinct pre-update sources on a mixed word.
 
 Run these checks from the sandbox repository root.
 
@@ -25,6 +27,7 @@ lake env lean checks/OrderedOverlap.lean
 lake env lean checks/AlternateMidpoint.lean
 lake env lean checks/Placement.lean
 lake env lean checks/Initializers.lean
+lake env lean checks/FareyBirth.lean
 sha256sum --quiet -c paper.sha256
 ```
 
@@ -38,10 +41,12 @@ The placement, trim and correction consumers report `[propext, Classical.choice,
 
 The base-mask and initial-register checks likewise report `[propext, Classical.choice, Quot.sound]`.
 
-The bootstrap, ordered-height, alternate-midpoint and placement milestones landed on `main` at `4dbc1eb`, `dd24414`, `a0df1d2` and `7056241`. With the worker's read-only `.git` mount, submit tested named paths via `python3 scripts/checkpoint.py request` and wait for its receipt before editing those paths again.
+The Farey rational coverage, retained birth and inverse consumer checks report `[propext, Classical.choice, Quot.sound]`; the determinant walk, initial split and nonempty saved word checks report only `[propext]`.
+
+The bootstrap, ordered-height, alternate-midpoint, placement and initializer milestones landed on `main` at `4dbc1eb`, `dd24414`, `a0df1d2`, `7056241` and `d08b018`. With the worker's read-only `.git` mount, submit tested named paths via `python3 scripts/checkpoint.py request` and wait for its receipt before editing those paths again.
 
 ## Open
 
-The two headline theorems, the literal unbounded mixed-word constructor, the general plane ranks, source-specific finite-tile height comparisons, and occupied-domain period coverage remain open. The ordered height lemma does not supply the actual shifted sources and ancestor chronology or their geometric comparisons. The recurrence work here proves the direction from allowed sets to pointwise comparison over every finite set. The reverse direction in the paper uses a source strongly connected component and remains open. The endpoint consumer verifies recurrence comparison and superharmonicity at $0/1$ through its explicit rank. The $1/1$ endpoint and endpoint growth, the root and pure-word plane ranks and the general signed rank and band induction are separate obligations.
+The two headline theorems, the literal unbounded mixed-word constructor, the general plane ranks, source-specific finite-tile height comparisons, and occupied-domain period coverage remain open. The ordered height lemma does not supply the actual shifted sources or their geometric comparisons. The recurrence work here proves the direction from allowed sets to pointwise comparison over every finite set. The reverse direction in the paper uses a source strongly connected component and remains open. The endpoint consumer verifies recurrence comparison and superharmonicity at $0/1$ through its explicit rank. The $1/1$ endpoint and endpoint growth, the root and pure-word plane ranks and the general signed rank and band induction are separate obligations.
 
-Next constructor dependencies: transcribe the Farey fraction registers and exact word chronology before using the slot offsets, including where the initial pure run ends and where each retained tile was born. Then connect the ordinary and corrected source lists to placed assembly. In parallel mathematically, the local threshold-minimum and equal-level rank implication in supplement Part I, lines 43–46, can be proved from the signed standard choices without assuming any new child rank or geometry.
+Next constructor dependencies: use the Farey registers and distinct saved histories in the slot offsets, and connect the ordinary and corrected source lists to placed assembly. The local threshold-minimum and equal-level rank implication in supplement Part I, lines 43–46, is independent of the new child's geometry.
