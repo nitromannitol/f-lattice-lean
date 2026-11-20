@@ -435,17 +435,62 @@ theorem mem_stairOddAlt_raw_iff {den : ℤ} (point : Site) :
     or_false]
   omega
 
+abbrev LadderOddCorner (den : ℤ) (point : Site) : Prop :=
+  (point.1 = 0 ∧ point.2 = 0) ∨ (point.1 = den + 2 ∧ point.2 = den + 2)
+
+abbrev LadderOddBump (den : ℤ) (point : Site) : Prop :=
+  (point.1 = 0 ∧ point.2 = 0) ∨ (point.1 = den + 2 ∧ point.2 = den + 2) ∨
+    (point.1 + point.2 = den + 2 ∧ 1 < point.2 ∧ point.2 < den + 1)
+
+/-- The B5 height formula, including its two corners and inner diagonal. -/
+def ladderOddValue (den : ℤ) (point : Site) : ℤ :=
+  -(point.2 * (point.2 - 1) / 2) + min 0 (point.1 - 1) + max (point.2 + point.1 - den - 2) 0 +
+    min (den + 1 - point.1) 0 + (if LadderOddBump den point then 1 else 0)
+
+theorem mem_ladderOdd_raw_iff {den : ℤ} {point : Site} :
+    point ∈ (ladderOdd.raw den).sites ↔
+      (2 - den ≤ point.1 ∧ point.1 ≤ 2 * den) ∧ (0 ≤ point.2 ∧ point.2 ≤ den + 2) ∧
+      (LadderOddCorner den point ∨ (1 ≤ point.1 + point.2 ∧ point.1 + point.2 ≤ 2 * den + 3 ∧
+        ¬ ((point.2 = 0 ∧ den ≤ point.1) ∨ (point.2 = den + 2 ∧ point.1 ≤ 2)))) := by
+  obtain ⟨x, y⟩ := point
+  simp only [raw, mem_maskedTile_sites, window, entry, isSome_ite_some, Option.isSome_none,
+    Bool.false_eq_true, or_false, LadderOddCorner]
+  omega
+
+theorem ladderOdd_raw_height (den : ℤ) (point : (ladderOdd.raw den).sites) :
+    (ladderOdd.raw den).height point = ladderOddValue den point.val := by
+  obtain ⟨⟨x, y⟩, hmem⟩ := point
+  have hentry := ((mem_maskedTile_sites _ _ _ _).mp hmem).2.2
+  change (entry .ladderOdd den (x, y)).isSome at hentry
+  apply Option.get_of_eq_some
+  change entry .ladderOdd den (x, y) = some (ladderOddValue den (x, y))
+  by_cases h : LadderOddBump den (x, y)
+  · simp only [entry, ladderOddValue, if_pos h]
+  · simp only [entry, if_neg h] at hentry
+    simp only [entry, ladderOddValue, if_neg h, if_pos (Option.isSome_ite.mp hentry), add_zero]
+
+theorem ladderOdd_llCenter_agrees {den : ℤ} (hden : ladderOdd.Valid den) {field : Field}
+    (hagree : (ladderOdd.raw den).Agrees field 0) :
+    ((ladderOdd.tile den hden).llCenter (ladderOdd.tile_nonempty den hden)).Agrees field 0 := by
+  have hmin := hden.1
+  have hzero : (0 : Site) ∈ (ladderOdd.raw den).sites := by
+    apply mem_ladderOdd_raw_iff.mpr
+    exact ⟨⟨by change 2 - den ≤ 0; omega, by change (0 : ℤ) ≤ 2 * den; omega⟩,
+      ⟨le_rfl, by change (0 : ℤ) ≤ den + 2; omega⟩, Or.inl (Or.inl ⟨rfl, rfl⟩)⟩
+  have hfirst (site : Site) (hs : site ∈ (ladderOdd.raw den).sites) :
+      (0 : Site).2 ≤ site.2 ∧ ((0 : Site).2 = site.2 → (0 : Site).1 ≤ site.1) := by
+    obtain ⟨hx, hy, hshape⟩ := mem_ladderOdd_raw_iff.mp hs
+    simp only [Prod.fst_zero, Prod.snd_zero, LadderOddCorner] at *
+    omega
+  simpa only [tile, add_zero] using hagree.llCenter_trim (ladderOdd.raw_nonempty den hden) hzero hfirst
+
 theorem mem_ladderOdd_body {den : ℤ} {point : Site}
     (hx : 2 - den ≤ point.1 ∧ point.1 ≤ 2 * den)
     (hy : 0 ≤ point.2 ∧ point.2 ≤ den + 2)
     (hband : 1 ≤ point.1 + point.2 ∧ point.1 + point.2 ≤ 2 * den + 3)
     (hstrip : ¬ ((point.2 = 0 ∧ den ≤ point.1) ∨ (point.2 = den + 2 ∧ point.1 ≤ 2))) :
-    point ∈ (ladderOdd.raw den).sites := by
-  rw [raw, mem_maskedTile_sites]
-  refine ⟨hx, hy, ?_⟩
-  obtain ⟨col, row⟩ := point
-  simp only [entry, isSome_ite_some, Option.isSome_none, Bool.false_eq_true, or_false]
-  exact Or.inr ⟨hband.1, hband.2, hstrip⟩
+    point ∈ (ladderOdd.raw den).sites :=
+  mem_ladderOdd_raw_iff.mpr ⟨hx, hy, Or.inr ⟨hband.1, hband.2, hstrip⟩⟩
 
 theorem mem_ladderOddAlt_placed_body {den : ℤ} {point : Site}
     (hx : 2 - den ≤ point.1 ∧ point.1 ≤ 2 * den - 1)

@@ -1,3 +1,4 @@
+import FLatticePaper.Construction.LadderExtension
 import FLatticePaper.Construction.NativeCoverage
 import FLatticePaper.Plane.EndpointGrowth
 import FLatticePaper.Farey.Birth
@@ -24,6 +25,14 @@ theorem long_pure_runs_cover_all_registers :
       registers.Covers (parentsAt (List.replicate 200 .three))) :=
   ⟨evaluateNative_base_covers (.twos 199), evaluateNative_base_covers (.threes 199)⟩
 
+theorem long_pure_three_has_standard_ladder_extension :
+    let word := List.replicate 200 .three
+    ∃ registers : TileRegisters, ∃ field : Field,
+      evaluateNative word = .ok registers ∧ registers.standard.currentOdd.val.Agrees field 0 ∧
+      HasGeneratorPeriods ((parentsAt word).current .odd) field 0 (stairEvenConstantV 402) ∧
+      HasQuadraticGrowth field ((parentsAt word).current .odd).matrix := by
+  exact evaluateNative_threes_odd_standard_extension 199
+
 #print axioms Fraction.integralLattice_eq_span
 #print axioms Fraction.mem_modifiedDeck_iff_integral_even
 #print axioms evaluateNative_empty_covers
@@ -40,5 +49,10 @@ theorem long_pure_runs_cover_all_registers :
 #print axioms checkerboard_endpoints
 #print axioms birth_periods_eq_integral_even
 #print axioms recognizable_root_has_its_matrix_growth
+#print axioms BaseMask.ladderOdd_raw_height
+#print axioms ladderOdd_overlap_indices
+#print axioms ladderOdd_respectsPeriods
+#print axioms evaluateNative_threes_odd_standard_extension
+#print axioms long_pure_three_has_standard_ladder_extension
 
 end FLatticePaper.Checks

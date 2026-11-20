@@ -7,6 +7,7 @@ import FLatticePaper.Construction.AlternateStaircaseSeams
 import FLatticePaper.Construction.BaseRegisters
 import FLatticePaper.Construction.Chronology
 import FLatticePaper.Construction.CorrectionHeight
+import FLatticePaper.Construction.LadderExtension
 import FLatticePaper.Construction.Native
 import FLatticePaper.Construction.NativeCoverage
 import FLatticePaper.Construction.PlacedAssembly

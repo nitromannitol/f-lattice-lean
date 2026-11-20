@@ -4,10 +4,10 @@ namespace FLatticePaper.Construction
 
 open Farey
 
-private def reciprocalLadderDeck (den : ℤ) : PeriodDeck :=
+def reciprocalLadderDeck (den : ℤ) : PeriodDeck :=
   (Fraction.mk 1 den).modifiedDeck
 
-private theorem reciprocalLadderDeck_eq {den : ℤ} (heven : den % 2 = 0) :
+theorem reciprocalLadderDeck_eq {den : ℤ} (heven : den % 2 = 0) :
     reciprocalLadderDeck den = ⟨(2 * den, 2), (1 - den, 1 + den)⟩ := by
   have hodd : (1 + den) % 2 ≠ 0 := by omega
   simp [reciprocalLadderDeck, Fraction.modifiedDeck, Fraction.periodMultiplicity,
@@ -99,7 +99,7 @@ private theorem ladder_cell_bounds {den : ℤ} {point : Site} (hden : 4 ≤ den)
     have hhiInt : point.2 < 3 := by exact_mod_cast hhi
     omega
 
-private theorem ladderOdd_raw_cover {den : ℤ} (hden : BaseMask.ladderOdd.Valid den) :
+theorem ladderOdd_raw_cover {den : ℤ} (hden : BaseMask.ladderOdd.Valid den) :
     (reciprocalLadderDeck den).Covers (BaseMask.ladderOdd.raw den).sites := by
   obtain ⟨hmin, heven⟩ := hden
   apply PeriodDeck.covers_of_halfShiftedCell _ (ne_of_gt (reciprocalLadderDeck_pos hmin))
@@ -186,7 +186,7 @@ theorem ladderEvenAlt_cover {den : ℤ} (hden : BaseMask.ladderEvenAlt.Valid den
   exact covers_nearOne_ladder_of_mapSite hden.2 (den, den)
     (fun point hmem => (BaseMask.mem_ladderEvenAlt_raw_iff point).mpr hmem) (ladderOddAlt_raw_cover hden)
 
-private theorem threes_current_odd (extra : ℕ) :
+theorem threes_current_odd (extra : ℕ) :
     (parentsAt (BaseRun.threes extra).word).current .odd = ⟨1, 2 * (extra : ℤ) + 3 + 1⟩ := by
   rw [BaseRun.word, parentsAt_replicate_three]
   apply Fraction.ext <;> simp [Parents.current, Parents.combine, Nat.cast_add]
