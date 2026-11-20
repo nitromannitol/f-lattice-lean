@@ -1,4 +1,6 @@
 import FLatticePaper.Construction.LadderExtension
+import FLatticePaper.Construction.LadderReflection
+import FLatticePaper.Construction.LadderRotation
 import FLatticePaper.Construction.NativeCoverage
 import FLatticePaper.Plane.EndpointGrowth
 import FLatticePaper.Farey.Birth
@@ -33,6 +35,21 @@ theorem long_pure_three_has_standard_ladder_extension :
       HasQuadraticGrowth field ((parentsAt word).current .odd).matrix := by
   exact evaluateNative_threes_odd_standard_extension 199
 
+theorem long_pure_two_has_standard_ladder_extension :
+    let word := List.replicate 200 .two
+    ∃ registers : TileRegisters, ∃ field : Field,
+      evaluateNative word = .ok registers ∧ registers.standard.currentEven.val.Agrees field 0 ∧
+      HasGeneratorPeriods ((parentsAt word).current .even) field 0 (ladderEvenConstantV 402) ∧
+      HasQuadraticGrowth field ((parentsAt word).current .even).matrix := by
+  exact evaluateNative_twos_even_standard_extension 199
+
+theorem reciprocal_ladder_four_laplacian_reflection :
+    ∃ field : Field, (BaseMask.ladderOdd.raw 4).Agrees field 0 ∧
+      ∀ point, laplacian field ((6, 6) - point) = laplacian field point := by
+  have hvalid : BaseMask.ladderOdd.Valid 4 := by simp [BaseMask.Valid]
+  obtain ⟨field, hagree, hperiod, _⟩ := ladderOdd_exists_extension hvalid
+  exact ⟨field, hagree, laplacian_ladderOddField_reflection hvalid hagree hperiod⟩
+
 #print axioms Fraction.integralLattice_eq_span
 #print axioms Fraction.mem_modifiedDeck_iff_integral_even
 #print axioms evaluateNative_empty_covers
@@ -54,5 +71,13 @@ theorem long_pure_three_has_standard_ladder_extension :
 #print axioms ladderOdd_respectsPeriods
 #print axioms evaluateNative_threes_odd_standard_extension
 #print axioms long_pure_three_has_standard_ladder_extension
+#print axioms BaseMask.ladderEven_raw_height
+#print axioms rotateLadderField_periods
+#print axioms ladderEvenConstantV_eq
+#print axioms evaluateNative_twos_even_standard_extension
+#print axioms long_pure_two_has_standard_ladder_extension
+#print axioms ladderOddField_reflection
+#print axioms laplacian_ladderOddField_reflection
+#print axioms reciprocal_ladder_four_laplacian_reflection
 
 end FLatticePaper.Checks

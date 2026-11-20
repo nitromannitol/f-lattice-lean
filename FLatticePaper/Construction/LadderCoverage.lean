@@ -154,7 +154,7 @@ theorem ladderOddAlt_cover {den : ℤ} (hden : BaseMask.ladderOddAlt.Valid den) 
     (Fraction.mk 1 den).modifiedDeck.Covers (BaseMask.ladderOddAlt.tile den hden).sites :=
   covers_trim (ladderOddAlt_raw_cover hden) _
 
-private theorem nearOneLadderDeck_eq {den : ℤ} (heven : den % 2 = 0) :
+theorem nearOneLadderDeck_eq {den : ℤ} (heven : den % 2 = 0) :
     (Fraction.mk 1 den).rotate.modifiedDeck = ⟨(den + 1, den - 1), (-2, 2 * den)⟩ := by
   have hodd : (Fraction.mk 1 den).Odd := by
     change (1 + den) % 2 = 1
@@ -192,7 +192,7 @@ theorem threes_current_odd (extra : ℕ) :
   apply Fraction.ext <;> simp [Parents.current, Parents.combine, Nat.cast_add]
   all_goals omega
 
-private theorem twos_current_even (extra : ℕ) :
+theorem twos_current_even (extra : ℕ) :
     (parentsAt (BaseRun.twos extra).word).current .even =
       (Fraction.mk 1 (2 * (extra : ℤ) + 3 + 1)).rotate := by
   have hparents := parentsAt_valid (BaseRun.threes extra).word

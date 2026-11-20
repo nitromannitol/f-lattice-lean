@@ -529,6 +529,71 @@ theorem mem_ladderEven_raw_iff {den : ℤ} (point : Site) :
     or_false]
   omega
 
+/-- The source's B6 pullback in its raw formula coordinates. -/
+theorem mem_ladderEven_raw_pullback_iff {den : ℤ} (point : Site) :
+    point ∈ (ladderEven.raw den).sites ↔
+      (2 * den + 1 - point.2, point.1 + 1) ∈ (ladderOdd.raw den).sites := by
+  obtain ⟨x, y⟩ := point
+  rw [mem_ladderOdd_raw_iff]
+  simp only [raw, mem_maskedTile_sites, window, entry, isSome_ite_some, Option.isSome_none,
+    Bool.false_eq_true, or_false, LadderOddCorner]
+  omega
+
+/-- The B6 height on the raw support is the B5 height plus the source's harmonic correction. -/
+theorem ladderEven_raw_height (den : ℤ) (point : (ladderEven.raw den).sites) :
+    (ladderEven.raw den).height point = ladderOddValue den (2 * den + 1 - point.val.2, point.val.1 + 1) +
+      (point.val.1 * (point.val.1 - 1) / 2 - (point.val.1 - point.val.2) ^ 2 / 4) := by
+  obtain ⟨⟨x, y⟩, hmem⟩ := point
+  let value := -((x - y) ^ 2 / 4) + min 0 (den - y) + max 0 (y - x - den) + min 0 (2 * den - y)
+  let bump := (x = -1 ∧ y = 2 * den + 1) ∨ (x = den + 1 ∧ y = den - 1) ∨
+    (y - x = den ∧ 0 < x ∧ x < den)
+  let correction := x * (x - 1) / 2 - (x - y) ^ 2 / 4
+  have htri : -((x + 1) * x / 2) + x * (x - 1) / 2 = -x := by
+    rw [show (x + 1) * x = x * (x - 1) + x * 2 by ring,
+      Int.add_mul_ediv_right _ _ (by decide)]
+    omega
+  have hmin (n : ℤ) : min (-n) 0 = min 0 n - n := by omega
+  have hmax (n : ℤ) : max (-n) 0 = max 0 n - n := by omega
+  have hbump : LadderOddBump den (2 * den + 1 - y, x + 1) ↔ bump := by
+    simp only [LadderOddBump, bump]
+    omega
+  have hvalue : ladderOddValue den (2 * den + 1 - y, x + 1) + correction =
+      value + (if bump then 1 else 0) := by
+    simp only [ladderOddValue, correction, value, if_congr hbump rfl rfl]
+    rw [show x + 1 - 1 = x by omega, show 2 * den + 1 - y - 1 = 2 * den - y by omega,
+      show den + 1 - (2 * den + 1 - y) = -(den - y) by omega,
+      show x + 1 + (2 * den + 1 - y) - den - 2 = -(y - x - den) by omega, hmin, hmax]
+    omega
+  have hentry := ((mem_maskedTile_sites _ _ _ _).mp hmem).2.2
+  change (entry .ladderEven den (x, y)).isSome at hentry
+  apply Option.get_of_eq_some
+  change entry .ladderEven den (x, y) = some (ladderOddValue den (2 * den + 1 - y, x + 1) + correction)
+  rw [hvalue]
+  have hrule : entry .ladderEven den (x, y) =
+    if bump then some (value + 1)
+    else if -1 ≤ y - x ∧ y - x ≤ 2 * den + 1 ∧
+        ¬ ((x = -1 ∧ y ≤ den + 1) ∨ (x = den + 1 ∧ 2 * den - 1 ≤ y)) then some value
+    else none := rfl
+  rw [hrule] at hentry ⊢
+  by_cases h : bump
+  · simp only [if_pos h]
+  · simp only [if_neg h] at hentry
+    simp only [if_neg h, add_zero, if_pos (Option.isSome_ite.mp hentry)]
+
+theorem ladderEven_llCenter_agrees {den : ℤ} (hden : ladderEven.Valid den) {field : Field}
+    (hagree : (ladderEven.raw den).Agrees field 0) :
+    ((ladderEven.tile den hden).llCenter (ladderEven.tile_nonempty den hden)).Agrees
+      (fun site => field (site + (0, 1))) 0 := by
+  have hmin := hden.1
+  apply hagree.llCenter_trim (ladderEven.raw_nonempty den hden)
+  · rw [mem_ladderEven_raw_pullback_iff, mem_ladderOdd_raw_iff]
+    simp only [LadderOddCorner]
+    omega
+  · intro point hpoint
+    rw [mem_ladderEven_raw_pullback_iff, mem_ladderOdd_raw_iff] at hpoint
+    simp only [LadderOddCorner] at hpoint
+    omega
+
 theorem mem_ladderEvenAlt_raw_iff {den : ℤ} (point : Site) :
     QuarterTurn.counterclockwise.mapSite (den, den) point ∈ (ladderEvenAlt.raw den).sites ↔
       point ∈ (ladderOddAlt.raw den).sites := by
