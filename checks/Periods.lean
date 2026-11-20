@@ -1,3 +1,4 @@
+import FLatticePaper.Construction.AlternateLadderExtension
 import FLatticePaper.Construction.LadderExtension
 import FLatticePaper.Construction.LadderLaplacian
 import FLatticePaper.Construction.LadderRank
@@ -70,6 +71,15 @@ theorem reciprocal_ladder_four_rank_agrees_on_shelf_overlap :
   have hstep : ((-3, 5) : Site) ∈ (reciprocalLadderDeck 4).span := ⟨0, 1, rfl⟩
   exact ⟨correction, (hagree _ hfirst).trans (by decide), (hagree _ hsecond).trans (by decide), hperiod _ hstep⟩
 
+theorem long_pure_three_has_alternate_ladder_extension_in_physical_chart :
+    let word := List.replicate 200 .three
+    ∃ registers : TileRegisters, ∃ field : Field,
+      evaluateNative word = .ok registers ∧
+      registers.alternate.currentOdd.val.Agrees (fun site => field (site + (-1, -1))) 0 ∧
+      HasGeneratorPeriods ((parentsAt word).current .odd) field (-1) (ladderOddAltConstantV 402) ∧
+      HasQuadraticGrowth field ((parentsAt word).current .odd).matrix := by
+  exact evaluateNative_threes_odd_alternate_extension 199
+
 #print axioms Fraction.integralLattice_eq_span
 #print axioms Fraction.mem_modifiedDeck_iff_integral_even
 #print axioms evaluateNative_empty_covers
@@ -110,5 +120,10 @@ theorem reciprocal_ladder_four_rank_agrees_on_shelf_overlap :
 #print axioms ladderEven_exists_recurrent_extension
 #print axioms evaluateNative_threes_odd_standard_recurrent
 #print axioms evaluateNative_twos_even_standard_recurrent
+#print axioms BaseMask.ladderOddAlt_raw_height
+#print axioms ladderOddAlt_overlap_indices
+#print axioms ladderOddAlt_respectsPeriods
+#print axioms evaluateNative_threes_odd_alternate_extension
+#print axioms long_pure_three_has_alternate_ladder_extension_in_physical_chart
 
 end FLatticePaper.Checks

@@ -112,7 +112,7 @@ theorem ladderOdd_raw_cover {den : ℤ} (hden : BaseMask.ladderOdd.Valid den) :
   · simp [PeriodDeck.combine]
     rfl
 
-private theorem ladderOddAlt_raw_cover {den : ℤ} (hden : BaseMask.ladderOddAlt.Valid den) :
+theorem ladderOddAlt_raw_cover {den : ℤ} (hden : BaseMask.ladderOddAlt.Valid den) :
     (reciprocalLadderDeck den).Covers (BaseMask.ladderOddAlt.raw den).sites := by
   obtain ⟨hmin, heven⟩ := hden
   apply covers_of_place (1, 1) 0
