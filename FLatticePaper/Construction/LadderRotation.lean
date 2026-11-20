@@ -1,4 +1,5 @@
 import FLatticePaper.Construction.LadderExtension
+import FLatticePaper.Construction.LadderReflection
 import FLatticePaper.Construction.QuarterTurnCorrection
 import FLatticePaper.Plane.RecurrenceRotation
 
@@ -95,6 +96,51 @@ theorem rotateLadderField_periods {den : ℤ} (heven : den % 2 = 0) {field : Fie
   rw [show den + stairEvenConstantV den + chooseTwo (den + 1) = 0 by unfold stairEvenConstantV; omega,
     sub_zero] at h
   exact h
+
+/-- In the genuine B5/B6 charts, the odd standard ladder is the authentic
+harmonically corrected quarter-turn of the even standard ladder. The
+composed chart maps use the odd reflection followed by minus its transverse
+period, whose affine increments cancel. -/
+theorem ladderOdd_earlierChain {den : ℤ} (hden : BaseMask.ladderOdd.Valid den) {field : Field}
+    (hagree : (BaseMask.ladderOdd.raw den).Agrees field 0)
+    (hperiod : HasGeneratorPeriods (Fraction.mk 1 den) field 0 (stairEvenConstantV den)) (point : Site) :
+    field point = rotateLadderField den field (QuarterTurn.counterclockwise.mapSite (0, -1) point) +
+      centeredQuarterTurnCorrection point := by
+  let rotated := QuarterTurn.counterclockwise.mapSite (0, -1) point
+  have hphase : (rotated.1 + rotated.2) % 2 = 1 - (point.1 + point.2) % 2 := by
+    change (-point.2 + 0 + (point.1 + -1)) % 2 = _
+    omega
+  have hcorrection : centeredQuarterTurnCorrection rotated + centeredQuarterTurnCorrection point = 0 := by
+    have hr := four_mul_centeredQuarterTurnCorrection rotated
+    have hp := four_mul_centeredQuarterTurnCorrection point
+    rw [hphase] at hr
+    have hx : rotated.1 = -point.2 := by simp [rotated, QuarterTurn.mapSite, QuarterTurn.turn]
+    have hy : rotated.2 = point.1 - 1 := by dsimp [rotated, QuarterTurn.mapSite, QuarterTurn.turn]; omega
+    rw [hx, hy] at hr
+    apply (mul_right_inj' (show (4 : ℤ) ≠ 0 by decide)).mp
+    linear_combination hr + hp
+  let reflected := reflectLadderOdd den point
+  let transverse := (reciprocalLadderDeck den).transverse
+  have hvec : transverse = (1 - den, den + 1) := by
+    simp [transverse, reciprocalLadderDeck_eq hden.2, add_comm]
+  have hpull : QuarterTurn.counterclockwise.mapSite (2 * den, 1) rotated = reflected - transverse := by
+    rw [hvec]
+    apply Prod.ext <;> dsimp [reflected, reflectLadderOdd, rotated, QuarterTurn.mapSite, QuarterTurn.turn] <;> omega
+  have href := ladderOddField_reflection hden hagree hperiod point
+  have hjet := hperiod.2 (reflected - transverse)
+  change field (reflected - transverse + transverse) =
+    field (reflected - transverse) - (Fraction.mk 1 den).transverseGrade (reflected - transverse) +
+      stairEvenConstantV den at hjet
+  rw [sub_add_cancel] at hjet
+  have hvalue : field (reflected - transverse) = field point := by
+    change field reflected = _ at href
+    simp only [hvec, Fraction.transverseGrade, reflected, reflectLadderOdd, Prod.fst_sub, Prod.snd_sub,
+      one_mul, stairEvenConstantV] at href hjet
+    rw [hvec]
+    dsimp only [reflected, reflectLadderOdd]
+    linear_combination href - hjet
+  change field point = rotateLadderField den field rotated + centeredQuarterTurnCorrection point
+  rw [rotateLadderField, hpull, hvalue, add_assoc, hcorrection, add_zero]
 
 theorem BaseMask.ladderEven_agrees_rotateLadderField {den : ℤ} (hden : BaseMask.ladderEven.Valid den)
     {field : Field} (hagree : (BaseMask.ladderOdd.raw den).Agrees field 0) :

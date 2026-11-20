@@ -98,7 +98,7 @@ The constructor schedule checks, exact lattice and period proofs, endpoint odome
 
 [BellmanRank.lean](FLatticePaper/Plane/BellmanRank.lean) proves the general Part I rank construction from the absence of forts in grade half-spaces. It uses the two physical inputs to obtain uniform exit depth, bounds all obstacle iterates, and stabilizes their bounded correction on the finite period deck. The [physical endpoint consumer](checks/BellmanRank.lean) checks the hypotheses and derives recurrence from the resulting rank. The source-specific fort elimination remains open.
 
-[EarlierChainPrice.lean](FLatticePaper/Plane/EarlierChainPrice.lean) proves the constant sum of the donor price and earlier chain price for both creator digits and every trailing run of threes, from the authentic harmonic rotation and earlier generator periods. [EarlierChain.lean](FLatticePaper/Farey/EarlierChain.lean) derives the deck displacement directly from the actual Farey registers. The [root consumer](checks/EarlierChain.lean) verifies the hypotheses on the B1/B2 physical heights. General rotation identification and transport of the actual canonical graphs are open.
+[EarlierChainPrice.lean](FLatticePaper/Plane/EarlierChainPrice.lean) proves the constant sum of the donor price and earlier chain price for both creator digits and every trailing run of threes, from the authentic harmonic rotation and earlier generator periods. [EarlierChain.lean](FLatticePaper/Farey/EarlierChain.lean) derives the deck displacement directly from the actual Farey registers and separates words of all threes from the two creator roles with a strict earlier word. The [consumer](checks/EarlierChain.lean) verifies the hypotheses on B1/B2 and B5/B6 in their literal physical charts. General rotation identification and transport of the actual canonical graphs are open.
 
 The bootstrap, ordered-height, alternate-midpoint, placement, initializer, Farey chronology, threshold, recurrence/rotation and native evaluator milestones landed on `main` at `4dbc1eb`, `dd24414`, `a0df1d2`, `7056241`, `d08b018`, `acea381`, `ab4c8ca`, `f2cf9be` and `2546d52`. The matrix and period laws, root coverage and endpoint growth landed at `8501715`. The reciprocal and near-one staircase covers landed at `68e33d2` and `980b4b2`. Complete native initializer coverage landed at `c2606db`. The B1 height extension landed at `5d5e799`, its binary Laplacian and symmetry at `05a6538`, and its recurrence and centered native agreement at `2152670`. B2 recurrence landed at `048f7d0`, and B3 heights and reflection landed at `66ef919`. The B3 rank overlap and physical Laplacian landed at `bb44dcb` and `39d28ae`. With the worker's read-only `.git` mount, submit tested named paths via `python3 scripts/checkpoint.py request` and wait for its receipt before editing those paths again.
 
@@ -139,19 +139,25 @@ The smaller arithmetic critical family has an admission result in the source, a 
 
 [Trace.lean](FLatticePaper/GeneralK/Trace.lean) proves `trace_le_zero_of_mem_growthSet` for arbitrary real entries and every $k\ge2$. Its comparison height has constant physical Laplacian after a harmonic-grid correction. At $k=3$ the consumer excludes all real $a>-2/3$ on the slice $b=c=1/3$, whose endpoint is attained by the checked harmonic field.
 
+[Envelope.lean](FLatticePaper/GeneralK/Envelope.lean) proves `exists_superharmonic_min` for a pointwise lower-bounded family of integer superharmonic heights. `mem_growthSet_of_affine_lower_bound` upgrades an affine lower quadratic bound to two-sided growth by the pinned phase-preserving translated minimum. `sub_mem_growthSet_of_posSemidef` derives downward closure for all real positive semidefinite decrements. The consumer checks both inclusions of the $k=3$, $b=c=1/3$ slice and admission of the singular matrix $A(-2,-\sqrt 2,-1)$ for every $k\ge2$.
+
+[Connectivity.lean](FLatticePaper/GeneralK/Connectivity.lean) proves `inputReaches_all` by traversing the actual vertical chains between retained horizontal sites. `InputReaches.exists_uniform_upper_bound` propagates a pointwise upper bound from an anchor through the true physical stars under pointwise lower bounds. The consumer reaches between nonretained sites in different phases and columns at $k=3$.
+
 The $k=2$ operator specialization is axiom-free. The interpolation, Laplacian, lift equivalence, growth and harmonic results and the consumers report only `[propext, Classical.choice, Quot.sound]`.
 
 ```sh
 export PATH="$HOME/.elan/bin:$PATH"
 lake build FLatticePaper.GeneralK.Harmonic
 lake build FLatticePaper.GeneralK.Trace
+lake build FLatticePaper.GeneralK.Envelope
+lake build FLatticePaper.GeneralK.Connectivity
 lake build FLatticePaper.GeneralK.ColumnLift
 lake env lean checks/GeneralKColumns.lean
 ```
 
 ### Proof queue
 
-1. Use checked leastness and monotonicity to prove the retained comparison and its zero-operator case. Prove the finite-cell equivalence, closedness, and semidefinite downward closure.
+1. Use checked leastness and monotonicity to prove the retained comparison and its zero-operator case. Prove the finite-cell equivalence and closedness. The compactness step must produce a superharmonic height with a global affine lower bound before applying `mem_growthSet_of_affine_lower_bound`.
 2. Define the explicit finite weighted graphs and $p_k$. Prove cycle admission by constructing a height. Prove the rational upper bound using exact periodic realization for any admissible full-rank period lattice, the least integer superharmonic obstacle majorant, the explicit Fourier bound on column differences, and finite cycle erasure. Derive the real equivalence and both cone inclusions. The physical trace bound $a+(k-1)c\le0$ gives the compactness needed for the maximality criterion.
 3. Use the checked harmonic witnesses to establish the gcd endpoint formula on the $1/k$ grid, the canonical critical parameters and exact grid period index, and the endpoint translation identity. The grid calculation is independent of the general Fourier bound.
 4. Prove the forbidden-set equivalences, chain test with both endpoint bits and their coincidence at $k=2$, and explicit forbidden intervals. Classify residue-only binary charges, realize all such patterns by integer heights, and derive the scalar odometers and the integer weighted-trace classification with its leftmost-column argument.

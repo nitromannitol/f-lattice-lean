@@ -8,6 +8,23 @@ retain that donor and advance the even parent. -/
 def donorWord (origin : Word) (replaceEven : Bool) (steps : ℕ) : Word :=
   origin ++ [if replaceEven then .one else .two] ++ List.replicate steps .three
 
+theorem Word.eq_threes_or_eq_donorWord (word : Word) :
+    (∃ steps, word = List.replicate steps .three) ∨
+      ∃ origin replaceEven steps, word = donorWord origin replaceEven steps := by
+  induction word using List.reverseRecOn with
+  | nil => exact Or.inl ⟨0, rfl⟩
+  | append_singleton word digit ih =>
+    cases digit
+    · exact Or.inr ⟨word, true, 0, by simp [donorWord]⟩
+    · exact Or.inr ⟨word, false, 0, by simp [donorWord]⟩
+    · rcases ih with ⟨steps, rfl⟩ | ⟨origin, replaceEven, steps, rfl⟩
+      · exact Or.inl ⟨steps + 1, List.replicate_succ'.symm⟩
+      · exact Or.inr ⟨origin, replaceEven, steps + 1, by rw [donorWord, donorWord, List.replicate_succ', List.append_assoc]⟩
+
+theorem length_origin_lt_donorWord (origin : Word) (replaceEven : Bool) (steps : ℕ) :
+    origin.length < (donorWord origin replaceEven steps).length := by
+  simp [donorWord]
+
 theorem Parents.walk_threes (parents : Parents) (steps : ℕ) :
     parents.walk (List.replicate steps .three) =
       ⟨parents.odd, parents.combine (2 * steps) 1⟩ := by
