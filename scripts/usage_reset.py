@@ -27,6 +27,12 @@ def save(state):
     tmp=STATE.with_suffix(".tmp")
     tmp.write_text(json.dumps(state,sort_keys=True,indent=2)+"\n")
     os.replace(tmp,STATE)
+    public_keys=("checked_utc","status","remaining_percent","available_credits","goal_status",
+                 "redeemed_utc","verified_restoration","outcome","last_error")
+    public=STATE.with_name("usage-status.json")
+    tmp=public.with_suffix(".tmp")
+    tmp.write_text(json.dumps({k:state[k] for k in public_keys if k in state},indent=2)+"\\n")
+    os.replace(tmp,public)
 
 
 def timed_out(*_):
@@ -166,6 +172,11 @@ def tick(state,may_redeem):
                     state["status"]="restored_check_goal"
             else:
                 state["status"]="credit_redeemed_checking_allowance"
+        elif state.get("pending_redemption") and remain>0:
+            state["status"]="restored_after_unconfirmed_attempt"
+            state.setdefault("unconfirmed_restoration_utc",stamp())
+        elif state.get("unconfirmed_restoration_utc"):
+            state["status"]="restored_after_unconfirmed_attempt"
         elif goal not in ("active","blocked"):
             state["status"]="inactive_campaign"
         elif remain>0:
@@ -210,7 +221,7 @@ def main():
                 save(state)
             print(state.get("checked_utc"),state.get("status"),state.get("remaining_percent"),
                   state.get("available_credits"),state.get("last_error",""),flush=True)
-            if not args.watch or state.get("status")=="restored_and_goal_verified":
+            if (not args.watch or state.get("goal_status")=="complete" or state.get("status") in\n                    ("restored_and_goal_verified","restored_after_unconfirmed_attempt")):
                 break
             time.sleep(60)
 
