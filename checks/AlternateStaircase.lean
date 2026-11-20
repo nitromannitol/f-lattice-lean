@@ -1,3 +1,4 @@
+import FLatticePaper.Construction.AlternateStaircaseLaplacian
 import FLatticePaper.Construction.AlternateStaircaseRankCorrection
 import FLatticePaper.Construction.AlternateStaircaseRotation
 import FLatticePaper.Construction.AlternateStaircaseSeams
@@ -41,15 +42,16 @@ theorem reciprocal_alternate_left_corner_has_physical_laplacian_neg_one :
   obtain ⟨standard, hagree, hperiod, _⟩ := stairEven_exists_extension hvalid
   refine ⟨stairEvenAltField 3 standard, stairEvenAltField_agrees hvalid hagree hperiod, ?_⟩
   have hsite : ((-2, 0) : Site) ∈ (BaseMask.stairEvenAlt.raw 3).sites := by decide +kernel
-  have heven : EvenSite (-2, 0) := by decide
-  have href := (reflectStairEvenAlt_mem_iff 3 (-2, 0)).mpr hsite
-  have heven' := (evenSite_reflectStairEvenAlt_iff 3 (-2, 0)).mpr heven
-  rw [laplacian_stairEvenAltField_eq_background_add_residual, laplacian_stairEvenAltBackground,
-    if_pos heven, stairEvenAltResidual_incomingNeg_even hvalid hagree hperiod hsite heven,
-    stairEvenAltResidual_incomingPos_reflect hvalid hagree hperiod,
-    stairEvenAltResidual_incomingNeg_even hvalid hagree hperiod href heven',
-    stairEvenAltResidual_on_raw hvalid hagree hperiod hsite]
+  rw [stairEvenAlt_laplacian_on_raw hvalid hagree hperiod _ hsite]
   decide
+
+theorem reciprocal_alternate_five_has_binary_plane_laplacian :
+    ∃ field : Field, (BaseMask.stairEvenAlt.raw 5).Agrees field 0 ∧
+      ∀ site, laplacian field site = -1 ∨ laplacian field site = 0 := by
+  have hvalid : BaseMask.stairEvenAlt.Valid 5 := by simp [BaseMask.Valid]
+  obtain ⟨standard, hagree, hperiod, _⟩ := stairEven_exists_extension hvalid
+  exact ⟨stairEvenAltField 5 standard, stairEvenAltField_agrees hvalid hagree hperiod,
+    stairEvenAlt_binary_laplacian hvalid hagree hperiod⟩
 
 theorem reciprocal_alternate_corner_and_diagonal_share_periodic_rank_correction :
     ∃ correction : Field, correction (-2, 0) = 24 ∧ correction (1, 1) = 24 ∧
@@ -99,7 +101,10 @@ theorem centered_root_alternate_has_no_unshifted_superharmonic_extension :
 #print axioms stairEvenAltResidual_incomingNeg_even
 #print axioms stairEvenAltResidual_incomingNeg_odd
 #print axioms stairEvenAltResidual_incomingPos_reflect
+#print axioms stairEvenAlt_laplacian_on_raw
+#print axioms stairEvenAlt_binary_laplacian
 #print axioms reciprocal_alternate_left_corner_has_physical_laplacian_neg_one
+#print axioms reciprocal_alternate_five_has_binary_plane_laplacian
 #print axioms stairEvenAlt_rankCorrection_class_constant
 #print axioms stairEvenAlt_exists_periodic_rankCorrection
 #print axioms reciprocal_alternate_corner_and_diagonal_share_periodic_rank_correction
