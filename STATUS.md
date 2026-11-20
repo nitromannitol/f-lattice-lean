@@ -114,18 +114,22 @@ The smaller arithmetic critical family has an admission result in the source, a 
 
 [Columns.lean](FLatticePaper/GeneralK/Columns.lean) defines the physical operator with horizontal inputs at coordinate sum zero modulo $k$. `laplacian_two` specializes it to the primary physical graph. `laplacian_liftColumns_columnSite` derives both weighted ceilings at the actual incoming sites, `laplacian_liftColumns_openChain` gives the exact slope drop, and `superharmonic_liftColumns_iff` proves the equivalence for the displayed concave lift. Pointwise leastness among other integer concave extensions is open. The [consumer](checks/GeneralKColumns.lean) checks a retained row and an interior slope drop in a negative column at $k=3$.
 
-The $k=2$ specialization is axiom-free. The interpolation, Laplacian, lift equivalence and both consumers report only `[propext, Classical.choice, Quot.sound]`.
+[Growth.lean](FLatticePaper/GeneralK/Growth.lean) defines `symmetricMatrix` and `growthSet` using the real quadratic form and the uniform little-oh error for integer physical heights. `mem_growthSet_two_iff` checks the physical specialization and `add_mem_growthSet` proves additive closure.
+
+[Harmonic.lean](FLatticePaper/GeneralK/Harmonic.lean) proves `phasePrimitive_secondDifference`, giving the phase-zero indicator. For every integer $k\ge2$ and integers $m,t$, `laplacian_harmonicField` and `quadraticGrowth_harmonicField` check the integer harmonic field of matrix $H(m/k,t)$. `add_harmonicMatrix_mem_growthSet_iff` gives translation invariance in both directions. The consumer checks admission of $A(-2/3,1/3,1/3)$ at $k=3$. The rational endpoint formula and its translation identity require the remaining classification steps.
+
+The $k=2$ operator specialization is axiom-free. The interpolation, Laplacian, lift equivalence, growth and harmonic results and the consumers report only `[propext, Classical.choice, Quot.sound]`.
 
 ```sh
 export PATH="$HOME/.elan/bin:$PATH"
-lake build FLatticePaper.GeneralK.Columns
+lake build FLatticePaper.GeneralK.Harmonic
 lake env lean checks/GeneralKColumns.lean
 ```
 
 ### Proof queue
 
-1. Define the growth set from the physical operator, prove pointwise leastness and monotonicity of the checked column lift, and prove the retained comparison and its zero-operator case. Prove the finite-cell equivalence, closedness, and semidefinite downward closure.
+1. Prove pointwise leastness and monotonicity of the checked column lift, and prove the retained comparison and its zero-operator case. Prove the finite-cell equivalence, closedness, and semidefinite downward closure.
 2. Define the explicit finite weighted graphs and $p_k$. Prove cycle admission by constructing a height. Prove the rational upper bound using exact periodic realization for any admissible full-rank period lattice, the least integer superharmonic obstacle majorant, the explicit Fourier bound on column differences, and finite cycle erasure. Derive the real equivalence and both cone inclusions. The physical trace bound $a+(k-1)c\le0$ gives the compactness needed for the maximality criterion.
-3. Develop the harmonic translations, the gcd endpoint formula on the $1/k$ grid, and the canonical critical parameters and exact grid period index. These are separate from the general Fourier bound.
+3. Use the checked harmonic witnesses to establish the gcd endpoint formula on the $1/k$ grid, the canonical critical parameters and exact grid period index, and the endpoint translation identity. The grid calculation is independent of the general Fourier bound.
 4. Prove the forbidden-set equivalences, chain test with both endpoint bits and their coincidence at $k=2$, and explicit forbidden intervals. Classify residue-only binary charges, realize all such patterns by integer heights, and derive the scalar odometers and the integer weighted-trace classification with its leftmost-column argument.
 5. Track the sibling's $k=2$ staircase and Farey results under their own conventions. The primary campaign above tracks the corrected October 2023 native height identification, coverage and mixed-word induction.

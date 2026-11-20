@@ -1,4 +1,4 @@
-import FLatticePaper.GeneralK.Columns
+import FLatticePaper.GeneralK.Harmonic
 
 namespace FLatticePaper.GeneralK.Checks
 
@@ -16,6 +16,12 @@ theorem three_chain_slope_drop_in_negative_column :
   rw [laplacian_liftColumns_openChain (by decide : (2 : ℤ) ≤ 3) _ _ _ _ (by decide) (by decide)]
   decide
 
+theorem three_grid_harmonic_matrix_is_admitted :
+    symmetricMatrix (-(2 / 3)) (1 / 3) (1 / 3) ∈ growthSet 3 := by
+  have h := harmonicMatrix_mem_growthSet (by decide : (2 : ℤ) ≤ 3) 1 0
+  norm_num [harmonicMatrix] at h
+  exact h
+
 #print axioms laplacian_two
 #print axioms interpolate_first
 #print axioms interpolate_last
@@ -24,5 +30,13 @@ theorem three_chain_slope_drop_in_negative_column :
 #print axioms superharmonic_liftColumns_iff
 #print axioms three_retained_star_at_origin
 #print axioms three_chain_slope_drop_in_negative_column
+#print axioms symmetricMatrix_mem_growthSet_iff
+#print axioms mem_growthSet_two_iff
+#print axioms add_mem_growthSet
+#print axioms phasePrimitive_secondDifference
+#print axioms laplacian_harmonicField
+#print axioms quadraticGrowth_harmonicField
+#print axioms add_harmonicMatrix_mem_growthSet_iff
+#print axioms three_grid_harmonic_matrix_is_admitted
 
 end FLatticePaper.GeneralK.Checks
