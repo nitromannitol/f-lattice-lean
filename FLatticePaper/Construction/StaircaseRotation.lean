@@ -11,9 +11,21 @@ chart of the near-one staircase. -/
 def rotateStaircaseField (den : ℤ) (field : Field) : Field := fun point =>
   field (QuarterTurn.counterclockwise.mapSite (den, 0) point) + centeredQuarterTurnCorrection point
 
+/-- The same duality formula in the raw B2 and B4 coordinates. -/
+def rawRotateStaircaseField (den : ℤ) (field : Field) : Field := fun point =>
+  field (den + 1 - point.2, point.1) + (chooseTwo point.1 - (point.1 - point.2) ^ 2 / 4)
+
 private theorem rotateStaircase_pullback (den : ℤ) (point : Site) :
     QuarterTurn.counterclockwise.mapSite (den, 0) point = (den - point.2, point.1) := by
   apply Prod.ext <;> dsimp [QuarterTurn.mapSite, QuarterTurn.turn] <;> omega
+
+theorem rawRotateStaircaseField_chart (den : ℤ) (field : Field) :
+    (fun point : Site => rawRotateStaircaseField den field (point + (0, 1))) = rotateStaircaseField den field := by
+  funext point
+  rw [rotateStaircaseField, rotateStaircase_pullback]
+  simp only [rawRotateStaircaseField, centeredQuarterTurnCorrection, Prod.fst_add, Prod.snd_add, add_zero]
+  rw [show den + 1 - (point.2 + 1) = den - point.2 by omega,
+    show point.1 - (point.2 + 1) = point.1 - point.2 - 1 by omega]
 
 theorem rotateStaircaseField_recurrent {den : ℤ} (hodd : den % 2 = 1) {field : Field}
     (hrec : Recurrent field) (hsuper : Superharmonic field) :
@@ -87,7 +99,7 @@ theorem staircase_rotate_inUnitInterval {den : ℤ} (hden : 3 ≤ den) (hodd : d
 /-- The B2 transverse constant in the constructor's final physical chart. -/
 def stairOddConstantV (den : ℤ) : ℤ := 1 - (den + 2) ^ 2 / 4
 
-private theorem correction_at_nearOne_transverse (den : ℤ) :
+theorem centeredQuarterTurnCorrection_nearOne_transverse (den : ℤ) :
     centeredQuarterTurnCorrection (-1, den) = stairOddConstantV den := by
   change chooseTwo (-1) - (-1 - den - 1) ^ 2 / 4 = 1 - (den + 2) ^ 2 / 4
   rw [show (-1 - den - 1) ^ 2 = (den + 2) ^ 2 by ring]
@@ -98,9 +110,7 @@ theorem BaseMask.stairOdd_agrees_rotateStaircaseField {den : ℤ} (hden : BaseMa
     {field : Field} (hagree : (BaseMask.stairEven.raw den).Agrees field 0) :
     ((BaseMask.stairOdd.tile den hden).llCenter (BaseMask.stairOdd.tile_nonempty den hden)).Agrees
       (rotateStaircaseField den field) 0 := by
-  let formulaField : Field := fun point => field (den + 1 - point.2, point.1) +
-    (chooseTwo point.1 - (point.1 - point.2) ^ 2 / 4)
-  have hformula : (BaseMask.stairOdd.raw den).Agrees formulaField 0 := by
+  have hformula : (BaseMask.stairOdd.raw den).Agrees (rawRotateStaircaseField den field) 0 := by
     intro point
     let pulled : (BaseMask.stairEven.raw den).sites :=
       ⟨(den + 1 - point.val.2, point.val.1), (BaseMask.mem_stairOdd_raw_pullback_iff _).mp point.property⟩
@@ -109,16 +119,10 @@ theorem BaseMask.stairOdd_agrees_rotateStaircaseField {den : ℤ} (hden : BaseMa
     change BaseMask.stairEvenValue den (den + 1 - point.val.2, point.val.1) =
       field (den + 1 - point.val.2, point.val.1) at hpull
     rw [BaseMask.stairOdd_raw_height]
-    change _ = formulaField point.val + 0
-    simp only [formulaField, add_zero, hpull, chooseTwo]
+    change _ = rawRotateStaircaseField den field point.val + 0
+    simp only [rawRotateStaircaseField, add_zero, hpull, chooseTwo]
   have hcenter := BaseMask.stairOdd_llCenter_agrees hden hformula
-  have heq : (fun point : Site => formulaField (point + (0, 1))) = rotateStaircaseField den field := by
-    funext point
-    rw [rotateStaircaseField, rotateStaircase_pullback]
-    simp only [formulaField, centeredQuarterTurnCorrection, Prod.fst_add, Prod.snd_add, add_zero]
-    rw [show den + 1 - (point.2 + 1) = den - point.2 by omega,
-      show point.1 - (point.2 + 1) = point.1 - point.2 - 1 by omega]
-  rwa [heq] at hcenter
+  rwa [rawRotateStaircaseField_chart] at hcenter
 
 /-- The exact centered B2 tile is the restriction of a recurrent field at
 the reduced near-one slope, with its source period and growth data. -/
@@ -130,7 +134,7 @@ theorem stairOdd_exists_recurrent_extension {den : ℤ} (hden : BaseMask.stairOd
   obtain ⟨field, hagree, hperiod, _, hsuper, hrec⟩ := stairEven_exists_recurrent_extension hden
   have hperiod' := rotateStaircaseField_periods hden.2 hperiod
   rw [show den + stairEvenConstantV den + chooseTwo (den + 1) = 0 by
-    unfold stairEvenConstantV; omega, correction_at_nearOne_transverse, sub_zero] at hperiod'
+    unfold stairEvenConstantV; omega, centeredQuarterTurnCorrection_nearOne_transverse, sub_zero] at hperiod'
   obtain ⟨hsuper', hrec'⟩ := rotateStaircaseField_recurrent hden.2 hrec hsuper
   exact ⟨rotateStaircaseField den field, BaseMask.stairOdd_agrees_rotateStaircaseField hden hagree, hperiod',
     generator_periods_growth (staircase_rotate_inUnitInterval hden.1 hden.2) hperiod', hsuper', hrec'⟩

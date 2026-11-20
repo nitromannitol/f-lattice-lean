@@ -1,6 +1,7 @@
 import FLatticePaper.Construction.Placement
 import FLatticePaper.Plane.QuarterTurn
 import Mathlib.Data.Int.Interval
+import Mathlib.Tactic.Ring
 
 namespace FLatticePaper.Construction
 
@@ -323,6 +324,95 @@ theorem stairOdd_llCenter_agrees {den : ℤ} (hden : stairOdd.Valid den) {field 
   · intro site hmem
     have hbounds := (mem_maskedTile_sites _ _ _ site).mp hmem
     exact ⟨hbounds.2.1.1, fun _ => hbounds.1.1⟩
+
+theorem mem_stairOddAlt_raw_pullback_iff {den : ℤ} (hden : 3 ≤ den) (point : Site) :
+    point ∈ (stairOddAlt.raw den).sites ↔ (den + 1 - point.2, point.1) ∈ (stairEvenAlt.raw den).sites := by
+  obtain ⟨col, row⟩ := point
+  rw [raw, mem_maskedTile_sites, mem_stairEvenAlt_raw_iff]
+  simp only [window, entry, isSome_ite_some, Option.isSome_none, Bool.false_eq_true, or_false]
+  omega
+
+/-- B4 has the exact B3 pullback height plus the raw harmonic correction. -/
+theorem stairOddAlt_raw_height (den : ℤ) (point : (stairOddAlt.raw den).sites) :
+    (stairOddAlt.raw den).height point =
+      stairEvenAltBackground den (den + 1 - point.val.2, point.val.1) +
+        (if StairEvenAltBump den (den + 1 - point.val.2, point.val.1) then 1 else 0) +
+      (point.val.1 * (point.val.1 - 1) / 2 - (point.val.1 - point.val.2) ^ 2 / 4) := by
+  obtain ⟨⟨col, row⟩, hmem⟩ := point
+  let special : Prop := (col = 0 ∧ row = 2 * den) ∨ (col = den ∧ row = den - 2) ∨
+    (col = -1 ∧ row = 2 * den) ∨ (col = den + 1 ∧ row = den - 2)
+  let rail : Prop := (col = -1 ∧ den + 1 ≤ row ∧ row ≤ 2 * den) ∨
+    (col = den + 1 ∧ den - 2 ≤ row ∧ row ≤ 2 * den - 3)
+  let diagonal : Prop := row - col = den - 1 ∧ 0 < col ∧ col < den
+  let value := -((col - row) ^ 2 / 4) + min (den - row - 1) 0 +
+    min (2 * den - 1 - row) 0 + max (row - col - den + 1) 0
+  let correction := col * (col - 1) / 2 - (col - row) ^ 2 / 4
+  have htri : -(col * (col + 1) / 2) + col * (col - 1) / 2 = -col := by
+    rw [show col * (col + 1) = col * (col - 1) + col * 2 by ring,
+      Int.add_mul_ediv_right _ _ (by decide)]
+    omega
+  have hmin (n : ℤ) : min 0 (-n) = min n 0 - n := by
+    by_cases h : n ≤ 0
+    · rw [min_eq_left h, min_eq_left (by omega : 0 ≤ -n), sub_self]
+    · rw [min_eq_right (by omega : 0 ≤ n), min_eq_right (by omega : -n ≤ 0), zero_sub]
+  have hmax (n : ℤ) : max (-n) 0 = max n 0 - n := by
+    by_cases h : n ≤ 0
+    · rw [max_eq_right h, max_eq_left (by omega : 0 ≤ -n), zero_sub]
+    · rw [max_eq_left (by omega : 0 ≤ n), max_eq_right (by omega : -n ≤ 0), sub_self]
+  have hbackground : stairEvenAltBackground den (den + 1 - row, col) + correction = value := by
+    dsimp only [stairEvenAltBackground, correction, value]
+    rw [show 2 - (den + 1 - row) = -(den - row - 1) by omega,
+      show den - 2 + (den + 1 - row) = 2 * den - 1 - row by omega,
+      show den + 1 - row + col - 2 = -(row - col - den + 1) by omega, hmin, hmax,
+      min_comm 0 (2 * den - 1 - row)]
+    omega
+  have hbump : StairEvenAltBump den (den + 1 - row, col) ↔ special ∨ diagonal := by
+    simp only [StairEvenAltBump, special, diagonal]
+    omega
+  have hentry := ((mem_maskedTile_sites _ _ _ _).mp hmem).2.2
+  change (entry .stairOddAlt den (col, row)).isSome at hentry
+  apply Option.get_of_eq_some
+  change entry .stairOddAlt den (col, row) = some (stairEvenAltBackground den (den + 1 - row, col) +
+    (if StairEvenAltBump den (den + 1 - row, col) then 1 else 0) + correction)
+  rw [add_right_comm, hbackground, if_congr hbump rfl rfl]
+  have hrule : entry .stairOddAlt den (col, row) =
+      if special then some (value + 1)
+      else if rail then some value
+      else if diagonal then some (value + 1)
+      else if 0 ≤ col ∧ col ≤ den ∧ -1 ≤ row - col ∧ row - col ≤ 2 * den - 1 then some value
+      else none := rfl
+  rw [hrule] at hentry ⊢
+  by_cases hspecial : special
+  · simp only [if_pos hspecial, if_pos (Or.inl hspecial : special ∨ diagonal)]
+  · by_cases hrail : rail
+    · have hno : ¬ diagonal := by dsimp [diagonal, rail] at hrail ⊢; omega
+      simp only [if_neg hspecial, if_pos hrail, if_neg (not_or.mpr ⟨hspecial, hno⟩), add_zero]
+    · by_cases hdiagonal : diagonal
+      · simp only [if_neg hspecial, if_neg hrail, if_pos hdiagonal,
+          if_pos (Or.inr hdiagonal : special ∨ diagonal)]
+      · simp only [if_neg hspecial, if_neg hrail, if_neg hdiagonal] at hentry
+        simp only [if_neg hspecial, if_neg hrail, if_neg hdiagonal,
+          if_pos (Option.isSome_ite.mp hentry), if_neg (not_or.mpr ⟨hspecial, hdiagonal⟩), add_zero]
+
+theorem stairOddAlt_llCenter_agrees {den : ℤ} (hden : stairOddAlt.Valid den) {field : Field}
+    (hagree : (stairOddAlt.raw den).Agrees field 0) :
+    ((stairOddAlt.tile den hden).llCenter (stairOddAlt.tile_nonempty den hden)).Agrees
+      (fun site => field (site + (0, 1))) 0 := by
+  have hmin := hden.1
+  apply hagree.llCenter_trim (stairOddAlt.raw_nonempty den hden)
+  · apply (mem_stairOddAlt_raw_pullback_iff hmin _).mpr
+    apply mem_stairEvenAlt_raw_iff.mpr
+    dsimp
+    omega
+  · intro site hmem
+    have hbounds := (mem_maskedTile_sites _ _ _ site).mp hmem
+    have hrow : 1 ≤ site.2 := hbounds.2.1.1
+    refine ⟨hrow, ?_⟩
+    intro htop
+    have htop : 1 = site.2 := htop
+    obtain ⟨_, _, hshape⟩ := mem_stairEvenAlt_raw_iff.mp ((mem_stairOddAlt_raw_pullback_iff hmin _).mp hmem)
+    dsimp at hshape ⊢
+    omega
 
 /-- The standard raw staircase domains are related by the specified quarter-turn. -/
 theorem mem_stairOdd_raw_iff {den : ℤ} (point : Site) :

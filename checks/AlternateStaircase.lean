@@ -1,4 +1,5 @@
 import FLatticePaper.Construction.AlternateStaircaseReflection
+import FLatticePaper.Construction.AlternateStaircaseRotation
 
 namespace FLatticePaper.Checks
 
@@ -12,6 +13,26 @@ theorem long_pure_three_has_alternate_extension_in_physical_chart :
       HasQuadraticGrowth field ((parentsAt word).current .even).matrix := by
   obtain ⟨registers, field, heval, hagree, _, hgrowth⟩ := evaluateNative_threes_even_alternate_extension 199
   exact ⟨registers, field, heval, hagree, hgrowth⟩
+
+theorem long_pure_two_has_alternate_extension :
+    let word := List.replicate 200 .two
+    ∃ registers : TileRegisters, ∃ field : Field,
+      evaluateNative word = .ok registers ∧ registers.alternate.currentOdd.val.Agrees field 0 ∧
+      HasQuadraticGrowth field ((parentsAt word).current .odd).matrix := by
+  obtain ⟨registers, field, heval, hagree, _, hgrowth⟩ := evaluateNative_twos_odd_alternate_extension 199
+  exact ⟨registers, field, heval, hagree, hgrowth⟩
+
+theorem root_odd_staircases_have_distinct_plane_extensions :
+    ∃ registers : TileRegisters, ∃ standard alternate : Field,
+      evaluateNative [] = .ok registers ∧ registers.standard.currentOdd.val.Agrees standard 0 ∧
+      registers.alternate.currentOdd.val.Agrees alternate 0 ∧
+      ¬ IntegerAffine (fun site => alternate site - standard site) := by
+  obtain ⟨first, standard, hf, hstandard, hperiod, _⟩ := evaluateNative_empty_odd_standard_recurrent
+  obtain ⟨second, alternate, hs, halternate, hperiod', _⟩ := evaluateNative_empty_odd_alternate_extension
+  have heq : first = second := Except.ok.inj (hf.symm.trans hs)
+  subst second
+  exact ⟨first, standard, alternate, hf, hstandard, halternate,
+    stairOddAlt_sub_standard_not_integerAffine (den := 3) (by decide) hperiod hperiod'⟩
 
 /-- The stored root alternate needs its physical chart. Its centered
 coordinates alone give a positive Laplacian at `(2,2)`. -/
@@ -43,10 +64,18 @@ theorem centered_root_alternate_has_no_unshifted_superharmonic_extension :
 #print axioms stairEvenAltMarker_periodic
 #print axioms stairEvenAltField_reflection
 #print axioms stairEvenAltField_residual_reflection
+#print axioms laplacian_stairEvenAltField_reflection
+#print axioms laplacian_stairEvenAltBackground
+#print axioms stairEvenAlt_incomingNeg_notMem_iff
 #print axioms stairEvenAltField_agrees
 #print axioms stairEvenAlt_exists_extension
 #print axioms evaluateNative_empty_even_alternate_extension
 #print axioms long_pure_three_has_alternate_extension_in_physical_chart
+#print axioms stairOddAlt_exists_extension
+#print axioms stairEvenAltField_sub_standard_not_integerAffine
+#print axioms stairOddAlt_sub_standard_not_integerAffine
+#print axioms long_pure_two_has_alternate_extension
+#print axioms root_odd_staircases_have_distinct_plane_extensions
 #print axioms centered_root_alternate_has_no_unshifted_superharmonic_extension
 
 end FLatticePaper.Checks
