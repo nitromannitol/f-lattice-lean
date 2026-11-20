@@ -5,6 +5,8 @@ import FLatticePaper.Construction.CorrectionHeight
 import FLatticePaper.Construction.PlacedAssembly
 import FLatticePaper.Plane.AlternatePeriods
 import FLatticePaper.Plane.BandBurn
+import FLatticePaper.Plane.RecurrenceRotation
 import FLatticePaper.Farey.RationalBirth
+import FLatticePaper.Farey.Rotation
 
 /-! Root import for the corrected F-lattice paper. -/
