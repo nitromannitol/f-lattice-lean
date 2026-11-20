@@ -39,10 +39,10 @@ private theorem int_le_of_cast_pred_lt {first second : ℤ}
   have : first - 1 < second := by exact_mod_cast hlt
   omega
 
-private def reciprocalEvenDeck (den : ℤ) : PeriodDeck :=
+def reciprocalEvenDeck (den : ℤ) : PeriodDeck :=
   (Fraction.mk 1 den).modifiedDeck
 
-private theorem reciprocalEvenDeck_eq {den : ℤ} (hodd : den % 2 = 1) :
+theorem reciprocalEvenDeck_eq {den : ℤ} (hodd : den % 2 = 1) :
     reciprocalEvenDeck den = ⟨(den, 1), (1 - den, 1 + den)⟩ := by
   have heven : (1 + den) % 2 = 0 := by omega
   simp [reciprocalEvenDeck, Fraction.modifiedDeck, Fraction.periodMultiplicity,
@@ -128,7 +128,7 @@ private theorem reciprocal_cell_top_bounds {den : ℤ} {point : Site} (hden : 3 
     nlinarith only [hcol, hmaxLoss, htra1,
       mul_pos (by linarith : 0 < 1 - alongKernel) (by linarith : 0 < (den : ℝ))]
 
-private theorem stairEven_raw_cover {den : ℤ} (hden : BaseMask.stairEven.Valid den) :
+theorem stairEven_raw_cover {den : ℤ} (hden : BaseMask.stairEven.Valid den) :
     (reciprocalEvenDeck den).Covers (BaseMask.stairEven.raw den).sites := by
   obtain ⟨hmin, hodd⟩ := hden
   apply PeriodDeck.covers_of_halfShiftedCell _ (ne_of_gt (reciprocalEvenDeck_pos hmin))

@@ -32,6 +32,17 @@ def Valid (kind : BaseMask) (den : ℤ) : Prop :=
   | .stairEven | .stairOdd | .stairEvenAlt | .stairOddAlt => 3 ≤ den ∧ den % 2 = 1
   | .ladderOdd | .ladderEven | .ladderOddAlt | .ladderEvenAlt => 4 ≤ den ∧ den % 2 = 0
 
+def StairEvenCorner (den : ℤ) (point : Site) : Prop :=
+  (point.1 = 0 ∧ point.2 = 0) ∨ (point.1 = 2 ∧ point.2 = den + 1)
+
+instance (den : ℤ) (point : Site) : Decidable (StairEvenCorner den point) :=
+  inferInstanceAs (Decidable (_ ∨ _))
+
+/-- The B1 height formula on the occupied mask, including its two corner increments. -/
+def stairEvenValue (den : ℤ) (point : Site) : ℤ :=
+  -(point.2 * (point.2 - 1) / 2) + min (point.1 - 1) 0 +
+    (if StairEvenCorner den point then 1 else 0)
+
 private def window : BaseMask → ℤ → Site × Site
   | .stairEven, den => ((2 - den, 0), (den, den + 1))
   | .stairOdd, den => ((0, 1), (den + 1, 2 * den - 1))
@@ -44,9 +55,8 @@ private def window : BaseMask → ℤ → Site × Site
 
 private def entry : BaseMask → ℤ → Site → Option ℤ
   | .stairEven, den, (col, row) =>
-    let value := -(row * (row - 1) / 2) + min (col - 1) 0
-    if (col = 0 ∧ row = 0) ∨ (col = 2 ∧ row = den + 1) then some (value + 1)
-    else if 1 ≤ col + row ∧ col + row ≤ den + 2 then some value
+    if StairEvenCorner den (col, row) ∨ (1 ≤ col + row ∧ col + row ≤ den + 2)
+      then some (stairEvenValue den (col, row))
     else none
   | .stairOdd, den, (col, row) =>
     let value := -((col - row) ^ 2 / 4) + min (den - row) 0
@@ -140,16 +150,27 @@ theorem tile_nonempty (kind : BaseMask) (den : ℤ) (hden : kind.Valid den) :
     (kind.tile den hden).sites.Nonempty :=
   (kind.raw den).trim_sites_nonempty (kind.raw_nonempty den hden)
 
+theorem mem_stairEven_raw_iff {den : ℤ} {point : Site} :
+    point ∈ (stairEven.raw den).sites ↔
+      (2 - den ≤ point.1 ∧ point.1 ≤ den) ∧ (0 ≤ point.2 ∧ point.2 ≤ den + 1) ∧
+        (StairEvenCorner den point ∨ (1 ≤ point.1 + point.2 ∧ point.1 + point.2 ≤ den + 2)) := by
+  obtain ⟨col, row⟩ := point
+  rw [raw, mem_maskedTile_sites]
+  simp only [window, entry, Option.isSome_ite]
+
+theorem stairEven_raw_height (den : ℤ) (point : (stairEven.raw den).sites) :
+    (stairEven.raw den).height point = stairEvenValue den point.val := by
+  obtain ⟨⟨col, row⟩, hpoint⟩ := point
+  have hbody := (mem_stairEven_raw_iff.mp hpoint).2.2
+  apply Option.get_of_eq_some
+  simp only [entry, if_pos hbody]
+
 theorem mem_stairEven_body {den : ℤ} {point : Site}
     (hx : 2 - den ≤ point.1 ∧ point.1 ≤ den)
     (hy : 0 ≤ point.2 ∧ point.2 ≤ den + 1)
     (hband : 1 ≤ point.1 + point.2 ∧ point.1 + point.2 ≤ den + 2) :
-    point ∈ (BaseMask.stairEven.raw den).sites := by
-  rw [raw, mem_maskedTile_sites]
-  refine ⟨hx, hy, ?_⟩
-  obtain ⟨col, row⟩ := point
-  simp only [entry]
-  split <;> rfl
+    point ∈ (BaseMask.stairEven.raw den).sites :=
+  mem_stairEven_raw_iff.mpr ⟨hx, hy, Or.inr hband⟩
 
 theorem mem_stairEvenAlt_body_or_rail {den : ℤ} {point : Site}
     (hx : 4 - 2 * den ≤ point.1 ∧ point.1 ≤ den)
@@ -181,7 +202,7 @@ theorem mem_stairOdd_raw_iff {den : ℤ} (point : Site) :
       point ∈ (stairEven.raw den).sites := by
   obtain ⟨col, row⟩ := point
   simp only [raw, mem_maskedTile_sites, window, QuarterTurn.mapSite, QuarterTurn.turn,
-    Prod.fst_add, Prod.snd_add, entry, isSome_ite_some, Option.isSome_none, Bool.false_eq_true,
+    Prod.fst_add, Prod.snd_add, entry, isSome_ite_some, StairEvenCorner, Option.isSome_none, Bool.false_eq_true,
     or_false]
   omega
 
