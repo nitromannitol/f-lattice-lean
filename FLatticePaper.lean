@@ -3,9 +3,11 @@ import FLatticePaper.Construction.BaseRegisters
 import FLatticePaper.Construction.Chronology
 import FLatticePaper.Construction.CorrectionHeight
 import FLatticePaper.Construction.Native
+import FLatticePaper.Construction.NativeCoverage
 import FLatticePaper.Construction.PlacedAssembly
 import FLatticePaper.Plane.AlternatePeriods
 import FLatticePaper.Plane.BandBurn
+import FLatticePaper.Plane.EndpointGrowth
 import FLatticePaper.Plane.RecurrenceRotation
 import FLatticePaper.Farey.RationalBirth
 import FLatticePaper.Farey.Rotation

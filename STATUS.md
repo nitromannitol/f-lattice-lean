@@ -24,6 +24,10 @@ The November 20 corrected edition and its supporting constructor are pinned by [
 - [Unbounded native evaluator](FLatticePaper/Construction/Native.lean): exact ordinary and corrected standard/alternate schedules, both lengths and sides of correction, seventh-source restoration, actual pre-update saved payloads, and final occupied lower-left centering. `evaluateNative_base` proves all literal initial runs succeed; `evaluateNativeState_history` proves saved chronology on successful evaluations. [The check](checks/Native.lean) matches the occupied sites and heights of all 31 pinned fixtures. This is not a proof of all-word mixed success.
 - [Schedule consumers](FLatticePaper/Construction/PlacedSchedule.lean): `eval_ok_iff`, `eval_tile_agrees` and `eval_correction_agrees` link the exact assembled output to chronological contact and ordered height comparison, including trim and the correction's max-zero gauge.
 
+- [Period lattice and root coverage](FLatticePaper/Construction/NativeCoverage.lean): `Fraction.integralLattice_eq_span` identifies the actual integer-action lattice, and `mem_modifiedDeck_iff_integral_even` checks its physical parity sublattice. `evaluateNative_empty_covers` verifies the complete quotient on the occupied supports of all eight literal root registers. This is a kernel-checked finite certificate, not a fixture test or a statement about all pure lengths.
+- [Affine period and growth](FLatticePaper/Plane/PeriodCocycle.lean): `generator_period_formula`, `generator_periods_affine` and `generator_periods_growth` derive the exact law, bounded tilted remainder and uniform quadratic error from the two prescribed generator identities. `eq_of_covered_generator_periods` proves uniqueness from actual native support coverage and equal generator increments.
+- [Endpoint odometers](FLatticePaper/Plane/EndpointGrowth.lean): `checkerboard_endpoints` checks superharmonicity, recurrence and quadratic growth of both literal endpoint fields at their prescribed matrices. [The consumers](checks/Periods.lean) use the matrix-lattice equality for an arbitrary generated birth and the growth theorem at the even root slope.
+
 Run these checks from the sandbox repository root.
 
 ```sh
@@ -38,6 +42,7 @@ lake env lean checks/FareyBirth.lean
 lake env lean checks/ThresholdMinimum.lean
 lake env lean checks/QuarterTurn.lean
 lake env lean checks/Native.lean
+lake env lean checks/Periods.lean
 sha256sum --quiet -c paper.sha256
 ```
 
@@ -57,10 +62,12 @@ The threshold ranks, band orders and concrete consumers report `[propext, Classi
 
 The exact recurrence criterion, rotation transports, and endpoint recurrence consumers report `[propext, Classical.choice, Quot.sound]`. The $1/1$ Laplacian uses `[propext, Quot.sound]`, and the birth rotation involution only `[propext]`.
 
-The bootstrap, ordered-height, alternate-midpoint, placement, initializer, Farey chronology and threshold milestones landed on `main` at `4dbc1eb`, `dd24414`, `a0df1d2`, `7056241`, `d08b018`, `acea381` and `ab4c8ca`. With the worker's read-only `.git` mount, submit tested named paths via `python3 scripts/checkpoint.py request` and wait for its receipt before editing those paths again.
+The constructor schedule checks, exact lattice and period proofs, kernel-checked root coverage, and endpoint odometer consumers report only `[propext, Classical.choice, Quot.sound]`.
+
+The bootstrap, ordered-height, alternate-midpoint, placement, initializer, Farey chronology, threshold, recurrence/rotation and native evaluator milestones landed on `main` at `4dbc1eb`, `dd24414`, `a0df1d2`, `7056241`, `d08b018`, `acea381`, `ab4c8ca`, `f2cf9be` and `2546d52`. With the worker's read-only `.git` mount, submit tested named paths via `python3 scripts/checkpoint.py request` and wait for its receipt before editing those paths again.
 
 ## Open
 
-The two headline theorems, all-word success of mixed evaluation, general plane ranks, source-specific finite-tile height comparisons, and occupied-domain period coverage remain open. The ordered height lemma does not prove the geometric comparisons of the actual shifted sources. The exact endpoint fields still need quadratic growth at their respective matrices. The root and pure-word plane ranks and the general signed rank and band induction are separate obligations.
+The two headline theorems, all-word success of mixed evaluation, general plane ranks, source-specific finite-tile height comparisons, and occupied-domain period coverage away from the verified empty word remain open. The ordered height lemma does not prove the geometric comparisons of the actual shifted sources. The root and pure-word plane ranks and the general signed rank and band induction are separate obligations.
 
-Next constructor dependencies: prove the geometric comparisons of the actual schedules and coverage of their native occupied sites, starting with the literal outputs. For the plane proof, connect the threshold calculation to the actual earlier harmonically conjugate parent pair, and obtain its unit bounds and both signed ranks from the genuine boundary and cut arguments, not as hypotheses on a final source root.
+Next constructor dependencies: use the literal pure-boundary arguments to prove coverage for all nonempty pure runs, then the actual native support and height comparisons for each mixed schedule. For the plane proof, establish the literal plane initializers and connect the threshold calculation to the actual earlier harmonically conjugate parent pair, deriving its unit bounds and both signed ranks from the boundary and cut arguments.
