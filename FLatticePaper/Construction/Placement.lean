@@ -76,6 +76,16 @@ theorem lowerLeft_mem (tile : HeightTile Site) (hne : tile.sites.Nonempty) :
   rw [← heq]
   exact hsite
 
+theorem lowerLeft_eq_of_minimal (tile : HeightTile Site) (hne : tile.sites.Nonempty)
+    {point : Site} (hpoint : point ∈ tile.sites)
+    (hmin : ∀ site ∈ tile.sites, point.2 ≤ site.2 ∧ (point.2 = site.2 → point.1 ≤ site.1)) :
+    tile.lowerLeft hne = point := by
+  have hle₁ : rowKey (tile.lowerLeft hne) ≤ rowKey point :=
+    Finset.min'_le _ _ (Finset.mem_image_of_mem rowKey hpoint)
+  have hle₂ : rowKey point ≤ rowKey (tile.lowerLeft hne) :=
+    Prod.Lex.toLex_le_toLex'.mpr (hmin _ (tile.lowerLeft_mem hne))
+  exact congrArg siteOfRowKey (le_antisymm hle₁ hle₂)
+
 theorem upperRight_mem (tile : HeightTile Site) (hne : tile.sites.Nonempty) :
     tile.upperRight hne ∈ tile.sites := by
   obtain ⟨site, hsite, heq⟩ := Finset.mem_image.mp

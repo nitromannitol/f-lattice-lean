@@ -251,7 +251,7 @@ theorem parentsAt_replicate_three (count : ℕ) :
     apply Fraction.ext <;> simp [Parents.current, Parents.combine, Nat.cast_succ]
     all_goals omega
 
-private theorem threes_current_even (extra : ℕ) :
+theorem threes_current_even (extra : ℕ) :
     (parentsAt (BaseRun.threes extra).word).current .even = ⟨1, 2 * (extra : ℤ) + 3 + 2⟩ := by
   rw [BaseRun.word, parentsAt_replicate_three]
   apply Fraction.ext <;> simp [Parents.current, Parents.combine, Nat.cast_add]

@@ -1,4 +1,4 @@
-import FLatticePaper.Construction.StaircaseLaplacian
+import FLatticePaper.Construction.StaircaseRank
 
 namespace FLatticePaper.Checks
 
@@ -37,6 +37,15 @@ theorem reciprocal_staircase_has_binary_plane_extension_at_three :
   rw [stairEvenConstantV_eq] at h
   exact h
 
+theorem long_pure_three_has_recurrent_native_standard :
+    let word := List.replicate 200 .three
+    ∃ registers : TileRegisters, ∃ field : Field,
+      evaluateNative word = .ok registers ∧ registers.standard.currentEven.val.Agrees field 0 ∧
+      HasQuadraticGrowth field ((parentsAt word).current .even).matrix ∧ Recurrent field := by
+  obtain ⟨registers, field, heval, hagree, _, hgrowth, _, hrec⟩ :=
+    evaluateNative_threes_even_standard_recurrent 199
+  exact ⟨registers, field, heval, hagree, hgrowth, hrec⟩
+
 #print axioms PeriodDeck.exists_halfShiftedCell_representative
 #print axioms stairEven_cover
 #print axioms stairEvenAlt_cover
@@ -58,5 +67,11 @@ theorem reciprocal_staircase_has_binary_plane_extension_at_three :
 #print axioms laplacian_periodic_of_generatorPeriods
 #print axioms stairEven_exists_binary_extension
 #print axioms reciprocal_staircase_has_binary_plane_extension_at_three
+#print axioms stairEven_rankCorrection_class_constant
+#print axioms stairEven_exists_burningRank
+#print axioms stairEven_exists_recurrent_extension
+#print axioms evaluateNative_empty_even_standard_recurrent
+#print axioms evaluateNative_threes_even_standard_recurrent
+#print axioms long_pure_three_has_recurrent_native_standard
 
 end FLatticePaper.Checks

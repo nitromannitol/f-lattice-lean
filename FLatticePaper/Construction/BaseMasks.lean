@@ -165,6 +165,38 @@ theorem stairEven_raw_height (den : ℤ) (point : (stairEven.raw den).sites) :
   apply Option.get_of_eq_some
   simp only [entry, if_pos hbody]
 
+/-- For B1 the raw origin is already the occupied lower-left. The rectangular
+trim and the final occupied centering therefore cancel in the height chart. -/
+theorem stairEven_llCenter_agrees {den : ℤ} (hden : stairEven.Valid den) {field : Field}
+    (hagree : (stairEven.raw den).Agrees field 0) :
+    ((stairEven.tile den hden).llCenter (stairEven.tile_nonempty den hden)).Agrees field 0 := by
+  let raw := stairEven.raw den
+  have hraw : raw.sites.Nonempty := stairEven.raw_nonempty den hden
+  let origin := raw.boxOrigin hraw
+  let tile := stairEven.tile den hden
+  have htile : tile.sites.Nonempty := stairEven.tile_nonempty den hden
+  have hmin := hden.1
+  have hzero : (0 : Site) ∈ raw.sites := by
+    apply mem_stairEven_raw_iff.mpr
+    exact ⟨⟨by dsimp; omega, by dsimp; omega⟩, ⟨by decide, by dsimp; omega⟩,
+      Or.inl (Or.inl ⟨rfl, rfl⟩)⟩
+  have hleft : tile.lowerLeft htile = -origin := by
+    apply HeightTile.lowerLeft_eq_of_minimal
+    · change -origin ∈ (raw.place (-origin) 0).sites
+      rwa [HeightTile.mem_place_sites, sub_self]
+    · intro site hmem
+      change site ∈ (raw.place (-origin) 0).sites at hmem
+      rw [HeightTile.mem_place_sites, sub_neg_eq_add] at hmem
+      obtain ⟨hx, hy, hband⟩ := mem_stairEven_raw_iff.mp hmem
+      simp only [StairEvenCorner, Prod.fst_add, Prod.snd_add] at hx hy hband
+      simp only [Prod.fst_neg, Prod.snd_neg]
+      omega
+  have h := (hagree.trim hraw).place (-tile.lowerLeft htile) 0
+  change (tile.place (-tile.lowerLeft htile) 0).Agrees
+    (fun site => field (site - -tile.lowerLeft htile + origin) + (0 * site.1 + 0 * site.2)) 0 at h
+  change (tile.place (-tile.lowerLeft htile) 0).Agrees field 0
+  simpa only [hleft, neg_neg, sub_add_cancel, zero_mul, add_zero] using h
+
 theorem mem_stairEven_body {den : ℤ} {point : Site}
     (hx : 2 - den ≤ point.1 ∧ point.1 ≤ den)
     (hy : 0 ≤ point.2 ∧ point.2 ≤ den + 1)
