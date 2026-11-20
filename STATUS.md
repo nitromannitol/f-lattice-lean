@@ -112,7 +112,9 @@ The smaller arithmetic critical family has an admission result in the source, a 
 
 ### Checked on Lean 4.32.0
 
-[Columns.lean](FLatticePaper/GeneralK/Columns.lean) defines the physical operator with horizontal inputs at coordinate sum zero modulo $k$. `laplacian_two` specializes it to the primary physical graph. `laplacian_liftColumns_columnSite` derives both weighted ceilings at the actual incoming sites, `laplacian_liftColumns_openChain` gives the exact slope drop, and `superharmonic_liftColumns_iff` proves the equivalence for the displayed concave lift. Pointwise leastness among other integer concave extensions is open. The [consumer](checks/GeneralKColumns.lean) checks a retained row and an interior slope drop in a negative column at $k=3$.
+[Columns.lean](FLatticePaper/GeneralK/Columns.lean) defines the physical operator with horizontal inputs at coordinate sum zero modulo $k$. `laplacian_two` specializes it to the primary physical graph. `laplacian_liftColumns_columnSite` derives both weighted ceilings at the actual incoming sites, `laplacian_liftColumns_openChain` gives the exact slope drop, and `superharmonic_liftColumns_iff` proves the equivalence for the displayed concave lift. The [consumer](checks/GeneralKColumns.lean) checks a retained row and an interior slope drop in a negative column at $k=3$.
+
+[ColumnLift.lean](FLatticePaper/GeneralK/ColumnLift.lean) proves leastness of the displayed lift among all integer extensions superharmonic on the open chains, and monotonicity in both endpoints. `columnRow_restriction_nonpos` gives the reduced inequality for the restriction of any physical superharmonic field. The consumer applies it to the actual $k=3$ harmonic witness.
 
 [Growth.lean](FLatticePaper/GeneralK/Growth.lean) defines `symmetricMatrix` and `growthSet` using the real quadratic form and the uniform little-oh error for integer physical heights. `mem_growthSet_two_iff` checks the physical specialization and `add_mem_growthSet` proves additive closure.
 
@@ -123,12 +125,13 @@ The $k=2$ operator specialization is axiom-free. The interpolation, Laplacian, l
 ```sh
 export PATH="$HOME/.elan/bin:$PATH"
 lake build FLatticePaper.GeneralK.Harmonic
+lake build FLatticePaper.GeneralK.ColumnLift
 lake env lean checks/GeneralKColumns.lean
 ```
 
 ### Proof queue
 
-1. Prove pointwise leastness and monotonicity of the checked column lift, and prove the retained comparison and its zero-operator case. Prove the finite-cell equivalence, closedness, and semidefinite downward closure.
+1. Use checked leastness and monotonicity to prove the retained comparison and its zero-operator case. Prove the finite-cell equivalence, closedness, and semidefinite downward closure.
 2. Define the explicit finite weighted graphs and $p_k$. Prove cycle admission by constructing a height. Prove the rational upper bound using exact periodic realization for any admissible full-rank period lattice, the least integer superharmonic obstacle majorant, the explicit Fourier bound on column differences, and finite cycle erasure. Derive the real equivalence and both cone inclusions. The physical trace bound $a+(k-1)c\le0$ gives the compactness needed for the maximality criterion.
 3. Use the checked harmonic witnesses to establish the gcd endpoint formula on the $1/k$ grid, the canonical critical parameters and exact grid period index, and the endpoint translation identity. The grid calculation is independent of the general Fourier bound.
 4. Prove the forbidden-set equivalences, chain test with both endpoint bits and their coincidence at $k=2$, and explicit forbidden intervals. Classify residue-only binary charges, realize all such patterns by integer heights, and derive the scalar odometers and the integer weighted-trace classification with its leftmost-column argument.

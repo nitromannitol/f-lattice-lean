@@ -1,3 +1,4 @@
+import FLatticePaper.GeneralK.ColumnLift
 import FLatticePaper.GeneralK.Harmonic
 
 namespace FLatticePaper.GeneralK.Checks
@@ -22,6 +23,11 @@ theorem three_grid_harmonic_matrix_is_admitted :
   norm_num [harmonicMatrix] at h
   exact h
 
+theorem three_harmonic_retained_rows_are_superharmonic (column row : ℤ) :
+    columnRow 3 (fun ij => harmonicField 3 1 0 (columnSite 3 ij.1 ij.2 0)) column row ≤ 0 := by
+  have hk : (2 : ℤ) ≤ 3 := by decide
+  exact columnRow_restriction_nonpos hk (fun site => (laplacian_harmonicField hk 1 0 site).le) column row
+
 #print axioms laplacian_two
 #print axioms interpolate_first
 #print axioms interpolate_last
@@ -38,5 +44,11 @@ theorem three_grid_harmonic_matrix_is_admitted :
 #print axioms quadraticGrowth_harmonicField
 #print axioms add_harmonicMatrix_mem_growthSet_iff
 #print axioms three_grid_harmonic_matrix_is_admitted
+#print axioms interpolate_le_of_concave
+#print axioms interpolate_monotone_first
+#print axioms interpolate_monotone_last
+#print axioms liftColumns_restriction_le
+#print axioms columnRow_restriction_nonpos
+#print axioms three_harmonic_retained_rows_are_superharmonic
 
 end FLatticePaper.GeneralK.Checks
