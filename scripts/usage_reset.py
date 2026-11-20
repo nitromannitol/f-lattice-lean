@@ -31,7 +31,7 @@ def save(state):
                  "redeemed_utc","verified_restoration","outcome","last_error")
     public=STATE.with_name("usage-status.json")
     tmp=public.with_suffix(".tmp")
-    tmp.write_text(json.dumps({k:state[k] for k in public_keys if k in state},indent=2)+"\\n")
+    tmp.write_text(json.dumps({k:state[k] for k in public_keys if k in state},indent=2)+"\n")
     os.replace(tmp,public)
 
 
@@ -221,7 +221,8 @@ def main():
                 save(state)
             print(state.get("checked_utc"),state.get("status"),state.get("remaining_percent"),
                   state.get("available_credits"),state.get("last_error",""),flush=True)
-            if (not args.watch or state.get("goal_status")=="complete" or state.get("status") in\n                    ("restored_and_goal_verified","restored_after_unconfirmed_attempt")):
+            if (not args.watch or state.get("goal_status")=="complete" or state.get("status") in
+                    ("restored_and_goal_verified","restored_after_unconfirmed_attempt")):
                 break
             time.sleep(60)
 
