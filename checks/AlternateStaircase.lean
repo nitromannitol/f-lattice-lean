@@ -1,5 +1,6 @@
 import FLatticePaper.Construction.AlternateStaircaseLaplacian
 import FLatticePaper.Construction.AlternateStaircaseRankCorrection
+import FLatticePaper.Construction.AlternateStaircaseRecurrence
 import FLatticePaper.Construction.AlternateStaircaseRotation
 import FLatticePaper.Construction.AlternateStaircaseSeams
 
@@ -7,22 +8,33 @@ namespace FLatticePaper.Checks
 
 open Construction Farey
 
-theorem long_pure_three_has_alternate_extension_in_physical_chart :
+theorem long_pure_three_has_recurrent_alternate_in_physical_chart :
     let word := List.replicate 200 .three
     ∃ registers : TileRegisters, ∃ field : Field,
       evaluateNative word = .ok registers ∧
       registers.alternate.currentEven.val.Agrees (fun site => field (site + (-402, -1))) 0 ∧
-      HasQuadraticGrowth field ((parentsAt word).current .even).matrix := by
-  obtain ⟨registers, field, heval, hagree, _, hgrowth⟩ := evaluateNative_threes_even_alternate_extension 199
-  exact ⟨registers, field, heval, hagree, hgrowth⟩
+      HasQuadraticGrowth field ((parentsAt word).current .even).matrix ∧ Recurrent field := by
+  obtain ⟨registers, field, heval, hagree, _, hgrowth, _, hrec⟩ := evaluateNative_threes_even_alternate_recurrent 199
+  exact ⟨registers, field, heval, hagree, hgrowth, hrec⟩
 
-theorem long_pure_two_has_alternate_extension :
+theorem long_pure_two_has_recurrent_alternate :
     let word := List.replicate 200 .two
     ∃ registers : TileRegisters, ∃ field : Field,
       evaluateNative word = .ok registers ∧ registers.alternate.currentOdd.val.Agrees field 0 ∧
-      HasQuadraticGrowth field ((parentsAt word).current .odd).matrix := by
-  obtain ⟨registers, field, heval, hagree, _, hgrowth⟩ := evaluateNative_twos_odd_alternate_extension 199
-  exact ⟨registers, field, heval, hagree, hgrowth⟩
+      HasQuadraticGrowth field ((parentsAt word).current .odd).matrix ∧ Recurrent field := by
+  obtain ⟨registers, field, heval, hagree, _, hgrowth, _, hrec⟩ := evaluateNative_twos_odd_alternate_recurrent 199
+  exact ⟨registers, field, heval, hagree, hgrowth, hrec⟩
+
+theorem native_root_even_alternate_finiteComparison :
+    ∃ registers : TileRegisters, ∃ field : Field,
+      evaluateNative [] = .ok registers ∧
+      registers.alternate.currentEven.val.Agrees (fun site => field (site + (-2, -1))) 0 ∧
+      ∀ competitor : Field, Superharmonic competitor →
+        ∀ (sites : Finset Site), StronglyConnected sites → ∀ bound : ℤ,
+          (∀ point ∈ incomingBoundary sites, field point - competitor point ≤ bound) →
+          ∀ point ∈ sites, field point - competitor point ≤ bound := by
+  obtain ⟨registers, field, heval, hagree, _, _, _, hrec⟩ := evaluateNative_empty_even_alternate_recurrent
+  exact ⟨registers, field, heval, hagree, fun _ => hrec.finiteComparison⟩
 
 theorem root_odd_staircases_have_distinct_plane_extensions :
     ∃ registers : TileRegisters, ∃ standard alternate : Field,
@@ -30,7 +42,7 @@ theorem root_odd_staircases_have_distinct_plane_extensions :
       registers.alternate.currentOdd.val.Agrees alternate 0 ∧
       ¬ IntegerAffine (fun site => alternate site - standard site) := by
   obtain ⟨first, standard, hf, hstandard, hperiod, _⟩ := evaluateNative_empty_odd_standard_recurrent
-  obtain ⟨second, alternate, hs, halternate, hperiod', _⟩ := evaluateNative_empty_odd_alternate_extension
+  obtain ⟨second, alternate, hs, halternate, hperiod', _, _, _⟩ := evaluateNative_empty_odd_alternate_recurrent
   have heq : first = second := Except.ok.inj (hf.symm.trans hs)
   subst second
   exact ⟨first, standard, alternate, hf, hstandard, halternate,
@@ -111,11 +123,19 @@ theorem centered_root_alternate_has_no_unshifted_superharmonic_extension :
 #print axioms stairEvenAltField_agrees
 #print axioms stairEvenAlt_exists_extension
 #print axioms evaluateNative_empty_even_alternate_extension
-#print axioms long_pure_three_has_alternate_extension_in_physical_chart
+#print axioms stairEvenAlt_exists_burningRank
+#print axioms stairEvenAlt_exists_recurrent_extension
+#print axioms evaluateNative_empty_even_alternate_recurrent
+#print axioms evaluateNative_threes_even_alternate_recurrent
+#print axioms long_pure_three_has_recurrent_alternate_in_physical_chart
+#print axioms native_root_even_alternate_finiteComparison
 #print axioms stairOddAlt_exists_extension
+#print axioms stairOddAlt_exists_recurrent_extension
+#print axioms evaluateNative_empty_odd_alternate_recurrent
+#print axioms evaluateNative_twos_odd_alternate_recurrent
 #print axioms stairEvenAltField_sub_standard_not_integerAffine
 #print axioms stairOddAlt_sub_standard_not_integerAffine
-#print axioms long_pure_two_has_alternate_extension
+#print axioms long_pure_two_has_recurrent_alternate
 #print axioms root_odd_staircases_have_distinct_plane_extensions
 #print axioms centered_root_alternate_has_no_unshifted_superharmonic_extension
 
