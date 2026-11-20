@@ -1,4 +1,5 @@
 import FLatticePaper.Construction.Placement
+import FLatticePaper.Plane.QuarterTurn
 import Mathlib.Data.Int.Interval
 
 namespace FLatticePaper.Construction
@@ -164,6 +165,31 @@ theorem mem_stairEvenAlt_body_or_rail {den : ℤ} {point : Site}
   · rfl
   · rw [if_pos (hbody.imp_right Or.inr)]
     rfl
+
+private theorem isSome_ite_some {α : Type*} {p : Prop} [Decidable p] (value : α)
+    (other : Option α) : (if p then some value else other).isSome ↔ p ∨ other.isSome := by
+  by_cases hp : p <;> simp [hp]
+
+/-- The standard raw staircase domains are related by the specified quarter-turn. -/
+theorem mem_stairOdd_raw_iff {den : ℤ} (point : Site) :
+    QuarterTurn.counterclockwise.mapSite (den + 1, den - 1) point ∈ (stairOdd.raw den).sites ↔
+      point ∈ (stairEven.raw den).sites := by
+  obtain ⟨col, row⟩ := point
+  simp only [raw, mem_maskedTile_sites, window, QuarterTurn.mapSite, QuarterTurn.turn,
+    Prod.fst_add, Prod.snd_add, entry, isSome_ite_some, Option.isSome_none, Bool.false_eq_true,
+    or_false]
+  omega
+
+/-- The alternate quarter-turn carries the body and the two rails, with
+the alternate initializer's own translation. -/
+theorem mem_stairOddAlt_raw_iff {den : ℤ} (point : Site) :
+    QuarterTurn.counterclockwise.mapSite (den, 2 * den - 3) point ∈ (stairOddAlt.raw den).sites ↔
+      point ∈ (stairEvenAlt.raw den).sites := by
+  obtain ⟨col, row⟩ := point
+  simp only [raw, mem_maskedTile_sites, window, QuarterTurn.mapSite, QuarterTurn.turn,
+    Prod.fst_add, Prod.snd_add, entry, isSome_ite_some, Option.isSome_none, Bool.false_eq_true,
+    or_false]
+  omega
 
 end BaseMask
 

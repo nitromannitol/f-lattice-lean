@@ -1,5 +1,6 @@
 import FLatticePaper.Construction.Native
 import FLatticePaper.Farey.CenteredCell
+import FLatticePaper.Farey.Rotation
 
 namespace FLatticePaper.Construction
 
@@ -119,9 +120,8 @@ private theorem reciprocal_cell_top_bounds {den : ℤ} {point : Site} (hden : 3 
     nlinarith only [hcol, hmaxLoss, htra1,
       mul_pos (by linarith : 0 < 1 - alongKernel) (by linarith : 0 < (den : ℝ))]
 
-theorem stairEven_cover {den : ℤ} (hden : BaseMask.stairEven.Valid den) :
-    (Fraction.mk 1 den).modifiedDeck.Covers (BaseMask.stairEven.tile den hden).sites := by
-  apply covers_trim
+private theorem stairEven_raw_cover {den : ℤ} (hden : BaseMask.stairEven.Valid den) :
+    (reciprocalEvenDeck den).Covers (BaseMask.stairEven.raw den).sites := by
   obtain ⟨hmin, hodd⟩ := hden
   apply PeriodDeck.covers_of_halfShiftedCell _ (ne_of_gt (reciprocalEvenDeck_pos hmin))
   intro point hcell
@@ -130,9 +130,8 @@ theorem stairEven_cover {den : ℤ} (hden : BaseMask.stairEven.Valid den) :
   simp [PeriodDeck.combine]
   rfl
 
-theorem stairEvenAlt_cover {den : ℤ} (hden : BaseMask.stairEvenAlt.Valid den) :
-    (Fraction.mk 1 den).modifiedDeck.Covers (BaseMask.stairEvenAlt.tile den hden).sites := by
-  apply covers_trim
+private theorem stairEvenAlt_raw_cover {den : ℤ} (hden : BaseMask.stairEvenAlt.Valid den) :
+    (reciprocalEvenDeck den).Covers (BaseMask.stairEvenAlt.raw den).sites := by
   obtain ⟨hmin, hodd⟩ := hden
   apply PeriodDeck.covers_of_halfShiftedCell _ (ne_of_gt (reciprocalEvenDeck_pos hmin))
   intro point hcell
@@ -168,6 +167,61 @@ theorem stairEvenAlt_cover {den : ℤ} (hden : BaseMask.stairEvenAlt.Valid den) 
         exact_mod_cast hc
       exact hpoint (Or.inr ⟨htop, hx, by omega⟩)
 
+theorem stairEven_cover {den : ℤ} (hden : BaseMask.stairEven.Valid den) :
+    (Fraction.mk 1 den).modifiedDeck.Covers (BaseMask.stairEven.tile den hden).sites :=
+  covers_trim (stairEven_raw_cover hden) _
+
+theorem stairEvenAlt_cover {den : ℤ} (hden : BaseMask.stairEvenAlt.Valid den) :
+    (Fraction.mk 1 den).modifiedDeck.Covers (BaseMask.stairEvenAlt.tile den hden).sites :=
+  covers_trim (stairEvenAlt_raw_cover hden) _
+
+private theorem nearOneDeck_eq {den : ℤ} (hodd : den % 2 = 1) :
+    (Fraction.mk 1 den).rotate.modifiedDeck = ⟨(den + 1, den - 1), (-1, den)⟩ := by
+  have heven : (Fraction.mk 1 den).Even := by
+    change (1 + den) % 2 = 0
+    omega
+  rw [Fraction.rotate_of_even heven]
+  have hsum : ((den - 1) / 2 + (den + 1) / 2) % 2 ≠ 0 := by omega
+  simp only [Fraction.modifiedDeck, Fraction.periodMultiplicity, Fraction.unmodifiedDeck,
+    if_neg hsum]
+  apply congrArg₂ PeriodDeck.mk <;> apply Prod.ext <;> dsimp <;> omega
+
+/-- Under the counterclockwise turn, the reciprocal generators become the
+near-one transverse generator and the negative near-one kernel generator. -/
+private theorem covers_nearOne_of_mapSite {den : ℤ} (hodd : den % 2 = 1)
+    {reciprocal nearOne : Finset Site} (offset : Site)
+    (hmap : ∀ point ∈ reciprocal, QuarterTurn.counterclockwise.mapSite offset point ∈ nearOne)
+    (hcover : (reciprocalEvenDeck den).Covers reciprocal) :
+    (Fraction.mk 1 den).rotate.modifiedDeck.Covers nearOne := by
+  rw [reciprocalEvenDeck_eq hodd] at hcover
+  rw [nearOneDeck_eq hodd]
+  intro site
+  obtain ⟨point, rfl⟩ := (QuarterTurn.counterclockwise.siteEquiv offset).surjective site
+  obtain ⟨representative, hrep, kernel, transverse, hspan⟩ := hcover point
+  refine ⟨_, hmap representative hrep, -transverse, kernel, Prod.ext ?_ ?_⟩
+  · have h := congrArg Prod.snd hspan
+    change point.2 - representative.2 = kernel * 1 + transverse * (1 + den) at h
+    change -point.2 + offset.1 - (-representative.2 + offset.1) =
+      -transverse * (den + 1) + kernel * (-1)
+    linear_combination -h
+  · have h := congrArg Prod.fst hspan
+    change point.1 - representative.1 = kernel * den + transverse * (1 - den) at h
+    change point.1 + offset.2 - (representative.1 + offset.2) =
+      -transverse * (den - 1) + kernel * den
+    linear_combination h
+
+theorem stairOdd_cover {den : ℤ} (hden : BaseMask.stairOdd.Valid den) :
+    (Fraction.mk 1 den).rotate.modifiedDeck.Covers (BaseMask.stairOdd.tile den hden).sites := by
+  apply covers_trim
+  exact covers_nearOne_of_mapSite hden.2 (den + 1, den - 1)
+    (fun point hmem => (BaseMask.mem_stairOdd_raw_iff point).mpr hmem) (stairEven_raw_cover hden)
+
+theorem stairOddAlt_cover {den : ℤ} (hden : BaseMask.stairOddAlt.Valid den) :
+    (Fraction.mk 1 den).rotate.modifiedDeck.Covers (BaseMask.stairOddAlt.tile den hden).sites := by
+  apply covers_trim
+  exact covers_nearOne_of_mapSite hden.2 (den, 2 * den - 3)
+    (fun point hmem => (BaseMask.mem_stairOddAlt_raw_iff point).mpr hmem) (stairEvenAlt_raw_cover hden)
+
 private theorem parentsAt_replicate_three (count : ℕ) :
     parentsAt (List.replicate count .three) = ⟨⟨0, 1⟩, ⟨1, 2 * (count : ℤ) + 1⟩⟩ := by
   induction count with
@@ -202,5 +256,31 @@ theorem evaluateNative_threes_even_covers (extra : ℕ) :
     exact stairEven_cover hvalid
   · apply covers_place
     exact stairEvenAlt_cover hvalid
+
+private theorem twos_current_odd (extra : ℕ) :
+    (parentsAt (BaseRun.twos extra).word).current .odd =
+      (Fraction.mk 1 (2 * (extra : ℤ) + 3 + 2)).rotate := by
+  have hparents := parentsAt_valid (BaseRun.threes extra).word
+  rw [← threes_current_even, hparents.rotate_current_even, rotate_parentsAt]
+  simp [BaseRun.word, Digit.swapTwoThree]
+
+/-- The actual odd standard and alternate outputs of every nonempty initial
+run of digit two cover their own modified period classes. -/
+theorem evaluateNative_twos_odd_covers (extra : ℕ) :
+    let word := (BaseRun.twos extra).word
+    let deck := (parentsAt word).current .odd |>.modifiedDeck
+    ∃ registers, evaluateNative word = .ok registers ∧
+      deck.Covers registers.standard.currentOdd.val.sites ∧
+      deck.Covers registers.alternate.currentOdd.val.sites := by
+  dsimp only
+  rw [twos_current_odd]
+  have hvalid : BaseMask.stairOdd.Valid (2 * (extra : ℤ) + 3 + 2) := by
+    change 3 ≤ 2 * (extra : ℤ) + 3 + 2 ∧ (2 * (extra : ℤ) + 3 + 2) % 2 = 1
+    omega
+  refine ⟨(BaseRun.twos extra).registers.llCenter, evaluateNative_base _, ?_, ?_⟩
+  · apply covers_place
+    exact stairOdd_cover hvalid
+  · apply covers_place
+    exact stairOddAlt_cover hvalid
 
 end FLatticePaper.Construction

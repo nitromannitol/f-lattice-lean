@@ -31,6 +31,7 @@ The November 20 corrected edition and its supporting constructor are pinned by [
 - [Endpoint odometers](FLatticePaper/Plane/EndpointGrowth.lean): `checkerboard_endpoints` checks superharmonicity, recurrence and quadratic growth of both literal endpoint fields at their prescribed matrices. [The consumers](checks/Periods.lean) use the matrix-lattice equality for an arbitrary generated birth and the growth theorem at the even root slope.
 
 - [Symbolic reciprocal staircase coverage](FLatticePaper/Construction/StaircaseCoverage.lean): `stairEven_cover` and `stairEvenAlt_cover` prove the two covers for every odd denominator at least three, using the half-shifted real cell and the literal occupied mask, with the $d=3$ alternate rail exception handled by a true transverse period. `evaluateNative_threes_even_covers` consumes both results for the actual even outputs of every nonempty pure-3 run; [the consumer](checks/StaircaseCoverage.lean) instantiates a 200-letter word without enumerating its support.
+- [Symbolic near-one staircase coverage](FLatticePaper/Construction/StaircaseCoverage.lean) uses `BaseMask.mem_stairOdd_raw_iff` and `BaseMask.mem_stairOddAlt_raw_iff` to transport the actual raw supports by their respective quarter-turn translations. `stairOdd_cover` and `stairOddAlt_cover` transport the period span with the swapped, signed generators and then apply the constructor's trim. `evaluateNative_twos_odd_covers` checks both native odd outputs for every nonempty pure-2 run. The staircase consumer checks both symbolic native results and their 200-letter instances, with only `[propext, Classical.choice, Quot.sound]`.
 
 Run these checks from the sandbox repository root.
 
@@ -75,7 +76,7 @@ The bootstrap, ordered-height, alternate-midpoint, placement, initializer, Farey
 
 The two headline theorems, all-word success of mixed evaluation, general plane ranks, source-specific finite-tile height comparisons, and the remaining pure and mixed occupied-domain coverage stay open. The ordered height lemma does not prove the geometric comparisons of the actual shifted sources. The root and pure-word plane ranks and the general signed rank and band induction are separate obligations.
 
-Next constructor dependencies: transfer the staircase covers by exact raw-mask rotations, prove the doubled-ladder covers, and then use the native support and height comparisons for each mixed schedule. For the plane proof, establish the literal plane initializers and connect the threshold calculation to the actual earlier harmonically conjugate parent pair, deriving its unit bounds and both signed ranks from the boundary and cut arguments.
+The next constructor dependency is the doubled-ladder cover, followed by the native support and height comparisons for each mixed schedule. For the plane proof, establish the literal plane initializers and connect the threshold calculation to the actual earlier harmonically conjugate parent pair, deriving its unit bounds and both signed ranks from the boundary and cut arguments.
 
 ## GeneralK track · Recurrence on the F-lattice and its generalizations
 
