@@ -1,4 +1,4 @@
-import FLatticePaper.Construction.StaircaseExtension
+import FLatticePaper.Construction.StaircaseLaplacian
 
 namespace FLatticePaper.Checks
 
@@ -28,6 +28,15 @@ theorem reciprocal_staircase_has_its_prescribed_plane_extension :
   rw [stairEvenConstantV_eq] at h
   exact h
 
+theorem reciprocal_staircase_has_binary_plane_extension_at_three :
+    ∃ field : Field, (BaseMask.stairEven.raw 3).Agrees field 0 ∧
+      HasGeneratorPeriods ⟨1, 3⟩ field 0 (-9) ∧
+      HasQuadraticGrowth field (Fraction.mk 1 3).matrix ∧
+      ∀ point, laplacian field point = -1 ∨ laplacian field point = 0 := by
+  have h := stairEven_exists_binary_extension (den := 3) (by simp [BaseMask.Valid])
+  rw [stairEvenConstantV_eq] at h
+  exact h
+
 #print axioms PeriodDeck.exists_halfShiftedCell_representative
 #print axioms stairEven_cover
 #print axioms stairEvenAlt_cover
@@ -44,5 +53,10 @@ theorem reciprocal_staircase_has_its_prescribed_plane_extension :
 #print axioms stairEven_respectsPeriods
 #print axioms stairEven_exists_extension
 #print axioms reciprocal_staircase_has_its_prescribed_plane_extension
+#print axioms stairEven_reflection
+#print axioms stairEven_laplacian_on_raw
+#print axioms laplacian_periodic_of_generatorPeriods
+#print axioms stairEven_exists_binary_extension
+#print axioms reciprocal_staircase_has_binary_plane_extension_at_three
 
 end FLatticePaper.Checks
