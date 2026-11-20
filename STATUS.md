@@ -12,6 +12,7 @@ The November 20 corrected edition and its supporting constructor are pinned by [
 - [Alternate midpoint](FLatticePaper/Plane/AlternateMidpoint.lean): `FLatticePaper.isBurningRank_roundedMidpoint` checks the binary Laplacian and lexicographic rank by the exact local input calculation. `FLatticePaper.roundedMidpoint_eq_min_of_slip` proves the min formula given the three-value gap bound.
 - [Prescribed even slip](FLatticePaper/Plane/AlternateSlip.lean): `FLatticePaper.isBurningRank_alternateCompanion_midpoint` supplies binary Laplacian of the translated sheet by physical parity, rather than assuming it. [The consumer](checks/AlternateMidpoint.lean) applies that rank to finite comparison. The slip bounds, saddle exclusion and the standard's slip-constrained rank are still genuine proof obligations.
 - [Even distinctness calculation](FLatticePaper/Plane/AlternatePeriods.lean): the midpoint-minus-standard increments are $0,-1$ on the two generators, and `FLatticePaper.not_integerAffine_roundedMidpoint_sub_standard` rules out an integer-affine difference from those increments. The standard's period jet, unit Farey determinant and interior slope are explicit inputs; this is not a native-tile identification.
+- [Sparse placement and assembly](FLatticePaper/Construction/PlacedAssembly.lean): exact destination-slope placement, distinct rectangular trim and occupied lower-left centering, and placed list assembly with trim followed by max normalization for a correction. `HeightTile.meldCorrection_agrees` consumes ordered agreement and tracks the actual spatial shift and additive gauge. [The placement check](checks/Placement.lean) tests the different origins and a large translation without clipping.
 
 Run these checks from the sandbox repository root.
 
@@ -21,6 +22,7 @@ lake build
 lake env lean checks/RankAxioms.lean
 lake env lean checks/OrderedOverlap.lean
 lake env lean checks/AlternateMidpoint.lean
+lake env lean checks/Placement.lean
 sha256sum --quiet -c paper.sha256
 ```
 
@@ -30,7 +32,9 @@ The ordered insertion, correction, and concrete reinsertion checks report only `
 
 The midpoint and slip ranks, finite comparison consumer and even non-affinity check report `[propext, Classical.choice, Quot.sound]`. The rounded-height formulas and the two difference increments report `[propext, Quot.sound]`.
 
-The bootstrap and ordered-height milestones landed on `main` at `4dbc1eb` and `dd24414`. With the worker's read-only `.git` mount, submit tested named paths via `python3 scripts/checkpoint.py request` and wait for its receipt before editing those paths again.
+The placement, trim and correction consumers report `[propext, Classical.choice, Quot.sound]`.
+
+The bootstrap, ordered-height and alternate-midpoint milestones landed on `main` at `4dbc1eb`, `dd24414` and `a0df1d2`. With the worker's read-only `.git` mount, submit tested named paths via `python3 scripts/checkpoint.py request` and wait for its receipt before editing those paths again.
 
 ## Open
 
