@@ -1,5 +1,6 @@
 import FLatticePaper.Construction.LadderExtension
 import FLatticePaper.Construction.LadderLaplacian
+import FLatticePaper.Construction.LadderRank
 import FLatticePaper.Construction.LadderRankCorrection
 import FLatticePaper.Construction.LadderReflection
 import FLatticePaper.Construction.LadderRotation
@@ -29,21 +30,21 @@ theorem long_pure_runs_cover_all_registers :
       registers.Covers (parentsAt (List.replicate 200 .three))) :=
   ⟨evaluateNative_base_covers (.twos 199), evaluateNative_base_covers (.threes 199)⟩
 
-theorem long_pure_three_has_standard_ladder_extension :
+theorem long_pure_three_has_recurrent_standard_ladder :
     let word := List.replicate 200 .three
     ∃ registers : TileRegisters, ∃ field : Field,
       evaluateNative word = .ok registers ∧ registers.standard.currentOdd.val.Agrees field 0 ∧
       HasGeneratorPeriods ((parentsAt word).current .odd) field 0 (stairEvenConstantV 402) ∧
-      HasQuadraticGrowth field ((parentsAt word).current .odd).matrix := by
-  exact evaluateNative_threes_odd_standard_extension 199
+      HasQuadraticGrowth field ((parentsAt word).current .odd).matrix ∧ Superharmonic field ∧ Recurrent field := by
+  exact evaluateNative_threes_odd_standard_recurrent 199
 
-theorem long_pure_two_has_standard_ladder_extension :
+theorem long_pure_two_has_recurrent_standard_ladder :
     let word := List.replicate 200 .two
     ∃ registers : TileRegisters, ∃ field : Field,
       evaluateNative word = .ok registers ∧ registers.standard.currentEven.val.Agrees field 0 ∧
       HasGeneratorPeriods ((parentsAt word).current .even) field 0 (ladderEvenConstantV 402) ∧
-      HasQuadraticGrowth field ((parentsAt word).current .even).matrix := by
-  exact evaluateNative_twos_even_standard_extension 199
+      HasQuadraticGrowth field ((parentsAt word).current .even).matrix ∧ Superharmonic field ∧ Recurrent field := by
+  exact evaluateNative_twos_even_standard_recurrent 199
 
 theorem reciprocal_ladder_four_laplacian_reflection :
     ∃ field : Field, (BaseMask.ladderOdd.raw 4).Agrees field 0 ∧
@@ -89,12 +90,12 @@ theorem reciprocal_ladder_four_rank_agrees_on_shelf_overlap :
 #print axioms ladderOdd_overlap_indices
 #print axioms ladderOdd_respectsPeriods
 #print axioms evaluateNative_threes_odd_standard_extension
-#print axioms long_pure_three_has_standard_ladder_extension
+#print axioms long_pure_three_has_recurrent_standard_ladder
 #print axioms BaseMask.ladderEven_raw_height
 #print axioms rotateLadderField_periods
 #print axioms ladderEvenConstantV_eq
 #print axioms evaluateNative_twos_even_standard_extension
-#print axioms long_pure_two_has_standard_ladder_extension
+#print axioms long_pure_two_has_recurrent_standard_ladder
 #print axioms ladderOddField_reflection
 #print axioms laplacian_ladderOddField_reflection
 #print axioms reciprocal_ladder_four_laplacian_reflection
@@ -104,5 +105,10 @@ theorem reciprocal_ladder_four_rank_agrees_on_shelf_overlap :
 #print axioms ladderOdd_rankCorrection_class_constant
 #print axioms ladderOdd_exists_periodic_rankCorrection
 #print axioms reciprocal_ladder_four_rank_agrees_on_shelf_overlap
+#print axioms ladderOdd_exists_burningRank
+#print axioms ladderOdd_exists_recurrent_extension
+#print axioms ladderEven_exists_recurrent_extension
+#print axioms evaluateNative_threes_odd_standard_recurrent
+#print axioms evaluateNative_twos_even_standard_recurrent
 
 end FLatticePaper.Checks
