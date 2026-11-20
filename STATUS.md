@@ -1,8 +1,10 @@
 # Formalization status
 
-The November 20 corrected edition and its supporting constructor are pinned by [paper.sha256](paper.sha256). [Source correspondence](SOURCE-MAP.md) maps the first Lean results and the remaining paper obligations.
+## Primary track · Corrected October 2023 manuscript
 
-## Checked on Lean 4.32.0
+The November 20 corrected edition and its supporting constructor are pinned by [paper.sha256](paper.sha256). [Source correspondence](SOURCE-MAP.md) maps the checked Lean declarations and the remaining paper obligations.
+
+### Checked on Lean 4.32.0
 
 - [Physical graph](FLatticePaper/Graph.lean) defines the horizontal incoming edges at even sites and the vertical incoming edges at odd sites. The Laplacian, induced indegree and incoming boundary use these edges.
 - [Rank and comparison](FLatticePaper/Rank.lean) proves `FLatticePaper.IsBurningRank.allowed`, `FLatticePaper.finiteComparison_of_allowed`, and `FLatticePaper.IsBurningRank.finiteComparison`. The rank argument requires both inputs to decrease at a Laplacian $-1$ site and at least one at a Laplacian $0$ site. It proves that every nonempty finite set has an allowed vertex. Finite comparison follows by taking the set of maximizers of the integer difference.
@@ -67,10 +69,24 @@ The exact recurrence criterion, rotation transports, and endpoint recurrence con
 
 The constructor schedule checks, exact lattice and period proofs, kernel-checked root coverage, endpoint odometer consumers and symbolic reciprocal staircase covers report only `[propext, Classical.choice, Quot.sound]`.
 
-The bootstrap, ordered-height, alternate-midpoint, placement, initializer, Farey chronology, threshold, recurrence/rotation and native evaluator milestones landed on `main` at `4dbc1eb`, `dd24414`, `a0df1d2`, `7056241`, `d08b018`, `acea381`, `ab4c8ca`, `f2cf9be` and `2546d52`. With the worker's read-only `.git` mount, submit tested named paths via `python3 scripts/checkpoint.py request` and wait for its receipt before editing those paths again.
+The bootstrap, ordered-height, alternate-midpoint, placement, initializer, Farey chronology, threshold, recurrence/rotation and native evaluator milestones landed on `main` at `4dbc1eb`, `dd24414`, `a0df1d2`, `7056241`, `d08b018`, `acea381`, `ab4c8ca`, `f2cf9be` and `2546d52`. The matrix and period laws, root coverage and endpoint growth landed at `8501715`. The symbolic reciprocal staircase cover landed at `68e33d2`. With the worker's read-only `.git` mount, submit tested named paths via `python3 scripts/checkpoint.py request` and wait for its receipt before editing those paths again.
 
-## Open
+### Open
 
 The two headline theorems, all-word success of mixed evaluation, general plane ranks, source-specific finite-tile height comparisons, and the remaining pure and mixed occupied-domain coverage stay open. The ordered height lemma does not prove the geometric comparisons of the actual shifted sources. The root and pure-word plane ranks and the general signed rank and band induction are separate obligations.
 
 Next constructor dependencies: transfer the staircase covers by exact raw-mask rotations, prove the doubled-ladder covers, and then use the native support and height comparisons for each mixed schedule. For the plane proof, establish the literal plane initializers and connect the threshold calculation to the actual earlier harmonically conjugate parent pair, deriving its unit bounds and both signed ranks from the boundary and cut arguments.
+
+## GeneralK track · Recurrence on the F-lattice and its generalizations
+
+The separate `FLatticePaper.GeneralK` track covers every integer $k\ge2$. It follows the [November 20 request](docs/GENERAL-K-FOLLOWUP.md) and the [GeneralK source correspondence](docs/GENERAL-K-SOURCE-MAP.md). The local sibling snapshot has its own [checksum manifest](docs/general-k.sha256). The corrected October 2023 manuscript remains the primary campaign.
+
+### Proof queue
+
+1. Define the physical operator, prove the equivalence between finite strongly connected comparison, absence of a forbidden set, and absence of a finite legal lowering. Prove the chain test with both endpoint bits, their coincidence at $k=2$, and the explicit forbidden interval with two black interior sites.
+2. Classify all residue-only binary charges, construct a physical height for every charge pattern, and give explicit finite countersets when two residues are black.
+3. Prove least integer concave completion, the exact retained comparison and its zero-operator case. Derive the scalar odometers and the integer weighted-trace classification, including the leftmost-column argument and the interior case.
+4. Prove termination and exact acceptance at every refinement scale for the real growth set, including the boundary criterion. The source makes no critical-circle classification claim.
+5. Track the sibling's $k=2$ staircase and Farey results against their own hypotheses and coordinates. The primary open items above track the literal native identification, coverage and mixed-word induction.
+
+The GeneralK statements are queued. The primary checked results listed above concern the corrected October 2023 manuscript.
