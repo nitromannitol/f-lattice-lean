@@ -103,6 +103,22 @@ theorem stairEvenAltField_residual_reflection {den : ℤ} (hden : BaseMask.stair
   rw [stairEvenAltField_reflection hden hagree hperiod, stairEvenAltBackground_reflection]
   ring
 
+theorem evenSite_reflectStairEvenAlt_iff (den : ℤ) (point : Site) :
+    EvenSite (reflectStairEvenAlt den point) ↔ EvenSite point := by
+  simp only [EvenSite, reflectStairEvenAlt, Prod.fst_sub, Prod.snd_sub]
+  omega
+
+theorem incomingStar_reflectStairEvenAlt (den : ℤ) (point : Site) :
+    incomingNeg (reflectStairEvenAlt den point) = reflectStairEvenAlt den (incomingPos point) ∧
+      incomingPos (reflectStairEvenAlt den point) = reflectStairEvenAlt den (incomingNeg point) := by
+  have hpar := evenSite_reflectStairEvenAlt_iff den point
+  by_cases he : EvenSite point
+  · simp only [incomingNeg, incomingPos, if_pos he, if_pos (hpar.mpr he)]
+    constructor <;> apply Prod.ext <;> dsimp [reflectStairEvenAlt] <;> omega
+  · have hnot : ¬ EvenSite (reflectStairEvenAlt den point) := fun h => he (hpar.mp h)
+    simp only [incomingNeg, incomingPos, if_neg he, if_neg hnot]
+    constructor <;> apply Prod.ext <;> dsimp [reflectStairEvenAlt] <;> omega
+
 /-- Central reflection preserves the physical in-star and the B3 Laplacian. -/
 theorem laplacian_stairEvenAltField_reflection {den : ℤ} (hden : BaseMask.stairEvenAlt.Valid den)
     {standard : Field} (hagree : (BaseMask.stairEven.raw den).Agrees standard 0)
@@ -110,17 +126,7 @@ theorem laplacian_stairEvenAltField_reflection {den : ℤ} (hden : BaseMask.stai
     (point : Site) :
     laplacian (stairEvenAltField den standard) (reflectStairEvenAlt den point) =
       laplacian (stairEvenAltField den standard) point := by
-  have hpar : EvenSite (reflectStairEvenAlt den point) ↔ EvenSite point := by
-    simp only [EvenSite, reflectStairEvenAlt, Prod.fst_sub, Prod.snd_sub]
-    omega
-  have hstars : incomingNeg (reflectStairEvenAlt den point) = reflectStairEvenAlt den (incomingPos point) ∧
-      incomingPos (reflectStairEvenAlt den point) = reflectStairEvenAlt den (incomingNeg point) := by
-    by_cases he : EvenSite point
-    · simp only [incomingNeg, incomingPos, if_pos he, if_pos (hpar.mpr he)]
-      constructor <;> apply Prod.ext <;> dsimp [reflectStairEvenAlt] <;> omega
-    · have hnot : ¬ EvenSite (reflectStairEvenAlt den point) := fun h => he (hpar.mp h)
-      simp only [incomingNeg, incomingPos, if_neg he, if_neg hnot]
-      constructor <;> apply Prod.ext <;> dsimp [reflectStairEvenAlt] <;> omega
+  have hstars := incomingStar_reflectStairEvenAlt den point
   have hgrade : (Fraction.mk 1 den).transverseGrade (incomingNeg point) +
       (Fraction.mk 1 den).transverseGrade (incomingPos point) =
         2 * (Fraction.mk 1 den).transverseGrade point := by

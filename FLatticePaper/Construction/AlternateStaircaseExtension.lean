@@ -4,7 +4,7 @@ namespace FLatticePaper.Construction
 
 open Farey
 
-private def staircaseLevel (den : ℤ) (point : Site) : ℤ := point.1 - den * point.2
+def staircaseLevel (den : ℤ) (point : Site) : ℤ := point.1 - den * point.2
 
 /-- B3 adds one on the `d-1` transverse classes through its inner diagonal. -/
 def stairEvenAltMarker (den : ℤ) (point : Site) : ℤ :=
@@ -82,11 +82,11 @@ private theorem eq_of_emod_eq_of_within_period {period first second : ℤ} (hper
     rw [mul_neg, mul_one] at h
     omega
 
-/-- In the range of B3's occupied levels, each marker class has exactly its
-displayed level, without a nonzero transverse translate. -/
-private theorem marker_eq_of_level_bounds {den : ℤ} (hmin : 3 ≤ den) (point : Site)
-    (hlo : 3 - (Fraction.mk 1 den).periodDenominator ≤ staircaseLevel den point)
-    (hhi : staircaseLevel den point ≤ den) :
+/-- The range containing both the occupied B3 levels and its left and lower
+exit levels meets the marker classes only at their displayed levels. -/
+theorem stairEvenAltMarker_eq_of_level_bounds {den : ℤ} (hmin : 3 ≤ den) (point : Site)
+    (hlo : 3 - den - (Fraction.mk 1 den).periodDenominator ≤ staircaseLevel den point)
+    (hhi : staircaseLevel den point ≤ 2 * den) :
     stairEvenAltMarker den point =
       if ∃ row ∈ Finset.Ico (1 : ℤ) den, staircaseLevel den point = 2 - (den + 1) * row then 1 else 0 := by
   unfold stairEvenAltMarker
@@ -138,7 +138,7 @@ private theorem stairEvenAltMarker_on_raw {den : ℤ} (hmin : 3 ≤ den) {point 
     stairEvenAltMarker den point = if MarkedSite den point then 1 else 0 := by
   obtain ⟨hlo, hhi⟩ := stairEvenAlt_level_bounds hmin hmem
   obtain ⟨_, _, hshape⟩ := BaseMask.mem_stairEvenAlt_raw_iff.mp hmem
-  rw [marker_eq_of_level_bounds hmin point hlo hhi]
+  rw [stairEvenAltMarker_eq_of_level_bounds hmin point (by omega) (by omega)]
   apply if_congr ?_ rfl rfl
   constructor
   · rintro ⟨row, hrow, hlevel⟩

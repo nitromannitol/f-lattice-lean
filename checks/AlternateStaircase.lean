@@ -1,5 +1,5 @@
-import FLatticePaper.Construction.AlternateStaircaseReflection
 import FLatticePaper.Construction.AlternateStaircaseRotation
+import FLatticePaper.Construction.AlternateStaircaseSeams
 
 namespace FLatticePaper.Checks
 
@@ -34,6 +34,22 @@ theorem root_odd_staircases_have_distinct_plane_extensions :
   exact ⟨first, standard, alternate, hf, hstandard, halternate,
     stairOddAlt_sub_standard_not_integerAffine (den := 3) (by decide) hperiod hperiod'⟩
 
+theorem reciprocal_alternate_left_corner_has_physical_laplacian_neg_one :
+    ∃ field : Field, (BaseMask.stairEvenAlt.raw 3).Agrees field 0 ∧ laplacian field (-2, 0) = -1 := by
+  have hvalid : BaseMask.stairEvenAlt.Valid 3 := by simp [BaseMask.Valid]
+  obtain ⟨standard, hagree, hperiod, _⟩ := stairEven_exists_extension hvalid
+  refine ⟨stairEvenAltField 3 standard, stairEvenAltField_agrees hvalid hagree hperiod, ?_⟩
+  have hsite : ((-2, 0) : Site) ∈ (BaseMask.stairEvenAlt.raw 3).sites := by decide +kernel
+  have heven : EvenSite (-2, 0) := by decide
+  have href := (reflectStairEvenAlt_mem_iff 3 (-2, 0)).mpr hsite
+  have heven' := (evenSite_reflectStairEvenAlt_iff 3 (-2, 0)).mpr heven
+  rw [laplacian_stairEvenAltField_eq_background_add_residual, laplacian_stairEvenAltBackground,
+    if_pos heven, stairEvenAltResidual_incomingNeg_even hvalid hagree hperiod hsite heven,
+    stairEvenAltResidual_incomingPos_reflect hvalid hagree hperiod,
+    stairEvenAltResidual_incomingNeg_even hvalid hagree hperiod href heven',
+    stairEvenAltResidual_on_raw hvalid hagree hperiod hsite]
+  decide
+
 /-- The stored root alternate needs its physical chart. Its centered
 coordinates alone give a positive Laplacian at `(2,2)`. -/
 theorem centered_root_alternate_has_no_unshifted_superharmonic_extension :
@@ -67,6 +83,11 @@ theorem centered_root_alternate_has_no_unshifted_superharmonic_extension :
 #print axioms laplacian_stairEvenAltField_reflection
 #print axioms laplacian_stairEvenAltBackground
 #print axioms stairEvenAlt_incomingNeg_notMem_iff
+#print axioms stairEvenAltResidual_incomingNeg_of_notMem
+#print axioms stairEvenAltResidual_incomingNeg_even
+#print axioms stairEvenAltResidual_incomingNeg_odd
+#print axioms stairEvenAltResidual_incomingPos_reflect
+#print axioms reciprocal_alternate_left_corner_has_physical_laplacian_neg_one
 #print axioms stairEvenAltField_agrees
 #print axioms stairEvenAlt_exists_extension
 #print axioms evaluateNative_empty_even_alternate_extension
