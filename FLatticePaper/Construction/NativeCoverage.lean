@@ -24,7 +24,7 @@ theorem evaluateNative_empty_covers :
     ∃ registers, evaluateNative [] = .ok registers ∧ registers.Covers (parentsAt []) :=
   ⟨BaseRun.empty.registers.llCenter, evaluateNative_base .empty, empty_registers_cover⟩
 
-private def EndpointAtom.fraction : EndpointAtom → Fraction
+def EndpointAtom.fraction : EndpointAtom → Fraction
   | .zero => ⟨0, 1⟩
   | .one => ⟨1, 1⟩
 

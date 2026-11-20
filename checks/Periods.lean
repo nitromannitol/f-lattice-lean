@@ -1,8 +1,10 @@
 import FLatticePaper.Construction.AlternateLadderExtension
 import FLatticePaper.Construction.AlternateLadderLaplacian
+import FLatticePaper.Construction.AlternateLadderRank
 import FLatticePaper.Construction.AlternateLadderRankCorrection
 import FLatticePaper.Construction.AlternateLadderReflection
 import FLatticePaper.Construction.AlternateLadderRotation
+import FLatticePaper.Construction.EndpointAtoms
 import FLatticePaper.Construction.LadderExtension
 import FLatticePaper.Construction.LadderLaplacian
 import FLatticePaper.Construction.LadderRank
@@ -75,22 +77,22 @@ theorem reciprocal_ladder_four_rank_agrees_on_shelf_overlap :
   have hstep : ((-3, 5) : Site) ∈ (reciprocalLadderDeck 4).span := ⟨0, 1, rfl⟩
   exact ⟨correction, (hagree _ hfirst).trans (by decide), (hagree _ hsecond).trans (by decide), hperiod _ hstep⟩
 
-theorem long_pure_three_has_alternate_ladder_extension_in_physical_chart :
+theorem long_pure_three_has_recurrent_alternate_ladder_in_physical_chart :
     let word := List.replicate 200 .three
     ∃ registers : TileRegisters, ∃ field : Field,
       evaluateNative word = .ok registers ∧
       registers.alternate.currentOdd.val.Agrees (fun site => field (site + (-1, -1))) 0 ∧
       HasGeneratorPeriods ((parentsAt word).current .odd) field (-1) (ladderOddAltConstantV 402) ∧
-      HasQuadraticGrowth field ((parentsAt word).current .odd).matrix := by
-  exact evaluateNative_threes_odd_alternate_extension 199
+      HasQuadraticGrowth field ((parentsAt word).current .odd).matrix ∧ Superharmonic field ∧ Recurrent field := by
+  exact evaluateNative_threes_odd_alternate_recurrent 199
 
-theorem long_pure_two_has_alternate_ladder_extension :
+theorem long_pure_two_has_recurrent_alternate_ladder :
     let word := List.replicate 200 .two
     ∃ registers : TileRegisters, ∃ field : Field,
       evaluateNative word = .ok registers ∧ registers.alternate.currentEven.val.Agrees field 0 ∧
       HasGeneratorPeriods ((parentsAt word).current .even) field 0 (ladderEvenAltConstantV 402) ∧
-      HasQuadraticGrowth field ((parentsAt word).current .even).matrix := by
-  exact evaluateNative_twos_even_alternate_extension 199
+      HasQuadraticGrowth field ((parentsAt word).current .even).matrix ∧ Superharmonic field ∧ Recurrent field := by
+  exact evaluateNative_twos_even_alternate_recurrent 199
 
 theorem two_even_ladders_have_distinct_plane_extensions :
     ∃ registers : TileRegisters, ∃ standard alternate : Field,
@@ -128,6 +130,20 @@ theorem reciprocal_alternate_ladder_four_rank_agrees_on_corner_overlap :
   have hsecond : ((4, 6) : Site) ∈ (BaseMask.ladderOddAlt.raw 4).sites := by decide +kernel
   have hstep : ((5, 7) : Site) ∈ (reciprocalLadderDeck 4).span := ⟨1, 1, rfl⟩
   exact ⟨correction, (hagree _ hfirst).trans (by decide), (hagree _ hsecond).trans (by decide), hperiod _ hstep⟩
+
+theorem native_root_retained_atoms_agree :
+    ∃ registers : TileRegisters, evaluateNative [] = .ok registers ∧
+      registers.standard.retainedOdd.val.Agrees EndpointAtom.zero.planeField 0 ∧
+      registers.standard.retainedEven.val.Agrees EndpointAtom.one.planeField 0 ∧
+      registers.alternate.retainedOdd.val.Agrees EndpointAtom.zero.planeField 0 ∧
+      registers.alternate.retainedEven.val.Agrees EndpointAtom.one.planeField 0 ∧
+      Recurrent EndpointAtom.zero.planeField ∧ Recurrent EndpointAtom.one.planeField := by
+  let odd := BaseMask.asNonemptyTile .stairOdd 3 (by simp [BaseMask.Valid])
+  let even := BaseMask.asNonemptyTile .stairEven 3 (by simp [BaseMask.Valid])
+  have hz := EndpointAtom.attach_llCenter_agrees .zero odd
+  have ho := EndpointAtom.attach_llCenter_agrees .one even
+  exact ⟨BaseRun.empty.registers.llCenter, evaluateNative_base .empty, hz, ho, hz, ho,
+    EndpointAtom.zero.planeField_recurrent.2.1, EndpointAtom.one.planeField_recurrent.2.1⟩
 
 #print axioms Fraction.integralLattice_eq_span
 #print axioms Fraction.mem_modifiedDeck_iff_integral_even
@@ -173,13 +189,13 @@ theorem reciprocal_alternate_ladder_four_rank_agrees_on_corner_overlap :
 #print axioms ladderOddAlt_overlap_indices
 #print axioms ladderOddAlt_respectsPeriods
 #print axioms evaluateNative_threes_odd_alternate_extension
-#print axioms long_pure_three_has_alternate_ladder_extension_in_physical_chart
+#print axioms long_pure_three_has_recurrent_alternate_ladder_in_physical_chart
 #print axioms BaseMask.ladderEvenAlt_raw_height
 #print axioms rotateLadderAltField_periods
 #print axioms rotateLadderAltField_recurrent
 #print axioms ladderEvenAltConstantV_eq
 #print axioms evaluateNative_twos_even_alternate_extension
-#print axioms long_pure_two_has_alternate_ladder_extension
+#print axioms long_pure_two_has_recurrent_alternate_ladder
 #print axioms ladderOddAlt_sub_standard_not_integerAffine
 #print axioms ladderEvenAlt_sub_standard_not_integerAffine
 #print axioms two_even_ladders_have_distinct_plane_extensions
@@ -191,5 +207,15 @@ theorem reciprocal_alternate_ladder_four_rank_agrees_on_corner_overlap :
 #print axioms ladderOddAlt_exists_periodic_rankCorrection
 #print axioms reciprocal_alternate_ladder_four_has_binary_plane_laplacian
 #print axioms reciprocal_alternate_ladder_four_rank_agrees_on_corner_overlap
+#print axioms ladderOddAlt_exists_burningRank
+#print axioms ladderOddAlt_exists_recurrent_extension
+#print axioms ladderEvenAlt_exists_recurrent_extension
+#print axioms evaluateNative_threes_odd_alternate_recurrent
+#print axioms evaluateNative_twos_even_alternate_recurrent
+#print axioms EndpointAtom.atOrigin_agrees
+#print axioms EndpointAtom.attach_llCenter_agrees
+#print axioms EndpointAtom.planeField_periods
+#print axioms EndpointAtom.planeField_recurrent
+#print axioms native_root_retained_atoms_agree
 
 end FLatticePaper.Checks

@@ -1,6 +1,7 @@
 import FLatticePaper.Endpoint
 import FLatticePaper.Construction.AlternateLadderExtension
 import FLatticePaper.Construction.AlternateLadderLaplacian
+import FLatticePaper.Construction.AlternateLadderRank
 import FLatticePaper.Construction.AlternateLadderRankCorrection
 import FLatticePaper.Construction.AlternateLadderReflection
 import FLatticePaper.Construction.AlternateLadderRotation
@@ -12,6 +13,7 @@ import FLatticePaper.Construction.AlternateStaircaseSeams
 import FLatticePaper.Construction.BaseRegisters
 import FLatticePaper.Construction.Chronology
 import FLatticePaper.Construction.CorrectionHeight
+import FLatticePaper.Construction.EndpointAtoms
 import FLatticePaper.Construction.LadderExtension
 import FLatticePaper.Construction.LadderLaplacian
 import FLatticePaper.Construction.LadderRank
