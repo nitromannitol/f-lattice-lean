@@ -16,6 +16,8 @@ The November 20 corrected edition and its supporting constructor are pinned by [
 - [Literal initializers](FLatticePaper/Construction/BaseRegisters.lean): `FLatticePaper.Construction.BaseRun.registers` gives both four-register tuples at the empty word and positive pure runs. Each of the eight masks is supported only on its specified occupied integer sites, with nonemptiness proved for all valid denominators. [The initializer check](checks/Initializers.lean) compares all four current occupied height sets at each of the empty, `22` and `33` words against pinned TSV fixtures. These are finite masks, not proofs of the plane initializers.
 - [Farey registers and unique birth](FLatticePaper/Farey/RationalBirth.lean): `FLatticePaper.Farey.parentsAt_valid` gives denominator, parity and unit determinant invariants; `existsUnique_rational_birth` proves coverage and uniqueness across both current slots. The inverse is computable, with no denominator cutoff. [Lineage](FLatticePaper/Farey/Lineage.lean) proves that each non-endpoint retained birth lies at a strict prefix of the same word.
 - [Correction chronology](FLatticePaper/Construction/Chronology.lean): `splitInitial_word` and `ancestorHistory_current` verify the pure prefix and chronological suffix fold. The two saved histories have their specified constant-digit suffixes and are nonempty at a nonempty prefix. [The consumer](checks/FareyBirth.lean) checks the actual inverse computation, both retained births, and the distinct pre-update sources on a mixed word.
+- [Threshold minima](FLatticePaper/Plane/ThresholdMinimum.lean): `FLatticePaper.isBurningRank_leftThreshold` and `isBurningRank_rightThreshold` prove binary Laplacians and strict ranks for every integer threshold from the unit slip bound and the two signed standard ranks. Strict winners use the winning rank; ties have the exact off-band or preferred-sheet comparisons.
+- [Tie-band burn](FLatticePaper/Plane/BandBurn.lean): `FLatticePaper.exists_leftThreshold_bandBurnOrder` and `exists_rightThreshold_bandBurnOrder` burn any finite family of classes given the respective rank factorization on the band. They count the two actual input slots even if projected classes coincide. [The diagonal consumer](checks/ThresholdMinimum.lean) proves finite comparison and a band burn for the concrete pair `0` and `x₁ + x₂`. The true ancestor pairs, their signed choices, and their rank periodicity remain separate proof obligations.
 
 Run these checks from the sandbox repository root.
 
@@ -28,6 +30,7 @@ lake env lean checks/AlternateMidpoint.lean
 lake env lean checks/Placement.lean
 lake env lean checks/Initializers.lean
 lake env lean checks/FareyBirth.lean
+lake env lean checks/ThresholdMinimum.lean
 sha256sum --quiet -c paper.sha256
 ```
 
@@ -43,10 +46,12 @@ The base-mask and initial-register checks likewise report `[propext, Classical.c
 
 The Farey rational coverage, retained birth and inverse consumer checks report `[propext, Classical.choice, Quot.sound]`; the determinant walk, initial split and nonempty saved word checks report only `[propext]`.
 
-The bootstrap, ordered-height, alternate-midpoint, placement and initializer milestones landed on `main` at `4dbc1eb`, `dd24414`, `a0df1d2`, `7056241` and `d08b018`. With the worker's read-only `.git` mount, submit tested named paths via `python3 scripts/checkpoint.py request` and wait for its receipt before editing those paths again.
+The threshold ranks, band orders and concrete consumers report `[propext, Classical.choice, Quot.sound]`; the left tie comparison reports `[propext, Quot.sound]`.
+
+The bootstrap, ordered-height, alternate-midpoint, placement, initializer and Farey chronology milestones landed on `main` at `4dbc1eb`, `dd24414`, `a0df1d2`, `7056241`, `d08b018` and `acea381`. With the worker's read-only `.git` mount, submit tested named paths via `python3 scripts/checkpoint.py request` and wait for its receipt before editing those paths again.
 
 ## Open
 
 The two headline theorems, the literal unbounded mixed-word constructor, the general plane ranks, source-specific finite-tile height comparisons, and occupied-domain period coverage remain open. The ordered height lemma does not supply the actual shifted sources or their geometric comparisons. The recurrence work here proves the direction from allowed sets to pointwise comparison over every finite set. The reverse direction in the paper uses a source strongly connected component and remains open. The endpoint consumer verifies recurrence comparison and superharmonicity at $0/1$ through its explicit rank. The $1/1$ endpoint and endpoint growth, the root and pure-word plane ranks and the general signed rank and band induction are separate obligations.
 
-Next constructor dependencies: use the Farey registers and distinct saved histories in the slot offsets, and connect the ordinary and corrected source lists to placed assembly. The local threshold-minimum and equal-level rank implication in supplement Part I, lines 43–46, is independent of the new child's geometry.
+Next constructor dependencies: use the Farey registers and distinct saved histories in the slot offsets, and connect the ordinary and corrected source lists to placed assembly. For the plane proof, connect the threshold calculation to the actual earlier harmonically conjugate parent pair, and obtain its unit bounds and both signed ranks from the genuine boundary and cut arguments, not as hypotheses on a final source root.
