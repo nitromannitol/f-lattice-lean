@@ -2,6 +2,7 @@ import FLatticePaper.GeneralK.ColumnLift
 import FLatticePaper.GeneralK.Connectivity
 import FLatticePaper.GeneralK.Trace
 import FLatticePaper.GeneralK.Envelope
+import FLatticePaper.GeneralK.GrowthClosed
 import Mathlib.Algebra.Order.Star.Real
 import Mathlib.Analysis.Real.Sqrt
 
@@ -104,5 +105,7 @@ theorem irrational_rank_one_is_admitted {k : ℤ} (hk : 2 ≤ k) :
 #print axioms inputReaches_all
 #print axioms InputReaches.exists_uniform_upper_bound
 #print axioms three_cross_phase_path
+#print axioms isClosed_growthSet
+#print axioms isClosed_growthSet_two
 
 end FLatticePaper.GeneralK.Checks

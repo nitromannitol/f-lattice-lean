@@ -143,6 +143,8 @@ The smaller arithmetic critical family has an admission result in the source, a 
 
 [Connectivity.lean](FLatticePaper/GeneralK/Connectivity.lean) proves `inputReaches_all` by traversing the actual vertical chains between retained horizontal sites. `InputReaches.exists_uniform_upper_bound` propagates a pointwise upper bound from an anchor through the true physical stars under pointwise lower bounds. The consumer reaches between nonretained sites in different phases and columns at $k=3$.
 
+[GrowthClosed.lean](FLatticePaper/GeneralK/GrowthClosed.lean) proves `isClosed_growthSet` for every $k\ge2$. It normalizes a convergent sequence of admitted matrices at plane minima of slightly lowered quadratics, fixes a phase anchor, and takes the joint limit of the integer heights and affine slopes on compact sets. The translated envelope then yields two-sided growth at the real limit. This gives `isClosed_growthSet_two` for the physical graph of the primary manuscript. The exact finite-cell algorithm and its acceptance equivalence remain separate from closedness.
+
 The $k=2$ operator specialization is axiom-free. The interpolation, Laplacian, lift equivalence, growth and harmonic results and the consumers report only `[propext, Classical.choice, Quot.sound]`.
 
 ```sh
@@ -151,13 +153,14 @@ lake build FLatticePaper.GeneralK.Harmonic
 lake build FLatticePaper.GeneralK.Trace
 lake build FLatticePaper.GeneralK.Envelope
 lake build FLatticePaper.GeneralK.Connectivity
+lake build FLatticePaper.GeneralK.GrowthClosed
 lake build FLatticePaper.GeneralK.ColumnLift
 lake env lean checks/GeneralKColumns.lean
 ```
 
 ### Proof queue
 
-1. Use checked leastness and monotonicity to prove the retained comparison and its zero-operator case. Prove the finite-cell equivalence and closedness. The compactness step must produce a superharmonic height with a global affine lower bound before applying `mem_growthSet_of_affine_lower_bound`.
+1. Use checked leastness and monotonicity to prove the retained comparison and its zero-operator case. Prove the finite-cell equivalence using the actual quotient and round rule. Downward closure and closedness are checked.
 2. Define the explicit finite weighted graphs and $p_k$. Prove cycle admission by constructing a height. Prove the rational upper bound using exact periodic realization for any admissible full-rank period lattice, the least integer superharmonic obstacle majorant, the explicit Fourier bound on column differences, and finite cycle erasure. Derive the real equivalence and both cone inclusions. The physical trace bound $a+(k-1)c\le0$ gives the compactness needed for the maximality criterion.
 3. Use the checked harmonic witnesses to establish the gcd endpoint formula on the $1/k$ grid, the canonical critical parameters and exact grid period index, and the endpoint translation identity. The grid calculation is independent of the general Fourier bound.
 4. Prove the forbidden-set equivalences, chain test with both endpoint bits and their coincidence at $k=2$, and explicit forbidden intervals. Classify residue-only binary charges, realize all such patterns by integer heights, and derive the scalar odometers and the integer weighted-trace classification with its leftmost-column argument.

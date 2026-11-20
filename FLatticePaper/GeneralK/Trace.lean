@@ -13,7 +13,7 @@ private theorem realLaplacian_matrixQuadratic (k : ℤ) (a b c : ℝ) (site : Si
     simp only [realLaplacian, incomingNeg, incomingPos, if_pos, if_neg, h, not_false_eq_true,
       matrixQuadratic_symmetricMatrix, Int.cast_add, Int.cast_sub, Int.cast_one] <;> ring
 
-private theorem exists_min_of_quadratic_lower_bound {field : Site → ℝ} {radius slope : ℝ}
+theorem exists_min_of_quadratic_lower_bound {field : Site → ℝ} {radius slope : ℝ}
     (hradius : 0 ≤ radius) (hslope : 0 < slope)
     (hlower : ∀ site, radius ^ 2 ≤ squaredSize site → slope * squaredSize site ≤ field site) :
     ∃ point, ∀ site, field point ≤ field site := by
