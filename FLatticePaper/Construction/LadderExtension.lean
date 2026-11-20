@@ -75,7 +75,7 @@ theorem ladderOdd_overlap_indices {den : ℤ} (hden : BaseMask.ladderOdd.Valid d
       omega
     exact Or.inr (Or.inr (Or.inr (Or.inl ⟨hi', rfl⟩)))
 
-private theorem ladderOdd_kernel_overlap {den : ℤ} (hmin : 4 ≤ den) {point : Site}
+theorem ladderOdd_kernel_overlap {den : ℤ} (hmin : 4 ≤ den) {point : Site}
     (hp : point ∈ (BaseMask.ladderOdd.raw den).sites)
     (hq : point + (2 * den, 2) ∈ (BaseMask.ladderOdd.raw den).sites) :
     (point.1 = 0 ∧ point.2 = 0) ∨
@@ -86,7 +86,7 @@ private theorem ladderOdd_kernel_overlap {den : ℤ} (hmin : 4 ≤ den) {point :
   simp only [BaseMask.LadderOddCorner, Prod.fst_add, Prod.snd_add] at hx' hy' hs hs'
   omega
 
-private theorem ladderOdd_transverse_overlap {den : ℤ} {point : Site}
+theorem ladderOdd_transverse_overlap {den : ℤ} {point : Site}
     (hp : point ∈ (BaseMask.ladderOdd.raw den).sites)
     (hq : point + (1 - den, den + 1) ∈ (BaseMask.ladderOdd.raw den).sites) :
     (point.2 = 0 ∧ 1 ≤ point.1 ∧ point.1 ≤ den - 1) ∨
