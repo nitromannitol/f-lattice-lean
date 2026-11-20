@@ -19,6 +19,22 @@ private theorem rotateStaircase_pullback (den : ℤ) (point : Site) :
     QuarterTurn.counterclockwise.mapSite (den, 0) point = (den - point.2, point.1) := by
   apply Prod.ext <;> dsimp [QuarterTurn.mapSite, QuarterTurn.turn] <;> omega
 
+/-- The two physical quarter-turn charts differ by the reciprocal kernel.
+The reciprocal field has zero height increment along that kernel. -/
+theorem rotateStaircaseField_earlierChain {den : ℤ} (hodd : den % 2 = 1) {field : Field} {constantV : ℤ}
+    (hperiod : HasGeneratorPeriods (Fraction.mk 1 den) field 0 constantV) (point : Site) :
+    rotateStaircaseField den field point =
+      field (QuarterTurn.counterclockwise.mapSite (0, -1) point) + centeredQuarterTurnCorrection point := by
+  have hmap : QuarterTurn.counterclockwise.mapSite (den, 0) point =
+      QuarterTurn.counterclockwise.mapSite (0, -1) point + (reciprocalEvenDeck den).kernel := by
+    rw [reciprocalEvenDeck_eq hodd]
+    apply Prod.ext <;> dsimp [QuarterTurn.mapSite, QuarterTurn.turn] <;> ring
+  change field (QuarterTurn.counterclockwise.mapSite (den, 0) point) + centeredQuarterTurnCorrection point = _
+  rw [hmap]
+  have h := hperiod.1 (QuarterTurn.counterclockwise.mapSite (0, -1) point)
+  change field (QuarterTurn.counterclockwise.mapSite (0, -1) point + (reciprocalEvenDeck den).kernel) = _ at h
+  rw [h, add_zero]
+
 theorem rawRotateStaircaseField_chart (den : ℤ) (field : Field) :
     (fun point : Site => rawRotateStaircaseField den field (point + (0, 1))) = rotateStaircaseField den field := by
   funext point

@@ -31,6 +31,7 @@ import FLatticePaper.Construction.StaircaseRotation
 import FLatticePaper.Plane.AlternatePeriods
 import FLatticePaper.Plane.BandBurn
 import FLatticePaper.Plane.BellmanRank
+import FLatticePaper.Plane.EarlierChainPrice
 import FLatticePaper.Plane.EndpointGrowth
 import FLatticePaper.Plane.RecurrenceRotation
 import FLatticePaper.Farey.RationalBirth
