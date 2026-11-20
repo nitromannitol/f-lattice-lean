@@ -183,7 +183,7 @@ theorem stairEvenAlt_cover {den : ℤ} (hden : BaseMask.stairEvenAlt.Valid den) 
     (Fraction.mk 1 den).modifiedDeck.Covers (BaseMask.stairEvenAlt.tile den hden).sites :=
   covers_trim (stairEvenAlt_raw_cover hden) _
 
-private theorem nearOneDeck_eq {den : ℤ} (hodd : den % 2 = 1) :
+theorem nearOneDeck_eq {den : ℤ} (hodd : den % 2 = 1) :
     (Fraction.mk 1 den).rotate.modifiedDeck = ⟨(den + 1, den - 1), (-1, den)⟩ := by
   have heven : (Fraction.mk 1 den).Even := by
     change (1 + den) % 2 = 0
@@ -276,7 +276,7 @@ theorem evaluateNative_threes_even_covers (extra : ℕ) :
   · apply covers_place
     exact stairEvenAlt_cover hvalid
 
-private theorem twos_current_odd (extra : ℕ) :
+theorem twos_current_odd (extra : ℕ) :
     (parentsAt (BaseRun.twos extra).word).current .odd =
       (Fraction.mk 1 (2 * (extra : ℤ) + 3 + 2)).rotate := by
   have hparents := parentsAt_valid (BaseRun.threes extra).word

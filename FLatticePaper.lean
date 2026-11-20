@@ -9,6 +9,7 @@ import FLatticePaper.Construction.StaircaseCoverage
 import FLatticePaper.Construction.StaircaseExtension
 import FLatticePaper.Construction.StaircaseLaplacian
 import FLatticePaper.Construction.StaircaseRank
+import FLatticePaper.Construction.StaircaseRotation
 import FLatticePaper.Plane.AlternatePeriods
 import FLatticePaper.Plane.BandBurn
 import FLatticePaper.Plane.EndpointGrowth

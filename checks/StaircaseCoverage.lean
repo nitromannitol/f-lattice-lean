@@ -1,4 +1,4 @@
-import FLatticePaper.Construction.StaircaseRank
+import FLatticePaper.Construction.StaircaseRotation
 
 namespace FLatticePaper.Checks
 
@@ -46,6 +46,15 @@ theorem long_pure_three_has_recurrent_native_standard :
     evaluateNative_threes_even_standard_recurrent 199
   exact ⟨registers, field, heval, hagree, hgrowth, hrec⟩
 
+theorem long_pure_two_has_recurrent_native_standard :
+    let word := List.replicate 200 .two
+    ∃ registers : TileRegisters, ∃ field : Field,
+      evaluateNative word = .ok registers ∧ registers.standard.currentOdd.val.Agrees field 0 ∧
+      HasQuadraticGrowth field ((parentsAt word).current .odd).matrix ∧ Recurrent field := by
+  obtain ⟨registers, field, heval, hagree, _, hgrowth, _, hrec⟩ :=
+    evaluateNative_twos_odd_standard_recurrent 199
+  exact ⟨registers, field, heval, hagree, hgrowth, hrec⟩
+
 #print axioms PeriodDeck.exists_halfShiftedCell_representative
 #print axioms stairEven_cover
 #print axioms stairEvenAlt_cover
@@ -73,5 +82,11 @@ theorem long_pure_three_has_recurrent_native_standard :
 #print axioms evaluateNative_empty_even_standard_recurrent
 #print axioms evaluateNative_threes_even_standard_recurrent
 #print axioms long_pure_three_has_recurrent_native_standard
+#print axioms harmonic_centeredQuarterTurnCorrection
+#print axioms rotateStaircaseField_periods
+#print axioms stairOdd_exists_recurrent_extension
+#print axioms evaluateNative_empty_odd_standard_recurrent
+#print axioms evaluateNative_twos_odd_standard_recurrent
+#print axioms long_pure_two_has_recurrent_native_standard
 
 end FLatticePaper.Checks

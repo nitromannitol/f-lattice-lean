@@ -228,6 +228,51 @@ private theorem isSome_ite_iff {α : Type*} {p : Prop} [Decidable p] (first seco
       (p ∧ first.isSome) ∨ (¬ p ∧ second.isSome) := by
   by_cases hp : p <;> simp [hp]
 
+/-- The source's B2 pullback in the raw formula coordinates. -/
+theorem mem_stairOdd_raw_pullback_iff {den : ℤ} (point : Site) :
+    point ∈ (stairOdd.raw den).sites ↔ (den + 1 - point.2, point.1) ∈ (stairEven.raw den).sites := by
+  obtain ⟨col, row⟩ := point
+  rw [raw, mem_maskedTile_sites, mem_stairEven_raw_iff]
+  simp only [window, entry, isSome_ite_some, Option.isSome_none, Bool.false_eq_true, or_false,
+    StairEvenCorner]
+  omega
+
+/-- On its literal support, the raw B2 height is the B1 pullback plus the
+integer correction in the source's formula coordinates. -/
+theorem stairOdd_raw_height (den : ℤ) (point : (stairOdd.raw den).sites) :
+    (stairOdd.raw den).height point = stairEvenValue den (den + 1 - point.val.2, point.val.1) +
+      (point.val.1 * (point.val.1 - 1) / 2 - (point.val.1 - point.val.2) ^ 2 / 4) := by
+  obtain ⟨⟨col, row⟩, hmem⟩ := point
+  obtain ⟨_, _, hshape⟩ := (mem_stairEven_raw_iff.mp ((mem_stairOdd_raw_pullback_iff _).mp hmem))
+  have hcorners : StairEvenCorner den (den + 1 - row, col) ↔
+      (col = 0 ∧ row = den + 1) ∨ (col = den + 1 ∧ row = den - 1) := by
+    simp only [StairEvenCorner]
+    omega
+  apply Option.get_of_eq_some
+  change entry .stairOdd den (col, row) = some _
+  simp only [entry, stairEvenValue, hcorners]
+  rw [show den + 1 - row - 1 = den - row by omega]
+  by_cases hcorner : (col = 0 ∧ row = den + 1) ∨ (col = den + 1 ∧ row = den - 1)
+  · rw [if_pos hcorner, if_pos hcorner, Option.some.injEq]
+    omega
+  · have hband := hshape.resolve_left (mt hcorners.mp hcorner)
+    rw [if_neg hcorner, if_neg hcorner, if_pos (by dsimp at hband; omega : -1 ≤ row - col ∧ row - col ≤ den),
+      Option.some.injEq]
+    omega
+
+/-- B2's occupied lower-left in raw formula coordinates is `(0,1)`. -/
+theorem stairOdd_llCenter_agrees {den : ℤ} (hden : stairOdd.Valid den) {field : Field}
+    (hagree : (stairOdd.raw den).Agrees field 0) :
+    ((stairOdd.tile den hden).llCenter (stairOdd.tile_nonempty den hden)).Agrees
+      (fun site => field (site + (0, 1))) 0 := by
+  apply hagree.llCenter_trim (stairOdd.raw_nonempty den hden)
+  · apply (mem_stairOdd_raw_pullback_iff _).mpr
+    have := hden.1
+    apply mem_stairEven_body <;> dsimp <;> omega
+  · intro site hmem
+    have hbounds := (mem_maskedTile_sites _ _ _ site).mp hmem
+    exact ⟨hbounds.2.1.1, fun _ => hbounds.1.1⟩
+
 /-- The standard raw staircase domains are related by the specified quarter-turn. -/
 theorem mem_stairOdd_raw_iff {den : ℤ} (point : Site) :
     QuarterTurn.counterclockwise.mapSite (den + 1, den - 1) point ∈ (stairOdd.raw den).sites ↔

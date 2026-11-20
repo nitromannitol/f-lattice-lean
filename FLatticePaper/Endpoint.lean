@@ -67,6 +67,18 @@ private theorem square_quarter_odd (half : ℤ) : (2 * half + 1) ^ 2 / 4 = half 
     Int.add_mul_ediv_right _ _ (by decide)]
   omega
 
+/-- Modulo four, an integer square has the residue of its parity. -/
+theorem four_mul_square_div_four (value : ℤ) : 4 * (value ^ 2 / 4) = value ^ 2 - value % 2 := by
+  let half := value / 2
+  by_cases hparity : value % 2 = 0
+  · have hvalue : value = 2 * half := by dsimp [half]; omega
+    rw [hparity, hvalue, square_quarter_even]
+    ring
+  · have hparity' : value % 2 = 1 := by omega
+    have hvalue : value = 2 * half + 1 := by dsimp [half]; omega
+    rw [hparity', hvalue, square_quarter_odd]
+    ring
+
 private theorem neg_square_quarter_secondDiff (value : ℤ) :
     (-((value - 1) ^ 2 / 4) - -(value ^ 2 / 4)) +
       (-((value + 1) ^ 2 / 4) - -(value ^ 2 / 4)) = -(value % 2) := by

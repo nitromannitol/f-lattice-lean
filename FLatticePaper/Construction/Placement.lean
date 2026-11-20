@@ -121,4 +121,32 @@ theorem Agrees.trim {tile : HeightTile Site} {target : Field} {gauge : ℤ}
   change (tile.place (-tile.boxOrigin hne) 0).Agrees _ _
   simpa [sub_neg_eq_add] using h.place (-tile.boxOrigin hne) 0
 
+/-- After rectangular trim and occupied lower-left centering, the target is
+read relative to the original tile's least site in row-first order. -/
+theorem Agrees.llCenter_trim {tile : HeightTile Site} {target : Field} {gauge : ℤ}
+    (h : tile.Agrees target gauge) (hne : tile.sites.Nonempty) {point : Site}
+    (hpoint : point ∈ tile.sites)
+    (hmin : ∀ site ∈ tile.sites, point.2 ≤ site.2 ∧ (point.2 = site.2 → point.1 ≤ site.1)) :
+    ((tile.trim hne).llCenter (tile.trim_sites_nonempty hne)).Agrees
+      (fun site => target (site + point)) gauge := by
+  let origin := tile.boxOrigin hne
+  let trimmed := tile.trim hne
+  have htrim : trimmed.sites.Nonempty := tile.trim_sites_nonempty hne
+  have hleft : trimmed.lowerLeft htrim = point - origin := by
+    apply lowerLeft_eq_of_minimal
+    · change point - origin ∈ (tile.place (-origin) 0).sites
+      rwa [mem_place_sites, sub_neg_eq_add, sub_add_cancel]
+    · intro site hmem
+      change site ∈ (tile.place (-origin) 0).sites at hmem
+      rw [mem_place_sites, sub_neg_eq_add] at hmem
+      have := hmin _ hmem
+      simp only [Prod.fst_add, Prod.snd_add] at this
+      simp only [Prod.fst_sub, Prod.snd_sub]
+      omega
+  have hplaced := (h.trim hne).place (-trimmed.lowerLeft htrim) 0
+  change (trimmed.place (-trimmed.lowerLeft htrim) 0).Agrees
+    (fun site => target (site - -trimmed.lowerLeft htrim + origin) + (0 * site.1 + 0 * site.2)) gauge at hplaced
+  change (trimmed.place (-trimmed.lowerLeft htrim) 0).Agrees _ _
+  simpa only [hleft, sub_neg_eq_add, add_assoc, sub_add_cancel, Int.zero_mul, add_zero] using hplaced
+
 end FLatticePaper.Construction.HeightTile
