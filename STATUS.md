@@ -84,14 +84,27 @@ The next constructor dependencies are native support and height comparisons for 
 
 ## GeneralK track · Recurrence on the F-lattice and its generalizations
 
-The separate `FLatticePaper.GeneralK` track covers every integer $k\ge2$. It follows the [November 20 request](docs/GENERAL-K-FOLLOWUP.md) and the [GeneralK source correspondence](docs/GENERAL-K-SOURCE-MAP.md). The local sibling snapshot has its own [checksum manifest](docs/general-k.sha256). The corrected October 2023 manuscript remains the primary campaign.
+The separate `FLatticePaper.GeneralK` track covers every integer $k\ge2$. The [earlier recurrence and finite-cell snapshot](docs/general-k.sha256) and the [November 20 column-classification snapshot](docs/general-k-column.sha256) have separate pins. The [GeneralK source correspondence](docs/GENERAL-K-SOURCE-MAP.md) records both. The corrected October 2023 manuscript remains the primary campaign.
+
+### Real matrix classification
+
+The [updated GeneralK target](docs/GENERAL-K-CLASSIFICATION.md) is Theorem 2.1 of `paper/classification.tex` in the column snapshot. For every real symmetric physical matrix $A(a,b,c)$, membership in $\Gamma_k$ means that an integer superharmonic height has quadratic part $x^T A x/2$ with error $o(\lvert x\rvert^2)$. The theorem requires both directions of
+
+$$
+A(a,b,c)\in\Gamma_k\quad\Longleftrightarrow\quad
+a\le\inf_{u,v\in\mathbb Q,\ v<c}\left(p_k(u,v)+\frac{(b-u)^2}{c-v}\right),
+$$
+
+where $p_k$ comes from the explicit bounded column graphs and maximum simple directed cycle means. Each rational endpoint must have an integer superharmonic witness at the boundary. The closure of the union of its downward semidefinite cones must give all of $\Gamma_k$, including irrational boundaries. The mesh inclusions, the global semidefinite-maximality criterion, the $1/k$-grid gcd formula and harmonic translations, and the canonical critical parameters and period index on that grid are distinct targets.
+
+The column snapshot supplies a written proof. The corresponding GeneralK Lean declarations are open. For the smaller arithmetic critical family, record its admission direction and the proved grid and terminal-contact cases separately. Geometric critical exhaustion for $k\ge3$ remains open.
 
 ### Proof queue
 
-1. Define the physical operator, prove the equivalence between finite strongly connected comparison, absence of a forbidden set, and absence of a finite legal lowering. Prove the chain test with both endpoint bits, their coincidence at $k=2$, and the explicit forbidden interval with two black interior sites.
-2. Classify all residue-only binary charges, construct a physical height for every charge pattern, and give explicit finite countersets when two residues are black.
-3. Prove least integer concave completion, the exact retained comparison and its zero-operator case. Derive the scalar odometers and the integer weighted-trace classification, including the leftmost-column argument and the interior case.
-4. Prove termination and exact acceptance at every refinement scale for the real growth set, including the boundary criterion. The source makes no critical-circle classification claim.
-5. Track the sibling's $k=2$ staircase and Farey results against their own hypotheses and coordinates. The primary open items above track the literal native identification, coverage and mixed-word induction.
+1. Define the physical operator and growth set, prove least integer concave completion, derive the exact reduced row in the physical columns $(i,kr-i)$, and prove the retained comparison and its zero-operator case. Prove the finite-cell equivalence, closedness, and semidefinite downward closure.
+2. Define the explicit finite weighted graphs and $p_k$. Prove cycle admission by constructing a height. Prove the rational upper bound using exact periodic realization, the least integer superharmonic obstacle majorant, the explicit Fourier bound on column differences, and finite cycle erasure. Derive the real equivalence, both cone inclusions and the mesh and maximality results.
+3. Develop the harmonic translations, the gcd endpoint formula on the $1/k$ grid, and the canonical critical parameters and exact grid period index. These are separate from the general Fourier bound.
+4. Prove the forbidden-set equivalences, chain test with both endpoint bits and their coincidence at $k=2$, and explicit forbidden intervals. Classify residue-only binary charges, realize all such patterns by integer heights, and derive the scalar odometers and the integer weighted-trace classification with its leftmost-column argument.
+5. Track the sibling's $k=2$ staircase and Farey results under their own conventions. The primary campaign above tracks the corrected October 2023 native height identification, coverage and mixed-word induction.
 
-The GeneralK statements are queued. The primary checked results listed above concern the corrected October 2023 manuscript.
+The GeneralK results are queued. No GeneralK Lean declarations have landed.

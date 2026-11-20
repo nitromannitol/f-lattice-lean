@@ -1,13 +1,35 @@
 # GeneralK source correspondence
 
-The sibling manuscript *Recurrence on the F-lattice and its generalizations* is in `/home/nitro/flattice-simple-proof-reference`. Verify its TeX sources and PDF from the campaign repository root.
+The sibling manuscript *Recurrence on the F-lattice and its generalizations* has two local snapshots. The earlier snapshot gives the recurrence and finite-cell results. The November 20 column snapshot gives the complete real matrix classification by explicit cycle data. Verify both pins from the campaign repository root.
 
 ```sh
 (cd /home/nitro/flattice-simple-proof-reference &&
   sha256sum --quiet -c /home/nitro/flattice-lean/docs/general-k.sha256)
+(cd /home/nitro/flattice-simple-proof-reference/column-classification-20261120 &&
+  sha256sum --quiet -c /home/nitro/flattice-lean/docs/general-k-column.sha256)
 ```
 
 The GeneralK namespace is `FLatticePaper.GeneralK`. The [corrected October 2023 source map](../SOURCE-MAP.md) records the obligations for the primary manuscript and its literal constructor.
+
+## Column-classification snapshot
+
+These are pending Lean targets from the [updated GeneralK request](GENERAL-K-CLASSIFICATION.md). `A(a,b,c)` is the real symmetric physical matrix with diagonal $(a,c)$ and off-diagonal $b$. Congruence by $B$ applies when explicitly moving to the retained coordinates of the critical family.
+
+| Pinned source | Statement and dependencies |
+| --- | --- |
+| `paper/classification.tex:12–25,301–315`, `thm:classification`, `eq:parabolic` | For all integers $k\ge2$ and all real $a,b,c$, existence of an integer superharmonic height with growth $A(a,b,c)$ is equivalent to $a\le\inf_{u,v\in\mathbb Q,\ v<c}(p_k(u,v)+(b-u)^2/(c-v))$. On rational $(b,c)$ slices this means $a\le p_k(b,c)$ for arbitrary real $a$. Each rational endpoint is admitted and on the boundary. Prove both inclusions for the closure of the union of downward PSD cones under the rational endpoints. The real passage uses PSD downward closure, closedness from `thm:cell`, and rational approximants $u_h$ nearest to $b$ on the $1/h$ mesh and $v_h=(\lfloor hc\rfloor-1)/h$ with correction at most $1/(4h)$. |
+| `paper/classification.tex:32–114`, `lem:periodicphysical` | For rational admitted $A$ and **any** full-rank lattice $P$ of phase-preserving integer-action shifts, construct an integer superharmonic height with the same $A$, rational linear tilt, and bounded $P$-periodic remainder. Formalize the translated limits, envelope with an affine increment, periodic edge-label constraints, difference-constraints cycles, and independent-winding tight-cycle argument on the physical torus. |
+| `paper/classification.tex:116–182`, `eq:columnrow`, `eq:widthbound`, `eq:rowweight`, `eq:cyclepeak` | At the retained site $(i,kr-i)$ the first ceiling uses rows $r,r+1$ in column $i+1$ and the second uses rows $r,r-1$ in column $i-1$. Define the harmonic lower bound $a_0$, least $L,S$, sectors $0\le d<kL$, reference $J$, bounds $D,K,E$ and integer shapes $s(0)=0$, $\lvert s(r)\rvert\le E$. The vertices are $(i\bmod S,s_-,s_0)$ and an edge appends $s_+$ with weight $-\max_r T(J+s)_i(r)$. The explicit endpoint is $a_0$ plus the maximum simple directed cycle mean over all sectors. |
+| `paper/classification.tex:217–299` | Admission repeats a cycle and solves its integer second-difference equation, then applies the least physical chain lift. The rational upper bound uses periodic realization, the least integer superharmonic obstacle majorant, charges in $[0,D]$, the resulting bound $\lvert\mathcal L(f-J)\rvert\le K$, and the explicit Fourier contraction on nonzero column modes. Cycle erasure bounds the average path weight. Track the $L=2$ bound and sector reduction by $\gcd(kL,vL,wL)$ under their stated scopes. |
+| `paper/classification.tex:184–215`, `cor:columns` | When $kb,kc\in\mathbb Z$, prove $p_k(b,c)=-(k-1)c-1+\gcd(k,k(b-c))/k$. Check the finite residue averages, the harmonic representative with Hessian $H(s,t)=A(-(k-1)s,s+t,s)$ for $ks,t\in\mathbb Z$, and the endpoint translation identity $p_k(b+s+t,c+s)=p_k(b,c)-(k-1)s$. |
+| `paper/classification.tex:317–329`, `eq:mesh` | For every $h\ge1$, prove $\Gamma_k-2I/h\subseteq\mathcal C_h\subseteq\Gamma_k$ where $\mathcal C_h$ uses the same endpoints restricted to $hu,hv\in\mathbb Z$. |
+| `paper/classification.tex:331–365`, `cor:maxclassification` | Prove global PSD maximality iff $a=P_k(b,c)$ and, for every integer $n\ge1$, the supremum of $p_k(u,v)-(u-b)^2/(v-c)$ over rational $u,v$ with $v\ge c+1/n$ is strictly below $a$. The compactness argument uses the physical torus trace bound $a+(k-1)c\le0$ and closedness. |
+| `paper/classification.tex:367–399`, `cor:gridcritical` | For grid slices set $g=\gcd(k,k(b-c))$, $n=k/g$, $\ell=k(b-c)/g$, $j=1-2\ell-n(kc+1)$. Under $B^T A B$ verify the canonical critical apex, the divisibility $n\mid j^2-j+2j\ell+k\ell^2$, its exact period index $n$, and domination of the whole slice. |
+| `paper/classification.tex:367–378`, `paper/seam.tex`, `prop:seam`, and `research/critical-exhaustion.md` | Track the admission direction for the smaller arithmetic critical hull, the terminal-contact reductions and the explicit proved seam separately. Exhaustion of $\Gamma_k$ by this smaller family for $k\ge3$ remains open. |
+
+`classify_matrices.py` and `checks/matrix_classification.py` give executable checks for the column formulas. The Lean theorem must quantify over all real matrices and use the actual height predicate and cycle data.
+
+## Earlier recurrence and finite-cell snapshot
 
 | Local source | Proof obligation |
 | --- | --- |

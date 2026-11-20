@@ -2,6 +2,8 @@
 
 The corrected October 2023 edition is pinned by [paper.sha256](paper.sha256). The links below locate its statements and the exact sparse Julia constructor delivered with it. `sha256sum --quiet -c paper.sha256` verifies the sources locally.
 
+The independent classification for every $k\ge2$ has its own [GeneralK source correspondence](docs/GENERAL-K-SOURCE-MAP.md).
+
 | Source | Lean result or outstanding obligation |
 | --- | --- |
 | Physical graph, integer superharmonicity and incoming boundary, [introduction, lines 32–49](paper/farey_recursion.tex#L32), `eq:superharmonic` | [Graph.lean](FLatticePaper/Graph.lean) defines `Site`, `Field`, `EvenSite`, `Edge`, `laplacian`, `Superharmonic`, `incomingBoundary` and `incomingDegree` on physical integer coordinates. `incomingNeg_ne_incomingPos` verifies that the signed slots count distinct inputs. |
