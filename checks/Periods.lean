@@ -1,4 +1,6 @@
 import FLatticePaper.Construction.AlternateLadderExtension
+import FLatticePaper.Construction.AlternateLadderLaplacian
+import FLatticePaper.Construction.AlternateLadderRankCorrection
 import FLatticePaper.Construction.AlternateLadderReflection
 import FLatticePaper.Construction.AlternateLadderRotation
 import FLatticePaper.Construction.LadderExtension
@@ -110,6 +112,23 @@ theorem reciprocal_alternate_ladder_four_laplacian_reflection :
   obtain ⟨field, hagree, hperiod, _⟩ := ladderOddAlt_exists_extension hvalid
   exact ⟨field, hagree, laplacian_ladderOddAltField_reflection hvalid hagree hperiod⟩
 
+theorem reciprocal_alternate_ladder_four_has_binary_plane_laplacian :
+    ∃ field : Field, (BaseMask.ladderOddAlt.raw 4).Agrees field 0 ∧
+      ∀ point, laplacian field point = -1 ∨ laplacian field point = 0 := by
+  have hvalid : BaseMask.ladderOddAlt.Valid 4 := by simp [BaseMask.Valid]
+  obtain ⟨field, hagree, hperiod, _⟩ := ladderOddAlt_exists_extension hvalid
+  exact ⟨field, hagree, ladderOddAlt_binary_laplacian hvalid hagree hperiod⟩
+
+theorem reciprocal_alternate_ladder_four_rank_agrees_on_corner_overlap :
+    ∃ correction : Field, correction (-1, -1) = 4 ∧ correction (4, 6) = 4 ∧
+      Function.Periodic correction (5, 7) := by
+  have hvalid : BaseMask.ladderOddAlt.Valid 4 := by simp [BaseMask.Valid]
+  obtain ⟨correction, hagree, hperiod⟩ := ladderOddAlt_exists_periodic_rankCorrection hvalid
+  have hfirst : ((-1, -1) : Site) ∈ (BaseMask.ladderOddAlt.raw 4).sites := by decide +kernel
+  have hsecond : ((4, 6) : Site) ∈ (BaseMask.ladderOddAlt.raw 4).sites := by decide +kernel
+  have hstep : ((5, 7) : Site) ∈ (reciprocalLadderDeck 4).span := ⟨1, 1, rfl⟩
+  exact ⟨correction, (hagree _ hfirst).trans (by decide), (hagree _ hsecond).trans (by decide), hperiod _ hstep⟩
+
 #print axioms Fraction.integralLattice_eq_span
 #print axioms Fraction.mem_modifiedDeck_iff_integral_even
 #print axioms evaluateNative_empty_covers
@@ -166,5 +185,11 @@ theorem reciprocal_alternate_ladder_four_laplacian_reflection :
 #print axioms two_even_ladders_have_distinct_plane_extensions
 #print axioms ladderOddAltField_reflection
 #print axioms reciprocal_alternate_ladder_four_laplacian_reflection
+#print axioms ladderOddAlt_laplacian_on_raw
+#print axioms ladderOddAlt_binary_laplacian
+#print axioms ladderOddAlt_rankCorrection_class_constant
+#print axioms ladderOddAlt_exists_periodic_rankCorrection
+#print axioms reciprocal_alternate_ladder_four_has_binary_plane_laplacian
+#print axioms reciprocal_alternate_ladder_four_rank_agrees_on_corner_overlap
 
 end FLatticePaper.Checks

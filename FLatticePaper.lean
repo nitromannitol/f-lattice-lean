@@ -1,5 +1,7 @@
 import FLatticePaper.Endpoint
 import FLatticePaper.Construction.AlternateLadderExtension
+import FLatticePaper.Construction.AlternateLadderLaplacian
+import FLatticePaper.Construction.AlternateLadderRankCorrection
 import FLatticePaper.Construction.AlternateLadderReflection
 import FLatticePaper.Construction.AlternateLadderRotation
 import FLatticePaper.Construction.AlternateStaircaseLaplacian
