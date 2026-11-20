@@ -21,6 +21,14 @@ theorem covers_trim {deck : PeriodDeck} {tile : HeightTile Site}
     deck.Covers (tile.trim hne).sites :=
   covers_place hcover _ _
 
+theorem covers_of_place {deck : PeriodDeck} {tile : HeightTile Site} (offset slope : Site)
+    (hcover : deck.Covers (tile.place offset slope).sites) : deck.Covers tile.sites := by
+  intro site
+  obtain ⟨point, hpoint, hspan⟩ := hcover (site + offset)
+  refine ⟨point - offset, (tile.mem_place_sites offset slope _).mp hpoint, ?_⟩
+  have heq : site - (point - offset) = site + offset - point := by abel
+  rwa [heq]
+
 private theorem int_le_of_lt_cast_succ {first second : ℤ}
     (hlt : (first : ℝ) < (second : ℝ) + 1) : first ≤ second := by
   have : first < second + 1 := by exact_mod_cast hlt
@@ -186,8 +194,31 @@ private theorem nearOneDeck_eq {den : ℤ} (hodd : den % 2 = 1) :
     if_neg hsum]
   apply congrArg₂ PeriodDeck.mk <;> apply Prod.ext <;> dsimp <;> omega
 
-/-- Under the counterclockwise turn, the reciprocal generators become the
-near-one transverse generator and the negative near-one kernel generator. -/
+/-- Transport coverage when a counterclockwise turn takes the two original
+generators to the new transverse generator and the negative new kernel. -/
+theorem covers_counterclockwise {before after : PeriodDeck} {original rotated : Finset Site}
+    (offset : Site)
+    (hkernel : QuarterTurn.counterclockwise.turn before.kernel = after.transverse)
+    (htransverse : QuarterTurn.counterclockwise.turn before.transverse = -after.kernel)
+    (hmap : ∀ point ∈ original, QuarterTurn.counterclockwise.mapSite offset point ∈ rotated)
+    (hcover : before.Covers original) : after.Covers rotated := by
+  intro site
+  obtain ⟨point, rfl⟩ := (QuarterTurn.counterclockwise.siteEquiv offset).surjective site
+  obtain ⟨representative, hrep, kernel, transverse, hspan⟩ := hcover point
+  refine ⟨_, hmap representative hrep, -transverse, kernel, Prod.ext ?_ ?_⟩
+  · have hk := congrArg Prod.fst hkernel
+    have ht := congrArg Prod.fst htransverse
+    have h := congrArg Prod.snd hspan
+    dsimp [QuarterTurn.turn] at hk ht
+    dsimp [QuarterTurn.siteEquiv, QuarterTurn.mapSite, QuarterTurn.turn, PeriodDeck.combine] at h ⊢
+    linear_combination -h + kernel * hk + transverse * ht
+  · have hk := congrArg Prod.snd hkernel
+    have ht := congrArg Prod.snd htransverse
+    have h := congrArg Prod.fst hspan
+    dsimp [QuarterTurn.turn] at hk ht
+    dsimp [QuarterTurn.siteEquiv, QuarterTurn.mapSite, QuarterTurn.turn, PeriodDeck.combine] at h ⊢
+    linear_combination h + kernel * hk + transverse * ht
+
 private theorem covers_nearOne_of_mapSite {den : ℤ} (hodd : den % 2 = 1)
     {reciprocal nearOne : Finset Site} (offset : Site)
     (hmap : ∀ point ∈ reciprocal, QuarterTurn.counterclockwise.mapSite offset point ∈ nearOne)
@@ -195,20 +226,8 @@ private theorem covers_nearOne_of_mapSite {den : ℤ} (hodd : den % 2 = 1)
     (Fraction.mk 1 den).rotate.modifiedDeck.Covers nearOne := by
   rw [reciprocalEvenDeck_eq hodd] at hcover
   rw [nearOneDeck_eq hodd]
-  intro site
-  obtain ⟨point, rfl⟩ := (QuarterTurn.counterclockwise.siteEquiv offset).surjective site
-  obtain ⟨representative, hrep, kernel, transverse, hspan⟩ := hcover point
-  refine ⟨_, hmap representative hrep, -transverse, kernel, Prod.ext ?_ ?_⟩
-  · have h := congrArg Prod.snd hspan
-    change point.2 - representative.2 = kernel * 1 + transverse * (1 + den) at h
-    change -point.2 + offset.1 - (-representative.2 + offset.1) =
-      -transverse * (den + 1) + kernel * (-1)
-    linear_combination -h
-  · have h := congrArg Prod.fst hspan
-    change point.1 - representative.1 = kernel * den + transverse * (1 - den) at h
-    change point.1 + offset.2 - (representative.1 + offset.2) =
-      -transverse * (den - 1) + kernel * den
-    linear_combination h
+  refine covers_counterclockwise offset rfl ?_ hmap hcover
+  apply Prod.ext <;> dsimp [QuarterTurn.turn] <;> omega
 
 theorem stairOdd_cover {den : ℤ} (hden : BaseMask.stairOdd.Valid den) :
     (Fraction.mk 1 den).rotate.modifiedDeck.Covers (BaseMask.stairOdd.tile den hden).sites := by
@@ -222,7 +241,7 @@ theorem stairOddAlt_cover {den : ℤ} (hden : BaseMask.stairOddAlt.Valid den) :
   exact covers_nearOne_of_mapSite hden.2 (den, 2 * den - 3)
     (fun point hmem => (BaseMask.mem_stairOddAlt_raw_iff point).mpr hmem) (stairEvenAlt_raw_cover hden)
 
-private theorem parentsAt_replicate_three (count : ℕ) :
+theorem parentsAt_replicate_three (count : ℕ) :
     parentsAt (List.replicate count .three) = ⟨⟨0, 1⟩, ⟨1, 2 * (count : ℤ) + 1⟩⟩ := by
   induction count with
   | zero => rfl

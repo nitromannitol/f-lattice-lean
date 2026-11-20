@@ -42,7 +42,8 @@ def TileRegisters.llCenter (tiles : TileRegisters) : TileRegisters :=
 inductive EndpointAtom where
   | zero | one
 
-private def EndpointAtom.atOrigin : EndpointAtom → NonemptyTile
+/-- The literal endpoint mask before its attachment to the current standard. -/
+def EndpointAtom.atOrigin : EndpointAtom → NonemptyTile
   | .zero =>
     ⟨maskedTile (0, 0) (1, 2) (fun site => some (if site.2 = 2 then -1 else 0)),
       ⟨(0, 0), by decide⟩⟩

@@ -170,6 +170,11 @@ private theorem isSome_ite_some {α : Type*} {p : Prop} [Decidable p] (value : �
     (other : Option α) : (if p then some value else other).isSome ↔ p ∨ other.isSome := by
   by_cases hp : p <;> simp [hp]
 
+private theorem isSome_ite_iff {α : Type*} {p : Prop} [Decidable p] (first second : Option α) :
+    (if p then first else second).isSome ↔
+      (p ∧ first.isSome) ∨ (¬ p ∧ second.isSome) := by
+  by_cases hp : p <;> simp [hp]
+
 /-- The standard raw staircase domains are related by the specified quarter-turn. -/
 theorem mem_stairOdd_raw_iff {den : ℤ} (point : Site) :
     QuarterTurn.counterclockwise.mapSite (den + 1, den - 1) point ∈ (stairOdd.raw den).sites ↔
@@ -189,6 +194,64 @@ theorem mem_stairOddAlt_raw_iff {den : ℤ} (point : Site) :
   simp only [raw, mem_maskedTile_sites, window, QuarterTurn.mapSite, QuarterTurn.turn,
     Prod.fst_add, Prod.snd_add, entry, isSome_ite_some, Option.isSome_none, Bool.false_eq_true,
     or_false]
+  omega
+
+theorem mem_ladderOdd_body {den : ℤ} {point : Site}
+    (hx : 2 - den ≤ point.1 ∧ point.1 ≤ 2 * den)
+    (hy : 0 ≤ point.2 ∧ point.2 ≤ den + 2)
+    (hband : 1 ≤ point.1 + point.2 ∧ point.1 + point.2 ≤ 2 * den + 3)
+    (hstrip : ¬ ((point.2 = 0 ∧ den ≤ point.1) ∨ (point.2 = den + 2 ∧ point.1 ≤ 2))) :
+    point ∈ (ladderOdd.raw den).sites := by
+  rw [raw, mem_maskedTile_sites]
+  refine ⟨hx, hy, ?_⟩
+  obtain ⟨col, row⟩ := point
+  simp only [entry, isSome_ite_some, Option.isSome_none, Bool.false_eq_true, or_false]
+  exact Or.inr ⟨hband.1, hband.2, hstrip⟩
+
+theorem mem_ladderOddAlt_placed_body {den : ℤ} {point : Site}
+    (hx : 2 - den ≤ point.1 ∧ point.1 ≤ 2 * den - 1)
+    (hy : 0 ≤ point.2 ∧ point.2 ≤ den + 3)
+    (hband : 1 ≤ point.1 + point.2 ∧ point.1 + point.2 ≤ 2 * den + 3)
+    (hstrip : ¬ ((point.2 ≤ 1 ∧ den + 1 ≤ point.1) ∨ (den + 2 ≤ point.2 ∧ point.1 ≤ 0))) :
+    point ∈ ((ladderOddAlt.raw den).place (1, 1) 0).sites := by
+  rw [HeightTile.mem_place_sites, raw, mem_maskedTile_sites]
+  obtain ⟨col, row⟩ := point
+  simp only [window, Prod.mk_sub_mk, entry, isSome_ite_iff, Option.isSome_some, Option.isSome_none,
+    Bool.false_eq_true, and_true, and_false, or_false]
+  omega
+
+theorem zero_mem_ladderOddAlt_placed {den : ℤ} (hden : 4 ≤ den) :
+    (0 : Site) ∈ ((ladderOddAlt.raw den).place (1, 1) 0).sites := by
+  rw [HeightTile.mem_place_sites, raw, mem_maskedTile_sites]
+  refine ⟨⟨?_, ?_⟩, ⟨?_, ?_⟩, ?_⟩
+  · change 1 - den ≤ -1
+    omega
+  · change -1 ≤ 2 * den - 2
+    omega
+  · change (-1 : ℤ) ≤ -1
+    decide
+  · change -1 ≤ den + 2
+    omega
+  · simp only [entry]
+    rw [if_pos (Or.inl ⟨rfl, rfl⟩)]
+    rfl
+
+theorem mem_ladderEven_raw_iff {den : ℤ} (point : Site) :
+    QuarterTurn.counterclockwise.mapSite (den + 1, den - 1) point ∈ (ladderEven.raw den).sites ↔
+      point ∈ (ladderOdd.raw den).sites := by
+  obtain ⟨col, row⟩ := point
+  simp only [raw, mem_maskedTile_sites, window, QuarterTurn.mapSite, QuarterTurn.turn,
+    Prod.fst_add, Prod.snd_add, entry, isSome_ite_some, Option.isSome_none, Bool.false_eq_true,
+    or_false]
+  omega
+
+theorem mem_ladderEvenAlt_raw_iff {den : ℤ} (point : Site) :
+    QuarterTurn.counterclockwise.mapSite (den, den) point ∈ (ladderEvenAlt.raw den).sites ↔
+      point ∈ (ladderOddAlt.raw den).sites := by
+  obtain ⟨col, row⟩ := point
+  simp only [raw, mem_maskedTile_sites, window, QuarterTurn.mapSite, QuarterTurn.turn,
+    Prod.fst_add, Prod.snd_add, entry, isSome_ite_iff, Option.isSome_some, Option.isSome_none,
+    Bool.false_eq_true, and_true, and_false, or_false]
   omega
 
 end BaseMask
