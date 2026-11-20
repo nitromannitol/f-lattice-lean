@@ -98,14 +98,24 @@ $$
 
 where $p_k$ comes from the explicit bounded column graphs and maximum simple directed cycle means. Each rational endpoint must have an integer superharmonic witness at the boundary. The closure of the union of its downward semidefinite cones must give all of $\Gamma_k$, including irrational boundaries. The mesh inclusions, the global semidefinite-maximality criterion, the $1/k$-grid gcd formula and harmonic translations, and the canonical critical parameters and period index on that grid are distinct targets.
 
-The column snapshot supplies a written proof. The corresponding GeneralK Lean declarations are open. For the smaller arithmetic critical family, record its admission direction and the proved grid and terminal-contact cases separately. Geometric critical exhaustion for $k\ge3$ remains open.
+The column snapshot supplies a written proof. The real equivalence, explicit cycle endpoint theorem and stated corollaries remain open in Lean. For the smaller arithmetic critical family, record its admission direction and the proved grid and terminal-contact cases separately. Geometric critical exhaustion for $k\ge3$ remains open.
+
+### Checked on Lean 4.32.0
+
+[Columns.lean](FLatticePaper/GeneralK/Columns.lean) defines the physical operator with horizontal inputs at coordinate sum zero modulo $k$. `laplacian_two` specializes it to the primary physical graph. `laplacian_liftColumns_columnSite` derives both weighted ceilings at the actual incoming sites, `laplacian_liftColumns_openChain` gives the exact slope drop, and `superharmonic_liftColumns_iff` proves the equivalence for the displayed concave lift. Pointwise leastness among other integer concave extensions is open. The [consumer](checks/GeneralKColumns.lean) checks a retained row and an interior slope drop in a negative column at $k=3$.
+
+The $k=2$ specialization is axiom-free. The interpolation, Laplacian, lift equivalence and both consumers report only `[propext, Classical.choice, Quot.sound]`.
+
+```sh
+export PATH="$HOME/.elan/bin:$PATH"
+lake build FLatticePaper.GeneralK.Columns
+lake env lean checks/GeneralKColumns.lean
+```
 
 ### Proof queue
 
-1. Define the physical operator and growth set, prove least integer concave completion, derive the exact reduced row in the physical columns $(i,kr-i)$, and prove the retained comparison and its zero-operator case. Prove the finite-cell equivalence, closedness, and semidefinite downward closure.
+1. Define the growth set from the physical operator, prove pointwise leastness and monotonicity of the checked column lift, and prove the retained comparison and its zero-operator case. Prove the finite-cell equivalence, closedness, and semidefinite downward closure.
 2. Define the explicit finite weighted graphs and $p_k$. Prove cycle admission by constructing a height. Prove the rational upper bound using exact periodic realization, the least integer superharmonic obstacle majorant, the explicit Fourier bound on column differences, and finite cycle erasure. Derive the real equivalence, both cone inclusions and the mesh and maximality results.
 3. Develop the harmonic translations, the gcd endpoint formula on the $1/k$ grid, and the canonical critical parameters and exact grid period index. These are separate from the general Fourier bound.
 4. Prove the forbidden-set equivalences, chain test with both endpoint bits and their coincidence at $k=2$, and explicit forbidden intervals. Classify residue-only binary charges, realize all such patterns by integer heights, and derive the scalar odometers and the integer weighted-trace classification with its leftmost-column argument.
 5. Track the sibling's $k=2$ staircase and Farey results under their own conventions. The primary campaign above tracks the corrected October 2023 native height identification, coverage and mixed-word induction.
-
-The GeneralK results are queued. No GeneralK Lean declarations have landed.
