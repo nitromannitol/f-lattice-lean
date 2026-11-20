@@ -1,3 +1,4 @@
+import FLatticePaper.Construction.AlternateStaircaseRankCorrection
 import FLatticePaper.Construction.AlternateStaircaseRotation
 import FLatticePaper.Construction.AlternateStaircaseSeams
 
@@ -50,6 +51,17 @@ theorem reciprocal_alternate_left_corner_has_physical_laplacian_neg_one :
     stairEvenAltResidual_on_raw hvalid hagree hperiod hsite]
   decide
 
+theorem reciprocal_alternate_corner_and_diagonal_share_periodic_rank_correction :
+    ∃ correction : Field, correction (-2, 0) = 24 ∧ correction (1, 1) = 24 ∧
+      Function.Periodic correction (3, 1) := by
+  have hvalid : BaseMask.stairEvenAlt.Valid 3 := by simp [BaseMask.Valid]
+  obtain ⟨correction, hagree, hperiodic⟩ := stairEvenAlt_exists_periodic_rankCorrection hvalid
+  have hcorner : ((-2, 0) : Site) ∈ (BaseMask.stairEvenAlt.raw 3).sites := by decide +kernel
+  have hdiag : ((1, 1) : Site) ∈ (BaseMask.stairEvenAlt.raw 3).sites := by decide +kernel
+  have hstep : ((3, 1) : Site) ∈ (reciprocalEvenDeck 3).span := ⟨1, 0, rfl⟩
+  exact ⟨correction, (hagree _ hcorner).trans (by decide), (hagree _ hdiag).trans (by decide),
+    hperiodic _ hstep⟩
+
 /-- The stored root alternate needs its physical chart. Its centered
 coordinates alone give a positive Laplacian at `(2,2)`. -/
 theorem centered_root_alternate_has_no_unshifted_superharmonic_extension :
@@ -88,6 +100,9 @@ theorem centered_root_alternate_has_no_unshifted_superharmonic_extension :
 #print axioms stairEvenAltResidual_incomingNeg_odd
 #print axioms stairEvenAltResidual_incomingPos_reflect
 #print axioms reciprocal_alternate_left_corner_has_physical_laplacian_neg_one
+#print axioms stairEvenAlt_rankCorrection_class_constant
+#print axioms stairEvenAlt_exists_periodic_rankCorrection
+#print axioms reciprocal_alternate_corner_and_diagonal_share_periodic_rank_correction
 #print axioms stairEvenAltField_agrees
 #print axioms stairEvenAlt_exists_extension
 #print axioms evaluateNative_empty_even_alternate_extension

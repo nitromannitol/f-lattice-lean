@@ -138,7 +138,7 @@ theorem stairEven_raw_cover {den : ℤ} (hden : BaseMask.stairEven.Valid den) :
   simp [PeriodDeck.combine]
   rfl
 
-private theorem stairEvenAlt_raw_cover {den : ℤ} (hden : BaseMask.stairEvenAlt.Valid den) :
+theorem stairEvenAlt_raw_cover {den : ℤ} (hden : BaseMask.stairEvenAlt.Valid den) :
     (reciprocalEvenDeck den).Covers (BaseMask.stairEvenAlt.raw den).sites := by
   obtain ⟨hmin, hodd⟩ := hden
   apply PeriodDeck.covers_of_halfShiftedCell _ (ne_of_gt (reciprocalEvenDeck_pos hmin))

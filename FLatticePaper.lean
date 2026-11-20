@@ -1,4 +1,5 @@
 import FLatticePaper.Endpoint
+import FLatticePaper.Construction.AlternateStaircaseRankCorrection
 import FLatticePaper.Construction.AlternateStaircaseRotation
 import FLatticePaper.Construction.AlternateStaircaseSeams
 import FLatticePaper.Construction.BaseRegisters

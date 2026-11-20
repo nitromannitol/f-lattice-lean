@@ -107,7 +107,7 @@ theorem stairEvenAltMarker_eq_of_level_bounds {den : ℤ} (hmin : 3 ≤ den) (po
   · rintro ⟨row, hrow, heq⟩
     exact ⟨row, hrow, congrArg (· % (Fraction.mk 1 den).periodDenominator) heq⟩
 
-private theorem stairEvenAlt_level_bounds {den : ℤ} (hmin : 3 ≤ den) {point : Site}
+theorem stairEvenAlt_level_bounds {den : ℤ} (hmin : 3 ≤ den) {point : Site}
     (hmem : point ∈ (BaseMask.stairEvenAlt.raw den).sites) :
     3 - (Fraction.mk 1 den).periodDenominator ≤ staircaseLevel den point ∧ staircaseLevel den point ≤ den := by
   obtain ⟨hx, _, hshape⟩ := BaseMask.mem_stairEvenAlt_raw_iff.mp hmem
