@@ -1,4 +1,5 @@
 import FLatticePaper.Endpoint
+import FLatticePaper.Construction.AlternateStaircaseReflection
 import FLatticePaper.Construction.BaseRegisters
 import FLatticePaper.Construction.Chronology
 import FLatticePaper.Construction.CorrectionHeight

@@ -228,6 +228,57 @@ private theorem isSome_ite_iff {α : Type*} {p : Prop} [Decidable p] (first seco
       (p ∧ first.isSome) ∨ (¬ p ∧ second.isSome) := by
   by_cases hp : p <;> simp [hp]
 
+/-- The body, both rails, and the two isolated corners of the raw B3 mask. -/
+theorem mem_stairEvenAlt_raw_iff {den : ℤ} {point : Site} :
+    point ∈ (stairEvenAlt.raw den).sites ↔
+      (4 - 2 * den ≤ point.1 ∧ point.1 ≤ den) ∧ (-1 ≤ point.2 ∧ point.2 ≤ den + 1) ∧
+      ((0 ≤ point.2 ∧ point.2 ≤ den ∧ 2 - den ≤ point.1 + point.2 ∧ point.1 + point.2 ≤ den + 2) ∨
+       (point.2 = -1 ∧ 1 - den ≤ point.1 ∧ point.1 ≤ 0) ∨
+       (point.2 = den + 1 ∧ 4 - den ≤ point.1 ∧ point.1 ≤ 3) ∨
+       (point.1 = 1 - den ∧ point.2 = 0) ∨ (point.1 = 3 ∧ point.2 = den)) := by
+  obtain ⟨col, row⟩ := point
+  rw [raw, mem_maskedTile_sites]
+  simp only [window, entry, isSome_ite_some, Option.isSome_none, Bool.false_eq_true, or_false]
+  omega
+
+/-- The polynomial and the three piecewise linear terms of B3. -/
+def stairEvenAltBackground (den : ℤ) (point : Site) : ℤ :=
+  -(point.2 * (point.2 + 1) / 2) + min 0 (2 - point.1) +
+    min 0 (den - 2 + point.1) + max (point.1 + point.2 - 2) 0
+
+abbrev StairEvenAltBump (den : ℤ) (point : Site) : Prop :=
+  (point.1 + point.2 = 2 ∧ 0 < point.2 ∧ point.2 < den) ∨
+    (point.1 = 1 - den ∧ (point.2 = 0 ∨ point.2 = -1)) ∨
+    (point.1 = 3 ∧ (point.2 = den ∨ point.2 = den + 1))
+
+theorem stairEvenAlt_raw_height (den : ℤ) (point : (stairEvenAlt.raw den).sites) :
+    (stairEvenAlt.raw den).height point = stairEvenAltBackground den point.val +
+      (if StairEvenAltBump den point.val then 1 else 0) := by
+  obtain ⟨⟨col, row⟩, hmem⟩ := point
+  have hentry := ((mem_maskedTile_sites _ _ _ _).mp hmem).2.2
+  change (entry .stairEvenAlt den (col, row)).isSome at hentry
+  apply Option.get_of_eq_some
+  change entry .stairEvenAlt den (col, row) = some _
+  by_cases h : StairEvenAltBump den (col, row)
+  · simp only [entry, stairEvenAltBackground, if_pos h]
+  · simp only [entry, if_neg h] at hentry
+    simp only [entry, stairEvenAltBackground, if_neg h, if_pos (Option.isSome_ite.mp hentry), add_zero]
+
+/-- Restore the B3 physical chart after the constructor's storage centering. -/
+theorem stairEvenAlt_llCenter_agrees {den : ℤ} (hden : stairEvenAlt.Valid den) {field : Field}
+    (hagree : (stairEvenAlt.raw den).Agrees field 0) :
+    ((stairEvenAlt.tile den hden).llCenter (stairEvenAlt.tile_nonempty den hden)).Agrees
+      (fun site => field (site + (1 - den, -1))) 0 := by
+  have hmin := hden.1
+  apply hagree.llCenter_trim (stairEvenAlt.raw_nonempty den hden)
+  · apply mem_stairEvenAlt_raw_iff.mpr
+    dsimp
+    omega
+  · intro site hsite
+    obtain ⟨hcol, hrow, hshape⟩ := mem_stairEvenAlt_raw_iff.mp hsite
+    dsimp
+    omega
+
 /-- The source's B2 pullback in the raw formula coordinates. -/
 theorem mem_stairOdd_raw_pullback_iff {den : ℤ} (point : Site) :
     point ∈ (stairOdd.raw den).sites ↔ (den + 1 - point.2, point.1) ∈ (stairEven.raw den).sites := by
