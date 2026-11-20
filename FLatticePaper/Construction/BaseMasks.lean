@@ -657,6 +657,77 @@ theorem mem_ladderEvenAlt_raw_iff {den : ℤ} (point : Site) :
     Bool.false_eq_true, and_true, and_false, or_false]
   omega
 
+/-- The corrected B8 domain in its raw formula coordinates. -/
+theorem mem_ladderEvenAlt_raw_pullback_iff {den : ℤ} (point : Site) :
+    point ∈ (ladderEvenAlt.raw den).sites ↔
+      (2 * den - 1 - point.2, point.1 + 1) ∈ (ladderOddAlt.raw den).sites := by
+  obtain ⟨x, y⟩ := point
+  rw [mem_ladderOddAlt_raw_iff]
+  simp only [raw, mem_maskedTile_sites, window, entry, isSome_ite_iff, Option.isSome_some, Option.isSome_none,
+    Bool.false_eq_true, and_true, and_false, or_false, LadderOddAltCorner]
+  omega
+
+/-- The literal B8 height includes the source's additional affine term. -/
+theorem ladderEvenAlt_raw_height (den : ℤ) (point : (ladderEvenAlt.raw den).sites) :
+    (ladderEvenAlt.raw den).height point =
+      ladderOddAltValue den (2 * den - 1 - point.val.2, point.val.1 + 1) +
+        (point.val.1 * (point.val.1 - 1) / 2 - (point.val.1 - point.val.2) ^ 2 / 4 +
+          point.val.1 + 1) := by
+  obtain ⟨⟨x, y⟩, hmem⟩ := point
+  let value := -((x - y) ^ 2 / 4) + min 0 (den - y) + min (2 * den - 1 - y) 0 + max (y - x - den) 0
+  let corner := (x = -2 ∧ y = 2 * den) ∨ (x = den + 1 ∧ y = den - 1)
+  let diagonal := y - x = den ∧ 0 < x ∧ x < den - 1
+  let shape := -1 ≤ y - x ∧ y - x ≤ 2 * den + 1 ∧
+    ¬ ((x ≤ -1 ∧ y ≤ den - 1) ∨ (den ≤ x ∧ 2 * den ≤ y))
+  let correction := x * (x - 1) / 2 - (x - y) ^ 2 / 4 + x + 1
+  have htri : -((x + 1) * (x + 2) / 2) + x * (x - 1) / 2 + x + 1 = -x := by
+    rw [show (x + 1) * (x + 2) = x * (x - 1) + (2 * x + 1) * 2 by ring,
+      Int.add_mul_ediv_right _ _ (by decide)]
+    omega
+  have hmin (n : ℤ) : min (-n) 0 = min 0 n - n := by omega
+  have hmax (n : ℤ) : max (-n) 0 = max n 0 - n := by omega
+  have hbump : (LadderOddAltCorner den (2 * den - 1 - y, x + 1) ∨
+      LadderOddAltDiagonal den (2 * den - 1 - y, x + 1)) ↔ corner ∨ diagonal := by
+    simp only [LadderOddAltCorner, LadderOddAltDiagonal, corner, diagonal]
+    omega
+  have hvalue : ladderOddAltValue den (2 * den - 1 - y, x + 1) + correction =
+      value + (if corner ∨ diagonal then 1 else 0) := by
+    simp only [ladderOddAltValue, correction, value, if_congr hbump rfl rfl]
+    rw [show x + 1 + 1 = x + 2 by omega, show den - (2 * den - 1 - y) - 1 = -(den - y) by omega,
+      show 2 * den - 1 - y + (x + 1) - den = -(y - x - den) by omega, hmin, hmax]
+    omega
+  have hentry := ((mem_maskedTile_sites _ _ _ _).mp hmem).2.2
+  change (entry .ladderEvenAlt den (x, y)).isSome at hentry
+  apply Option.get_of_eq_some
+  change entry .ladderEvenAlt den (x, y) = some (ladderOddAltValue den (2 * den - 1 - y, x + 1) + correction)
+  rw [hvalue]
+  have hrule : entry .ladderEvenAlt den (x, y) =
+    if corner then some (value + 1)
+    else if shape then (if diagonal then some (value + 1) else some value)
+    else none := rfl
+  rw [hrule] at hentry ⊢
+  by_cases hc : corner
+  · simp only [if_pos hc, if_pos (Or.inl hc : corner ∨ diagonal)]
+  by_cases hs : shape
+  · by_cases hd : diagonal
+    · simp only [if_neg hc, if_pos hs, if_pos hd, if_pos (Or.inr hd : corner ∨ diagonal)]
+    · simp only [if_neg hc, if_pos hs, if_neg hd, if_neg (not_or.mpr ⟨hc, hd⟩), add_zero]
+  · simp [hc, hs] at hentry
+
+theorem ladderEvenAlt_llCenter_agrees {den : ℤ} (hden : ladderEvenAlt.Valid den) {field : Field}
+    (hagree : (ladderEvenAlt.raw den).Agrees field 0) :
+    ((ladderEvenAlt.tile den hden).llCenter (ladderEvenAlt.tile_nonempty den hden)).Agrees
+      (fun site => field (site + (0, 1))) 0 := by
+  have hmin := hden.1
+  apply hagree.llCenter_trim (ladderEvenAlt.raw_nonempty den hden)
+  · rw [mem_ladderEvenAlt_raw_pullback_iff, mem_ladderOddAlt_raw_iff]
+    simp only [LadderOddAltCorner]
+    omega
+  · intro point hpoint
+    rw [mem_ladderEvenAlt_raw_pullback_iff, mem_ladderOddAlt_raw_iff] at hpoint
+    simp only [LadderOddAltCorner] at hpoint
+    omega
+
 end BaseMask
 
 end FLatticePaper.Construction

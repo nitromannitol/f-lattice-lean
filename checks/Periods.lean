@@ -1,4 +1,6 @@
 import FLatticePaper.Construction.AlternateLadderExtension
+import FLatticePaper.Construction.AlternateLadderReflection
+import FLatticePaper.Construction.AlternateLadderRotation
 import FLatticePaper.Construction.LadderExtension
 import FLatticePaper.Construction.LadderLaplacian
 import FLatticePaper.Construction.LadderRank
@@ -80,6 +82,34 @@ theorem long_pure_three_has_alternate_ladder_extension_in_physical_chart :
       HasQuadraticGrowth field ((parentsAt word).current .odd).matrix := by
   exact evaluateNative_threes_odd_alternate_extension 199
 
+theorem long_pure_two_has_alternate_ladder_extension :
+    let word := List.replicate 200 .two
+    ∃ registers : TileRegisters, ∃ field : Field,
+      evaluateNative word = .ok registers ∧ registers.alternate.currentEven.val.Agrees field 0 ∧
+      HasGeneratorPeriods ((parentsAt word).current .even) field 0 (ladderEvenAltConstantV 402) ∧
+      HasQuadraticGrowth field ((parentsAt word).current .even).matrix := by
+  exact evaluateNative_twos_even_alternate_extension 199
+
+theorem two_even_ladders_have_distinct_plane_extensions :
+    ∃ registers : TileRegisters, ∃ standard alternate : Field,
+      evaluateNative [.two] = .ok registers ∧
+      registers.standard.currentEven.val.Agrees standard 0 ∧ registers.alternate.currentEven.val.Agrees alternate 0 ∧
+      ¬ IntegerAffine (fun site => alternate site - standard site) := by
+  obtain ⟨first, standard, hf, hs, hperiod, _⟩ := evaluateNative_twos_even_standard_extension 0
+  obtain ⟨second, alternate, hg, ha, hperiod', _⟩ := evaluateNative_twos_even_alternate_extension 0
+  have heq : first = second := Except.ok.inj (hf.symm.trans hg)
+  subst second
+  rw [twos_current_even] at hperiod hperiod'
+  exact ⟨first, standard, alternate, hf, hs, ha,
+    ladderEvenAlt_sub_standard_not_integerAffine (den := 4) (by decide) hperiod hperiod'⟩
+
+theorem reciprocal_alternate_ladder_four_laplacian_reflection :
+    ∃ field : Field, (BaseMask.ladderOddAlt.raw 4).Agrees field 0 ∧
+      ∀ point, laplacian field ((3, 5) - point) = laplacian field point := by
+  have hvalid : BaseMask.ladderOddAlt.Valid 4 := by simp [BaseMask.Valid]
+  obtain ⟨field, hagree, hperiod, _⟩ := ladderOddAlt_exists_extension hvalid
+  exact ⟨field, hagree, laplacian_ladderOddAltField_reflection hvalid hagree hperiod⟩
+
 #print axioms Fraction.integralLattice_eq_span
 #print axioms Fraction.mem_modifiedDeck_iff_integral_even
 #print axioms evaluateNative_empty_covers
@@ -125,5 +155,16 @@ theorem long_pure_three_has_alternate_ladder_extension_in_physical_chart :
 #print axioms ladderOddAlt_respectsPeriods
 #print axioms evaluateNative_threes_odd_alternate_extension
 #print axioms long_pure_three_has_alternate_ladder_extension_in_physical_chart
+#print axioms BaseMask.ladderEvenAlt_raw_height
+#print axioms rotateLadderAltField_periods
+#print axioms rotateLadderAltField_recurrent
+#print axioms ladderEvenAltConstantV_eq
+#print axioms evaluateNative_twos_even_alternate_extension
+#print axioms long_pure_two_has_alternate_ladder_extension
+#print axioms ladderOddAlt_sub_standard_not_integerAffine
+#print axioms ladderEvenAlt_sub_standard_not_integerAffine
+#print axioms two_even_ladders_have_distinct_plane_extensions
+#print axioms ladderOddAltField_reflection
+#print axioms reciprocal_alternate_ladder_four_laplacian_reflection
 
 end FLatticePaper.Checks

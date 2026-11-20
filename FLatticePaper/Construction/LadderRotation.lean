@@ -40,9 +40,10 @@ theorem ladderEvenConstantV_eq (den : ℤ) : ladderEvenConstantV den = 1 - den ^
   rw [show ((-2 : ℤ) + 2 * den) % 2 = 0 by omega] at h
   linarith
 
-theorem rotateLadderField_periods {den : ℤ} (heven : den % 2 = 0) {field : Field}
-    (hperiod : HasGeneratorPeriods (Fraction.mk 1 den) field 0 (stairEvenConstantV den)) :
-    HasGeneratorPeriods (Fraction.mk 1 den).rotate (rotateLadderField den field) 0 (ladderEvenConstantV den) := by
+theorem hasGeneratorPeriods_rotateLadderField {den : ℤ} (heven : den % 2 = 0) {field : Field}
+    {constantU constantV : ℤ} (hperiod : HasGeneratorPeriods (Fraction.mk 1 den) field constantU constantV) :
+    HasGeneratorPeriods (Fraction.mk 1 den).rotate (rotateLadderField den field)
+      (den + constantV + chooseTwo (den + 1)) (ladderEvenConstantV den - constantU) := by
   constructor
   · intro point
     rw [nearOneLadderDeck_eq heven]
@@ -62,7 +63,7 @@ theorem rotateLadderField_periods {den : ℤ} (heven : den % 2 = 0) {field : Fie
     rw [hc, correction_at_ladder_kernel,
       show (den + 1 + (den - 1)) / 2 = den by omega,
       show (den + 1 - (den - 1)) / 2 = 1 by omega]
-    simp only [Fraction.transverseGrade, one_mul, stairEvenConstantV]
+    simp only [Fraction.transverseGrade, one_mul]
     ring
   · intro point
     rw [nearOneLadderDeck_eq heven]
@@ -72,8 +73,8 @@ theorem rotateLadderField_periods {den : ℤ} (heven : den % 2 = 0) {field : Fie
       rw [reciprocalLadderDeck_eq heven]
       apply Prod.ext <;> dsimp [pulled] <;> omega
     have hshift := hperiod.1 pulled
-    change field (pulled + (reciprocalLadderDeck den).kernel) = field pulled + 0 at hshift
-    rw [hsource, add_zero] at hshift
+    change field (pulled + (reciprocalLadderDeck den).kernel) = field pulled + constantU at hshift
+    rw [hsource] at hshift
     change field pulled + centeredQuarterTurnCorrection (point + (-2, 2 * den)) = _
     have hphase : EvenSite (-2, 2 * den) := by change (-2 + 2 * den) % 2 = 0; omega
     have hc := centeredQuarterTurnCorrection_add point hphase
@@ -86,6 +87,14 @@ theorem rotateLadderField_periods {den : ℤ} (heven : den % 2 = 0) {field : Fie
       show (-2 - 2 * den) / 2 = -(den + 1) by omega]
     simp only [Fraction.transverseGrade, ladderEvenConstantV]
     ring
+
+theorem rotateLadderField_periods {den : ℤ} (heven : den % 2 = 0) {field : Field}
+    (hperiod : HasGeneratorPeriods (Fraction.mk 1 den) field 0 (stairEvenConstantV den)) :
+    HasGeneratorPeriods (Fraction.mk 1 den).rotate (rotateLadderField den field) 0 (ladderEvenConstantV den) := by
+  have h := hasGeneratorPeriods_rotateLadderField heven hperiod
+  rw [show den + stairEvenConstantV den + chooseTwo (den + 1) = 0 by unfold stairEvenConstantV; omega,
+    sub_zero] at h
+  exact h
 
 theorem BaseMask.ladderEven_agrees_rotateLadderField {den : ℤ} (hden : BaseMask.ladderEven.Valid den)
     {field : Field} (hagree : (BaseMask.ladderOdd.raw den).Agrees field 0) :
