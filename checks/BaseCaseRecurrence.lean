@@ -1,0 +1,6 @@
+import FLatticePaper.Construction.BaseCaseRecurrence
+
+#print axioms FLatticePaper.Construction.staircase_recurrent
+#print axioms FLatticePaper.Construction.alt_staircase_recurrent
+#print axioms FLatticePaper.Construction.doubled_staircase_recurrent
+#print axioms FLatticePaper.Construction.doubled_alt_staircase_recurrent

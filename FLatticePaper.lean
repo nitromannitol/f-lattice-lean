@@ -46,5 +46,6 @@ import FLatticePaper.Farey.SlopeDensity
 import FLatticePaper.Plane.OdometerTheorem
 import FLatticePaper.Tiles.BinaryWords
 import FLatticePaper.MainTheorems
+import FLatticePaper.Construction.BaseCaseRecurrence
 
 /-! Root import for the corrected F-lattice paper. -/
