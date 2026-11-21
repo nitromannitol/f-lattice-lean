@@ -73,11 +73,11 @@ theorem childWords_congr {w w' : Word} (h : w.count .one % 2 = w'.count .one % 2
 theorem WordQuad.step_congr {w w' : Word} (h : w.count .one % 2 = w'.count .one % 2)
     (quad : WordQuad) (d : Digit) : quad.step w d = quad.step w' d := by
   have h1 : (w ++ [Digit.one]).count .one % 2 = (w' ++ [Digit.one]).count .one % 2 := by
-    simp [List.count_append] <;> omega
+    simp [List.count_append]; omega
   have h2 : (w ++ [Digit.two]).count .one % 2 = (w' ++ [Digit.two]).count .one % 2 := by
-    simp [List.count_append] <;> omega
+    simp [List.count_append]; omega
   have h3 : (w ++ [Digit.three]).count .one % 2 = (w' ++ [Digit.three]).count .one % 2 := by
-    simp [List.count_append] <;> omega
+    simp [List.count_append]; omega
   cases d
   · simp only [WordQuad.step, childWords_congr h1]
   · simp only [WordQuad.step, childWords_congr h2]
