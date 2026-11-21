@@ -137,4 +137,55 @@ theorem sum_south (u : F2Word) (hu : ∀ x ∈ u, x ≠ .i) (p : GInt) (b a : �
       · simp only [h, if_false, false_and]
         split_ifs <;> omega
 
+/-- An integer equation of two indicator sums: `M` holds exactly when `P1` fails and `P2` holds. -/
+theorem ite_sum_iff (P1 P2 M : Prop) [Decidable P1] [Decidable P2] [Decidable M]
+    (h : (if P1 then (1 : ℤ) else 0) + (if P2 then -1 else 0) = -(if M then 1 else 0)) :
+    M ↔ (¬P1 ∧ P2) := by
+  by_cases hP1 : P1 <;> by_cases hP2 : P2 <;> by_cases hM : M <;> simp_all
+
+/-- The row-interval description of a tile whose boundary word is `w1 * w2 * hat(rev w1) * hat(rev w2)`, with `w1` in
+`{1, i}` and `w2` in `{i, -1}`: the cell `(a, b)` lies in the tile exactly when the row `b` is in the range of the
+walk's north steps and `colS ≤ a < colN`. -/
+theorem mem_iff_interval {T : CellTile} {c : GInt} {w1 w2 : F2Word}
+    (hT : IsBoundaryWordAt T c (boundaryWordOf w1 w2))
+    (h1 : ∀ x ∈ w1, x = .one ∨ x = .i) (h2 : ∀ x ∈ w2, x = .i ∨ x = .negOne) (a b : ℤ) :
+    ((a, b) : GInt) ∈ T ↔
+      (c.2 ≤ b ∧ b < c.2 + cntI (w1 ++ w2)) ∧
+        colS (w1.map Unit4.neg ++ w2.map Unit4.neg) (c + F2Word.sum (w1 ++ w2)) b ≤ a ∧
+        a < colN (w1 ++ w2) c b := by
+  have hrc := row_scan T b a
+  rw [rowCount_eq_edges hT b a] at hrc
+  have hword : boundaryWordOf w1 w2 = (w1 ++ w2) ++ (w1.map Unit4.neg ++ w2.map Unit4.neg) := by
+    simp [boundaryWordOf, hat_rev, List.append_assoc]
+  rw [hword, edgesFrom_append, List.map_append, List.sum_append] at hrc
+  have hnoNeg : ∀ x ∈ w1 ++ w2, x ≠ .negI := by
+    intro x hx
+    rcases List.mem_append.mp hx with hx | hx
+    · rcases h1 x hx with rfl | rfl <;> simp
+    · rcases h2 x hx with rfl | rfl <;> simp
+  have hnoI : ∀ x ∈ w1.map Unit4.neg ++ w2.map Unit4.neg, x ≠ .i := by
+    intro x hx
+    rcases List.mem_append.mp hx with hx | hx
+    · obtain ⟨y, hy, rfl⟩ := List.mem_map.mp hx
+      rcases h1 y hy with rfl | rfl <;> simp [Unit4.neg]
+    · obtain ⟨y, hy, rfl⟩ := List.mem_map.mp hx
+      rcases h2 y hy with rfl | rfl <;> simp [Unit4.neg]
+  rw [sum_north (w1 ++ w2) hnoNeg c b a, sum_south _ hnoI (c + F2Word.sum (w1 ++ w2)) b a] at hrc
+  have hsnd : (c + F2Word.sum (w1 ++ w2)).2 = c.2 + cntI (w1 ++ w2) := by
+    rw [Prod.snd_add, sum_snd _ hnoNeg]
+  have hneg : cntNegI (w1.map Unit4.neg ++ w2.map Unit4.neg) = cntI (w1 ++ w2) := by
+    rw [cntNegI_append, cntNegI_map_neg, cntNegI_map_neg, cntI_append]
+  rw [hsnd, hneg] at hrc
+  unfold cellInd at hrc
+  have key := ite_sum_iff _ _ _ hrc
+  rw [key]
+  constructor
+  · rintro ⟨hn, g1, g2, g3⟩
+    refine ⟨⟨by omega, by omega⟩, g3, ?_⟩
+    by_contra hc
+    exact hn ⟨by omega, by omega, by omega⟩
+  · rintro ⟨⟨h1', h2'⟩, h3, h4⟩
+    refine ⟨fun hP1 => absurd hP1.2.2 (not_le.mpr h4), ?_⟩
+    exact ⟨by omega, by omega, h3⟩
+
 end FLatticePaper.Tiles

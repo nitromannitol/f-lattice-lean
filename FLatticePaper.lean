@@ -83,6 +83,8 @@ import FLatticePaper.Tiles.BoundaryStrings
 import FLatticePaper.Tiles.BinaryWords
 import FLatticePaper.Tiles.AlmostTiling
 import FLatticePaper.Tiles.RowScan
+import FLatticePaper.Tiles.WalkRows
+import FLatticePaper.Tiles.RowInterval
 import FLatticePaper.MainTheorems
 import FLatticePaper.Construction.BaseCaseRecurrence
 
