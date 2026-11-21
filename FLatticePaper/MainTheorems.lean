@@ -5,6 +5,7 @@ import FLatticePaper.Plane.Induction.EvenStep
 import FLatticePaper.Plane.Induction.OddStep
 import FLatticePaper.Plane.Induction.Packet
 import FLatticePaper.Plane.Induction.StandardField
+import FLatticePaper.Plane.Induction.WordInduction
 
 /-! The two headline theorems from `theorem:odometers` at every reduced interior slope. -/
 
@@ -114,5 +115,26 @@ theorem odometersTheorem_of_packets
       (⟨parentsAt word, parentsAt_valid word⟩ : Induction.ChildFrame) hp.periods hU hNS hrank
     rw [hchild] at key
     exact key
+
+/-- `theorem:odometers` from the open inputs of the plane induction and the star estimates at every proper word. -/
+theorem odometersTheorem_of_openInputs
+    (hopen : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → Induction.OpenInputs word)
+    (hest : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → StarEstimates word) :
+    OdometersTheorem :=
+  odometersTheorem_of_packets (fun word _ => Induction.packet_standardField hopen word) hest
+
+/-- `theorem:hyperbola` from the open inputs and the star estimates. -/
+theorem hyperbola_of_openInputs
+    (hopen : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → Induction.OpenInputs word)
+    (hest : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → StarEstimates word) (t : ℝ) (ht : 0 ≤ t) (hu : t ≤ 1) :
+    symmetricCircleMatrix t (1 - t) (-Real.sqrt (t ^ 2 + (1 - t) ^ 2)) ∈ frontier symmetricGrowthSet :=
+  hyperbola_of_odometersTheorem (odometersTheorem_of_openInputs hopen hest) t ht hu
+
+/-- `theorem:circle_packing` from the open inputs and the star estimates. -/
+theorem circlePacking_of_openInputs
+    (hopen : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → Induction.OpenInputs word)
+    (hest : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → StarEstimates word) (matrix : Matrix (Fin 2) (Fin 2) ℝ) :
+    matrix ∈ integerSuperharmonicMatrices ↔ ∃ s t : ℤ, (harmonicPeak s t - matrix).PosSemidef :=
+  circlePacking_of_odometersTheorem (odometersTheorem_of_openInputs hopen hest) matrix
 
 end FLatticePaper

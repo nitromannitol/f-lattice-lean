@@ -4,3 +4,6 @@ import FLatticePaper.MainTheorems
 #print axioms FLatticePaper.circlePacking_of_odometersTheorem
 #print axioms FLatticePaper.odometersTheorem_of_standardData
 #print axioms FLatticePaper.odometersTheorem_of_packets
+#print axioms FLatticePaper.odometersTheorem_of_openInputs
+#print axioms FLatticePaper.hyperbola_of_openInputs
+#print axioms FLatticePaper.circlePacking_of_openInputs
