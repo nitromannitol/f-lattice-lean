@@ -12,6 +12,8 @@ import FLatticePaper.GeneralK.ColumnWidth
 import FLatticePaper.GeneralK.RationalReference
 import FLatticePaper.GeneralK.ColumnCycleBound
 import FLatticePaper.GeneralK.ColumnResidual
+import FLatticePaper.GeneralK.ColumnUpperObstacle
+import FLatticePaper.GeneralK.Classification
 import Mathlib.Algebra.Order.Star.Real
 import Mathlib.Analysis.Real.Sqrt
 
@@ -145,6 +147,26 @@ theorem three_repeated_zero_shape_path_weight_is_bounded :
       cycle.2.property.2.2 (ColumnSlice.cycleIndex cycle (i : ℤ)))
   simpa only [path, Int.natCast_add, Int.natCast_one, cycle, ColumnSlice.cycleWeightAt] using h
 
+theorem three_zero_slice_cyclePeak_eq_zero : (zeroSlice.cyclePeak : ℝ) = 0 := by
+  have htrace := trace_le_zero_of_mem_growthSet (by decide : (2 : ℤ) ≤ 3) three_zero_slice_cyclePeak_is_admitted
+  norm_num at htrace
+  apply le_antisymm (show (zeroSlice.cyclePeak : ℝ) ≤ 0 by exact_mod_cast htrace)
+  have hstart := trace_le_zero_of_mem_growthSet (by decide : (2 : ℤ) ≤ 3)
+    (startingColumnEntry_mem_growthSet (by decide : (2 : ℤ) ≤ 3) 0 0)
+  norm_num at hstart
+  have hstart' : (zeroSlice.a₀ : ℝ) ≤ 0 := by exact_mod_cast (show zeroSlice.a₀ ≤ 0 from hstart)
+  apply zeroSlice.le_cyclePeak_of_transverse_representative (a := 0) (tiltX := 0) (tiltY := 0) (bound := 0)
+    (height := 0) hstart' (fun _ => by simp [laplacian]) 0
+  · norm_num [zeroSlice]
+  · rintro ⟨x, y⟩
+    norm_num [zeroSlice, matrixQuadratic_symmetricMatrix]
+
+#print axioms ColumnSlice.le_cyclePeak_of_bounded_column_restriction
+#print axioms ColumnSlice.le_cyclePeak_of_transverse_representative
+#print axioms three_zero_slice_cyclePeak_eq_zero
+#print axioms rationalSlice_iff_le_cycleEndpoint
+#print axioms mem_growthSet_iff_le_cycleParabolic
+#print axioms growthSet_eq_closure_cycleCones
 #print axioms ColumnSlice.abs_linearColumnRow_sub_reference_le
 #print axioms ColumnSlice.exists_pathWeight_bound
 #print axioms three_repeated_zero_shape_path_weight_is_bounded

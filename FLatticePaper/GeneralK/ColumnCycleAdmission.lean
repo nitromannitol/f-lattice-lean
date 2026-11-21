@@ -4,7 +4,7 @@ import FLatticePaper.GeneralK.PeriodicPrimitive
 
 namespace FLatticePaper.GeneralK
 
-private theorem columnRow_add_column {k : ℤ} (hk : k ≠ 0) (field : Field) (adjustment : ℤ → ℤ)
+theorem columnRow_add_column {k : ℤ} (hk : k ≠ 0) (field : Field) (adjustment : ℤ → ℤ)
     (column row : ℤ) :
     columnRow k (fun site => field site + adjustment site.1) column row =
       columnRow k field column row + (adjustment (column - 1) + adjustment (column + 1) - 2 * adjustment column) := by

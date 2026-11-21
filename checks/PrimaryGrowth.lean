@@ -1,5 +1,6 @@
 import FLatticePaper.Plane.ClassificationReduction
 import FLatticePaper.Plane.RecurrentBoundary
+import FLatticePaper.Plane.CirclePacking
 import FLatticePaper.Construction.EndpointAtoms
 
 namespace FLatticePaper.Checks
@@ -27,6 +28,13 @@ theorem retained_endpoint_atoms_are_on_the_physical_frontier (atom : Constructio
   obtain ⟨hsuper, hrec, hgrowth⟩ := atom.planeField_recurrent
   exact ⟨hs, hrec.mem_frontier_of_quadraticGrowth hsuper ⟨_, hs⟩ hgrowth⟩
 
+theorem negative_identity_lies_in_physical_interior : symmetricCircleMatrix 0 0 (-2) ∈ interior symmetricGrowthSet := by
+  have h := harmonicPeak_mem_integerSuperharmonicMatrices 0 0
+  norm_num [harmonicPeak] at h
+  exact symmetricCircleMatrix_mem_interior_of_lt h (by norm_num)
+
+#print axioms negative_identity_lies_in_physical_interior
+#print axioms circlePacking_of_hyperbolaBoundary
 #print axioms circle_origin_cone_admits_irrational_singular_matrix
 #print axioms nonzero_harmonic_apex_is_on_the_physical_frontier
 #print axioms circleMatrix_posSemidef_iff
