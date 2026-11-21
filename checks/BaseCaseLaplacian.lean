@@ -1,0 +1,6 @@
+import FLatticePaper.Construction.BaseCaseLaplacian
+
+#print axioms FLatticePaper.Construction.staircase_laplacian
+#print axioms FLatticePaper.Construction.alt_staircase_laplacian
+#print axioms FLatticePaper.Construction.doubled_staircase_laplacian
+#print axioms FLatticePaper.Construction.doubled_alt_staircase_laplacian

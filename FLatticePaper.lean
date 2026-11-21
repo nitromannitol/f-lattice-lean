@@ -10,6 +10,7 @@ import FLatticePaper.Construction.AlternateStaircaseRankCorrection
 import FLatticePaper.Construction.AlternateStaircaseRecurrence
 import FLatticePaper.Construction.AlternateStaircaseRotation
 import FLatticePaper.Construction.AlternateStaircaseSeams
+import FLatticePaper.Construction.BaseCaseLaplacian
 import FLatticePaper.Construction.BaseRegisters
 import FLatticePaper.Construction.Chronology
 import FLatticePaper.Construction.CorrectionHeight
