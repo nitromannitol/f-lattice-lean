@@ -77,6 +77,7 @@ import FLatticePaper.Construction.BaseCases
 import FLatticePaper.Construction.OffsetTables
 import FLatticePaper.Tiles.BoundaryStrings
 import FLatticePaper.Tiles.BinaryWords
+import FLatticePaper.Tiles.AlmostTiling
 import FLatticePaper.MainTheorems
 import FLatticePaper.Construction.BaseCaseRecurrence
 
