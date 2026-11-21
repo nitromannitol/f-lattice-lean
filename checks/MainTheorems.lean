@@ -2,3 +2,4 @@ import FLatticePaper.MainTheorems
 
 #print axioms FLatticePaper.hyperbola_of_odometersTheorem
 #print axioms FLatticePaper.circlePacking_of_odometersTheorem
+#print axioms FLatticePaper.odometersTheorem_of_standardData
