@@ -6,6 +6,8 @@ import FLatticePaper.Plane.Induction.OddStep
 import FLatticePaper.Plane.Induction.Packet
 import FLatticePaper.Plane.Induction.StandardField
 import FLatticePaper.Plane.Induction.WordInduction
+import FLatticePaper.Plane.Induction.LocalPremises
+import FLatticePaper.Plane.RestrictedBellmanRank
 
 /-! The two headline theorems from `theorem:odometers` at every reduced interior slope. -/
 
@@ -136,5 +138,33 @@ theorem circlePacking_of_openInputs
     (hest : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → StarEstimates word) (matrix : Matrix (Fin 2) (Fin 2) ℝ) :
     matrix ∈ integerSuperharmonicMatrices ↔ ∃ s t : ℤ, (harmonicPeak s t - matrix).PosSemidef :=
   circlePacking_of_odometersTheorem (odometersTheorem_of_openInputs hopen hest) matrix
+
+/-- The three star estimates at a proper word, from its packet and its local premises. -/
+theorem starEstimates_of_localPremises {word : Word} (hp : (frameAt word).Packet (standardField word))
+    (hloc : Induction.LocalPremises word) : StarEstimates word := by
+  dsimp only [Induction.LocalPremises] at hloc
+  obtain ⟨-, -, -, -, -, hEr, hNr, hJ, hlocal, hno⟩ := hloc
+  obtain ⟨hU, hNS⟩ := Induction.ChildFrame.star_of_closedPolygon (frameAt word) hp.periods hEr hNr hJ
+  obtain ⟨rank, hrank⟩ := S3_of_packet_restrictedNoFort word hp hlocal hno
+  unfold StarEstimates
+  exact ⟨hU, hNS, rank, hrank⟩
+
+/-- `theorem:odometers` from the local premises at every proper word. -/
+theorem odometersTheorem_of_localPremises
+    (h : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → Induction.LocalPremises word) : OdometersTheorem :=
+  odometersTheorem_of_packets (fun word _ => Induction.packet_of_localPremises h word)
+    (fun word hw => starEstimates_of_localPremises (Induction.packet_of_localPremises h word) (h word hw))
+
+/-- `theorem:hyperbola` from the local premises at every proper word. -/
+theorem hyperbola_of_localPremises
+    (h : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → Induction.LocalPremises word) (t : ℝ) (ht : 0 ≤ t) (hu : t ≤ 1) :
+    symmetricCircleMatrix t (1 - t) (-Real.sqrt (t ^ 2 + (1 - t) ^ 2)) ∈ frontier symmetricGrowthSet :=
+  hyperbola_of_odometersTheorem (odometersTheorem_of_localPremises h) t ht hu
+
+/-- `theorem:circle_packing` from the local premises at every proper word. -/
+theorem circlePacking_of_localPremises
+    (h : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → Induction.LocalPremises word) (matrix : Matrix (Fin 2) (Fin 2) ℝ) :
+    matrix ∈ integerSuperharmonicMatrices ↔ ∃ s t : ℤ, (harmonicPeak s t - matrix).PosSemidef :=
+  circlePacking_of_odometersTheorem (odometersTheorem_of_localPremises h) matrix
 
 end FLatticePaper
