@@ -43,5 +43,6 @@ import FLatticePaper.Farey.Rotation
 import FLatticePaper.Tiles.Gluing
 import FLatticePaper.Farey.RotationLattice
 import FLatticePaper.Farey.SlopeDensity
+import FLatticePaper.Plane.OdometerTheorem
 
 /-! Root import for the corrected F-lattice paper. -/
