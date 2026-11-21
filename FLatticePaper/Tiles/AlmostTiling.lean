@@ -4,6 +4,8 @@ import Mathlib.Data.Finset.Prod
 import Mathlib.Data.Int.Interval
 import Mathlib.Data.Int.Basic
 import Mathlib.Algebra.Group.Prod
+import Mathlib.Tactic.Ring
+import Mathlib.Tactic.Abel
 
 /-! Section 4 of the paper: cells, tiles, boundary words, almost tilings, and the admissible words of
 `lemma:almost_square_tiling`. Gaussian integers `a + b i` are pairs `(a, b)`. -/
@@ -223,5 +225,44 @@ def AlmostSquareTilingStatement : Prop :=
   ∀ (T : CellTile) (w₁ w₂ : F2Word), IsSimpleTile T → IsBoundaryWord T (boundaryWordOf w₁ w₂) →
     Admissible w₁ → Admissible (w₂.map Unit4.mulNegI) →
     IsRegularAlmostTiling T (almostV₁ w₁) (almostV₂ w₂) ∧ EdgeSharingClause T (almostV₁ w₁) (almostV₂ w₂)
+
+/-- The translates `T` and `T + u` have a common cell: some cell `x` of `T` has `x - u` in `T`. -/
+def Overlap (T : CellTile) (u : GInt) : Prop := ∃ x ∈ T, x - u ∈ T
+
+/-- The surrounding vectors `k v₁ + k' v₂`, `|k|, |k'| ≤ 1`, other than `0` (the surrounding `S` of the proof of
+`lemma:almost_square_tiling`, lines 806-807). -/
+def surroundVectors (v₁ v₂ : GInt) : Set GInt :=
+  {n | ∃ k k' : ℤ, -1 ≤ k ∧ k ≤ 1 ∧ -1 ≤ k' ∧ k' ≤ 1 ∧ (k, k') ≠ (0, 0) ∧
+    n = (k * v₁.1 + k' * v₂.1, k * v₁.2 + k' * v₂.2)}
+
+/-- The topological input of the proof of `lemma:almost_square_tiling` (Step 2, last paragraph: "for any other pair of
+cells in S to overlap, there must first be a crossing on the horizontal or vertical edges"), stated at the level of
+cells: if `T` overlaps a translate by a nonzero lattice vector, then it overlaps a translate by a surrounding vector.
+This is the only hypothesis beyond the combinatorial interface facts. -/
+structure NoFirstCrossing (T : CellTile) (v₁ v₂ : GInt) : Prop where
+  propagate : ∀ u ∈ latticeOf v₁ v₂, u ≠ 0 → Overlap T u → ∃ n ∈ surroundVectors v₁ v₂, Overlap T n
+
+/-- The lattice is closed under subtraction. -/
+theorem sub_mem_latticeOf (v₁ v₂ v w : GInt) (hv : v ∈ latticeOf v₁ v₂) (hw : w ∈ latticeOf v₁ v₂) :
+    v - w ∈ latticeOf v₁ v₂ := by
+  obtain ⟨k, k', hk⟩ := hv
+  obtain ⟨m, m', hm⟩ := hw
+  refine ⟨k - m, k' - m', ?_⟩
+  subst hk
+  subst hm
+  ext <;> simp only [Prod.fst_sub, Prod.snd_sub] <;> ring
+
+/-- Neighbour-free uniqueness reduces the almost tiling uniqueness condition to the surrounding: if no surrounding
+translate overlaps `T` and the first-crossing input holds, any two lattice translates containing `c` agree. -/
+theorem uniqueness_of_neighbours {T : CellTile} {v₁ v₂ : GInt}
+    (hN : ∀ n ∈ surroundVectors v₁ v₂, ¬ Overlap T n) (hF : NoFirstCrossing T v₁ v₂) :
+    ∀ c : GInt, ∀ v ∈ latticeOf v₁ v₂, ∀ v' ∈ latticeOf v₁ v₂, c - v ∈ T → c - v' ∈ T → v = v' := by
+  intro c v hv v' hv' h1 h2
+  by_contra hne
+  have hu : v - v' ∈ latticeOf v₁ v₂ := sub_mem_latticeOf v₁ v₂ v v' hv hv'
+  have h0 : v - v' ≠ 0 := sub_ne_zero.mpr hne
+  have hov : Overlap T (v - v') := ⟨c - v', h2, by rw [show c - v' - (v - v') = c - v by abel]; exact h1⟩
+  obtain ⟨n, hn, hov'⟩ := hF.propagate (v - v') hu h0 hov
+  exact hN n hn hov'
 
 end FLatticePaper.Tiles
