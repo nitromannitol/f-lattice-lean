@@ -148,4 +148,45 @@ theorem gPseudo_rotPseudo (wh wv : BinaryWord) :
     unfold gV
     rw [flipW_flipW]
 
+/-! ### Pseudo-squares and the boundary-word lemma -/
+
+/-- A `(w_h, w_v)`-pseudo-square (Definition def:tile_boundary_strings, lines 1626-1633). The boundary of `T`, read
+counterclockwise from a lower-left vertex `c`, is the concatenation of four traces: the lower trace `lo` and the right
+trace `ri` of the two zero-one strings, and the upper and left traces, which are the half-turns of the reversed strings
+(line 1698). The Table 1 identities `lo = G(w_h)` and `ri = G(w_v)` (line 1697, "by checking Table 1 and the figures")
+are geometric, so they are explicit fields here, not proved. The subtile decomposition is not formalized. -/
+structure IsPseudoSquare (T : CellTile) (wh wv : BinaryWord) : Prop where
+  trace : ∃ c : GInt, ∃ lo ri : F2Word,
+    IsBoundaryWordAt T c (lo ++ ri ++ F2Word.hat (F2Word.rev lo) ++ F2Word.hat (F2Word.rev ri)) ∧
+      lo = (gPseudo wh wv).1 ∧ ri = (gPseudo wh wv).2
+
+/-- The boundary-word lemma (line 1686): the boundary word of a `(w_h, w_v)`-pseudo-square is
+`w_1 * w_2 * hat(rev w_1) * hat(rev w_2)` with `(w_1, w_2) = G(w_h, w_v)`. The proof is the assembly of the four traces
+from the Table 1 fields of `IsPseudoSquare`. -/
+theorem pseudoSquare_boundaryWord {T : CellTile} {wh wv : BinaryWord} (hT : IsPseudoSquare T wh wv) :
+    IsBoundaryWord T (pseudoBoundaryWord (gPseudo wh wv).1 (gPseudo wh wv).2) := by
+  obtain ⟨c, lo, ri, hb, hlo, hri⟩ := hT.trace
+  refine ⟨c, ?_⟩
+  rw [← hlo, ← hri]
+  exact hb
+
+/-- "In particular, `T` is 180-degree symmetric" (line 1686): the boundary word of a pseudo-square is a boundary word
+and is invariant under the half-turn, which negates the letters and rotates by half the length. -/
+theorem pseudoSquare_halfTurn {T : CellTile} {wh wv : BinaryWord} (hT : IsPseudoSquare T wh wv) :
+    IsBoundaryWord T (pseudoBoundaryWord (gPseudo wh wv).1 (gPseudo wh wv).2) ∧
+      (pseudoBoundaryWord (gPseudo wh wv).1 (gPseudo wh wv).2).map Unit4.neg =
+        (pseudoBoundaryWord (gPseudo wh wv).1 (gPseudo wh wv).2).rotate
+          ((gPseudo wh wv).1.length + (gPseudo wh wv).2.length) :=
+  ⟨pseudoSquare_boundaryWord hT, pseudoBoundaryWord_halfTurn _ _⟩
+
+/-- "In particular, `R(T)` is a 90-degree rotation of `T`" (line 1686): the boundary word of the rotated pair is a
+rotation of the `i`-multiple of the boundary word of `T`. -/
+theorem pseudoSquare_quarterTurn (wh wv : BinaryWord) :
+    pseudoBoundaryWord (gPseudo (rotPseudo wh wv).1 (rotPseudo wh wv).2).1
+        (gPseudo (rotPseudo wh wv).1 (rotPseudo wh wv).2).2 =
+      ((pseudoBoundaryWord (gPseudo wh wv).1 (gPseudo wh wv).2).map Unit4.mulI).rotate
+        ((gPseudo wh wv).1.length + (gPseudo wh wv).2.length + (gPseudo wh wv).1.length) := by
+  rw [gPseudo_rotPseudo]
+  exact pseudoBoundaryWord_rotation _ _
+
 end FLatticePaper.Tiles
