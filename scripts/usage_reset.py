@@ -16,6 +16,7 @@ ROOT = Path("/home/nitro/flattice-lean")
 CODEX = Path("/home/nitro/.codex")
 CLIENT = CODEX/"packages/app-server-daemon/current/bin/codex"
 STATE = ROOT/".work/usage-reset.json"
+REDEEMABLE_GOALS = ("active", "blocked", "usage_limited")
 
 
 def stamp():
@@ -130,8 +131,14 @@ def project_state(tid,ends):
                     continue
                 limits=p.get("rate_limits") or {}
                 if limits.get("limit_id") in (None,"codex") and any(limits.get(k) for k in ("primary","secondary")):
-                    exhausted=any((limits.get(k) or {}).get("resets_at") in ends and
-                                  (limits.get(k) or {}).get("used_percent",0)>=100 for k in ("primary","secondary"))
+                    # The session and the account service can round the same reset time a second apart.
+                    windows = (limits.get("primary") or {}, limits.get("secondary") or {})
+                    exhausted = any(
+                        window.get("used_percent", 0) >= 100 and
+                        isinstance(window.get("resets_at"), (int, float)) and
+                        any(abs(window["resets_at"] - end) <= 1 for end in ends)
+                        for window in windows
+                    )
                 if p.get("type")=="error" and any(t in str(p).lower() for t in ("usage limit","usage_limit","rate_limit_reached")):
                     error_time=e.get("timestamp")
     if error_time:
@@ -163,7 +170,8 @@ def tick(state,may_redeem):
         if state.get("redeemed_utc"):
             if remain>0:
                 state.setdefault("verified_restoration",{"remaining_percent":remain,"utc":stamp()})
-                if goal=="blocked" and state.get("goal_at_redemption") in ("active","blocked") and not state.get("resume_sent"):
+                if (goal in ("blocked", "usage_limited") and state.get("goal_at_redemption") in REDEEMABLE_GOALS
+                        and not state.get("resume_sent")):
                     resume_goal()
                     state["resume_sent"]=stamp()
                 if goal=="active" or goal=="complete":
@@ -177,7 +185,7 @@ def tick(state,may_redeem):
             state.setdefault("unconfirmed_restoration_utc",stamp())
         elif state.get("unconfirmed_restoration_utc"):
             state["status"]="restored_after_unconfirmed_attempt"
-        elif goal not in ("active","blocked"):
+        elif goal not in REDEEMABLE_GOALS:
             state["status"]="inactive_campaign"
         elif remain>0:
             state["status"]="armed_above_zero"
