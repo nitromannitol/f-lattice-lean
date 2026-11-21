@@ -50,6 +50,7 @@ import FLatticePaper.Plane.Induction.ChildFrame
 import FLatticePaper.Plane.Induction.Potentials
 import FLatticePaper.Plane.Induction.Sheets
 import FLatticePaper.Plane.Induction.Bands
+import FLatticePaper.Plane.Induction.ReciprocalInputs
 import FLatticePaper.Plane.Induction.EvenStep
 import FLatticePaper.Plane.Induction.PolygonGeometry
 import FLatticePaper.Plane.Induction.OddStep
