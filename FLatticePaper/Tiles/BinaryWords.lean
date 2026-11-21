@@ -195,4 +195,61 @@ theorem cen_even_three (hM1 : M = b ++ [Letter.p, Letter.q] ++ a)
 
 end Even
 
+section Odd
+
+variable {a b N : BinaryWord}
+
+theorem mid_rev_odd (ha : a.reverse = a) (hb : b.reverse = b)
+    (hN1 : N = a ++ [Letter.p, Letter.q] ++ b) (hN2 : N = b ++ [Letter.q, Letter.p] ++ a) :
+    N.reverse = N := by
+  have h : N.reverse = a ++ [Letter.p, Letter.q] ++ b := by
+    rw [hN2]; simp [List.reverse_append, ha, hb, List.append_assoc]
+  rw [h]; exact hN1.symm
+
+/-- The relation `N p q b = b q p N` identifies the odd child `N p q b`. -/
+theorem hR_odd (hN1 : N = a ++ [Letter.p, Letter.q] ++ b) (hN2 : N = b ++ [Letter.q, Letter.p] ++ a) :
+    N ++ [Letter.p, Letter.q] ++ b = b ++ [Letter.q, Letter.p] ++ N := by
+  calc N ++ [Letter.p, Letter.q] ++ b
+      = (b ++ [Letter.q, Letter.p] ++ a) ++ [Letter.p, Letter.q] ++ b := by rw [← hN2]
+    _ = b ++ [Letter.q, Letter.p] ++ (a ++ [Letter.p, Letter.q] ++ b) := by
+          simp [List.append_assoc]
+    _ = b ++ [Letter.q, Letter.p] ++ N := by rw [← hN1]
+
+theorem k1_odd (hN1 : N = a ++ [Letter.p, Letter.q] ++ b) (hN2 : N = b ++ [Letter.q, Letter.p] ++ a) :
+    a ++ [Letter.p, Letter.q] ++ N = N ++ [Letter.q, Letter.p] ++ a := by
+  calc a ++ [Letter.p, Letter.q] ++ N
+      = a ++ [Letter.p, Letter.q] ++ (b ++ [Letter.q, Letter.p] ++ a) := by rw [← hN2]
+    _ = (a ++ [Letter.p, Letter.q] ++ b) ++ [Letter.q, Letter.p] ++ a := by
+          simp [List.append_assoc]
+    _ = N ++ [Letter.q, Letter.p] ++ a := by rw [← hN1]
+
+theorem r_rev_odd (ha : a.reverse = a) (hb : b.reverse = b)
+    (hN1 : N = a ++ [Letter.p, Letter.q] ++ b) (hN2 : N = b ++ [Letter.q, Letter.p] ++ a) :
+    (N ++ [Letter.p, Letter.q] ++ b).reverse = N ++ [Letter.p, Letter.q] ++ b := by
+  have hNr := mid_rev_odd ha hb hN1 hN2
+  have h1 : (N ++ [Letter.p, Letter.q] ++ b).reverse = b ++ [Letter.q, Letter.p] ++ N := by
+    simp [List.reverse_append, hNr, hb, List.append_assoc]
+  rw [h1]; exact (hR_odd hN1 hN2).symm
+
+/-- `Cen R N` for the odd child `R = N p q b`. -/
+theorem cen_odd_one (hN1 : N = a ++ [Letter.p, Letter.q] ++ b) (hN2 : N = b ++ [Letter.q, Letter.p] ++ a) :
+    N ++ [Letter.p, Letter.q] ++ (N ++ [Letter.p, Letter.q] ++ b)
+      = (N ++ [Letter.p, Letter.q] ++ b) ++ [Letter.q, Letter.p] ++ N := by
+  calc N ++ [Letter.p, Letter.q] ++ (N ++ [Letter.p, Letter.q] ++ b)
+      = N ++ [Letter.p, Letter.q] ++ (b ++ [Letter.q, Letter.p] ++ N) := by
+          rw [hR_odd hN1 hN2]
+    _ = (N ++ [Letter.p, Letter.q] ++ b) ++ [Letter.q, Letter.p] ++ N := by
+          simp [List.append_assoc]
+
+/-- `Cen b R` for the odd child `R = N p q b`. -/
+theorem cen_odd_two (hN1 : N = a ++ [Letter.p, Letter.q] ++ b) (hN2 : N = b ++ [Letter.q, Letter.p] ++ a) :
+    (N ++ [Letter.p, Letter.q] ++ b) ++ [Letter.p, Letter.q] ++ b
+      = b ++ [Letter.q, Letter.p] ++ (N ++ [Letter.p, Letter.q] ++ b) := by
+  calc (N ++ [Letter.p, Letter.q] ++ b) ++ [Letter.p, Letter.q] ++ b
+      = (b ++ [Letter.q, Letter.p] ++ N) ++ [Letter.p, Letter.q] ++ b := by rw [hR_odd hN1 hN2]
+    _ = b ++ [Letter.q, Letter.p] ++ (N ++ [Letter.p, Letter.q] ++ b) := by
+          simp [List.append_assoc]
+
+end Odd
+
 end FLatticePaper.Tiles
