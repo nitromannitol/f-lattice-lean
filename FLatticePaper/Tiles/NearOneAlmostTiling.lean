@@ -1,5 +1,6 @@
 import FLatticePaper.Tiles.NearOneRotation
 import FLatticePaper.Tiles.BaseCaseDecided
+import FLatticePaper.Tiles.BaseCaseGlobal
 
 /-! The near-one almost tilings of `prop:base_cases` (a).
 
@@ -448,6 +449,46 @@ theorem nearLadder_global_d6 :
   nearLadder_global 1
     (by rw [almostV1_ladder, almostV2_ladder]; exact noFirstCrossing_of_decide _ _ _ (by decide +kernel))
     (by rw [almostV1_ladder, almostV2_ladder]; exact noFarAdjacency_of_decide _ _ _ (by decide +kernel))
+
+/-- `prop:base_cases` (a), near-one stair rows: the turned stair tile is an almost tiling of `L'(R(1/d))`, `d = 2k+3`,
+for every `k`, with no global hypothesis (the global inputs are w3's `stair_global`). -/
+theorem nearStair_almost_all (k : ℕ) :
+    IsAlmostTiling (cellTurn (2 * (k : ℤ) + 3 + 1, 2 * (k : ℤ) + 3 - 2) (stairCells (2 * (k : ℤ) + 3)))
+      (paperLattice ((k : ℤ) + 1) ((k : ℤ) + 2)) :=
+  nearStair_almost k (stair_global k).1 (stair_global k).2
+
+/-- The near-one stair global inputs and edge-sharing clause, for every `k`, with no global hypothesis. -/
+theorem nearStair_global_all (k : ℕ) :
+    NoFirstCrossing
+        (cellTurn (2 * (k : ℤ) + 3 + 1, 2 * (k : ℤ) + 3 - 2) (stairCells (2 * (k : ℤ) + 3)))
+        (unlin (almostV₁ (gH (stairH k)))) (unlin (almostV₂ (gV (stairV k)))) ∧
+      NoFarAdjacency
+        (cellTurn (2 * (k : ℤ) + 3 + 1, 2 * (k : ℤ) + 3 - 2) (stairCells (2 * (k : ℤ) + 3)))
+        (unlin (almostV₁ (gH (stairH k)))) (unlin (almostV₂ (gV (stairV k)))) ∧
+      EdgeSharingClause
+        (cellTurn (2 * (k : ℤ) + 3 + 1, 2 * (k : ℤ) + 3 - 2) (stairCells (2 * (k : ℤ) + 3)))
+        (unlin (almostV₁ (gH (stairH k)))) (unlin (almostV₂ (gV (stairV k)))) :=
+  nearStair_global k (stair_global k).1 (stair_global k).2
+
+/-- `prop:base_cases` (a), near-one ladder rows: the turned doubled staircase is an almost tiling of `L'(R(1/d))`,
+`d = 2m+4`, for every `m`, with no global hypothesis (the global inputs are w3's `ladder_global`). -/
+theorem nearLadder_almost_all (m : ℕ) :
+    IsAlmostTiling (cellTurn (2 * (m : ℤ) + 4 + 1, 2 * (m : ℤ) + 4 - 2) (ladderCells (2 * (m : ℤ) + 4)))
+      (paperLattice (2 * (m : ℤ) + 3) (2 * (m : ℤ) + 5)) :=
+  nearLadder_almost m (ladder_global m).1 (ladder_global m).2
+
+/-- The near-one ladder global inputs and edge-sharing clause, for every `m`, with no global hypothesis. -/
+theorem nearLadder_global_all (m : ℕ) :
+    NoFirstCrossing
+        (cellTurn (2 * (m : ℤ) + 4 + 1, 2 * (m : ℤ) + 4 - 2) (ladderCells (2 * (m : ℤ) + 4)))
+        (unlin (almostV₁ (gH (ladderH (m + 1))))) (unlin (almostV₂ (gV (ladderV (m + 1))))) ∧
+      NoFarAdjacency
+        (cellTurn (2 * (m : ℤ) + 4 + 1, 2 * (m : ℤ) + 4 - 2) (ladderCells (2 * (m : ℤ) + 4)))
+        (unlin (almostV₁ (gH (ladderH (m + 1))))) (unlin (almostV₂ (gV (ladderV (m + 1))))) ∧
+      EdgeSharingClause
+        (cellTurn (2 * (m : ℤ) + 4 + 1, 2 * (m : ℤ) + 4 - 2) (ladderCells (2 * (m : ℤ) + 4)))
+        (unlin (almostV₁ (gH (ladderH (m + 1))))) (unlin (almostV₂ (gV (ladderV (m + 1))))) :=
+  nearLadder_global m (ladder_global m).1 (ladder_global m).2
 
 end NearTurn
 
