@@ -12,7 +12,7 @@ decided inputs of the reciprocal stairs (`d = 3, 5, 7`) therefore carry over. -/
 
 namespace FLatticePaper.Tiles
 
-open FLatticePaper.Construction (paperNearStairTile)
+open FLatticePaper.Construction (paperNearStairTile paperNearLadderTile)
 
 namespace NearTurn
 
@@ -301,6 +301,79 @@ theorem nearStair_vertices (k : ℕ) (x : GInt) :
       x ∈ chartDown (paperNearStairTile (2 * (k : ℤ) + 3)) := by
   rw [vertices_cellTurn, chartDown_nearStair, mem_turnedTile,
     mem_stairVertices (2 * (k : ℤ) + 3) (by omega)]
+
+/-- The unlin-image of the reciprocal ladder lattice `latticeOf (4m+8, 2) (-(2m+3), 2m+5)` is `paperLattice (2m+3) (2m+5)`,
+the paper lattice `L'(R(1/d))` of the rotated fraction `(2m+3)/(2m+5)`, `d = 2m+4`. -/
+theorem ladder_unlin_lattice (m : ℤ) :
+    latticeOf (unlin (2 * (2 * m + 4), 2 * 1)) (unlin (1 - (2 * m + 4), 1 + (2 * m + 4))) =
+      paperLattice (2 * m + 3) (2 * m + 5) := by
+  have hpar : (2 * m + 3 + (2 * m + 5)) % 2 = 0 := by omega
+  unfold paperLattice
+  rw [if_pos hpar]
+  ext u
+  simp only [latticeOf, Set.mem_setOf_eq, unlin]
+  constructor
+  · rintro ⟨k1, k2, rfl⟩
+    exact ⟨-k2, k1, by ext <;> dsimp only <;> ring⟩
+  · rintro ⟨c, c', rfl⟩
+    exact ⟨c', -c, by ext <;> dsimp only <;> ring⟩
+
+/-- The near-one ladder cell tile over the reciprocal ladder `ladderCells (2m+4)`: an almost tiling of the paper lattice
+`L'(R(1/d))`, `d = 2m+4`. -/
+theorem nearLadder_almost (m : ℕ)
+    (hF : NoFirstCrossing (ladderCells (2 * (m : ℤ) + 4)) (almostV₁ (gH (ladderH (m + 1))))
+      (almostV₂ (gV (ladderV (m + 1)))))
+    (hG : NoFarAdjacency (ladderCells (2 * (m : ℤ) + 4)) (almostV₁ (gH (ladderH (m + 1))))
+      (almostV₂ (gV (ladderV (m + 1))))) :
+    IsAlmostTiling (cellTurn (2 * (m : ℤ) + 4 + 1, 2 * (m : ℤ) + 4 - 2) (ladderCells (2 * (m : ℤ) + 4)))
+      (paperLattice (2 * (m : ℤ) + 3) (2 * (m : ℤ) + 5)) := by
+  have hR : IsAlmostTiling (ladderCells (2 * (m : ℤ) + 4))
+      (latticeOf (almostV₁ (gH (ladderH (m + 1)))) (almostV₂ (gV (ladderV (m + 1))))) := by
+    rw [(ladder_base_tile m).2.2.2]
+    exact ladder_almost_tiling_paper m hF hG
+  have h := almost_cellTurn (2 * (m : ℤ) + 4 + 1, 2 * (m : ℤ) + 4 - 2) hR
+  rw [almostV1_ladder, almostV2_ladder, ladder_unlin_lattice] at h
+  exact h
+
+/-- The two global inputs and the edge-sharing clause for the near-one ladder, transported from the reciprocal ones. -/
+theorem nearLadder_global (m : ℕ)
+    (hF : NoFirstCrossing (ladderCells (2 * (m : ℤ) + 4)) (almostV₁ (gH (ladderH (m + 1))))
+      (almostV₂ (gV (ladderV (m + 1)))))
+    (hG : NoFarAdjacency (ladderCells (2 * (m : ℤ) + 4)) (almostV₁ (gH (ladderH (m + 1))))
+      (almostV₂ (gV (ladderV (m + 1))))) :
+    NoFirstCrossing (cellTurn (2 * (m : ℤ) + 4 + 1, 2 * (m : ℤ) + 4 - 2) (ladderCells (2 * (m : ℤ) + 4)))
+        (unlin (almostV₁ (gH (ladderH (m + 1))))) (unlin (almostV₂ (gV (ladderV (m + 1))))) ∧
+      NoFarAdjacency (cellTurn (2 * (m : ℤ) + 4 + 1, 2 * (m : ℤ) + 4 - 2) (ladderCells (2 * (m : ℤ) + 4)))
+        (unlin (almostV₁ (gH (ladderH (m + 1))))) (unlin (almostV₂ (gV (ladderV (m + 1))))) ∧
+      EdgeSharingClause
+        (cellTurn (2 * (m : ℤ) + 4 + 1, 2 * (m : ℤ) + 4 - 2) (ladderCells (2 * (m : ℤ) + 4)))
+        (unlin (almostV₁ (gH (ladderH (m + 1))))) (unlin (almostV₂ (gV (ladderV (m + 1))))) :=
+  ⟨noFirst_cellTurn _ hF, noFar_cellTurn _ hG, edge_cellTurn _ (ladder_almost_tiling m hF hG).2⟩
+
+/-- The decided input for `d = 4` (`m = 0`). -/
+theorem nearLadder_almost_d4 :
+    IsAlmostTiling
+      (cellTurn (2 * ((0 : ℕ) : ℤ) + 4 + 1, 2 * ((0 : ℕ) : ℤ) + 4 - 2) (ladderCells (2 * ((0 : ℕ) : ℤ) + 4)))
+      (paperLattice (2 * ((0 : ℕ) : ℤ) + 3) (2 * ((0 : ℕ) : ℤ) + 5)) :=
+  nearLadder_almost 0
+    (by rw [almostV1_ladder, almostV2_ladder]; exact noFirstCrossing_of_decide _ _ _ (by decide +kernel))
+    (by rw [almostV1_ladder, almostV2_ladder]; exact noFarAdjacency_of_decide _ _ _ (by decide +kernel))
+
+/-- The decided input for `d = 6` (`m = 1`). -/
+theorem nearLadder_almost_d6 :
+    IsAlmostTiling
+      (cellTurn (2 * ((1 : ℕ) : ℤ) + 4 + 1, 2 * ((1 : ℕ) : ℤ) + 4 - 2) (ladderCells (2 * ((1 : ℕ) : ℤ) + 4)))
+      (paperLattice (2 * ((1 : ℕ) : ℤ) + 3) (2 * ((1 : ℕ) : ℤ) + 5)) :=
+  nearLadder_almost 1
+    (by rw [almostV1_ladder, almostV2_ladder]; exact noFirstCrossing_of_decide _ _ _ (by decide +kernel))
+    (by rw [almostV1_ladder, almostV2_ladder]; exact noFarAdjacency_of_decide _ _ _ (by decide +kernel))
+
+/-- The vertex set of the near-one ladder cell tile is the near-one chart `chartDown (paperNearLadderTile d)`. -/
+theorem nearLadder_vertices (m : ℕ) (x : GInt) :
+    x ∈ (cellTurn (2 * (m : ℤ) + 4 + 1, 2 * (m : ℤ) + 4 - 2) (ladderCells (2 * (m : ℤ) + 4))).vertices ↔
+      x ∈ chartDown (paperNearLadderTile (2 * (m : ℤ) + 4)) := by
+  rw [vertices_cellTurn, chartDown_nearLadder, mem_turnedTile,
+    mem_ladderVertices (2 * (m : ℤ) + 4) (by omega)]
 
 end NearTurn
 
