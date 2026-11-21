@@ -449,7 +449,7 @@ theorem form_step {u : Word} {X Y : BinaryWord} (h : Form u X Y) :
       | zero => exact Or.inl ⟨0, by simp, by simp, by simp⟩
       | succ j =>
         have e : 2 * (j + 1) = 2 * j + 1 + 1 := by ring
-        refine Or.inr (Or.inr (Or.inl ⟨by simp [count_snoc_three, count_rep_two], ?_⟩))
+        refine Or.inr (Or.inr (Or.inl ⟨by simp [count_rep_two], ?_⟩))
         refine ⟨List.replicate (2 * j + 1) Letter.q, List.replicate (2 * (j + 1)) Letter.q, ?_, ?_, ?_⟩
         · rw [e]; simp [cw, List.replicate_succ]
         · simp [cw]
@@ -464,6 +464,55 @@ theorem form_step {u : Word} {X Y : BinaryWord} (h : Form u X Y) :
     refine ⟨Or.inr (Or.inr (Or.inl ⟨by rw [count_snoc_one]; omega, c1_one hC⟩)),
       Or.inr (Or.inr (Or.inr ⟨by rw [count_snoc_two]; exact hu, c1_two hC⟩)),
       Or.inr (Or.inr (Or.inr ⟨by rw [count_snoc_three]; exact hu, c1_three hC⟩))⟩
+
+/-- Every even-root state `Q_(u)` has the form `Form u X Y`. -/
+theorem quadAt_form (u : Word) :
+    ∃ X Y : BinaryWord, quadAt [] u = ⟨(childWords u X Y).1, (childWords u X Y).2, X, Y⟩
+      ∧ Form u X Y := by
+  induction u using List.reverseRecOn with
+  | nil =>
+    refine ⟨[Letter.p], [Letter.q], ?_, Or.inr (Or.inl ⟨0, rfl, rfl, by simp⟩)⟩
+    rw [quadAt_nil]; rfl
+  | append_singleton u d ih =>
+    obtain ⟨X, Y, hq, hF⟩ := ih
+    obtain ⟨h1, h2, h3⟩ := form_step hF
+    cases d with
+    | one => exact ⟨_, _, by rw [quadAt_append_singleton, hq]; simp [WordQuad.step], h1⟩
+    | two => exact ⟨_, _, by rw [quadAt_append_singleton, hq]; simp [WordQuad.step], h2⟩
+    | three => exact ⟨_, _, by rw [quadAt_append_singleton, hq]; simp [WordQuad.step], h3⟩
+
+/-- Both children of every state are wrapped palindromes `cw m`, `cw m'`. -/
+theorem children_pal {u : Word} {X Y : BinaryWord} (h : Form u X Y) :
+    ∃ m m' : BinaryWord, m.reverse = m ∧ m'.reverse = m' ∧
+      (childWords u X Y).1 = cw m ∧ (childWords u X Y).2 = cw m' := by
+  rcases h with ⟨k, rfl, rfl, rfl⟩ | ⟨k, rfl, rfl, rfl⟩ | ⟨hu, a, b, rfl, rfl, hC⟩ |
+      ⟨hu, a, b, rfl, rfl, hC⟩
+  · have h0 : (List.replicate (k + 1) Digit.three).count Digit.one % 2 = 0 := by
+      rw [count_rep_three]
+    refine ⟨List.replicate (k + 1) Letter.p ++ [Letter.q] ++ List.replicate (k + 1) Letter.p,
+      List.replicate (k + 1) Letter.p, ?_, ?_, ?_, ?_⟩
+    · simp [List.reverse_append, List.reverse_replicate]
+    · simp [List.reverse_replicate]
+    · rw [childWords_even_gen h0]; simp [cw]
+    · rw [childWords_even_gen h0]; simp [cw]
+  · have h0 : (List.replicate k Digit.two).count Digit.one % 2 = 0 := by
+      rw [count_rep_two]
+    refine ⟨List.replicate (2 * k + 1) Letter.q, List.replicate (2 * k) Letter.q, ?_, ?_, ?_, ?_⟩
+    · simp [List.reverse_replicate]
+    · simp [List.reverse_replicate]
+    · rw [childWords_even_gen h0]; simp [cw, List.replicate_succ]
+    · rw [childWords_even_gen h0]; simp [cw]
+  · obtain ⟨ha, hb, hM⟩ := hC
+    have hMr := mid_rev_even (M := b ++ [Letter.p, Letter.q] ++ a) ha hb rfl hM
+    have k1 := k1_even (M := b ++ [Letter.p, Letter.q] ++ a) rfl hM
+    rw [childWords_even_gen hu]
+    exact ⟨(b ++ [Letter.p, Letter.q]) ++ (b ++ [Letter.p, Letter.q] ++ a),
+      b ++ [Letter.p, Letter.q] ++ a, z_rev_even hb hMr k1, hMr, by simp [cw], by simp [cw]⟩
+  · obtain ⟨hb, ha, hN⟩ := hC
+    have hNr := mid_rev_odd ha hb (N := a ++ [Letter.p, Letter.q] ++ b) rfl hN
+    rw [childWords_odd_gen hu]
+    exact ⟨(a ++ [Letter.p, Letter.q] ++ b) ++ [Letter.p, Letter.q] ++ b,
+      a ++ [Letter.p, Letter.q] ++ b, r_rev_odd ha hb rfl hN, hNr, by simp [cw], by simp [cw]⟩
 
 end Invariant
 
