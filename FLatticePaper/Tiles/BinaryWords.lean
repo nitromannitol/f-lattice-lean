@@ -252,4 +252,72 @@ theorem cen_odd_two (hN1 : N = a ++ [Letter.p, Letter.q] ++ b) (hN2 : N = b ++ [
 
 end Odd
 
+/-- The wrapped word `q a p`. -/
+def cw (a : BinaryWord) : BinaryWord := Letter.q :: (a ++ [Letter.p])
+
+/-- Both parents are wrapped central pairs `cw a`, `cw b` with `Cen a b` (even parity). -/
+def CForm0 (X Y : BinaryWord) : Prop := ∃ a b : BinaryWord, X = cw a ∧ Y = cw b ∧ Cen a b
+
+/-- Both parents are wrapped central pairs with `Cen b a` (odd parity). -/
+def CForm1 (X Y : BinaryWord) : Prop := ∃ a b : BinaryWord, X = cw a ∧ Y = cw b ∧ Cen b a
+
+section Transitions
+
+theorem c0_one {a b : BinaryWord} (hC : Cen a b) :
+    CForm1 (cw b ++ cw b ++ cw a) (cw b ++ cw a) := by
+  obtain ⟨ha, hb, hM⟩ := hC
+  have hMr := mid_rev_even (M := b ++ [Letter.p, Letter.q] ++ a) ha hb rfl hM
+  have k1 := k1_even (M := b ++ [Letter.p, Letter.q] ++ a) rfl hM
+  refine ⟨(b ++ [Letter.p, Letter.q]) ++ (b ++ [Letter.p, Letter.q] ++ a),
+    b ++ [Letter.p, Letter.q] ++ a, ?_, ?_, ?_⟩
+  · simp [cw, List.append_assoc]
+  · simp [cw, List.append_assoc]
+  · exact ⟨hMr, z_rev_even hb hMr k1, cen_even_one k1⟩
+
+theorem c0_two {a b : BinaryWord} (hC : Cen a b) :
+    CForm0 (cw b ++ cw b ++ cw a) (cw b) := by
+  obtain ⟨ha, hb, hM⟩ := hC
+  have hMr := mid_rev_even (M := b ++ [Letter.p, Letter.q] ++ a) ha hb rfl hM
+  have k1 := k1_even (M := b ++ [Letter.p, Letter.q] ++ a) rfl hM
+  refine ⟨(b ++ [Letter.p, Letter.q]) ++ (b ++ [Letter.p, Letter.q] ++ a), b, ?_, rfl, ?_⟩
+  · simp [cw, List.append_assoc]
+  · exact ⟨z_rev_even hb hMr k1, hb, cen_even_two k1⟩
+
+theorem c0_three {a b : BinaryWord} (hC : Cen a b) :
+    CForm0 (cw a) (cw b ++ cw a) := by
+  obtain ⟨ha, hb, hM⟩ := hC
+  have hMr := mid_rev_even (M := b ++ [Letter.p, Letter.q] ++ a) ha hb rfl hM
+  refine ⟨a, b ++ [Letter.p, Letter.q] ++ a, rfl, ?_, ?_⟩
+  · simp [cw, List.append_assoc]
+  · exact ⟨ha, hMr, cen_even_three rfl hM⟩
+
+theorem c1_one {a b : BinaryWord} (hC : Cen b a) :
+    CForm0 (cw a ++ cw b ++ cw b) (cw a ++ cw b) := by
+  obtain ⟨hb, ha, hN⟩ := hC
+  have hN2 := hN
+  have hNr := mid_rev_odd ha hb (N := a ++ [Letter.p, Letter.q] ++ b) rfl hN
+  refine ⟨(a ++ [Letter.p, Letter.q] ++ b) ++ [Letter.p, Letter.q] ++ b, a ++ [Letter.p, Letter.q] ++ b,
+    ?_, ?_, ?_⟩
+  · simp [cw, List.append_assoc]
+  · simp [cw, List.append_assoc]
+  · exact ⟨r_rev_odd ha hb rfl hN, hNr, cen_odd_one rfl hN⟩
+
+theorem c1_two {a b : BinaryWord} (hC : Cen b a) :
+    CForm1 (cw a ++ cw b ++ cw b) (cw b) := by
+  obtain ⟨hb, ha, hN⟩ := hC
+  have hNr := mid_rev_odd ha hb (N := a ++ [Letter.p, Letter.q] ++ b) rfl hN
+  refine ⟨(a ++ [Letter.p, Letter.q] ++ b) ++ [Letter.p, Letter.q] ++ b, b, ?_, rfl, ?_⟩
+  · simp [cw, List.append_assoc]
+  · exact ⟨hb, r_rev_odd ha hb rfl hN, cen_odd_two rfl hN⟩
+
+theorem c1_three {a b : BinaryWord} (hC : Cen b a) :
+    CForm1 (cw a) (cw a ++ cw b) := by
+  obtain ⟨hb, ha, hN⟩ := hC
+  refine ⟨a, a ++ [Letter.p, Letter.q] ++ b, rfl, ?_, ?_⟩
+  · simp [cw, List.append_assoc]
+  · exact ⟨mid_rev_odd ha hb (N := a ++ [Letter.p, Letter.q] ++ b) rfl hN, ha,
+      k1_odd rfl hN⟩
+
+end Transitions
+
 end FLatticePaper.Tiles
