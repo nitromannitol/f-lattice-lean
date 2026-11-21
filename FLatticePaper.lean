@@ -56,6 +56,7 @@ import FLatticePaper.Plane.Induction.PolygonGeometry
 import FLatticePaper.Plane.Induction.Coherence
 import FLatticePaper.Plane.Induction.OddStep
 import FLatticePaper.Plane.Induction.Periodization
+import FLatticePaper.Plane.Induction.Seams
 import FLatticePaper.Construction.NearOneBaseCases
 import FLatticePaper.Tiles.BoundaryStrings
 import FLatticePaper.Tiles.BinaryWords
