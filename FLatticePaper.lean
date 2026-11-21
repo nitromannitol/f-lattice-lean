@@ -113,6 +113,7 @@ import FLatticePaper.Tiles.WordFacts1
 import FLatticePaper.Tiles.WordFacts2
 import FLatticePaper.Tiles.WordFacts3
 import FLatticePaper.Tiles.SuccessorProof
+import FLatticePaper.Tiles.RowConvexCrossing
 import FLatticePaper.MainTheorems
 import FLatticePaper.Construction.BaseCaseRecurrence
 
