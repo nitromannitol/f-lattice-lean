@@ -10,6 +10,8 @@ import FLatticePaper.GeneralK.Obstacle
 import FLatticePaper.GeneralK.PeriodicEnvelope
 import FLatticePaper.GeneralK.ColumnWidth
 import FLatticePaper.GeneralK.RationalReference
+import FLatticePaper.GeneralK.ColumnCycleBound
+import FLatticePaper.GeneralK.ColumnResidual
 import Mathlib.Algebra.Order.Star.Real
 import Mathlib.Analysis.Real.Sqrt
 
@@ -128,6 +130,24 @@ theorem three_zero_correction_has_a_width_certified_shape (column : ℤ) :
   simpa using zeroSlice.exists_shape_of_periodicColumn 0 (fun row => (0 : Field) (column, row))
     (hperiod column) hwidth
 
+private def zeroSector : zeroSlice.Sector := ⟨0, zeroSlice.sectorCount_pos⟩
+
+theorem three_repeated_zero_shape_path_weight_is_bounded :
+    ∃ bound : ℚ, ∀ length : ℕ,
+      ∑ i ∈ Finset.range length, (ColumnSlice.cycleWeightAt (zeroSlice.zeroCycle zeroSector.val) (i : ℤ) : ℚ) ≤
+        length * (zeroSlice.cyclePeak - zeroSlice.a₀) + bound := by
+  let cycle := zeroSlice.zeroCycle zeroSector.val
+  let path (i : ℕ) := cycle.2.val (ColumnSlice.cycleIndex cycle (i : ℤ))
+  obtain ⟨bound, hbound⟩ := zeroSlice.exists_pathWeight_bound zeroSector
+  refine ⟨bound, fun length => ?_⟩
+  have h := hbound length path (fun i _ => by
+    simpa only [path, Int.natCast_add, Int.natCast_one, ColumnSlice.cycleIndex_add_one] using
+      cycle.2.property.2.2 (ColumnSlice.cycleIndex cycle (i : ℤ)))
+  simpa only [path, Int.natCast_add, Int.natCast_one, cycle, ColumnSlice.cycleWeightAt] using h
+
+#print axioms ColumnSlice.abs_linearColumnRow_sub_reference_le
+#print axioms ColumnSlice.exists_pathWeight_bound
+#print axioms three_repeated_zero_shape_path_weight_is_bounded
 #print axioms three_zero_correction_has_a_width_certified_shape
 #print axioms ColumnSlice.abs_sub_zero_le_shapeBound
 #print axioms exists_rationalFloorReference

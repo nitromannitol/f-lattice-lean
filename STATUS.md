@@ -56,6 +56,7 @@ The November 20 corrected edition and its supporting constructor are pinned by [
 - [Alternate ladder recurrence](FLatticePaper/Construction/AlternateLadderRank.lean) proves both strict input inequalities at B7 charge-one points and the selected strict decrease at every charge-zero point, using the actual spatial coordinates and the source correction from the occupied representative. `ladderOddAlt_exists_burningRank` transports the inequalities throughout the plane, and `ladderEvenAlt_exists_recurrent_extension` gives B8 by harmonic rotation. The native B7 and B8 theorems preserve height agreement, periods and growth along all positive pure runs. The period consumer checks both at length 200.
 - [Native retained endpoint atoms](FLatticePaper/Construction/EndpointAtoms.lean) identifies B9 and B10 with their literal height formulas in the occupied chart. `EndpointAtom.attach_llCenter_agrees` verifies the attachment and centering for any standard tile. Both fields have the source periods and growth and are recurrent on the physical graph. B10 reverses the checkerboard charge phase here, so its rank decreases along the vertical direction. The period consumer checks all four actual retained root registers.
 - [Classification reduction](FLatticePaper/Plane/ClassificationReduction.lean) verifies the primary harmonic apices, their boundary membership in the symmetric matrix space, the exact circular cone inequality, and the admission direction of the circle-packing theorem. The physical consumer checks a nonzero apex and a singular irrational matrix in an apex's cone. The hyperbola boundary theorem and the upper direction are still open.
+- [Recurrence and boundary](FLatticePaper/Plane/RecurrentBoundary.lean) proves that the quadratic growth of a recurrent integer superharmonic height is on the physical symmetric growth frontier. It compares with every global competitor having a strict quadratic advantage, on a box large enough for the two growth errors. The consumer applies this to both retained endpoint atoms.
 
 Run these checks from the sandbox repository root.
 
@@ -77,6 +78,7 @@ lake env lean checks/Periods.lean
 lake env lean checks/StaircaseCoverage.lean
 lake env lean checks/AlternateStaircase.lean
 lake build FLatticePaper.Plane.ClassificationReduction
+lake build FLatticePaper.Plane.RecurrentBoundary
 lake env lean checks/PrimaryGrowth.lean
 sha256sum --quiet -c paper.sha256
 ```
@@ -164,7 +166,7 @@ The smaller arithmetic critical family has an admission result in the source, a 
 
 [Obstacle.lean](FLatticePaper/GeneralK/Obstacle.lean) proves the attained least superharmonic majorant of an obstacle with a given majorizing height, inheritance of the integer affine periods, and the exact charge bound $D$ at and above the quadratic ceiling obstacle. [ColumnCharge.lean](FLatticePaper/GeneralK/ColumnCharge.lean) proves the real parabolic bound on each open chain and $0\le-\mathcal L f\le k^2D$ for the actual retained restriction. The consumer checks the least majorant at the zero obstacle and the zero linear row on the $k=3$ harmonic height.
 
-[ColumnFourier.lean](FLatticePaper/GeneralK/ColumnFourier.lean) proves the exact nonzero-mode contraction and inverse Fourier width bound for rows of length $L$ with uniformly bounded oscillation. [ColumnWidth.lean](FLatticePaper/GeneralK/ColumnWidth.lean) gives the resulting $E$ bound on integer periodic corrections with linear row norm at most $K$, and embeds the normalized physical column into the exact shape alphabet. The $k=3$ consumer checks this embedding at the zero correction. The upper bound still needs the actual correction to satisfy these hypotheses and the cycle estimate for its path.
+[ColumnFourier.lean](FLatticePaper/GeneralK/ColumnFourier.lean) proves the exact nonzero-mode contraction and inverse Fourier width bound for rows of length $L$ with uniformly bounded oscillation. [ColumnWidth.lean](FLatticePaper/GeneralK/ColumnWidth.lean) gives the resulting $E$ bound on integer periodic corrections with linear row norm at most $K$, and embeds the normalized physical column into the exact shape alphabet. [ColumnResidual.lean](FLatticePaper/GeneralK/ColumnResidual.lean) proves that the linear row of the retained restriction minus the reference has norm at most $K$ on the entire plane. [ColumnCycleBound.lean](FLatticePaper/GeneralK/ColumnCycleBound.lean) proves a uniform additive error on finite path weights by erasing shortest repeated segments, which are simple cycles. The $k=3$ consumer checks the shape embedding at the zero correction and the path bound for every length of a repeated zero-shape cycle. The upper bound still needs exact periodic realization, passage from the bounded remainder to the actual shape path, and the limiting comparison of its weights with the quadratic coefficient.
 
 The $k=2$ operator specialization is axiom-free. The interpolation, Laplacian, lift equivalence, growth and harmonic results and the consumers report only `[propext, Classical.choice, Quot.sound]`.
 
@@ -182,6 +184,8 @@ lake build FLatticePaper.GeneralK.PeriodicEnvelope
 lake build FLatticePaper.GeneralK.Obstacle
 lake build FLatticePaper.GeneralK.ColumnCharge
 lake build FLatticePaper.GeneralK.ColumnWidth
+lake build FLatticePaper.GeneralK.ColumnResidual
+lake build FLatticePaper.GeneralK.ColumnCycleBound
 lake build FLatticePaper.GeneralK.RationalReference
 lake build FLatticePaper.GeneralK.ColumnLift
 lake env lean checks/GeneralKColumns.lean
