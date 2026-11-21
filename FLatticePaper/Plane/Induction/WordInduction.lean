@@ -1,0 +1,56 @@
+import FLatticePaper.Plane.Induction.SheetFacts
+import FLatticePaper.Plane.Induction.Step
+
+namespace FLatticePaper.Induction
+open Farey
+
+/-- The conjugate word of a proper word: the swapped birth prefix of its odd parent. -/
+def conjWord (word : Word) : Word := (oddBirthPrefix word).map Digit.swapTwoThree
+
+/-- Induction over words: a property of the pure words and a step from the conjugate word gives every word. -/
+theorem word_induction {P : Word → Prop}
+    (hpure : ∀ k : ℕ, P (List.replicate k .three))
+    (hstep : ∀ word, (∃ x ∈ word, x ≠ .three) → P (conjWord word) → P word) :
+    ∀ word, P word := by
+  have key : ∀ n : ℕ, ∀ word : Word, word.length = n → P word := by
+    intro n
+    induction n using Nat.strong_induction_on with
+    | _ n ih =>
+      intro word hlen
+      by_cases hall : ∀ x ∈ word, x = Digit.three
+      · rw [all_three_eq_replicate hall]
+        exact hpure _
+      · have hex : ∃ x ∈ word, x ≠ Digit.three := by
+          by_contra hc
+          exact hall (fun x hx => Classical.byContradiction fun hne => hc ⟨x, hx, hne⟩)
+        have hlt : (conjWord word).length < n := by
+          rw [← hlen]
+          exact length_map_oddBirthPrefix_lt hex
+        exact hstep word hex (ih _ hlt _ rfl)
+  intro word
+  exact key _ word rfl
+
+/-- The three open inputs I1, I2, I3 of the step at a proper word (STATUS.md, Open). -/
+def OpenInputs (word : Word) : Prop :=
+  let frame := frameAt word
+  let Fp := quarterTurnField (standardField (conjWord word))
+  (∀ z ∈ frame.closedPolygon, 1 - frame.child.den ≤ frame.tGrade z → 0 ≤ frame.sheetC Fp z) ∧
+  (∀ z ∈ frame.closedPolygon, frame.sGrade z ≤ 2 * (frame.child.den + frame.child.num) - 1 →
+    harmonicGrid z ≤ (if frame.eps = 1 then frame.sheetC Fp z else frame.sheetA Fp z)) ∧
+  (∀ z ∈ frame.closedPolygon, laplacian (frame.sheetMin Fp) z = -1 ∨ laplacian (frame.sheetMin Fp) z = 0)
+
+/-- Every standard field has the packet, given the open inputs at every proper word. -/
+theorem packet_standardField (h : ∀ word, (∃ x ∈ word, x ≠ .three) → OpenInputs word) :
+    ∀ word, (frameAt word).Packet (standardField word) := by
+  refine word_induction (P := fun word => (frameAt word).Packet (standardField word)) ?_ ?_
+  · intro k
+    exact reciprocal_packet k
+  · intro word hproper hIH
+    obtain ⟨hA0, hEq, hrefl, -⟩ := sheetFacts_of_conjPacket hproper hIH
+    obtain ⟨hC0, hGe, hbin⟩ := h word hproper
+    have hP := (frameAt word).packet_of_sheets (Fp := quarterTurnField (standardField (conjWord word)))
+      hA0 hC0 hEq hGe hrefl hbin
+    rw [standardField_proper hproper]
+    exact hP
+
+end FLatticePaper.Induction
