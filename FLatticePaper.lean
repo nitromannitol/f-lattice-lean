@@ -52,6 +52,7 @@ import FLatticePaper.Plane.Induction.Sheets
 import FLatticePaper.Plane.Induction.Bands
 import FLatticePaper.Plane.Induction.EvenStep
 import FLatticePaper.Plane.Induction.PolygonGeometry
+import FLatticePaper.Plane.Induction.Coherence
 import FLatticePaper.Plane.Induction.OddStep
 import FLatticePaper.Plane.Induction.Periodization
 import FLatticePaper.Construction.NearOneBaseCases
