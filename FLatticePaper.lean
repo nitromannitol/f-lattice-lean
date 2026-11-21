@@ -101,6 +101,7 @@ import FLatticePaper.Tiles.RowPalin
 import FLatticePaper.Tiles.RowAdmiss
 import FLatticePaper.Tiles.NeighbourDisjoint
 import FLatticePaper.Tiles.EdgeClause
+import FLatticePaper.Tiles.AlmostTilingAssembly
 import FLatticePaper.MainTheorems
 import FLatticePaper.Construction.BaseCaseRecurrence
 
