@@ -349,7 +349,7 @@ theorem cen_rqr (n : ℕ) :
     Cen (List.replicate n Letter.p)
       (List.replicate n Letter.p ++ [Letter.q] ++ List.replicate n Letter.p) := by
   refine ⟨?_, ?_, ?_⟩
-  · simp [List.reverse_append, List.reverse_replicate]
+  · simp [List.reverse_replicate]
   · simp [List.reverse_replicate]
   · calc (List.replicate n Letter.p ++ [Letter.q] ++ List.replicate n Letter.p)
           ++ [Letter.p, Letter.q] ++ List.replicate n Letter.p
@@ -382,5 +382,89 @@ theorem cen_a2 (n : ℕ) :
             simp [List.append_assoc]
 
 end Powers
+
+section Invariant
+
+theorem childWords_even_gen {u : Word} (h : u.count Digit.one % 2 = 0) (X Y : BinaryWord) :
+    childWords u X Y = (Y ++ Y ++ X, Y ++ X) := by
+  simp [childWords, h]
+
+theorem childWords_odd_gen {u : Word} (h : u.count Digit.one % 2 = 1) (X Y : BinaryWord) :
+    childWords u X Y = (X ++ Y ++ Y, X ++ Y) := by
+  simp [childWords, h]
+
+theorem count_snoc_one (u : Word) : (u ++ [Digit.one]).count Digit.one = u.count Digit.one + 1 := by
+  simp [List.count_append]
+
+theorem count_snoc_two (u : Word) : (u ++ [Digit.two]).count Digit.one = u.count Digit.one := by
+  simp [List.count_append]
+
+theorem count_snoc_three (u : Word) :
+    (u ++ [Digit.three]).count Digit.one = u.count Digit.one := by
+  simp [List.count_append]
+
+theorem count_rep_two (k : ℕ) : (List.replicate k Digit.two).count Digit.one = 0 := by
+  simp [List.count_replicate]
+
+theorem count_rep_three (k : ℕ) : (List.replicate k Digit.three).count Digit.one = 0 := by
+  simp [List.count_replicate]
+
+/-- The four shapes of a parent pair: the two singleton families and the two central-pair parities. -/
+def Form (u : Word) (X Y : BinaryWord) : Prop :=
+  (∃ k : ℕ, u = List.replicate (k + 1) Digit.three ∧ X = [Letter.p]
+      ∧ Y = Letter.q :: List.replicate (k + 1) Letter.p) ∨
+  (∃ k : ℕ, u = List.replicate k Digit.two ∧ Y = [Letter.q]
+      ∧ X = List.replicate (2 * k) Letter.q ++ [Letter.p]) ∨
+  (u.count Digit.one % 2 = 0 ∧ CForm0 X Y) ∨
+  (u.count Digit.one % 2 = 1 ∧ CForm1 X Y)
+
+/-- One digit step preserves `Form`, with the next parents given by the digit. -/
+theorem form_step {u : Word} {X Y : BinaryWord} (h : Form u X Y) :
+    Form (u ++ [Digit.one]) (childWords u X Y).1 (childWords u X Y).2 ∧
+    Form (u ++ [Digit.two]) (childWords u X Y).1 Y ∧
+    Form (u ++ [Digit.three]) X (childWords u X Y).2 := by
+  rcases h with ⟨k, rfl, rfl, rfl⟩ | ⟨k, rfl, rfl, rfl⟩ | ⟨hu, a, b, rfl, rfl, hC⟩ |
+      ⟨hu, a, b, rfl, rfl, hC⟩
+  · -- singleton `3`-family: `u = 3^(k+1)`, `X = p`, `Y = q p^(k+1)`
+    have h0 : (List.replicate (k + 1) Digit.three).count Digit.one = 0 := count_rep_three _
+    rw [childWords_even_gen (by rw [h0])]
+    refine ⟨Or.inr (Or.inr (Or.inr ⟨by rw [count_snoc_one, h0], ?_⟩)),
+      Or.inr (Or.inr (Or.inl ⟨by rw [count_snoc_two, h0], ?_⟩)),
+      Or.inl ⟨k + 1, (List.replicate_succ').symm, rfl, ?_⟩⟩
+    · exact ⟨List.replicate (k + 1) Letter.p ++ [Letter.q] ++ List.replicate (k + 1) Letter.p,
+        List.replicate (k + 1) Letter.p, by simp [cw], by simp [cw], cen_rqr (k + 1)⟩
+    · exact ⟨List.replicate (k + 1) Letter.p ++ [Letter.q] ++ List.replicate (k + 1) Letter.p,
+        List.replicate k Letter.p, by simp [cw], by simp only [cw]; rw [List.replicate_succ'], cen_a2 k⟩
+    · simp [List.replicate_succ']
+  · -- singleton `2`-family: `u = 2^k`, `Y = q`, `X = q^(2k) p`
+    have hpar : (List.replicate k Digit.two).count Digit.one % 2 = 0 := by rw [count_rep_two]
+    rw [childWords_even_gen hpar]
+    refine ⟨Or.inr (Or.inr (Or.inr ⟨by simp [count_rep_two], ?_⟩)),
+      Or.inr (Or.inl ⟨k + 1, (List.replicate_succ').symm, rfl, ?_⟩), ?_⟩
+    · exact ⟨List.replicate (2 * k + 1) Letter.q, List.replicate (2 * k) Letter.q,
+        by simp [cw, List.replicate_succ], by simp [cw], cen_pow_q (2 * k)⟩
+    · have e : 2 * (k + 1) = 2 * k + 1 + 1 := by ring
+      rw [e]; simp [List.replicate_succ]
+    · cases k with
+      | zero => exact Or.inl ⟨0, by simp, by simp, by simp⟩
+      | succ j =>
+        have e : 2 * (j + 1) = 2 * j + 1 + 1 := by ring
+        refine Or.inr (Or.inr (Or.inl ⟨by simp [count_snoc_three, count_rep_two], ?_⟩))
+        refine ⟨List.replicate (2 * j + 1) Letter.q, List.replicate (2 * (j + 1)) Letter.q, ?_, ?_, ?_⟩
+        · rw [e]; simp [cw, List.replicate_succ]
+        · simp [cw]
+        · rw [e]; exact cen_pow_q _
+  · -- central pair of even parity
+    rw [childWords_even_gen hu]
+    refine ⟨Or.inr (Or.inr (Or.inr ⟨by rw [count_snoc_one]; omega, c0_one hC⟩)),
+      Or.inr (Or.inr (Or.inl ⟨by rw [count_snoc_two]; exact hu, c0_two hC⟩)),
+      Or.inr (Or.inr (Or.inl ⟨by rw [count_snoc_three]; exact hu, c0_three hC⟩))⟩
+  · -- central pair of odd parity
+    rw [childWords_odd_gen hu]
+    refine ⟨Or.inr (Or.inr (Or.inl ⟨by rw [count_snoc_one]; omega, c1_one hC⟩)),
+      Or.inr (Or.inr (Or.inr ⟨by rw [count_snoc_two]; exact hu, c1_two hC⟩)),
+      Or.inr (Or.inr (Or.inr ⟨by rw [count_snoc_three]; exact hu, c1_three hC⟩))⟩
+
+end Invariant
 
 end FLatticePaper.Tiles
