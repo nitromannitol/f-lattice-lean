@@ -227,4 +227,107 @@ theorem oddAlt_sourcesCover_iff_reduced (tp : TileParents) (beforePush : Word) (
   · exact hits_place_congr deck tp.odd m4 x
   · exact hits_place_congr deck tp.odd m5 x
 
+/-- Phase-zero offsets of the six odd alternate jets: `0, 2p+2w+e, e, 2e+w, f, e+w+f`. -/
+def oddAltOffset0 (word : Word) : Fin 6 → Site :=
+  let po := (parentsAt word).odd
+  let pe := (parentsAt word).even
+  ![0, 2 • kernelSite po + 2 • transverseSite po + kernelSite pe, kernelSite pe,
+    kernelSite pe + (kernelSite pe + transverseSite po), transverseSite pe,
+    transverseSite pe + (kernelSite pe + transverseSite po)]
+
+theorem alternateJets_odd_fst_zero (word : Word) (hphase : phase word = 0) (i : Fin 6) :
+    (alternateJets word .odd i).1 = oddAltOffset0 word i := by
+  unfold alternateJets
+  dsimp only
+  rw [if_pos hphase]
+  change ((![(0 : TileJet),
+      2 • kernelJet (parentsAt word).odd + 2 • transverseJet (parentsAt word).odd +
+        kernelJet (parentsAt word).even,
+      kernelJet (parentsAt word).even,
+      kernelJet (parentsAt word).even + (kernelJet (parentsAt word).even + transverseJet (parentsAt word).odd),
+      transverseJet (parentsAt word).even,
+      transverseJet (parentsAt word).even +
+        (kernelJet (parentsAt word).even + transverseJet (parentsAt word).odd)] : Fin 6 → TileJet) i).1 = _
+  fin_cases i <;> simp [oddAltOffset0, kernelJet_fst, transverseJet_fst, kernelSite, transverseSite,
+    Prod.fst_add, Prod.smul_fst]
+
+/-- The phase-zero seventh source of the odd alternate sits at `e + w`. -/
+theorem seventh_odd_fst_zero (beforePush : Word) (digit : Digit) (hphase : phase (beforePush ++ [digit]) = 0) :
+    (seventhAlternateJet beforePush digit .odd).1 =
+      kernelSite (parentsAt (beforePush ++ [digit])).even + transverseSite (parentsAt (beforePush ++ [digit])).odd := by
+  unfold seventhAlternateJet
+  dsimp only
+  simp [hphase, kernelJet_fst, transverseJet_fst, kernelSite, transverseSite]
+
+/-- The reduced seven sources of the phase-zero odd alternate, in schedule order. Each one is a period translate
+(`U = 2p+2e`, `V = w+f`) of the matching literal source, and the list is the hand proof's `E0` (with `P` at `e`
+listed twice, as the literal schedule does). -/
+def oddAltReduced0 (tp : TileParents) (word : Word) : List NonemptyTile :=
+  let po := (parentsAt word).odd
+  let pe := (parentsAt word).even
+  [tp.even.place 0 0,
+    (restoreAlternate word .even tp.alternateEven).place (kernelSite pe - transverseSite pe) 0,
+    tp.odd.place (kernelSite pe) 0,
+    tp.odd.place (-(2 • kernelSite po) - transverseSite pe) 0,
+    tp.even.place (-kernelSite pe - 2 • transverseSite pe) 0,
+    tp.odd.place (-transverseSite po) 0,
+    tp.odd.place (kernelSite pe) 0]
+
+/-- Step 1 of the phase-zero case: the literal seven sources cover the odd alternate's deck exactly when the reduced
+list does. -/
+theorem oddAlt_sourcesCover_iff_reduced0 (tp : TileParents) (beforePush : Word) (digit : Digit)
+    (hphase : phase (beforePush ++ [digit]) = 0) :
+    SourcesCover (oddAltDeck (parentsAt (beforePush ++ [digit])))
+        ((ordinaryAlternateSchedule tp beforePush digit .odd).first ::
+          (ordinaryAlternateSchedule tp beforePush digit .odd).rest) ↔
+      SourcesCover (oddAltDeck (parentsAt (beforePush ++ [digit])))
+        (oddAltReduced0 tp (beforePush ++ [digit])) := by
+  rw [ordinaryAlternateSchedule_odd_first, ordinaryAlternateSchedule_odd_rest]
+  rw [sourcesCover_seven_iff]
+  unfold oddAltReduced0
+  simp only []
+  rw [sourcesCover_seven_iff]
+  set word := beforePush ++ [digit] with hword
+  set deck := oddAltDeck (parentsAt word) with hdeck
+  have hU : deck.kernel = 2 • kernelSite (parentsAt word).odd + 2 • kernelSite (parentsAt word).even := rfl
+  have hV : deck.transverse = transverseSite (parentsAt word).odd + transverseSite (parentsAt word).even := rfl
+  have hoff : ∀ i : Fin 6, (alternateJets word .odd i).1 = oddAltOffset0 word i :=
+    fun i => alternateJets_odd_fst_zero word hphase i
+  have hs : (seventhAlternateJet beforePush digit .odd).1 =
+      kernelSite (parentsAt word).even + transverseSite (parentsAt word).odd :=
+    seventh_odd_fst_zero beforePush digit hphase
+  have m0 : (alternateJets word .odd 0).1 - 0 ∈ deck.span := by
+    rw [hoff]
+    exact mem_span_of deck 0 0 _ (by ext <;> simp [oddAltOffset0, hU, hV, PeriodDeck.combine])
+  have m1 : (seventhAlternateJet beforePush digit .odd).1 -
+      (kernelSite (parentsAt word).even - transverseSite (parentsAt word).even) ∈ deck.span := by
+    rw [hs]
+    exact mem_span_of deck 0 1 _ (by ext <;> simp [hU, hV, PeriodDeck.combine])
+  have m2 : (alternateJets word .odd 2).1 - kernelSite (parentsAt word).even ∈ deck.span := by
+    rw [hoff]
+    exact mem_span_of deck 0 0 _ (by ext <;> simp [oddAltOffset0, hU, hV, PeriodDeck.combine])
+  have m3 : (alternateJets word .odd 3).1 -
+      (-(2 • kernelSite (parentsAt word).odd) - transverseSite (parentsAt word).even) ∈ deck.span := by
+    rw [hoff]
+    exact mem_span_of deck 1 1 _ (by ext <;> simp [oddAltOffset0, hU, hV, PeriodDeck.combine] <;> ring)
+  have m4 : (alternateJets word .odd 1).1 -
+      (-kernelSite (parentsAt word).even - 2 • transverseSite (parentsAt word).even) ∈ deck.span := by
+    rw [hoff]
+    exact mem_span_of deck 1 2 _ (by ext <;> simp [oddAltOffset0, hU, hV, PeriodDeck.combine] <;> ring)
+  have m5 : (alternateJets word .odd 4).1 - -transverseSite (parentsAt word).odd ∈ deck.span := by
+    rw [hoff]
+    exact mem_span_of deck 0 1 _ (by ext <;> simp [oddAltOffset0, hU, hV, PeriodDeck.combine] <;> ring)
+  have m6 : (alternateJets word .odd 5).1 - kernelSite (parentsAt word).even ∈ deck.span := by
+    rw [hoff]
+    exact mem_span_of deck 0 1 _ (by ext <;> simp [oddAltOffset0, hU, hV, PeriodDeck.combine] <;> ring)
+  refine forall_congr' fun x => ?_
+  refine or_congr ?_ (or_congr ?_ (or_congr ?_ (or_congr ?_ (or_congr ?_ (or_congr ?_ ?_)))))
+  · exact hits_place_congr deck tp.even m0 x
+  · exact hits_place_congr deck (restoreAlternate word .even tp.alternateEven) m1 x
+  · exact hits_place_congr deck tp.odd m2 x
+  · exact hits_place_congr deck tp.odd m3 x
+  · exact hits_place_congr deck tp.even m4 x
+  · exact hits_place_congr deck tp.odd m5 x
+  · exact hits_place_congr deck tp.odd m6 x
+
 end FLatticePaper.Construction
