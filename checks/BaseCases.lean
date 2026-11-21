@@ -1,0 +1,9 @@
+import FLatticePaper.Construction.BaseCases
+
+open FLatticePaper.Construction
+
+#print axioms FLatticePaper.Construction.baseChildren_threes
+#print axioms FLatticePaper.Construction.baseChildren_twos
+#print axioms FLatticePaper.Construction.prop_base_cases_odometers
+#print axioms FLatticePaper.Construction.prop_base_cases_alternate_cover_odd
+#print axioms FLatticePaper.Construction.prop_base_cases_alternate_cover_even
