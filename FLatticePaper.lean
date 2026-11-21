@@ -78,6 +78,7 @@ import FLatticePaper.Tiles.ZeroOneRespects
 import FLatticePaper.Tiles.ZeroOneSentence
 import FLatticePaper.Tiles.ZeroOneStringPositions
 import FLatticePaper.Tiles.AlmostTilingCover
+import FLatticePaper.Plane.Induction.StarFromSheets
 import FLatticePaper.Plane.Induction.OddStep
 import FLatticePaper.Plane.Induction.Periodization
 import FLatticePaper.Plane.Induction.Seams
