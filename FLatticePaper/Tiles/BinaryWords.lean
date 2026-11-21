@@ -583,4 +583,77 @@ theorem almost_palindrome_two (w0 u : Word) :
 
 end Invariant
 
+section Agreement
+
+/-- Even-parity agreement of `lemma:almost_palindrome` (3). -/
+def AgreeE (P Q : BinaryWord) : Prop :=
+  slice2 P (min P.length Q.length) = slice2 Q.reverse (min P.length Q.length) ∧
+  slice2 P (min P.length (2 * Q.length)) = slice2 (Q ++ Q).reverse (min P.length (2 * Q.length))
+
+/-- Odd-parity agreement of `lemma:almost_palindrome` (3). -/
+def AgreeO (P Q : BinaryWord) : Prop :=
+  slice2 P.reverse (min P.length Q.length) = slice2 Q (min P.length Q.length) ∧
+  slice2 P.reverse (min P.length (2 * Q.length)) = slice2 (Q ++ Q) (min P.length (2 * Q.length))
+
+/-- A slice is read off any decomposition of `w.drop 1` whose head has the right length. -/
+theorem slice2_eq_of {w W S : BinaryWord} {n : ℕ} (h : w.drop 1 = W ++ S)
+    (hn : n - 1 = W.length) : slice2 w n = W := by
+  unfold slice2
+  rw [h, hn]
+  simp
+
+/-- The identity `N p q N = (b q p N) q p a` from `N = a p q b = b q p a`. -/
+theorem n_pn {a b N : BinaryWord} (hN1 : N = a ++ [Letter.p, Letter.q] ++ b)
+    (hN2 : N = b ++ [Letter.q, Letter.p] ++ a) :
+    N ++ [Letter.p, Letter.q] ++ N = (b ++ [Letter.q, Letter.p] ++ N) ++ [Letter.q, Letter.p] ++ a := by
+  calc N ++ [Letter.p, Letter.q] ++ N
+      = N ++ [Letter.p, Letter.q] ++ (b ++ [Letter.q, Letter.p] ++ a) := by rw [← hN2]
+    _ = (N ++ [Letter.p, Letter.q] ++ b) ++ [Letter.q, Letter.p] ++ a := by
+          simp [List.append_assoc]
+    _ = (b ++ [Letter.q, Letter.p] ++ N) ++ [Letter.q, Letter.p] ++ a := by
+          rw [hR_odd hN1 hN2]
+
+theorem agreeE_c0 {a b : BinaryWord} (hC : Cen a b) :
+    AgreeE (cw b ++ cw b ++ cw a) (cw b ++ cw a) := by
+  obtain ⟨ha, hb, hM⟩ := hC
+  have hMr := mid_rev_even (M := b ++ [Letter.p, Letter.q] ++ a) ha hb rfl hM
+  have k1 := k1_even (M := b ++ [Letter.p, Letter.q] ++ a) rfl hM
+  -- the even child `P` drops to `W1 ++ S1` with `W1 = M q`
+  have hP1 : (cw b ++ cw b ++ cw a).drop 1
+      = ((b ++ [Letter.p, Letter.q] ++ a) ++ [Letter.q]) ++ (Letter.p :: (b ++ [Letter.p])) := by
+    have e : cw b ++ cw b ++ cw a
+        = Letter.q :: (((b ++ [Letter.p, Letter.q]) ++ (b ++ [Letter.p, Letter.q] ++ a)) ++ [Letter.p]) := by
+      simp [cw]
+    rw [e]
+    simp only [List.drop_succ_cons, List.drop_zero]
+    rw [k1]
+    simp [List.append_assoc]
+  have e0 : cw b ++ cw a = Letter.q :: ((b ++ [Letter.p, Letter.q] ++ a) ++ [Letter.p]) := by
+    simp [cw]
+  have hQr : (cw b ++ cw a).reverse
+      = Letter.p :: ((b ++ [Letter.p, Letter.q] ++ a) ++ [Letter.q]) := by
+    rw [e0, List.reverse_cons, List.reverse_append, hMr]; simp
+  -- the reversed even child drops to `M q`
+  have hQ1 : (cw b ++ cw a).reverse.drop 1 = ((b ++ [Letter.p, Letter.q] ++ a) ++ [Letter.q]) ++ [] := by
+    rw [hQr]; simp
+  -- the even child, after its head, is `M q p b p` in full
+  have hP2 : (cw b ++ cw b ++ cw a).drop 1
+      = ((b ++ [Letter.p, Letter.q] ++ a) ++ [Letter.q, Letter.p] ++ b ++ [Letter.p]) ++ [] := by
+    rw [hP1]; simp [List.append_assoc]
+  have hQQ : ((cw b ++ cw a) ++ (cw b ++ cw a)).reverse.drop 1
+      = ((b ++ [Letter.p, Letter.q] ++ a) ++ [Letter.q, Letter.p] ++ b ++ [Letter.p])
+          ++ ([Letter.q] ++ a ++ [Letter.q]) := by
+    rw [List.reverse_append, hQr]; simp [List.append_assoc]
+  have hn1 : min (cw b ++ cw b ++ cw a).length (cw b ++ cw a).length - 1
+      = ((b ++ [Letter.p, Letter.q] ++ a) ++ [Letter.q]).length := by
+    simp [cw]; omega
+  have hn2 : min (cw b ++ cw b ++ cw a).length (2 * (cw b ++ cw a).length) - 1
+      = ((b ++ [Letter.p, Letter.q] ++ a) ++ [Letter.q, Letter.p] ++ b ++ [Letter.p]).length := by
+    simp [cw]; omega
+  refine ⟨?_, ?_⟩
+  · rw [slice2_eq_of hP1 hn1, slice2_eq_of hQ1 hn1]
+  · rw [slice2_eq_of hP2 hn2, slice2_eq_of hQQ hn2]
+
+end Agreement
+
 end FLatticePaper.Tiles
