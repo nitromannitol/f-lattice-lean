@@ -45,6 +45,7 @@ import FLatticePaper.Tiles.Gluing
 import FLatticePaper.Farey.RotationLattice
 import FLatticePaper.Farey.SlopeDensity
 import FLatticePaper.Plane.OdometerTheorem
+import FLatticePaper.Construction.NearOneBaseCases
 import FLatticePaper.Tiles.BoundaryStrings
 import FLatticePaper.Tiles.BinaryWords
 import FLatticePaper.MainTheorems
