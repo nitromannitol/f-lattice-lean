@@ -30,6 +30,7 @@ import FLatticePaper.Construction.StaircaseRank
 import FLatticePaper.Construction.StaircaseRotation
 import FLatticePaper.Plane.AlternatePeriods
 import FLatticePaper.Plane.BandBurn
+import FLatticePaper.Plane.BandDeck
 import FLatticePaper.Plane.BellmanRank
 import FLatticePaper.Plane.EarlierChainPrice
 import FLatticePaper.Plane.EndpointGrowth

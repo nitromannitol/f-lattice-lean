@@ -3,6 +3,7 @@ import FLatticePaper.GeneralK.Connectivity
 import FLatticePaper.GeneralK.Trace
 import FLatticePaper.GeneralK.Envelope
 import FLatticePaper.GeneralK.GrowthClosed
+import FLatticePaper.GeneralK.Parabolic
 import Mathlib.Algebra.Order.Star.Real
 import Mathlib.Analysis.Real.Sqrt
 
@@ -74,6 +75,11 @@ theorem irrational_rank_one_is_admitted {k : ℤ} (hk : 2 ≤ k) :
     linear_combination (x : ℝ) ^ 2 * hs
   nlinarith only [hn, heq]
 
+theorem irrational_rank_one_parabolic_bound {k : ℤ} (hk : 2 ≤ k) (endpoint : ℚ → ℚ → ℝ)
+    (hslice : ∀ (u v : ℚ) (a : ℝ), symmetricMatrix a u v ∈ growthSet k ↔ a ≤ endpoint u v) :
+    -2 ≤ sInf (parabolicValues endpoint (-Real.sqrt 2) (-1)) :=
+  (mem_growthSet_iff_le_sInf_parabolicValues hk hslice _ _ _).mp (irrational_rank_one_is_admitted hk)
+
 #print axioms laplacian_two
 #print axioms interpolate_first
 #print axioms interpolate_last
@@ -107,5 +113,8 @@ theorem irrational_rank_one_is_admitted {k : ℤ} (hk : 2 ≤ k) :
 #print axioms three_cross_phase_path
 #print axioms isClosed_growthSet
 #print axioms isClosed_growthSet_two
+#print axioms mem_growthSet_iff_le_sInf_parabolicValues
+#print axioms growthSet_eq_closure_rationalConeUnion
+#print axioms irrational_rank_one_parabolic_bound
 
 end FLatticePaper.GeneralK.Checks

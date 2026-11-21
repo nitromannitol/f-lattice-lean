@@ -1,4 +1,4 @@
-import FLatticePaper.Plane.BandBurn
+import FLatticePaper.Plane.BandDeck
 
 namespace FLatticePaper.Checks
 
@@ -56,6 +56,22 @@ theorem diagonalThreshold_bandBurn (level : ℤ) :
   dsimp [thresholdGap, zeroSheet] at htie
   omega
 
+private def diagonalDeck : Farey.PeriodDeck := ⟨(0, 1), (-2, 0)⟩
+
+/-- The same plane example burns the actual two classes for the winding
+period `(-2,2)`, while keeping both physical input slots. -/
+theorem diagonalThreshold_bandBurn_deck (level : ℤ) :
+    ∃ order, BandBurns (thresholdMin zeroSheet diagonalSheet level)
+      (thresholdGap zeroSheet diagonalSheet level) diagonalDeck.classCode
+        (diagonalDeck.residueSquare.image diagonalDeck.classCode) order := by
+  apply exists_leftThreshold_bandBurnOrder_deck level diagonal_unit diagonal_left diagonal_right diagonalDeck (by decide) 2
+  · intro site i j
+    dsimp [thresholdGap, zeroSheet, diagonalSheet, diagonalDeck, Farey.PeriodDeck.combine]
+    omega
+  · intro site
+    dsimp [diagonalSheet, diagonalDeck, Farey.PeriodDeck.combine]
+    omega
+
 example : laplacian (thresholdMin zeroSheet diagonalSheet 0) (0, 0) = -1 := by decide
 
 #print axioms isBurningRank_leftThreshold
@@ -66,5 +82,8 @@ example : laplacian (thresholdMin zeroSheet diagonalSheet 0) (0, 0) = -1 := by d
 #print axioms exists_rightThreshold_bandBurnOrder
 #print axioms diagonalThreshold_comparison
 #print axioms diagonalThreshold_bandBurn
+#print axioms classCode_eq_on_band_iff
+#print axioms exists_leftThreshold_bandBurnOrder_deck
+#print axioms diagonalThreshold_bandBurn_deck
 
 end FLatticePaper.Checks
