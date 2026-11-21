@@ -10,14 +10,14 @@ def edgesFrom : GInt → F2Word → List (GInt × GInt)
   | _, [] => []
   | c, x :: w => (c, c + x.vec) :: edgesFrom (c + x.vec) w
 
-theorem walk_cons (c : GInt) (x : Unit4) (w : F2Word) :
+theorem walkCons (c : GInt) (x : Unit4) (w : F2Word) :
     F2Word.walk c (x :: w) = c :: F2Word.walk (c + x.vec) w := by
   simp [F2Word.walk]
 
 theorem walk_eq_cons (c : GInt) (w : F2Word) : ∃ t, F2Word.walk c w = c :: t := by
   cases w with
   | nil => exact ⟨[], by simp [F2Word.walk]⟩
-  | cons x w => exact ⟨_, walk_cons c x w⟩
+  | cons x w => exact ⟨_, walkCons c x w⟩
 
 /-- The consecutive pairs of the walk are the walk's edges. -/
 theorem zip_walk_eq (c : GInt) (w : F2Word) :
@@ -28,7 +28,7 @@ theorem zip_walk_eq (c : GInt) (w : F2Word) :
     obtain ⟨t, ht⟩ := walk_eq_cons (c + x.vec) w
     have ih' := ih (c + x.vec)
     rw [ht, List.tail_cons] at ih'
-    rw [walk_cons, ht, List.tail_cons, List.zip_cons_cons]
+    rw [walkCons, ht, List.tail_cons, List.zip_cons_cons]
     simp only [edgesFrom]
     rw [ih']
 

@@ -94,6 +94,10 @@ import FLatticePaper.Tiles.AlmostTiling
 import FLatticePaper.Tiles.RowScan
 import FLatticePaper.Tiles.WalkRows
 import FLatticePaper.Tiles.RowInterval
+import FLatticePaper.Tiles.RowCols
+import FLatticePaper.Tiles.RowPalin
+import FLatticePaper.Tiles.RowAdmiss
+import FLatticePaper.Tiles.NeighbourDisjoint
 import FLatticePaper.MainTheorems
 import FLatticePaper.Construction.BaseCaseRecurrence
 

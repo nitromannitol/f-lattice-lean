@@ -19,12 +19,12 @@ def cntNegI : F2Word → ℤ
 
 /-- The column of the north step, starting in row `b`, of a word walked from `p`. -/
 def colN : F2Word → GInt → ℤ → ℤ
-  | [], _, _ => 0
+  | [], p, _ => p.1
   | x :: u, p, b => if x = .i ∧ p.2 = b then p.1 else colN u (p + x.vec) b
 
 /-- The column of the south step, ending in row `b` (starting in row `b + 1`), of a word walked from `p`. -/
 def colS : F2Word → GInt → ℤ → ℤ
-  | [], _, _ => 0
+  | [], p, _ => p.1
   | x :: u, p, b => if x = .negI ∧ p.2 = b + 1 then p.1 else colS u (p + x.vec) b
 
 theorem cntI_nonneg (u : F2Word) : 0 ≤ cntI u := by
