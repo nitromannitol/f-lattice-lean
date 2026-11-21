@@ -61,6 +61,7 @@ import FLatticePaper.Plane.Induction.StandardField
 import FLatticePaper.Plane.Induction.SheetSwap
 import FLatticePaper.Plane.Induction.Packet
 import FLatticePaper.Plane.Induction.SheetMinRank
+import FLatticePaper.Plane.Induction.SheetDifference
 import FLatticePaper.Plane.Induction.OddStep
 import FLatticePaper.Plane.Induction.Periodization
 import FLatticePaper.Plane.Induction.Seams

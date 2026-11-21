@@ -1,0 +1,7 @@
+import FLatticePaper.Plane.Induction.SheetDifference
+
+open FLatticePaper.Induction
+
+#print axioms FLatticePaper.Induction.ChildFrame.sheetC_sub_sheetA_eq
+#print axioms FLatticePaper.Induction.sheetDifference_identifies
+#print axioms FLatticePaper.Induction.sheetDifference_identifies_pure
