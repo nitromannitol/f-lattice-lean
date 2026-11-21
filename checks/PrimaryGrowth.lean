@@ -1,7 +1,9 @@
 import FLatticePaper.Plane.ClassificationReduction
 import FLatticePaper.Plane.RecurrentBoundary
 import FLatticePaper.Plane.CirclePacking
+import FLatticePaper.Plane.HyperbolaBoundary
 import FLatticePaper.Construction.EndpointAtoms
+import FLatticePaper.Construction.StaircaseRank
 
 namespace FLatticePaper.Checks
 
@@ -33,6 +35,26 @@ theorem negative_identity_lies_in_physical_interior : symmetricCircleMatrix 0 0 
   norm_num [harmonicPeak] at h
   exact symmetricCircleMatrix_mem_interior_of_lt h (by norm_num)
 
+theorem reciprocal_root_is_on_the_hyperbola_frontier :
+    symmetricCircleMatrix (4 / 7) (1 - 4 / 7) (-Real.sqrt ((4 / 7) ^ 2 + (1 - 4 / 7) ^ 2)) ∈
+      frontier symmetricGrowthSet := by
+  obtain ⟨height, -, -, hg, hs, hr⟩ := Construction.stairEven_exists_recurrent_extension (den := 3)
+    (by simp [Construction.BaseMask.Valid])
+  let point := symmetricCircleMatrix (4 / 7) (1 - 4 / 7) (-Real.sqrt ((4 / 7) ^ 2 + (1 - 4 / 7) ^ 2))
+  have hsqrt : Real.sqrt ((4 / 7 : ℝ) ^ 2 + (1 - 4 / 7) ^ 2) = (5 / 7 : ℝ) := by
+    rw [← Real.sqrt_sq (show 0 ≤ (5 / 7 : ℝ) by norm_num)]
+    congr 1
+    norm_num
+  have hm : (⟨1, 3⟩ : Farey.Fraction).matrix = point.val := by
+    simp only [point, hsqrt]
+    ext i j
+    fin_cases i <;> fin_cases j <;> norm_num [Farey.Fraction.matrix, Farey.Fraction.periodDenominator,
+      symmetricCircleMatrix, circleMatrix, GeneralK.symmetricMatrix]
+  exact hr.mem_frontier_of_quadraticGrowth hs point (hm ▸ hg)
+
+#print axioms reciprocal_root_is_on_the_hyperbola_frontier
+#print axioms hyperbolaBoundary_of_recurrentInterior
+#print axioms circlePacking_of_recurrentInterior
 #print axioms negative_identity_lies_in_physical_interior
 #print axioms circlePacking_of_hyperbolaBoundary
 #print axioms circle_origin_cone_admits_irrational_singular_matrix

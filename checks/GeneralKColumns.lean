@@ -14,6 +14,8 @@ import FLatticePaper.GeneralK.ColumnCycleBound
 import FLatticePaper.GeneralK.ColumnResidual
 import FLatticePaper.GeneralK.ColumnUpperObstacle
 import FLatticePaper.GeneralK.Classification
+import FLatticePaper.GeneralK.PeriodPotential
+import FLatticePaper.GeneralK.TightPeriodWalk
 import Mathlib.Algebra.Order.Star.Real
 import Mathlib.Analysis.Real.Sqrt
 
@@ -167,6 +169,9 @@ theorem three_zero_slice_cyclePeak_eq_zero : (zeroSlice.cyclePeak : ℝ) = 0 := 
 #print axioms rationalSlice_iff_le_cycleEndpoint
 #print axioms mem_growthSet_iff_le_cycleParabolic
 #print axioms growthSet_eq_closure_cycleCones
+#print axioms rationalPeriodRealization_of_integralInputPotentials
+#print axioms HasDeckSlope.exists_rat_of_tight_basis_walks
+#print axioms exists_rationalReferencePolynomial
 #print axioms ColumnSlice.abs_linearColumnRow_sub_reference_le
 #print axioms ColumnSlice.exists_pathWeight_bound
 #print axioms three_repeated_zero_shape_path_weight_is_bounded
