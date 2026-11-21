@@ -1,4 +1,5 @@
 import FLatticePaper.Construction.StaircaseRotation
+import FLatticePaper.Construction.StaircaseStrips
 import FLatticePaper.Construction.LadderRotation
 import FLatticePaper.Plane.EarlierChainPrice
 
@@ -64,3 +65,14 @@ theorem pureThree_donorPrice_constant (extra : ℕ) (replaceEven : Bool) (steps 
     hjet (ladderOdd_earlierChain hvalid hagree hperiod)
 
 #print axioms pureThree_donorPrice_constant
+
+theorem reciprocal_root_zero_at_upper_transverse_edge :
+    ∃ field : Field, (BaseMask.stairEven.raw 3).Agrees field 0 ∧ Recurrent field ∧
+      ∀ y : ℤ, field (3 * y + 6, y) = 0 := by
+  have hvalid : BaseMask.stairEven.Valid 3 := by simp [BaseMask.Valid]
+  obtain ⟨field, hagree, hperiod, _, _, hrec⟩ := stairEven_exists_recurrent_extension hvalid
+  exact ⟨field, hagree, hrec, fun y =>
+    stairEven_eq_zero_of_transverse hvalid hagree hperiod (3 * y + 6, y) (by dsimp; omega) (by dsimp; omega)⟩
+
+#print axioms stairEven_eq_zero_of_transverse
+#print axioms reciprocal_root_zero_at_upper_transverse_edge

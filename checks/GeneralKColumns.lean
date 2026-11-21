@@ -1,4 +1,5 @@
 import FLatticePaper.GeneralK.ColumnLift
+import FLatticePaper.GeneralK.ColumnCycles
 import FLatticePaper.GeneralK.Connectivity
 import FLatticePaper.GeneralK.Trace
 import FLatticePaper.GeneralK.Envelope
@@ -80,6 +81,20 @@ theorem irrational_rank_one_parabolic_bound {k : ℤ} (hk : 2 ≤ k) (endpoint :
     -2 ≤ sInf (parabolicValues endpoint (-Real.sqrt 2) (-1)) :=
   (mem_growthSet_iff_le_sInf_parabolicValues hk hslice _ _ _).mp (irrational_rank_one_is_admitted hk)
 
+private def zeroSlice : ColumnSlice := ⟨3, by decide, 0, 0⟩
+
+theorem three_zero_slice_has_one_row_phase : zeroSlice.length = 1 := by
+  apply le_antisymm _ zeroSlice.length_pos
+  exact columnLength_min 3 0 0 Nat.one_pos ⟨0, by norm_num⟩ ⟨0, by norm_num⟩
+
+theorem three_zero_slice_reference_origin : zeroSlice.reference 0 (0, 0) = 0 := by
+  norm_num [ColumnSlice.reference, ColumnSlice.referencePolynomial]
+
+theorem three_zero_slice_cyclePeak_has_witness : ∃ (sector : zeroSlice.Sector)
+    (cycle : zeroSlice.SimpleCycle sector.val),
+    zeroSlice.cyclePeak = (zeroSlice.a₀ : ℚ) + zeroSlice.cycleMean sector.val cycle :=
+  zeroSlice.cyclePeak_attained
+
 #print axioms laplacian_two
 #print axioms interpolate_first
 #print axioms interpolate_last
@@ -116,5 +131,12 @@ theorem irrational_rank_one_parabolic_bound {k : ℤ} (hk : 2 ≤ k) (endpoint :
 #print axioms mem_growthSet_iff_le_sInf_parabolicValues
 #print axioms growthSet_eq_closure_rationalConeUnion
 #print axioms irrational_rank_one_parabolic_bound
+#print axioms startingColumnEntry_mem_growthSet
+#print axioms ColumnSlice.reference_add_phasePeriod
+#print axioms ColumnSlice.reference_add_length
+#print axioms ColumnSlice.columnRow_edgeColumns_add_phasePeriod
+#print axioms ColumnSlice.cyclePeak_attained
+#print axioms three_zero_slice_has_one_row_phase
+#print axioms three_zero_slice_cyclePeak_has_witness
 
 end FLatticePaper.GeneralK.Checks

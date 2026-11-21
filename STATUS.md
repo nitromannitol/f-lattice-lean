@@ -98,9 +98,13 @@ The constructor schedule checks, exact lattice and period proofs, endpoint odome
 
 [BellmanRank.lean](FLatticePaper/Plane/BellmanRank.lean) proves the general Part I rank construction from the absence of forts in grade half-spaces. It uses the two physical inputs to obtain uniform exit depth, bounds all obstacle iterates, and stabilizes their bounded correction on the finite period deck. The [physical endpoint consumer](checks/BellmanRank.lean) checks the hypotheses and derives recurrence from the resulting rank. The source-specific fort elimination remains open.
 
+[WeightedForts.lean](FLatticePaper/Plane/WeightedForts.lean) proves `no_boundedFort_of_componentwise_exit`. A minimal weighted grade reaches a free site through the bulk order. A single physical deck shift normalizes the entire fort, and the componentwise endpoint gate contradicts minimality or decreases the free-site order. The endpoint consumer now verifies these hypotheses directly. The proper-word bulk, normalization and endpoint certificates still have to be established for the actual mixed fields.
+
 [BandDeck.lean](FLatticePaper/Plane/BandDeck.lean) proves `classCode_eq_on_band_iff` from the primitive gap character $-i+2\eta j$. Every deck class meets the band, and two band sites in one class differ by a genuine winding translate. The periodic tie rank therefore gives `exists_leftThreshold_bandBurnOrder_deck` on the complete finite set of deck classes. The diagonal consumer checks the rank with winding $(-2,2)$ and both physical input slots.
 
 [EarlierChainPrice.lean](FLatticePaper/Plane/EarlierChainPrice.lean) proves the constant sum of the donor price and earlier chain price for both creator digits and every trailing run of threes, from the authentic harmonic rotation and earlier generator periods. [EarlierChain.lean](FLatticePaper/Farey/EarlierChain.lean) derives the deck displacement directly from the actual Farey registers and separates words of all threes from the two creator roles with a strict earlier word. The [consumer](checks/EarlierChain.lean) verifies the hypotheses on B1/B2 and B5/B6 in their literal physical charts. General rotation identification and transport of the actual canonical graphs are open.
+
+[StaircaseStrips.lean](FLatticePaper/Construction/StaircaseStrips.lean) proves `stairEven_eq_zero_of_transverse` on the entire physical strip $1-d\le x-dy\le2d$ for every odd $d\ge3$. It uses the native period cover and both actual corner increments. The consumer checks the whole line $x-3y=6$ on the recurrent root field. The complementary harmonic strip and the strengthened two zero levels remain separate proof obligations.
 
 The bootstrap, ordered-height, alternate-midpoint, placement, initializer, Farey chronology, threshold, recurrence/rotation and native evaluator milestones landed on `main` at `4dbc1eb`, `dd24414`, `a0df1d2`, `7056241`, `d08b018`, `acea381`, `ab4c8ca`, `f2cf9be` and `2546d52`. The matrix and period laws, root coverage and endpoint growth landed at `8501715`. The reciprocal and near-one staircase covers landed at `68e33d2` and `980b4b2`. Complete native initializer coverage landed at `c2606db`. The B1 height extension landed at `5d5e799`, its binary Laplacian and symmetry at `05a6538`, and its recurrence and centered native agreement at `2152670`. B2 recurrence landed at `048f7d0`, and B3 heights and reflection landed at `66ef919`. The B3 rank overlap and physical Laplacian landed at `bb44dcb` and `39d28ae`. With the worker's read-only `.git` mount, submit tested named paths via `python3 scripts/checkpoint.py request` and wait for its receipt before editing those paths again.
 
@@ -149,6 +153,8 @@ The smaller arithmetic critical family has an admission result in the source, a 
 
 [Parabolic.lean](FLatticePaper/GeneralK/Parabolic.lean) proves `mem_growthSet_iff_le_sInf_parabolicValues` and `growthSet_eq_closure_rationalConeUnion` for all real entries from the exact rational slice characterization. Necessity subtracts a rank-one positive semidefinite matrix. Sufficiency uses the pinned nearest-rational and lower-rational mesh with loss at most $1/(4h)$ and the checked closedness theorem. The irrational example applies the parabolic implication under the rational slice hypothesis. The rational characterization by the explicit weighted cycle graphs remains open.
 
+[ColumnReference.lean](FLatticePaper/GeneralK/ColumnReference.lean) checks the admitted reference entry $a_0$, the least positive integers $L,S$, the sector floor heights $J$, and both exact affine increments. [ColumnGraph.lean](FLatticePaper/GeneralK/ColumnGraph.lean) defines $D,K,E$, the normalized bounded shapes, the physical edge weights, and proves row and phase lift invariance. [ColumnCycles.lean](FLatticePaper/GeneralK/ColumnCycles.lean) defines `ColumnSlice.cyclePeak` as the maximum over all sectors and simple directed cycles, and proves `cyclePeak_attained` using the zero-shape cycle for nonemptiness. The consumer checks the one-row phase count and an attained cycle on the $k=3$, $b=c=0$ slice. Admission from an arbitrary cycle and the upper bound for all rational slices require further proofs.
+
 The $k=2$ operator specialization is axiom-free. The interpolation, Laplacian, lift equivalence, growth and harmonic results and the consumers report only `[propext, Classical.choice, Quot.sound]`.
 
 ```sh
@@ -159,6 +165,7 @@ lake build FLatticePaper.GeneralK.Envelope
 lake build FLatticePaper.GeneralK.Connectivity
 lake build FLatticePaper.GeneralK.GrowthClosed
 lake build FLatticePaper.GeneralK.Parabolic
+lake build FLatticePaper.GeneralK.ColumnCycles
 lake build FLatticePaper.GeneralK.ColumnLift
 lake env lean checks/GeneralKColumns.lean
 ```
@@ -166,7 +173,7 @@ lake env lean checks/GeneralKColumns.lean
 ### Proof queue
 
 1. Use checked leastness and monotonicity to prove the retained comparison and its zero-operator case. Prove the finite-cell equivalence using the actual quotient and round rule. Downward closure and closedness are checked.
-2. Define the explicit finite weighted graphs and $p_k$. Prove cycle admission by constructing a height. Prove the rational upper bound using exact periodic realization for any admissible full-rank period lattice, the least integer superharmonic obstacle majorant, the explicit Fourier bound on column differences, and finite cycle erasure. Derive the real equivalence and both cone inclusions. The physical trace bound $a+(k-1)c\le0$ gives the compactness needed for the maximality criterion.
+2. Prove admission of the defined `cyclePeak` by repeating a maximizing cycle and lifting its height. Prove the rational upper bound using exact periodic realization for any admissible full-rank period lattice, the least integer superharmonic obstacle majorant, the explicit Fourier bound on column differences, and finite cycle erasure. Discharge the rational slice hypothesis in the real equivalence and both cone inclusions. The physical trace bound $a+(k-1)c\le0$ gives the compactness needed for the maximality criterion.
 3. Use the checked harmonic witnesses to establish the gcd endpoint formula on the $1/k$ grid, the canonical critical parameters and exact grid period index, and the endpoint translation identity. The grid calculation is independent of the general Fourier bound.
 4. Prove the forbidden-set equivalences, chain test with both endpoint bits and their coincidence at $k=2$, and explicit forbidden intervals. Classify residue-only binary charges, realize all such patterns by integer heights, and derive the scalar odometers and the integer weighted-trace classification with its leftmost-column argument.
 5. Track the sibling's $k=2$ staircase and Farey results under their own conventions. The primary campaign above tracks the corrected October 2023 native height identification, coverage and mixed-word induction.
