@@ -56,6 +56,7 @@ import FLatticePaper.Plane.Induction.ReciprocalInputs
 import FLatticePaper.Plane.Induction.Binary
 import FLatticePaper.Plane.Induction.Strips
 import FLatticePaper.Tiles.GradeWindow
+import FLatticePaper.Tiles.WindowCounterexample
 import FLatticePaper.Tiles.BaseCaseGlobal
 import FLatticePaper.Tiles.PseudoSquare
 import FLatticePaper.Tiles.PseudoSquareSites
