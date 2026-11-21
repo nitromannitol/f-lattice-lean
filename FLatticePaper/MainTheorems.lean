@@ -7,6 +7,7 @@ import FLatticePaper.Plane.Induction.Packet
 import FLatticePaper.Plane.Induction.StandardField
 import FLatticePaper.Plane.Induction.WordInduction
 import FLatticePaper.Plane.Induction.LocalPremises
+import FLatticePaper.Plane.Induction.LocalPremisesRestricted
 import FLatticePaper.Plane.RestrictedBellmanRank
 
 /-! The two headline theorems from `theorem:odometers` at every reduced interior slope. -/
@@ -154,6 +155,14 @@ theorem odometersTheorem_of_localPremises
     (h : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → Induction.LocalPremises word) : OdometersTheorem :=
   odometersTheorem_of_packets (fun word _ => Induction.packet_of_localPremises h word)
     (fun word hw => starEstimates_of_localPremises (Induction.packet_of_localPremises h word) (h word hw))
+
+/-- `theorem:odometers` from the variant of the local premises (restricted forts) at every proper word. -/
+theorem odometersTheorem_of_localPremises'
+    (h : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → Induction.LocalPremises' word) : OdometersTheorem :=
+  odometersTheorem_of_packets (fun word _ => Induction.packet_of_localPremises' h word)
+    (fun word hw => starEstimates_of_localPremises (Induction.packet_of_localPremises' h word)
+      (Induction.localPremises_of_variant hw (Induction.packet_of_localPremises' h (Induction.conjWord word))
+        (h word hw)))
 
 /-- `theorem:hyperbola` from the local premises at every proper word. -/
 theorem hyperbola_of_localPremises
