@@ -98,7 +98,7 @@ theorem L_g2 (w1 : F2Word) (hA : Admissible w1) :
     have e : cntI wt - 1 - s = cntI wt - 1 - s := rfl
     linarith
 
-theorem map_mulI_mulNegI (v : F2Word) : (v.map Unit4.mulNegI).map Unit4.mulI = v := by
+theorem mapMulINegI (v : F2Word) : (v.map Unit4.mulNegI).map Unit4.mulI = v := by
   induction v with
   | nil => rfl
   | cons x v ih => cases x <;> simp [Unit4.mulNegI, Unit4.mulI, ih]
@@ -157,7 +157,7 @@ theorem L_g1 (w2 : F2Word) (hA : Admissible (w2.map Unit4.mulNegI)) (hlet : ∀ 
     have hWp : (ut.map Unit4.mulI).reverse = ut.map Unit4.mulI := by
       rw [← List.map_reverse, hutp]
     have hw2 : w2 = Unit4.i :: Unit4.i :: Unit4.negOne :: (ut.map Unit4.mulI ++ [Unit4.i]) := by
-      rw [← map_mulI_mulNegI w2, hut]
+      rw [← mapMulINegI w2, hut]
       simp [Unit4.mulI]
     subst hw2
     have hnnW : ∀ y ∈ ut.map Unit4.mulI, y ≠ .negI := fun y hy => by
@@ -214,7 +214,7 @@ theorem L_g1 (w2 : F2Word) (hA : Admissible (w2.map Unit4.mulNegI)) (hlet : ∀ 
     have hWp : (ut.map Unit4.mulI).reverse = ut.map Unit4.mulI := by
       rw [← List.map_reverse, hutp]
     have hw2 : w2 = Unit4.i :: (ut.map Unit4.mulI ++ [Unit4.i, Unit4.i, Unit4.i]) := by
-      rw [← map_mulI_mulNegI w2, hut]
+      rw [← mapMulINegI w2, hut]
       simp [Unit4.mulI]
     subst hw2
     have hnnW : ∀ y ∈ ut.map Unit4.mulI, y ≠ .negI := fun y hy => by
