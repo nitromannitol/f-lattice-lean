@@ -60,6 +60,7 @@ import FLatticePaper.Tiles.PseudoSquareAlong
 import FLatticePaper.Tiles.BaseCasePseudoSquares
 import FLatticePaper.Tiles.NearOneRotation
 import FLatticePaper.Tiles.NearOneAlmostTiling
+import FLatticePaper.Tiles.CommonExtension
 import FLatticePaper.Tiles.BaseCaseTiling
 import FLatticePaper.Tiles.BaseCaseAlmostTiling
 import FLatticePaper.Tiles.BaseCaseDecided
