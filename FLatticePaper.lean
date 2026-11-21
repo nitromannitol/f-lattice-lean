@@ -9,6 +9,7 @@ import FLatticePaper.Construction.AlternateStaircaseLaplacian
 import FLatticePaper.Construction.AlternateStaircaseRankCorrection
 import FLatticePaper.Construction.AlternateStaircaseRecurrence
 import FLatticePaper.Construction.AlternateStaircaseRotation
+import FLatticePaper.Construction.OrdinaryOddAltSources
 import FLatticePaper.Construction.AlternateStaircaseSeams
 import FLatticePaper.Construction.BaseCaseLaplacian
 import FLatticePaper.Construction.BaseRegisters
