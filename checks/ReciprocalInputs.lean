@@ -1,0 +1,5 @@
+import FLatticePaper.Plane.Induction.ReciprocalInputs
+
+#print axioms FLatticePaper.Induction.reciprocalFrame_child
+#print axioms FLatticePaper.Induction.reciprocal_heightInputs
+#print axioms FLatticePaper.Induction.reciprocal_coherentConstants
