@@ -52,6 +52,7 @@ import FLatticePaper.Plane.Induction.Sheets
 import FLatticePaper.Plane.Induction.Bands
 import FLatticePaper.Plane.Induction.ReciprocalInputs
 import FLatticePaper.Plane.Induction.Binary
+import FLatticePaper.Plane.Induction.Strips
 import FLatticePaper.Plane.Induction.EvenStep
 import FLatticePaper.Plane.Induction.PolygonGeometry
 import FLatticePaper.Plane.Induction.Coherence
