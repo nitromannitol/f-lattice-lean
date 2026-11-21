@@ -48,7 +48,7 @@ def slice2 (w : BinaryWord) (n : ℕ) : BinaryWord := (w.drop 1).take (n - 1)
 theorem quadAt_nil (w0 : Word) : quadAt w0 [] = initialQuad w0 := rfl
 
 /-- The word component of the accumulator grows by the appended digits. -/
-theorem foldl_fst (w0 u : Word) (acc : Word × WordQuad) :
+theorem foldl_fst (u : Word) (acc : Word × WordQuad) :
     (u.foldl (fun (acc : Word × WordQuad) digit => (acc.1 ++ [digit], acc.2.step acc.1 digit)) acc).1
       = acc.1 ++ u := by
   induction u generalizing acc with
@@ -59,10 +59,81 @@ theorem foldl_fst (w0 u : Word) (acc : Word × WordQuad) :
 
 theorem quadAt_append_singleton (w0 u : Word) (d : Digit) :
     quadAt w0 (u ++ [d]) = (quadAt w0 u).step (w0 ++ u) d := by
-  have h := foldl_fst w0 u (w0, initialQuad w0)
+  have h := foldl_fst u (w0, initialQuad w0)
   unfold quadAt at *
   rw [List.foldl_append]
   simp only [List.foldl_cons, List.foldl_nil]
   rw [h]
+
+theorem childWords_congr {w w' : Word} (h : w.count .one % 2 = w'.count .one % 2)
+    (pw qw : BinaryWord) : childWords w pw qw = childWords w' pw qw := by
+  unfold childWords
+  rw [h]
+
+theorem WordQuad.step_congr {w w' : Word} (h : w.count .one % 2 = w'.count .one % 2)
+    (quad : WordQuad) (d : Digit) : quad.step w d = quad.step w' d := by
+  have h1 : (w ++ [.one]).count .one % 2 = (w' ++ [.one]).count .one % 2 := by
+    simp [List.count_append] <;> omega
+  have h2 : (w ++ [.two]).count .one % 2 = (w' ++ [.two]).count .one % 2 := by
+    simp [List.count_append] <;> omega
+  have h3 : (w ++ [.three]).count .one % 2 = (w' ++ [.three]).count .one % 2 := by
+    simp [List.count_append] <;> omega
+  cases d
+  · simp only [WordQuad.step, childWords_congr h1]
+  · simp only [WordQuad.step, childWords_congr h2]
+  · simp only [WordQuad.step, childWords_congr h3]
+
+/-- `Q_{(w_0 u)}` depends on `w_0` only through the parity of its ones. -/
+theorem quadAt_congr {w0 w0' : Word} (h : w0.count .one % 2 = w0'.count .one % 2) (u : Word) :
+    quadAt w0 u = quadAt w0' u := by
+  induction u using List.reverseRecOn with
+  | nil =>
+    rw [quadAt_nil, quadAt_nil]
+    unfold initialQuad
+    rw [childWords_congr h]
+  | append_singleton u d ih =>
+    have h' : (w0 ++ u).count .one % 2 = (w0' ++ u).count .one % 2 := by
+      simp only [List.count_append]; omega
+    rw [quadAt_append_singleton, quadAt_append_singleton, ih, WordQuad.step_congr h']
+
+/-- Reversing every word of a quadruple. -/
+def WordQuad.rev (quad : WordQuad) : WordQuad :=
+  ⟨quad.childP.reverse, quad.childQ.reverse, quad.parentP.reverse, quad.parentQ.reverse⟩
+
+/-- Reversal exchanges the two parities of the child operator. -/
+theorem childWords_reverse (w : Word) (X Y : BinaryWord) :
+    childWords (.one :: w) X.reverse Y.reverse
+      = ((childWords w X Y).1.reverse, (childWords w X Y).2.reverse) := by
+  unfold childWords
+  rw [List.count_cons_self]
+  split_ifs <;> first | (exfalso; omega) | simp [List.reverse_append, List.append_assoc]
+
+theorem WordQuad.rev_step (w : Word) (quad : WordQuad) (d : Digit) :
+    quad.rev.step ([.one] ++ w) d = (quad.step w d).rev := by
+  cases d with
+  | one =>
+    simp only [WordQuad.step, WordQuad.rev, List.cons_append, List.nil_append]
+    rw [childWords_reverse (w ++ [.one]) quad.childP quad.childQ]
+  | two =>
+    simp only [WordQuad.step, WordQuad.rev, List.cons_append, List.nil_append]
+    rw [childWords_reverse (w ++ [.two]) quad.childP quad.parentQ]
+  | three =>
+    simp only [WordQuad.step, WordQuad.rev, List.cons_append, List.nil_append]
+    rw [childWords_reverse (w ++ [.three]) quad.parentP quad.childQ]
+
+/-- The odd-root family is the reversal of the even-root family. -/
+theorem quadAt_one_eq_rev (u : Word) : quadAt [.one] u = (quadAt [] u).rev := by
+  induction u using List.reverseRecOn with
+  | nil =>
+    rw [quadAt_nil, quadAt_nil]
+    have hc : childWords [.one] [.p] [.q]
+        = ((childWords [] [.p] [.q]).1.reverse, (childWords [] [.p] [.q]).2.reverse) := by
+      have := childWords_reverse [] [.p] [.q]
+      simpa using this
+    unfold initialQuad WordQuad.rev
+    rw [hc]
+    simp
+  | append_singleton u d ih =>
+    rw [quadAt_append_singleton, quadAt_append_singleton, ih, WordQuad.rev_step, List.nil_append]
 
 end FLatticePaper.Tiles
