@@ -12,3 +12,6 @@ open FLatticePaper.Construction
 #print axioms hits_place_congr
 #print axioms sourcesCover_seven_iff
 #print axioms oddAlt_sourcesCover_iff_reduced
+#print axioms alternateJets_odd_fst_zero
+#print axioms seventh_odd_fst_zero
+#print axioms oddAlt_sourcesCover_iff_reduced0
