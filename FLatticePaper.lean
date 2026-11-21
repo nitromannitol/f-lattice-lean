@@ -44,6 +44,7 @@ import FLatticePaper.Tiles.Gluing
 import FLatticePaper.Farey.RotationLattice
 import FLatticePaper.Farey.SlopeDensity
 import FLatticePaper.Plane.OdometerTheorem
+import FLatticePaper.Tiles.BoundaryStrings
 import FLatticePaper.Tiles.BinaryWords
 
 /-! Root import for the corrected F-lattice paper. -/
