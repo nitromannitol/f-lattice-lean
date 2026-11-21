@@ -2,7 +2,7 @@ import FLatticePaper.Plane.Induction.ChildFrame
 import FLatticePaper.Plane.RecurrenceRotation
 import FLatticePaper.Plane.QuadraticGrowth
 import FLatticePaper.Farey.RotationLattice
-import FLatticePaper.MainTheorems
+import FLatticePaper.Plane.OdometersStatement
 import FLatticePaper.Plane.OdometerTheorem
 
 namespace FLatticePaper.Induction
