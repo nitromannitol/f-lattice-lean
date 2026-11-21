@@ -43,3 +43,5 @@ theorem single_cell_vectors : almostV₁ [.one] = (1, 1) ∧ almostV₂ [.i] = (
 #print axioms rectangle_edges
 #print axioms single_cell_word
 #print axioms single_cell_vectors
+#print axioms sub_mem_latticeOf
+#print axioms uniqueness_of_neighbours
