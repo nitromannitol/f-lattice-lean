@@ -320,4 +320,67 @@ theorem c1_three {a b : BinaryWord} (hC : Cen b a) :
 
 end Transitions
 
+section Powers
+
+theorem rep_snoc (n : ℕ) (x : Letter) :
+    List.replicate n x ++ [x] = x :: List.replicate n x := by
+  rw [← List.replicate_succ', List.replicate_succ]
+
+theorem rep_comm (m : ℕ) (x : Letter) (l : BinaryWord) :
+    List.replicate m x ++ x :: l = x :: (List.replicate m x ++ l) := by
+  induction m with
+  | zero => simp
+  | succ k ih => simp [List.replicate_succ, ih]
+
+/-- `q^(m+1)` and `q^m` form a central pair. -/
+theorem cen_pow_q (m : ℕ) :
+    Cen (List.replicate m Letter.q) (List.replicate (m + 1) Letter.q) := by
+  refine ⟨List.reverse_replicate, List.reverse_replicate, ?_⟩
+  calc List.replicate (m + 1) Letter.q ++ [Letter.p, Letter.q] ++ List.replicate m Letter.q
+      = Letter.q :: (List.replicate m Letter.q ++ Letter.p :: Letter.q :: List.replicate m Letter.q) := by
+          simp [List.replicate_succ, List.append_assoc]
+    _ = List.replicate m Letter.q ++ Letter.q :: (Letter.p :: Letter.q :: List.replicate m Letter.q) :=
+          (rep_comm m Letter.q _).symm
+    _ = List.replicate m Letter.q ++ [Letter.q, Letter.p] ++ List.replicate (m + 1) Letter.q := by
+          simp [List.replicate_succ, List.append_assoc]
+
+/-- `p^n q p^n` is a palindrome and forms a central pair with `p^n`. -/
+theorem cen_rqr (n : ℕ) :
+    Cen (List.replicate n Letter.p)
+      (List.replicate n Letter.p ++ [Letter.q] ++ List.replicate n Letter.p) := by
+  refine ⟨?_, ?_, ?_⟩
+  · simp [List.reverse_append, List.reverse_replicate]
+  · simp [List.reverse_replicate]
+  · calc (List.replicate n Letter.p ++ [Letter.q] ++ List.replicate n Letter.p)
+          ++ [Letter.p, Letter.q] ++ List.replicate n Letter.p
+        = List.replicate n Letter.p ++ Letter.q :: (List.replicate n Letter.p ++ Letter.p :: Letter.q :: List.replicate n Letter.p) := by
+            simp [List.append_assoc]
+      _ = List.replicate n Letter.p ++ Letter.q :: Letter.p :: (List.replicate n Letter.p ++ Letter.q :: List.replicate n Letter.p) := by
+            rw [rep_comm n Letter.p (Letter.q :: List.replicate n Letter.p)]
+      _ = List.replicate n Letter.p ++ [Letter.q, Letter.p]
+            ++ (List.replicate n Letter.p ++ [Letter.q] ++ List.replicate n Letter.p) := by
+            simp [List.append_assoc]
+
+/-- `p^(n+1) q p^(n+1)` and `p^n` form a central pair (the even child after `3^(n+1) 2`). -/
+theorem cen_a2 (n : ℕ) :
+    Cen (List.replicate (n + 1) Letter.p ++ [Letter.q] ++ List.replicate (n + 1) Letter.p)
+      (List.replicate n Letter.p) := by
+  have hR : List.replicate (n + 1) Letter.p = Letter.p :: List.replicate n Letter.p :=
+    List.replicate_succ
+  refine ⟨?_, ?_, ?_⟩
+  · simp [List.reverse_append, List.reverse_replicate]
+  · simp [List.reverse_replicate]
+  · rw [hR]
+    calc List.replicate n Letter.p ++ [Letter.p, Letter.q]
+          ++ ((Letter.p :: List.replicate n Letter.p) ++ [Letter.q] ++ (Letter.p :: List.replicate n Letter.p))
+        = List.replicate n Letter.p ++ Letter.p :: Letter.q :: ((Letter.p :: List.replicate n Letter.p) ++ Letter.q :: (Letter.p :: List.replicate n Letter.p)) := by
+            simp [List.append_assoc]
+      _ = Letter.p :: (List.replicate n Letter.p ++ Letter.q :: ((Letter.p :: List.replicate n Letter.p) ++ Letter.q :: (Letter.p :: List.replicate n Letter.p))) :=
+            rep_comm n Letter.p _
+      _ = ((Letter.p :: List.replicate n Letter.p) ++ [Letter.q] ++ (Letter.p :: List.replicate n Letter.p))
+          ++ [Letter.q, Letter.p] ++ List.replicate n Letter.p := by
+            simp [List.append_assoc]
+
+end Powers
+
 end FLatticePaper.Tiles
