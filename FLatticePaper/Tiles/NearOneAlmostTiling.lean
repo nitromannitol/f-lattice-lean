@@ -375,6 +375,80 @@ theorem nearLadder_vertices (m : ℕ) (x : GInt) :
   rw [vertices_cellTurn, chartDown_nearLadder, mem_turnedTile,
     mem_ladderVertices (2 * (m : ℤ) + 4) (by omega)]
 
+/-- The decided near-one stair inputs for `d = 3`, `5`, `7`: the two global inputs and the edge-sharing clause of the
+turned tile, transported from the decided reciprocal inputs. -/
+theorem nearStair_global_d3 :
+    NoFirstCrossing
+        (cellTurn (2 * ((0 : ℕ) : ℤ) + 3 + 1, 2 * ((0 : ℕ) : ℤ) + 3 - 2) (stairCells (2 * ((0 : ℕ) : ℤ) + 3)))
+        (unlin (almostV₁ (gH (stairH 0)))) (unlin (almostV₂ (gV (stairV 0)))) ∧
+      NoFarAdjacency
+        (cellTurn (2 * ((0 : ℕ) : ℤ) + 3 + 1, 2 * ((0 : ℕ) : ℤ) + 3 - 2) (stairCells (2 * ((0 : ℕ) : ℤ) + 3)))
+        (unlin (almostV₁ (gH (stairH 0)))) (unlin (almostV₂ (gV (stairV 0)))) ∧
+      EdgeSharingClause
+        (cellTurn (2 * ((0 : ℕ) : ℤ) + 3 + 1, 2 * ((0 : ℕ) : ℤ) + 3 - 2) (stairCells (2 * ((0 : ℕ) : ℤ) + 3)))
+        (unlin (almostV₁ (gH (stairH 0)))) (unlin (almostV₂ (gV (stairV 0)))) :=
+  nearStair_global 0
+    (by rw [almostV1_stair, almostV2_stair]; exact noFirstCrossing_of_decide _ _ _ (by decide +kernel))
+    (by rw [almostV1_stair, almostV2_stair]; exact noFarAdjacency_of_decide _ _ _ (by decide +kernel))
+
+theorem nearStair_global_d5 :
+    NoFirstCrossing
+        (cellTurn (2 * ((1 : ℕ) : ℤ) + 3 + 1, 2 * ((1 : ℕ) : ℤ) + 3 - 2) (stairCells (2 * ((1 : ℕ) : ℤ) + 3)))
+        (unlin (almostV₁ (gH (stairH 1)))) (unlin (almostV₂ (gV (stairV 1)))) ∧
+      NoFarAdjacency
+        (cellTurn (2 * ((1 : ℕ) : ℤ) + 3 + 1, 2 * ((1 : ℕ) : ℤ) + 3 - 2) (stairCells (2 * ((1 : ℕ) : ℤ) + 3)))
+        (unlin (almostV₁ (gH (stairH 1)))) (unlin (almostV₂ (gV (stairV 1)))) ∧
+      EdgeSharingClause
+        (cellTurn (2 * ((1 : ℕ) : ℤ) + 3 + 1, 2 * ((1 : ℕ) : ℤ) + 3 - 2) (stairCells (2 * ((1 : ℕ) : ℤ) + 3)))
+        (unlin (almostV₁ (gH (stairH 1)))) (unlin (almostV₂ (gV (stairV 1)))) :=
+  nearStair_global 1
+    (by rw [almostV1_stair, almostV2_stair]; exact noFirstCrossing_of_decide _ _ _ (by decide +kernel))
+    (by rw [almostV1_stair, almostV2_stair]; exact noFarAdjacency_of_decide _ _ _ (by decide +kernel))
+
+theorem nearStair_global_d7 :
+    NoFirstCrossing
+        (cellTurn (2 * ((2 : ℕ) : ℤ) + 3 + 1, 2 * ((2 : ℕ) : ℤ) + 3 - 2) (stairCells (2 * ((2 : ℕ) : ℤ) + 3)))
+        (unlin (almostV₁ (gH (stairH 2)))) (unlin (almostV₂ (gV (stairV 2)))) ∧
+      NoFarAdjacency
+        (cellTurn (2 * ((2 : ℕ) : ℤ) + 3 + 1, 2 * ((2 : ℕ) : ℤ) + 3 - 2) (stairCells (2 * ((2 : ℕ) : ℤ) + 3)))
+        (unlin (almostV₁ (gH (stairH 2)))) (unlin (almostV₂ (gV (stairV 2)))) ∧
+      EdgeSharingClause
+        (cellTurn (2 * ((2 : ℕ) : ℤ) + 3 + 1, 2 * ((2 : ℕ) : ℤ) + 3 - 2) (stairCells (2 * ((2 : ℕ) : ℤ) + 3)))
+        (unlin (almostV₁ (gH (stairH 2)))) (unlin (almostV₂ (gV (stairV 2)))) :=
+  nearStair_global 2
+    (by rw [almostV1_stair, almostV2_stair]; exact noFirstCrossing_of_decide _ _ _ (by decide +kernel))
+    (by rw [almostV1_stair, almostV2_stair]; exact noFarAdjacency_of_decide _ _ _ (by decide +kernel))
+
+/-- The decided near-one ladder inputs for `d = 4` (`m = 0`). -/
+theorem nearLadder_global_d4 :
+    NoFirstCrossing
+        (cellTurn (2 * ((0 : ℕ) : ℤ) + 4 + 1, 2 * ((0 : ℕ) : ℤ) + 4 - 2) (ladderCells (2 * ((0 : ℕ) : ℤ) + 4)))
+        (unlin (almostV₁ (gH (ladderH (0 + 1))))) (unlin (almostV₂ (gV (ladderV (0 + 1))))) ∧
+      NoFarAdjacency
+        (cellTurn (2 * ((0 : ℕ) : ℤ) + 4 + 1, 2 * ((0 : ℕ) : ℤ) + 4 - 2) (ladderCells (2 * ((0 : ℕ) : ℤ) + 4)))
+        (unlin (almostV₁ (gH (ladderH (0 + 1))))) (unlin (almostV₂ (gV (ladderV (0 + 1))))) ∧
+      EdgeSharingClause
+        (cellTurn (2 * ((0 : ℕ) : ℤ) + 4 + 1, 2 * ((0 : ℕ) : ℤ) + 4 - 2) (ladderCells (2 * ((0 : ℕ) : ℤ) + 4)))
+        (unlin (almostV₁ (gH (ladderH (0 + 1))))) (unlin (almostV₂ (gV (ladderV (0 + 1))))) :=
+  nearLadder_global 0
+    (by rw [almostV1_ladder, almostV2_ladder]; exact noFirstCrossing_of_decide _ _ _ (by decide +kernel))
+    (by rw [almostV1_ladder, almostV2_ladder]; exact noFarAdjacency_of_decide _ _ _ (by decide +kernel))
+
+/-- The decided near-one ladder inputs for `d = 6` (`m = 1`). -/
+theorem nearLadder_global_d6 :
+    NoFirstCrossing
+        (cellTurn (2 * ((1 : ℕ) : ℤ) + 4 + 1, 2 * ((1 : ℕ) : ℤ) + 4 - 2) (ladderCells (2 * ((1 : ℕ) : ℤ) + 4)))
+        (unlin (almostV₁ (gH (ladderH (1 + 1))))) (unlin (almostV₂ (gV (ladderV (1 + 1))))) ∧
+      NoFarAdjacency
+        (cellTurn (2 * ((1 : ℕ) : ℤ) + 4 + 1, 2 * ((1 : ℕ) : ℤ) + 4 - 2) (ladderCells (2 * ((1 : ℕ) : ℤ) + 4)))
+        (unlin (almostV₁ (gH (ladderH (1 + 1))))) (unlin (almostV₂ (gV (ladderV (1 + 1))))) ∧
+      EdgeSharingClause
+        (cellTurn (2 * ((1 : ℕ) : ℤ) + 4 + 1, 2 * ((1 : ℕ) : ℤ) + 4 - 2) (ladderCells (2 * ((1 : ℕ) : ℤ) + 4)))
+        (unlin (almostV₁ (gH (ladderH (1 + 1))))) (unlin (almostV₂ (gV (ladderV (1 + 1))))) :=
+  nearLadder_global 1
+    (by rw [almostV1_ladder, almostV2_ladder]; exact noFirstCrossing_of_decide _ _ _ (by decide +kernel))
+    (by rw [almostV1_ladder, almostV2_ladder]; exact noFarAdjacency_of_decide _ _ _ (by decide +kernel))
+
 end NearTurn
 
 end FLatticePaper.Tiles
