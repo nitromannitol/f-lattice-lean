@@ -63,6 +63,7 @@ import FLatticePaper.Plane.Induction.OddStep
 import FLatticePaper.Plane.Induction.Periodization
 import FLatticePaper.Plane.Induction.Seams
 import FLatticePaper.Plane.Induction.Reflection
+import FLatticePaper.Plane.Induction.SheetRegions
 import FLatticePaper.Construction.NearOneBaseCases
 import FLatticePaper.Tiles.BoundaryStrings
 import FLatticePaper.Tiles.BinaryWords
