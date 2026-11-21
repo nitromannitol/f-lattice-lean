@@ -65,6 +65,7 @@ import FLatticePaper.Plane.Induction.SheetDifference
 import FLatticePaper.Plane.Induction.ZeroRegionBound
 import FLatticePaper.Plane.Induction.HarmonicRegionBound
 import FLatticePaper.Plane.Induction.SheetMinFromConj
+import FLatticePaper.Tiles.ZeroOneOdometers
 import FLatticePaper.Plane.Induction.OddStep
 import FLatticePaper.Plane.Induction.Periodization
 import FLatticePaper.Plane.Induction.Seams
