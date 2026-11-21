@@ -27,6 +27,11 @@ set_option maxRecDepth 20000 in
 theorem rectangle_window : WindowAlmostTiling ({(0, 0), (1, 0)} : CellTile) (2, 1) (-1, 1) 3 2 := by decide
 theorem rectangle_edges : WindowEdgeClause ({(0, 0), (1, 0)} : CellTile) (2, 1) (-1, 1) 2 := by decide
 
+-- the boundary word of the single cell is `w1 * w2 * hat(rev w1) * hat(rev w2)` for `w1 = [1]`, `w2 = [i]`, and the
+-- two lattice vectors of the statement are `(1,1)` and `(-1,1)`, as in `single_cell_window`
+theorem single_cell_word : IsBoundaryWord ({(0, 0)} : CellTile) (boundaryWordOf [.one] [.i]) := ⟨(0, 0), by decide⟩
+theorem single_cell_vectors : almostV₁ [.one] = (1, 1) ∧ almostV₂ [.i] = (-1, 1) := by decide
+
 #print axioms single_cell_boundary
 #print axioms rectangle_boundary
 #print axioms admissible_one
@@ -36,3 +41,5 @@ theorem rectangle_edges : WindowEdgeClause ({(0, 0), (1, 0)} : CellTile) (2, 1) 
 #print axioms single_cell_edges
 #print axioms rectangle_window
 #print axioms rectangle_edges
+#print axioms single_cell_word
+#print axioms single_cell_vectors

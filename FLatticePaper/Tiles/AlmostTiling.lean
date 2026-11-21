@@ -202,4 +202,26 @@ def Admissible (w : F2Word) : Prop :=
       (∃ wt : F2Word, w = [.one, .one, .i] ++ wt ++ [.one] ∧ wt.reverse = wt ∧ IFollowedBy 1 w) ∨
       (∃ wt : F2Word, w = [.one] ++ wt ++ [.one, .one, .one] ∧ wt.reverse = wt ∧ IFollowedBy 3 w))
 
+/-- The boundary word `w' = w₁ * w₂ * \widehat{rev w₁} * \widehat{rev w₂}` of `lemma:almost_square_tiling` (line 786). -/
+def boundaryWordOf (w₁ w₂ : F2Word) : F2Word :=
+  w₁ ++ w₂ ++ (F2Word.rev w₁).hat ++ (F2Word.rev w₂).hat
+
+/-- The first lattice vector `Σ w₁ + i` of `lemma:almost_square_tiling` (line 795). -/
+def almostV₁ (w₁ : F2Word) : GInt := F2Word.sum w₁ + gI
+
+/-- The second lattice vector `Σ w₂ - 1` of `lemma:almost_square_tiling` (line 795). -/
+def almostV₂ (w₂ : F2Word) : GInt := F2Word.sum w₂ - gOne
+
+/-- The edge-sharing clause (lines 796-797): a nonzero translate of `T` in the lattice `latticeOf v₁ v₂` that shares an
+edge with `T` is `±v₁` or `±v₂`. -/
+def EdgeSharingClause (T : CellTile) (v₁ v₂ : GInt) : Prop :=
+  ∀ v ∈ latticeOf v₁ v₂, v ≠ 0 → SharesEdge T v → v = v₁ ∨ v = -v₁ ∨ v = v₂ ∨ v = -v₂
+
+/-- The statement of `lemma:almost_square_tiling` (lines 779-797). The conditions (1)-(2) are on `w ∈ {w₁, -i·w₂}`,
+so both `w₁` and `-i·w₂` are admissible. The tile is simple (`IsSimpleTile`, the paper's notion of tile). -/
+def AlmostSquareTilingStatement : Prop :=
+  ∀ (T : CellTile) (w₁ w₂ : F2Word), IsSimpleTile T → IsBoundaryWord T (boundaryWordOf w₁ w₂) →
+    Admissible w₁ → Admissible (w₂.map Unit4.mulNegI) →
+    IsRegularAlmostTiling T (almostV₁ w₁) (almostV₂ w₂) ∧ EdgeSharingClause T (almostV₁ w₁) (almostV₂ w₂)
+
 end FLatticePaper.Tiles
