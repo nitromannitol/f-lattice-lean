@@ -3,6 +3,8 @@ import FLatticePaper.Plane.OdometerTheorem
 import FLatticePaper.Plane.OdometersStatement
 import FLatticePaper.Plane.Induction.EvenStep
 import FLatticePaper.Plane.Induction.OddStep
+import FLatticePaper.Plane.Induction.Packet
+import FLatticePaper.Plane.Induction.StandardField
 
 /-! The two headline theorems from `theorem:odometers` at every reduced interior slope. -/
 
@@ -62,5 +64,55 @@ theorem odometersTheorem_of_standardData
     (⟨parentsAt word, parentsAt_valid word⟩ : Induction.ChildFrame) hper hstep hnoSaddle hrank
   rw [hchild] at key
   exact key
+
+open Induction
+
+/-- The three star estimates and a constrained rank of the standard field of a word (Section 9). -/
+def StarEstimates (word : Word) : Prop :=
+  let F := standardField word
+  let frame := frameAt word
+  HasUnitSlip F (fun z => F (z + frame.shortShift)) ∧
+    NoEvenSlipSaddle F (fun z => F (z + frame.shortShift)) ∧
+    ∃ rank : Site → ℤ, IsConstrainedBurningRank F rank
+      (fun center input => slipIncrement F (fun z => F (z + frame.shortShift)) center input ≤ 0)
+
+/-- All three headline results from the packets and the star estimates at every proper word. -/
+theorem odometersTheorem_of_packets
+    (hpacket : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → (frameAt word).Packet (standardField word))
+    (hest : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → StarEstimates word) :
+    OdometersTheorem := by
+  refine Induction.odometersTheorem_of_even ?_
+  intro fraction hint hred heven
+  obtain ⟨birth, hbirth, -⟩ := existsUnique_birth fraction hint hred
+  obtain ⟨word, parity⟩ := birth
+  have hparity : parity = Parity.even := by
+    cases parity with
+    | even => rfl
+    | odd =>
+      exfalso
+      have hodd : fraction.Odd := by
+        rw [← hbirth]
+        exact (parentsAt_valid word).current_odd_parity
+      unfold Fraction.Odd at hodd
+      unfold Fraction.Even at heven
+      omega
+  subst hparity
+  have hchild : (⟨parentsAt word, parentsAt_valid word⟩ : Induction.ChildFrame).child = fraction := hbirth
+  by_cases hall : ∀ x ∈ word, x = .three
+  · obtain ⟨k, hk⟩ : ∃ k : ℕ, word = List.replicate k Digit.three :=
+      ⟨word.length, List.eq_replicate_iff.mpr ⟨rfl, hall⟩⟩
+    subst hk
+    have hfr : fraction = ⟨1, 2 * (k : ℤ) + 3⟩ := by
+      rw [← hchild]
+      exact reciprocalFrame_child k
+    rw [hfr]
+    exact (odometersTheoremAt_base (by omega)).1
+  · push Not at hall
+    have hp := hpacket word hall
+    obtain ⟨hU, hNS, rank, hrank⟩ := hest word hall
+    have key := Induction.ChildFrame.odometersTheoremAt_of_standard
+      (⟨parentsAt word, parentsAt_valid word⟩ : Induction.ChildFrame) hp.periods hU hNS hrank
+    rw [hchild] at key
+    exact key
 
 end FLatticePaper
