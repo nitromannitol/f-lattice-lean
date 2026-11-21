@@ -41,5 +41,7 @@ import FLatticePaper.Plane.WeightedForts
 import FLatticePaper.Farey.RationalBirth
 import FLatticePaper.Farey.Rotation
 import FLatticePaper.Tiles.Gluing
+import FLatticePaper.Farey.RotationLattice
+import FLatticePaper.Farey.SlopeDensity
 
 /-! Root import for the corrected F-lattice paper. -/
