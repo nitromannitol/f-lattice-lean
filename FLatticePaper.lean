@@ -58,6 +58,7 @@ import FLatticePaper.Tiles.PseudoSquareSites
 import FLatticePaper.Tiles.PseudoSquareAlong
 import FLatticePaper.Tiles.BaseCasePseudoSquares
 import FLatticePaper.Tiles.NearOneRotation
+import FLatticePaper.Tiles.BaseCaseTiling
 import FLatticePaper.Plane.Induction.Step
 import FLatticePaper.Plane.Induction.EvenStep
 import FLatticePaper.Plane.Induction.PolygonGeometry
