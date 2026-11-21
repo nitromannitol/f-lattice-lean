@@ -23,6 +23,7 @@ import FLatticePaper.Construction.LadderRotation
 import FLatticePaper.Construction.Native
 import FLatticePaper.Construction.NativeCoverage
 import FLatticePaper.Construction.PlacedAssembly
+import FLatticePaper.Construction.PureZeroLevels
 import FLatticePaper.Construction.StaircaseCoverage
 import FLatticePaper.Construction.StaircaseExtension
 import FLatticePaper.Construction.StaircaseLaplacian

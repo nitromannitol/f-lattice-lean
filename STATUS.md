@@ -84,6 +84,8 @@ lake build FLatticePaper.Plane.RecurrentBoundary
 lake build FLatticePaper.Plane.CirclePacking
 lake build FLatticePaper.Plane.HyperbolaBoundary
 lake env lean checks/PrimaryGrowth.lean
+lake build FLatticePaper.Construction.PureZeroLevels
+lake env lean checks/PureZeroLevels.lean
 sha256sum --quiet -c paper.sha256
 ```
 
@@ -113,7 +115,7 @@ The constructor schedule checks, exact lattice and period proofs, endpoint odome
 
 [EarlierChainPrice.lean](FLatticePaper/Plane/EarlierChainPrice.lean) proves the constant sum of the donor price and earlier chain price for both creator digits and every trailing run of threes, from the authentic harmonic rotation and earlier generator periods. [EarlierChain.lean](FLatticePaper/Farey/EarlierChain.lean) derives the deck displacement directly from the actual Farey registers and separates words of all threes from the two creator roles with a strict earlier word. The [consumer](checks/EarlierChain.lean) verifies the hypotheses on B1/B2 and B5/B6 in their literal physical charts. General rotation identification and transport of the actual canonical graphs are open.
 
-[StaircaseStrips.lean](FLatticePaper/Construction/StaircaseStrips.lean) proves `stairEven_eq_zero_of_transverse` on the entire physical strip $1-d\le x-dy\le2d$ and `stairEven_eq_harmonic_of_longitudinal` on $1-2d\le(d+1)x+(d-1)y\le2d+1$ for every odd $d\ge3$. Both use the native period cover and the actual corner increments. The consumer checks two whole lines on the recurrent root field. The strengthened two zero levels and the pure signed price data remain open.
+[StaircaseStrips.lean](FLatticePaper/Construction/StaircaseStrips.lean) proves `stairEven_eq_zero_of_transverse` on the entire physical strip $1-d\le x-dy\le2d$ and `stairEven_eq_harmonic_of_longitudinal` on $1-2d\le(d+1)x+(d-1)y\le2d+1$ for every odd $d\ge3$. Both use the native period cover and the actual corner increments. The consumer checks two whole lines on the recurrent root field. [PureZeroLevels.lean](FLatticePaper/Construction/PureZeroLevels.lean) checks the two additional zero-level laws across the four literal standard branches, including the restored vertical charts, the genuine diagonal bump, and the odd phase restriction. The physical consumer checks both root and doubled-ladder pairs. The other strengthened strips and the pure signed price data remain open.
 
 The bootstrap, ordered-height, alternate-midpoint, placement, initializer, Farey chronology, threshold, recurrence/rotation and native evaluator milestones landed on `main` at `4dbc1eb`, `dd24414`, `a0df1d2`, `7056241`, `d08b018`, `acea381`, `ab4c8ca`, `f2cf9be` and `2546d52`. The matrix and period laws, root coverage and endpoint growth landed at `8501715`. The reciprocal and near-one staircase covers landed at `68e33d2` and `980b4b2`. Complete native initializer coverage landed at `c2606db`. The B1 height extension landed at `5d5e799`, its binary Laplacian and symmetry at `05a6538`, and its recurrence and centered native agreement at `2152670`. B2 recurrence landed at `048f7d0`, and B3 heights and reflection landed at `66ef919`. The B3 rank overlap and physical Laplacian landed at `bb44dcb` and `39d28ae`. With the worker's read-only `.git` mount, submit tested named paths via `python3 scripts/checkpoint.py request` and wait for its receipt before editing those paths again.
 
@@ -176,6 +178,8 @@ The smaller arithmetic critical family has an admission result in the source, a 
 
 [PeriodPotential.lean](FLatticePaper/GeneralK/PeriodPotential.lean) proves that a feasible potential with a rational slope and integer deck increments gives the exact periodic representative. It rounds the two actual input differences, checks superharmonicity from the ceiling-label sum, and proves the affine remainder is periodic and bounded. [TightPeriodWalk.lean](FLatticePaper/GeneralK/TightPeriodWalk.lean) proves that tight physical walks for the two basis shifts give integer increments on the entire deck and rational slope coordinates. The remaining realization step is to produce those walks in a feasible potential on the physical quotient.
 
+[PeriodQuotient.lean](FLatticePaper/GeneralK/PeriodQuotient.lean) represents a feasible potential by the two real slopes and the finitely many phase values, normalized at the physical origin. Physical directed paths bound both slopes and every phase value, so the feasible set is compact. [PeriodExtremum.lean](FLatticePaper/GeneralK/PeriodExtremum.lean) proves that a maximizer of the sum of squares admits no nonzero normalized perturbation preserving all tight physical edges. The consumer checks feasibility and the extremum on a three-site physical quotient. The remaining steps are to obtain tight walks of independent winding and prove their tight component has the full period stabilizer.
+
 The $k=2$ operator specialization is axiom-free. The interpolation, Laplacian, lift equivalence, growth and harmonic results and the consumers report only `[propext, Classical.choice, Quot.sound]`.
 
 ```sh
@@ -198,6 +202,8 @@ lake build FLatticePaper.GeneralK.ColumnUpperObstacle
 lake build FLatticePaper.GeneralK.Classification
 lake build FLatticePaper.GeneralK.PeriodPotential
 lake build FLatticePaper.GeneralK.TightPeriodWalk
+lake build FLatticePaper.GeneralK.PeriodExtremum
+lake env lean checks/GeneralKPeriodQuotient.lean
 lake build FLatticePaper.GeneralK.RationalReference
 lake build FLatticePaper.GeneralK.ColumnLift
 lake env lean checks/GeneralKColumns.lean
