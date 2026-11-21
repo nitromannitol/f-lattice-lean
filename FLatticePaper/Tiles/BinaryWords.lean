@@ -757,6 +757,90 @@ theorem agreeE_B' {S : BinaryWord} (hSr : S.reverse = S) :
   · rw [slice2_eq_of hP1 hn1, slice2_eq_of hQ1 hn1]
   · rw [slice2_eq_of hP2 hn2, slice2_eq_of hQQ hn2]
 
+/-- The agreement of the children at every shape, split by the parity of the word. -/
+theorem family_agree {u : Word} {X Y : BinaryWord} (hF : Form u X Y) :
+    (u.count Digit.one % 2 = 0 → AgreeE (childWords u X Y).1 (childWords u X Y).2) ∧
+    (u.count Digit.one % 2 = 1 → AgreeO (childWords u X Y).1 (childWords u X Y).2) := by
+  rcases hF with ⟨k, rfl, rfl, rfl⟩ | ⟨k, rfl, rfl, rfl⟩ | ⟨hu, a, b, rfl, rfl, hC⟩ |
+      ⟨hu, a, b, rfl, rfl, hC⟩
+  · have hpar : (List.replicate (k + 1) Digit.three).count Digit.one % 2 = 0 := by
+      rw [count_rep_three]
+    refine ⟨fun _ => ?_, fun h => ?_⟩
+    · rw [childWords_even_gen hpar]
+      have eP : (Letter.q :: List.replicate (k + 1) Letter.p)
+          ++ (Letter.q :: List.replicate (k + 1) Letter.p) ++ [Letter.p]
+          = cw (List.replicate (k + 1) Letter.p ++ [Letter.q] ++ List.replicate (k + 1) Letter.p) := by
+        simp [cw]
+      have eQ : (Letter.q :: List.replicate (k + 1) Letter.p) ++ [Letter.p]
+          = cw (List.replicate (k + 1) Letter.p) := by
+        simp [cw]
+      show AgreeE ((Letter.q :: List.replicate (k + 1) Letter.p)
+          ++ (Letter.q :: List.replicate (k + 1) Letter.p) ++ [Letter.p])
+        ((Letter.q :: List.replicate (k + 1) Letter.p) ++ [Letter.p])
+      rw [eP, eQ]
+      exact agreeE_A' List.reverse_replicate (rep_snoc (k + 1) Letter.p)
+    · rw [count_rep_three] at h; norm_num at h
+  · have hpar : (List.replicate k Digit.two).count Digit.one % 2 = 0 := by
+      rw [count_rep_two]
+    refine ⟨fun _ => ?_, fun h => ?_⟩
+    · rw [childWords_even_gen hpar]
+      have eP : [Letter.q] ++ [Letter.q] ++ (List.replicate (2 * k) Letter.q ++ [Letter.p])
+          = cw (List.replicate (2 * k) Letter.q ++ [Letter.q]) := by
+        rw [rep_snoc]; simp [cw]
+      have eQ : [Letter.q] ++ (List.replicate (2 * k) Letter.q ++ [Letter.p])
+          = cw (List.replicate (2 * k) Letter.q) := by
+        simp [cw]
+      show AgreeE ([Letter.q] ++ [Letter.q] ++ (List.replicate (2 * k) Letter.q ++ [Letter.p]))
+        ([Letter.q] ++ (List.replicate (2 * k) Letter.q ++ [Letter.p]))
+      rw [eP, eQ]
+      exact agreeE_B' List.reverse_replicate
+    · rw [count_rep_two] at h; norm_num at h
+  · refine ⟨fun _ => ?_, fun h => ?_⟩
+    · rw [childWords_even_gen hu]; exact agreeE_c0 hC
+    · exact absurd h (by omega)
+  · refine ⟨fun h => ?_, fun _ => ?_⟩
+    · exact absurd h (by omega)
+    · rw [childWords_odd_gen hu]; exact agreeO_c1 hC
+
+theorem family_agree_quad (u : Word) :
+    (u.count Digit.one % 2 = 0 → AgreeE (quadAt [] u).childP (quadAt [] u).childQ) ∧
+    (u.count Digit.one % 2 = 1 → AgreeO (quadAt [] u).childP (quadAt [] u).childQ) := by
+  obtain ⟨X, Y, hq, hF⟩ := quadAt_form u
+  rw [hq]
+  exact family_agree hF
+
 end Agreement
+
+/-- `lemma:almost_palindrome` (3): the prefix agreements, read at the parity of the current word. -/
+theorem almost_palindrome_three (w0 u : Word) :
+    let pw := (quadAt w0 u).childP
+    let qw := (quadAt w0 u).childQ
+    let n := min pw.length qw.length
+    let m := min pw.length (2 * qw.length)
+    ((w0 ++ u).count .one % 2 = 0 →
+      slice2 pw n = slice2 qw.reverse n ∧ slice2 pw m = slice2 (qw ++ qw).reverse m) ∧
+    ((w0 ++ u).count .one % 2 = 1 →
+      slice2 pw.reverse n = slice2 qw n ∧ slice2 pw.reverse m = slice2 (qw ++ qw) m) := by
+  dsimp only
+  have hc : (w0 ++ u).count Digit.one % 2 = (w0.count Digit.one + u.count Digit.one) % 2 := by
+    rw [List.count_append]
+  rcases Nat.mod_two_eq_zero_or_one (w0.count Digit.one) with h | h
+  · rw [quadAt_of_even h u]
+    obtain ⟨e1, e2⟩ := family_agree_quad u
+    exact ⟨fun hp => e1 (by omega), fun hp => e2 (by omega)⟩
+  · rw [quadAt_of_odd h u]
+    obtain ⟨e1, e2⟩ := family_agree_quad u
+    dsimp only [WordQuad.rev]
+    constructor
+    · intro hp
+      obtain ⟨f1, f2⟩ := e2 (by omega)
+      constructor
+      · simpa using f1
+      · simpa [List.reverse_append] using f2
+    · intro hp
+      obtain ⟨f1, f2⟩ := e1 (by omega)
+      constructor
+      · simpa using f1
+      · simpa [List.reverse_append] using f2
 
 end FLatticePaper.Tiles
