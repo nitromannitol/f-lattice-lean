@@ -9,7 +9,7 @@ arithmetic of the harmonic grid under the transverse vector and under the reflec
 
 /-- The harmonic grid under the transverse vector `(n − d, n + d)`: `h0(x + V) = h0(x) + t(x) + c_V`. -/
 theorem strip_harmonic_shift (x1 x2 N D P cV : ℤ) (hP : P = D ^ 2 + 2 * D * N - N ^ 2)
-    (hcV : 2 * cV = -(D + N + P)) (hpar : (N + D) % 2 = 0) :
+    (hcV : 2 * cV = -(D + N + P)) (_hpar : (N + D) % 2 = 0) :
     harmonicGrid (x1 + (N - D), x2 + (N + D)) = harmonicGrid (x1, x2) + (N * x1 - D * x2) + cV := by
   have e1 := harmonicGrid_exact (x1 + (N - D), x2 + (N + D))
   have e2 := harmonicGrid_exact (x1, x2)
@@ -23,7 +23,7 @@ theorem strip_harmonic_shift (x1 x2 N D P cV : ℤ) (hP : P = D ^ 2 + 2 * D * N 
 
 /-- The harmonic grid under the reflection `R − K`: `h0(R − K − z) = h0(z) − t(z) + κ`. -/
 theorem strip_harmonic_reflect (z1 z2 N D P κ : ℤ) (hP : P = D ^ 2 + 2 * D * N - N ^ 2)
-    (hκ : 2 * κ = D + N - P) (hpar : (N + D) % 2 = 0) :
+    (hκ : 2 * κ = D + N - P) (_hpar : (N + D) % 2 = 0) :
     harmonicGrid (N - D + 1 - z1, N + D - 1 - z2) = harmonicGrid (z1, z2) - (N * z1 - D * z2) + κ := by
   have e1 := harmonicGrid_exact (N - D + 1 - z1, N + D - 1 - z2)
   have e2 := harmonicGrid_exact (z1, z2)
@@ -241,7 +241,7 @@ theorem ChildFrame.zero_of_transverse_mem (frame : ChildFrame) {M : Site → ℤ
     {F : Field} (hagree : ∀ y ∈ frame.closedPolygon, F y = M y)
     (hper : HasGeneratorPeriods frame.child F 0 frame.coherentConstantV) (z : Site)
     (hy : z + frame.child.modifiedDeck.transverse ∈ frame.closedPolygon)
-    (hlo : 1 - frame.child.den ≤ frame.tGrade z)
+    (_hlo : 1 - frame.child.den ≤ frame.tGrade z)
     (hhi : frame.tGrade z ≤ frame.child.num + 2 * frame.child.den - 1) : F z = 0 := by
   have hF := frame.field_transverse hper z
   have hw := frame.centre_sub_mem hy
