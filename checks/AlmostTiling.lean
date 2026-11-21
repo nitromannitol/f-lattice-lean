@@ -1,4 +1,4 @@
-import FLatticePaper.Tiles.AlmostTiling
+import FLatticePaper.Tiles.AlmostTilingAssembly
 
 open FLatticePaper.Tiles
 
@@ -45,3 +45,4 @@ theorem single_cell_vectors : almostV₁ [.one] = (1, 1) ∧ almostV₂ [.i] = (
 #print axioms single_cell_vectors
 #print axioms sub_mem_latticeOf
 #print axioms uniqueness_of_neighbours
+#print axioms FLatticePaper.Tiles.almost_square_tiling
