@@ -107,6 +107,11 @@ import FLatticePaper.Tiles.EdgeClause
 import FLatticePaper.Tiles.AlmostTilingAssembly
 import FLatticePaper.Tiles.CoveringRows
 import FLatticePaper.Tiles.SuccessorCover
+import FLatticePaper.Tiles.RowOverlap
+import FLatticePaper.Tiles.WordFacts1
+import FLatticePaper.Tiles.WordFacts2
+import FLatticePaper.Tiles.WordFacts3
+import FLatticePaper.Tiles.SuccessorProof
 import FLatticePaper.MainTheorems
 import FLatticePaper.Construction.BaseCaseRecurrence
 
