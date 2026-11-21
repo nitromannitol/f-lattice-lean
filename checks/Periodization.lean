@@ -1,0 +1,4 @@
+import FLatticePaper.Plane.Induction.Periodization
+
+#print axioms FLatticePaper.Induction.exists_unique_extension_of_respectsPeriodsOn
+#print axioms FLatticePaper.Induction.ChildFrame.exists_unique_periodization
