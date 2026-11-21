@@ -1,0 +1,7 @@
+import FLatticePaper.Plane.Induction.Coherence
+
+open FLatticePaper.Induction
+
+#print axioms FLatticePaper.Induction.ChildFrame.centre_sub_mem
+#print axioms FLatticePaper.Induction.ChildFrame.respectsPeriodsOn_of_heightInputs
+#print axioms FLatticePaper.Induction.ChildFrame.exists_unique_sewn_of_heightInputs
