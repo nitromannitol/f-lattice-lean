@@ -654,6 +654,109 @@ theorem agreeE_c0 {a b : BinaryWord} (hC : Cen a b) :
   · rw [slice2_eq_of hP1 hn1, slice2_eq_of hQ1 hn1]
   · rw [slice2_eq_of hP2 hn2, slice2_eq_of hQQ hn2]
 
+/-- The odd-parity agreement for the child pair `(N p q b p q b, N p q b)` with the pair word `N`. -/
+theorem agreeO_gen {a b N : BinaryWord} (hb : b.reverse = b) (hNr : N.reverse = N)
+    (hN1 : N = a ++ [Letter.p, Letter.q] ++ b) (hN2 : N = b ++ [Letter.q, Letter.p] ++ a) :
+    AgreeO (cw a ++ cw b ++ cw b) (cw a ++ cw b) := by
+  have hR := hR_odd hN1 hN2
+  have hNN := n_pn hN1 hN2
+  have eQ : cw a ++ cw b = Letter.q :: (N ++ [Letter.p]) := by simp [cw, hN1]
+  have eP : cw a ++ cw b ++ cw b
+      = Letter.q :: ((N ++ [Letter.p, Letter.q] ++ b) ++ [Letter.p]) := by
+    simp [cw, hN1]
+  have eR : (cw a ++ cw b ++ cw b).reverse
+      = Letter.p :: ((b ++ [Letter.q, Letter.p] ++ N) ++ [Letter.q]) := by
+    rw [eP]; simp [List.reverse_append, hb, hNr, List.append_assoc]
+  -- left slice: `N p` on both sides
+  have hL1 : (cw a ++ cw b ++ cw b).reverse.drop 1
+      = (N ++ [Letter.p]) ++ (Letter.q :: (b ++ [Letter.q])) := by
+    rw [eR]
+    simp only [List.drop_succ_cons, List.drop_zero]
+    rw [← hR]
+    simp [List.append_assoc]
+  have hR1 : (cw a ++ cw b).drop 1 = (N ++ [Letter.p]) ++ [] := by
+    rw [eQ]
+    simp only [List.drop_succ_cons, List.drop_zero]
+    simp
+  have hn1 : min (cw a ++ cw b ++ cw b).length (cw a ++ cw b).length - 1
+      = (N ++ [Letter.p]).length := by
+    simp [cw, hN1] <;> omega
+  -- right slice: the word `b q p N q`
+  have hL2 : (cw a ++ cw b ++ cw b).reverse.drop 1
+      = (b ++ [Letter.q, Letter.p] ++ N ++ [Letter.q]) ++ [] := by
+    rw [eR]
+    simp only [List.drop_succ_cons, List.drop_zero]
+    simp [List.append_assoc]
+  have hQ2 : ((cw a ++ cw b) ++ (cw a ++ cw b)).drop 1
+      = (b ++ [Letter.q, Letter.p] ++ N ++ [Letter.q]) ++ ([Letter.p] ++ a ++ [Letter.p]) := by
+    calc ((cw a ++ cw b) ++ (cw a ++ cw b)).drop 1
+        = (N ++ [Letter.p, Letter.q] ++ N) ++ [Letter.p] := by
+          rw [eQ]; simp [List.append_assoc]
+      _ = ((b ++ [Letter.q, Letter.p] ++ N) ++ [Letter.q, Letter.p] ++ a) ++ [Letter.p] := by
+          rw [hNN]
+      _ = (b ++ [Letter.q, Letter.p] ++ N ++ [Letter.q]) ++ ([Letter.p] ++ a ++ [Letter.p]) := by
+          simp [List.append_assoc]
+  have hn2 : min (cw a ++ cw b ++ cw b).length (2 * (cw a ++ cw b).length) - 1
+      = (b ++ [Letter.q, Letter.p] ++ N ++ [Letter.q]).length := by
+    simp [cw, hN1] <;> omega
+  refine ⟨?_, ?_⟩
+  · rw [slice2_eq_of hL1 hn1, slice2_eq_of hR1 hn1]
+  · rw [slice2_eq_of hL2 hn2, slice2_eq_of hQ2 hn2]
+
+theorem agreeO_c1 {a b : BinaryWord} (hC : Cen b a) :
+    AgreeO (cw a ++ cw b ++ cw b) (cw a ++ cw b) := by
+  obtain ⟨hb, ha, hN⟩ := hC
+  exact agreeO_gen hb (mid_rev_odd ha hb (N := a ++ [Letter.p, Letter.q] ++ b) rfl hN) rfl hN
+
+/-- The singleton `3`-family: children `cw (R q R)` and `cw R` with `R = p^(k+1)`. -/
+theorem agreeE_A' {R : BinaryWord} (hRr : R.reverse = R) (hR : R ++ [Letter.p] = Letter.p :: R) :
+    AgreeE (cw (R ++ [Letter.q] ++ R)) (cw R) := by
+  have hQr : (cw R).reverse = Letter.p :: (R ++ [Letter.q]) := by
+    simp [cw, List.reverse_append, hRr]
+  have hP1 : (cw (R ++ [Letter.q] ++ R)).drop 1 = (R ++ [Letter.q]) ++ (R ++ [Letter.p]) := by
+    simp [cw, List.append_assoc]
+  have hP2 : (cw (R ++ [Letter.q] ++ R)).drop 1 = (R ++ [Letter.q] ++ R ++ [Letter.p]) ++ [] := by
+    simp [cw, List.append_assoc]
+  have hQ1 : (cw R).reverse.drop 1 = (R ++ [Letter.q]) ++ [] := by
+    rw [hQr]; simp
+  have hpq : Letter.p :: (R ++ [Letter.q]) = (R ++ [Letter.p]) ++ [Letter.q] := by
+    rw [hR]; simp
+  have hQQ : ((cw R) ++ (cw R)).reverse.drop 1 = (R ++ [Letter.q] ++ R ++ [Letter.p]) ++ [Letter.q] := by
+    have e1 : ((cw R) ++ (cw R)).reverse.drop 1
+        = (R ++ [Letter.q]) ++ (Letter.p :: (R ++ [Letter.q])) := by
+      rw [List.reverse_append, hQr]; simp
+    rw [e1, hpq]; simp [List.append_assoc]
+  have hn1 : min (cw (R ++ [Letter.q] ++ R)).length (cw R).length - 1 = (R ++ [Letter.q]).length := by
+    simp [cw] <;> omega
+  have hn2 : min (cw (R ++ [Letter.q] ++ R)).length (2 * (cw R).length) - 1
+      = (R ++ [Letter.q] ++ R ++ [Letter.p]).length := by
+    simp [cw] <;> omega
+  refine ⟨?_, ?_⟩
+  · rw [slice2_eq_of hP1 hn1, slice2_eq_of hQ1 hn1]
+  · rw [slice2_eq_of hP2 hn2, slice2_eq_of hQQ hn2]
+
+/-- The singleton `2`-family: children `cw (S q)` and `cw S` with `S = q^(2k)`. -/
+theorem agreeE_B' {S : BinaryWord} (hSr : S.reverse = S) :
+    AgreeE (cw (S ++ [Letter.q])) (cw S) := by
+  have hQr : (cw S).reverse = Letter.p :: (S ++ [Letter.q]) := by
+    simp [cw, List.reverse_append, hSr]
+  have hP1 : (cw (S ++ [Letter.q])).drop 1 = (S ++ [Letter.q]) ++ [Letter.p] := by
+    simp [cw]
+  have hP2 : (cw (S ++ [Letter.q])).drop 1 = ((S ++ [Letter.q]) ++ [Letter.p]) ++ [] := by
+    simp [cw]
+  have hQ1 : (cw S).reverse.drop 1 = (S ++ [Letter.q]) ++ [] := by
+    rw [hQr]; simp
+  have hQQ : ((cw S) ++ (cw S)).reverse.drop 1 = ((S ++ [Letter.q]) ++ [Letter.p]) ++ (S ++ [Letter.q]) := by
+    rw [List.reverse_append, hQr]; simp [List.append_assoc]
+  have hn1 : min (cw (S ++ [Letter.q])).length (cw S).length - 1 = (S ++ [Letter.q]).length := by
+    simp [cw] <;> omega
+  have hn2 : min (cw (S ++ [Letter.q])).length (2 * (cw S).length) - 1
+      = ((S ++ [Letter.q]) ++ [Letter.p]).length := by
+    simp [cw] <;> omega
+  refine ⟨?_, ?_⟩
+  · rw [slice2_eq_of hP1 hn1, slice2_eq_of hQ1 hn1]
+  · rw [slice2_eq_of hP2 hn2, slice2_eq_of hQQ hn2]
+
 end Agreement
 
 end FLatticePaper.Tiles
