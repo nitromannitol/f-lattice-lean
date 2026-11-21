@@ -1,0 +1,5 @@
+import FLatticePaper.Plane.Induction.Reflection
+
+#print axioms FLatticePaper.Induction.ChildFrame.coherentConstantU_eq_zero
+#print axioms FLatticePaper.Induction.ChildFrame.coherentConstantV_eq
+#print axioms FLatticePaper.Induction.ChildFrame.reflection_of_heightInputs
