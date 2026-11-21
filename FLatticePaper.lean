@@ -40,6 +40,7 @@ import FLatticePaper.Plane.RecurrenceRotation
 import FLatticePaper.Plane.WeightedForts
 import FLatticePaper.Farey.RationalBirth
 import FLatticePaper.Farey.Rotation
+import FLatticePaper.Farey.RecursionLemmas
 import FLatticePaper.Tiles.Gluing
 import FLatticePaper.Farey.RotationLattice
 import FLatticePaper.Farey.SlopeDensity
