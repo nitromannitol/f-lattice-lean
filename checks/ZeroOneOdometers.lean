@@ -1,4 +1,5 @@
 import FLatticePaper.Tiles.ZeroOneOdometers
+import FLatticePaper.Tiles.ZeroOneStringPositions
 
 open FLatticePaper.Tiles
 
@@ -51,3 +52,6 @@ example : ZeroOneFirstSentence .horizontal false [.p, .q] := zeroOneFirstSentenc
 #print axioms zeroOneFirstSentence_upTo_six
 #print axioms FLatticePaper.Tiles.zeroOneFirstSentence_of_checks
 #print axioms zeroOne_checks_upTo_six
+
+-- the general theorem: the first sentence of lemma:stacked_zero_one_string for every binary word
+#print axioms FLatticePaper.Tiles.zeroOneFirstSentence_all

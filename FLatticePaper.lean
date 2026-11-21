@@ -69,6 +69,13 @@ import FLatticePaper.Plane.Induction.ZeroRegionBound
 import FLatticePaper.Plane.Induction.HarmonicRegionBound
 import FLatticePaper.Plane.Induction.SheetMinFromConj
 import FLatticePaper.Tiles.ZeroOneOdometers
+import FLatticePaper.Tiles.ZeroOneGeneral
+import FLatticePaper.Tiles.ZeroOneSlopes
+import FLatticePaper.Tiles.ZeroOneGeometry
+import FLatticePaper.Tiles.ZeroOneConditions
+import FLatticePaper.Tiles.ZeroOneRespects
+import FLatticePaper.Tiles.ZeroOneSentence
+import FLatticePaper.Tiles.ZeroOneStringPositions
 import FLatticePaper.Plane.Induction.OddStep
 import FLatticePaper.Plane.Induction.Periodization
 import FLatticePaper.Plane.Induction.Seams
