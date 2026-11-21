@@ -30,6 +30,7 @@ The November 20 corrected edition and its supporting constructor are pinned by [
 - [Binary word recursion](FLatticePaper/Tiles/BinaryWords.lean): `FLatticePaper.Tiles.almost_palindrome_one`, `almost_palindrome_two` and `almost_palindrome_three` prove the three claims of `lemma:almost_palindrome` for every starting word and extension. The [check](checks/BinaryWords.lean) also evaluates `eq:words_degenerate_cases` for $k\le2$ and reports `[propext, Classical.choice, Quot.sound]`.
 - [Stacked boundary string offsets](FLatticePaper/Tiles/BoundaryStrings.lean): `FLatticePaper.Tiles.almost_palindrome_offset`, `zeroOne_fixed_offsets_horizontal` and `zeroOne_fixed_offsets_vertical` prove `lemma:almost_palindrome_offset` and the offset table of `lemma:zero-one-fixed-offsets`. The [check](checks/BoundaryStrings.lean) reports `[propext, Classical.choice, Quot.sound]`.
 - [Plane induction coordinates](FLatticePaper/Plane/Induction/ChildFrame.lean): `FLatticePaper.Induction.ChildFrame` and its identities (`eps_unit`, `tGrade_shortShift`, `sGrade_transverse`, `parentSGrade_transverse`, `cutPrice_eq`) and `harmonicGrid_harmonic` give the coordinates of supplement Part I. The [check](checks/ChildFrame.lean) reports `[propext, Classical.choice, Quot.sound]`; `eps_unit` uses no axioms.
+- [Plane induction potentials](FLatticePaper/Plane/Induction/Potentials.lean): `FLatticePaper.Induction.ChildFrame.price_kernel`, `slip_transverse`, `roundedSlip_transverse`, `chainPotential_transverse`, `cutGrade_kernel` and their companions give the deck increments of the Part I potentials for any field with the child's generator identities. The [check](checks/Potentials.lean) reports `[propext, Classical.choice, Quot.sound]`, and `[propext, Quot.sound]` for `chainPotential_eq`.
 - [Gluing by overlap constants](FLatticePaper/Tiles/Gluing.lean): `FLatticePaper.Tiles.exists_compatible_iff_walkSum_eq_zero` and `compatible_unique` prove `lemma:pairwise_compatibility` for partial odometers on any carrier, with the overlap graph on distinct indices with meeting domains. The [check](checks/Gluing.lean) reports `[propext, Classical.choice, Quot.sound]`.
 
 - [Unbounded native evaluator](FLatticePaper/Construction/Native.lean): exact ordinary and corrected standard/alternate schedules, both lengths and sides of correction, seventh-source restoration, actual pre-update saved payloads, and final occupied lower-left centering. `evaluateNative_base` proves all literal initial runs succeed; `evaluateNativeState_history` proves saved chronology on successful evaluations. [The check](checks/Native.lean) matches the occupied sites and heights of all 31 pinned fixtures. This is not a proof of all-word mixed success.
@@ -96,6 +97,7 @@ lake env lean checks/BinaryWords.lean
 lake env lean checks/BoundaryStrings.lean
 lake env lean checks/RecursionLemmas.lean
 lake env lean checks/ChildFrame.lean
+lake env lean checks/Potentials.lean
 lake env lean checks/AlternateStaircase.lean
 lake build FLatticePaper.Plane.ClassificationReduction
 lake build FLatticePaper.Plane.RecurrentBoundary
