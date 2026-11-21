@@ -73,6 +73,7 @@ import FLatticePaper.Plane.Induction.SheetFacts
 import FLatticePaper.Plane.Induction.WordInduction
 import FLatticePaper.Construction.NearOneBaseCases
 import FLatticePaper.Construction.BaseCases
+import FLatticePaper.Construction.OffsetTables
 import FLatticePaper.Tiles.BoundaryStrings
 import FLatticePaper.Tiles.BinaryWords
 import FLatticePaper.MainTheorems
