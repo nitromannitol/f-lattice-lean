@@ -127,5 +127,6 @@ import FLatticePaper.Tiles.RowConvexCrossing
 import FLatticePaper.MainTheorems
 import FLatticePaper.Construction.BaseCaseRecurrence
 import FLatticePaper.Construction.PropBaseCases
+import FLatticePaper.Tiles.StackedStringConnected
 
 /-! Root import for the corrected F-lattice paper. -/
