@@ -40,6 +40,7 @@ import FLatticePaper.Plane.BellmanRank
 import FLatticePaper.Plane.EarlierChainPrice
 import FLatticePaper.Plane.EndpointGrowth
 import FLatticePaper.Plane.RecurrenceRotation
+import FLatticePaper.Plane.RestrictedNoFortCriterion
 import FLatticePaper.Plane.WeightedForts
 import FLatticePaper.Farey.RationalBirth
 import FLatticePaper.Farey.Rotation
