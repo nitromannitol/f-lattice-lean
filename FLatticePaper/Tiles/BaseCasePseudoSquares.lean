@@ -7,7 +7,7 @@ so the starts of `alongStrings` are explicit in the sums of the two G-words. -/
 
 namespace FLatticePaper.Tiles
 
-open FLatticePaper.Construction (paperStairTile innerBoundary)
+open FLatticePaper.Construction (paperStairTile paperLadderTile paperLadderA paperLadderB paperLadderC paperLadderD innerBoundary)
 
 theorem walk_getElem_append (u v : F2Word) (c : GInt) :
     (F2Word.walk c (u ++ v))[u.length]? = some (c + F2Word.sum u) := by
@@ -687,5 +687,506 @@ theorem stair_isPseudoSquareAlongT (k : ℕ) :
     IsPseudoSquareAlongT (paperStairTile (2 * (k : ℤ) + 3)) (stairH k) (stairV k) :=
   ⟨(0, 0), ⟨(stair_lowerLeft k).1, (stair_lowerLeft k).2⟩,
     fun x hx => stair_contain k x hx, fun x hx => stair_cover k x hx.1 hx.2⟩
+
+/-! ### The ladder family: words and G-sums -/
+
+/-- The horizontal word of the doubled staircase `paperLadderTile (2k+2)`: `q p^k q p^{k+1}` (table, line 1912). -/
+def ladderH (k : ℕ) : BinaryWord :=
+  Letter.q :: (List.replicate k Letter.p ++ Letter.q :: List.replicate (k + 1) Letter.p)
+
+/-- The vertical word of the doubled staircase: `p^{2k+1} q`. -/
+def ladderV (k : ℕ) : BinaryWord := List.replicate (2 * k + 1) Letter.p ++ [Letter.q]
+
+/-- The sum of `pairSum` over the consecutive pairs of a tile list. -/
+def pairChain : List ZTile → GInt
+  | [] => 0
+  | [_] => 0
+  | a :: b :: L => pairSum a b + pairChain (b :: L)
+
+theorem pairChain_cons_cons (a b : ZTile) (L : List ZTile) :
+    pairChain (a :: b :: L) = pairSum a b + pairChain (b :: L) := rfl
+
+theorem pairSum_zo : pairSum ZTile.zero ZTile.one = (1, 1) := by decide
+
+theorem zip_tail_pairChain (ts : List ZTile) :
+    ((ts.zip ts.tail).map fun ab => pairSum ab.1 ab.2).sum = pairChain ts := by
+  induction ts with
+  | nil => rfl
+  | cons a L ih =>
+    cases L with
+    | nil => rfl
+    | cons b L' =>
+      simp only [List.tail_cons] at ih ⊢
+      rw [List.zip_cons_cons, List.map_cons, List.sum_cons, pairChain_cons_cons, ih]
+
+theorem sum_gH_chain (w : BinaryWord) : F2Word.sum (gH w) = pairChain (tileSeq w) + (1, 0) := by
+  rw [sum_gH_eq, zip_tail_pairChain]
+
+/-- A run of `n+1` zero tiles followed by `T`, with the chain sum. -/
+theorem pc_zrun (n : ℕ) (T : List ZTile) :
+    pairChain (List.replicate (n + 1) ZTile.zero ++ T) =
+      ((n : ℤ) * 2, 0) + pairChain (ZTile.zero :: T) := by
+  induction n with
+  | zero =>
+    show pairChain (ZTile.zero :: T) = (((0 : ℕ) : ℤ) * 2, 0) + pairChain (ZTile.zero :: T)
+    simp
+  | succ n ih =>
+    have e : List.replicate (n + 1 + 1) ZTile.zero ++ T =
+        ZTile.zero :: ZTile.zero :: (List.replicate n ZTile.zero ++ T) := by
+      simp [List.replicate_succ]
+    have e2 : ZTile.zero :: (List.replicate n ZTile.zero ++ T) = List.replicate (n + 1) ZTile.zero ++ T := by
+      simp [List.replicate_succ]
+    rw [e, pairChain_cons_cons, pairSum_zz, e2, ih]
+    refine Prod.ext (by simp; try ring) (by simp; try ring)
+
+theorem pc_zrun_nil (n : ℕ) : pairChain (List.replicate (n + 1) ZTile.zero) = ((n : ℤ) * 2, 0) := by
+  have h := pc_zrun n []
+  simp only [List.append_nil] at h
+  rw [h]
+  simp [pairChain]
+
+theorem pc_oneD (n : ℕ) :
+    pairChain (List.replicate (n + 1) ZTile.oneD ++ [ZTile.zero]) = ((n : ℤ) + 1, (n : ℤ) + 1) := by
+  rw [← zip_tail_pairChain]
+  rw [show (List.replicate (n + 1) ZTile.oneD ++ [ZTile.zero]).tail =
+      List.replicate n ZTile.oneD ++ [ZTile.zero] by simp [List.replicate_succ]]
+  exact oneDZero_sum n
+
+theorem pc_one_head (n : ℕ) :
+    pairChain (ZTile.one :: (List.replicate (n + 1) ZTile.oneD ++ [ZTile.zero])) =
+      pairSum ZTile.one ZTile.oneD + pairChain (List.replicate (n + 1) ZTile.oneD ++ [ZTile.zero]) := by
+  rw [show List.replicate (n + 1) ZTile.oneD ++ [ZTile.zero] =
+      ZTile.oneD :: (List.replicate n ZTile.oneD ++ [ZTile.zero]) by simp [List.replicate_succ]]
+  rw [pairChain_cons_cons]
+
+theorem tileSeqAux_rep_p_append (prev : Option Letter) (n : ℕ) (w : BinaryWord) :
+    tileSeqAux prev (List.replicate (n + 1) Letter.p ++ w) =
+      List.replicate (n + 1) ZTile.zero ++ tileSeqAux none w := by
+  induction n generalizing prev with
+  | zero => simp [List.replicate_succ, tileSeqAux, tileSeqAux_some_p]
+  | succ n ih =>
+    have e : List.replicate (n + 1 + 1) Letter.p ++ w = Letter.p :: (List.replicate (n + 1) Letter.p ++ w) := by
+      simp [List.replicate_succ]
+    rw [e]
+    simp only [tileSeqAux]
+    rw [tileSeqAux_some_p, ih none]
+    simp [List.replicate_succ]
+
+theorem tileSeq_ladderH (m : ℕ) :
+    tileSeq (ladderH (m + 1)) =
+      ZTile.one :: (List.replicate (m + 1) ZTile.zero ++ ZTile.one :: List.replicate (m + 2) ZTile.zero) := by
+  have e : ladderH (m + 1) = Letter.q :: (List.replicate (m + 1) Letter.p ++ Letter.q :: List.replicate (m + 2) Letter.p) :=
+    rfl
+  rw [e]
+  simp only [tileSeq, tileSeqAux]
+  rw [tileSeqAux_rep_p_append]
+  simp [tileSeqAux, tileSeqAux_p_rep]
+
+theorem sum_gH_ladder (m : ℕ) : F2Word.sum (gH (ladderH (m + 1))) = (4 * (m : ℤ) + 8, 1) := by
+  rw [sum_gH_chain, tileSeq_ladderH]
+  have e1 : List.replicate (m + 1) ZTile.zero ++ (ZTile.one :: List.replicate (m + 2) ZTile.zero) =
+      ZTile.zero :: (List.replicate m ZTile.zero ++ (ZTile.one :: List.replicate (m + 2) ZTile.zero)) := by
+    simp [List.replicate_succ]
+  have e3 : ZTile.one :: List.replicate (m + 2) ZTile.zero =
+      ZTile.one :: ZTile.zero :: List.replicate (m + 1) ZTile.zero := by
+    simp [List.replicate_succ]
+  have e4 : ZTile.zero :: List.replicate (m + 1) ZTile.zero = List.replicate (m + 2) ZTile.zero := by
+    simp [List.replicate_succ]
+  have h5 : pairChain (ZTile.one :: List.replicate (m + 2) ZTile.zero) = (2, 0) + ((((m : ℤ) + 1) * 2), 0) := by
+    rw [e3, pairChain_cons_cons, pairSum_oz, e4]
+    have h := pc_zrun_nil (m + 1)
+    push_cast at h
+    rw [h]
+  rw [e1, pairChain_cons_cons, ← e1, pc_zrun m, pairChain_cons_cons, pairSum_zo, h5, pairSum_oz]
+  refine Prod.ext (by simp; try ring) (by simp; try ring)
+
+theorem sum_gV_ladder (m : ℕ) :
+    F2Word.sum (gV (ladderV (m + 1))) = (-(2 * (m : ℤ) + 2), 2 * (m : ℤ) + 5) := by
+  have hf : flipW (ladderV (m + 1)) = List.replicate (2 * m + 1 + 1 + 1) Letter.q ++ [Letter.p] := by
+    simp only [ladderV, flipW, flipLetter, List.map_append, List.map_replicate, List.map_cons, List.map_nil]
+    rfl
+  unfold gV
+  rw [hf, f2sum_mulI, sum_gH_chain, tileSeq_flip (2 * m + 1 + 1), pc_one_head, pc_oneD (2 * m + 1),
+    pairSum_od]
+  refine Prod.ext (by simp; try ring) (by simp; try ring)
+
+/-! ### The ladder family: placed rectangles -/
+
+theorem hOffset_q : hOffset Letter.q = (1, 1) := rfl
+theorem hRevOffset_qp : hRevOffset Letter.q Letter.p = (1, 0) := rfl
+
+theorem ladderV_reverse (k : ℕ) : (ladderV k).reverse = Letter.q :: List.replicate (2 * k + 1) Letter.p := by
+  simp [ladderV, List.reverse_replicate]
+
+theorem ladderH_reverse (m : ℕ) :
+    (ladderH (m + 1)).reverse =
+      List.replicate (m + 1 + 1) Letter.p ++ Letter.q :: (List.replicate (m + 1) Letter.p ++ [Letter.q]) := by
+  simp [ladderH, List.reverse_append, List.reverse_replicate, List.append_assoc]
+
+theorem hStringAt_cons_pq (v : BinaryWord) (c : GInt) :
+    hStringAt (Letter.p :: Letter.q :: v) c = (ZTile.zero, c) :: hStringAt (Letter.q :: v) (c + hOffset Letter.q) := by
+  unfold hStringAt
+  simp [tileSeq, tileSeqAux, List.scanl_cons]
+
+/-- The lower string of a `p^{n+1}`-run followed by `q` and `rest`: the zeros at `c + (2j, 0)`, then the `q` tile
+at `c + (2n, 0) + (1,1)`, where the tail is placed by its own cons decomposition. -/
+theorem mem_lowRun (n : ℕ) (c : GInt) (rest : BinaryWord) (x : GInt) :
+    x ∈ placedSites (hStringAt (List.replicate (n + 1) Letter.p ++ Letter.q :: rest) c) ↔
+      (∃ j : ℕ, j ≤ n ∧ zeroAt (c.1 + (j : ℤ) * 2, c.2) x) ∨
+        x ∈ placedSites (hStringAt (Letter.q :: rest) (c.1 + (n : ℤ) * 2 + 1, c.2 + 1)) := by
+  induction n generalizing c with
+  | zero =>
+    have e : hStringAt (List.replicate (0 + 1) Letter.p ++ Letter.q :: rest) c =
+        (ZTile.zero, c) :: hStringAt (Letter.q :: rest) (c + hOffset Letter.q) :=
+      hStringAt_cons_pq rest c
+    have hq : c + hOffset Letter.q = (c.1 + ((0 : ℕ) : ℤ) * 2 + 1, c.2 + 1) := by
+      rw [hOffset_q]
+      exact Prod.ext (by simp) (by simp)
+    rw [e, placedSites_cons_zero, List.mem_append, mem_shape_zero, hq]
+    constructor
+    · rintro (h | h)
+      · exact Or.inl ⟨0, le_refl 0, by unfold zeroAt at h ⊢; simpa using h⟩
+      · exact Or.inr h
+    · rintro (⟨j, hj, h⟩ | h)
+      · have hj0 : j = 0 := by omega
+        subst hj0
+        left
+        unfold zeroAt at h ⊢
+        simpa using h
+      · exact Or.inr h
+  | succ n ih =>
+    have e : hStringAt (List.replicate (n + 1 + 1) Letter.p ++ Letter.q :: rest) c =
+        (ZTile.zero, c) :: hStringAt (List.replicate (n + 1) Letter.p ++ Letter.q :: rest) (c + hOffset Letter.p) :=
+      hStringAt_cons_p Letter.p (List.replicate n Letter.p ++ Letter.q :: rest) c
+    have hpos : ((c + hOffset Letter.p).1 + (n : ℤ) * 2 + 1, (c + hOffset Letter.p).2 + 1) =
+        (c.1 + ((n + 1 : ℕ) : ℤ) * 2 + 1, c.2 + 1) := by
+      rw [hOffset_p]
+      refine Prod.ext ?_ ?_
+      · simp only [Prod.fst_add]
+        push_cast
+        ring
+      · simp only [Prod.snd_add]
+        ring
+    rw [e, placedSites_cons_zero, List.mem_append, mem_shape_zero, ih (c + hOffset Letter.p), hpos]
+    constructor
+    · rintro (h | ⟨j, hj, h⟩ | h)
+      · exact Or.inl ⟨0, by omega, by unfold zeroAt at h ⊢; simpa using h⟩
+      · refine Or.inl ⟨j + 1, by omega, ?_⟩
+        unfold zeroAt at h ⊢
+        simp only [Prod.fst_add, Prod.snd_add, hOffset_p] at h ⊢
+        push_cast
+        omega
+      · exact Or.inr h
+    · rintro (⟨j, hj, h⟩ | h)
+      · rcases Nat.eq_zero_or_pos j with h0 | hpos'
+        · left
+          subst h0
+          unfold zeroAt at h ⊢
+          simpa using h
+        · right
+          left
+          refine ⟨j - 1, by omega, ?_⟩
+          unfold zeroAt at h ⊢
+          simp only [Prod.fst_add, Prod.snd_add, hOffset_p]
+          have hc : ((j - 1 : ℕ) : ℤ) = (j : ℤ) - 1 := by omega
+          rw [hc]
+          push_cast at h
+          omega
+      · exact Or.inr (Or.inr h)
+
+/-- The reversed top string of a `p^{n+1}`-run followed by `q` and `rest`: zeros at `s + (2j, 0)`, then the `q` tile
+at `s + (2n, 0) + (2, 1)`. -/
+theorem mem_topRun (n : ℕ) (s : GInt) (rest : BinaryWord) (x : GInt) :
+    x ∈ placedSites (hRevStringAt (List.replicate (n + 1) Letter.p ++ Letter.q :: rest) s) ↔
+      (∃ j : ℕ, j ≤ n ∧ zeroAt (s.1 + (j : ℤ) * 2, s.2) x) ∨
+        x ∈ placedSites (hRevStringAt (Letter.q :: rest) (s.1 + (n : ℤ) * 2 + 2, s.2 + 1)) := by
+  induction n generalizing s with
+  | zero =>
+    have e : hRevStringAt (List.replicate (0 + 1) Letter.p ++ Letter.q :: rest) s =
+        (ZTile.zero, s) :: hRevStringAt (Letter.q :: rest) (s + hRevOffset Letter.p Letter.q) :=
+      hRevStringAt_cons Letter.p Letter.q rest s
+    have hq : s + hRevOffset Letter.p Letter.q = (s.1 + ((0 : ℕ) : ℤ) * 2 + 2, s.2 + 1) := by
+      rw [hRevOffset_pq]
+      exact Prod.ext (by simp) (by simp)
+    rw [e, placedSites_cons_zero, List.mem_append, mem_shape_zero, hq]
+    constructor
+    · rintro (h | h)
+      · exact Or.inl ⟨0, le_refl 0, by unfold zeroAt at h ⊢; simpa using h⟩
+      · exact Or.inr h
+    · rintro (⟨j, hj, h⟩ | h)
+      · have hj0 : j = 0 := by omega
+        subst hj0
+        left
+        unfold zeroAt at h ⊢
+        simpa using h
+      · exact Or.inr h
+  | succ n ih =>
+    have e : hRevStringAt (List.replicate (n + 1 + 1) Letter.p ++ Letter.q :: rest) s =
+        (ZTile.zero, s) :: hRevStringAt (List.replicate (n + 1) Letter.p ++ Letter.q :: rest) (s + hRevOffset Letter.p Letter.p) :=
+      hRevStringAt_cons Letter.p Letter.p (List.replicate n Letter.p ++ Letter.q :: rest) s
+    have hpos : ((s + hRevOffset Letter.p Letter.p).1 + (n : ℤ) * 2 + 2, (s + hRevOffset Letter.p Letter.p).2 + 1) =
+        (s.1 + ((n + 1 : ℕ) : ℤ) * 2 + 2, s.2 + 1) := by
+      rw [hRevOffset_pp]
+      refine Prod.ext ?_ ?_
+      · simp only [Prod.fst_add]
+        push_cast
+        ring
+      · simp only [Prod.snd_add]
+        ring
+    rw [e, placedSites_cons_zero, List.mem_append, mem_shape_zero, ih (s + hRevOffset Letter.p Letter.p), hpos]
+    constructor
+    · rintro (h | ⟨j, hj, h⟩ | h)
+      · exact Or.inl ⟨0, by omega, by unfold zeroAt at h ⊢; simpa using h⟩
+      · refine Or.inl ⟨j + 1, by omega, ?_⟩
+        unfold zeroAt at h ⊢
+        simp only [Prod.fst_add, Prod.snd_add, hRevOffset_pp] at h ⊢
+        push_cast
+        omega
+      · exact Or.inr h
+    · rintro (⟨j, hj, h⟩ | h)
+      · rcases Nat.eq_zero_or_pos j with h0 | hpos'
+        · left
+          subst h0
+          unfold zeroAt at h ⊢
+          simpa using h
+        · right
+          left
+          refine ⟨j - 1, by omega, ?_⟩
+          unfold zeroAt at h ⊢
+          simp only [Prod.fst_add, Prod.snd_add, hRevOffset_pp]
+          have hc : ((j - 1 : ℕ) : ℤ) = (j : ℤ) - 1 := by omega
+          rw [hc]
+          push_cast at h
+          omega
+      · exact Or.inr (Or.inr h)
+
+theorem mem_hRevStringAt_qp (v : BinaryWord) (t x : GInt) :
+    x ∈ placedSites (hRevStringAt (Letter.q :: Letter.p :: v) t) ↔
+      oneAt t x ∨ x ∈ placedSites (hRevStringAt (Letter.p :: v) (t + (1, 0))) := by
+  have e : hRevStringAt (Letter.q :: Letter.p :: v) t =
+      (ZTile.one, t) :: hRevStringAt (Letter.p :: v) (t + hRevOffset Letter.q Letter.p) :=
+    hRevStringAt_cons Letter.q Letter.p v t
+  rw [e, hRevOffset_qp, placedSites_cons_one, List.mem_append, mem_shape_one]
+
+theorem mem_vLeftGen (n : ℕ) (c x : GInt) :
+    x ∈ placedSites (vRevStringAt (Letter.q :: List.replicate (n + 1) Letter.p) c) ↔
+      oneAt c x ∨ ∃ j : ℕ, j ≤ n ∧ zeroAt (c.1 - (j : ℤ), c.2 + 1 + (j : ℤ)) x := by
+  have e : vRevStringAt (Letter.q :: List.replicate (n + 1) Letter.p) c =
+      (ZTile.one, c) :: vRevStringAt (List.replicate (n + 1) Letter.p) (c + vRevOffset Letter.q Letter.p) :=
+    vRevStringAt_cons Letter.q Letter.p (List.replicate n Letter.p) c
+  have hv : c + vRevOffset Letter.q Letter.p = (c.1, c.2 + 1) := by
+    rw [vRevOffset_qp]
+    exact Prod.ext (by simp) (by simp)
+  rw [e, placedSites_cons_one, List.mem_append, mem_shape_one, hv, vRevStringAt_zeros]
+
+/-! ### The four strings of the ladder tile -/
+
+/-- The lower string of the ladder: one tile at `c`, then the zeros and the `q` tile of `mem_lowRun`, with the tail
+placed as the stair lower string `stairH m`. -/
+theorem piece_lower (m : ℕ) (c : GInt) (x : GInt) :
+    x ∈ placedSites (hStringAt (ladderH (m + 1)) c) ↔
+      oneAt c x ∨
+        ((∃ j : ℕ, j ≤ m ∧ zeroAt ((c + hOffset Letter.p).1 + (j : ℤ) * 2, (c + hOffset Letter.p).2) x) ∨
+          (oneAt ((c + hOffset Letter.p).1 + (m : ℤ) * 2 + 1, (c + hOffset Letter.p).2 + 1) x ∨
+            ∃ j : ℕ, j ≤ m + 1 ∧
+              zeroAt ((c + hOffset Letter.p).1 + (m : ℤ) * 2 + 1 + 2 + (j : ℤ) * 2, (c + hOffset Letter.p).2 + 1) x)) := by
+  have e : hStringAt (ladderH (m + 1)) c =
+      (ZTile.one, c) :: hStringAt (List.replicate (m + 1) Letter.p ++ Letter.q :: List.replicate (m + 1 + 1) Letter.p)
+        (c + hOffset Letter.p) :=
+    hStringAt_cons_q_p (List.replicate m Letter.p ++ Letter.q :: List.replicate (m + 1 + 1) Letter.p) c
+  rw [e, placedSites_cons_one, List.mem_append, mem_shape_one, mem_lowRun m (c + hOffset Letter.p)
+    (List.replicate (m + 1 + 1) Letter.p) x,
+    show (Letter.q :: List.replicate (m + 1 + 1) Letter.p) = stairH (m + 1) from rfl, mem_hLower (m + 1)]
+
+/-- The top string of the ladder, through the reversed word `p^{m+2} q p^{m+1} q`. -/
+theorem piece_top (m : ℕ) (s : GInt) (x : GInt) :
+    x ∈ placedSites (hRevStringAt (ladderH (m + 1)).reverse s) ↔
+      (∃ j : ℕ, j ≤ m + 1 ∧ zeroAt (s.1 + (j : ℤ) * 2, s.2) x) ∨
+        (oneAt (s.1 + ((m + 1 : ℕ) : ℤ) * 2 + 2, s.2 + 1) x ∨
+          ((∃ j : ℕ, j ≤ m ∧ zeroAt (s.1 + ((m + 1 : ℕ) : ℤ) * 2 + 2 + 1 + (j : ℤ) * 2, s.2 + 1) x) ∨
+            oneAt (s.1 + ((m + 1 : ℕ) : ℤ) * 2 + 2 + 1 + (m : ℤ) * 2 + 2, s.2 + 1 + 1) x)) := by
+  rw [ladderH_reverse, mem_topRun (m + 1) s (List.replicate (m + 1) Letter.p ++ [Letter.q]) x,
+    show (Letter.q :: (List.replicate (m + 1) Letter.p ++ [Letter.q])) =
+      Letter.q :: Letter.p :: (List.replicate m Letter.p ++ [Letter.q]) by simp [List.replicate_succ],
+    mem_hRevStringAt_qp,
+    show (Letter.p :: (List.replicate m Letter.p ++ [Letter.q])) = List.replicate (m + 1) Letter.p ++ [Letter.q]
+      by simp [List.replicate_succ],
+    mem_hRevRun m]
+  simp only [Prod.fst_add, Prod.snd_add, add_zero]
+
+/-- The left string of the ladder: the reversed vertical string of `q p^{2m+3}`. -/
+theorem piece_left (m : ℕ) (c : GInt) (x : GInt) :
+    x ∈ placedSites (vRevStringAt (ladderV (m + 1)).reverse c) ↔
+      oneAt c x ∨ ∃ j : ℕ, j ≤ 2 * (m + 1) ∧ zeroAt (c.1 - (j : ℤ), c.2 + 1 + (j : ℤ)) x := by
+  rw [ladderV_reverse]
+  exact mem_vLeftGen (2 * (m + 1)) c x
+
+/-- The right string of the ladder: the vertical string of `p^{2m+3} q`. -/
+theorem piece_right (m : ℕ) (r : GInt) (x : GInt) :
+    x ∈ placedSites (vStringAt (ladderV (m + 1)) r) ↔
+      (∃ j : ℕ, j ≤ 2 * (m + 1) ∧ zeroAt (r.1 - (j : ℤ), r.2 + (j : ℤ)) x) ∨
+        oneAt (r.1 - ((2 * (m + 1) : ℕ) : ℤ), r.2 + ((2 * (m + 1) : ℕ) : ℤ) + 2) x :=
+  mem_vRun (2 * (m + 1)) r x
+
+theorem sum_gV_ladder_eq (m : ℕ) :
+    F2Word.sum (gPseudo (ladderH (m + 1)) (ladderV (m + 1))).2 = (-(2 * (m : ℤ) + 2), 2 * (m : ℤ) + 5) :=
+  sum_gV_ladder m
+
+/-- The four strings of the ladder tile for `c = (0,0)`, with the walk starts `(-(2m+2), 2m+3)` (top) and
+`(4m+7, 1)` (right). -/
+theorem mem_alongStrings_ladder (m : ℕ) (x : GInt) :
+    x ∈ placedSites (alongStrings (ladderH (m + 1)) (ladderV (m + 1)) (0, 0)) ↔
+      x ∈ placedSites (hStringAt (ladderH (m + 1)) (0, 0) ++
+        hRevStringAt (ladderH (m + 1)).reverse (-(2 * (m : ℤ) + 2), 2 * (m : ℤ) + 3) ++
+        vRevStringAt (ladderV (m + 1)).reverse (0, 0) ++ vStringAt (ladderV (m + 1)) (4 * (m : ℤ) + 7, 1)) := by
+  have hH : F2Word.sum (gPseudo (ladderH (m + 1)) (ladderV (m + 1))).1 = (4 * (m : ℤ) + 8, 1) :=
+    sum_gH_ladder m
+  have hV : F2Word.sum (gPseudo (ladderH (m + 1)) (ladderV (m + 1))).2 = (-(2 * (m : ℤ) + 2), 2 * (m : ℤ) + 5) :=
+    sum_gV_ladder m
+  have hs : (((0, 0) : GInt) + (-(2 * (m : ℤ) + 2), 2 * (m : ℤ) + 5) + (0, -2)) =
+      (-(2 * (m : ℤ) + 2), 2 * (m : ℤ) + 3) :=
+    Prod.ext (by simp; try ring) (by simp; try ring)
+  have hr : (((0, 0) : GInt) + (4 * (m : ℤ) + 8, 1) + (-1, 0)) = (4 * (m : ℤ) + 7, 1) :=
+    Prod.ext (by simp; try ring) (by simp; try ring)
+  simp only [alongStrings]
+  rw [walkAt_top, walkAt_right, hV, hH, hs, hr]
+
+/-- The membership of the ladder tile `(A ∪ B ∪ C) \ D` (lines 59-75 of `BaseCaseRecurrence`). -/
+theorem mem_ladderT_disj (d : ℤ) (x : GInt) :
+    x ∈ paperLadderTile d ↔
+      (((x.1 = 0 ∧ x.2 = 0) ∨ (x.1 = d + 2 ∧ x.2 = d + 2) ∨
+          (x.1 + x.2 = d + 2 ∧ 1 < x.2 ∧ x.2 < d + 1) ∨
+          (-d + 2 ≤ x.1 ∧ x.1 ≤ 2 * d ∧ 0 ≤ x.2 ∧ x.2 ≤ d + 2 ∧ 1 ≤ x.1 + x.2 ∧ x.1 + x.2 ≤ 2 * d + 3)) ∧
+        ¬((d ≤ x.1 ∧ x.2 = 0) ∨ (x.1 ≤ 2 ∧ x.2 = d + 2))) := by
+  unfold paperLadderTile paperLadderA paperLadderB paperLadderC paperLadderD
+  simp only [Set.mem_sdiff, Set.mem_union, Set.mem_setOf_eq, Set.mem_insert_iff, Set.mem_singleton_iff,
+    Prod.ext_iff]
+  constructor <;> intro h <;> tauto
+
+/-! ### Containment, the corner and the boundary lines for the ladder tile (d = 2m+4) -/
+
+theorem ladder_contain (m : ℕ) (x : GInt)
+    (hx : x ∈ placedSites (alongStrings (ladderH (m + 1)) (ladderV (m + 1)) (0, 0))) :
+    x ∈ paperLadderTile (2 * (m : ℤ) + 4) := by
+  rw [mem_alongStrings_ladder] at hx
+  simp only [placedSites_append, List.mem_append] at hx
+  rw [piece_lower, piece_top, piece_left, piece_right] at hx
+  rw [mem_ladderT_disj]
+  rcases hx with (((h1 | ⟨j1, hj1, h2⟩ | h3 | ⟨j2, hj2, h4⟩) | (⟨j3, hj3, h5⟩ | h6 | ⟨j4, hj4, h7⟩ | h8)) |
+    (h9 | ⟨j5, hj5, h10⟩)) | (⟨j6, hj6, h11⟩ | h12)
+  all_goals (simp only [oneAt, zeroAt, hOffset_p, Prod.fst_add, Prod.snd_add] at *; try push_cast at *; omega)
+
+theorem ladder_lowerLeft (m : ℕ) :
+    (0 : GInt) ∈ paperLadderTile (2 * (m : ℤ) + 4) ∧
+      ∀ y ∈ paperLadderTile (2 * (m : ℤ) + 4), (0 : GInt).2 < y.2 ∨ ((0 : GInt).2 = y.2 ∧ (0 : GInt).1 ≤ y.1) := by
+  refine ⟨?_, ?_⟩
+  · rw [mem_ladderT_disj]
+    refine ⟨Or.inl ⟨rfl, rfl⟩, ?_⟩
+    rintro (⟨h1, _⟩ | ⟨_, h2⟩)
+    · simp only [Prod.fst_zero] at h1
+      omega
+    · simp only [Prod.snd_zero] at h2
+      omega
+  · intro y hy
+    rw [mem_ladderT_disj] at hy
+    simp only [Prod.fst_zero, Prod.snd_zero]
+    omega
+
+/-- The boundary lines of `T = paperLadderTile (2m+4)` in one-sided form: `x.2 ≤ 0` (the bottom side), `x.1 ≤ -(2m+2)`
+(the left side), `4m+8 ≤ x.1` (the right side), `2m+6 ≤ x.2` (the top side), `x.1+x.2 ≤ 1` and `4m+11 ≤ x.1+x.2`
+(the two diagonals), the cut `x.2 ≤ 1 ∧ 2m+4 ≤ x.1` of the bottom row, and the cut `2m+5 ≤ x.2 ∧ x.1 ≤ 2` of the top row. -/
+def LadderBL (m : ℤ) (x : GInt) : Prop :=
+  x.2 ≤ 0 ∨ x.1 ≤ -(2 * m + 2) ∨ 4 * m + 8 ≤ x.1 ∨ 2 * m + 6 ≤ x.2 ∨ x.1 + x.2 ≤ 1 ∨ 4 * m + 11 ≤ x.1 + x.2 ∨
+    (x.2 ≤ 1 ∧ 2 * m + 4 ≤ x.1) ∨ (2 * m + 5 ≤ x.2 ∧ x.1 ≤ 2)
+
+/-- The neighbours of a point of `T` off the lines `LadderBL` lie in `T`. -/
+theorem ladder_nbrs (m : ℕ) (x : GInt) (hT : x ∈ paperLadderTile (2 * (m : ℤ) + 4))
+    (hne : ¬ LadderBL (m : ℤ) x) :
+    (x.1 + 1, x.2) ∈ paperLadderTile (2 * (m : ℤ) + 4) ∧ (x.1 - 1, x.2) ∈ paperLadderTile (2 * (m : ℤ) + 4) ∧
+      (x.1, x.2 + 1) ∈ paperLadderTile (2 * (m : ℤ) + 4) ∧ (x.1, x.2 - 1) ∈ paperLadderTile (2 * (m : ℤ) + 4) := by
+  unfold LadderBL at hne
+  have hT' := (mem_ladderT_disj (2 * (m : ℤ) + 4) x).1 hT
+  have hin : 0 < x.2 ∧ x.2 < 2 * (m : ℤ) + 6 ∧ -(2 * (m : ℤ) + 2) < x.1 ∧ x.1 < 4 * (m : ℤ) + 8 ∧
+      1 < x.1 + x.2 ∧ x.1 + x.2 < 4 * (m : ℤ) + 11 ∧ ¬(x.2 ≤ 1 ∧ 2 * (m : ℤ) + 4 ≤ x.1) ∧
+        ¬(2 * (m : ℤ) + 5 ≤ x.2 ∧ x.1 ≤ 2) := by
+    omega
+  obtain ⟨hy1, hy2, hy3, hy4, hy5, hy6, hy7, hy8⟩ := hin
+  clear hT' hne hT
+  refine ⟨?_, ?_, ?_, ?_⟩ <;> rw [mem_ladderT_disj] <;> dsimp only <;> omega
+
+/-- The boundary lines: every point of `∂⁻T` lies on one of them. -/
+theorem ladder_bl (m : ℕ) (x : GInt) (hT : x ∈ paperLadderTile (2 * (m : ℤ) + 4))
+    (hB : (x.1 + 1, x.2) ∉ paperLadderTile (2 * (m : ℤ) + 4) ∨ (x.1 - 1, x.2) ∉ paperLadderTile (2 * (m : ℤ) + 4) ∨
+      (x.1, x.2 + 1) ∉ paperLadderTile (2 * (m : ℤ) + 4) ∨ (x.1, x.2 - 1) ∉ paperLadderTile (2 * (m : ℤ) + 4)) :
+    LadderBL (m : ℤ) x := by
+  by_contra hne
+  obtain ⟨n1, n2, n3, n4⟩ := ladder_nbrs m x hT hne
+  rcases hB with h | h | h | h
+  · exact h n1
+  · exact h n2
+  · exact h n3
+  · exact h n4
+
+/-- Covering (clause 2) for the ladder family: every site of `∂⁻T` is covered by the placed rectangles. -/
+theorem ladder_cover (m : ℕ) (x : GInt)
+    (hT : x ∈ paperLadderTile (2 * (m : ℤ) + 4))
+    (hB : (x.1 + 1, x.2) ∉ paperLadderTile (2 * (m : ℤ) + 4) ∨ (x.1 - 1, x.2) ∉ paperLadderTile (2 * (m : ℤ) + 4) ∨
+      (x.1, x.2 + 1) ∉ paperLadderTile (2 * (m : ℤ) + 4) ∨ (x.1, x.2 - 1) ∉ paperLadderTile (2 * (m : ℤ) + 4)) :
+    x ∈ placedSites (alongStrings (ladderH (m + 1)) (ladderV (m + 1)) (0, 0)) := by
+  have hL := ladder_bl m x hT hB
+  unfold LadderBL at hL
+  rw [mem_alongStrings_ladder]
+  simp only [placedSites_append, List.mem_append]
+  rw [piece_lower, piece_top, piece_left, piece_right]
+  rw [mem_ladderT_disj] at hT
+  rcases hL with h1 | h2 | h3 | h4 | h5 | h6 | ⟨h7a, h7b⟩ | ⟨h8a, h8b⟩
+  · -- the bottom row x.2 = 0
+    rcases le_or_gt x.1 1 with ha | ha
+    · exact Or.inl (Or.inl (Or.inl (Or.inl (by simp only [oneAt]; omega))))
+    · obtain ⟨j, hj⟩ := exists_nat_of_int ((x.1 - 2) / 2) (by omega)
+      exact Or.inl (Or.inl (Or.inl (Or.inr (Or.inl ⟨j, by omega,
+        by simp only [zeroAt, hOffset_p, Prod.fst_add, Prod.snd_add]; omega⟩))))
+  · -- the left side x.1 = -(2m+2): the top zeros with j = 0
+    exact Or.inl (Or.inl (Or.inr (Or.inl ⟨0, by omega, by simp only [zeroAt]; omega⟩)))
+  · -- the right side x.1 = 4m+8: the second lower zeros
+    obtain ⟨j, hj⟩ := exists_nat_of_int ((x.1 - 2 * (m : ℤ) - 5) / 2) (by omega)
+    exact Or.inl (Or.inl (Or.inl (Or.inr (Or.inr (Or.inr ⟨j, by omega,
+      by simp only [zeroAt, hOffset_p, Prod.fst_add, Prod.snd_add]; omega⟩)))))
+  · -- the top side x.2 = 2m+6
+    rcases le_or_gt (2 * (m : ℤ) + 5) x.1 with ha | ha
+    · exact Or.inl (Or.inl (Or.inr (Or.inr (Or.inr (Or.inr (by simp only [oneAt]; omega))))))
+    · obtain ⟨j, hj⟩ := exists_nat_of_int ((x.1 - 3) / 2) (by omega)
+      exact Or.inl (Or.inl (Or.inr (Or.inr (Or.inr (Or.inl ⟨j, by omega, by simp only [zeroAt]; omega⟩)))))
+  · -- the lower-left diagonal x.1 + x.2 = 1
+    by_cases hb : x.2 ≤ 0
+    · exact Or.inl (Or.inl (Or.inl (Or.inl (by simp only [oneAt]; omega))))
+    · obtain ⟨j, hj⟩ := exists_nat_of_int (x.2 - 1) (by omega)
+      exact Or.inl (Or.inr (Or.inr ⟨j, by omega, by simp only [zeroAt]; omega⟩))
+  · -- the upper-right diagonal x.1 + x.2 = 4m+11
+    by_cases hb : x.2 = 2 * (m : ℤ) + 6
+    · exact Or.inr (Or.inr (by simp only [oneAt]; omega))
+    · obtain ⟨j, hj⟩ := exists_nat_of_int (x.2 - 3) (by omega)
+      exact Or.inr (Or.inl ⟨j, by omega, by simp only [zeroAt]; omega⟩)
+  · -- the bottom row cut x.2 ≤ 1 with x.1 ≥ d
+    by_cases ha : x.1 = 2 * (m : ℤ) + 4
+    · exact Or.inl (Or.inl (Or.inl (Or.inr (Or.inr (Or.inl (by simp only [oneAt, hOffset_p, Prod.fst_add, Prod.snd_add]; omega))))))
+    · obtain ⟨j, hj⟩ := exists_nat_of_int ((x.1 - 2 * (m : ℤ) - 5) / 2) (by omega)
+      exact Or.inl (Or.inl (Or.inl (Or.inr (Or.inr (Or.inr ⟨j, by omega,
+        by simp only [zeroAt, hOffset_p, Prod.fst_add, Prod.snd_add]; omega⟩)))))
+  · -- the top row cut x.2 ≥ 2m+5 with x.1 ≤ 2
+    by_cases ha : x.1 = 2
+    · exact Or.inl (Or.inl (Or.inr (Or.inr (Or.inl (by simp only [oneAt]; omega)))))
+    · obtain ⟨j, hj⟩ := exists_nat_of_int ((x.1 + 2 * (m : ℤ) + 2) / 2) (by omega)
+      exact Or.inl (Or.inl (Or.inr (Or.inl ⟨j, by omega, by simp only [zeroAt]; omega⟩)))
+
+/-- The doubled staircase family of `prop:base_cases` (d) for every `k ≥ 1`: `paperLadderTile (2k+2)` is a
+`(q p^k q p^{k+1}, p^{2k+1} q)`-pseudo-square under the walk placement, with `c(T) = (0,0)`. -/
+theorem ladder_isPseudoSquareAlongT (k : ℕ) (hk : 1 ≤ k) :
+    IsPseudoSquareAlongT (paperLadderTile (2 * (k : ℤ) + 2)) (ladderH k) (ladderV k) := by
+  obtain ⟨m, rfl⟩ : ∃ m, k = m + 1 := ⟨k - 1, by omega⟩
+  have hd : (2 * ((m + 1 : ℕ) : ℤ) + 2) = 2 * (m : ℤ) + 4 := by push_cast; ring
+  rw [hd]
+  obtain ⟨hz, hll⟩ := ladder_lowerLeft m
+  exact ⟨(0, 0), ⟨hz, hll⟩, fun x hx => ladder_contain m x hx, fun x hx => ladder_cover m x hx.1 hx.2⟩
 
 end FLatticePaper.Tiles
