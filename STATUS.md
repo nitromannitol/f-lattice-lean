@@ -55,6 +55,7 @@ The November 20 corrected edition and its supporting constructor are pinned by [
 - [Alternate ladder Laplacian and rank overlaps](FLatticePaper/Construction/AlternateLadderLaplacian.lean) proves B7's even charge-one and odd charge-zero tables on the physical mask by evaluating the outside input residuals and reflecting to the other slot. The table is binary on the plane. [AlternateLadderRankCorrection.lean](FLatticePaper/Construction/AlternateLadderRankCorrection.lean) proves periodicity of the literal correction, including the additional corner overlap. Both results have $d=4$ consumers.
 - [Alternate ladder recurrence](FLatticePaper/Construction/AlternateLadderRank.lean) proves both strict input inequalities at B7 charge-one points and the selected strict decrease at every charge-zero point, using the actual spatial coordinates and the source correction from the occupied representative. `ladderOddAlt_exists_burningRank` transports the inequalities throughout the plane, and `ladderEvenAlt_exists_recurrent_extension` gives B8 by harmonic rotation. The native B7 and B8 theorems preserve height agreement, periods and growth along all positive pure runs. The period consumer checks both at length 200.
 - [Native retained endpoint atoms](FLatticePaper/Construction/EndpointAtoms.lean) identifies B9 and B10 with their literal height formulas in the occupied chart. `EndpointAtom.attach_llCenter_agrees` verifies the attachment and centering for any standard tile. Both fields have the source periods and growth and are recurrent on the physical graph. B10 reverses the checkerboard charge phase here, so its rank decreases along the vertical direction. The period consumer checks all four actual retained root registers.
+- [Classification reduction](FLatticePaper/Plane/ClassificationReduction.lean) verifies the primary harmonic apices, their boundary membership in the symmetric matrix space, the exact circular cone inequality, and the admission direction of the circle-packing theorem. The physical consumer checks a nonzero apex and a singular irrational matrix in an apex's cone. The hyperbola boundary theorem and the upper direction are still open.
 
 Run these checks from the sandbox repository root.
 
@@ -75,6 +76,8 @@ lake env lean checks/Native.lean
 lake env lean checks/Periods.lean
 lake env lean checks/StaircaseCoverage.lean
 lake env lean checks/AlternateStaircase.lean
+lake build FLatticePaper.Plane.ClassificationReduction
+lake env lean checks/PrimaryGrowth.lean
 sha256sum --quiet -c paper.sha256
 ```
 
@@ -157,9 +160,11 @@ The smaller arithmetic critical family has an admission result in the source, a 
 
 [ColumnCycleAdmission.lean](FLatticePaper/GeneralK/ColumnCycleAdmission.lean) proves `cycleMean_mem_growthSet`, `cyclePeak_mem_growthSet` and `closure_cycleCone_subset_growthSet`. The repeated shape path uses both directions of the actual columns, and the sum of shifted integer phase primitives solves the edge-weight second-difference equation. [ColumnGrowth.lean](FLatticePaper/GeneralK/ColumnGrowth.lean) bounds the least interpolation error on the physical chains and proves quadratic growth at the actual matrix. The cycle cone inclusion is unconditional for all real matrices. The opposite inclusion needs the rational upper bound. The $k=3$, $b=c=0$ consumer applies the cycle-attainment and admission theorems to a one-row phase slice.
 
-[GrowthClosed.lean](FLatticePaper/GeneralK/GrowthClosed.lean) exports the affine lower height witness used at the start of rational period realization. [PeriodicEnvelope.lean](FLatticePaper/GeneralK/PeriodicEnvelope.lean) proves the fractional translated envelope and the simultaneous integer ceiling bounds for its two incoming labels. The authentic integer-affine floor periods and the tight-cycle rational slope step are still needed for the full rational period theorem.
+[GrowthClosed.lean](FLatticePaper/GeneralK/GrowthClosed.lean) exports the affine lower height witness used at the start of rational period realization. [PeriodicEnvelope.lean](FLatticePaper/GeneralK/PeriodicEnvelope.lean) proves the fractional translated envelope and the simultaneous integer ceiling bounds for its two incoming labels. [RationalReference.lean](FLatticePaper/GeneralK/RationalReference.lean) constructs the integer-affine floor reference on every specified full-rank integer-action deck and proves that the labels descend to the physical quotient. Full rational period realization still needs the difference constraints and the tight-cycle winding argument.
 
 [Obstacle.lean](FLatticePaper/GeneralK/Obstacle.lean) proves the attained least superharmonic majorant of an obstacle with a given majorizing height, inheritance of the integer affine periods, and the exact charge bound $D$ at and above the quadratic ceiling obstacle. [ColumnCharge.lean](FLatticePaper/GeneralK/ColumnCharge.lean) proves the real parabolic bound on each open chain and $0\le-\mathcal L f\le k^2D$ for the actual retained restriction. The consumer checks the least majorant at the zero obstacle and the zero linear row on the $k=3$ harmonic height.
+
+[ColumnFourier.lean](FLatticePaper/GeneralK/ColumnFourier.lean) proves the exact nonzero-mode contraction and inverse Fourier width bound for rows of length $L$ with uniformly bounded oscillation. [ColumnWidth.lean](FLatticePaper/GeneralK/ColumnWidth.lean) gives the resulting $E$ bound on integer periodic corrections with linear row norm at most $K$, and embeds the normalized physical column into the exact shape alphabet. The $k=3$ consumer checks this embedding at the zero correction. The upper bound still needs the actual correction to satisfy these hypotheses and the cycle estimate for its path.
 
 The $k=2$ operator specialization is axiom-free. The interpolation, Laplacian, lift equivalence, growth and harmonic results and the consumers report only `[propext, Classical.choice, Quot.sound]`.
 
@@ -176,6 +181,8 @@ lake build FLatticePaper.GeneralK.ColumnCycleAdmission
 lake build FLatticePaper.GeneralK.PeriodicEnvelope
 lake build FLatticePaper.GeneralK.Obstacle
 lake build FLatticePaper.GeneralK.ColumnCharge
+lake build FLatticePaper.GeneralK.ColumnWidth
+lake build FLatticePaper.GeneralK.RationalReference
 lake build FLatticePaper.GeneralK.ColumnLift
 lake env lean checks/GeneralKColumns.lean
 ```

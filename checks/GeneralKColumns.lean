@@ -8,6 +8,8 @@ import FLatticePaper.GeneralK.GrowthClosed
 import FLatticePaper.GeneralK.Parabolic
 import FLatticePaper.GeneralK.Obstacle
 import FLatticePaper.GeneralK.PeriodicEnvelope
+import FLatticePaper.GeneralK.ColumnWidth
+import FLatticePaper.GeneralK.RationalReference
 import Mathlib.Algebra.Order.Star.Real
 import Mathlib.Analysis.Real.Sqrt
 
@@ -116,6 +118,21 @@ theorem three_zero_ceiling_majorant : IsLeastMajorant 3 (ceilingObstacle 0 0 0 0
   exact ⟨fun site => by simp [laplacian], fun site => by simp [hzero site], fun field _ h site => by
     simpa only [hzero site, Pi.zero_apply] using h site⟩
 
+theorem three_zero_correction_has_a_width_certified_shape (column : ℤ) :
+    ∃ shape : zeroSlice.Shape 0, ∀ row, ColumnSlice.shapeAt shape row = 0 := by
+  have hperiod (i : ℤ) : Function.Periodic (fun row : ℤ => (0 : Field) (i, row))
+      (zeroSlice.length : ℤ) := fun _ => rfl
+  have hwidth := zeroSlice.abs_sub_zero_le_shapeBound 0 hperiod (field := 0)
+    ⟨0, fun _ _ => by simp⟩ (fun _ _ => by
+      simpa [linearColumnRow] using zeroSlice.residualBound_nonneg 0) column
+  simpa using zeroSlice.exists_shape_of_periodicColumn 0 (fun row => (0 : Field) (column, row))
+    (hperiod column) hwidth
+
+#print axioms three_zero_correction_has_a_width_certified_shape
+#print axioms ColumnSlice.abs_sub_zero_le_shapeBound
+#print axioms exists_rationalFloorReference
+#print axioms exists_periodicEnvelope_of_mem_growthSet
+#print axioms ceilEnvelope_input_periodic
 #print axioms laplacian_two
 #print axioms interpolate_first
 #print axioms interpolate_last
