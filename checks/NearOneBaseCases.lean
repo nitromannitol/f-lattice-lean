@@ -1,0 +1,9 @@
+import FLatticePaper.Construction.NearOneBaseCases
+
+open FLatticePaper.Construction
+
+#print axioms FLatticePaper.Construction.near_staircase_base
+#print axioms FLatticePaper.Construction.near_alt_staircase_base
+#print axioms FLatticePaper.Construction.near_doubled_staircase_base
+#print axioms FLatticePaper.Construction.near_doubled_alt_staircase_base
+#print axioms FLatticePaper.Construction.near_staircase_tex_chart_laplacian
