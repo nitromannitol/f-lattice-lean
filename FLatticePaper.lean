@@ -49,6 +49,7 @@ import FLatticePaper.Plane.Induction.ChildFrame
 import FLatticePaper.Plane.Induction.Potentials
 import FLatticePaper.Plane.Induction.Sheets
 import FLatticePaper.Plane.Induction.EvenStep
+import FLatticePaper.Plane.Induction.OddStep
 import FLatticePaper.Tiles.BoundaryStrings
 import FLatticePaper.Tiles.BinaryWords
 import FLatticePaper.MainTheorems
