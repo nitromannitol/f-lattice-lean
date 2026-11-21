@@ -27,6 +27,7 @@ The November 20 corrected edition and its supporting constructor are pinned by [
 - [Headline root](FLatticePaper/MainTheorems.lean): `FLatticePaper.hyperbola_of_odometersTheorem` and `circlePacking_of_odometersTheorem` derive `theorem:hyperbola` and `theorem:circle_packing` from `OdometersTheorem`, the statement of `theorem:odometers` for every reduced interior slope. The [check](checks/MainTheorems.lean) reports `[propext, Classical.choice, Quot.sound]`. Proving `OdometersTheorem` is the remaining obligation for all three headline results.
 - [Odometer theorem](FLatticePaper/Plane/OdometerTheorem.lean): `FLatticePaper.OdometersTheoremAt` is the conclusion of `theorem:odometers` at one fraction, with `eq:periodicity` on the whole lattice $L'(n,d)$. `FLatticePaper.odometersTheoremAt_base` proves it at $1/d$ and $\mathcal R(1/d)$ for every $d\ge3$, covering all base fractions of Section 6. The [check](checks/OdometerTheorem.lean) also instantiates $1/2=\mathcal R(1/3)$ and reports `[propext, Classical.choice, Quot.sound]`.
 - [Section 6 recurrence lemmas](FLatticePaper/Construction/BaseCaseRecurrence.lean): `FLatticePaper.Construction.staircase_recurrent`, `alt_staircase_recurrent`, `doubled_staircase_recurrent` and `doubled_alt_staircase_recurrent` state the four recurrence lemmas with the TeX tiles and heights, each proved equal to its literal raw mask. The [check](checks/BaseCaseRecurrence.lean) reports `[propext, Classical.choice, Quot.sound]`.
+- [Binary word recursion](FLatticePaper/Tiles/BinaryWords.lean): `FLatticePaper.Tiles.almost_palindrome_one`, `almost_palindrome_two` and `almost_palindrome_three` prove the three claims of `lemma:almost_palindrome` for every starting word and extension. The [check](checks/BinaryWords.lean) also evaluates `eq:words_degenerate_cases` for $k\le2$ and reports `[propext, Classical.choice, Quot.sound]`.
 - [Stacked boundary string offsets](FLatticePaper/Tiles/BoundaryStrings.lean): `FLatticePaper.Tiles.almost_palindrome_offset`, `zeroOne_fixed_offsets_horizontal` and `zeroOne_fixed_offsets_vertical` prove `lemma:almost_palindrome_offset` and the offset table of `lemma:zero-one-fixed-offsets`. The [check](checks/BoundaryStrings.lean) reports `[propext, Classical.choice, Quot.sound]`.
 - [Gluing by overlap constants](FLatticePaper/Tiles/Gluing.lean): `FLatticePaper.Tiles.exists_compatible_iff_walkSum_eq_zero` and `compatible_unique` prove `lemma:pairwise_compatibility` for partial odometers on any carrier, with the overlap graph on distinct indices with meeting domains. The [check](checks/Gluing.lean) reports `[propext, Classical.choice, Quot.sound]`.
 
@@ -90,6 +91,7 @@ lake env lean checks/RotationLattice.lean
 lake env lean checks/OdometerTheorem.lean
 lake env lean checks/MainTheorems.lean
 lake env lean checks/BaseCaseRecurrence.lean
+lake env lean checks/BinaryWords.lean
 lake env lean checks/BoundaryStrings.lean
 lake env lean checks/RecursionLemmas.lean
 lake env lean checks/AlternateStaircase.lean
