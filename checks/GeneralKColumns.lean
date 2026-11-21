@@ -1,10 +1,13 @@
 import FLatticePaper.GeneralK.ColumnLift
 import FLatticePaper.GeneralK.ColumnCycleAdmission
+import FLatticePaper.GeneralK.ColumnCharge
 import FLatticePaper.GeneralK.Connectivity
 import FLatticePaper.GeneralK.Trace
 import FLatticePaper.GeneralK.Envelope
 import FLatticePaper.GeneralK.GrowthClosed
 import FLatticePaper.GeneralK.Parabolic
+import FLatticePaper.GeneralK.Obstacle
+import FLatticePaper.GeneralK.PeriodicEnvelope
 import Mathlib.Algebra.Order.Star.Real
 import Mathlib.Analysis.Real.Sqrt
 
@@ -98,6 +101,21 @@ theorem three_zero_slice_cyclePeak_has_witness : ∃ (sector : zeroSlice.Sector)
 theorem three_zero_slice_cyclePeak_is_admitted : symmetricMatrix (zeroSlice.cyclePeak : ℝ) 0 0 ∈ growthSet 3 := by
   simpa only [zeroSlice, Rat.cast_zero] using zeroSlice.cyclePeak_mem_growthSet
 
+theorem three_harmonic_linearColumnRow (column row : ℤ) :
+    linearColumnRow 3 (fun point => harmonicField 3 1 0 (columnSite 3 point.1 point.2 0)) column row = 0 := by
+  have hcharge (site : Site) : 0 ≤ -laplacian 3 (harmonicField 3 1 0) site ∧
+      -laplacian 3 (harmonicField 3 1 0) site ≤ 0 := by
+    simp [laplacian_harmonicField (by decide : (2 : ℤ) ≤ 3)]
+  have h := linearColumnRow_restriction_bounds (by decide) hcharge column row
+  omega
+
+theorem three_zero_ceiling_majorant : IsLeastMajorant 3 (ceilingObstacle 0 0 0 0 0) 0 := by
+  have hzero (site : Site) : ceilingObstacle 0 0 0 0 0 site = 0 := by
+    obtain ⟨x, y⟩ := site
+    simp [ceilingObstacle, matrixQuadratic_symmetricMatrix]
+  exact ⟨fun site => by simp [laplacian], fun site => by simp [hzero site], fun field _ h site => by
+    simpa only [hzero site, Pi.zero_apply] using h site⟩
+
 #print axioms laplacian_two
 #print axioms interpolate_first
 #print axioms interpolate_last
@@ -146,5 +164,14 @@ theorem three_zero_slice_cyclePeak_is_admitted : symmetricMatrix (zeroSlice.cycl
 #print axioms ColumnSlice.cyclePeak_mem_growthSet
 #print axioms closure_cycleCone_subset_growthSet
 #print axioms three_zero_slice_cyclePeak_is_admitted
+#print axioms exists_affine_lower_bound_of_mem_growthSet
+#print axioms exists_roundedEnvelope
+#print axioms ceilEnvelope_input_sum_le
+#print axioms IsLeastMajorant.chargeBound
+#print axioms IsLeastMajorant.add_period
+#print axioms chain_sub_linearChainValue_bounds
+#print axioms linearColumnRow_restriction_bounds
+#print axioms three_harmonic_linearColumnRow
+#print axioms three_zero_ceiling_majorant
 
 end FLatticePaper.GeneralK.Checks

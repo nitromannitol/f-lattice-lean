@@ -157,6 +157,10 @@ The smaller arithmetic critical family has an admission result in the source, a 
 
 [ColumnCycleAdmission.lean](FLatticePaper/GeneralK/ColumnCycleAdmission.lean) proves `cycleMean_mem_growthSet`, `cyclePeak_mem_growthSet` and `closure_cycleCone_subset_growthSet`. The repeated shape path uses both directions of the actual columns, and the sum of shifted integer phase primitives solves the edge-weight second-difference equation. [ColumnGrowth.lean](FLatticePaper/GeneralK/ColumnGrowth.lean) bounds the least interpolation error on the physical chains and proves quadratic growth at the actual matrix. The cycle cone inclusion is unconditional for all real matrices. The opposite inclusion needs the rational upper bound. The $k=3$, $b=c=0$ consumer applies the cycle-attainment and admission theorems to a one-row phase slice.
 
+[GrowthClosed.lean](FLatticePaper/GeneralK/GrowthClosed.lean) exports the affine lower height witness used at the start of rational period realization. [PeriodicEnvelope.lean](FLatticePaper/GeneralK/PeriodicEnvelope.lean) proves the fractional translated envelope and the simultaneous integer ceiling bounds for its two incoming labels. The authentic integer-affine floor periods and the tight-cycle rational slope step are still needed for the full rational period theorem.
+
+[Obstacle.lean](FLatticePaper/GeneralK/Obstacle.lean) proves the attained least superharmonic majorant of an obstacle with a given majorizing height, inheritance of the integer affine periods, and the exact charge bound $D$ at and above the quadratic ceiling obstacle. [ColumnCharge.lean](FLatticePaper/GeneralK/ColumnCharge.lean) proves the real parabolic bound on each open chain and $0\le-\mathcal L f\le k^2D$ for the actual retained restriction. The consumer checks the least majorant at the zero obstacle and the zero linear row on the $k=3$ harmonic height.
+
 The $k=2$ operator specialization is axiom-free. The interpolation, Laplacian, lift equivalence, growth and harmonic results and the consumers report only `[propext, Classical.choice, Quot.sound]`.
 
 ```sh
@@ -169,6 +173,9 @@ lake build FLatticePaper.GeneralK.GrowthClosed
 lake build FLatticePaper.GeneralK.Parabolic
 lake build FLatticePaper.GeneralK.ColumnCycles
 lake build FLatticePaper.GeneralK.ColumnCycleAdmission
+lake build FLatticePaper.GeneralK.PeriodicEnvelope
+lake build FLatticePaper.GeneralK.Obstacle
+lake build FLatticePaper.GeneralK.ColumnCharge
 lake build FLatticePaper.GeneralK.ColumnLift
 lake env lean checks/GeneralKColumns.lean
 ```

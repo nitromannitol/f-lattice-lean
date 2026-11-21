@@ -87,10 +87,12 @@ private theorem eventuallyEq_of_tendsto_int {sequence : ℕ → ℤ} {value : �
     (h : Tendsto sequence atTop (𝓝 value)) : ∀ᶠ n in atTop, sequence n = value := by
   exact h (mem_nhds_discrete.mpr (Set.mem_singleton value))
 
-private theorem mem_growthSet_of_tendsto_entries {k : ℤ} (hk : 2 ≤ k) {a b c : ℕ → ℝ} {a₀ b₀ c₀ : ℝ}
+private theorem exists_affine_lower_bound_of_tendsto_entries {k : ℤ} (hk : 2 ≤ k) {a b c : ℕ → ℝ} {a₀ b₀ c₀ : ℝ}
     (ha : Tendsto a atTop (𝓝 a₀)) (hb : Tendsto b atTop (𝓝 b₀)) (hc : Tendsto c atTop (𝓝 c₀))
     (hadmit : ∀ n, symmetricMatrix (a n) (b n) (c n) ∈ growthSet k) :
-    symmetricMatrix a₀ b₀ c₀ ∈ growthSet k := by
+    ∃ (height : Field) (tiltX tiltY constant : ℝ), Superharmonic k height ∧
+      ∀ site, matrixQuadratic (symmetricMatrix a₀ b₀ c₀) site +
+        (tiltX * (site.1 : ℝ) + tiltY * (site.2 : ℝ)) + constant ≤ height site := by
   let shift (n : ℕ) : ℝ := 1 / ((n : ℝ) + 1)
   have hshift : Tendsto shift atTop (𝓝 0) := tendsto_one_div_add_atTop_nhds_zero_nat
   choose row tiltX tiltY height hrow htiltX htiltY hsuper hnormalize hlower using
@@ -179,16 +181,25 @@ private theorem mem_growthSet_of_tendsto_entries {k : ℤ} (hk : 2 ≤ k) {a b c
       ((hx.mul_const ((site - anchor).1 : ℝ)).add (hy.mul_const ((site - anchor).2 : ℝ))))
     · exact tendsto_nhds_of_eventually_eq ((hpoint site).mono fun _ h => congrArg (fun x : ℤ => (x : ℝ)) h)
     · exact fun n => hfLower site (finalIndex n)
-  refine mem_growthSet_of_affine_lower_bound hk hlimitSuper
-    (tx - a₀ * (anchor.1 : ℝ) - b₀ * (anchor.2 : ℝ)) (ty - b₀ * (anchor.1 : ℝ) - c₀ * (anchor.2 : ℝ))
-    (matrixQuadratic (symmetricMatrix a₀ b₀ c₀) anchor - (tx * (anchor.1 : ℝ) + ty * (anchor.2 : ℝ)))
-    (fun site => ?_)
+  refine ⟨limit,
+    tx - a₀ * (anchor.1 : ℝ) - b₀ * (anchor.2 : ℝ), ty - b₀ * (anchor.1 : ℝ) - c₀ * (anchor.2 : ℝ),
+    matrixQuadratic (symmetricMatrix a₀ b₀ c₀) anchor - (tx * (anchor.1 : ℝ) + ty * (anchor.2 : ℝ)),
+    hlimitSuper, fun site => ?_⟩
   refine le_trans (le_of_eq ?_) (hlimitLower site)
   rw [matrixQuadratic_symmetricMatrix (x := site.1) (y := site.2),
     matrixQuadratic_symmetricMatrix (x := anchor.1) (y := anchor.2),
     matrixQuadratic_symmetricMatrix (x := (site - anchor).1) (y := (site - anchor).2)]
   simp only [Prod.fst_sub, Prod.snd_sub, Int.cast_sub]
   ring
+
+/-- Every admitted quadratic part has an integer superharmonic height with
+a global lower bound by that quadratic plus one real affine function. -/
+theorem exists_affine_lower_bound_of_mem_growthSet {k : ℤ} (hk : 2 ≤ k) {a b c : ℝ}
+    (hm : symmetricMatrix a b c ∈ growthSet k) :
+    ∃ (height : Field) (tiltX tiltY constant : ℝ), Superharmonic k height ∧
+      ∀ site, matrixQuadratic (symmetricMatrix a b c) site +
+        (tiltX * (site.1 : ℝ) + tiltY * (site.2 : ℝ)) + constant ≤ height site :=
+  exists_affine_lower_bound_of_tendsto_entries hk tendsto_const_nhds tendsto_const_nhds tendsto_const_nhds (fun _ => hm)
 
 /-- The physical growth set of real matrices is closed. The normalization
 uses a plane minimum, and the limiting height is taken in the discrete
@@ -206,8 +217,9 @@ theorem isClosed_growthSet {k : ℤ} (hk : 2 ≤ k) : IsClosed (growthSet k) := 
     exact tendsto_nhds_unique (hentry j i)
       ((hentry i j).congr fun n => (hmem n).1.apply j i)
   rw [← symmetricMatrix_entries hsymm]
-  exact mem_growthSet_of_tendsto_entries hk (hentry 0 0) (hentry 0 1) (hentry 1 1) fun n =>
-    (symmetricMatrix_entries (hmem n).1).symm ▸ hmem n
+  obtain ⟨height, tiltX, tiltY, constant, hsuper, hbound⟩ := exists_affine_lower_bound_of_tendsto_entries hk
+    (hentry 0 0) (hentry 0 1) (hentry 1 1) (fun n => (symmetricMatrix_entries (hmem n).1).symm ▸ hmem n)
+  exact mem_growthSet_of_affine_lower_bound hk hsuper tiltX tiltY constant hbound
 
 /-- The same closedness theorem for the primary manuscript's physical graph. -/
 theorem isClosed_growthSet_two : IsClosed {matrix : Matrix (Fin 2) (Fin 2) ℝ |

@@ -3,10 +3,10 @@ import Mathlib.Algebra.Order.Archimedean.Real.Basic
 
 namespace FLatticePaper.GeneralK
 
-private def realLaplacian (k : ℤ) (field : Site → ℝ) (site : Site) : ℝ :=
+def realLaplacian (k : ℤ) (field : Site → ℝ) (site : Site) : ℝ :=
   (field (incomingNeg k site) - field site) + (field (incomingPos k site) - field site)
 
-private theorem realLaplacian_matrixQuadratic (k : ℤ) (a b c : ℝ) (site : Site) :
+theorem realLaplacian_matrixQuadratic (k : ℤ) (a b c : ℝ) (site : Site) :
     realLaplacian k (matrixQuadratic (symmetricMatrix a b c)) site = if Retained k site then a else c := by
   obtain ⟨x, y⟩ := site
   by_cases h : Retained k (x, y) <;>
