@@ -40,5 +40,6 @@ import FLatticePaper.Plane.RecurrenceRotation
 import FLatticePaper.Plane.WeightedForts
 import FLatticePaper.Farey.RationalBirth
 import FLatticePaper.Farey.Rotation
+import FLatticePaper.Tiles.BinaryWords
 
 /-! Root import for the corrected F-lattice paper. -/
