@@ -1,0 +1,7 @@
+import FLatticePaper.Plane.Induction.Binary
+
+#print axioms FLatticePaper.Induction.ChildFrame.mem_bands_of_input_not_mem
+#print axioms FLatticePaper.Induction.ChildFrame.laplacian_centre_sub
+#print axioms FLatticePaper.Induction.ChildFrame.binary_of_strips
+#print axioms FLatticePaper.Induction.ChildFrame.laplacian_eq_zero_of_hBand
+#print axioms FLatticePaper.Induction.ChildFrame.laplacian_eq_zero_of_vBand
