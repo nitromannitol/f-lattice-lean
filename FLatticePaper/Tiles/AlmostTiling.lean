@@ -105,9 +105,18 @@ def IsBoundaryWordAt (T : CellTile) (c : GInt) (w : F2Word) : Prop :=
 /-- `w` is a boundary word of `T`. -/
 def IsBoundaryWord (T : CellTile) (w : F2Word) : Prop := ∃ c, IsBoundaryWordAt T c w
 
-/-- A tile whose boundary is a simple closed curve: its boundary word visits no vertex twice (Sec. 4). -/
+/-- Two cells share an edge: their lower-left corners differ by a unit step. -/
+def CellAdj (x y : GInt) : Prop := y = x + gOne ∨ y = x - gOne ∨ y = x + gI ∨ y = x - gI
+
+/-- Edge-connectivity of a tile: any two of its cells are joined by a chain of cells of the tile, consecutive cells
+sharing an edge. This is the paper's "simply connected union of cells" (Sec. 4, line 724). -/
+def EdgeConnected (T : CellTile) : Prop :=
+  ∀ x ∈ T, ∀ y ∈ T, Relation.ReflTransGen (fun a b => a ∈ T ∧ b ∈ T ∧ CellAdj a b) x y
+
+/-- A tile: a union of cells that is edge-connected (Sec. 4, line 724), whose boundary is a simple closed curve, i.e.
+its boundary word visits no vertex twice (Sec. 4). -/
 def IsSimpleTile (T : CellTile) : Prop :=
-  ∃ c w, IsBoundaryWordAt T c w ∧ ((F2Word.walk c w).dropLast).Nodup
+  (∃ c w, IsBoundaryWordAt T c w ∧ ((F2Word.walk c w).dropLast).Nodup) ∧ EdgeConnected T
 
 /-- The lattice `Z v₁ + Z v₂` (Sec. 4, the `(v₁, v₂)`-regular condition). -/
 def latticeOf (v₁ v₂ : GInt) : Set GInt :=

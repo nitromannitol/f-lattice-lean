@@ -1,11 +1,13 @@
 import FLatticePaper.Tiles.EdgeClause
 import FLatticePaper.Tiles.AlmostTilingCover
 import FLatticePaper.Tiles.CoveringRows
+import FLatticePaper.Tiles.SuccessorProof
 
 /-! Assembly of `lemma:almost_square_tiling`. The almost tiling condition has two parts: uniqueness of the cell-translates
 (proved from the neighbour disjointness and the first-crossing input `NoFirstCrossing`), and the covering clause, which
-is the successor condition `SuccCover` (not yet proved; see the report). The edge clause is proved from `NoFarAdjacency`. The two
-global inputs of the paper, and the covering clause, are explicit hypotheses of the theorem. -/
+is proved from the successor condition `SuccCover` (proved from the edge-connectivity of the tile, which is part of
+`IsSimpleTile`, Sec. 4 line 724). The edge clause is proved from `NoFarAdjacency`. The two named global inputs of the
+paper are the explicit hypotheses of the theorem. -/
 
 namespace FLatticePaper.Tiles
 
@@ -24,12 +26,12 @@ admissible `w1`, `-i w2`, the tile generates the `(Σw1 + i, Σw2 - 1)`-regular 
 sharing an edge with it are `± (Σw1 + i)` and `± (Σw2 - 1)`. The successor condition `SuccCover` (the combinatorial
 interface lemma of the covering, to be proved) and the two global inputs are explicit hypotheses. -/
 theorem almost_square_tiling {T : CellTile} {c : GInt} {w1 w2 : F2Word}
-    (_hT : IsSimpleTile T) (hB : IsBoundaryWordAt T c (boundaryWordOf w1 w2))
+    (hT : IsSimpleTile T) (hB : IsBoundaryWordAt T c (boundaryWordOf w1 w2))
     (hA1 : Admissible w1) (hA2 : Admissible (w2.map Unit4.mulNegI))
-    (hS : SuccCover c w1 w2 T (latticeOf (almostV₁ w1) (almostV₂ w2)))
     (hF : NoFirstCrossing T (almostV₁ w1) (almostV₂ w2))
     (hG : NoFarAdjacency T (almostV₁ w1) (almostV₂ w2)) :
     IsRegularAlmostTiling T (almostV₁ w1) (almostV₂ w2) ∧ EdgeSharingClause T (almostV₁ w1) (almostV₂ w2) := by
+  obtain ⟨-, hE⟩ := hT
   have h1 : ∀ x ∈ w1, x = .one ∨ x = .i := hA1.1
   have hmono : ∀ y ∈ w2.map Unit4.mulNegI, y = .one ∨ y = .i := hA2.1
   have h2 : ∀ x ∈ w2, x = .i ∨ x = .negOne := by
@@ -41,6 +43,7 @@ theorem almost_square_tiling {T : CellTile} {c : GInt} {w1 w2 : F2Word}
     · rw [hxe, h]; simp [Unit4.mulI]
   have hN := neighbour_disjoint hB hA1 hA2
   have hU := uniqueness_of_neighbours hN hF
+  have hS := succCover_proved hB hE hA1 hA2
   have hC := covering_clause_of_succ hB h1 h2 (cntI_w2_pos hA2) hS
   exact ⟨⟨hU, hC⟩, edge_clause hB hA1 hA2 hF hG⟩
 
