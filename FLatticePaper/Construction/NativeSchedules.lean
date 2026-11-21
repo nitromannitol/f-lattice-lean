@@ -17,7 +17,7 @@ def TileRegisters.parentsFor (registers : TileRegisters) (digit : Digit) : TileP
     if digit = .three then tiles.alternate.retainedOdd else tiles.alternate.currentOdd,
     if digit = .two then tiles.alternate.retainedEven else tiles.alternate.currentEven⟩
 
-private def afterFirstStandard : Parity → List (Fin 6)
+def afterFirstStandard : Parity → List (Fin 6)
   | .odd => [1, 4, 5, 2, 3]
   | .even => [2, 3, 1, 4, 5]
 
@@ -25,11 +25,11 @@ private def afterSeventhAlternate : Parity → List (Fin 6)
   | .odd => [2, 3, 1, 4, 5]
   | .even => [1, 4, 2, 3, 5]
 
-private def standardSources (parents : TileParents) : Parity → Fin 6 → NonemptyTile
+def standardSources (parents : TileParents) : Parity → Fin 6 → NonemptyTile
   | .odd => ![parents.even, parents.even, parents.even, parents.even, parents.odd, parents.odd]
   | .even => ![parents.even, parents.even, parents.odd, parents.odd, parents.odd, parents.odd]
 
-private def placedBySlot (jets : Fin 6 → TileJet) (donor : Fin 6 → NonemptyTile) :
+def placedBySlot (jets : Fin 6 → TileJet) (donor : Fin 6 → NonemptyTile) :
     Fin 6 → NonemptyTile :=
   fun slot => (jets slot).place (donor slot)
 

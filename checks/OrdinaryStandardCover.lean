@@ -1,0 +1,12 @@
+import FLatticePaper.Construction.OrdinaryStandardCover
+
+open FLatticePaper.Construction
+
+#print axioms ordinaryStandardSchedule_first
+#print axioms ordinaryStandardSchedule_rest
+#print axioms afterFirstStandard_cases
+#print axioms mem_foldl_sites
+#print axioms mem_raw_sites
+#print axioms ordinaryStandard_raw_sites
+#print axioms ordinaryStandard_eval_covers_iff
+#print axioms ordinaryStandard_output_covers
