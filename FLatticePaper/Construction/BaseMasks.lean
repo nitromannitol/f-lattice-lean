@@ -728,6 +728,134 @@ theorem ladderEvenAlt_llCenter_agrees {den : ℤ} (hden : ladderEvenAlt.Valid de
     simp only [LadderOddAltCorner] at hpoint
     omega
 
+/-! Literal raw-table descriptions of the four rotated base masks, for the TeX transcriptions of
+`NearOneBaseCases.lean`. They read the private `window` and `entry` tables without changing them. -/
+
+theorem mem_stairOdd_raw_direct {den : ℤ} {point : Site} :
+    point ∈ (stairOdd.raw den).sites ↔
+      (0 ≤ point.1 ∧ point.1 ≤ den + 1) ∧ (1 ≤ point.2 ∧ point.2 ≤ 2 * den - 1) ∧
+        ((point.1 = 0 ∧ point.2 = den + 1) ∨ (point.1 = den + 1 ∧ point.2 = den - 1) ∨
+          (-1 ≤ point.2 - point.1 ∧ point.2 - point.1 ≤ den)) := by
+  obtain ⟨col, row⟩ := point
+  rw [raw, mem_maskedTile_sites]
+  simp only [window, entry]
+  constructor
+  · intro h
+    split_ifs at h <;> simp_all
+    all_goals omega
+  · intro h
+    split_ifs <;> simp_all
+    all_goals omega
+
+theorem stairOdd_raw_height_direct (den : ℤ) (point : (stairOdd.raw den).sites) :
+    (stairOdd.raw den).height point = -((point.val.1 - point.val.2) ^ 2 / 4) + min (den - point.val.2) 0 +
+      (if (point.val.1 = 0 ∧ point.val.2 = den + 1) ∨ (point.val.1 = den + 1 ∧ point.val.2 = den - 1)
+        then 1 else 0) := by
+  obtain ⟨⟨col, row⟩, hmem⟩ := point
+  have hm := (mem_stairOdd_raw_direct (den := den)).mp hmem
+  apply Option.get_of_eq_some
+  simp only [entry]
+  split_ifs <;> simp_all
+  all_goals omega
+
+theorem mem_stairOddAlt_raw_direct {den : ℤ} {point : Site} :
+    point ∈ (stairOddAlt.raw den).sites ↔
+      (-1 ≤ point.1 ∧ point.1 ≤ den + 1) ∧ (1 ≤ point.2 ∧ point.2 ≤ 3 * den - 3) ∧
+        ((point.1 = 0 ∧ point.2 = 2 * den) ∨ (point.1 = den ∧ point.2 = den - 2) ∨
+          (point.1 = -1 ∧ point.2 = 2 * den) ∨ (point.1 = den + 1 ∧ point.2 = den - 2) ∨
+          (point.1 = -1 ∧ den + 1 ≤ point.2 ∧ point.2 ≤ 2 * den) ∨
+          (point.1 = den + 1 ∧ den - 2 ≤ point.2 ∧ point.2 ≤ 2 * den - 3) ∨
+          (point.2 - point.1 = den - 1 ∧ 0 < point.1 ∧ point.1 < den) ∨
+          (0 ≤ point.1 ∧ point.1 ≤ den ∧ -1 ≤ point.2 - point.1 ∧ point.2 - point.1 ≤ 2 * den - 1)) := by
+  obtain ⟨col, row⟩ := point
+  rw [raw, mem_maskedTile_sites]
+  simp only [window, entry]
+  constructor
+  · intro h
+    split_ifs at h <;> simp_all
+    all_goals omega
+  · intro h
+    split_ifs <;> simp_all
+    all_goals omega
+
+theorem stairOddAlt_raw_height_direct (den : ℤ) (point : (stairOddAlt.raw den).sites) :
+    (stairOddAlt.raw den).height point =
+      -((point.val.1 - point.val.2) ^ 2 / 4) + min (den - point.val.2 - 1) 0 +
+        min (2 * den - 1 - point.val.2) 0 + max (point.val.2 - point.val.1 - den + 1) 0 +
+        (if (point.val.1 = 0 ∧ point.val.2 = 2 * den) ∨ (point.val.1 = den ∧ point.val.2 = den - 2) ∨
+          (point.val.1 = -1 ∧ point.val.2 = 2 * den) ∨ (point.val.1 = den + 1 ∧ point.val.2 = den - 2) ∨
+          (point.val.2 - point.val.1 = den - 1 ∧ 0 < point.val.1 ∧ point.val.1 < den)
+          then 1 else 0) := by
+  obtain ⟨⟨col, row⟩, hmem⟩ := point
+  have hm := (mem_stairOddAlt_raw_direct (den := den)).mp hmem
+  apply Option.get_of_eq_some
+  simp only [entry]
+  split_ifs <;> simp_all
+  all_goals omega
+
+theorem mem_ladderEven_raw_direct {den : ℤ} {point : Site} :
+    point ∈ (ladderEven.raw den).sites ↔
+      (-1 ≤ point.1 ∧ point.1 ≤ den + 1) ∧ (1 ≤ point.2 ∧ point.2 ≤ 3 * den - 1) ∧
+        ((point.1 = -1 ∧ point.2 = 2 * den + 1) ∨ (point.1 = den + 1 ∧ point.2 = den - 1) ∨
+          (point.2 - point.1 = den ∧ 0 < point.1 ∧ point.1 < den) ∨
+          (-1 ≤ point.2 - point.1 ∧ point.2 - point.1 ≤ 2 * den + 1 ∧
+            ¬((point.1 = -1 ∧ point.2 ≤ den + 1) ∨ (point.1 = den + 1 ∧ 2 * den - 1 ≤ point.2)))) := by
+  obtain ⟨col, row⟩ := point
+  rw [raw, mem_maskedTile_sites]
+  simp only [window, entry]
+  constructor
+  · intro h
+    split_ifs at h <;> simp_all
+    all_goals omega
+  · intro h
+    split_ifs <;> simp_all
+    all_goals omega
+
+theorem ladderEven_raw_height_direct (den : ℤ) (point : (ladderEven.raw den).sites) :
+    (ladderEven.raw den).height point =
+      -((point.val.1 - point.val.2) ^ 2 / 4) + min 0 (den - point.val.2) + max 0 (point.val.2 - point.val.1 - den)
+        + min 0 (2 * den - point.val.2) +
+        (if (point.val.1 = -1 ∧ point.val.2 = 2 * den + 1) ∨ (point.val.1 = den + 1 ∧ point.val.2 = den - 1) ∨
+          (point.val.2 - point.val.1 = den ∧ 0 < point.val.1 ∧ point.val.1 < den)
+          then 1 else 0) := by
+  obtain ⟨⟨col, row⟩, hmem⟩ := point
+  have hm := (mem_ladderEven_raw_direct (den := den)).mp hmem
+  apply Option.get_of_eq_some
+  simp only [entry]
+  split_ifs <;> simp_all
+  all_goals omega
+
+theorem mem_ladderEvenAlt_raw_direct {den : ℤ} {point : Site} :
+    point ∈ (ladderEvenAlt.raw den).sites ↔
+      (-2 ≤ point.1 ∧ point.1 ≤ den + 1) ∧ (1 ≤ point.2 ∧ point.2 ≤ 3 * den - 2) ∧
+        ((point.1 = -2 ∧ point.2 = 2 * den) ∨ (point.1 = den + 1 ∧ point.2 = den - 1) ∨
+          (-1 ≤ point.2 - point.1 ∧ point.2 - point.1 ≤ 2 * den + 1 ∧
+            ¬((point.1 ≤ -1 ∧ point.2 ≤ den - 1) ∨ (den ≤ point.1 ∧ 2 * den ≤ point.2)))) := by
+  obtain ⟨col, row⟩ := point
+  rw [raw, mem_maskedTile_sites]
+  simp only [window, entry]
+  constructor
+  · intro h
+    split_ifs at h <;> simp_all
+    all_goals omega
+  · intro h
+    split_ifs <;> simp_all
+    all_goals omega
+
+theorem ladderEvenAlt_raw_height_direct (den : ℤ) (point : (ladderEvenAlt.raw den).sites) :
+    (ladderEvenAlt.raw den).height point =
+      -((point.val.1 - point.val.2) ^ 2 / 4) + min 0 (den - point.val.2) +
+        min (2 * den - 1 - point.val.2) 0 + max (point.val.2 - point.val.1 - den) 0 +
+        (if (point.val.1 = -2 ∧ point.val.2 = 2 * den) ∨ (point.val.1 = den + 1 ∧ point.val.2 = den - 1) ∨
+          (point.val.2 - point.val.1 = den ∧ 0 < point.val.1 ∧ point.val.1 < den - 1)
+          then 1 else 0) := by
+  obtain ⟨⟨col, row⟩, hmem⟩ := point
+  have hm := (mem_ladderEvenAlt_raw_direct (den := den)).mp hmem
+  apply Option.get_of_eq_some
+  simp only [entry]
+  split_ifs <;> simp_all
+  all_goals omega
+
 end BaseMask
 
 end FLatticePaper.Construction
