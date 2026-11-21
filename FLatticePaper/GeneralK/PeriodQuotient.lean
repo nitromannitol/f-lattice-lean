@@ -70,11 +70,11 @@ theorem isClosed_feasiblePotentialParameters {deck : PeriodDeck} (hdet : 0 < dec
   exact (isClosed_le ((continuous_evaluatePotential hdet _).sub (continuous_evaluatePotential hdet _)) continuous_const).inter
     (isClosed_le ((continuous_evaluatePotential hdet _).sub (continuous_evaluatePotential hdet _)) continuous_const)
 
-theorem feasiblePotentialParameters_nonempty {deck : PeriodDeck} (hdet : 0 < deck.det) {k : ℤ}
-    {negative positive : Field} {potential : Site → ℝ} {slopeX slopeY : ℝ}
-    (hfeasible : SatisfiesInputLabels k negative positive potential)
+theorem exists_evaluatePotential_of_deckSlope {deck : PeriodDeck} (hdet : 0 < deck.det)
+    {potential : Site → ℝ} {slopeX slopeY : ℝ}
     (hslope : HasDeckSlope deck potential slopeX slopeY) :
-    (feasiblePotentialParameters hdet k negative positive).Nonempty := by
+    ∃ param : PotentialParameters deck, param.1.1 = slopeX ∧ param.1.2 = slopeY ∧
+      ∀ site, evaluatePotential hdet param site = potential site - potential 0 := by
   classical
   let periodicPart (site : Site) := potential site - potential 0 - (slopeX * (site.1 : ℝ) + slopeY * (site.2 : ℝ))
   have hperiod (step : Site) (hstep : step ∈ deck.span) (site : Site) : periodicPart (site + step) = periodicPart site := by
@@ -87,9 +87,16 @@ theorem feasiblePotentialParameters_nonempty {deck : PeriodDeck} (hdet : 0 < dec
     have hspan : point - site ∈ deck.span := (periodClassAt_eq_iff hdet _ _).mp (hrep _)
     have h := hperiod (point - site) hspan site
     simpa only [add_comm site (point - site), sub_add_cancel] using h
-  have hval (site : Site) : evaluatePotential hdet param site = potential site - potential 0 := by
-    simp only [evaluatePotential, param, hpart, periodicPart]
-    ring
+  refine ⟨param, rfl, rfl, fun site => ?_⟩
+  simp only [evaluatePotential, param, hpart, periodicPart]
+  ring
+
+theorem feasiblePotentialParameters_nonempty {deck : PeriodDeck} (hdet : 0 < deck.det) {k : ℤ}
+    {negative positive : Field} {potential : Site → ℝ} {slopeX slopeY : ℝ}
+    (hfeasible : SatisfiesInputLabels k negative positive potential)
+    (hslope : HasDeckSlope deck potential slopeX slopeY) :
+    (feasiblePotentialParameters hdet k negative positive).Nonempty := by
+  obtain ⟨param, -, -, hval⟩ := exists_evaluatePotential_of_deckSlope hdet hslope
   refine ⟨param, ?_⟩
   change evaluatePotential hdet param 0 = 0 ∧ SatisfiesInputLabels k negative positive (evaluatePotential hdet param)
   refine ⟨by rw [hval, sub_self], fun site => ?_⟩

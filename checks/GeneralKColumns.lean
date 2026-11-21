@@ -16,6 +16,7 @@ import FLatticePaper.GeneralK.ColumnUpperObstacle
 import FLatticePaper.GeneralK.Classification
 import FLatticePaper.GeneralK.PeriodPotential
 import FLatticePaper.GeneralK.TightPeriodWalk
+import FLatticePaper.GeneralK.MatrixClassification
 import Mathlib.Algebra.Order.Star.Real
 import Mathlib.Analysis.Real.Sqrt
 
@@ -163,6 +164,23 @@ theorem three_zero_slice_cyclePeak_eq_zero : (zeroSlice.cyclePeak : ℝ) = 0 := 
   · rintro ⟨x, y⟩
     norm_num [zeroSlice, matrixQuadratic_symmetricMatrix]
 
+theorem three_zero_slice_all_real_entries_iff (a : ℝ) :
+    symmetricMatrix a 0 0 ∈ growthSet 3 ↔ a ≤ 0 := by
+  have h := mem_growthSet_iff_le_cycleEndpoint (by decide : (2 : ℤ) ≤ 3) 0 0 a
+  rw [show cycleEndpoint 3 (by decide) 0 0 = 0 from three_zero_slice_cyclePeak_eq_zero] at h
+  simpa only [Rat.cast_zero] using h
+
+theorem irrational_rank_one_mem_closed_column_cones {k : ℤ} (hk : 2 ≤ k) :
+    symmetricMatrix (-2) (-Real.sqrt 2) (-1) ∈ closure (rationalConeUnion (cycleEndpoint k hk)) := by
+  rw [← growthSet_eq_closure_columnCones hk]
+  exact irrational_rank_one_is_admitted hk
+
+#print axioms rationalPeriodRealization_of_two_le
+#print axioms mem_growthSet_iff_le_cycleEndpoint
+#print axioms mem_growthSet_iff_le_columnParabolic
+#print axioms growthSet_eq_closure_columnCones
+#print axioms three_zero_slice_all_real_entries_iff
+#print axioms irrational_rank_one_mem_closed_column_cones
 #print axioms ColumnSlice.le_cyclePeak_of_bounded_column_restriction
 #print axioms ColumnSlice.le_cyclePeak_of_transverse_representative
 #print axioms three_zero_slice_cyclePeak_eq_zero
