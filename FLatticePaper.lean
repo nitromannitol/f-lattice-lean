@@ -68,6 +68,7 @@ import FLatticePaper.Plane.Induction.Reflection
 import FLatticePaper.Plane.Induction.SheetRegions
 import FLatticePaper.Plane.Induction.SheetFacts
 import FLatticePaper.Construction.NearOneBaseCases
+import FLatticePaper.Construction.BaseCases
 import FLatticePaper.Tiles.BoundaryStrings
 import FLatticePaper.Tiles.BinaryWords
 import FLatticePaper.MainTheorems
