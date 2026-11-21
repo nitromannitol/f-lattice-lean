@@ -54,6 +54,7 @@ import FLatticePaper.Plane.Induction.ReciprocalInputs
 import FLatticePaper.Plane.Induction.EvenStep
 import FLatticePaper.Plane.Induction.PolygonGeometry
 import FLatticePaper.Plane.Induction.Coherence
+import FLatticePaper.Plane.Induction.StandardField
 import FLatticePaper.Plane.Induction.OddStep
 import FLatticePaper.Plane.Induction.Periodization
 import FLatticePaper.Plane.Induction.Seams
