@@ -680,7 +680,7 @@ theorem agreeO_gen {a b N : BinaryWord} (hb : b.reverse = b) (hNr : N.reverse = 
     simp
   have hn1 : min (cw a ++ cw b ++ cw b).length (cw a ++ cw b).length - 1
       = (N ++ [Letter.p]).length := by
-    simp [cw, hN1] <;> omega
+    simp [cw, hN1]
   -- right slice: the word `b q p N q`
   have hL2 : (cw a ++ cw b ++ cw b).reverse.drop 1
       = (b ++ [Letter.q, Letter.p] ++ N ++ [Letter.q]) ++ [] := by
@@ -698,7 +698,7 @@ theorem agreeO_gen {a b N : BinaryWord} (hb : b.reverse = b) (hNr : N.reverse = 
           simp [List.append_assoc]
   have hn2 : min (cw a ++ cw b ++ cw b).length (2 * (cw a ++ cw b).length) - 1
       = (b ++ [Letter.q, Letter.p] ++ N ++ [Letter.q]).length := by
-    simp [cw, hN1] <;> omega
+    simp [cw, hN1]; omega
   refine ⟨?_, ?_⟩
   · rw [slice2_eq_of hL1 hn1, slice2_eq_of hR1 hn1]
   · rw [slice2_eq_of hL2 hn2, slice2_eq_of hQ2 hn2]
@@ -727,10 +727,10 @@ theorem agreeE_A' {R : BinaryWord} (hRr : R.reverse = R) (hR : R ++ [Letter.p] =
       rw [List.reverse_append, hQr]; simp
     rw [e1, hpq]; simp [List.append_assoc]
   have hn1 : min (cw (R ++ [Letter.q] ++ R)).length (cw R).length - 1 = (R ++ [Letter.q]).length := by
-    simp [cw] <;> omega
+    simp [cw]
   have hn2 : min (cw (R ++ [Letter.q] ++ R)).length (2 * (cw R).length) - 1
       = (R ++ [Letter.q] ++ R ++ [Letter.p]).length := by
-    simp [cw] <;> omega
+    simp [cw]; omega
   refine ⟨?_, ?_⟩
   · rw [slice2_eq_of hP1 hn1, slice2_eq_of hQ1 hn1]
   · rw [slice2_eq_of hP2 hn2, slice2_eq_of hQQ hn2]
@@ -749,10 +749,10 @@ theorem agreeE_B' {S : BinaryWord} (hSr : S.reverse = S) :
   have hQQ : ((cw S) ++ (cw S)).reverse.drop 1 = ((S ++ [Letter.q]) ++ [Letter.p]) ++ (S ++ [Letter.q]) := by
     rw [List.reverse_append, hQr]; simp [List.append_assoc]
   have hn1 : min (cw (S ++ [Letter.q])).length (cw S).length - 1 = (S ++ [Letter.q]).length := by
-    simp [cw] <;> omega
+    simp [cw]
   have hn2 : min (cw (S ++ [Letter.q])).length (2 * (cw S).length) - 1
       = ((S ++ [Letter.q]) ++ [Letter.p]).length := by
-    simp [cw] <;> omega
+    simp [cw]; omega
   refine ⟨?_, ?_⟩
   · rw [slice2_eq_of hP1 hn1, slice2_eq_of hQ1 hn1]
   · rw [slice2_eq_of hP2 hn2, slice2_eq_of hQQ hn2]
