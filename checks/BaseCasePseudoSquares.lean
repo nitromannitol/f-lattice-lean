@@ -10,3 +10,12 @@ open FLatticePaper.Tiles
 #print axioms mem_alongStrings_stair
 #print axioms sum_gH_stair
 #print axioms sum_gV_stair
+
+/-! The doubled staircase family of `prop:base_cases` (d) for every `k ≥ 1`. -/
+#print axioms ladder_isPseudoSquareAlongT
+#print axioms ladder_contain
+#print axioms ladder_cover
+#print axioms mem_alongStrings_ladder
+#print axioms sum_gH_ladder
+#print axioms sum_gV_ladder
+
