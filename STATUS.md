@@ -180,6 +180,8 @@ The smaller arithmetic critical family has an admission result in the source, a 
 
 [PeriodQuotient.lean](FLatticePaper/GeneralK/PeriodQuotient.lean) represents a feasible potential by the two real slopes and the finitely many phase values, normalized at the physical origin. Physical directed paths bound both slopes and every phase value, so the feasible set is compact. [PeriodExtremum.lean](FLatticePaper/GeneralK/PeriodExtremum.lean) proves that a maximizer of the sum of squares admits no nonzero normalized perturbation preserving all tight physical edges. The consumer checks feasibility and the extremum on a three-site physical quotient. The remaining steps are to obtain tight walks of independent winding and prove their tight component has the full period stabilizer.
 
+[WalkIntersection.lean](FLatticePaper/GeneralK/WalkIntersection.lean) proves that closed axis walks of independent winding intersect on a square period quotient. [AxisWalkFlux.lean](FLatticePaper/GeneralK/AxisWalkFlux.lean) counts signed steps and proves the divergence and displacement laws. [AxisPotential.lean](FLatticePaper/GeneralK/AxisPotential.lean) integrates the rotated flow, whose increments vanish along any disjoint second walk. The consumer checks two transverse three-step loops. The full stabilizer argument still has to apply this result to the tight subgraph for an arbitrary period deck.
+
 The $k=2$ operator specialization is axiom-free. The interpolation, Laplacian, lift equivalence, growth and harmonic results and the consumers report only `[propext, Classical.choice, Quot.sound]`.
 
 ```sh
@@ -204,6 +206,8 @@ lake build FLatticePaper.GeneralK.PeriodPotential
 lake build FLatticePaper.GeneralK.TightPeriodWalk
 lake build FLatticePaper.GeneralK.PeriodExtremum
 lake env lean checks/GeneralKPeriodQuotient.lean
+lake build FLatticePaper.GeneralK.WalkIntersection
+lake env lean checks/GeneralKWalkIntersection.lean
 lake build FLatticePaper.GeneralK.RationalReference
 lake build FLatticePaper.GeneralK.ColumnLift
 lake env lean checks/GeneralKColumns.lean
