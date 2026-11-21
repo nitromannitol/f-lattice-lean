@@ -136,4 +136,63 @@ theorem quadAt_one_eq_rev (u : Word) : quadAt [Digit.one] u = (quadAt [] u).rev 
   | append_singleton u d ih =>
     rw [quadAt_append_singleton, quadAt_append_singleton, ih, WordQuad.rev_step, List.nil_append]
 
+/-- A central pair: palindromes `a`, `b` with `b p q a = a q p b`. -/
+def Cen (a b : BinaryWord) : Prop :=
+  a.reverse = a ∧ b.reverse = b ∧ b ++ [Letter.p, Letter.q] ++ a = a ++ [Letter.q, Letter.p] ++ b
+
+section Even
+
+variable {a b M : BinaryWord}
+
+theorem mid_rev_even (ha : a.reverse = a) (hb : b.reverse = b)
+    (hM1 : M = b ++ [Letter.p, Letter.q] ++ a) (hM2 : M = a ++ [Letter.q, Letter.p] ++ b) :
+    M.reverse = M := by
+  have h : M.reverse = a ++ [Letter.q, Letter.p] ++ b := by
+    rw [hM1]; simp [List.reverse_append, ha, hb, List.append_assoc]
+  rw [h]; exact hM2.symm
+
+theorem k1_even (hM1 : M = b ++ [Letter.p, Letter.q] ++ a) (hM2 : M = a ++ [Letter.q, Letter.p] ++ b) :
+    (b ++ [Letter.p, Letter.q]) ++ M = M ++ [Letter.q, Letter.p] ++ b := by
+  calc (b ++ [Letter.p, Letter.q]) ++ M
+      = (b ++ [Letter.p, Letter.q]) ++ (a ++ [Letter.q, Letter.p] ++ b) := by rw [← hM2]
+    _ = (b ++ [Letter.p, Letter.q] ++ a) ++ [Letter.q, Letter.p] ++ b := by simp [List.append_assoc]
+    _ = M ++ [Letter.q, Letter.p] ++ b := by rw [← hM1]
+
+theorem z_rev_even (hb : b.reverse = b) (hMr : M.reverse = M)
+    (k1 : (b ++ [Letter.p, Letter.q]) ++ M = M ++ [Letter.q, Letter.p] ++ b) :
+    ((b ++ [Letter.p, Letter.q]) ++ M).reverse = (b ++ [Letter.p, Letter.q]) ++ M := by
+  have h1 : ((b ++ [Letter.p, Letter.q]) ++ M).reverse = M ++ [Letter.q, Letter.p] ++ b := by
+    simp [List.reverse_append, hMr, hb, List.append_assoc]
+  rw [h1]; exact k1.symm
+
+/-- `Cen M Z` for `Z = (b p q) M`: the even-parity child pair recurses. -/
+theorem cen_even_one (k1 : (b ++ [Letter.p, Letter.q]) ++ M = M ++ [Letter.q, Letter.p] ++ b) :
+    ((b ++ [Letter.p, Letter.q]) ++ M) ++ [Letter.p, Letter.q] ++ M
+      = M ++ [Letter.q, Letter.p] ++ ((b ++ [Letter.p, Letter.q]) ++ M) := by
+  calc ((b ++ [Letter.p, Letter.q]) ++ M) ++ [Letter.p, Letter.q] ++ M
+      = (M ++ [Letter.q, Letter.p] ++ b) ++ [Letter.p, Letter.q] ++ M := by rw [k1]
+    _ = M ++ [Letter.q, Letter.p] ++ ((b ++ [Letter.p, Letter.q]) ++ M) := by
+          simp [List.append_assoc]
+
+/-- `Cen Z b` for `Z = (b p q) M`. -/
+theorem cen_even_two (k1 : (b ++ [Letter.p, Letter.q]) ++ M = M ++ [Letter.q, Letter.p] ++ b) :
+    b ++ [Letter.p, Letter.q] ++ ((b ++ [Letter.p, Letter.q]) ++ M)
+      = ((b ++ [Letter.p, Letter.q]) ++ M) ++ [Letter.q, Letter.p] ++ b := by
+  calc b ++ [Letter.p, Letter.q] ++ ((b ++ [Letter.p, Letter.q]) ++ M)
+      = (b ++ [Letter.p, Letter.q]) ++ (M ++ [Letter.q, Letter.p] ++ b) := by rw [k1]
+    _ = ((b ++ [Letter.p, Letter.q]) ++ M) ++ [Letter.q, Letter.p] ++ b := by
+          simp [List.append_assoc]
+
+/-- `Cen a M` for the middle word `M = b p q a = a q p b`. -/
+theorem cen_even_three (hM1 : M = b ++ [Letter.p, Letter.q] ++ a)
+    (hM2 : M = a ++ [Letter.q, Letter.p] ++ b) :
+    M ++ [Letter.p, Letter.q] ++ a = a ++ [Letter.q, Letter.p] ++ M := by
+  calc M ++ [Letter.p, Letter.q] ++ a
+      = (a ++ [Letter.q, Letter.p] ++ b) ++ [Letter.p, Letter.q] ++ a := by rw [← hM2]
+    _ = a ++ [Letter.q, Letter.p] ++ (b ++ [Letter.p, Letter.q] ++ a) := by
+          simp [List.append_assoc]
+    _ = a ++ [Letter.q, Letter.p] ++ M := by rw [← hM1]
+
+end Even
+
 end FLatticePaper.Tiles
