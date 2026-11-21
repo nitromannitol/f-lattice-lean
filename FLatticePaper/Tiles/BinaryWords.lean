@@ -514,6 +514,73 @@ theorem children_pal {u : Word} {X Y : BinaryWord} (h : Form u X Y) :
     exact ⟨(a ++ [Letter.p, Letter.q] ++ b) ++ [Letter.p, Letter.q] ++ b,
       a ++ [Letter.p, Letter.q] ++ b, r_rev_odd ha hb rfl hN, hNr, by simp [cw], by simp [cw]⟩
 
+theorem quad_even (u : Word) :
+    ∃ m m' : BinaryWord, m.reverse = m ∧ m'.reverse = m' ∧
+      (quadAt [] u).childP = cw m ∧ (quadAt [] u).childQ = cw m' := by
+  obtain ⟨X, Y, hq, hF⟩ := quadAt_form u
+  obtain ⟨m, m', hm, hm', h1, h2⟩ := children_pal hF
+  exact ⟨m, m', hm, hm', by rw [hq]; exact h1, by rw [hq]; exact h2⟩
+
+theorem quadAt_of_even {w0 : Word} (h : w0.count Digit.one % 2 = 0) (u : Word) :
+    quadAt w0 u = quadAt [] u :=
+  quadAt_congr (by simp [h]) u
+
+theorem quadAt_of_odd {w0 : Word} (h : w0.count Digit.one % 2 = 1) (u : Word) :
+    quadAt w0 u = (quadAt [] u).rev := by
+  rw [quadAt_congr (w0' := [Digit.one]) (by simp [h]) u, quadAt_one_eq_rev]
+
+theorem isAP_cw {m : BinaryWord} (hm : m.reverse = m) : IsAlmostPalindrome (cw m) :=
+  ⟨Letter.q, Letter.p, m, hm, rfl⟩
+
+theorem isAP_rev {w : BinaryWord} (h : IsAlmostPalindrome w) : IsAlmostPalindrome w.reverse := by
+  obtain ⟨f, l, m, hm, rfl⟩ := h
+  exact ⟨l, f, m, hm, by simp [List.reverse_append, hm]⟩
+
+/-- `lemma:almost_palindrome` (1): both binary words are almost palindromes. -/
+theorem almost_palindrome_one (w0 u : Word) :
+    IsAlmostPalindrome (quadAt w0 u).childP ∧ IsAlmostPalindrome (quadAt w0 u).childQ := by
+  rcases Nat.mod_two_eq_zero_or_one (w0.count Digit.one) with h | h
+  · rw [quadAt_of_even h u]
+    obtain ⟨m, m', hm, hm', h1, h2⟩ := quad_even u
+    rw [h1, h2]
+    exact ⟨isAP_cw hm, isAP_cw hm'⟩
+  · rw [quadAt_of_odd h u]
+    obtain ⟨m, m', hm, hm', h1, h2⟩ := quad_even u
+    show IsAlmostPalindrome (quadAt [] u).childP.reverse ∧
+      IsAlmostPalindrome (quadAt [] u).childQ.reverse
+    rw [h1, h2]
+    exact ⟨isAP_rev (isAP_cw hm), isAP_rev (isAP_cw hm')⟩
+
+theorem getLast_wrap (m : BinaryWord) (x y : Letter) :
+    (x :: (m ++ [y])).getLast? = some y := by
+  induction m generalizing x with
+  | nil => simp
+  | cons z zs ih => simpa using ih z
+
+/-- `lemma:almost_palindrome` (2): the endpoint letters are fixed by the parity of `w0`. -/
+theorem almost_palindrome_two (w0 u : Word) :
+    (w0.count Digit.one % 2 = 0 →
+      (quadAt w0 u).childP.head? = some .q ∧ (quadAt w0 u).childP.getLast? = some .p ∧
+      (quadAt w0 u).childQ.head? = some .q ∧ (quadAt w0 u).childQ.getLast? = some .p) ∧
+    (w0.count Digit.one % 2 = 1 →
+      (quadAt w0 u).childP.head? = some .p ∧ (quadAt w0 u).childP.getLast? = some .q ∧
+      (quadAt w0 u).childQ.head? = some .p ∧ (quadAt w0 u).childQ.getLast? = some .q) := by
+  constructor
+  · intro h
+    rw [quadAt_of_even h u]
+    obtain ⟨m, m', hm, hm', h1, h2⟩ := quad_even u
+    rw [h1, h2]
+    simp [cw, getLast_wrap]
+  · intro h
+    rw [quadAt_of_odd h u]
+    obtain ⟨m, m', hm, hm', h1, h2⟩ := quad_even u
+    show ((quadAt [] u).childP.reverse).head? = some .p ∧
+      ((quadAt [] u).childP.reverse).getLast? = some .q ∧
+      ((quadAt [] u).childQ.reverse).head? = some .p ∧
+      ((quadAt [] u).childQ.reverse).getLast? = some .q
+    rw [h1, h2]
+    simp [cw, getLast_wrap]
+
 end Invariant
 
 end FLatticePaper.Tiles
