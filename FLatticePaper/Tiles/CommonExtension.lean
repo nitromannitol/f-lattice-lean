@@ -1,6 +1,7 @@
 import FLatticePaper.Tiles.PseudoSquare
 import FLatticePaper.Tiles.AlmostTilingAssembly
 import FLatticePaper.Tiles.BaseCaseAlmostTiling
+import FLatticePaper.Tiles.BaseCaseGlobal
 import FLatticePaper.Plane.Induction.Periodization
 
 /-! `lemma:common-extension-pseudo-square` (line 1705).
@@ -16,6 +17,7 @@ period lattice; that covering clause is read off the almost tiling. -/
 namespace FLatticePaper.Tiles
 
 open FLatticePaper.Farey (Fraction PeriodDeck)
+open FLatticePaper.Construction (paperStairTile paperLadderTile)
 
 /-- The first sentence of `lemma:common-extension-pseudo-square`: a pseudo-square with admissible `G`-words satisfying
 the two global inputs generates the regular almost tiling `(Σw_1 + i, Σw_2 - 1)`. -/
@@ -126,5 +128,118 @@ theorem stair_common_extension_unique (k : ℕ)
           FLatticePaper.HasGeneratorPeriods (⟨1, 2 * (k : ℤ) + 3⟩ : Fraction) other c1 c2 → other = field :=
   common_extension_unique (⟨1, 2 * (k : ℤ) + 3⟩ : Fraction)
     (by unfold Fraction.InUnitInterval; dsimp only; omega) (stair_almost_tiling_paper k hF hG) hcompat
+
+/-! ### The two readings of the base tiles, for every `k` and `m` -/
+
+/-- The reciprocal ladder `ladderCells (2m+4)` is a `(ladderH (m+1), ladderV (m+1))`-pseudo-square at the cell level,
+its trace being the ladder boundary word. -/
+theorem ladder_isPseudoSquare (m : ℕ) :
+    IsPseudoSquare (ladderCells (2 * (m : ℤ) + 4)) (ladderH (m + 1)) (ladderV (m + 1)) := by
+  obtain ⟨c, hc⟩ := (ladder_base_tile m).1
+  exact ⟨⟨c, gH (ladderH (m + 1)), gV (ladderV (m + 1)), hc, (gPseudo_fst _ _).symm, (gPseudo_snd _ _).symm⟩⟩
+
+/-- The vertex-level reading of the reciprocal stair: the walk placement holds on the vertex set of `stairCells (2k+3)`,
+for every `k`. -/
+theorem stair_isPseudoSquareAlongT_vertices (k : ℕ) :
+    IsPseudoSquareAlongT ((stairCells (2 * (k : ℤ) + 3)).vertices : Set GInt) (stairH k) (stairV k) := by
+  have hset : ((stairCells (2 * (k : ℤ) + 3)).vertices : Set GInt) = paperStairTile (2 * (k : ℤ) + 3) := by
+    ext x
+    exact mem_stairVertices (2 * (k : ℤ) + 3) (by omega) x
+  rw [hset]
+  exact stair_isPseudoSquareAlongT k
+
+/-- The vertex-level reading of the reciprocal ladder: the walk placement holds on the vertex set of
+`ladderCells (2m+4)`, for every `m`. -/
+theorem ladder_isPseudoSquareAlongT_vertices (m : ℕ) :
+    IsPseudoSquareAlongT ((ladderCells (2 * (m : ℤ) + 4)).vertices : Set GInt) (ladderH (m + 1)) (ladderV (m + 1)) := by
+  have hset : ((ladderCells (2 * (m : ℤ) + 4)).vertices : Set GInt) = paperLadderTile (2 * (m : ℤ) + 4) := by
+    ext x
+    exact mem_ladderVertices (2 * (m : ℤ) + 4) (by omega) x
+  rw [hset]
+  have h := ladder_isPseudoSquareAlongT (m + 1) (by omega)
+  have hd : (2 * ((m + 1 : ℕ) : ℤ) + 2) = 2 * (m : ℤ) + 4 := by push_cast; ring
+  rw [hd] at h
+  exact h
+
+/-- Agreement of the two readings on the reciprocal stair `stairCells (2k+3)`, for every `k`: the cell-level
+`IsPseudoSquare` and the vertex-level `IsPseudoSquareAlongT` on the vertex set of the same cell tile hold together. Both
+sides are established from independent data (the stair boundary word and the walk placement), so this is agreement of
+truth values for the base tile, not an implication for general tiles. -/
+theorem stair_readings_agree (k : ℕ) :
+    IsPseudoSquare (stairCells (2 * (k : ℤ) + 3)) (stairH k) (stairV k) ↔
+      IsPseudoSquareAlongT ((stairCells (2 * (k : ℤ) + 3)).vertices : Set GInt) (stairH k) (stairV k) :=
+  ⟨fun _ => stair_isPseudoSquareAlongT_vertices k, fun _ => stair_isPseudoSquare k⟩
+
+/-- Agreement of the two readings on the reciprocal ladder `ladderCells (2m+4)`, for every `m`. -/
+theorem ladder_readings_agree (m : ℕ) :
+    IsPseudoSquare (ladderCells (2 * (m : ℤ) + 4)) (ladderH (m + 1)) (ladderV (m + 1)) ↔
+      IsPseudoSquareAlongT ((ladderCells (2 * (m : ℤ) + 4)).vertices : Set GInt) (ladderH (m + 1)) (ladderV (m + 1)) :=
+  ⟨fun _ => ladder_isPseudoSquareAlongT_vertices m, fun _ => ladder_isPseudoSquare m⟩
+
+/-- The first sentence for the ladder base tiles: the cell-level pseudo-square with admissible `G`-words and the two
+global inputs gives the regular almost tiling `(Σw_1 + i, Σw_2 - 1)`. -/
+theorem ladder_common_extension (m : ℕ)
+    (hF : NoFirstCrossing (ladderCells (2 * (m : ℤ) + 4)) (almostV₁ (gH (ladderH (m + 1))))
+      (almostV₂ (gV (ladderV (m + 1)))))
+    (hG : NoFarAdjacency (ladderCells (2 * (m : ℤ) + 4)) (almostV₁ (gH (ladderH (m + 1))))
+      (almostV₂ (gV (ladderV (m + 1))))) :
+    IsRegularAlmostTiling (ladderCells (2 * (m : ℤ) + 4)) (almostV₁ (gH (ladderH (m + 1))))
+      (almostV₂ (gV (ladderV (m + 1)))) := by
+  have hA1 : Admissible (gPseudo (ladderH (m + 1)) (ladderV (m + 1))).1 := by
+    rw [gPseudo_fst]
+    exact (ladder_base_tile m).2.1
+  have hA2 : Admissible ((gPseudo (ladderH (m + 1)) (ladderV (m + 1))).2.map Unit4.mulNegI) := by
+    rw [gPseudo_snd]
+    exact (ladder_base_tile m).2.2.1
+  have hF' : NoFirstCrossing (ladderCells (2 * (m : ℤ) + 4))
+      (almostV₁ (gPseudo (ladderH (m + 1)) (ladderV (m + 1))).1)
+      (almostV₂ (gPseudo (ladderH (m + 1)) (ladderV (m + 1))).2) := by
+    rw [gPseudo_fst, gPseudo_snd]
+    exact hF
+  have hG' : NoFarAdjacency (ladderCells (2 * (m : ℤ) + 4))
+      (almostV₁ (gPseudo (ladderH (m + 1)) (ladderV (m + 1))).1)
+      (almostV₂ (gPseudo (ladderH (m + 1)) (ladderV (m + 1))).2) := by
+    rw [gPseudo_fst, gPseudo_snd]
+    exact hG
+  have h := common_extension_almost (ladder_isPseudoSquare m) (ladder_simple m) hA1 hA2 hF' hG'
+  rw [gPseudo_fst, gPseudo_snd] at h
+  exact h
+
+/-- The first sentence for every reciprocal stair base tile `stairCells (2k+3)`, with no global hypothesis. -/
+theorem stair_first_sentence_all (k : ℕ) :
+    IsRegularAlmostTiling (stairCells (2 * (k : ℤ) + 3)) (almostV₁ (gH (stairH k)))
+      (almostV₂ (gV (stairV k))) :=
+  stair_common_extension k (stair_global k).1 (stair_global k).2
+
+/-- The first sentence for every reciprocal ladder base tile `ladderCells (2m+4)`, with no global hypothesis. -/
+theorem ladder_first_sentence_all (m : ℕ) :
+    IsRegularAlmostTiling (ladderCells (2 * (m : ℤ) + 4)) (almostV₁ (gH (ladderH (m + 1))))
+      (almostV₂ (gV (ladderV (m + 1)))) :=
+  ladder_common_extension m (ladder_global m).1 (ladder_global m).2
+
+/-- The translation condition on the reciprocal stair extends uniquely to the plane, for every `k`. -/
+theorem stair_common_extension_unique_all (k : ℕ) {c1 c2 : ℤ} {g : FLatticePaper.Field}
+    (hcompat : FLatticePaper.Induction.RespectsPeriodsOn (⟨1, 2 * (k : ℤ) + 3⟩ : Fraction) c1 c2
+      ((stairCells (2 * (k : ℤ) + 3)).vertices : Set GInt) g) :
+    ∃ field : FLatticePaper.Field,
+      (∀ y ∈ ((stairCells (2 * (k : ℤ) + 3)).vertices : Set GInt), field y = g y) ∧
+      FLatticePaper.HasGeneratorPeriods (⟨1, 2 * (k : ℤ) + 3⟩ : Fraction) field c1 c2 ∧
+      ∀ other : FLatticePaper.Field,
+        (∀ y ∈ ((stairCells (2 * (k : ℤ) + 3)).vertices : Set GInt), other y = g y) →
+          FLatticePaper.HasGeneratorPeriods (⟨1, 2 * (k : ℤ) + 3⟩ : Fraction) other c1 c2 → other = field :=
+  stair_common_extension_unique k (stair_global k).1 (stair_global k).2 hcompat
+
+/-- The translation condition on the reciprocal ladder extends uniquely to the plane, for every `m`. -/
+theorem ladder_common_extension_unique_all (m : ℕ) {c1 c2 : ℤ} {g : FLatticePaper.Field}
+    (hcompat : FLatticePaper.Induction.RespectsPeriodsOn (⟨1, 2 * (m : ℤ) + 4⟩ : Fraction) c1 c2
+      ((ladderCells (2 * (m : ℤ) + 4)).vertices : Set GInt) g) :
+    ∃ field : FLatticePaper.Field,
+      (∀ y ∈ ((ladderCells (2 * (m : ℤ) + 4)).vertices : Set GInt), field y = g y) ∧
+      FLatticePaper.HasGeneratorPeriods (⟨1, 2 * (m : ℤ) + 4⟩ : Fraction) field c1 c2 ∧
+      ∀ other : FLatticePaper.Field,
+        (∀ y ∈ ((ladderCells (2 * (m : ℤ) + 4)).vertices : Set GInt), other y = g y) →
+          FLatticePaper.HasGeneratorPeriods (⟨1, 2 * (m : ℤ) + 4⟩ : Fraction) other c1 c2 → other = field :=
+  common_extension_unique (⟨1, 2 * (m : ℤ) + 4⟩ : Fraction)
+    (by unfold Fraction.InUnitInterval; dsimp only; omega) (ladder_almost_tiling_paper_all m) hcompat
 
 end FLatticePaper.Tiles
