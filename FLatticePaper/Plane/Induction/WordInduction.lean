@@ -1,4 +1,5 @@
 import FLatticePaper.Plane.Induction.SheetFacts
+import FLatticePaper.Plane.Induction.Step
 
 namespace FLatticePaper.Induction
 open Farey
@@ -37,5 +38,19 @@ def OpenInputs (word : Word) : Prop :=
   (∀ z ∈ frame.closedPolygon, frame.sGrade z ≤ 2 * (frame.child.den + frame.child.num) - 1 →
     harmonicGrid z ≤ (if frame.eps = 1 then frame.sheetC Fp z else frame.sheetA Fp z)) ∧
   (∀ z ∈ frame.closedPolygon, laplacian (frame.sheetMin Fp) z = -1 ∨ laplacian (frame.sheetMin Fp) z = 0)
+
+/-- Every standard field has the packet, given the open inputs at every proper word. -/
+theorem packet_standardField (h : ∀ word, (∃ x ∈ word, x ≠ .three) → OpenInputs word) :
+    ∀ word, (frameAt word).Packet (standardField word) := by
+  refine word_induction (P := fun word => (frameAt word).Packet (standardField word)) ?_ ?_
+  · intro k
+    exact reciprocal_packet k
+  · intro word hproper hIH
+    obtain ⟨hA0, hEq, hrefl, -⟩ := sheetFacts_of_conjPacket hproper hIH
+    obtain ⟨hC0, hGe, hbin⟩ := h word hproper
+    have hP := (frameAt word).packet_of_sheets (Fp := quarterTurnField (standardField (conjWord word)))
+      hA0 hC0 hEq hGe hrefl hbin
+    rw [standardField_proper hproper]
+    exact hP
 
 end FLatticePaper.Induction
