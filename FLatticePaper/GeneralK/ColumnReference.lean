@@ -260,7 +260,7 @@ theorem reference_add_length (slice : ColumnSlice) (sector : ℤ) :
 
 end ColumnSlice
 
-private theorem ceilDiv_add_mul {k : ℤ} (hk : k ≠ 0) (value constant : ℤ) :
+theorem ceilDiv_add_mul {k : ℤ} (hk : k ≠ 0) (value constant : ℤ) :
     ceilDiv (value + k * constant) k = ceilDiv value k + constant := by
   unfold ceilDiv
   rw [show -(value + k * constant) = -value + (-constant) * k by ring, Int.add_mul_ediv_right _ _ hk]

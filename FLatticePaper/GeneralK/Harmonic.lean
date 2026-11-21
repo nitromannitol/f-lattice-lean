@@ -79,7 +79,7 @@ private theorem cast_chooseTwo (n : ℤ) : (chooseTwo n : ℝ) = (n : ℝ) * ((n
     exact_mod_cast two_mul_chooseTwo n
   linarith
 
-private theorem cast_phasePrimitive {k : ℤ} (hk : 0 < k) (n : ℤ) :
+theorem cast_phasePrimitive {k : ℤ} (hk : 0 < k) (n : ℤ) :
     (phasePrimitive k n : ℝ) = (n : ℝ) ^ 2 / (2 * (k : ℝ)) - (n : ℝ) / 2 +
       ((n % k : ℤ) : ℝ) * ((k : ℝ) - ((n % k : ℤ) : ℝ)) / (2 * (k : ℝ)) := by
   have hk' : (0 : ℝ) < k := by exact_mod_cast hk

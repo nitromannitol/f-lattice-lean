@@ -76,3 +76,14 @@ theorem reciprocal_root_zero_at_upper_transverse_edge :
 
 #print axioms stairEven_eq_zero_of_transverse
 #print axioms reciprocal_root_zero_at_upper_transverse_edge
+
+theorem reciprocal_root_harmonic_along_transverse_period :
+    ∃ field : Field, (BaseMask.stairEven.raw 3).Agrees field 0 ∧ Recurrent field ∧
+      ∀ j : ℤ, field (-2 * j, 4 * j) = centeredQuarterTurnCorrection (-2 * j, 4 * j) := by
+  have hvalid : BaseMask.stairEven.Valid 3 := by simp [BaseMask.Valid]
+  obtain ⟨field, hagree, hperiod, _, _, hrec⟩ := stairEven_exists_recurrent_extension hvalid
+  refine ⟨field, hagree, hrec, fun j => ?_⟩
+  exact stairEven_eq_harmonic_of_longitudinal hvalid hagree hperiod (-2 * j, 4 * j) (by dsimp; omega) (by dsimp; omega)
+
+#print axioms stairEven_eq_harmonic_of_longitudinal
+#print axioms reciprocal_root_harmonic_along_transverse_period

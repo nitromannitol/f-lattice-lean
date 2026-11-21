@@ -21,7 +21,7 @@ theorem posSemidef_parabolic (b c : ℝ) (hc : 0 < c) :
   rw [heq]
   exact div_nonneg (sq_nonneg _) hc.le
 
-private theorem posSemidef_topEntry {a : ℝ} (ha : 0 ≤ a) : (symmetricMatrix a 0 0).PosSemidef := by
+theorem posSemidef_topEntry {a : ℝ} (ha : 0 ≤ a) : (symmetricMatrix a 0 0).PosSemidef := by
   apply Matrix.PosSemidef.of_dotProduct_mulVec_nonneg
     (Matrix.isHermitian_iff_isSymm.mpr (isSymm_symmetricMatrix ..))
   intro x
@@ -176,12 +176,12 @@ private theorem exists_tendsto_rationalCone {a b c : ℝ}
     · exact hu
     · exact hv
 
-private theorem closure_rationalCone_subset_growthSet (hk : 2 ≤ k)
-    (hslice : ∀ (u v : ℚ) (a : ℝ), symmetricMatrix a u v ∈ growthSet k ↔ a ≤ endpoint u v) :
+theorem closure_rationalCone_subset_growthSet (hk : 2 ≤ k)
+    (hadmit : ∀ (u v : ℚ), symmetricMatrix (endpoint u v) u v ∈ growthSet k) :
     closure (rationalConeUnion endpoint) ⊆ growthSet k := by
   apply closure_minimal _ (isClosed_growthSet hk)
   rintro matrix ⟨_, u, v, hpos⟩
-  have h := sub_mem_growthSet_of_posSemidef hk ((hslice u v _).mpr le_rfl) hpos
+  have h := sub_mem_growthSet_of_posSemidef hk (hadmit u v) hpos
   rwa [sub_sub_cancel] at h
 
 /-- Once the rational slice endpoint calculation is available, the
@@ -204,14 +204,15 @@ theorem mem_growthSet_iff_le_sInf_parabolicValues (hk : 2 ≤ k)
     have hparabola (u v : ℚ) (hv : (v : ℝ) < c) : a ≤ endpoint u v + (b - (u : ℝ)) ^ 2 / (c - (v : ℝ)) :=
       hm.trans (csInf_le hbounded ⟨u, v, hv, rfl⟩)
     obtain ⟨approximants, hmem, hlim⟩ := exists_tendsto_rationalCone hparabola
-    exact closure_rationalCone_subset_growthSet hk hslice (mem_closure_of_tendsto hlim (Eventually.of_forall hmem))
+    exact closure_rationalCone_subset_growthSet hk (fun u v => (hslice u v _).mpr le_rfl)
+      (mem_closure_of_tendsto hlim (Eventually.of_forall hmem))
 
 /-- Both cone inclusions, including the passage to closure at irrational
 entries, follow from the rational endpoint calculation. -/
 theorem growthSet_eq_closure_rationalConeUnion (hk : 2 ≤ k)
     (hslice : ∀ (u v : ℚ) (a : ℝ), symmetricMatrix a u v ∈ growthSet k ↔ a ≤ endpoint u v) :
     growthSet k = closure (rationalConeUnion endpoint) := by
-  apply le_antisymm _ (closure_rationalCone_subset_growthSet hk hslice)
+  apply le_antisymm _ (closure_rationalCone_subset_growthSet hk (fun u v => (hslice u v _).mpr le_rfl))
   intro matrix hmatrix
   have heq := symmetricMatrix_entries hmatrix.1
   rw [← heq] at hmatrix ⊢

@@ -1,5 +1,5 @@
 import FLatticePaper.GeneralK.ColumnLift
-import FLatticePaper.GeneralK.ColumnCycles
+import FLatticePaper.GeneralK.ColumnCycleAdmission
 import FLatticePaper.GeneralK.Connectivity
 import FLatticePaper.GeneralK.Trace
 import FLatticePaper.GeneralK.Envelope
@@ -95,6 +95,9 @@ theorem three_zero_slice_cyclePeak_has_witness : ∃ (sector : zeroSlice.Sector)
     zeroSlice.cyclePeak = (zeroSlice.a₀ : ℚ) + zeroSlice.cycleMean sector.val cycle :=
   zeroSlice.cyclePeak_attained
 
+theorem three_zero_slice_cyclePeak_is_admitted : symmetricMatrix (zeroSlice.cyclePeak : ℝ) 0 0 ∈ growthSet 3 := by
+  simpa only [zeroSlice, Rat.cast_zero] using zeroSlice.cyclePeak_mem_growthSet
+
 #print axioms laplacian_two
 #print axioms interpolate_first
 #print axioms interpolate_last
@@ -138,5 +141,10 @@ theorem three_zero_slice_cyclePeak_has_witness : ∃ (sector : zeroSlice.Sector)
 #print axioms ColumnSlice.cyclePeak_attained
 #print axioms three_zero_slice_has_one_row_phase
 #print axioms three_zero_slice_cyclePeak_has_witness
+#print axioms periodicPrimitive_secondDifference
+#print axioms ColumnSlice.columnRow_cycleRetained_nonpos
+#print axioms ColumnSlice.cyclePeak_mem_growthSet
+#print axioms closure_cycleCone_subset_growthSet
+#print axioms three_zero_slice_cyclePeak_is_admitted
 
 end FLatticePaper.GeneralK.Checks
