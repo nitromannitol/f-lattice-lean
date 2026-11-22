@@ -1,5 +1,7 @@
 import FLatticePaper.Plane.Induction.Bands
-
+import FLatticePaper.Plane.Induction.Coherence
+import FLatticePaper.Plane.Induction.Packet
+import FLatticePaper.Plane.Induction.WordInduction
 
 /-! Task 25, the eps = -1 branch of (I2) by the reflection.
 
@@ -49,5 +51,30 @@ theorem i2_neg_of_reflection (frame : ChildFrame) (Fp : Field) (hX : frame.Sheet
   have h := sheetDiff_antisymm_of_exchange frame Fp hX z
   have hp := hpos z hz hs
   linarith
+
+/-- The sheet exchange of the eps = -1 branch, from the conjugate packet. The reflection and the periods of the
+conjugate standard field, with the child identity of the conjugate, transport through the quarter turn to the two
+sheets (`ChildFrame.sheet_swap`, SheetSwap.lean). -/
+theorem sheetExchange_of_packet {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
+    (hG : (frameAt (conjWord word)).Packet (standardField (conjWord word))) :
+    (frameAt word).SheetExchange (quarterTurnField (standardField (conjWord word))) := by
+  have hc := frameAt_conj_child h
+  have hs := (frameAt word).sheet_swap (frameAt (conjWord word)) hc hG.reflection hG.periods
+  exact ⟨fun z => (hs z).1, fun z => (hs z).2⟩
+
+/-- (I2), eps = -1, from (I1) on the reflected band. If the reflected harmonic band lies in the I1 zone
+`{t >= 1 - d}` of the closed polygon, then `Psi <= 0` on the harmonic band follows from the I1 premise `Psi >= 0`
+there. The containment hypothesis is the part that is not satisfied (see the report). -/
+theorem i2_neg_of_I1_containment (frame : ChildFrame) (Fp : Field) (hX : frame.SheetExchange Fp)
+    (hI1 : ∀ z ∈ frame.closedPolygon, 1 - frame.child.den ≤ frame.tGrade z →
+      0 ≤ frame.sheetC Fp z - frame.sheetA Fp z)
+    (hcont : ∀ z ∈ frame.closedPolygon,
+      frame.sGrade z ≤ 2 * (frame.child.den + frame.child.num) - 1 →
+        1 - frame.child.den ≤ frame.tGrade (frame.centre - z)) :
+    ∀ z ∈ frame.closedPolygon,
+      frame.sGrade z ≤ 2 * (frame.child.den + frame.child.num) - 1 →
+        frame.sheetC Fp z - frame.sheetA Fp z ≤ 0 :=
+  i2_neg_of_reflection frame Fp hX
+    (fun z hz hs => hI1 (frame.centre - z) (frame.centre_sub_mem hz) (hcont z hz hs))
 
 end FLatticePaper.Induction
