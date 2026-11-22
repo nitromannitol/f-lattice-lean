@@ -38,6 +38,8 @@ def value_iter(n, g, lapv, edges, maxit):
             fixed = True
             break
         r = new
+        if not np.any(r == 0):
+            break   # every class has escaped: the escape certificates are complete
     return r, fixed, it
 
 
