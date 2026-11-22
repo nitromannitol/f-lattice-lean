@@ -110,6 +110,9 @@ import FLatticePaper.Plane.Induction.BaseInputsProof
 import FLatticePaper.Plane.Induction.BaseGeometry
 import FLatticePaper.Plane.Induction.BaseReflection
 import FLatticePaper.Plane.Induction.BaseUpper
+import FLatticePaper.Plane.Induction.S1S2Window
+import FLatticePaper.Plane.Induction.BaseRecurrent
+import FLatticePaper.Plane.Induction.BaseHalo
 import FLatticePaper.Plane.Induction.PermitMonotone
 import FLatticePaper.Plane.Induction.OpenInputsProof
 import FLatticePaper.Plane.Induction.RootCalibration
