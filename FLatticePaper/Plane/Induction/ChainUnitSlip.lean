@@ -39,4 +39,11 @@ theorem hasUnitSlip_sheets_of_chain {word : Word} (h : ∃ x ∈ word, x ≠ Dig
     (edge_sub_even i c (frameAt word).sheetShift hs hE)
   constructor <;> linarith [hu.1, hu.2]
 
+/-- The rise step of the archive (STRONG_PRICE_AND_ALTERNATE_STEP §4): "A Phi rise along a canonical F edge z -> u now
+forces D(u) = D(z) and P(u + eta sigma) = P(z + eta sigma) + 1". With `D` nonincreasing along the edge (`dD <= 0`) and
+`P` rising by at most one (`dP <= 1`), a rise of `Phi = D + P` (`1 <= dD + dP`) forces `dD = 0` and `dP = 1`. -/
+theorem rise_forces_flat_D_and_P_step (dD dP : ℤ) (hD : dD ≤ 0) (hP : dP ≤ 1) (hrise : 1 ≤ dD + dP) :
+    dD = 0 ∧ dP = 1 := by
+  omega
+
 end FLatticePaper.Induction
