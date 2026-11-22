@@ -417,6 +417,8 @@ theorem starEstimates_all (hpk : ∀ u : Word, (frameAt u).Packet (standardField
 /-- The even alternate of a word with its star estimates: the periods, growth, binary Laplacian, recurrence and the
 non-integer-affine difference from the standard field. -/
 theorem alternate_facts_word (u : Word) (hpk : (frameAt u).Packet (standardField u)) (hS : StarEstimates u) :
+    HasGeneratorPeriods (frameAt u).child ((frameAt u).alternate (standardField u))
+      (frameAt u).coherentConstantU ((frameAt u).coherentConstantV - 1) ∧
     SatisfiesPeriodicity (frameAt u).child ((frameAt u).alternate (standardField u)) ∧
       HasQuadraticGrowth ((frameAt u).alternate (standardField u)) (frameAt u).child.matrix ∧
       (∀ x, laplacian ((frameAt u).alternate (standardField u)) x = -1 ∨
@@ -468,11 +470,12 @@ theorem alternate_facts_birth (w : Word) (p : Parity) {fr : Fraction} (hfr : (pa
   cases p with
   | even =>
     rw [planeAlternate_even, planeTarget_even]
-    exact alternate_facts_word w (hpk w) (hS w)
+    obtain ⟨-, h1, h2, h3, h4, h5, h6⟩ := alternate_facts_word w (hpk w) (hS w)
+    exact ⟨h1, h2, h3, h4, h5, h6⟩
   | odd =>
     have hodd : ((parentsAt w).current .odd).Odd := (parentsAt_valid w).current_odd_parity
     have hch : (frameAt (swapW w)).child = ((parentsAt w).current .odd).rotate := (current_swap w).1
-    obtain ⟨hA1, hA2, hA3, hA4, hA5, hA6⟩ := alternate_facts_word (swapW w) (hpk (swapW w)) (hS (swapW w))
+    obtain ⟨-, hA1, hA2, hA3, hA4, hA5, hA6⟩ := alternate_facts_word (swapW w) (hpk (swapW w)) (hS (swapW w))
     rw [hch] at hA1 hA2
     rw [planeAlternate_odd, planeTarget_odd]
     exact alternate_quarterTurn_facts hodd hint.inUnitInterval hA1 hA2 hA3 hA4 hA5 hA6
@@ -594,13 +597,85 @@ theorem packet_all (hstar : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three)
       (fun _ hz hs => twos_harm_strip k hz hs))
     hstar hsheet
 
+/-- The explicit increments of the even alternate against the standard field: the transverse period lowers the difference by
+`1` (the alternate's transverse constant is `cV - 1`), and the kernel period leaves it unchanged. -/
+theorem even_increments {fr : Fraction} {F H : Field} {cU cV : ℤ}
+    (hF : HasGeneratorPeriods fr F cU cV) (hH : HasGeneratorPeriods fr H cU (cV - 1)) :
+    (∀ x : Site, H (x + fr.modifiedDeck.kernel) - F (x + fr.modifiedDeck.kernel) = H x - F x) ∧
+      (∀ x : Site, H (x + fr.modifiedDeck.transverse) - F (x + fr.modifiedDeck.transverse) = H x - F x - 1) := by
+  refine ⟨fun x => ?_, fun x => ?_⟩
+  · rw [hH.1 x, hF.1 x]
+    ring
+  · rw [hH.2 x, hF.2 x]
+    ring
+
+/-- The explicit increment of the odd alternate against the standard field: the kernel period of an odd fraction is the
+transverse period of its rotation, and the quarter-turned difference drops by `1` there. -/
+theorem odd_increments {fr : Fraction} (hodd : fr.Odd) {A G : Field} {cU cV : ℤ}
+    (hA : HasGeneratorPeriods fr.rotate A cU (cV - 1)) (hG : HasGeneratorPeriods fr.rotate G cU cV) (x : Site) :
+    quarterTurnField A (x + fr.modifiedDeck.kernel) - quarterTurnField G (x + fr.modifiedDeck.kernel) =
+      quarterTurnField A x - quarterTurnField G x - 1 := by
+  have hk : fr.modifiedDeck.kernel = (2 * fr.den, 2 * fr.num) := by
+    rw [modifiedDeck_kernel_of_odd hodd]
+    rfl
+  have ht : fr.rotate.modifiedDeck.transverse = (-(2 * fr.num), 2 * fr.den) := by
+    rw [modifiedDeck_transverse, Fraction.rotate_of_odd hodd]
+    simp only [texV2, Prod.mk.injEq]
+    constructor <;> ring
+  have hshift : (-((x + fr.modifiedDeck.kernel).2), (x + fr.modifiedDeck.kernel).1 - 1) =
+      (-x.2, x.1 - 1) + fr.rotate.modifiedDeck.transverse := by
+    rw [hk, ht]
+    refine Prod.ext ?_ ?_
+    · simp only [Prod.fst_add, Prod.snd_add]
+      ring
+    · simp only [Prod.fst_add, Prod.snd_add]
+      ring
+  simp only [quarterTurnField_eq]
+  rw [hshift, hA.2, hG.2]
+  ring
+
+/-- The explicit increments of the even alternate at an even birth `(w, 0)`-type. -/
+theorem even_alt_increments (w : Word) {fr : Fraction} (hfr : (frameAt w).child = fr)
+    (hpk : (frameAt w).Packet (standardField w)) (hS : StarEstimates w) :
+    (∀ x : Site, planeAlternate w .even (x + fr.modifiedDeck.transverse) -
+        planeTarget w .even (x + fr.modifiedDeck.transverse) =
+        planeAlternate w .even x - planeTarget w .even x - 1) ∧
+      (∀ x : Site, planeAlternate w .even (x + fr.modifiedDeck.kernel) -
+        planeTarget w .even (x + fr.modifiedDeck.kernel) = planeAlternate w .even x - planeTarget w .even x) := by
+  obtain ⟨hAgen, -, -, -, -, -, -⟩ := alternate_facts_word w hpk hS
+  rw [← hfr, planeAlternate_even, planeTarget_even]
+  exact ⟨(even_increments hpk.periods hAgen).2, (even_increments hpk.periods hAgen).1⟩
+
+/-- The explicit increment of the odd alternate at an odd birth `(w, 1)`-type: the kernel period lowers the difference by `1`. -/
+theorem odd_alt_increments (w : Word) {fr : Fraction} (hfr : (parentsAt w).current .odd = fr)
+    (hpk : (frameAt (swapW w)).Packet (standardField (swapW w))) (hS : StarEstimates (swapW w)) (x : Site) :
+    planeAlternate w .odd (x + fr.modifiedDeck.kernel) - planeTarget w .odd (x + fr.modifiedDeck.kernel) =
+      planeAlternate w .odd x - planeTarget w .odd x - 1 := by
+  have hodd : fr.Odd := by
+    rw [← hfr]
+    exact (parentsAt_valid w).current_odd_parity
+  have hch : (frameAt (swapW w)).child = fr.rotate := by
+    rw [← hfr]
+    exact (current_swap w).1
+  obtain ⟨hAgen, -, -, -, -, -, -⟩ := alternate_facts_word (swapW w) hpk hS
+  have hGgen := hpk.periods
+  rw [hch] at hAgen hGgen
+  rw [planeAlternate_odd, planeTarget_odd]
+  exact odd_increments hodd hAgen hGgen x
+
 /-- `lemma:global_odometers` for both odometers at a birth `(w, p)` of `fraction = n/d`: the standard one (`global_odometers`),
 and the alternate `ĝ = planeAlternate w p`, with its identification of the constructor's alternate tile (`htileAlt`) and the
-coverage of that tile (`hcovAlt`), and the distinctness of the two: the difference is not integer affine (in the fixed
-coordinates of `eq:periodicity`), and the Laplacians differ somewhere.
+coverage of that tile (`hcovAlt`), and the distinctness of the two in the fixed coordinates of `eq:periodicity`: the difference
+is not integer affine, the Laplacians differ somewhere, and the explicit increments (the transverse increment `-1` at even
+births, the kernel increment `-1` at odd births) hold.
 
-The inputs are those of `global_odometers` together with `hbase`: the star estimates of the base words (pure words and
-powers of two), which the library does not yet derive for the standard fields at those words. -/
+The alternate half is restricted to the births where the constructor's alternate identification holds numerically
+(`hid : p = even ∨ phase w = 0`: even alternates, and odd alternates of even phase). The odd alternate of odd phase
+(`p = odd ∧ phase w = 1`) matches no plane target tried, so it is not covered here (the plane facts of `planeAlternate`
+still hold there, by `alternate_facts_birth`).
+
+The inputs include `hbase`: the star estimates of the base words (pure words and powers of two), which the library does not
+derive for the standard fields at those words. -/
 theorem global_odometers_pair {fraction : Fraction} (hint : fraction.Interior) {w : Word} {p : Parity}
     (hbirth : (parentsAt w).current p = fraction)
     (hstar : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word → StarZoneInputs word)
@@ -619,7 +694,9 @@ theorem global_odometers_pair {fraction : Fraction} (hint : fraction.Interior) {
     (htile : ∃ gauge : ℤ, tile.Agrees (planeTarget w p) gauge)
     (hsites : (p = .even ∧ tile.sites = evenTile w) ∨ (p = .odd ∧ tile.sites = oddTile w) ∨
       fraction.modifiedDeck.Covers tile.sites)
-    (altTile : HeightTile Site) (htileAlt : ∃ gauge : ℤ, altTile.Agrees (planeAlternate w p) gauge)
+    (hid : p = .even ∨ phase w = 0)
+    (altTile : HeightTile Site)
+    (htileAlt : (p = .even ∨ phase w = 0) → ∃ gauge : ℤ, altTile.Agrees (planeAlternate w p) gauge)
     (hcovAlt : fraction.modifiedDeck.Covers altTile.sites) :
     ((∃ c : ℤ, ∀ (x : Site) (hx : x ∈ tile.sites), planeTarget w p x = tile.height ⟨x, hx⟩ + c) ∧
       SatisfiesPeriodicity fraction (planeTarget w p) ∧
@@ -644,17 +721,36 @@ theorem global_odometers_pair {fraction : Fraction} (hint : fraction.Interior) {
       (∀ v ∈ fraction.modifiedDeck.span, H v - H 0 = planeAlternate w p v - planeAlternate w p 0) →
       ∀ gH : ℤ, altTile.Agrees H gH → ∃ c : ℤ, ∀ x, H x = planeAlternate w p x + c) ∧
     ¬ IntegerAffine (fun x => planeAlternate w p x - planeTarget w p x) ∧
-    (∃ x, laplacian (planeAlternate w p) x ≠ laplacian (planeTarget w p) x) := by
+    (∃ x, laplacian (planeAlternate w p) x ≠ laplacian (planeTarget w p) x) ∧
+    ((p = .even →
+        (∀ x : Site, planeAlternate w p (x + fraction.modifiedDeck.transverse) -
+          planeTarget w p (x + fraction.modifiedDeck.transverse) =
+          planeAlternate w p x - planeTarget w p x - 1) ∧
+        (∀ x : Site, planeAlternate w p (x + fraction.modifiedDeck.kernel) -
+          planeTarget w p (x + fraction.modifiedDeck.kernel) = planeAlternate w p x - planeTarget w p x)) ∧
+      (p = .odd → ∀ x : Site, planeAlternate w p (x + fraction.modifiedDeck.kernel) -
+          planeTarget w p (x + fraction.modifiedDeck.kernel) = planeAlternate w p x - planeTarget w p x - 1)) := by
   have hpk : ∀ u : Word, (frameAt u).Packet (standardField u) := packet_all hstar hsheet
   have hS : ∀ u : Word, StarEstimates u := starEstimates_all hpk hstar hsheet harc hodd hbulk hbase
   have hstd := global_odometers hint hbirth hstar hsheet harc hodd hbulk bdOdd bdEven simpleOdd simpleEven
     tile htile hsites
   have hstdSP : SatisfiesPeriodicity fraction (planeTarget w p) := hstd.2.1
   obtain ⟨hAS, hAGr, hAB, hAS2, hAR, hAN⟩ := alternate_facts_birth w p hbirth hint hpk hS
-  obtain ⟨gauge, hag⟩ := htileAlt
+  obtain ⟨gauge, hag⟩ := htileAlt hid
+  have hinc : (p = .even →
+        (∀ x : Site, planeAlternate w p (x + fraction.modifiedDeck.transverse) -
+          planeTarget w p (x + fraction.modifiedDeck.transverse) =
+          planeAlternate w p x - planeTarget w p x - 1) ∧
+        (∀ x : Site, planeAlternate w p (x + fraction.modifiedDeck.kernel) -
+          planeTarget w p (x + fraction.modifiedDeck.kernel) = planeAlternate w p x - planeTarget w p x)) ∧
+      (p = .odd → ∀ x : Site, planeAlternate w p (x + fraction.modifiedDeck.kernel) -
+          planeTarget w p (x + fraction.modifiedDeck.kernel) = planeAlternate w p x - planeTarget w p x - 1) := by
+    cases p with
+    | even => exact ⟨fun _ => even_alt_increments w hbirth (hpk w) (hS w), fun h => Parity.noConfusion h⟩
+    | odd => exact ⟨fun h => Parity.noConfusion h, fun _ x => odd_alt_increments w hbirth (hpk (swapW w)) (hS (swapW w)) x⟩
   refine ⟨hstd, ⟨-gauge, fun x hx => ?_⟩, hAS, hAGr, exists_tilt hint.inUnitInterval hAS, hAB, hAS2, hAR,
     fun H hH hcc gH hHt => ⟨gauge - gH, fun x => unique_of_covers altTile hcovAlt hAS hH hcc hag hHt x⟩,
-    hAN, laplacian_differs hint.inUnitInterval hAS hstdSP hAN⟩
+    hAN, laplacian_differs hint.inUnitInterval hAS hstdSP hAN, hinc⟩
   have := hag ⟨x, hx⟩
   linarith
 
