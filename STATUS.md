@@ -44,6 +44,7 @@ The November 20 corrected edition and its supporting constructor are pinned by [
 - [Section 6 Laplacian lemmas](FLatticePaper/Construction/BaseCaseLaplacian.lean): `FLatticePaper.Construction.staircase_laplacian`, `alt_staircase_laplacian`, `doubled_staircase_laplacian` and `doubled_alt_staircase_laplacian` prove the Laplacian tables of `lemma:staircase_laplacian` and `lemma:doubled_staircase_laplacian` with the TeX tiles. The [check](checks/BaseCaseLaplacian.lean) reports `[propext, Classical.choice, Quot.sound]`.
 - [Section 6 recurrence lemmas](FLatticePaper/Construction/BaseCaseRecurrence.lean): `FLatticePaper.Construction.staircase_recurrent`, `alt_staircase_recurrent`, `doubled_staircase_recurrent` and `doubled_alt_staircase_recurrent` state the four recurrence lemmas with the TeX tiles and heights, each proved equal to its literal raw mask. The [check](checks/BaseCaseRecurrence.lean) reports `[propext, Classical.choice, Quot.sound]`.
 - [Binary word recursion](FLatticePaper/Tiles/BinaryWords.lean): `FLatticePaper.Tiles.almost_palindrome_one`, `almost_palindrome_two` and `almost_palindrome_three` prove the three claims of `lemma:almost_palindrome` for every starting word and extension. The [check](checks/BinaryWords.lean) also evaluates `eq:words_degenerate_cases` for $k\le2$ and reports `[propext, Classical.choice, Quot.sound]`.
+- [Beauquier-Nivat criterion](FLatticePaper/Tiles/TilingCriteria.lean): `FLatticePaper.Tiles.tiling_criteria` proves `prop:tiling_criteria`: a simple tile whose boundary word is $w_1w_2\hat w_1\hat w_2$ generates a $(\Sigma w_1,\Sigma w_2)$-regular tiling. The check `checks/TilingCriteria.lean` reports `[propext, Classical.choice, Quot.sound]`; `checks/TilingExample.lean` applies it to the unit cell.
 - [Stacked strings are simply connected](FLatticePaper/Tiles/StackFinalAssembly.lean): `FLatticePaper.Tiles.stacked_horizontal_simply_connected_all` and `FLatticePaper.Tiles.stacked_vertical_simply_connected_all` prove the last sentence of `lemma:zero-one-fixed-offsets` for every almost palindrome. The check `checks/StackedStringGeneral.lean` reports `[propext, Classical.choice, Quot.sound]`.
 - [Stacked boundary string offsets](FLatticePaper/Tiles/BoundaryStrings.lean): `FLatticePaper.Tiles.almost_palindrome_offset`, `zeroOne_fixed_offsets_horizontal` and `zeroOne_fixed_offsets_vertical` prove `lemma:almost_palindrome_offset` and the offset table of `lemma:zero-one-fixed-offsets`. The [check](checks/BoundaryStrings.lean) reports `[propext, Classical.choice, Quot.sound]`.
 - [Plane induction coordinates](FLatticePaper/Plane/Induction/ChildFrame.lean): `FLatticePaper.Induction.ChildFrame` and its identities (`eps_unit`, `tGrade_shortShift`, `sGrade_transverse`, `parentSGrade_transverse`, `cutPrice_eq`) and `harmonicGrid_harmonic` give the coordinates of supplement Part I. The [check](checks/ChildFrame.lean) reports `[propext, Classical.choice, Quot.sound]`; `eps_unit` uses no axioms.
@@ -132,6 +133,8 @@ lake env lean checks/NearOneBaseCases.lean
 lake env lean checks/BaseCaseLaplacian.lean
 lake env lean checks/BaseCaseGlobal.lean
 lake env lean checks/StackedStringGeneral.lean
+lake env lean checks/TilingCriteria.lean
+lake env lean checks/TilingExample.lean
 lake env lean checks/CutGradeS3.lean
 lake env lean checks/S3NoFort.lean
 lake env lean checks/StarRangeProof.lean
