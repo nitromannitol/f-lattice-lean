@@ -13,3 +13,5 @@ import FLatticePaper.Tiles.DeckCoverage
 #print axioms FLatticePaper.Tiles.DeckCoverage.deck_covers_even
 #print axioms FLatticePaper.Tiles.DeckCoverage.covers_of_eq_odd
 #print axioms FLatticePaper.Tiles.DeckCoverage.covers_of_eq_even
+#print axioms FLatticePaper.Tiles.DeckCoverage.span_add
+#print axioms FLatticePaper.Tiles.DeckCoverage.covers_of_removed
