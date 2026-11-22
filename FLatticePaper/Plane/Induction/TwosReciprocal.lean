@@ -1,4 +1,6 @@
 import FLatticePaper.Plane.Induction.StandardField
+import FLatticePaper.Plane.Induction.TwosSheets
+import FLatticePaper.Plane.Induction.WordInduction
 
 /-! Task 50, step 1: the reciprocal field `reciprocalField k` (the standard field of `3^k`, child `1/(2k+3)`) in explicit
 integer form. For any deck reduction `z = y + combine i j` with `y` in the tile of the near-one staircase `stairEven`,
@@ -11,14 +13,6 @@ with `cV = stairEvenConstantV(2k+3)` and `T = periodDenominator(1/(2k+3))`. The 
 
 namespace FLatticePaper.Induction
 open Farey Construction
-
-theorem reciprocalField_spec (k : ℕ) :
-    (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).Agrees (reciprocalField k) 0 ∧
-      HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 3)) (reciprocalField k) 0
-        (stairEvenConstantV (2 * (k : ℤ) + 3)) := by
-  have h := Classical.choose_spec
-    (stairEven_exists_extension (den := 2 * (k : ℤ) + 3) (stairEven_valid_reciprocal k))
-  exact ⟨h.1, h.2.1⟩
 
 /-- The explicit integer form of the reciprocal field at a deck reduction of the tile. -/
 theorem reciprocalField_reduction (k : ℕ) {z y : Site} {i j : ℤ}
@@ -75,5 +69,37 @@ theorem reciprocalField_one_neg6_1 : reciprocalField 1 (-6, 1) = -3 := by
   rw [hval] at h
   norm_num [Fraction.periodDenominator, Fraction.transverseGrade, stairEvenConstantV, chooseTwo] at h
   linarith
+
+/-- The sheet `A` of the frame of `2^2` at `(2,8)`: the reciprocal field at `(-7,0)` plus `harmonicGrid (1,7) = -12`. -/
+theorem twos_sheetA_at_two_eight :
+    (frameAt (List.replicate 2 Digit.two)).sheetA
+        (quarterTurnField (standardField (conjWord (List.replicate 2 Digit.two)))) (2, 8) = -13 := by
+  rw [twos_sheetA, show conjWord (List.replicate 2 Digit.two) = List.replicate 1 Digit.three from
+    conjWord_replicate_two 1, standardField_threes, quarterTurnField_eq]
+  have hR := reciprocalField_one_neg7
+  have hH : harmonicGrid ((2 : ℤ) - 1, (8 : ℤ) - 1) = -12 := by
+    norm_num [harmonicGrid]
+  show reciprocalField 1 (-((2 : ℤ) - 1, (8 : ℤ) - 1).2, ((2 : ℤ) - 1, (8 : ℤ) - 1).1 - 1) +
+      harmonicGrid ((2 : ℤ) - 1, (8 : ℤ) - 1) = -13
+  have e : (-((2 : ℤ) - 1, (8 : ℤ) - 1).2, ((2 : ℤ) - 1, (8 : ℤ) - 1).1 - 1) = (-7, 0) := by
+    norm_num
+  rw [e, hR, hH]
+  norm_num
+
+/-- The sheet `C` of the frame of `2^2` at `(2,8)`: the reciprocal field at `(-6,1)` plus `harmonicGrid (2,6) - 6`. -/
+theorem twos_sheetC_at_two_eight :
+    (frameAt (List.replicate 2 Digit.two)).sheetC
+        (quarterTurnField (standardField (conjWord (List.replicate 2 Digit.two)))) (2, 8) = -14 := by
+  rw [twos_sheetC, show conjWord (List.replicate 2 Digit.two) = List.replicate 1 Digit.three from
+    conjWord_replicate_two 1, standardField_threes, quarterTurnField_eq]
+  have hR := reciprocalField_one_neg6_1
+  have hH : harmonicGrid ((2 : ℤ), (8 : ℤ) - 2) = -5 := by
+    norm_num [harmonicGrid]
+  show reciprocalField 1 (-((2 : ℤ), (8 : ℤ) - 2).2, ((2 : ℤ), (8 : ℤ) - 2).1 - 1) +
+      harmonicGrid ((2 : ℤ), (8 : ℤ) - 2) + ((2 : ℤ) - 8) = -14
+  have e : (-((2 : ℤ), (8 : ℤ) - 2).2, ((2 : ℤ), (8 : ℤ) - 2).1 - 1) = (-6, 1) := by
+    norm_num
+  rw [e, hR, hH]
+  norm_num
 
 end FLatticePaper.Induction
