@@ -103,6 +103,7 @@ import FLatticePaper.Plane.Induction.SheetRegions
 import FLatticePaper.Plane.Induction.SheetFacts
 import FLatticePaper.Plane.Induction.WordInduction
 import FLatticePaper.Plane.Induction.S3NoFort
+import FLatticePaper.Plane.Induction.StarRangeProof
 import FLatticePaper.Construction.NearOneBaseCases
 import FLatticePaper.Construction.BaseCases
 import FLatticePaper.Construction.OffsetTables
