@@ -1,0 +1,11 @@
+import FLatticePaper.Tiles.NearStairBoundary
+import FLatticePaper.Tiles.NearLadderBoundary
+import FLatticePaper.Tiles.BaseCellIdentities
+
+#print axioms FLatticePaper.Tiles.BaseCellIdentities.cellTileOf_stairF
+#print axioms FLatticePaper.Tiles.BaseCellIdentities.cellTileOf_ladderF
+#print axioms FLatticePaper.Tiles.NearStairBoundary.cellTileOf_nstairN
+#print axioms FLatticePaper.Tiles.NearStairBoundary.nstairN_boundary
+#print axioms FLatticePaper.Tiles.NearLadderBoundary.cellTileOf_nladderN
+#print axioms FLatticePaper.Tiles.NearLadderBoundary.nladderN_boundary
+#print axioms FLatticePaper.Tiles.NearLadderBoundary.nladderN_two_boundary
