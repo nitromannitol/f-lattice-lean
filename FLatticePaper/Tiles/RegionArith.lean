@@ -187,6 +187,60 @@ theorem south_iff (D : ArcData F H c) (x k : ℤ) :
       exact hn ⟨h0, hk, by omega, by omega⟩
     exact ⟨by omega, by omega, hxe⟩
 
+/-- An east edge of the walk and the west edge that is its half-turn are never both in the walk. -/
+theorem cross_E (D : ArcData F H c) (q k : ℤ) :
+    ¬ ((0 ≤ k ∧ k ≤ H ∧ F (k - 1) ≤ q ∧ q < F k) ∧
+        (0 ≤ H - k ∧ H - k ≤ H ∧ F (H - k) ≤ c - q - 1 ∧ c - q - 1 < F (H - k - 1))) := by
+  have hH := D.hH
+  have hFm : F (0 - 1) = 0 := by
+    rw [zero_sub]
+    exact D.hFneg
+  rintro ⟨⟨h0, h1, h2, h3⟩, ⟨h4, h5, h6, h7⟩⟩
+  rcases lt_trichotomy k 0 with hk0 | hk0 | hk0
+  · omega
+  · subst hk0
+    have i2 : F (H - 0) = c := by
+      rw [sub_zero]
+      exact D.hFH
+    have i3 : F (H - 0 - 1) = c := by
+      rw [sub_zero]
+      exact D.hF1
+    rw [hFm] at h2
+    rw [i2] at h6
+    omega
+  · rcases lt_trichotomy k H with hkH | hkH | hkH
+    · have hne := D.nonempty_prev k (by omega) (by omega)
+      omega
+    · rw [hkH] at h2 h3
+      rw [D.hF1] at h2
+      rw [D.hFH] at h3
+      omega
+    · omega
+
+/-- A west edge of the walk and the east edge that is its half-turn are never both in the walk. -/
+theorem cross_W (D : ArcData F H c) (q k : ℤ) :
+    ¬ ((0 ≤ k ∧ k ≤ H ∧ F k ≤ q ∧ q < F (k - 1)) ∧
+        (0 ≤ H - k ∧ H - k ≤ H ∧ F (H - k - 1) ≤ c - q - 1 ∧ c - q - 1 < F (H - k))) := by
+  have hH := D.hH
+  have hFm : F (0 - 1) = 0 := by
+    rw [zero_sub]
+    exact D.hFneg
+  rintro ⟨⟨h0, h1, h2, h3⟩, ⟨h4, h5, h6, h7⟩⟩
+  rcases lt_trichotomy k 0 with hk0 | hk0 | hk0
+  · omega
+  · subst hk0
+    have hF00 := D.hF0 0 (le_refl 0) (by omega)
+    rw [hFm] at h3
+    omega
+  · rcases lt_trichotomy k H with hkH | hkH | hkH
+    · have hne := D.nonempty k hk0.le hkH
+      omega
+    · rw [hkH] at h2 h3
+      rw [D.hFH] at h2
+      rw [D.hF1] at h3
+      omega
+    · omega
+
 end ArcData
 
 end FLatticePaper.Tiles.RegionArith
