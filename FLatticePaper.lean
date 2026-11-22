@@ -198,5 +198,7 @@ import FLatticePaper.Tiles.StandardBaseWords
 import FLatticePaper.Tiles.StandardHalfTurn
 import FLatticePaper.Tiles.ChildBottomChain
 import FLatticePaper.Tiles.OrdinaryStandard
+import FLatticePaper.Construction.MissingSites
+import FLatticePaper.Tiles.BaseRegistersTeX
 
 /-! Root import for the corrected F-lattice paper. -/
