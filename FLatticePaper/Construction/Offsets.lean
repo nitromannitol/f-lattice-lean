@@ -20,7 +20,7 @@ def transverseJet (fraction : Fraction) : TileJet :=
 def doubleFirst (first second third fourth step : TileJet) : Fin 6 → TileJet :=
   ![first, first + step, second, second + step, third, fourth]
 
-private def doubleLast (first second third fourth step : TileJet) : Fin 6 → TileJet :=
+def doubleLast (first second third fourth step : TileJet) : Fin 6 → TileJet :=
   ![first, second, third, third + step, fourth, fourth + step]
 
 /-- The six standard placements from the two retained fraction registers. -/

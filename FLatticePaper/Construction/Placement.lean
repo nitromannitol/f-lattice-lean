@@ -86,6 +86,12 @@ theorem lowerLeft_eq_of_minimal (tile : HeightTile Site) (hne : tile.sites.Nonem
     Prod.Lex.toLex_le_toLex'.mpr (hmin _ (tile.lowerLeft_mem hne))
   exact congrArg siteOfRowKey (le_antisymm hle₁ hle₂)
 
+/-- Every occupied site is at or after the lower-left site in row-first order. -/
+theorem lowerLeft_le_of_mem (tile : HeightTile Site) (hne : tile.sites.Nonempty) {site : Site}
+    (hsite : site ∈ tile.sites) :
+    (tile.lowerLeft hne).2 ≤ site.2 ∧ ((tile.lowerLeft hne).2 = site.2 → (tile.lowerLeft hne).1 ≤ site.1) :=
+  Prod.Lex.toLex_le_toLex'.mp (Finset.min'_le _ _ (Finset.mem_image_of_mem rowKey hsite))
+
 theorem upperRight_mem (tile : HeightTile Site) (hne : tile.sites.Nonempty) :
     tile.upperRight hne ∈ tile.sites := by
   obtain ⟨site, hsite, heq⟩ := Finset.mem_image.mp
