@@ -183,6 +183,11 @@ import FLatticePaper.Tiles.PseudoSquareLiteral
 import FLatticePaper.Tiles.StandardClauseA
 import FLatticePaper.Tiles.StandardBoundary
 import FLatticePaper.Tiles.DeckCoverage
+import FLatticePaper.Tiles.NearStairBoundary
+import FLatticePaper.Tiles.NearLadderBoundary
+import FLatticePaper.Tiles.BoundaryWalks
+import FLatticePaper.Tiles.BoundaryTransport
+import FLatticePaper.Tiles.BaseCellIdentities
 import FLatticePaper.Tiles.OrdinaryStandard
 
 /-! Root import for the corrected F-lattice paper. -/
