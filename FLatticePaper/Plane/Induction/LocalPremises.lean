@@ -59,7 +59,7 @@ theorem openInputs_of_localPremises {word : Word} (h : ∃ x ∈ word, x ≠ Dig
     ⟨fun he => by linarith [hK z, (hI2 z hz hs).1 he], fun he => by linarith [hK z, (hI2 z hz hs).2 he]⟩)
   have hI3 := sheetMin_binary_recurrent_of_chain h hG hunit rankA rankC hrankA hrankC
   unfold OpenInputs
-  exact ⟨hI1', hI2', hI3.1⟩
+  exact ⟨hI1', hI2', fun z _ => hI3.1 z⟩
 
 /-- Every standard field has the packet, given the local premises at every proper word. -/
 theorem packet_of_localPremises (h : ∀ w : Word, (∃ x ∈ w, x ≠ Digit.three) → LocalPremises w) :
