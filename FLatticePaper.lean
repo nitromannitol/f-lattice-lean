@@ -200,6 +200,9 @@ import FLatticePaper.Tiles.StandardHalfTurn
 import FLatticePaper.Tiles.ChildBottomChain
 import FLatticePaper.Tiles.BottomSeam
 import FLatticePaper.Tiles.CellConnectivity
+import FLatticePaper.Tiles.JunctionGlue
+import FLatticePaper.Tiles.BaseFamilies
+import FLatticePaper.Tiles.RowChain
 import FLatticePaper.Tiles.CheckerFree
 import FLatticePaper.Tiles.SeamFinal
 import FLatticePaper.Tiles.SeamSymm
