@@ -109,6 +109,8 @@ import FLatticePaper.Plane.Induction.BaseRange
 import FLatticePaper.Plane.Induction.BaseInputsProof
 import FLatticePaper.Plane.Induction.PermitMonotone
 import FLatticePaper.Plane.Induction.OpenInputsProof
+import FLatticePaper.Plane.Induction.RootCalibration
+import FLatticePaper.Plane.Induction.SheetReflection
 import FLatticePaper.Construction.NearOneBaseCases
 import FLatticePaper.Construction.BaseCases
 import FLatticePaper.Construction.OffsetTables
