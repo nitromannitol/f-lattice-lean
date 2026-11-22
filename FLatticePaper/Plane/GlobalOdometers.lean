@@ -584,4 +584,78 @@ theorem laplacian_differs {fraction : Fraction} (hinterval : fraction.InUnitInte
     linear_combination hx
   exact_mod_cast key
 
+
+/-- The packets of every word, from the powers of two and the open inputs (as in `odometersTheorem_of_nearOne_unconditional`). -/
+theorem packet_all (hstar : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word → StarZoneInputs word)
+    (hsheet : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word → SheetLocalInputs word) :
+    ∀ u : Word, (frameAt u).Packet (standardField u) :=
+  packet_standardField_of_twos
+    (fun k => twos_packet_standard k (fun _ hz ht => twos_zero_strip k hz ht)
+      (fun _ hz hs => twos_harm_strip k hz hs))
+    hstar hsheet
+
+/-- `lemma:global_odometers` for both odometers at a birth `(w, p)` of `fraction = n/d`: the standard one (`global_odometers`),
+and the alternate `ĝ = planeAlternate w p`, with its identification of the constructor's alternate tile (`htileAlt`) and the
+coverage of that tile (`hcovAlt`), and the distinctness of the two: the difference is not integer affine (in the fixed
+coordinates of `eq:periodicity`), and the Laplacians differ somewhere.
+
+The inputs are those of `global_odometers` together with `hbase`: the star estimates of the base words (pure words and
+powers of two), which the library does not yet derive for the standard fields at those words. -/
+theorem global_odometers_pair {fraction : Fraction} (hint : fraction.Interior) {w : Word} {p : Parity}
+    (hbirth : (parentsAt w).current p = fraction)
+    (hstar : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word → StarZoneInputs word)
+    (hsheet : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word → SheetLocalInputs word)
+    (harc : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word →
+      VArcInputs (frameAt word) (standardField word))
+    (hodd : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word →
+      OddBlackNoRise (standardField word) (frameAt word).shortShift)
+    (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word →
+      S3NoFortInputs (frameAt word) (standardField word))
+    (hbase : ∀ u : Word, ((∀ x ∈ u, x = Digit.three) ∨ IsTwoPow u) → StarEstimates u)
+    (bdOdd : ∀ v : Word, StandardBoundaryOdd v) (bdEven : ∀ v : Word, StandardBoundaryEven v)
+    (simpleOdd : ∀ v : Word, IsSimpleTile (cellTileOf (oddTile v)))
+    (simpleEven : ∀ v : Word, IsSimpleTile (cellTileOf (evenTile v)))
+    (tile : HeightTile Site)
+    (htile : ∃ gauge : ℤ, tile.Agrees (planeTarget w p) gauge)
+    (hsites : (p = .even ∧ tile.sites = evenTile w) ∨ (p = .odd ∧ tile.sites = oddTile w) ∨
+      fraction.modifiedDeck.Covers tile.sites)
+    (altTile : HeightTile Site) (htileAlt : ∃ gauge : ℤ, altTile.Agrees (planeAlternate w p) gauge)
+    (hcovAlt : fraction.modifiedDeck.Covers altTile.sites) :
+    ((∃ c : ℤ, ∀ (x : Site) (hx : x ∈ tile.sites), planeTarget w p x = tile.height ⟨x, hx⟩ + c) ∧
+      SatisfiesPeriodicity fraction (planeTarget w p) ∧
+      HasQuadraticGrowth (planeTarget w p) fraction.matrix ∧
+      (∃ b : Fin 2 → ℝ, ∀ v ∈ fraction.modifiedDeck.span,
+        Function.Periodic (fun x : Site => ((planeTarget w p x : ℤ) : ℝ) - matrixQuadratic fraction.matrix x -
+          dotProduct b (siteVector x)) v) ∧
+      (∀ x, laplacian (planeTarget w p) x = -1 ∨ laplacian (planeTarget w p) x = 0) ∧
+      Superharmonic (planeTarget w p) ∧ Recurrent (planeTarget w p) ∧
+      (∀ H : Field, SatisfiesPeriodicity fraction H →
+        (∀ v ∈ fraction.modifiedDeck.span, H v - H 0 = planeTarget w p v - planeTarget w p 0) →
+        ∀ gH : ℤ, tile.Agrees H gH → ∃ c : ℤ, ∀ x, H x = planeTarget w p x + c)) ∧
+    (∃ c : ℤ, ∀ (x : Site) (hx : x ∈ altTile.sites), planeAlternate w p x = altTile.height ⟨x, hx⟩ + c) ∧
+    SatisfiesPeriodicity fraction (planeAlternate w p) ∧
+    HasQuadraticGrowth (planeAlternate w p) fraction.matrix ∧
+    (∃ b : Fin 2 → ℝ, ∀ v ∈ fraction.modifiedDeck.span,
+      Function.Periodic (fun x : Site => ((planeAlternate w p x : ℤ) : ℝ) - matrixQuadratic fraction.matrix x -
+        dotProduct b (siteVector x)) v) ∧
+    (∀ x, laplacian (planeAlternate w p) x = -1 ∨ laplacian (planeAlternate w p) x = 0) ∧
+    Superharmonic (planeAlternate w p) ∧ Recurrent (planeAlternate w p) ∧
+    (∀ H : Field, SatisfiesPeriodicity fraction H →
+      (∀ v ∈ fraction.modifiedDeck.span, H v - H 0 = planeAlternate w p v - planeAlternate w p 0) →
+      ∀ gH : ℤ, altTile.Agrees H gH → ∃ c : ℤ, ∀ x, H x = planeAlternate w p x + c) ∧
+    ¬ IntegerAffine (fun x => planeAlternate w p x - planeTarget w p x) ∧
+    (∃ x, laplacian (planeAlternate w p) x ≠ laplacian (planeTarget w p) x) := by
+  have hpk : ∀ u : Word, (frameAt u).Packet (standardField u) := packet_all hstar hsheet
+  have hS : ∀ u : Word, StarEstimates u := starEstimates_all hpk hstar hsheet harc hodd hbulk hbase
+  have hstd := global_odometers hint hbirth hstar hsheet harc hodd hbulk bdOdd bdEven simpleOdd simpleEven
+    tile htile hsites
+  have hstdSP : SatisfiesPeriodicity fraction (planeTarget w p) := hstd.2.1
+  obtain ⟨hAS, hAGr, hAB, hAS2, hAR, hAN⟩ := alternate_facts_birth w p hbirth hint hpk hS
+  obtain ⟨gauge, hag⟩ := htileAlt
+  refine ⟨hstd, ⟨-gauge, fun x hx => ?_⟩, hAS, hAGr, exists_tilt hint.inUnitInterval hAS, hAB, hAS2, hAR,
+    fun H hH hcc gH hHt => ⟨gauge - gH, fun x => unique_of_covers altTile hcovAlt hAS hH hcc hag hHt x⟩,
+    hAN, laplacian_differs hint.inUnitInterval hAS hstdSP hAN⟩
+  have := hag ⟨x, hx⟩
+  linarith
+
 end FLatticePaper.GlobalOdometers
