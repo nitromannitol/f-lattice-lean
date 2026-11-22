@@ -176,6 +176,12 @@ import FLatticePaper.Tiles.StackFinalAssembly
 import FLatticePaper.Tiles.TilingCriteria
 import FLatticePaper.Tiles.StandardTiles
 import FLatticePaper.Tiles.BottomEdges
+import FLatticePaper.Tiles.AdmissibleStatement
+import FLatticePaper.Tiles.AdmissibleFinal
+import FLatticePaper.Tiles.AdmissibleFamilies
+import FLatticePaper.Tiles.AdmissibleBridge
+import FLatticePaper.Tiles.AdmissibleForms
+import FLatticePaper.Tiles.AdmissibleLists
 import FLatticePaper.Tiles.AlternateTiles
 import FLatticePaper.Tiles.LCorrections
 import FLatticePaper.Tiles.AlternateConstructor
@@ -183,6 +189,12 @@ import FLatticePaper.Tiles.PseudoSquareLiteral
 import FLatticePaper.Tiles.StandardClauseA
 import FLatticePaper.Tiles.StandardBoundary
 import FLatticePaper.Tiles.DeckCoverage
+import FLatticePaper.Tiles.NearStairBoundary
+import FLatticePaper.Tiles.NearLadderBoundary
+import FLatticePaper.Tiles.BoundaryWalks
+import FLatticePaper.Tiles.BoundaryTransport
+import FLatticePaper.Tiles.BaseCellIdentities
+import FLatticePaper.Tiles.StandardBaseWords
 import FLatticePaper.Tiles.OrdinaryStandard
 
 /-! Root import for the corrected F-lattice paper. -/

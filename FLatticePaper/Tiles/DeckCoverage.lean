@@ -1,5 +1,6 @@
 import FLatticePaper.Tiles.StandardClauseA
 import FLatticePaper.Tiles.AlmostTilingCover
+import FLatticePaper.Tiles.StandardBoundary
 
 /-! # Deck coverage of the standard tiles (task 41)
 
@@ -10,14 +11,14 @@ of some translate of the cell tile) is proved from the boundary word, the simpli
 (texV2 f)` of the odd tile is the span of the modified deck `f.modifiedDeck` (the kernel is doubled for odd `f`, as in
 `eq:modified_lattice`), so a tile whose cell tile covers in this sense meets every class of its modified deck.
 
-The inputs used are those of `StandardInputsNoPack` (the fields of `StandardInputs` of `StandardClauseA` except the
-packing fields `packOdd`, `packEven`): `bdOdd`, `bdEven`, `sumOdd`, `sumEven`, `admOdd`, `admEven`, `simpleOdd`,
-`simpleEven`. -/
+The packing fields `packOdd`, `packEven` of `StandardInputs` are not used. The admissibility of the standard words is `bottomEdges_admissible` (task 51),
+so the inputs left are the boundary words (`StandardBoundaryOdd`, `StandardBoundaryEven`) and the simplicity of the cell
+tiles, `simpleOdd`, `simpleEven`. -/
 
 namespace FLatticePaper.Tiles.DeckCoverage
 
 open FLatticePaper FLatticePaper.Farey FLatticePaper.Construction FLatticePaper.Tiles FLatticePaper.Tiles.Standard
-  FLatticePaper.Tiles.StandardClause
+  FLatticePaper.Tiles.StandardClause FLatticePaper.Tiles.StandardBoundary
 
 /-! ### The covering clause without the packing inputs -/
 
@@ -78,34 +79,20 @@ theorem lattice_even_eq_span {f : Fraction} (h : f.Even) :
 
 /-! ### The named inputs of the coverage -/
 
-/-- The named inputs of the standard tiles' coverage: those of `StandardInputs` (`StandardClauseA`) without the packing
-fields `packOdd`, `packEven`. -/
-structure StandardInputsNoPack where
-  W1 : Word → F2Word
-  W2 : Word → F2Word
-  V1 : Word → F2Word
-  V2 : Word → F2Word
-  bdOdd : ∀ w, IsBoundaryWordAt (cellTileOf (oddTile w)) (0, 0) (boundaryWordOf (W1 w) (W2 w))
-  bdEven : ∀ w, IsBoundaryWordAt (cellTileOf (evenTile w)) (0, 0) (boundaryWordOf (V1 w) (V2 w))
-  sumOdd : ∀ w, almostV₁ (W1 w) = texV1Odd (fracOdd w) ∧ almostV₂ (W2 w) = texV2 (fracOdd w)
-  sumEven : ∀ w, almostV₁ (V1 w) = texV1Even (fracEven w) ∧ almostV₂ (V2 w) = texV2 (fracEven w)
-  admOdd : ∀ w, Admissible (W1 w) ∧ Admissible ((W2 w).map Unit4.mulNegI)
-  admEven : ∀ w, Admissible (V1 w) ∧ Admissible ((V2 w).map Unit4.mulNegI)
-  simpleOdd : ∀ w, IsSimpleTile (cellTileOf (oddTile w))
-  simpleEven : ∀ w, IsSimpleTile (cellTileOf (evenTile w))
-
 /-- The cell tile of a vertex set has its vertices in the set. -/
 theorem corners_subset_of_mem {P : Finset Site} {y : GInt} (hy : y ∈ cellTileOf P) : cellCorners y ⊆ P :=
   (Finset.mem_filter.mp hy).2
 
 /-! ### Coverage of the standard tiles by their modified decks -/
 
-/-- The odd standard tile: its cell tile covers the lattice `L'(f)`, `f = fracOdd w`, and so the tile meets every class of
-`f.modifiedDeck`. -/
-theorem deck_covers_odd (I : StandardInputsNoPack) (w : Word) : (fracOdd w).modifiedDeck.Covers (oddTile w) := by
+/-- The odd standard tile covers its modified deck: its cell tile covers the lattice `L'(f)`, `f = fracOdd w`. The
+inputs are the boundary word of the standard tile and the simplicity of the cell tile; the admissibility of the two
+words is `admissible_oddStandard` (from `bottomEdges_admissible`). -/
+theorem deck_covers_odd (bd : ∀ w, StandardBoundaryOdd w) (simpleO : ∀ w, IsSimpleTile (cellTileOf (oddTile w)))
+    (w : Word) : (fracOdd w).modifiedDeck.Covers (oddTile w) := by
   intro x
-  have h := covering_unconditional (I.simpleOdd w) (I.bdOdd w) (I.admOdd w).1 (I.admOdd w).2
-  rw [(I.sumOdd w).1, (I.sumOdd w).2] at h
+  have h := covering_unconditional (simpleO w) (bd w) (admissible_oddStandard w).1 (admissible_oddStandard w).2
+  rw [sum_oddBottom w, sum_oddRight w] at h
   obtain ⟨v, hv, y, hy, hxy⟩ := h x
   have hrep : x - v ∈ oddTile w :=
     corners_subset_of_mem hy ((mem_cellCorners_add_iff x y v).mp hxy)
@@ -114,12 +101,13 @@ theorem deck_covers_odd (I : StandardInputsNoPack) (w : Word) : (fracOdd w).modi
   rw [lattice_odd_eq_span (f := fracOdd w) (parentsAt_valid w).current_odd_parity] at hv
   exact hv
 
-/-- The even standard tile: its cell tile covers the lattice `L'(f)`, `f = fracEven w`, and so the tile meets every class
-of `f.modifiedDeck`. -/
-theorem deck_covers_even (I : StandardInputsNoPack) (w : Word) : (fracEven w).modifiedDeck.Covers (evenTile w) := by
+/-- The even standard tile covers its modified deck: its cell tile covers the lattice `L'(f)`, `f = fracEven w`. The
+admissibility is `admissible_evenStandard`. -/
+theorem deck_covers_even (bd : ∀ w, StandardBoundaryEven w) (simpleE : ∀ w, IsSimpleTile (cellTileOf (evenTile w)))
+    (w : Word) : (fracEven w).modifiedDeck.Covers (evenTile w) := by
   intro x
-  have h := covering_unconditional (I.simpleEven w) (I.bdEven w) (I.admEven w).1 (I.admEven w).2
-  rw [(I.sumEven w).1, (I.sumEven w).2] at h
+  have h := covering_unconditional (simpleE w) (bd w) (admissible_evenStandard w).1 (admissible_evenStandard w).2
+  rw [sum_evenBottom w, sum_evenRight w] at h
   obtain ⟨v, hv, y, hy, hxy⟩ := h x
   have hrep : x - v ∈ evenTile w :=
     corners_subset_of_mem hy ((mem_cellCorners_add_iff x y v).mp hxy)
@@ -128,18 +116,19 @@ theorem deck_covers_even (I : StandardInputsNoPack) (w : Word) : (fracEven w).mo
   rw [lattice_even_eq_span (f := fracEven w) (parentsAt_valid w).current_even_parity] at hv
   exact hv
 
-/-- Any site set equal to the odd standard tile covers its modified deck. This is the form in which the constructor's
-standard tile enters: wherever the constructor's tile equals `oddTile w` (the ordinary outputs). -/
-theorem covers_of_eq_odd (I : StandardInputsNoPack) {P : Finset Site} {w : Word} (h : P = oddTile w) :
-    (fracOdd w).modifiedDeck.Covers P := by
+/-- Any site set equal to the odd standard tile covers its modified deck: the form in which the constructor's standard
+tile enters (the ordinary outputs). -/
+theorem covers_of_eq_odd (bd : ∀ w, StandardBoundaryOdd w) (simpleO : ∀ w, IsSimpleTile (cellTileOf (oddTile w)))
+    {P : Finset Site} {w : Word} (h : P = oddTile w) : (fracOdd w).modifiedDeck.Covers P := by
   subst h
-  exact deck_covers_odd I w
+  exact deck_covers_odd bd simpleO w
 
 /-- Any site set equal to the even standard tile covers its modified deck. -/
-theorem covers_of_eq_even (I : StandardInputsNoPack) {P : Finset Site} {w : Word} (h : P = evenTile w) :
-    (fracEven w).modifiedDeck.Covers P := by
+theorem covers_of_eq_even (bd : ∀ w, StandardBoundaryEven w)
+    (simpleE : ∀ w, IsSimpleTile (cellTileOf (evenTile w)))
+    {P : Finset Site} {w : Word} (h : P = evenTile w) : (fracEven w).modifiedDeck.Covers P := by
   subst h
-  exact deck_covers_even I w
+  exact deck_covers_even bd simpleE w
 
 /-! ### Removing sites that are congruent to kept sites -/
 
