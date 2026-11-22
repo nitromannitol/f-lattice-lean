@@ -1961,4 +1961,329 @@ theorem twos_tile_min (k : ℕ) (w1 w2 : ℤ) (hE : (w1, w2) ∈ paperNearLadder
         · obtain ⟨h1, h2⟩ := columnDTopMax_piece k w1 w2 hw hw2
           exact min_tile0 _ _ _ h1 h2
 
+/-- The boundary point `(-1, d+1)` of `E` (the point `(-1, d)` in sheet coordinates): `A = V + 2` via `(-2,-1)`,
+`C = V` via `(-1,-1)`. -/
+theorem boundaryLeft_piece (k : ℕ) (w1 w2 : ℤ) (hw1 : w1 = -1) (hw2 : w2 = 2 * (k : ℤ) + 5) :
+    (frameAt (List.replicate (k + 1) Digit.two)).sheetA
+        (quarterTurnField (standardField (conjWord (List.replicate (k + 1) Digit.two))))
+        (w1, w2 - 1) = paperNearLadderValue (2 * (k : ℤ) + 4) (w1, w2) + 2 ∧
+    (frameAt (List.replicate (k + 1) Digit.two)).sheetC
+        (quarterTurnField (standardField (conjWord (List.replicate (k + 1) Digit.two))))
+        (w1, w2 - 1) = paperNearLadderValue (2 * (k : ℤ) + 4) (w1, w2) := by
+  subst hw1 hw2
+  have hA : ((-1 : ℤ), 2 * (k : ℤ) + 5) ∉ paperNearLadderA (2 * (k : ℤ) + 4) := by
+    simp only [paperNearLadderA, Set.mem_insert_iff, Set.mem_singleton_iff, Prod.mk.injEq]
+    omega
+  have hB : ((-1 : ℤ), 2 * (k : ℤ) + 5) ∉ paperNearLadderB (2 * (k : ℤ) + 4) := by
+    simp only [paperNearLadderB, Set.mem_setOf_eq]
+    omega
+  have hV : paperNearLadderValue (2 * (k : ℤ) + 4) (-1, 2 * (k : ℤ) + 5) =
+      -((2 * (k : ℤ) + 5 - -1) ^ 2 / 4) + 1 := by
+    rw [paperNearLadderValue_off _ _ _ hA hB,
+      min_eq_right (by omega : 2 * (k : ℤ) + 4 - (2 * (k : ℤ) + 5) ≤ 0),
+      min_eq_left (by omega : (0 : ℤ) ≤ 2 * (2 * (k : ℤ) + 4) - (2 * (k : ℤ) + 5)),
+      max_eq_left (by omega : (0 : ℤ) ≤ 2 * (k : ℤ) + 5 - -1 - (2 * (k : ℤ) + 4))]
+    ring
+  rw [hV]
+  constructor
+  · have hmem : ((1 : ℤ), 2 * (k : ℤ) + 3) ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites :=
+      BaseMask.mem_stairEven_raw_iff.mpr ⟨⟨by omega, by omega⟩, ⟨by omega, by omega⟩,
+        by unfold BaseMask.StairEvenCorner; omega⟩
+    have hA' := sheetA_via k (-1) (2 * (k : ℤ) + 5) (-2) (-1) 1 (2 * (k : ℤ) + 3)
+      (by ring) (by ring) hmem
+    have hc : ¬ BaseMask.StairEvenCorner (2 * (k : ℤ) + 3) ((1 : ℤ), 2 * (k : ℤ) + 3) := by
+      unfold BaseMask.StairEvenCorner
+      omega
+    rw [stairEvenValue_formula, if_neg hc, min_eq_left (by omega : (1 : ℤ) - 1 ≤ 0)] at hA'
+    rw [transverseGrade_one, periodDenominator_one] at hA'
+    have hQ := two_mul_triangle (2 * (k : ℤ) + 3)
+    have hcV := stairEvenConstantV_double (2 * (k : ℤ) + 3)
+    have hH := harmonicGrid_exact (-1 - 1, 2 * (k : ℤ) + 5 - 2)
+    simp only at hH
+    have hP := sq_div4_add_mod2 (2 * (k : ℤ) + 5 - -1)
+    have hpar : (-1 - 1 + (2 * (k : ℤ) + 5 - 2)) % 2 = 1 - (2 * (k : ℤ) + 5 - -1) % 2 := by
+      omega
+    apply mul_left_cancel₀ (by norm_num : (4 : ℤ) ≠ 0)
+    linear_combination 2 * hA' - 2 * hQ + hH + hP - hpar - 2 * hcV
+  · have hmem : (-2 * (k : ℤ) - 1, 2 * (k : ℤ) + 3) ∈
+        (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites :=
+      BaseMask.mem_stairEven_raw_iff.mpr ⟨⟨by omega, by omega⟩, ⟨by omega, by omega⟩,
+        by unfold BaseMask.StairEvenCorner; omega⟩
+    have hC := sheetC_via k (-1) (2 * (k : ℤ) + 5) (-1) (-1) (-2 * (k : ℤ) - 1) (2 * (k : ℤ) + 3)
+      (by ring) (by ring) hmem
+    have hc : ¬ BaseMask.StairEvenCorner (2 * (k : ℤ) + 3) (-2 * (k : ℤ) - 1, 2 * (k : ℤ) + 3) := by
+      unfold BaseMask.StairEvenCorner
+      omega
+    rw [stairEvenValue_formula, if_neg hc,
+      min_eq_left (by omega : -2 * (k : ℤ) - 1 - 1 ≤ 0)] at hC
+    rw [transverseGrade_one, periodDenominator_one] at hC
+    have hQ := two_mul_triangle (2 * (k : ℤ) + 3)
+    have hcV := stairEvenConstantV_double (2 * (k : ℤ) + 3)
+    have hH := harmonicGrid_exact (-1, 2 * (k : ℤ) + 5 - 3)
+    simp only at hH
+    have hP := sq_div4_add_mod2 (2 * (k : ℤ) + 5 - -1)
+    have hpar : (-1 + (2 * (k : ℤ) + 5 - 3)) % 2 = 1 - (2 * (k : ℤ) + 5 - -1) % 2 := by
+      omega
+    apply mul_left_cancel₀ (by norm_num : (4 : ℤ) ≠ 0)
+    linear_combination 2 * hC - 2 * hQ + hH + hP - hpar - 2 * hcV
+
+/-- The boundary point `(d+1, 2d-1)` of `E` (the point `(d+1, 2d-2)` in sheet coordinates): `A = V` via `(-1,1)`
+(a corner of the tile), `C = V + 2` via `(-1,1)`. -/
+theorem boundaryRight_piece (k : ℕ) (w1 w2 : ℤ) (hw1 : w1 = 2 * (k : ℤ) + 5)
+    (hw2 : w2 = 4 * (k : ℤ) + 7) :
+    (frameAt (List.replicate (k + 1) Digit.two)).sheetA
+        (quarterTurnField (standardField (conjWord (List.replicate (k + 1) Digit.two))))
+        (w1, w2 - 1) = paperNearLadderValue (2 * (k : ℤ) + 4) (w1, w2) ∧
+    (frameAt (List.replicate (k + 1) Digit.two)).sheetC
+        (quarterTurnField (standardField (conjWord (List.replicate (k + 1) Digit.two))))
+        (w1, w2 - 1) = paperNearLadderValue (2 * (k : ℤ) + 4) (w1, w2) + 2 := by
+  subst hw1 hw2
+  have hA : (2 * (k : ℤ) + 5, 4 * (k : ℤ) + 7) ∉ paperNearLadderA (2 * (k : ℤ) + 4) := by
+    simp only [paperNearLadderA, Set.mem_insert_iff, Set.mem_singleton_iff, Prod.mk.injEq]
+    omega
+  have hB : (2 * (k : ℤ) + 5, 4 * (k : ℤ) + 7) ∉ paperNearLadderB (2 * (k : ℤ) + 4) := by
+    simp only [paperNearLadderB, Set.mem_setOf_eq]
+    omega
+  have hV : paperNearLadderValue (2 * (k : ℤ) + 4) (2 * (k : ℤ) + 5, 4 * (k : ℤ) + 7) =
+      -((4 * (k : ℤ) + 7 - (2 * (k : ℤ) + 5)) ^ 2 / 4) - 2 * (k : ℤ) - 3 := by
+    rw [paperNearLadderValue_off _ _ _ hA hB,
+      min_eq_right (by omega : 2 * (k : ℤ) + 4 - (4 * (k : ℤ) + 7) ≤ 0),
+      min_eq_left (by omega : (0 : ℤ) ≤ 2 * (2 * (k : ℤ) + 4) - (4 * (k : ℤ) + 7)),
+      max_eq_right (by omega : 4 * (k : ℤ) + 7 - (2 * (k : ℤ) + 5) - (2 * (k : ℤ) + 4) ≤ 0)]
+    ring
+  rw [hV]
+  constructor
+  · have hmem : ((0 : ℤ), (0 : ℤ)) ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites :=
+      BaseMask.mem_stairEven_raw_iff.mpr ⟨⟨by omega, by omega⟩, ⟨by omega, by omega⟩,
+        by unfold BaseMask.StairEvenCorner; omega⟩
+    have hA' := sheetA_via k (2 * (k : ℤ) + 5) (4 * (k : ℤ) + 7) (-1) 1 0 0
+      (by ring) (by ring) hmem
+    have hcorner : BaseMask.StairEvenCorner (2 * (k : ℤ) + 3) ((0 : ℤ), (0 : ℤ)) := by
+      unfold BaseMask.StairEvenCorner
+      omega
+    rw [stairEvenValue_formula, if_pos hcorner, min_eq_left (by omega : (0 : ℤ) - 1 ≤ 0)] at hA'
+    rw [transverseGrade_one, periodDenominator_one] at hA'
+    have hQ := two_mul_triangle 0
+    have hcV := stairEvenConstantV_double (2 * (k : ℤ) + 3)
+    have hH := harmonicGrid_exact (2 * (k : ℤ) + 5 - 1, 4 * (k : ℤ) + 7 - 2)
+    simp only at hH
+    have hP := sq_div4_add_mod2 (4 * (k : ℤ) + 7 - (2 * (k : ℤ) + 5))
+    have hpar : (2 * (k : ℤ) + 5 - 1 + (4 * (k : ℤ) + 7 - 2)) % 2 =
+        1 - (4 * (k : ℤ) + 7 - (2 * (k : ℤ) + 5)) % 2 := by
+      omega
+    apply mul_left_cancel₀ (by norm_num : (4 : ℤ) ≠ 0)
+    linear_combination 2 * hA' - 2 * hQ + hH + hP - hpar + 2 * hcV
+  · have hmem : ((1 : ℤ), (1 : ℤ)) ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites :=
+      BaseMask.mem_stairEven_raw_iff.mpr ⟨⟨by omega, by omega⟩, ⟨by omega, by omega⟩,
+        by unfold BaseMask.StairEvenCorner; omega⟩
+    have hC := sheetC_via k (2 * (k : ℤ) + 5) (4 * (k : ℤ) + 7) (-1) 1 1 1 (by ring) (by ring) hmem
+    have hc : ¬ BaseMask.StairEvenCorner (2 * (k : ℤ) + 3) ((1 : ℤ), (1 : ℤ)) := by
+      unfold BaseMask.StairEvenCorner
+      omega
+    rw [stairEvenValue_formula, if_neg hc, min_eq_left (by omega : (1 : ℤ) - 1 ≤ 0)] at hC
+    rw [transverseGrade_one, periodDenominator_one] at hC
+    have hQ := two_mul_triangle 1
+    have hcV := stairEvenConstantV_double (2 * (k : ℤ) + 3)
+    have hH := harmonicGrid_exact (2 * (k : ℤ) + 5, 4 * (k : ℤ) + 7 - 3)
+    simp only at hH
+    have hP := sq_div4_add_mod2 (4 * (k : ℤ) + 7 - (2 * (k : ℤ) + 5))
+    have hpar : (2 * (k : ℤ) + 5 + (4 * (k : ℤ) + 7 - 3)) % 2 =
+        1 - (4 * (k : ℤ) + 7 - (2 * (k : ℤ) + 5)) % 2 := by
+      omega
+    apply mul_left_cancel₀ (by norm_num : (4 : ℤ) ≠ 0)
+    linear_combination 2 * hC - 2 * hQ + hH + hP - hpar + 2 * hcV
+
+/-- The closed polygon of `2^(k+1)` in the coordinates `(z1, v = z2 - z1)`, with `t = -2 z1 - (d+1) v` and
+`u = (d+1) z1 + v` (so `s = 2u`), `d = 2k+4`, `P = d^2 + 2d - 1` (so `T = 2P`): every point lies in the tile
+shifted by `(0,-1)`, or is one of the two boundary points `(-1, d)`, `(d+1, 2d-2)`. -/
+theorem twos_E_arith (d z1 v : ℤ) (hd : 4 ≤ d)
+    (hu0 : 0 ≤ (d + 1) * z1 + v) (huP : (d + 1) * z1 + v ≤ d * d + 2 * d - 1 + d - 1)
+    (hev : v % 2 = 0 → 2 - 2 * (d * d + 2 * d - 1) ≤ -2 * z1 - (d + 1) * v ∧
+      -2 * z1 - (d + 1) * v ≤ 2 * d - 2)
+    (hod : v % 2 = 1 → d - 1 - 2 * (d * d + 2 * d - 1) ≤ -2 * z1 - (d + 1) * v ∧
+      -2 * z1 - (d + 1) * v ≤ d + 1) :
+    (-1 ≤ z1 ∧ z1 ≤ d + 1 ∧ -2 ≤ v ∧ v ≤ 2 * d ∧ 0 ≤ z1 + v ∧ z1 + v ≤ 3 * d - 2 ∧
+        ¬(z1 = -1 ∧ z1 + v ≤ d) ∧ ¬(z1 = d + 1 ∧ 2 * d - 2 ≤ z1 + v)) ∨
+      (z1 = -1 ∧ v = 2 * d + 1) ∨ (z1 = d + 1 ∧ v = -3) ∨ (z1 = -1 ∧ z1 + v = d) ∨
+      (z1 = d + 1 ∧ z1 + v = 2 * d - 2) := by
+  have hP : 0 < d * d + 2 * d - 1 := by nlinarith
+  -- edge facts on u (parity independent)
+  have hzd1 : z1 = -1 → d + 1 ≤ v := by
+    intro h; subst h; nlinarith
+  have hz10 : z1 = 0 → 0 ≤ v := by
+    intro h; subst h; nlinarith
+  have hzd1' : z1 = d + 1 → v ≤ d - 3 := by
+    intro h; subst h; nlinarith
+  have hzd : z1 = d → v ≤ 2 * d - 2 := by
+    intro h; subst h; nlinarith
+  have hz1n : z1 ≠ -1 ∨ d + 1 ≤ v := by
+    rcases eq_or_ne z1 (-1) with h | h
+    · right; exact hzd1 h
+    · left; exact h
+  have hz10' : z1 ≠ 0 ∨ 0 ≤ v := by
+    rcases eq_or_ne z1 0 with h | h
+    · right; exact hz10 h
+    · left; exact h
+  have hzd1'' : z1 ≠ d + 1 ∨ v ≤ d - 3 := by
+    rcases eq_or_ne z1 (d + 1) with h | h
+    · right; exact hzd1' h
+    · left; exact h
+  have hzd'' : z1 ≠ d ∨ v ≤ 2 * d - 2 := by
+    rcases eq_or_ne z1 d with h | h
+    · right; exact hzd h
+    · left; exact h
+  clear hzd1 hz10 hzd1' hzd
+  rcases Int.emod_two_eq_zero_or_one v with hv | hv
+  · obtain ⟨he1, he2⟩ := hev hv
+    have hz1l : -1 ≤ z1 := by
+      by_contra h
+      have h2 : z1 ≤ -2 := by omega
+      nlinarith [mul_nonneg (show (0 : ℤ) ≤ d + 1 by omega) hu0,
+        mul_nonneg hP.le (show (0 : ℤ) ≤ -2 - z1 by omega)]
+    have hz1u : z1 ≤ d + 1 := by
+      by_contra h
+      have h2 : d + 2 ≤ z1 := by omega
+      nlinarith [mul_nonneg hP.le (show (0 : ℤ) ≤ z1 - (d + 2) by omega),
+        mul_nonneg (show (0 : ℤ) ≤ d + 1 by omega)
+          (show (0 : ℤ) ≤ d * d + 2 * d - 1 + d - 1 - ((d + 1) * z1 + v) by linarith)]
+    have hvt : v ≤ 2 * d := by
+      by_contra h
+      have h2 : 2 * d + 2 ≤ v := by omega
+      nlinarith [mul_nonneg (show (0 : ℤ) ≤ d + 1 by omega) (show (0 : ℤ) ≤ v - (2 * d + 2) by omega)]
+    have hvl : -2 ≤ v := by
+      by_contra h
+      have h2 : v ≤ -4 := by omega
+      nlinarith [mul_nonneg (show (0 : ℤ) ≤ d + 1 by omega) (show (0 : ℤ) ≤ -4 - v by omega)]
+    have hm2 : v ≠ -2 ∨ 2 ≤ z1 := by
+      rcases eq_or_ne v (-2) with h | h
+      · right; subst h; nlinarith
+      · left; exact h
+    have hvd : v ≠ 2 * d ∨ z1 ≤ d - 2 := by
+      rcases eq_or_ne v (2 * d) with h | h
+      · right; subst h; nlinarith
+      · left; exact h
+    clear hev hod hu0 huP he1 he2
+    omega
+  · obtain ⟨ho1, ho2⟩ := hod hv
+    have hz1l : -1 ≤ z1 := by
+      by_contra h
+      have h2 : z1 ≤ -2 := by omega
+      nlinarith [mul_nonneg (show (0 : ℤ) ≤ d + 1 by omega) hu0,
+        mul_nonneg hP.le (show (0 : ℤ) ≤ -2 - z1 by omega)]
+    have hz1u : z1 ≤ d + 1 := by
+      by_contra h
+      have h2 : d + 2 ≤ z1 := by omega
+      nlinarith [mul_nonneg hP.le (show (0 : ℤ) ≤ z1 - (d + 2) by omega),
+        mul_nonneg (show (0 : ℤ) ≤ d + 1 by omega)
+          (show (0 : ℤ) ≤ d * d + 2 * d - 1 + d - 1 - ((d + 1) * z1 + v) by linarith)]
+    have hvt1 : v ≤ 2 * d + 1 := by
+      by_contra h
+      have h2 : 2 * d + 2 ≤ v := by omega
+      nlinarith [mul_nonneg (show (0 : ℤ) ≤ d + 1 by omega) (show (0 : ℤ) ≤ v - (2 * d + 2) by omega)]
+    have hvt : v ≤ 2 * d ∨ (z1 = -1 ∧ v = 2 * d + 1) := by
+      by_cases h : v ≤ 2 * d
+      · left; exact h
+      · right
+        have h2 : v = 2 * d + 1 := by omega
+        subst h2
+        constructor
+        · nlinarith
+        · rfl
+    have hvl : -2 ≤ v ∨ (v = -3 ∧ z1 = d + 1) := by
+      by_cases h : -2 ≤ v
+      · left; exact h
+      · have h2 : v ≤ -3 := by omega
+        have h3 : -3 ≤ v := by
+          by_contra h4
+          have h5 : v ≤ -5 := by omega
+          nlinarith [mul_nonneg (show (0 : ℤ) ≤ d + 1 by omega) (show (0 : ℤ) ≤ -5 - v by omega)]
+        have h4 : v = -3 := by omega
+        subst h4
+        right
+        constructor
+        · rfl
+        · nlinarith
+    have hm2 : v ≠ -2 ∨ 2 ≤ z1 := Or.inl (by omega)
+    have hvd : v ≠ 2 * d ∨ z1 ≤ d - 2 := Or.inl (by omega)
+    clear hev hod hu0 huP ho1 ho2 hvt1
+    omega
+
+/-- The child of `2^(k+1)` is `(2k+3)/(2k+5)`. -/
+theorem twos_child_num_den (k : ℕ) :
+    (frameAt (List.replicate (k + 1) Digit.two)).child.num = 2 * (k : ℤ) + 3 ∧
+      (frameAt (List.replicate (k + 1) Digit.two)).child.den = 2 * (k : ℤ) + 5 := by
+  rw [child_replicate_two_succ]
+  unfold Fraction.rotate
+  split_ifs with h
+  · exact ⟨by show (2 * (k : ℤ) + 4) - 1 = 2 * (k : ℤ) + 3; ring,
+      by show (2 * (k : ℤ) + 4) + 1 = 2 * (k : ℤ) + 5; ring⟩
+  · exfalso
+    simp only at h
+    omega
+
+/-- Every point of the closed polygon of `2^(k+1)` lies in the tile shifted by `(0,-1)`, or is one of the two
+boundary points `(-1, d)`, `(d+1, 2d-2)` (here `d = 2k+4`). -/
+theorem closedPolygon_twos_tile (k : ℕ) (z : Site)
+    (hz : z ∈ (frameAt (List.replicate (k + 1) Digit.two)).closedPolygon) :
+    (z.1, z.2 + 1) ∈ paperNearLadderTile (2 * (k : ℤ) + 4) ∨
+      z = (-1, 2 * (k : ℤ) + 4) ∨ z = (2 * (k : ℤ) + 5, 4 * (k : ℤ) + 6) := by
+  obtain ⟨hn, hd⟩ := twos_child_num_den k
+  have hT : (frameAt (List.replicate (k + 1) Digit.two)).child.periodDenominator =
+      2 * ((2 * (k : ℤ) + 4) * (2 * (k : ℤ) + 4) + 2 * (2 * (k : ℤ) + 4) - 1) := by
+    simp only [Fraction.periodDenominator, hn, hd]
+    ring
+  obtain ⟨z1, z2⟩ := z
+  rw [ChildFrame.mem_closedPolygon_iff] at hz
+  simp only [ChildFrame.tGrade, ChildFrame.sGrade, hn, hd, hT, EvenSite] at hz
+  have hu0 : 0 ≤ (2 * (k : ℤ) + 4 + 1) * z1 + (z2 - z1) := by
+    rcases hz with ⟨_, _, _, h3, _⟩ | ⟨_, _, _, h3, _⟩ <;> linarith
+  have huP : (2 * (k : ℤ) + 4 + 1) * z1 + (z2 - z1) ≤
+      (2 * (k : ℤ) + 4) * (2 * (k : ℤ) + 4) + 2 * (2 * (k : ℤ) + 4) - 1 + (2 * (k : ℤ) + 4) - 1 := by
+    rcases hz with ⟨_, _, _, _, h4⟩ | ⟨_, _, _, _, h4⟩ <;> linarith
+  have hev : (z2 - z1) % 2 = 0 → 2 - 2 * ((2 * (k : ℤ) + 4) * (2 * (k : ℤ) + 4) + 2 * (2 * (k : ℤ) + 4) - 1) ≤
+      -2 * z1 - (2 * (k : ℤ) + 4 + 1) * (z2 - z1) ∧
+      -2 * z1 - (2 * (k : ℤ) + 4 + 1) * (z2 - z1) ≤ 2 * (2 * (k : ℤ) + 4) - 2 := by
+    intro hv
+    rcases hz with ⟨_, h1, h2, _, _⟩ | ⟨ho, _⟩
+    · exact ⟨by linarith, by linarith⟩
+    · exfalso
+      omega
+  have hod : (z2 - z1) % 2 = 1 → (2 * (k : ℤ) + 4) - 1 - 2 * ((2 * (k : ℤ) + 4) * (2 * (k : ℤ) + 4) + 2 * (2 * (k : ℤ) + 4) - 1) ≤
+      -2 * z1 - (2 * (k : ℤ) + 4 + 1) * (z2 - z1) ∧
+      -2 * z1 - (2 * (k : ℤ) + 4 + 1) * (z2 - z1) ≤ (2 * (k : ℤ) + 4) + 1 := by
+    intro hv
+    rcases hz with ⟨he, _, _, _, _⟩ | ⟨_, h1, h2, _, _⟩
+    · exfalso
+      omega
+    · exact ⟨by linarith, by linarith⟩
+  have key := twos_E_arith (2 * (k : ℤ) + 4) z1 (z2 - z1) (by omega) hu0 huP hev hod
+  show (z1, z2 + 1) ∈ paperNearLadderTile (2 * (k : ℤ) + 4) ∨
+      (z1, z2) = (-1, 2 * (k : ℤ) + 4) ∨ (z1, z2) = (2 * (k : ℤ) + 5, 4 * (k : ℤ) + 6)
+  rcases key with ⟨h1, h2, h3, h4, h5, h6, h7, h8⟩ | ⟨hA1, hA2⟩ | ⟨hA1, hA2⟩ | ⟨hP1, hP2⟩ | ⟨hP1, hP2⟩
+  · left
+    have hC : (z1, z2 + 1) ∈ paperNearLadderC (2 * (k : ℤ) + 4) := by
+      simp only [paperNearLadderC, Set.mem_setOf_eq]
+      omega
+    refine ⟨Set.mem_union_right _ hC, ?_⟩
+    simp only [paperNearLadderD, Set.mem_setOf_eq]
+    omega
+  · left
+    refine ⟨Set.mem_union_left _ (Set.mem_union_left _ ?_), ?_⟩
+    · simp only [paperNearLadderA, Set.mem_insert_iff, Set.mem_singleton_iff, Prod.mk.injEq]
+      left
+      constructor <;> omega
+    · simp only [paperNearLadderD, Set.mem_setOf_eq]
+      omega
+  · left
+    refine ⟨Set.mem_union_left _ (Set.mem_union_left _ ?_), ?_⟩
+    · simp only [paperNearLadderA, Set.mem_insert_iff, Set.mem_singleton_iff, Prod.mk.injEq]
+      right
+      constructor <;> omega
+    · simp only [paperNearLadderD, Set.mem_setOf_eq]
+      omega
+  · right; left
+    exact Prod.ext (by omega) (by omega)
+  · right; right
+    exact Prod.ext (by omega) (by omega)
+
 end FLatticePaper.Induction
