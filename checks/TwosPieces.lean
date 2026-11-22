@@ -12,3 +12,4 @@ import FLatticePaper.Plane.Induction.TwosPieces
 #print axioms FLatticePaper.Induction.upC1_piece
 #print axioms FLatticePaper.Induction.lowerA1_piece
 #print axioms FLatticePaper.Induction.leftEdge_piece
+#print axioms FLatticePaper.Induction.leftEdgeDouble_piece
