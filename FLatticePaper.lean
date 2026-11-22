@@ -195,6 +195,8 @@ import FLatticePaper.Tiles.BoundaryWalks
 import FLatticePaper.Tiles.BoundaryTransport
 import FLatticePaper.Tiles.BaseCellIdentities
 import FLatticePaper.Tiles.StandardBaseWords
+import FLatticePaper.Tiles.StandardHalfTurn
+import FLatticePaper.Tiles.ChildBottomChain
 import FLatticePaper.Tiles.OrdinaryStandard
 
 /-! Root import for the corrected F-lattice paper. -/
