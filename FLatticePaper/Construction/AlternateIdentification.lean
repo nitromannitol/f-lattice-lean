@@ -1,4 +1,5 @@
 import FLatticePaper.Construction.PlaneIdentification
+import FLatticePaper.Construction.NominalAgreement
 import FLatticePaper.Tiles.AlternateAgreement
 import FLatticePaper.Plane.AlternateMidpoint
 
@@ -173,5 +174,113 @@ theorem ordinaryAlternate_even_identifies_register (parents : TileParents) (befo
   obtain ⟨result, hres, g, hagree⟩ :=
     ordinaryAlternate_even_identifies parents beforePush digit hnb hstd hwin context hseventh hslot hcon
   exact ⟨result, hres, g, llCenter_agrees_of_zero result.property hagree (hzero result hres)⟩
+
+/-! ## The fourth copy of the even ordinary alternate is the third standard copy -/
+
+/-- The fourth alternate jet of the even ordinary alternate is the third standard jet of the even ordinary standard, in both
+phases (`evenKernel` for phase `0`, `0` for phase `1`). -/
+theorem alternateJets_even_four_eq (word : Word) : alternateJets word .even 4 = standardJets word .even 2 := by
+  by_cases h : phase word = 0 <;> simp [alternateJets, standardJets, h, doubleFirst, doubleLast]
+
+/-- The fourth copy of the even ordinary alternate is the third copy of the even ordinary standard of the same word: the
+same donor `parents.odd` at the same jet. -/
+theorem ordinaryAlternate_even_copy_four_eq (parents : TileParents) (word : Word) :
+    placedBySlot (alternateJets word .even) (standardSources parents .odd) 4 =
+      ordinaryStandardCopy parents word .even 2 := by
+  have hs : standardSources parents .odd 4 = standardSources parents .even 2 := rfl
+  unfold ordinaryStandardCopy
+  unfold placedBySlot
+  rw [alternateJets_even_four_eq, hs]
+
+/-- **The fourth copy of the even ordinary alternate agrees with the alternate target.** Its jet and donor are those of the
+third copy of the standard, so `nominal_even_two` (the sheet and period argument of the standard) gives its agreement with
+the standard field on its sites, under the same named inputs; the window `0 ≤ F − G ≤ 1` on its sites puts it on the branch
+where the alternate target is the standard field. -/
+theorem ordinaryAlternate_even_copy_four_agrees (parents : TileParents) (word : Word)
+    (hproper : ∃ x ∈ word, x ≠ Digit.three)
+    (hodd : ∃ g : ℤ, parents.odd.val.Agrees (quarterTurnField (standardField (conjWord word))) g)
+    (hper : RespectsPeriodsOn (frameAt word).child (frameAt word).coherentConstantU
+      (frameAt word).coherentConstantV (frameAt word).closedPolygon
+      ((frameAt word).sheetMin (quarterTurnField (standardField (conjWord word)))))
+    (hE : ∀ s ∈ (ordinaryStandardCopy parents word .even 2).val.sites, s ∈ (frameAt word).closedPolygon)
+    (hA : ∀ s ∈ (ordinaryStandardCopy parents word .even 2).val.sites,
+      (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) s ≤
+        (frameAt word).sheetC (quarterTurnField (standardField (conjWord word))) s)
+    (hwin : ∀ s ∈ (ordinaryStandardCopy parents word .even 2).val.sites,
+      0 ≤ standardField word s - standardField word (s + alternateSigma word) ∧
+        standardField word s - standardField word (s + alternateSigma word) ≤ 1) :
+    ∃ g : ℤ, (placedBySlot (alternateJets word .even) (standardSources parents .odd) 4).val.Agrees
+      (alternateTarget word) g := by
+  rw [ordinaryAlternate_even_copy_four_eq]
+  obtain ⟨g, hg⟩ := nominal_even_two parents word hproper hodd hper hE hA
+  refine ⟨g, HeightTile.Agrees.alternateTarget_of_branches (fun s hs => ?_) (fun s _ => hg s) (fun s hs' => ?_)⟩
+  · have h := hwin s hs
+    exact ⟨h.1, by omega⟩
+  · exact absurd (hwin s.1 s.2).2 (not_le.mpr hs')
+
+/-- The even ordinary alternate of a word ending in `1` or `2` has the proper letter needed by `nominal_even_two`. -/
+theorem exists_proper_of_even_digit (beforePush : Word) (digit : Digit)
+    (hd : digit = Digit.one ∨ digit = Digit.two) : ∃ x ∈ beforePush ++ [digit], x ≠ Digit.three :=
+  ⟨digit, List.mem_append.mpr (Or.inr (List.mem_singleton.mpr rfl)), by
+    rcases hd with rfl | rfl <;> intro h <;> cases h⟩
+
+/-- **The ordinary even alternate agrees with its plane target, with the fourth copy discharged.** As
+`ordinaryAlternate_even_identifies`, the first copy is discharged from the standard slot zero and the window; the fourth
+copy is discharged from `nominal_even_two` (`ordinaryAlternate_even_copy_four_agrees`). Named: the standard slot-zero and
+slot-two inputs, the windows on the first and fourth copies, the seventh copy of a non-base word, the slots other than the
+fourth, and the contacts. -/
+theorem ordinaryAlternate_even_identifies_four (parents : TileParents) (beforePush : Word) (digit : Digit)
+    (hd : digit = Digit.one ∨ digit = Digit.two)
+    (hnb : ¬ FLatticePaper.Tiles.Standard.IsBase (beforePush ++ [digit]))
+    (hstd : ∃ g : ℤ, (ordinaryStandardCopy parents (beforePush ++ [digit]) .even 0).val.Agrees
+      (standardField (beforePush ++ [digit])) g)
+    (hwin : ∀ s ∈ (ordinaryStandardCopy parents (beforePush ++ [digit]) .even 0).val.sites,
+      0 ≤ standardField (beforePush ++ [digit]) s -
+          standardField (beforePush ++ [digit]) (s + alternateSigma (beforePush ++ [digit])) ∧
+        standardField (beforePush ++ [digit]) s -
+          standardField (beforePush ++ [digit]) (s + alternateSigma (beforePush ++ [digit])) ≤ 1)
+    (hodd : ∃ g : ℤ, parents.odd.val.Agrees
+      (quarterTurnField (standardField (conjWord (beforePush ++ [digit])))) g)
+    (hper : RespectsPeriodsOn (frameAt (beforePush ++ [digit])).child
+      (frameAt (beforePush ++ [digit])).coherentConstantU (frameAt (beforePush ++ [digit])).coherentConstantV
+      (frameAt (beforePush ++ [digit])).closedPolygon
+      ((frameAt (beforePush ++ [digit])).sheetMin (quarterTurnField (standardField (conjWord (beforePush ++ [digit]))))))
+    (hE : ∀ s ∈ (ordinaryStandardCopy parents (beforePush ++ [digit]) .even 2).val.sites,
+      s ∈ (frameAt (beforePush ++ [digit])).closedPolygon)
+    (hA : ∀ s ∈ (ordinaryStandardCopy parents (beforePush ++ [digit]) .even 2).val.sites,
+      (frameAt (beforePush ++ [digit])).sheetA (quarterTurnField (standardField (conjWord (beforePush ++ [digit])))) s ≤
+        (frameAt (beforePush ++ [digit])).sheetC (quarterTurnField (standardField (conjWord (beforePush ++ [digit])))) s)
+    (hwin4 : ∀ s ∈ (ordinaryStandardCopy parents (beforePush ++ [digit]) .even 2).val.sites,
+      0 ≤ standardField (beforePush ++ [digit]) s -
+          standardField (beforePush ++ [digit]) (s + alternateSigma (beforePush ++ [digit])) ∧
+        standardField (beforePush ++ [digit]) s -
+          standardField (beforePush ++ [digit]) (s + alternateSigma (beforePush ++ [digit])) ≤ 1)
+    (context : String)
+    (hseventh : ¬ FLatticePaper.Tiles.Standard.IsBase (beforePush ++ [digit]) → ∃ g : ℤ,
+      ((seventhAlternateJet beforePush digit .even).place
+        (FLatticePaper.Tiles.AlternateOrdinary.oldAlternate parents (beforePush ++ [digit]) .even)).val.Agrees
+        (alternateTarget (beforePush ++ [digit])) g)
+    (hslot : ∀ s ∈ afterSeventhAlternate .even, s ≠ 4 → ∃ g : ℤ,
+      (placedBySlot (alternateJets (beforePush ++ [digit]) .even) (standardSources parents .odd) s).val.Agrees
+        (alternateTarget (beforePush ++ [digit])) g)
+    (hcon : HeightTile.OrderedContacts (ordinaryAlternateSchedule parents beforePush digit .even).first.val.sites
+      (ordinaryAlternateSchedule parents beforePush digit .even).copies) :
+    ∃ result, (ordinaryAlternateSchedule parents beforePush digit .even).eval .tile context = .ok result ∧
+      ∃ g : ℤ, result.val.Agrees
+        (fun site => alternateTarget (beforePush ++ [digit]) (site +
+          ((ordinaryAlternateSchedule parents beforePush digit .even).raw hcon).val.boxOrigin
+            ((ordinaryAlternateSchedule parents beforePush digit .even).raw hcon).property)) g := by
+  obtain ⟨_, hfirst⟩ := ordinaryAlternate_even_first_agrees parents beforePush digit hstd hwin
+  have hslot' : ∀ s ∈ afterSeventhAlternate .even, ∃ g : ℤ,
+      (placedBySlot (alternateJets (beforePush ++ [digit]) .even) (standardSources parents .odd) s).val.Agrees
+        (alternateTarget (beforePush ++ [digit])) g := by
+    intro s hs
+    by_cases h4 : s = 4
+    · subst h4
+      exact ordinaryAlternate_even_copy_four_agrees parents (beforePush ++ [digit])
+        (exists_proper_of_even_digit beforePush digit hd) hodd hper hE hA hwin4
+    · exact hslot s hs h4
+  exact FLatticePaper.Tiles.AlternateAgreement.ordinaryAlternate_output_agrees_of_seven parents beforePush digit .even
+    context hfirst (hseventh hnb) hslot' hcon
 
 end FLatticePaper.Construction

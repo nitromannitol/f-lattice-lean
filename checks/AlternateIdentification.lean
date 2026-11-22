@@ -10,3 +10,8 @@ import FLatticePaper.Construction.AlternateIdentification
 #print axioms FLatticePaper.Construction.ordinaryAlternate_even_first_agrees
 #print axioms FLatticePaper.Construction.ordinaryAlternate_even_identifies
 #print axioms FLatticePaper.Construction.ordinaryAlternate_even_identifies_register
+#print axioms FLatticePaper.Construction.alternateJets_even_four_eq
+#print axioms FLatticePaper.Construction.ordinaryAlternate_even_copy_four_eq
+#print axioms FLatticePaper.Construction.ordinaryAlternate_even_copy_four_agrees
+#print axioms FLatticePaper.Construction.exists_proper_of_even_digit
+#print axioms FLatticePaper.Construction.ordinaryAlternate_even_identifies_four
