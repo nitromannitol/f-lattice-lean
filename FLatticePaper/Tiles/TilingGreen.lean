@@ -28,7 +28,7 @@ def cellOther (c : GInt) : Fin 4 → GInt
   | 2 => c + gI
   | 3 => c - gOne
 
-theorem mem_boundaryEdges_iff (T : CellTile) (e : GInt × GInt) :
+theorem mem_cellBoundary_iff (T : CellTile) (e : GInt × GInt) :
     e ∈ T.boundaryEdges ↔ ∃ c ∈ T, ∃ j : Fin 4, cellEdge c j = e ∧ cellOther c j ∉ T := by
   unfold CellTile.boundaryEdges
   simp only [Finset.mem_biUnion, Finset.mem_image, List.mem_toFinset, List.mem_filter, cellEdgesWithOther,
@@ -94,7 +94,7 @@ theorem green_boundary (T : CellTile) : ∑ e ∈ T.boundaryEdges, omegaE e = 2 
   have hb : T.boundaryEdges =
       (P.filter (fun p => cellOther p.1 p.2 ∉ T)).image (fun p => cellEdge p.1 p.2) := by
     ext e
-    rw [mem_boundaryEdges_iff, Finset.mem_image]
+    rw [mem_cellBoundary_iff, Finset.mem_image]
     constructor
     · rintro ⟨c, hc, j, rfl, hn⟩
       exact ⟨(c, j), by simp [hP, hc, hn], rfl⟩

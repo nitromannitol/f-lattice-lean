@@ -57,7 +57,7 @@ theorem cellCount_outside (N : AddSubgroup GInt) (T : CellTile) (Q : GInt ⧸ N)
   apply Finset.card_nbij (fun t => cellEdge t j)
   · intro t ht
     simp only [Finset.mem_coe, Finset.mem_filter] at ht ⊢
-    refine ⟨(mem_boundaryEdges_iff _ _).2 ⟨t, ht.1, j, rfl, ht.2.2⟩, ?_, ?_⟩
+    refine ⟨(mem_cellBoundary_iff _ _).2 ⟨t, ht.1, j, rfl, ht.2.2⟩, ?_, ?_⟩
     · rw [cellEdge_eq, map_add, ht.2.1]
     · rw [cellEdge_eq]
       simp
@@ -69,7 +69,7 @@ theorem cellCount_outside (N : AddSubgroup GInt) (T : CellTile) (Q : GInt ⧸ N)
   · intro a ha
     simp only [Finset.mem_coe, Finset.mem_filter] at ha
     obtain ⟨hab, hcls, hdir⟩ := ha
-    obtain ⟨c, hc, j', hcj, hn⟩ := (mem_boundaryEdges_iff _ _).1 hab
+    obtain ⟨c, hc, j', hcj, hn⟩ := (mem_cellBoundary_iff _ _).1 hab
     have hdir' : dirJ j' = dirJ j := by
       rw [← hcj, cellEdge_eq] at hdir
       simpa using hdir
