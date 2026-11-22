@@ -2093,4 +2093,119 @@ theorem boundaryRight_piece (k : ℕ) (w1 w2 : ℤ) (hw1 : w1 = 2 * (k : ℤ) + 
     apply mul_left_cancel₀ (by norm_num : (4 : ℤ) ≠ 0)
     linear_combination 2 * hC - 2 * hQ + hH + hP - hpar + 2 * hcV
 
+/-- The closed polygon of `2^(k+1)` in the coordinates `(z1, v = z2 - z1)`, with `t = -2 z1 - (d+1) v` and
+`u = (d+1) z1 + v` (so `s = 2u`), `d = 2k+4`, `P = d^2 + 2d - 1` (so `T = 2P`): every point lies in the tile
+shifted by `(0,-1)`, or is one of the two boundary points `(-1, d)`, `(d+1, 2d-2)`. -/
+theorem twos_E_arith (d z1 v : ℤ) (hd : 4 ≤ d)
+    (hu0 : 0 ≤ (d + 1) * z1 + v) (huP : (d + 1) * z1 + v ≤ d * d + 2 * d - 1 + d - 1)
+    (hev : v % 2 = 0 → 2 - 2 * (d * d + 2 * d - 1) ≤ -2 * z1 - (d + 1) * v ∧
+      -2 * z1 - (d + 1) * v ≤ 2 * d - 2)
+    (hod : v % 2 = 1 → d - 1 - 2 * (d * d + 2 * d - 1) ≤ -2 * z1 - (d + 1) * v ∧
+      -2 * z1 - (d + 1) * v ≤ d + 1) :
+    (-1 ≤ z1 ∧ z1 ≤ d + 1 ∧ -2 ≤ v ∧ v ≤ 2 * d ∧ 0 ≤ z1 + v ∧ z1 + v ≤ 3 * d - 2 ∧
+        ¬(z1 = -1 ∧ z1 + v ≤ d) ∧ ¬(z1 = d + 1 ∧ 2 * d - 2 ≤ z1 + v)) ∨
+      (z1 = -1 ∧ v = 2 * d + 1) ∨ (z1 = d + 1 ∧ v = -3) ∨ (z1 = -1 ∧ z1 + v = d) ∨
+      (z1 = d + 1 ∧ z1 + v = 2 * d - 2) := by
+  have hP : 0 < d * d + 2 * d - 1 := by nlinarith
+  -- edge facts on u (parity independent)
+  have hzd1 : z1 = -1 → d + 1 ≤ v := by
+    intro h; subst h; nlinarith
+  have hz10 : z1 = 0 → 0 ≤ v := by
+    intro h; subst h; nlinarith
+  have hzd1' : z1 = d + 1 → v ≤ d - 3 := by
+    intro h; subst h; nlinarith
+  have hzd : z1 = d → v ≤ 2 * d - 2 := by
+    intro h; subst h; nlinarith
+  have hz1n : z1 ≠ -1 ∨ d + 1 ≤ v := by
+    rcases eq_or_ne z1 (-1) with h | h
+    · right; exact hzd1 h
+    · left; exact h
+  have hz10' : z1 ≠ 0 ∨ 0 ≤ v := by
+    rcases eq_or_ne z1 0 with h | h
+    · right; exact hz10 h
+    · left; exact h
+  have hzd1'' : z1 ≠ d + 1 ∨ v ≤ d - 3 := by
+    rcases eq_or_ne z1 (d + 1) with h | h
+    · right; exact hzd1' h
+    · left; exact h
+  have hzd'' : z1 ≠ d ∨ v ≤ 2 * d - 2 := by
+    rcases eq_or_ne z1 d with h | h
+    · right; exact hzd h
+    · left; exact h
+  clear hzd1 hz10 hzd1' hzd
+  rcases Int.emod_two_eq_zero_or_one v with hv | hv
+  · obtain ⟨he1, he2⟩ := hev hv
+    have hz1l : -1 ≤ z1 := by
+      by_contra h
+      have h2 : z1 ≤ -2 := by omega
+      nlinarith [mul_nonneg (show (0 : ℤ) ≤ d + 1 by omega) hu0,
+        mul_nonneg hP.le (show (0 : ℤ) ≤ -2 - z1 by omega)]
+    have hz1u : z1 ≤ d + 1 := by
+      by_contra h
+      have h2 : d + 2 ≤ z1 := by omega
+      nlinarith [mul_nonneg hP.le (show (0 : ℤ) ≤ z1 - (d + 2) by omega),
+        mul_nonneg (show (0 : ℤ) ≤ d + 1 by omega)
+          (show (0 : ℤ) ≤ d * d + 2 * d - 1 + d - 1 - ((d + 1) * z1 + v) by linarith)]
+    have hvt : v ≤ 2 * d := by
+      by_contra h
+      have h2 : 2 * d + 2 ≤ v := by omega
+      nlinarith [mul_nonneg (show (0 : ℤ) ≤ d + 1 by omega) (show (0 : ℤ) ≤ v - (2 * d + 2) by omega)]
+    have hvl : -2 ≤ v := by
+      by_contra h
+      have h2 : v ≤ -4 := by omega
+      nlinarith [mul_nonneg (show (0 : ℤ) ≤ d + 1 by omega) (show (0 : ℤ) ≤ -4 - v by omega)]
+    have hm2 : v ≠ -2 ∨ 2 ≤ z1 := by
+      rcases eq_or_ne v (-2) with h | h
+      · right; subst h; nlinarith
+      · left; exact h
+    have hvd : v ≠ 2 * d ∨ z1 ≤ d - 2 := by
+      rcases eq_or_ne v (2 * d) with h | h
+      · right; subst h; nlinarith
+      · left; exact h
+    clear hev hod hu0 huP he1 he2
+    omega
+  · obtain ⟨ho1, ho2⟩ := hod hv
+    have hz1l : -1 ≤ z1 := by
+      by_contra h
+      have h2 : z1 ≤ -2 := by omega
+      nlinarith [mul_nonneg (show (0 : ℤ) ≤ d + 1 by omega) hu0,
+        mul_nonneg hP.le (show (0 : ℤ) ≤ -2 - z1 by omega)]
+    have hz1u : z1 ≤ d + 1 := by
+      by_contra h
+      have h2 : d + 2 ≤ z1 := by omega
+      nlinarith [mul_nonneg hP.le (show (0 : ℤ) ≤ z1 - (d + 2) by omega),
+        mul_nonneg (show (0 : ℤ) ≤ d + 1 by omega)
+          (show (0 : ℤ) ≤ d * d + 2 * d - 1 + d - 1 - ((d + 1) * z1 + v) by linarith)]
+    have hvt1 : v ≤ 2 * d + 1 := by
+      by_contra h
+      have h2 : 2 * d + 2 ≤ v := by omega
+      nlinarith [mul_nonneg (show (0 : ℤ) ≤ d + 1 by omega) (show (0 : ℤ) ≤ v - (2 * d + 2) by omega)]
+    have hvt : v ≤ 2 * d ∨ (z1 = -1 ∧ v = 2 * d + 1) := by
+      by_cases h : v ≤ 2 * d
+      · left; exact h
+      · right
+        have h2 : v = 2 * d + 1 := by omega
+        subst h2
+        constructor
+        · nlinarith
+        · rfl
+    have hvl : -2 ≤ v ∨ (v = -3 ∧ z1 = d + 1) := by
+      by_cases h : -2 ≤ v
+      · left; exact h
+      · have h2 : v ≤ -3 := by omega
+        have h3 : -3 ≤ v := by
+          by_contra h4
+          have h5 : v ≤ -5 := by omega
+          nlinarith [mul_nonneg (show (0 : ℤ) ≤ d + 1 by omega) (show (0 : ℤ) ≤ -5 - v by omega)]
+        have h4 : v = -3 := by omega
+        subst h4
+        right
+        constructor
+        · rfl
+        · nlinarith
+    have hm2 : v ≠ -2 ∨ 2 ≤ z1 := Or.inl (by omega)
+    have hvd : v ≠ 2 * d ∨ z1 ≤ d - 2 := Or.inl (by omega)
+    clear hev hod hu0 huP ho1 ho2 hvt1
+    omega
+
 end FLatticePaper.Induction
