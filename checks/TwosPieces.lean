@@ -10,3 +10,4 @@ import FLatticePaper.Plane.Induction.TwosPieces
 #print axioms FLatticePaper.Induction.band2_tie_piece
 #print axioms FLatticePaper.Induction.upA1_piece
 #print axioms FLatticePaper.Induction.upC1_piece
+#print axioms FLatticePaper.Induction.lowerA1_piece
