@@ -219,7 +219,6 @@ theorem ChildFrame.cutGrade_kernel_zsmul (frame : ChildFrame) (F : Field) {cU cV
         (z + (k : ℤ) • frame.child.modifiedDeck.kernel) + frame.child.modifiedDeck.kernel := by
       rw [add_smul, one_smul, add_assoc]
     rw [e, frame.cutGrade_kernel F h A C η, ih]
-    push_cast
     ring
   | pred k ih =>
     have e : z + (-(k : ℤ)) • frame.child.modifiedDeck.kernel =
@@ -228,7 +227,6 @@ theorem ChildFrame.cutGrade_kernel_zsmul (frame : ChildFrame) (F : Field) {cU cV
       abel
     have h1 := frame.cutGrade_kernel F h A C η (z + (-(k : ℤ) - 1) • frame.child.modifiedDeck.kernel)
     rw [← e, ih] at h1
-    push_cast at h1 ⊢
     linear_combination (-1 : ℤ) * h1
 
 /-- Translating by `n` transverse periods shifts the cut grade by `n C η`. -/
@@ -243,7 +241,6 @@ theorem ChildFrame.cutGrade_transverse_zsmul (frame : ChildFrame) (F : Field) {c
         (z + (k : ℤ) • frame.child.modifiedDeck.transverse) + frame.child.modifiedDeck.transverse := by
       rw [add_smul, one_smul, add_assoc]
     rw [e, frame.cutGrade_transverse F h A C η, ih]
-    push_cast
     ring
   | pred k ih =>
     have e : z + (-(k : ℤ)) • frame.child.modifiedDeck.transverse =
@@ -252,7 +249,6 @@ theorem ChildFrame.cutGrade_transverse_zsmul (frame : ChildFrame) (F : Field) {c
       abel
     have h1 := frame.cutGrade_transverse F h A C η (z + (-(k : ℤ) - 1) • frame.child.modifiedDeck.transverse)
     rw [← e, ih] at h1
-    push_cast at h1 ⊢
     linear_combination (-1 : ℤ) * h1
 
 /-- Translating by `i U + j V` shifts the cut grade by `-i A + j C η`. -/

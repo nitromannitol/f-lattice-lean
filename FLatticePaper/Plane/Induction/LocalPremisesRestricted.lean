@@ -31,8 +31,8 @@ noncomputable def i3aGrade (word : Word) (x : Site) : ℤ :=
   (frameAt (conjWord word)).cutGrade (standardField (conjWord word)) 1 1 (frameAt word).eps (-x.2, x.1 - 1)
 
 /-- The local premises at a proper word, with the two signed ranks of (I3) replaced by the restricted-fort form: the
-local permits and the absence of restricted forts, for the two permit relations of `Fp`, in the frame's transverse
-grade. Every other clause is that of `LocalPremises`. -/
+local permits and the absence of restricted forts, for the two permit relations of `Fp`: the first in the half-spaces
+of `i3aGrade`, the second in those of the frame's transverse grade. Every other clause is that of `LocalPremises`. -/
 def LocalPremises' (word : Word) : Prop :=
   let frame := frameAt word
   let Fp := quarterTurnField (standardField (conjWord word))
@@ -46,7 +46,7 @@ def LocalPremises' (word : Word) : Prop :=
       (frame.eps = 1 → 0 ≤ frame.sheetC Fp z - frame.sheetA Fp z) ∧
       (frame.eps = -1 → frame.sheetC Fp z - frame.sheetA Fp z ≤ 0)) ∧
   -- I3: the chain potential has unit increments on edges; the two permitted sides have local permits and no
-  -- restricted forts in the transverse grade
+  -- restricted forts (in the grades `i3aGrade` and `t` respectively)
   (∀ c i : Site, FLatticePaper.Edge i c → -1 ≤ Ξ i - Ξ c ∧ Ξ i - Ξ c ≤ 1) ∧
   PermitLocal Fp (fun c i => Ξ i ≤ Ξ c) ∧
   RestrictedNoFort Fp (i3aGrade word) (fun c i => Ξ i ≤ Ξ c) ∧
