@@ -84,4 +84,27 @@ theorem i1_of_root_stars {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (Zone := fun z => z ∈ (frameAt word).closedPolygon ∧ 1 - (frameAt word).child.den ≤ (frameAt word).tGrade z)
     (fun z hz' => hcover z hz'.1 hz'.2) z ⟨hz, ht⟩
 
+/-- (I2), the harmonic region, for the branch `ε = 1`. The same star step gives `0 ≤ C − A` on the harmonic zone.
+The branch `ε = −1` is not covered: its mirror step is not written out in the archive. -/
+theorem i2_pos_of_root_stars {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
+    (hG : (frameAt (conjWord word)).Packet (standardField (conjWord word)))
+    (hunit : ∀ c i : Site, FLatticePaper.Edge i c →
+      -1 ≤ sheetChainPotential word (standardField (conjWord word)) i -
+          sheetChainPotential word (standardField (conjWord word)) c ∧
+        sheetChainPotential word (standardField (conjWord word)) i -
+          sheetChainPotential word (standardField (conjWord word)) c ≤ 1)
+    {R G : Site → Prop} (hR : ∀ c, R c → 1 ≤ sheetDiff word c) (hGd : ∀ z, G z → 0 ≤ sheetDiff word z)
+    (hcover : ∀ z ∈ (frameAt word).closedPolygon,
+      (frameAt word).sGrade z ≤ 2 * ((frameAt word).child.den + (frameAt word).child.num) - 1 →
+        R z ∨ (∃ c, R c ∧ FLatticePaper.Edge z c) ∨ G z) :
+    (frameAt word).eps = 1 → ∀ z ∈ (frameAt word).closedPolygon,
+      (frameAt word).sGrade z ≤ 2 * ((frameAt word).child.den + (frameAt word).child.num) - 1 →
+      0 ≤ (frameAt word).sheetC (quarterTurnField (standardField (conjWord word))) z -
+        (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) z := by
+  intro _ z hz hs
+  exact sheetDiff_nonneg_of_stars (sheetDiff_unit_of_chain h hG hunit) hR hGd
+    (Zone := fun z => z ∈ (frameAt word).closedPolygon ∧
+      (frameAt word).sGrade z ≤ 2 * ((frameAt word).child.den + (frameAt word).child.num) - 1)
+    (fun z hz' => hcover z hz'.1 hz'.2) z ⟨hz, hs⟩
+
 end FLatticePaper.Induction
