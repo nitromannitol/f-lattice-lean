@@ -150,6 +150,8 @@ lake env lean checks/BaseBoundaryWalks.lean
 lake env lean checks/StandardInduction.lean
 lake env lean checks/DeckCoverage.lean
 lake env lean checks/OrdinaryStandard.lean
+lake env lean checks/MissingSites.lean
+lake env lean checks/BaseRegistersTeX.lean
 lake env lean checks/PseudoSquareLiteral.lean
 lake env lean checks/AlternateTiles.lean
 lake env lean checks/AlternateConstructor.lean
