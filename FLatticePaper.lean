@@ -201,5 +201,6 @@ import FLatticePaper.Tiles.OrdinaryStandard
 import FLatticePaper.Construction.MissingSites
 import FLatticePaper.Tiles.BaseRegistersTeX
 import FLatticePaper.Tiles.RestoredAlternate
+import FLatticePaper.Tiles.AlternateInheritance
 
 /-! Root import for the corrected F-lattice paper. -/
