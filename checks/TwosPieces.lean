@@ -38,3 +38,4 @@ import FLatticePaper.Plane.Induction.TwosPieces
 #print axioms FLatticePaper.Induction.min_tile_right
 #print axioms FLatticePaper.Induction.tie_leaf
 #print axioms FLatticePaper.Induction.twos_tile_min
+#print axioms FLatticePaper.Induction.boundaryLeft_piece
