@@ -217,5 +217,6 @@ import FLatticePaper.Tiles.BaseRegistersTeX
 import FLatticePaper.Tiles.RestoredAlternate
 import FLatticePaper.Tiles.AlternateInheritance
 import FLatticePaper.Tiles.AlternateAgreement
+import FLatticePaper.Construction.AlternateIdentification
 
 /-! Root import for the corrected F-lattice paper. -/
