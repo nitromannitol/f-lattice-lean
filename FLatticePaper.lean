@@ -214,3 +214,4 @@ import FLatticePaper.Tiles.RestoredAlternate
 import FLatticePaper.Tiles.AlternateInheritance
 
 /-! Root import for the corrected F-lattice paper. -/
+import FLatticePaper.Plane.GlobalOdometers
