@@ -59,7 +59,9 @@ theorem rot_shift (T : Tile) (v : Site) : rot (shift T v) = shift (rot T) (mulI 
   ext x
   simp only [mem_rot, mem_shift]
   have e : (x.2, -x.1) - v = ((x - mulI v).2, -(x - mulI v).1) := by
-    ext <;> simp [mulI] <;> ring
+    ext
+    · simp [mulI]
+    · simp [mulI]; ring
   rw [e]
 
 theorem shift_shift (T : Tile) (v w : Site) : shift (shift T v) w = shift T (v + w) := by
@@ -175,27 +177,23 @@ identities behind the base words `2^k`, `3^k` and the empty word. -/
 
 theorem base_stair_nstair {d : ℤ} (hd : 2 ≤ d) : rot (stairF d) = shift (nstairN d) (tV 1 d) := by
   ext x
-  simp only [mem_rot, mem_shift, nstairN, mem_stairF hd, mem_nstairF hd, tV, Prod.fst_sub, Prod.snd_sub,
-    Prod.fst_neg, Prod.snd_neg]
+  simp only [mem_rot, mem_shift, nstairN, mem_stairF hd, mem_nstairF hd, tV, Prod.fst_sub, Prod.snd_sub]
   constructor <;> intro h <;> omega
 
 theorem base_nstair_stair {d : ℤ} (hd : 2 ≤ d) : rot (nstairN d) = shift (stairF d) (-d, 0) := by
   ext x
-  simp only [mem_rot, mem_shift, nstairN, mem_stairF hd, mem_nstairF hd, Prod.fst_sub, Prod.snd_sub,
-    Prod.fst_neg, Prod.snd_neg]
+  simp only [mem_rot, mem_shift, nstairN, mem_stairF hd, mem_nstairF hd, Prod.fst_sub, Prod.snd_sub]
   constructor <;> intro h <;> omega
 
 theorem base_ladder_nladder {d : ℤ} (hd : 2 ≤ d) : rot (ladderF d) = shift (nladderN d) (tV 1 d) := by
   ext x
-  simp only [mem_rot, mem_shift, nladderN, mem_ladderF hd, mem_nladderF hd, tV, Prod.fst_sub, Prod.snd_sub,
-    Prod.fst_neg, Prod.snd_neg]
+  simp only [mem_rot, mem_shift, nladderN, mem_ladderF hd, mem_nladderF hd, tV, Prod.fst_sub, Prod.snd_sub]
   constructor <;> intro h <;> omega
 
 theorem base_nladder_ladder {d : ℤ} (hd : 2 ≤ d) :
     rot (nladderN d) = shift (ladderF d) (tV (d - 1) (d + 1)) := by
   ext x
-  simp only [mem_rot, mem_shift, nladderN, mem_ladderF hd, mem_nladderF hd, tV, Prod.fst_sub, Prod.snd_sub,
-    Prod.fst_neg, Prod.snd_neg]
+  simp only [mem_rot, mem_shift, nladderN, mem_ladderF hd, mem_nladderF hd, tV, Prod.fst_sub, Prod.snd_sub]
   constructor <;> intro h <;> omega
 
 /-! ### The standard decomposition (`eq:standard_decompositions`) -/
@@ -789,5 +787,241 @@ theorem rot_standard_tiles (w : Word) :
     rot (oddTile w) = shift (evenTile (swapW w)) (tF ((parentsAt w).current .odd)) ∧
       rot (evenTile w) = shift (oddTile (swapW w)) (tF ((parentsAt w).current .even)) :=
   (good_and_rot w).1
+
+/-! ### Normalisation: the lower-left vertex of every standard tile is the origin (`c(T) = 0`) -/
+
+theorem lexLE_add {p q : Site} (hp : lexLE 0 p) (hq : lexLE 0 q) : lexLE 0 (p + q) := by
+  unfold lexLE at *
+  simp only [Prod.fst_add, Prod.snd_add, Prod.fst_zero, Prod.snd_zero] at *
+  omega
+
+theorem forall_union {P : Site → Prop} {A B : Tile} (hA : ∀ x ∈ A, P x) (hB : ∀ x ∈ B, P x) :
+    ∀ x ∈ A ∪ B, P x := by
+  intro x hx
+  rcases Finset.mem_union.mp hx with h | h
+  · exact hA x h
+  · exact hB x h
+
+theorem forall_shift {T : Tile} {v : Site} (hT : ∀ y ∈ T, lexLE 0 y) (hv : lexLE 0 v) :
+    ∀ x ∈ shift T v, lexLE 0 x := by
+  intro x hx
+  rw [mem_shift] at hx
+  simpa using lexLE_add (hT _ hx) hv
+
+theorem norm_stairF {d : ℤ} (hd : 2 ≤ d) : IsNormalised (stairF d) := by
+  refine ⟨?_, ?_⟩
+  · rw [mem_stairF hd]
+    exact Or.inr (Or.inl ⟨rfl, rfl⟩)
+  · intro p hp
+    rw [mem_stairF hd] at hp
+    unfold lexLE
+    simp only [Prod.fst_zero, Prod.snd_zero]
+    omega
+
+theorem norm_ladderF {d : ℤ} (hd : 2 ≤ d) : IsNormalised (ladderF d) := by
+  refine ⟨?_, ?_⟩
+  · rw [mem_ladderF hd]
+    refine ⟨Or.inl ⟨rfl, rfl⟩, ?_⟩
+    simp only [Prod.fst_zero, Prod.snd_zero]
+    omega
+  · intro p hp
+    rw [mem_ladderF hd] at hp
+    unfold lexLE
+    simp only [Prod.fst_zero, Prod.snd_zero]
+    omega
+
+theorem norm_nstairN {d : ℤ} (hd : 2 ≤ d) : IsNormalised (nstairN d) := by
+  refine ⟨?_, ?_⟩
+  · unfold nstairN
+    rw [mem_shift, mem_nstairF hd]
+    simp only [Prod.fst_sub, Prod.snd_sub, Prod.fst_zero, Prod.snd_zero]
+    omega
+  · intro p hp
+    unfold nstairN at hp
+    rw [mem_shift, mem_nstairF hd] at hp
+    unfold lexLE
+    simp only [Prod.fst_sub, Prod.snd_sub, Prod.fst_zero, Prod.snd_zero] at hp ⊢
+    omega
+
+theorem norm_nladderN {d : ℤ} (hd : 2 ≤ d) : IsNormalised (nladderN d) := by
+  refine ⟨?_, ?_⟩
+  · unfold nladderN
+    rw [mem_shift, mem_nladderF hd]
+    simp only [Prod.fst_sub, Prod.snd_sub, Prod.fst_zero, Prod.snd_zero]
+    omega
+  · intro p hp
+    unfold nladderN at hp
+    rw [mem_shift, mem_nladderF hd] at hp
+    unfold lexLE
+    simp only [Prod.fst_sub, Prod.snd_sub, Prod.fst_zero, Prod.snd_zero] at hp ⊢
+    omega
+
+theorem lexLE0_texV1Odd {p : Fraction} (hden : 0 < p.den) (hnum : 0 ≤ p.num) :
+    lexLE 0 (texV1Odd p) := by
+  unfold lexLE texV1Odd
+  simp only [Prod.fst_zero, Prod.snd_zero]
+  omega
+
+theorem lexLE0_texV1Even {q : Fraction} (hden : 0 < q.den) (hnum : 0 ≤ q.num) :
+    lexLE 0 (texV1Even q) := by
+  unfold lexLE texV1Even
+  simp only [Prod.fst_zero, Prod.snd_zero]
+  omega
+
+theorem lexLE0_texV2 {f : Fraction} (hden : 0 < f.den) (hnum : 0 ≤ f.num) : lexLE 0 (texV2 f) := by
+  unfold lexLE texV2
+  simp only [Prod.fst_zero, Prod.snd_zero]
+  omega
+
+theorem norm_oddChild (b : Bool) {T1 T2 : Tile} {p q : Fraction} (hpd : 0 < p.den) (hpn : 0 ≤ p.num)
+    (hqd : 0 < q.den) (hqn : 0 ≤ q.num) (hT1 : IsNormalised T1) (hT2 : IsNormalised T2) :
+    IsNormalised (oddChildB b T1 T2 p q) := by
+  have z1 := hT1.1
+  have z2 := hT2.1
+  have h1 : ∀ y ∈ T1, lexLE 0 y := hT1.2
+  have h2 : ∀ y ∈ T2, lexLE 0 y := hT2.2
+  have l1 := lexLE0_texV1Odd hpd hpn
+  have l2 := lexLE0_texV1Even hqd hqn
+  have l3 := lexLE0_texV2 hpd hpn
+  have l4 := lexLE0_texV2 hqd hqn
+  refine ⟨?_, ?_⟩
+  · cases b <;> simp only [oddChildB, Finset.mem_union] <;> tauto
+  · cases b
+    · exact forall_union (forall_union (forall_union (forall_union (forall_union h2
+        (forall_shift h2 l2)) (forall_shift h2 (lexLE_add l1 l3)))
+        (forall_shift h2 (lexLE_add (lexLE_add l1 l3) l2))) (forall_shift h1 (lexLE_add l2 l2)))
+        (forall_shift h1 l4)
+    · exact forall_union (forall_union (forall_union (forall_union (forall_union
+        (forall_shift h2 l1) (forall_shift h2 (lexLE_add l1 l2))) (forall_shift h2 l3))
+        (forall_shift h2 (lexLE_add l3 l2))) h1) (forall_shift h1 (lexLE_add (lexLE_add l2 l2) l4))
+
+theorem norm_evenChild (b : Bool) {T1 T2 : Tile} {p q : Fraction} (hpd : 0 < p.den) (hpn : 0 ≤ p.num)
+    (hqd : 0 < q.den) (hqn : 0 ≤ q.num) (hT1 : IsNormalised T1) (hT2 : IsNormalised T2) :
+    IsNormalised (evenChildB b T1 T2 p q) := by
+  have z1 := hT1.1
+  have z2 := hT2.1
+  have h1 : ∀ y ∈ T1, lexLE 0 y := hT1.2
+  have h2 : ∀ y ∈ T2, lexLE 0 y := hT2.2
+  have l1 := lexLE0_texV1Odd hpd hpn
+  have l2 := lexLE0_texV1Even hqd hqn
+  have l3 := lexLE0_texV2 hpd hpn
+  have l4 := lexLE0_texV2 hqd hqn
+  refine ⟨?_, ?_⟩
+  · cases b <;> simp only [evenChildB, Finset.mem_union] <;> tauto
+  · cases b
+    · exact forall_union (forall_union (forall_union (forall_union (forall_union h2
+        (forall_shift h2 (lexLE_add l1 (lexLE_add l3 l3)))) (forall_shift h1 l2))
+        (forall_shift h1 (lexLE_add l2 l3))) (forall_shift h1 l4)) (forall_shift h1 (lexLE_add l4 l3))
+    · exact forall_union (forall_union (forall_union (forall_union (forall_union
+        (forall_shift h2 l1) (forall_shift h2 (lexLE_add l3 l3))) h1) (forall_shift h1 l3))
+        (forall_shift h1 (lexLE_add l2 l4))) (forall_shift h1 (lexLE_add (lexLE_add l2 l4) l3))
+
+/-- The normalisation of a non-base word, from the normalisation of the two registers. -/
+theorem norm_child_of_not_base {w : Word} (hw : ¬ IsBase w) (hO : IsNormalised (stateAt w).tOdd)
+    (hE : IsNormalised (stateAt w).tEven) : IsNormalised (oddTile w) ∧ IsNormalised (evenTile w) := by
+  have hV := parentsAt_valid w
+  obtain ⟨hpd, hpn, -⟩ := hV.odd_bounds
+  obtain ⟨hqd, hqn, -⟩ := hV.even_bounds
+  rw [oddTile_eq_of_not_base hw, evenTile_eq_of_not_base hw]
+  exact ⟨norm_oddChild _ hpd hpn hqd hqn hO hE, norm_evenChild _ hpd hpn hqd hqn hO hE⟩
+
+abbrev NormOdd (w : Word) : Prop := (∀ d ∈ w, d = Digit.three) ∨ IsNormalised (stateAt w).tOdd
+
+abbrev NormEven (w : Word) : Prop := (∀ d ∈ w, d = Digit.two) ∨ IsNormalised (stateAt w).tEven
+
+abbrev NormChild (w : Word) : Prop := IsNormalised (oddTile w) ∧ IsNormalised (evenTile w)
+
+theorem normChild_of_good (w : Word) (hO : NormOdd w) (hE : NormEven w) : NormChild w := by
+  by_cases h0 : w = []
+  · subst h0
+    unfold NormChild oddTile evenTile
+    rw [childTiles_nil]
+    exact ⟨norm_nstairN (by norm_num), norm_stairF (by norm_num)⟩
+  by_cases h3 : ∀ d ∈ w, d = Digit.three
+  · obtain ⟨k, rfl⟩ : ∃ k, w = List.replicate k Digit.three :=
+      ⟨w.length, List.eq_replicate_iff.mpr ⟨rfl, h3⟩⟩
+    have hk : 1 ≤ k := by
+      rcases Nat.eq_zero_or_pos k with rfl | hk
+      · simp at h0
+      · exact hk
+    unfold NormChild oddTile evenTile
+    rw [childTiles_three hk]
+    exact ⟨norm_ladderF (by omega), norm_stairF (by omega)⟩
+  by_cases h2 : ∀ d ∈ w, d = Digit.two
+  · obtain ⟨k, rfl⟩ : ∃ k, w = List.replicate k Digit.two :=
+      ⟨w.length, List.eq_replicate_iff.mpr ⟨rfl, h2⟩⟩
+    have hk : 1 ≤ k := by
+      rcases Nat.eq_zero_or_pos k with rfl | hk
+      · simp at h0
+      · exact hk
+    unfold NormChild oddTile evenTile
+    rw [childTiles_two hk]
+    exact ⟨norm_nstairN (by omega), norm_nladderN (by omega)⟩
+  have hw : ¬ IsBase w := by
+    rintro (h | h | h)
+    · exact h0 h
+    · exact h3 h
+    · exact h2 h
+  exact norm_child_of_not_base hw (hO.resolve_left h3) (hE.resolve_left h2)
+
+theorem normOdd_snoc_one {u : Word} (hC : NormChild u) : NormOdd (u ++ [.one]) := by
+  refine Or.inr ?_
+  rw [tOdd_snoc_one]
+  exact hC.1
+
+theorem normEven_snoc_one {u : Word} (hC : NormChild u) : NormEven (u ++ [.one]) := by
+  refine Or.inr ?_
+  rw [tEven_snoc_one]
+  exact hC.2
+
+theorem normOdd_snoc_two {u : Word} (hC : NormChild u) : NormOdd (u ++ [.two]) := by
+  refine Or.inr ?_
+  rw [tOdd_snoc_two]
+  exact hC.1
+
+theorem normEven_snoc_two {u : Word} (hE : NormEven u) : NormEven (u ++ [.two]) := by
+  rcases hE with h | h
+  · refine Or.inl ?_
+    intro d hd
+    rcases List.mem_append.mp hd with hd | hd
+    · exact h d hd
+    · rw [List.mem_singleton.mp hd]
+  · refine Or.inr ?_
+    rw [tEven_snoc_two]
+    exact h
+
+theorem normOdd_snoc_three {u : Word} (hO : NormOdd u) : NormOdd (u ++ [.three]) := by
+  rcases hO with h | h
+  · refine Or.inl ?_
+    intro d hd
+    rcases List.mem_append.mp hd with hd | hd
+    · exact h d hd
+    · rw [List.mem_singleton.mp hd]
+  · refine Or.inr ?_
+    rw [tOdd_snoc_three]
+    exact h
+
+theorem normEven_snoc_three {u : Word} (hC : NormChild u) : NormEven (u ++ [.three]) := by
+  refine Or.inr ?_
+  rw [tEven_snoc_three]
+  exact hC.2
+
+theorem norm_all (w : Word) : NormChild w ∧ NormOdd w ∧ NormEven w := by
+  induction w using List.reverseRecOn with
+  | nil =>
+    exact ⟨normChild_of_good [] (Or.inl (by simp)) (Or.inl (by simp)), Or.inl (by simp), Or.inl (by simp)⟩
+  | append_singleton u d ih =>
+    obtain ⟨hC, hO, hE⟩ := ih
+    have hG : NormOdd (u ++ [d]) ∧ NormEven (u ++ [d]) := by
+      cases d
+      · exact ⟨normOdd_snoc_one hC, normEven_snoc_one hC⟩
+      · exact ⟨normOdd_snoc_two hC, normEven_snoc_two hE⟩
+      · exact ⟨normOdd_snoc_three hO, normEven_snoc_three hC⟩
+    exact ⟨normChild_of_good _ hG.1 hG.2, hG.1, hG.2⟩
+
+/-- **Normalisation of the standard tiles**: the lower-left vertex of the odd and the even standard tile of every word
+is the origin, so `c(T) = 0` holds for every standard tile of the convention of `def:standard_tiles`. -/
+theorem standard_tiles_normalised (w : Word) : IsNormalised (oddTile w) ∧ IsNormalised (evenTile w) :=
+  (norm_all w).1
 
 end FLatticePaper.Tiles.Standard
