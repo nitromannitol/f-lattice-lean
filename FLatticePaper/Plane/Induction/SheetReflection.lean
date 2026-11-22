@@ -1,5 +1,7 @@
 import FLatticePaper.Plane.Induction.Bands
-
+import FLatticePaper.Plane.Induction.Coherence
+import FLatticePaper.Plane.Induction.Packet
+import FLatticePaper.Plane.Induction.WordInduction
 
 /-! Task 25, the eps = -1 branch of (I2) by the reflection.
 
@@ -35,9 +37,14 @@ theorem sheetDiff_antisymm_of_exchange (frame : ChildFrame) (Fp : Field) (hX : f
   rw [h1 z, h2 z]
   ring
 
-/-- (I2), eps = -1, by the reflection. Named inputs: the stated sheet exchange `hX`, and the positivity of the difference
-on the reflected harmonic band (the claim that the reflection carries to the eps = +1 type statement; not written in the
-archive). Then the difference is nonpositive on the harmonic band. -/
+/-- (I2), eps = -1, by the reflection. Named inputs: the stated sheet exchange `hX`, and the positivity `hpos` of the
+difference on the reflected harmonic band `c - H`, where `H = E cap {s <= 2L - 1}`. Then the difference is nonpositive
+on the harmonic band.
+
+Uncovered region: `hpos` is not established. The reflected band `c - H` is inside `E` (E is invariant), but it meets
+`{t < 1 - d}`, which is outside the I1 zone `E cap {t >= 1 - d}`, the only region where `Psi >= 0` is a premise
+(numerically 6088 of the 6262 reflected points, over the 58 eps = -1 words). On that part `Psi >= 0` is not written in
+the archive. -/
 theorem i2_neg_of_reflection (frame : ChildFrame) (Fp : Field) (hX : frame.SheetExchange Fp)
     (hpos : ∀ z ∈ frame.closedPolygon,
       frame.sGrade z ≤ 2 * (frame.child.den + frame.child.num) - 1 →
@@ -49,5 +56,15 @@ theorem i2_neg_of_reflection (frame : ChildFrame) (Fp : Field) (hX : frame.Sheet
   have h := sheetDiff_antisymm_of_exchange frame Fp hX z
   have hp := hpos z hz hs
   linarith
+
+/-- The sheet exchange of the eps = -1 branch, from the conjugate packet. The reflection and the periods of the
+conjugate standard field, with the child identity of the conjugate, transport through the quarter turn to the two
+sheets (`ChildFrame.sheet_swap`, SheetSwap.lean). -/
+theorem sheetExchange_of_packet {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
+    (hG : (frameAt (conjWord word)).Packet (standardField (conjWord word))) :
+    (frameAt word).SheetExchange (quarterTurnField (standardField (conjWord word))) := by
+  have hc := frameAt_conj_child h
+  have hs := (frameAt word).sheet_swap (frameAt (conjWord word)) hc hG.reflection hG.periods
+  exact ⟨fun z => (hs z).1, fun z => (hs z).2⟩
 
 end FLatticePaper.Induction
