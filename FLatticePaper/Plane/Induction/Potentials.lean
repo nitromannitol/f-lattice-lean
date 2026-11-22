@@ -207,4 +207,62 @@ theorem ChildFrame.cutGrade_transverse (frame : ChildFrame) (F : Field) {cU cV :
   rw [frame.price_transverse F h z, frame.roundedSlip_transverse F h η z]
   ring
 
+/-- Translating by `n` kernel periods shifts the cut grade by `-n A`. -/
+theorem ChildFrame.cutGrade_kernel_zsmul (frame : ChildFrame) (F : Field) {cU cV : ℤ}
+    (h : HasGeneratorPeriods frame.child F cU cV) (A C η n : ℤ) (z : Site) :
+    frame.cutGrade F A C η (z + n • frame.child.modifiedDeck.kernel) =
+      frame.cutGrade F A C η z - n * A := by
+  induction n using Int.induction_on with
+  | zero => simp
+  | succ k ih =>
+    have e : z + ((k : ℤ) + 1) • frame.child.modifiedDeck.kernel =
+        (z + (k : ℤ) • frame.child.modifiedDeck.kernel) + frame.child.modifiedDeck.kernel := by
+      rw [add_smul, one_smul, add_assoc]
+    rw [e, frame.cutGrade_kernel F h A C η, ih]
+    push_cast
+    ring
+  | pred k ih =>
+    have e : z + (-(k : ℤ)) • frame.child.modifiedDeck.kernel =
+        (z + (-(k : ℤ) - 1) • frame.child.modifiedDeck.kernel) + frame.child.modifiedDeck.kernel := by
+      rw [add_assoc, sub_smul, one_smul]
+      abel
+    have h1 := frame.cutGrade_kernel F h A C η (z + (-(k : ℤ) - 1) • frame.child.modifiedDeck.kernel)
+    rw [← e, ih] at h1
+    push_cast at h1 ⊢
+    linear_combination (-1 : ℤ) * h1
+
+/-- Translating by `n` transverse periods shifts the cut grade by `n C η`. -/
+theorem ChildFrame.cutGrade_transverse_zsmul (frame : ChildFrame) (F : Field) {cU cV : ℤ}
+    (h : HasGeneratorPeriods frame.child F cU cV) (A C η n : ℤ) (z : Site) :
+    frame.cutGrade F A C η (z + n • frame.child.modifiedDeck.transverse) =
+      frame.cutGrade F A C η z + n * (C * η) := by
+  induction n using Int.induction_on with
+  | zero => simp
+  | succ k ih =>
+    have e : z + ((k : ℤ) + 1) • frame.child.modifiedDeck.transverse =
+        (z + (k : ℤ) • frame.child.modifiedDeck.transverse) + frame.child.modifiedDeck.transverse := by
+      rw [add_smul, one_smul, add_assoc]
+    rw [e, frame.cutGrade_transverse F h A C η, ih]
+    push_cast
+    ring
+  | pred k ih =>
+    have e : z + (-(k : ℤ)) • frame.child.modifiedDeck.transverse =
+        (z + (-(k : ℤ) - 1) • frame.child.modifiedDeck.transverse) + frame.child.modifiedDeck.transverse := by
+      rw [add_assoc, sub_smul, one_smul]
+      abel
+    have h1 := frame.cutGrade_transverse F h A C η (z + (-(k : ℤ) - 1) • frame.child.modifiedDeck.transverse)
+    rw [← e, ih] at h1
+    push_cast at h1 ⊢
+    linear_combination (-1 : ℤ) * h1
+
+/-- Translating by `i U + j V` shifts the cut grade by `-i A + j C η`. -/
+theorem ChildFrame.cutGrade_add_combine (frame : ChildFrame) (F : Field) {cU cV : ℤ}
+    (h : HasGeneratorPeriods frame.child F cU cV) (A C η i j : ℤ) (z : Site) :
+    frame.cutGrade F A C η (z + frame.child.modifiedDeck.combine i j) =
+      frame.cutGrade F A C η z - i * A + j * (C * η) := by
+  have e : z + frame.child.modifiedDeck.combine i j =
+      (z + i • frame.child.modifiedDeck.kernel) + j • frame.child.modifiedDeck.transverse := by
+    ext <;> simp [PeriodDeck.combine, zsmul_eq_mul] <;> ring
+  rw [e, frame.cutGrade_transverse_zsmul F h A C η j, frame.cutGrade_kernel_zsmul F h A C η i]
+
 end FLatticePaper.Induction

@@ -45,7 +45,7 @@ def LocalPremises (word : Word) : Prop :=
         (starDiff F frame.shortShift e = 2 ∧ starDiff F frame.shortShift u = 0))) ∧
   -- S3: the local permits and the absence of restricted forts in the grade half-spaces
   PermitLocal F (slipPermits F (fun z => F (z + frame.shortShift))) ∧
-  RestrictedNoFort F frame.tGrade (slipPermits F (fun z => F (z + frame.shortShift)))
+  RestrictedNoFort F (frame.cutGrade F 1 1 1) (slipPermits F (fun z => F (z + frame.shortShift)))
 
 /-- The open inputs of the step follow from the local premises and the conjugate Packet. -/
 theorem openInputs_of_localPremises {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
