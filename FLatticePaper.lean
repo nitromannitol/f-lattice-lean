@@ -108,6 +108,7 @@ import FLatticePaper.Plane.Induction.StarRangeArgument
 import FLatticePaper.Plane.Induction.BaseRange
 import FLatticePaper.Plane.Induction.BaseInputsProof
 import FLatticePaper.Plane.Induction.PermitMonotone
+import FLatticePaper.Plane.Induction.OpenInputsProof
 import FLatticePaper.Construction.NearOneBaseCases
 import FLatticePaper.Construction.BaseCases
 import FLatticePaper.Construction.OffsetTables
