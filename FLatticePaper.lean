@@ -116,6 +116,8 @@ import FLatticePaper.Plane.Induction.RootCalibration
 import FLatticePaper.Plane.Induction.SheetReflection
 import FLatticePaper.Plane.Induction.ChainUnitSlip
 import FLatticePaper.Plane.Induction.TwosField
+import FLatticePaper.Plane.Induction.TwosSheets
+import FLatticePaper.Plane.Induction.TwosChain
 import FLatticePaper.Construction.NearOneBaseCases
 import FLatticePaper.Construction.BaseCases
 import FLatticePaper.Construction.OffsetTables
