@@ -169,6 +169,8 @@ import FLatticePaper.Tiles.WordFacts3
 import FLatticePaper.Tiles.SuccessorProof
 import FLatticePaper.Tiles.RowConvexCrossing
 import FLatticePaper.MainTheorems
+import FLatticePaper.Plane.HarmonicConstant
+import FLatticePaper.Plane.Induction.AlternateFacts
 import FLatticePaper.Plane.GlobalOdometers
 import FLatticePaper.Construction.BaseCaseRecurrence
 import FLatticePaper.Construction.PropBaseCases
