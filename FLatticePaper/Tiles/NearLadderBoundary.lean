@@ -147,4 +147,10 @@ theorem nladderN_boundary (m : ℕ) :
   rw [hst] at hT
   exact hT
 
+/-- The near-one ladder `nladderN 2` (the base word `2^0`): checked on its finitely many cells. -/
+theorem nladderN_two_boundary :
+    IsBoundaryWordAt (cellTileOf (nladderN 2)) (0, 0)
+      (boundaryWordOf (baseTwoEdges 0).2 ((baseThreeEdges 0).1.map Unit4.mulI)) := by
+  decide
+
 end FLatticePaper.Tiles.NearLadderBoundary
