@@ -202,4 +202,22 @@ theorem stacked_vertical_simply_connected (w : BinaryWord) (hA : IsAlmostPalindr
   rw [hS]
   exact simplyConnectedCells_of_rows hGF.1 hGF.2
 
+/-- The last sentence of `lemma:zero-one-fixed-offsets`, horizontal strings: the stacked string of every almost
+palindrome `w = q ⋯ p` is simply connected. -/
+theorem stacked_horizontal_simply_connected_all (w : BinaryWord) (hA : IsAlmostPalindrome w)
+    (h0 : w.head? = some Letter.q) (hl : w.getLast? = some Letter.p) :
+    SimplyConnectedCells (stackedSites .horizontal w) := by
+  by_cases hn : 3 ≤ w.length
+  · exact stacked_horizontal_simply_connected w hA hn h0 hl
+  · exact stacked_horizontal_simply_connected_short (by omega) hA h0 hl
+
+/-- The last sentence of `lemma:zero-one-fixed-offsets`, vertical strings: the stacked string of every almost
+palindrome `w = p ⋯ q` is simply connected. -/
+theorem stacked_vertical_simply_connected_all (w : BinaryWord) (hA : IsAlmostPalindrome w)
+    (h0 : w.head? = some Letter.p) (hl : w.getLast? = some Letter.q) :
+    SimplyConnectedCells (stackedSites .vertical w) := by
+  by_cases hn : 3 ≤ w.length
+  · exact stacked_vertical_simply_connected w hA hn h0 hl
+  · exact stacked_vertical_simply_connected_short (by omega) hA h0 hl
+
 end FLatticePaper.Tiles
