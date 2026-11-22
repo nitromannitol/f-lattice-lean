@@ -198,6 +198,12 @@ import FLatticePaper.Tiles.StandardBaseWords
 import FLatticePaper.Tiles.StandardHalfTurn
 import FLatticePaper.Tiles.ChildBottomChain
 import FLatticePaper.Tiles.BottomSeam
+import FLatticePaper.Tiles.CellConnectivity
+import FLatticePaper.Tiles.CheckerFree
+import FLatticePaper.Tiles.SeamFinal
+import FLatticePaper.Tiles.SeamSymm
+import FLatticePaper.Tiles.RightSub
+import FLatticePaper.Tiles.OriginCell
 import FLatticePaper.Tiles.FourWalks
 import FLatticePaper.Tiles.RecursionIdentity
 import FLatticePaper.Tiles.RegisterTiles
