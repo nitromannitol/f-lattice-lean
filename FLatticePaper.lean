@@ -119,6 +119,7 @@ import FLatticePaper.Plane.Induction.TwosField
 import FLatticePaper.Plane.Induction.TwosSheets
 import FLatticePaper.Plane.Induction.TwosChain
 import FLatticePaper.Plane.Induction.TwosStrips
+import FLatticePaper.Plane.Induction.TwosZeroPiece
 import FLatticePaper.Construction.NearOneBaseCases
 import FLatticePaper.Construction.BaseCases
 import FLatticePaper.Construction.OffsetTables
