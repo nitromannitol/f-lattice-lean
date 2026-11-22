@@ -361,4 +361,157 @@ theorem rowConvex_step (o : Orientation) (ℓ : ℕ → Letter) (q : ℕ) (hq : 
     rw [hiy]
     exact window_conv o ℓ q hq i hi8 hgf a b ha hb hiy hiyb ⟨haw.1, haw.2.1⟩ ⟨hbw.1, hbw.2.1⟩ x hx1 hx2
 
+/-! ### Rows of the new tile, and the contiguity and linking steps -/
+
+theorem plusStep_snd_le2 (o : Orientation) (l : Letter) : (plusStepO o l).2 ≤ 2 := by
+  cases o <;> cases l <;> decide
+
+theorem zero_mem_rel (o : Orientation) (a : Letter) (ep : Bool) : ((0 : ℤ), (0 : ℤ)) ∈ relCells o a ep := by
+  cases o <;> cases a <;> cases ep <;> decide
+
+theorem one_mem_rel (o : Orientation) (a : Letter) (ep : Bool) : ((0 : ℤ), (1 : ℤ)) ∈ relCells o a ep := by
+  cases o <;> cases a <;> cases ep <;> decide
+
+theorem relRows_lower (o : Orientation) (a : Letter) (ep : Bool) :
+    ∀ d ∈ relCells o a ep, d.2 ≤ 0 → ∀ z ∈ Finset.Icc d.2 0, ∃ e ∈ relCells o a ep, e.2 = z := by
+  cases o <;> cases a <;> cases ep <;> decide
+
+theorem relRows_upper (o : Orientation) (a : Letter) (ep : Bool) :
+    ∀ d ∈ relCells o a ep, 0 ≤ d.2 → ∀ z ∈ Finset.Icc 0 d.2, ∃ e ∈ relCells o a ep, e.2 = z := by
+  cases o <;> cases a <;> cases ep <;> decide
+
+/-- A new cell's row is listed in the summary: the row of the new union is nonempty at index `j`. -/
+theorem newNe_of_rowSet (o : Orientation) (ℓ : ℕ → Letter) (q : ℕ) (hq : 1 ≤ q) (j : ℕ) (hj : j < 8)
+    (z : ℤ) (hz : RowSet (lamO o ℓ (q + 2)) z) (hzj : z = (posO o ℓ (q + 1)).2 + ((j : ℤ) - 4)) :
+    newNe o (stateOf o ℓ (q + 1)) (ℓ (q + 1)) j = true := by
+  obtain ⟨p, hp, hpz⟩ := hz
+  rw [← ne_bridge o ℓ q hq j hj]
+  exact (stateOf_ne_getD o ℓ (q + 1) j hj).trans (decide_eq_true ⟨p, Finset.mem_filter.2 ⟨hp, by omega⟩⟩)
+
+theorem rowsInterval_step (o : Orientation) (ℓ : ℕ → Letter) (q : ℕ) (hq : 1 ≤ q)
+    (hI : RowsInterval (lamO o ℓ (q + 1)) (posO o ℓ q)) :
+    RowsInterval (lamO o ℓ (q + 2)) (posO o ℓ (q + 1)) := by
+  obtain ⟨⟨p1, hp1, hp1y⟩, ⟨p2, hp2, hp2y⟩, hconv⟩ := hI
+  have hsy0 := plusStep_snd_nonneg' o (ℓ (q + 1))
+  have hsy2 := plusStep_snd_le2 o (ℓ (q + 1))
+  have hA2 : (posO o ℓ (q + 1)).2 = (posO o ℓ q).2 + (plusStepO o (ℓ (q + 1))).2 := by
+    rw [posO_new']
+    simp only [Prod.snd_add]
+  have hmono : ∀ p ∈ lamO o ℓ (q + 1), p ∈ lamO o ℓ (q + 2) :=
+    fun p hp => (mem_lamO_succ o ℓ q hq p).2 (Or.inl hp)
+  have hz0 : posO o ℓ (q + 1) - posO o ℓ (q + 1) = ((0 : ℤ), (0 : ℤ)) :=
+    Prod.ext (sub_self _) (sub_self _)
+  have hA0 : posO o ℓ (q + 1) ∈ lamO o ℓ (q + 2) :=
+    (mem_lamO_succ o ℓ q hq _).2 (Or.inr (by rw [hz0]; exact zero_mem_rel _ _ _))
+  have hA1 : posO o ℓ (q + 1) + ((0 : ℤ), (1 : ℤ)) ∈ lamO o ℓ (q + 2) :=
+    (mem_lamO_succ o ℓ q hq _).2 (Or.inr (by rw [add_sub_cancel_left]; exact one_mem_rel _ _ _))
+  refine ⟨⟨posO o ℓ (q + 1), hA0, rfl⟩, ⟨posO o ℓ (q + 1) + ((0 : ℤ), (1 : ℤ)), hA1, rfl⟩, ?_⟩
+  intro a ha b hb hab y hy
+  obtain ⟨hy1, hy2⟩ := Finset.mem_Icc.1 hy
+  by_cases hyB : y ≤ (posO o ℓ q).2 + 1 ∧ (posO o ℓ q).2 ≤ y
+  · rcases (show y = (posO o ℓ q).2 ∨ y = (posO o ℓ q).2 + 1 by omega) with h | h
+    · exact ⟨p1, hmono p1 hp1, by rw [hp1y]; exact h.symm⟩
+    · exact ⟨p2, hmono p2 hp2, by rw [hp2y]; exact h.symm⟩
+  by_cases hlow : y < (posO o ℓ q).2
+  · by_cases haS : a ∈ lamO o ℓ (q + 1)
+    · obtain ⟨p, hp, hpy⟩ := hconv a haS p1 hp1 (by omega) y (Finset.mem_Icc.2 ⟨hy1, by omega⟩)
+      exact ⟨p, hmono p hp, hpy⟩
+    · have haw := new_bounds o ℓ q hq a ha haS
+      have hd := ((mem_lamO_succ o ℓ q hq a).1 ha).resolve_left haS
+      have hdy : (a - posO o ℓ (q + 1)).2 = a.2 - (posO o ℓ (q + 1)).2 := Prod.snd_sub _ _
+      obtain ⟨e, he, hey⟩ := relRows_lower o (ℓ (q + 1)) (flagO o ℓ (q + 1)) _ hd (by omega)
+        (y - (posO o ℓ (q + 1)).2) (Finset.mem_Icc.2 ⟨by omega, by omega⟩)
+      refine ⟨posO o ℓ (q + 1) + e, (mem_lamO_succ o ℓ q hq _).2 (Or.inr ?_), ?_⟩
+      · rw [add_sub_cancel_left]
+        exact he
+      · show (posO o ℓ (q + 1)).2 + e.2 = y
+        rw [hey]
+        omega
+  · have hup : (posO o ℓ q).2 + 2 ≤ y ∨ (posO o ℓ q).2 + 1 < y := by omega
+    by_cases hbS : b ∈ lamO o ℓ (q + 1)
+    · obtain ⟨p, hp, hpy⟩ := hconv p2 hp2 b hbS (by omega) y (Finset.mem_Icc.2 ⟨by omega, hy2⟩)
+      exact ⟨p, hmono p hp, hpy⟩
+    · have hbw := new_bounds o ℓ q hq b hb hbS
+      have hd := ((mem_lamO_succ o ℓ q hq b).1 hb).resolve_left hbS
+      have hdy : (b - posO o ℓ (q + 1)).2 = b.2 - (posO o ℓ (q + 1)).2 := Prod.snd_sub _ _
+      obtain ⟨e, he, hey⟩ := relRows_upper o (ℓ (q + 1)) (flagO o ℓ (q + 1)) _ hd (by omega)
+        (y - (posO o ℓ (q + 1)).2) (Finset.mem_Icc.2 ⟨by omega, by omega⟩)
+      refine ⟨posO o ℓ (q + 1) + e, (mem_lamO_succ o ℓ q hq _).2 (Or.inr ?_), ?_⟩
+      · rw [add_sub_cancel_left]
+        exact he
+      · show (posO o ℓ (q + 1)).2 + e.2 = y
+        rw [hey]
+        omega
+
+theorem rowsLinked_step (o : Orientation) (ℓ : ℕ → Letter) (q : ℕ) (hq : 1 ≤ q)
+    (hL : RowsLinked (lamO o ℓ (q + 1)))
+    (hI0 : RowsInterval (lamO o ℓ (q + 1)) (posO o ℓ q))
+    (hI : RowsInterval (lamO o ℓ (q + 2)) (posO o ℓ (q + 1)))
+    (hok : okS2 o (stateOf o ℓ (q + 1)) (ℓ (q + 1)) = true) :
+    RowsLinked (lamO o ℓ (q + 2)) := by
+  obtain ⟨⟨p1, hp1, hp1y⟩, _, _⟩ := hI0
+  have hsy0 := plusStep_snd_nonneg' o (ℓ (q + 1))
+  have hsy2 := plusStep_snd_le2 o (ℓ (q + 1))
+  have hA2 : (posO o ℓ (q + 1)).2 = (posO o ℓ q).2 + (plusStepO o (ℓ (q + 1))).2 := by
+    rw [posO_new']
+    simp only [Prod.snd_add]
+  have hmono : ∀ p ∈ lamO o ℓ (q + 1), p ∈ lamO o ℓ (q + 2) :=
+    fun p hp => (mem_lamO_succ o ℓ q hq p).2 (Or.inl hp)
+  have hbd2 := lamO_bounds' o ℓ (q + 1) (by omega)
+  intro a ha b hb hab y hy
+  obtain ⟨hy1, hy2⟩ := Finset.mem_Ico.1 hy
+  have hyS : RowSet (lamO o ℓ (q + 2)) y :=
+    hI.2.2 a ha b hb hab y (Finset.mem_Icc.2 ⟨hy1, by omega⟩)
+  have hyS1 : RowSet (lamO o ℓ (q + 2)) (y + 1) :=
+    hI.2.2 a ha b hb hab (y + 1) (Finset.mem_Icc.2 ⟨by omega, by omega⟩)
+  have hb2 := (hbd2 b hb).1
+  by_cases hwin : (posO o ℓ (q + 1)).2 - 4 ≤ y
+  · obtain ⟨k, hk⟩ : ∃ k : ℕ, (k : ℤ) = y - (posO o ℓ (q + 1)).2 + 4 :=
+      ⟨(y - (posO o ℓ (q + 1)).2 + 4).toNat, Int.toNat_of_nonneg (by omega)⟩
+    have hk7 : k < 7 := by omega
+    have hk8 : k < 8 := by omega
+    have hk1 : k + 1 < 8 := by omega
+    have hpair := List.all_eq_true.1 ((Bool.and_eq_true _ _).mp hok).2 k (List.mem_range.2 hk7)
+    unfold pairOk at hpair
+    have hnk : newNe o (stateOf o ℓ (q + 1)) (ℓ (q + 1)) k = true :=
+      newNe_of_rowSet o ℓ q hq k hk8 y hyS (by omega)
+    have hnk1 : newNe o (stateOf o ℓ (q + 1)) (ℓ (q + 1)) (k + 1) = true :=
+      newNe_of_rowSet o ℓ q hq (k + 1) hk1 (y + 1) hyS1 (by push_cast; omega)
+    simp only [hnk, hnk1, Bool.and_self, Bool.not_true, Bool.false_or] at hpair
+    have hshT : (stateOf o ℓ (q + 2)).sh.getD k false = true :=
+      (sh_bridge o ℓ q hq k hk7).trans hpair
+    have hshD := (stateOf_sh_getD o ℓ (q + 1) k hk7).symm.trans hshT
+    obtain ⟨x, hx⟩ := of_decide_eq_true hshD
+    obtain ⟨_, hx1, hx2⟩ := Finset.mem_filter.1 hx
+    have hyk : (posO o ℓ (q + 1)).2 + ((k : ℤ) - 4) = y := by omega
+    rw [hyk] at hx1 hx2
+    exact ⟨x, Finset.mem_image.2 ⟨(x, y), hx1, rfl⟩, hx1, hx2⟩
+  · have haS : a ∈ lamO o ℓ (q + 1) := by
+      by_contra haS
+      have haw := new_bounds o ℓ q hq a ha haS
+      omega
+    obtain ⟨x, hxI, h1, h2⟩ := hL a haS p1 hp1 (by omega) y (Finset.mem_Ico.2 ⟨hy1, by omega⟩)
+    obtain ⟨c, hc, hcx⟩ := Finset.mem_image.1 hxI
+    exact ⟨x, Finset.mem_image.2 ⟨c, hmono c hc, hcx⟩, hmono _ h1, hmono _ h2⟩
+
+/-- The invariant of the induction, for every number of letters at least two. -/
+theorem goodAt_all (o : Orientation) (ℓ : ℕ → Letter) (q : ℕ) (hq : 1 ≤ q) : GoodAt o ℓ q := by
+  induction q, hq using Nat.le_induction with
+  | base => exact good_base o ℓ
+  | succ q hq ih =>
+    have hres : stateOf o ℓ (q + 1) ∈ reachList o := ih.reach
+    have hanyl : ℓ (q + 1) ∈ [Letter.p, Letter.q] := by cases ℓ (q + 1) <;> simp
+    have hok := okS2_all o _ hres _ hanyl
+    have hI' := rowsInterval_step o ℓ q hq ih.ivl
+    refine ⟨?_, ?_, ?_, hI'⟩
+    · show stateOf o ℓ (q + 2) ∈ reachList o
+      rw [stateOf_succ o ℓ q hq]
+      exact reach_trans_all o _ hres _ hanyl
+    · exact rowConvex_step o ℓ q hq ih.conv hok
+    · exact rowsLinked_step o ℓ q hq ih.link ih.ivl hI' hok
+
+theorem lamO_convex_linked (o : Orientation) (ℓ : ℕ → Letter) (q : ℕ) (hq : 1 ≤ q) :
+    RowConvex (lamO o ℓ (q + 1)) ∧ RowsLinked (lamO o ℓ (q + 1)) :=
+  ⟨(goodAt_all o ℓ q hq).conv, (goodAt_all o ℓ q hq).link⟩
+
 end FLatticePaper.Tiles
