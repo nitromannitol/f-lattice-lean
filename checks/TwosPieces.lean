@@ -8,3 +8,4 @@ import FLatticePaper.Plane.Induction.TwosPieces
 #print axioms FLatticePaper.Induction.paperNearLadderValue_lower
 #print axioms FLatticePaper.Induction.lower_tie_piece
 #print axioms FLatticePaper.Induction.band2_tie_piece
+#print axioms FLatticePaper.Induction.upA1_piece
