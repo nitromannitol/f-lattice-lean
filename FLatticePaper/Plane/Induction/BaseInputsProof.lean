@@ -2,6 +2,7 @@ import FLatticePaper.Plane.Induction.BaseRange
 import FLatticePaper.Plane.Induction.StarRangeArgument
 import FLatticePaper.Plane.BellmanRank
 import FLatticePaper.Plane.Induction.Strips
+import FLatticePaper.Plane.Induction.BaseGeometry
 
 /-! Proofs of the inputs of the base range of the S1/S2 window (task 35).
 
@@ -115,21 +116,12 @@ theorem starDiff_zero_of_zero_strip (frame : ChildFrame) {F M : Field}
   rw [h1, h2]
   ring
 
-/-- The shifted-`t` strip input of the bottom H arc: its points have `t` in `[3 − d, n + 2d − 1]`, so that the point and its
-short shift both lie in the zero strip. -/
-structure BottomInputs (frame : ChildFrame) (F : Field) : Prop where
-  tRange : ∀ z, PureBottom frame.closedPolygon z →
-    3 - frame.child.den ≤ frame.tGrade z ∧ frame.tGrade z ≤ frame.child.num + 2 * frame.child.den - 1
-
-/-- `bottomZero` of the base inputs, from the zero strip and the `t`-range of the pure bottom arc. -/
+/-- `bottomZero`: the pure bottom arc lies in the zero strip (`pureBottom_strip`), so `D = 0` there. -/
 theorem bottomZero_of_strip (frame : ChildFrame) {F M : Field} (hS : frame.StripInputs M)
     (hagree : ∀ y ∈ frame.closedPolygon, F y = M y)
-    (hper : HasGeneratorPeriods frame.child F 0 frame.coherentConstantV)
-    (bottom : BottomInputs frame F) :
-    ∀ z, PureBottom frame.closedPolygon z → starDiff F frame.shortShift z = 0 := by
-  intro z hz
-  obtain ⟨h1, h2⟩ := bottom.tRange z hz
-  exact starDiff_zero_of_zero_strip frame hS hagree hper z h1 h2
+    (hper : HasGeneratorPeriods frame.child F 0 frame.coherentConstantV) :
+    ∀ z, PureBottom frame.closedPolygon z → starDiff F frame.shortShift z = 0 := fun z hz =>
+  starDiff_zero_of_zero_strip frame hS hagree hper z (frame.pureBottom_strip hz).1 (frame.pureBottom_strip hz).2
 
 /-- The transverse period drift of `D`: `D(z + V) = D(z) + 2`. -/
 theorem ChildFrame.starDiff_add_transverse_two (frame : ChildFrame) {F : Field} {cU cV : ℤ}
@@ -147,34 +139,27 @@ theorem ChildFrame.starDiff_add_transverse_two (frame : ChildFrame) {F : Field} 
     norm_num
   rw [starDiff_add_transverse hper.2 hgσ z, hgσ2]
 
-/-- The inputs of `base` that the strips do not give: the top arc, the V arcs, the boundary cover and the comparison. -/
-structure StripBaseInputs (frame : ChildFrame) (F : Field) : Prop where
-  topTwo : ∀ z, PureTop frame.closedPolygon z → starDiff F frame.shortShift z = 2
+/-- `topTwo`: a pure top site is the transverse translate `z − V` of a site of the pure zero strip. Its `t`-grade is
+`t(z) + T` (`tGrade_sub_modTransverse`), which lies in the strip by `pureTop_strip`; the drift then gives `D z = 2`. -/
+theorem topTwo_of_strip (frame : ChildFrame) {F M : Field} (hS : frame.StripInputs M)
+    (hagree : ∀ y ∈ frame.closedPolygon, F y = M y)
+    (hper : HasGeneratorPeriods frame.child F 0 frame.coherentConstantV) :
+    ∀ z, PureTop frame.closedPolygon z → starDiff F frame.shortShift z = 2 := by
+  intro z hz
+  have hlo : 3 - frame.child.den ≤ frame.tGrade (z - frame.child.modifiedDeck.transverse) := by
+    rw [frame.tGrade_sub_modTransverse]; exact (frame.pureTop_strip hz).1
+  have hhi : frame.tGrade (z - frame.child.modifiedDeck.transverse) ≤
+      frame.child.num + 2 * frame.child.den - 1 := by
+    rw [frame.tGrade_sub_modTransverse]; exact (frame.pureTop_strip hz).2
+  have h0 := starDiff_zero_of_zero_strip frame hS hagree hper _ hlo hhi
+  have hdrift := frame.starDiff_add_transverse_two hper (z - frame.child.modifiedDeck.transverse)
+  rw [sub_add_cancel] at hdrift
+  rw [hdrift, h0]
+  norm_num
+
+/-- The arc inputs of the base range that the strips do not give: the V arcs (the left and right arcs of `E`). -/
+structure VArcInputs (frame : ChildFrame) (F : Field) : Prop where
   leftRange : ∀ z, OnVArc frame.closedPolygon z →
     starDiff F frame.shortShift z = 0 ∨ starDiff F frame.shortShift z = 1 ∨ starDiff F frame.shortShift z = 2
-  boundaryCover : ∀ z, OnBoundary frame.closedPolygon z →
-    PureBottom frame.closedPolygon z ∨ PureTop frame.closedPolygon z ∨ OnVArc frame.closedPolygon z
-  comparison : (∀ z, OnBoundary frame.closedPolygon z →
-      0 ≤ starDiff F frame.shortShift z ∧ starDiff F frame.shortShift z ≤ 2) →
-    ∀ z ∈ frame.closedPolygon, 0 ≤ starDiff F frame.shortShift z ∧ starDiff F frame.shortShift z ≤ 2
-
-/-- The base inputs, with `bottomZero` from the zero strip. -/
-theorem baseInputsOfStrips (frame : ChildFrame) {F M : Field} (hS : frame.StripInputs M)
-    (hagree : ∀ y ∈ frame.closedPolygon, F y = M y)
-    (hper : HasGeneratorPeriods frame.child F 0 frame.coherentConstantV)
-    (bottom : BottomInputs frame F) (rest : StripBaseInputs frame F) : BaseInputs frame F where
-  bottomZero := bottomZero_of_strip frame hS hagree hper bottom
-  topTwo := rest.topTwo
-  leftRange := rest.leftRange
-  boundaryCover := rest.boundaryCover
-  comparison := rest.comparison
-
-/-- The base range of `D` on the closed polygon, from the strips and the remaining inputs. -/
-theorem base_of_strips (frame : ChildFrame) {F M : Field} (hS : frame.StripInputs M)
-    (hagree : ∀ y ∈ frame.closedPolygon, F y = M y)
-    (hper : HasGeneratorPeriods frame.child F 0 frame.coherentConstantV)
-    (bottom : BottomInputs frame F) (rest : StripBaseInputs frame F) :
-    ∀ z ∈ frame.closedPolygon, 0 ≤ starDiff F frame.shortShift z ∧ starDiff F frame.shortShift z ≤ 2 :=
-  base_of_inputs frame (baseInputsOfStrips frame hS hagree hper bottom rest)
 
 end FLatticePaper.Induction
