@@ -29,6 +29,40 @@ def alternateSigma (word : Word) : Site :=
 noncomputable def alternateTarget (word : Word) : Field :=
   roundedMidpoint (standardField word) (fun s => standardField word (s + alternateSigma word))
 
+/-- The lower-left order of the rows (the order of `lowerLeft`): the lower row first, then the leftmost site. -/
+def siteLexMin (a b : Site) : Site :=
+  if toLex (a.2, a.1) ≤ toLex (b.2, b.1) then a else b
+
+/-- The lower-left site of the raw odd ordinary alternate output, as the minimum of the offsets of its seven copies: the six
+alternate jets and the seventh copy, placed at its jet offset plus the restoration. The donors are llCentered registers, so
+the lower-left of a placed copy is its offset. -/
+def alternateOddLowerLeft (word : Word) : Site :=
+  let seventh : Site := match word.getLast? with
+    | some d => (seventhAlternateJet word.dropLast d .odd).1 + alternateRestoration word .even
+    | none => 0
+  List.foldl siteLexMin (alternateJets word .odd 0).1
+    (seventh :: List.ofFn fun k : Fin 6 => (alternateJets word .odd k).1)
+
+/-- The llCenter chart of the odd alternate output of odd phase: the translation of its register in the prescribed
+coordinates, `δ − LL`, with `δ` the transverse offset of the odd parent minus the kernel offset of the even parent (zero in
+phase zero) and `LL` the lower-left of the raw output. The chart is determined modulo the period `2 (D + dq, N + nq)` of the
+target (the doubled kernel of the mediant of the two parents). -/
+def alternateOddChart (word : Word) : Site :=
+  (if phase word = 1 then (transverseJet (parentsAt word).odd).1 - (kernelJet (parentsAt word).even).1 else 0) -
+    alternateOddLowerLeft word
+
+/-- The transverse slope of the odd alternate output: `(num, −den)` of the odd parent in phase one, zero in phase zero. -/
+def alternateOddSlope (word : Word) : Site :=
+  if phase word = 1 then ((parentsAt word).odd.num, -(parentsAt word).odd.den) else 0
+
+/-- **The odd plane target of an ordinary alternate.** The quarter turn of the alternate midpoint of the swapped word, read in
+the llCenter chart `alternateOddChart`, plus the transverse slope `alternateOddSlope` of the odd parent in phase one. The
+numerical check (scripts/odd_chart_formula.py) finds that every ordinary odd alternate output of length at most three agrees
+with this target, with one constant on its sites. -/
+noncomputable def alternateOddTarget (word : Word) : Field := fun x =>
+  quarterTurnField (alternateTarget (word.map Digit.swapTwoThree)) (x - alternateOddChart word) +
+    ((alternateOddSlope word).1 * x.1 + (alternateOddSlope word).2 * x.2)
+
 /-- On the window `0 ≤ F(s) − G(s) ≤ 2`, the alternate target is the minimum `min(F, G + 1)`. -/
 theorem alternateTarget_eq_min {word : Word} (s : Site)
     (hlo : 0 ≤ standardField word s - standardField word (s + alternateSigma word))
