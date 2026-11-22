@@ -419,4 +419,165 @@ theorem ordinaryAlternate_even_identifies_seventh (parents : TileParents) (befor
       exact ⟨g0 - k, alternateSeventhCopy_agrees_of_donor parents beforePush digit hdonor k hk⟩)
     hslot hcon
 
+/-! ## The second sheet of the standard field of the word, for the digit-two copies -/
+
+/-- The second sheet `C` of the standard even field of a word, built from its odd parent field (the quarter turn of the
+conjugate standard field, as in `planeTarget`). -/
+noncomputable def alternateSheetC (word : Word) : Field := fun z =>
+  (frameAt word).sheetC (quarterTurnField (standardField (conjWord word))) z
+
+/-- **A copy on the second sheet, shifted by `σ`, agrees with the alternate target** on the branch where the gap is at least two:
+the copy is `C(· + σ) + g`, the standard field at `· + σ` is the sheet `C` there (attainment `C ≤ A`, membership in the closed
+polygon and periodicity, all named), and the alternate midpoint is `F(· + σ) + 1`; so the copy agrees with the target with the
+constant `g − 1`. -/
+theorem alternateCopy_of_sheetC_gbranch (word : Word) (proper : ∃ x ∈ word, x ≠ Digit.three)
+    (hper : RespectsPeriodsOn (frameAt word).child (frameAt word).coherentConstantU
+      (frameAt word).coherentConstantV (frameAt word).closedPolygon
+      ((frameAt word).sheetMin (quarterTurnField (standardField (conjWord word)))))
+    {tile : HeightTile Site} {g : ℤ}
+    (htile : tile.Agrees (fun s => alternateSheetC word (s + alternateSigma word)) g)
+    (hwin : ∀ s ∈ tile.sites, 0 ≤ standardField word s - standardField word (s + alternateSigma word) ∧
+      standardField word s - standardField word (s + alternateSigma word) ≤ 2)
+    (hgap : ∀ s ∈ tile.sites, 1 < standardField word s - standardField word (s + alternateSigma word))
+    (hpoly : ∀ s ∈ tile.sites, s + alternateSigma word ∈ (frameAt word).closedPolygon)
+    (hA : ∀ s ∈ tile.sites,
+      (frameAt word).sheetC (quarterTurnField (standardField (conjWord word))) (s + alternateSigma word) ≤
+        (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) (s + alternateSigma word)) :
+    tile.Agrees (alternateTarget word) (g - 1) := by
+  intro s
+  have hF : standardField word (s.1 + alternateSigma word) = alternateSheetC word (s.1 + alternateSigma word) := by
+    rw [standardField_eq_sheetMin proper (hpoly s.1 s.2) hper]
+    unfold ChildFrame.sheetMin alternateSheetC
+    exact min_eq_right (hA s.1 s.2)
+  have hw := hwin s.1 s.2
+  have hg := hgap s.1 s.2
+  rw [alternateTarget_eq_min s.1 hw.1 hw.2, hF, htile s]
+  have hlt : alternateSheetC word (s.1 + alternateSigma word) + 1 ≤ standardField word s.1 := by
+    rw [← hF]
+    omega
+  rw [min_eq_right hlt]
+  ring
+
+/-- The copy in slot three of the digit-two even alternate agrees with the alternate target, given the named identity of the
+copy with `alternateSheetC` shifted by `σ`. -/
+theorem ordinaryAlternate_even_copy_three_of_sheetC (parents : TileParents) (beforePush : Word)
+    (hproper : ∃ x ∈ beforePush ++ [Digit.two], x ≠ Digit.three)
+    (hper : RespectsPeriodsOn (frameAt (beforePush ++ [Digit.two])).child
+      (frameAt (beforePush ++ [Digit.two])).coherentConstantU (frameAt (beforePush ++ [Digit.two])).coherentConstantV
+      (frameAt (beforePush ++ [Digit.two])).closedPolygon
+      ((frameAt (beforePush ++ [Digit.two])).sheetMin
+        (quarterTurnField (standardField (conjWord (beforePush ++ [Digit.two]))))))
+    (hC3 : ∃ g : ℤ, (placedBySlot (alternateJets (beforePush ++ [Digit.two]) .even)
+        (standardSources parents .odd) 3).val.Agrees
+        (fun s => alternateSheetC (beforePush ++ [Digit.two]) (s + alternateSigma (beforePush ++ [Digit.two]))) g)
+    (hwin : ∀ s ∈ (placedBySlot (alternateJets (beforePush ++ [Digit.two]) .even)
+        (standardSources parents .odd) 3).val.sites,
+      0 ≤ standardField (beforePush ++ [Digit.two]) s -
+          standardField (beforePush ++ [Digit.two]) (s + alternateSigma (beforePush ++ [Digit.two])) ∧
+        standardField (beforePush ++ [Digit.two]) s -
+          standardField (beforePush ++ [Digit.two]) (s + alternateSigma (beforePush ++ [Digit.two])) ≤ 2)
+    (hgap : ∀ s ∈ (placedBySlot (alternateJets (beforePush ++ [Digit.two]) .even)
+        (standardSources parents .odd) 3).val.sites,
+      1 < standardField (beforePush ++ [Digit.two]) s -
+          standardField (beforePush ++ [Digit.two]) (s + alternateSigma (beforePush ++ [Digit.two])))
+    (hpoly : ∀ s ∈ (placedBySlot (alternateJets (beforePush ++ [Digit.two]) .even)
+        (standardSources parents .odd) 3).val.sites,
+      s + alternateSigma (beforePush ++ [Digit.two]) ∈ (frameAt (beforePush ++ [Digit.two])).closedPolygon)
+    (hA : ∀ s ∈ (placedBySlot (alternateJets (beforePush ++ [Digit.two]) .even)
+        (standardSources parents .odd) 3).val.sites,
+      (frameAt (beforePush ++ [Digit.two])).sheetC
+          (quarterTurnField (standardField (conjWord (beforePush ++ [Digit.two])))) (s + alternateSigma (beforePush ++ [Digit.two])) ≤
+        (frameAt (beforePush ++ [Digit.two])).sheetA
+          (quarterTurnField (standardField (conjWord (beforePush ++ [Digit.two])))) (s + alternateSigma (beforePush ++ [Digit.two]))) :
+    ∃ g : ℤ, (placedBySlot (alternateJets (beforePush ++ [Digit.two]) .even)
+        (standardSources parents .odd) 3).val.Agrees (alternateTarget (beforePush ++ [Digit.two])) g := by
+  obtain ⟨g, hg⟩ := hC3
+  exact ⟨g - 1, alternateCopy_of_sheetC_gbranch (beforePush ++ [Digit.two]) hproper hper hg hwin hgap hpoly hA⟩
+
+/-- **The even ordinary alternate of a word ending in digit two agrees with its plane target.** Discharged: the first copy
+(`ordinaryAlternate_even_first_agrees`), the fourth copy (`ordinaryAlternate_even_copy_four_agrees`), the third copy from the
+named identity of the copy with `alternateSheetC` shifted by `σ` (`ordinaryAlternate_even_copy_three_of_sheetC`), and the seventh
+copy from the donor induction and the named midpoint identity (`alternateSeventhCopy_agrees_of_donor`). Named: the standard
+slot-zero, slot-two and periodicity inputs, the windows and sheet facts of the slots three and four, the copy identity of slot
+three, the donor induction hypothesis and the midpoint identity of the seventh copy, and the slots one, two and five. -/
+theorem ordinaryAlternate_even_identifies_two (parents : TileParents) (beforePush : Word)
+    (hnb : ¬ FLatticePaper.Tiles.Standard.IsBase (beforePush ++ [Digit.two]))
+    (hstd : ∃ g : ℤ, (ordinaryStandardCopy parents (beforePush ++ [Digit.two]) .even 0).val.Agrees
+      (standardField (beforePush ++ [Digit.two])) g)
+    (hwin : ∀ s ∈ (ordinaryStandardCopy parents (beforePush ++ [Digit.two]) .even 0).val.sites,
+      0 ≤ standardField (beforePush ++ [Digit.two]) s -
+          standardField (beforePush ++ [Digit.two]) (s + alternateSigma (beforePush ++ [Digit.two])) ∧
+        standardField (beforePush ++ [Digit.two]) s -
+          standardField (beforePush ++ [Digit.two]) (s + alternateSigma (beforePush ++ [Digit.two])) ≤ 1)
+    (hodd : ∃ g : ℤ, parents.odd.val.Agrees
+      (quarterTurnField (standardField (conjWord (beforePush ++ [Digit.two])))) g)
+    (hper : RespectsPeriodsOn (frameAt (beforePush ++ [Digit.two])).child
+      (frameAt (beforePush ++ [Digit.two])).coherentConstantU (frameAt (beforePush ++ [Digit.two])).coherentConstantV
+      (frameAt (beforePush ++ [Digit.two])).closedPolygon
+      ((frameAt (beforePush ++ [Digit.two])).sheetMin
+        (quarterTurnField (standardField (conjWord (beforePush ++ [Digit.two]))))))
+    (hE : ∀ s ∈ (ordinaryStandardCopy parents (beforePush ++ [Digit.two]) .even 2).val.sites,
+      s ∈ (frameAt (beforePush ++ [Digit.two])).closedPolygon)
+    (hA : ∀ s ∈ (ordinaryStandardCopy parents (beforePush ++ [Digit.two]) .even 2).val.sites,
+      (frameAt (beforePush ++ [Digit.two])).sheetA
+          (quarterTurnField (standardField (conjWord (beforePush ++ [Digit.two])))) s ≤
+        (frameAt (beforePush ++ [Digit.two])).sheetC
+          (quarterTurnField (standardField (conjWord (beforePush ++ [Digit.two])))) s)
+    (hwin4 : ∀ s ∈ (ordinaryStandardCopy parents (beforePush ++ [Digit.two]) .even 2).val.sites,
+      0 ≤ standardField (beforePush ++ [Digit.two]) s -
+          standardField (beforePush ++ [Digit.two]) (s + alternateSigma (beforePush ++ [Digit.two])) ∧
+        standardField (beforePush ++ [Digit.two]) s -
+          standardField (beforePush ++ [Digit.two]) (s + alternateSigma (beforePush ++ [Digit.two])) ≤ 1)
+    (hC3 : ∃ g : ℤ, (placedBySlot (alternateJets (beforePush ++ [Digit.two]) .even)
+        (standardSources parents .odd) 3).val.Agrees
+        (fun s => alternateSheetC (beforePush ++ [Digit.two]) (s + alternateSigma (beforePush ++ [Digit.two]))) g)
+    (hwin3 : ∀ s ∈ (placedBySlot (alternateJets (beforePush ++ [Digit.two]) .even)
+        (standardSources parents .odd) 3).val.sites,
+      0 ≤ standardField (beforePush ++ [Digit.two]) s -
+          standardField (beforePush ++ [Digit.two]) (s + alternateSigma (beforePush ++ [Digit.two])) ∧
+        standardField (beforePush ++ [Digit.two]) s -
+          standardField (beforePush ++ [Digit.two]) (s + alternateSigma (beforePush ++ [Digit.two])) ≤ 2)
+    (hgap3 : ∀ s ∈ (placedBySlot (alternateJets (beforePush ++ [Digit.two]) .even)
+        (standardSources parents .odd) 3).val.sites,
+      1 < standardField (beforePush ++ [Digit.two]) s -
+          standardField (beforePush ++ [Digit.two]) (s + alternateSigma (beforePush ++ [Digit.two])))
+    (hpoly3 : ∀ s ∈ (placedBySlot (alternateJets (beforePush ++ [Digit.two]) .even)
+        (standardSources parents .odd) 3).val.sites,
+      s + alternateSigma (beforePush ++ [Digit.two]) ∈ (frameAt (beforePush ++ [Digit.two])).closedPolygon)
+    (hA3 : ∀ s ∈ (placedBySlot (alternateJets (beforePush ++ [Digit.two]) .even)
+        (standardSources parents .odd) 3).val.sites,
+      (frameAt (beforePush ++ [Digit.two])).sheetC
+          (quarterTurnField (standardField (conjWord (beforePush ++ [Digit.two])))) (s + alternateSigma (beforePush ++ [Digit.two])) ≤
+        (frameAt (beforePush ++ [Digit.two])).sheetA
+          (quarterTurnField (standardField (conjWord (beforePush ++ [Digit.two])))) (s + alternateSigma (beforePush ++ [Digit.two])))
+    (context : String) {g0 : ℤ}
+    (hdonor : parents.alternateOdd.val.Agrees (alternateOddTarget beforePush) g0)
+    (hmid : ¬ FLatticePaper.Tiles.Standard.IsBase (beforePush ++ [Digit.two]) → ∃ k : ℤ,
+      ∀ s ∈ (alternateSeventhCopy parents beforePush Digit.two).val.sites,
+        alternateTarget (beforePush ++ [Digit.two]) s =
+          alternateOddTarget beforePush
+              (s - ((seventhAlternateJet beforePush Digit.two .even).1 +
+                alternateRestoration (beforePush ++ [Digit.two]) .odd)) +
+            ((seventhAlternateJet beforePush Digit.two .even).2.1 * s.1 +
+              (seventhAlternateJet beforePush Digit.two .even).2.2 * s.2) + k)
+    (hslot : ∀ s ∈ afterSeventhAlternate .even, s ≠ 4 → s ≠ 3 → ∃ g : ℤ,
+      (placedBySlot (alternateJets (beforePush ++ [Digit.two]) .even) (standardSources parents .odd) s).val.Agrees
+        (alternateTarget (beforePush ++ [Digit.two])) g)
+    (hcon : HeightTile.OrderedContacts (ordinaryAlternateSchedule parents beforePush Digit.two .even).first.val.sites
+      (ordinaryAlternateSchedule parents beforePush Digit.two .even).copies) :
+    ∃ result, (ordinaryAlternateSchedule parents beforePush Digit.two .even).eval .tile context = .ok result ∧
+      ∃ g : ℤ, result.val.Agrees
+        (fun site => alternateTarget (beforePush ++ [Digit.two]) (site +
+          ((ordinaryAlternateSchedule parents beforePush Digit.two .even).raw hcon).val.boxOrigin
+            ((ordinaryAlternateSchedule parents beforePush Digit.two .even).raw hcon).property)) g :=
+  ordinaryAlternate_even_identifies_seventh parents beforePush Digit.two (Or.inr rfl) hnb hstd hwin hodd hper hE hA hwin4
+    context hdonor hmid
+    (fun s hs hs4 => by
+      by_cases h3 : s = 3
+      · subst h3
+        exact ordinaryAlternate_even_copy_three_of_sheetC parents beforePush
+          (exists_proper_of_even_digit beforePush Digit.two (Or.inr rfl)) hper hC3 hwin3 hgap3 hpoly3 hA3
+      · exact hslot s hs hs4 h3)
+    hcon
+
 end FLatticePaper.Construction
