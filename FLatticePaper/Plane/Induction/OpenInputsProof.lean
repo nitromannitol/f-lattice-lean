@@ -107,4 +107,35 @@ theorem i2_pos_of_root_stars {word : Word} (h : ∃ x ∈ word, x ≠ Digit.thre
       (frameAt word).sGrade z ≤ 2 * ((frameAt word).child.den + (frameAt word).child.num) - 1)
     (fun z hz' => hcover z hz'.1 hz'.2) z ⟨hz, hs⟩
 
+/-- (I3), binarity and recurrence of `min(A, C)`. The named inputs are the unit increments (I3a) and the two
+permit systems with their restricted-fort conditions; the ranks come from `constrainedRank_of_variant`, and the
+binarity from the admission lemma `sheetMin_binary_recurrent_of_chain`. -/
+theorem i3_binary_of_local_inputs {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
+    (hG : (frameAt (conjWord word)).Packet (standardField (conjWord word)))
+    (hunit : ∀ c i : Site, FLatticePaper.Edge i c →
+      -1 ≤ sheetChainPotential word (standardField (conjWord word)) i -
+          sheetChainPotential word (standardField (conjWord word)) c ∧
+        sheetChainPotential word (standardField (conjWord word)) i -
+          sheetChainPotential word (standardField (conjWord word)) c ≤ 1)
+    (hlocA : PermitLocal (quarterTurnField (standardField (conjWord word)))
+      (fun c i => sheetChainPotential word (standardField (conjWord word)) i ≤
+        sheetChainPotential word (standardField (conjWord word)) c))
+    (hnoA : RestrictedNoFort (quarterTurnField (standardField (conjWord word))) (i3aGrade word)
+      (fun c i => sheetChainPotential word (standardField (conjWord word)) i ≤
+        sheetChainPotential word (standardField (conjWord word)) c))
+    (hlocC : PermitLocal (quarterTurnField (standardField (conjWord word)))
+      (fun c i => sheetChainPotential word (standardField (conjWord word)) (c + (frameAt word).sheetOffset) ≤
+        sheetChainPotential word (standardField (conjWord word)) (i + (frameAt word).sheetOffset)))
+    (hnoC : RestrictedNoFort (quarterTurnField (standardField (conjWord word))) (frameAt word).tGrade
+      (fun c i => sheetChainPotential word (standardField (conjWord word)) (c + (frameAt word).sheetOffset) ≤
+        sheetChainPotential word (standardField (conjWord word)) (i + (frameAt word).sheetOffset))) :
+    (∀ z ∈ (frameAt word).closedPolygon,
+        laplacian ((frameAt word).sheetMin (quarterTurnField (standardField (conjWord word)))) z = -1 ∨
+          laplacian ((frameAt word).sheetMin (quarterTurnField (standardField (conjWord word)))) z = 0) ∧
+      Recurrent ((frameAt word).sheetMin (quarterTurnField (standardField (conjWord word)))) := by
+  obtain ⟨rankA, hrankA⟩ := constrainedRank_of_variant h hG (i3aGrade_deck h hG) (permitA_invariant h hG) hlocA hnoA
+  obtain ⟨rankC, hrankC⟩ := constrainedRank_of_variant h hG (tGrade_add_odd_deck word) (permitC_invariant h hG)
+    hlocC hnoC
+  exact sheetMin_binary_recurrent_of_chain h hG hunit rankA rankC hrankA hrankC
+
 end FLatticePaper.Induction
