@@ -164,6 +164,7 @@ lake env lean checks/AlternateAgreement.lean
 lake env lean checks/AlternateIdentification.lean
 lake env lean checks/OddChartParity.lean
 lake env lean checks/OddAlternateCopies.lean
+lake env lean checks/OddShear.lean
 lake env lean checks/DeckCoverage.lean
 lake env lean checks/OrdinaryStandard.lean
 lake env lean checks/MissingSites.lean
