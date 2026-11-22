@@ -174,6 +174,7 @@ import FLatticePaper.Tiles.StackedStringConnected
 import FLatticePaper.Tiles.StackFinalAssembly
 import FLatticePaper.Tiles.TilingCriteria
 import FLatticePaper.Tiles.StandardTiles
+import FLatticePaper.Tiles.BottomEdges
 import FLatticePaper.Tiles.AlternateTiles
 import FLatticePaper.Tiles.LCorrections
 import FLatticePaper.Tiles.AlternateConstructor
