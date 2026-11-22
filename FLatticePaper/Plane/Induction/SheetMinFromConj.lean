@@ -47,7 +47,7 @@ theorem sheetMin_binary_recurrent_of_chain {word : Word} (h : ∃ x ∈ word, x 
     (hrankC : IsConstrainedBurningRank (quarterTurnField (standardField (conjWord word))) rankC
       (fun c i => sheetChainPotential word (standardField (conjWord word)) (c + (frameAt word).sheetOffset) ≤
         sheetChainPotential word (standardField (conjWord word)) (i + (frameAt word).sheetOffset))) :
-    (∀ z ∈ (frameAt word).closedPolygon,
+    (∀ z,
         laplacian ((frameAt word).sheetMin (quarterTurnField (standardField (conjWord word)))) z = -1 ∨
           laplacian ((frameAt word).sheetMin (quarterTurnField (standardField (conjWord word)))) z = 0) ∧
       Recurrent ((frameAt word).sheetMin (quarterTurnField (standardField (conjWord word)))) := by
@@ -107,6 +107,6 @@ theorem sheetMin_binary_recurrent_of_chain {word : Word} (h : ∃ x ∈ word, x 
     simp only [e1] at h1
     exact h1
   obtain ⟨hbin, hrec⟩ := ChildFrame.sheetMin_binary_recurrent (frameAt word) hunitAC hA hC
-  exact ⟨fun z _ => hbin z, hrec⟩
+  exact ⟨hbin, hrec⟩
 
 end FLatticePaper.Induction

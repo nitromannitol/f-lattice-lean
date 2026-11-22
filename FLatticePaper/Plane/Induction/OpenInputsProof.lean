@@ -136,6 +136,7 @@ theorem i3_binary_of_local_inputs {word : Word} (h : ∃ x ∈ word, x ≠ Digit
   obtain ⟨rankA, hrankA⟩ := constrainedRank_of_variant h hG (i3aGrade_deck h hG) (permitA_invariant h hG) hlocA hnoA
   obtain ⟨rankC, hrankC⟩ := constrainedRank_of_variant h hG (tGrade_add_odd_deck word) (permitC_invariant h hG)
     hlocC hnoC
-  exact sheetMin_binary_recurrent_of_chain h hG hunit rankA rankC hrankA hrankC
+  obtain ⟨hbin, hrec⟩ := sheetMin_binary_recurrent_of_chain h hG hunit rankA rankC hrankA hrankC
+  exact ⟨fun z _ => hbin z, hrec⟩
 
 end FLatticePaper.Induction
