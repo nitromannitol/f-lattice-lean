@@ -17,3 +17,8 @@ import FLatticePaper.Construction.OddShear
 #print axioms FLatticePaper.Construction.alternateOddRawTarget_eq_planeTarget_phase_zero
 #print axioms FLatticePaper.Construction.ordinaryAlternate_odd_first_agrees_phase_zero
 #print axioms FLatticePaper.Construction.ordinaryAlternate_odd_copy_four_agrees_phase_zero
+#print axioms FLatticePaper.Construction.min_shift_aux
+#print axioms FLatticePaper.Construction.alternateOddRawTarget_eq_gPlane_add_min
+#print axioms FLatticePaper.Construction.HeightTile.Agrees.alternateOddRawTarget_of_gPlane
+#print axioms FLatticePaper.Construction.alternateOddRawTarget_eq_planeTarget_chart_min
+#print axioms FLatticePaper.Construction.HeightTile.Agrees.alternateOddRawTarget_of_coincident

@@ -314,4 +314,135 @@ theorem ordinaryAlternate_odd_copy_four_agrees_phase_zero (parents : TileParents
       min_eq_left (by linarith [h'.2]), add_zero]
   simpa using ordinaryAlternate_odd_copy_four_agrees parents word h hstd hshear
 
+/-! ## The copies by their standard type: the G-branch, the chart shear on the whole window, and the coincident copies -/
+
+theorem min_shift_aux (a b : ℤ) : min a (b + 1) = b + min (a - b) 1 := by
+  omega
+
+/-- The G-branch standard target of an odd word: the standard field of the swapped word at the quarter-turned point translated by
+`σ`, with the harmonic grid and the transverse slope of the raw target. -/
+noncomputable def alternateOddGPlane (word : Word) : Field := fun x =>
+  standardField (word.map Digit.swapTwoThree)
+      (QuarterTurn.counterclockwise.mapSite (0, -1) (x - alternateOddDelta word) +
+        alternateSigma (word.map Digit.swapTwoThree)) +
+    harmonicGrid (x - alternateOddDelta word) +
+    ((alternateOddSlope word).1 * x.1 + (alternateOddSlope word).2 * x.2)
+
+/-- **The raw odd target is the G-branch target plus the capped gap**, on the window `0 ≤ gap ≤ 2` (both phases): the alternate target
+is `F(· + σ) + min(gap, 1)` there, so the raw target is `alternateOddGPlane + min(gap, 1)` with no constant. -/
+theorem alternateOddRawTarget_eq_gPlane_add_min (word : Word) (x : Site)
+    (hlo : 0 ≤ shearGap word x) (hhi : shearGap word x ≤ 2) :
+    alternateOddRawTarget word x = alternateOddGPlane word x + min (shearGap word x) 1 := by
+  have hmin := alternateTarget_eq_min (word := word.map Digit.swapTwoThree)
+    (QuarterTurn.counterclockwise.mapSite (0, -1) (x - alternateOddDelta word)) hlo hhi
+  unfold alternateOddRawTarget alternateOddGPlane quarterTurnField
+  rw [hmin, min_shift_aux]
+  unfold shearGap
+  ring
+
+/-- **A copy on the G-branch agrees with the raw odd target**, with constant `g − 1`, when the gap of its sites lies in `[1, 2]` (there
+the capped gap is one). -/
+theorem HeightTile.Agrees.alternateOddRawTarget_of_gPlane {word : Word} {tile : HeightTile Site} {g : ℤ}
+    (h : tile.Agrees (alternateOddGPlane word) g)
+    (hwin : ∀ s ∈ tile.sites, 1 ≤ shearGap word s ∧ shearGap word s ≤ 2) :
+    tile.Agrees (alternateOddRawTarget word) (g - 1) := by
+  intro s
+  have hw := hwin s.1 s.2
+  rw [h s, alternateOddRawTarget_eq_gPlane_add_min word s.1 (by linarith [hw.1]) hw.2, min_eq_right hw.1]
+  ring
+
+/-- **The chart shear on the whole window** (phase one): on the sites where the gap lies in `[0, 2]`, the raw odd target is the
+standard odd target at the chart-shifted point, plus `min(gap, 1)` and a constant independent of the site. -/
+theorem alternateOddRawTarget_eq_planeTarget_chart_min (word : Word) (hph : phase word = 1)
+    (hpk : (frameAt (word.map Digit.swapTwoThree)).Packet (standardField (word.map Digit.swapTwoThree))) :
+    ∃ c : ℤ, ∀ x : Site, 0 ≤ shearGap word x → shearGap word x ≤ 2 →
+      alternateOddRawTarget word x = planeTarget word .odd (x - oddStdChart word) + min (shearGap word x) 1 + c := by
+  obtain ⟨ch, hch⟩ := harmonicGrid_shift (parentsAt word).odd.num (parentsAt word).odd.den
+  refine ⟨ch - ((parentsAt word).odd.num * (parentsAt word).even.den - (parentsAt word).odd.den * (parentsAt word).even.num),
+    fun x hg1 hg2 => ?_⟩
+  have hδ : alternateOddDelta word = ((parentsAt word).odd.num - (parentsAt word).odd.den - (parentsAt word).even.den,
+      (parentsAt word).odd.num + (parentsAt word).odd.den - (parentsAt word).even.num) := by
+    unfold alternateOddDelta
+    simp [hph, transverseJet, kernelJet]
+  have hchart : oddStdChart word = (-(parentsAt word).even.den, -(parentsAt word).even.num) := by
+    unfold oddStdChart
+    simp [hph, kernelJet]
+  have hslope : alternateOddSlope word = ((parentsAt word).odd.num, -(parentsAt word).odd.den) := by
+    unfold alternateOddSlope
+    simp [hph]
+  have hzrot : QuarterTurn.counterclockwise.mapSite (0, -1) (x - alternateOddDelta word) +
+      (-((parentsAt word).odd.num + (parentsAt word).odd.den), (parentsAt word).odd.num - (parentsAt word).odd.den) =
+      QuarterTurn.counterclockwise.mapSite (0, -1) (x - oddStdChart word) := by
+    rw [quarterTurn_site, quarterTurn_site, hδ, hchart]
+    ext
+    · simp
+      ring
+    · simp
+      ring
+  have hσ := alternateSigma_eq_rot_add_period word hph
+  have hper : ∀ y : Site, standardField (word.map Digit.swapTwoThree)
+      (y + ((frameAt (word.map Digit.swapTwoThree)).child.den, (frameAt (word.map Digit.swapTwoThree)).child.num)) =
+      standardField (word.map Digit.swapTwoThree) y :=
+    fun y => standardField_child_kernel_period _ hpk y
+  have hFσ : standardField (word.map Digit.swapTwoThree)
+      (QuarterTurn.counterclockwise.mapSite (0, -1) (x - alternateOddDelta word) + alternateSigma (word.map Digit.swapTwoThree)) =
+      standardField (word.map Digit.swapTwoThree)
+        (QuarterTurn.counterclockwise.mapSite (0, -1) (x - alternateOddDelta word) +
+          (-((parentsAt word).odd.num + (parentsAt word).odd.den), (parentsAt word).odd.num - (parentsAt word).odd.den)) := by
+    rw [hσ, ← add_assoc]
+    exact hper _
+  have hS : standardField (word.map Digit.swapTwoThree)
+      (QuarterTurn.counterclockwise.mapSite (0, -1) (x - alternateOddDelta word) + alternateSigma (word.map Digit.swapTwoThree)) =
+      standardField (word.map Digit.swapTwoThree) (QuarterTurn.counterclockwise.mapSite (0, -1) (x - oddStdChart word)) := by
+    rw [hFσ, hzrot]
+  have hh : harmonicGrid (x - alternateOddDelta word) =
+      harmonicGrid (x - oddStdChart word) -
+        ((parentsAt word).odd.num * (x - oddStdChart word).1 - (parentsAt word).odd.den * (x - oddStdChart word).2) + ch := by
+    rw [← hch]
+    congr 1
+    rw [hδ, hchart]
+    ext
+    · simp
+      ring
+    · simp
+      ring
+  have hmin : alternateTarget (word.map Digit.swapTwoThree)
+      (QuarterTurn.counterclockwise.mapSite (0, -1) (x - alternateOddDelta word)) =
+      standardField (word.map Digit.swapTwoThree)
+          (QuarterTurn.counterclockwise.mapSite (0, -1) (x - alternateOddDelta word) +
+            alternateSigma (word.map Digit.swapTwoThree)) +
+        min (standardField (word.map Digit.swapTwoThree)
+            (QuarterTurn.counterclockwise.mapSite (0, -1) (x - alternateOddDelta word)) -
+          standardField (word.map Digit.swapTwoThree)
+            (QuarterTurn.counterclockwise.mapSite (0, -1) (x - alternateOddDelta word) +
+              alternateSigma (word.map Digit.swapTwoThree))) 1 := by
+    rw [alternateTarget_eq_min (word := word.map Digit.swapTwoThree)
+      (QuarterTurn.counterclockwise.mapSite (0, -1) (x - alternateOddDelta word)) hg1 hg2, min_shift_aux]
+  unfold shearGap
+  unfold alternateOddRawTarget
+  rw [planeTarget_odd_eq]
+  unfold quarterTurnField
+  rw [hmin, hS, hh, hslope]
+  simp only [hchart, Prod.fst_sub, Prod.snd_sub]
+  ring
+
+/-- **A coincident copy agrees with the raw odd target** (phase one). A copy that is the standard odd target at zero shift, on the
+window `0 ≤ gap ≤ 2`, agrees with the raw target when the chart-shifted target plus the capped gap is the zero-shift target plus a
+constant `κ` on its sites (the branch identity, named). The agreement constant is `g − κ − c`. -/
+theorem HeightTile.Agrees.alternateOddRawTarget_of_coincident {word : Word} (hph : phase word = 1)
+    (hpk : (frameAt (word.map Digit.swapTwoThree)).Packet (standardField (word.map Digit.swapTwoThree)))
+    {tile : HeightTile Site} {g κ : ℤ}
+    (htile : tile.Agrees (planeTarget word .odd) g)
+    (hwin : ∀ s ∈ tile.sites, 0 ≤ shearGap word s ∧ shearGap word s ≤ 2)
+    (hbr : ∀ s ∈ tile.sites, planeTarget word .odd (s - oddStdChart word) + min (shearGap word s) 1 =
+      planeTarget word .odd s + κ) :
+    ∃ k : ℤ, tile.Agrees (alternateOddRawTarget word) k := by
+  obtain ⟨c, hc⟩ := alternateOddRawTarget_eq_planeTarget_chart_min word hph hpk
+  refine ⟨g - κ - c, ?_⟩
+  intro s
+  have hw := hwin s.1 s.2
+  have hb := hbr s.1 s.2
+  rw [htile s, hc s.1 hw.1 hw.2, hb]
+  ring
+
 end FLatticePaper.Construction
