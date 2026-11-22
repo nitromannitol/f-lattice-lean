@@ -208,4 +208,120 @@ theorem bdry_S_iff (T : CellTile) (x k : ℤ) :
     · simpa [gOne] using hnot
     · simp [gI]
 
+/-! ### No-EW words of the four-arc loop -/
+
+theorem noEW_of_no_negOne : ∀ u : F2Word, (∀ y ∈ u, y ≠ .negOne) → NoEWChain u
+  | [], _ => trivial
+  | [_], _ => trivial
+  | x :: y :: u, h => by
+    show NoEWAdj x y ∧ NoEWChain (y :: u)
+    refine ⟨?_, noEW_of_no_negOne (y :: u) (fun z hz => h z (List.mem_cons_of_mem _ hz))⟩
+    show ¬((x = .one ∧ y = .negOne) ∨ (x = .negOne ∧ y = .one))
+    rintro (⟨-, hy⟩ | ⟨hx, -⟩)
+    · exact h y (by simp) hy
+    · exact h x (by simp) hx
+
+theorem noEW_of_no_one : ∀ u : F2Word, (∀ y ∈ u, y ≠ .one) → NoEWChain u
+  | [], _ => trivial
+  | [_], _ => trivial
+  | x :: y :: u, h => by
+    show NoEWAdj x y ∧ NoEWChain (y :: u)
+    refine ⟨?_, noEW_of_no_one (y :: u) (fun z hz => h z (List.mem_cons_of_mem _ hz))⟩
+    show ¬((x = .one ∧ y = .negOne) ∨ (x = .negOne ∧ y = .one))
+    rintro (⟨hx, -⟩ | ⟨-, hy⟩)
+    · exact h x (by simp) hx
+    · exact h y (by simp) hy
+
+theorem noEW_append : ∀ u v : F2Word, NoEWChain u → NoEWChain v →
+    (∀ y ∈ u.getLast?, ∀ x ∈ v.head?, NoEWAdj y x) → NoEWChain (u ++ v)
+  | [], v, _, hv, _ => by simpa using hv
+  | [_], [], _, _, _ => trivial
+  | [x], y :: v, _, hv, h => by
+    show NoEWAdj x y ∧ NoEWChain (y :: v)
+    exact ⟨h x (by simp) y (by simp), hv⟩
+  | x :: y :: u, v, hu, hv, h => by
+    obtain ⟨hxy, hu'⟩ : NoEWAdj x y ∧ NoEWChain (y :: u) := hu
+    show NoEWAdj x y ∧ NoEWChain (y :: (u ++ v))
+    refine ⟨hxy, ?_⟩
+    have := noEW_append (y :: u) v hu' hv (fun z hz w hw => h z (by simpa using hz) w hw)
+    simpa using this
+
+/-! ### The walk of the four-arc loop, edge type by edge type -/
+
+theorem FF_eq_colN (u : F2Word) (j : ℤ) (hj0 : 0 ≤ j) (hj : j < cntI u) : FF u j = colN u (0, 0) j := by
+  unfold FF
+  rw [if_neg (not_lt.mpr hj0), if_pos hj]
+
+/-- The walk of a word with letters `one`, `i`, `negOne` has no south edge. -/
+theorem no_S (w1 w2 : F2Word) (hU : ∀ x ∈ w1 ++ w2, x = .one ∨ x = .i ∨ x = .negOne) (a b : ℤ) :
+    ((a, b + 1), (a, b)) ∉ edgesFrom (0, 0) (w1 ++ w2) := by
+  intro h
+  obtain ⟨x, hx, hv⟩ := edge_shape (0, 0) (w1 ++ w2) _ h
+  rcases hU x hx with rfl | rfl | rfl
+  all_goals simp [Unit4.vec, Prod.ext_iff] at hv
+  all_goals omega
+
+theorem walk_E (w1 w2 : F2Word) (RD : RunData (w1 ++ w2)) (c : ℤ)
+    (hz : F2Word.sum (w1 ++ w2) = (c, cntI (w1 ++ w2))) (q k : ℤ) :
+    ((q, k), (q + 1, k)) ∈ edgesFrom (0, 0) (boundaryWordOf w1 w2) ↔
+      ((0 ≤ k ∧ k ≤ cntI (w1 ++ w2) ∧ FF (w1 ++ w2) (k - 1) ≤ q ∧ q < FF (w1 ++ w2) k) ∨
+        (0 ≤ cntI (w1 ++ w2) - k ∧ cntI (w1 ++ w2) - k ≤ cntI (w1 ++ w2) ∧
+          FF (w1 ++ w2) (cntI (w1 ++ w2) - k) ≤ c - q - 1 ∧
+          c - q - 1 < FF (w1 ++ w2) (cntI (w1 ++ w2) - k - 1))) := by
+  have key : halfE (c, cntI (w1 ++ w2)) ((q, k), (q + 1, k)) =
+      ((c - (q + 1) + 1, cntI (w1 ++ w2) - k), (c - (q + 1), cntI (w1 ++ w2) - k)) := by
+    ext <;> simp [halfE]
+    all_goals ring
+  rw [mem_walk_iff, hz, key, show c - q - 1 = c - (q + 1) by ring]
+  constructor
+  · rintro (h | h)
+    · exact Or.inl ((RD.E q k).1 h)
+    · exact Or.inr ((RD.W _ _).1 h)
+  · rintro (h | h)
+    · exact Or.inl ((RD.E q k).2 h)
+    · exact Or.inr ((RD.W _ _).2 h)
+
+theorem walk_W (w1 w2 : F2Word) (RD : RunData (w1 ++ w2)) (c : ℤ)
+    (hz : F2Word.sum (w1 ++ w2) = (c, cntI (w1 ++ w2))) (q k : ℤ) :
+    ((q + 1, k), (q, k)) ∈ edgesFrom (0, 0) (boundaryWordOf w1 w2) ↔
+      ((0 ≤ k ∧ k ≤ cntI (w1 ++ w2) ∧ FF (w1 ++ w2) k ≤ q ∧ q < FF (w1 ++ w2) (k - 1)) ∨
+        (0 ≤ cntI (w1 ++ w2) - k ∧ cntI (w1 ++ w2) - k ≤ cntI (w1 ++ w2) ∧
+          FF (w1 ++ w2) (cntI (w1 ++ w2) - k - 1) ≤ c - q - 1 ∧
+          c - q - 1 < FF (w1 ++ w2) (cntI (w1 ++ w2) - k))) := by
+  have key : halfE (c, cntI (w1 ++ w2)) ((q + 1, k), (q, k)) =
+      ((c - (q + 1), cntI (w1 ++ w2) - k), (c - (q + 1) + 1, cntI (w1 ++ w2) - k)) := by
+    ext <;> simp [halfE]
+    all_goals ring
+  rw [mem_walk_iff, hz, key, show c - q - 1 = c - (q + 1) by ring]
+  constructor
+  · rintro (h | h)
+    · exact Or.inl ((RD.W q k).1 h)
+    · exact Or.inr ((RD.E _ _).1 h)
+  · rintro (h | h)
+    · exact Or.inl ((RD.W q k).2 h)
+    · exact Or.inr ((RD.E _ _).2 h)
+
+theorem walk_N (w1 w2 : F2Word) (RD : RunData (w1 ++ w2)) (hU : ∀ x ∈ w1 ++ w2, x = .one ∨ x = .i ∨ x = .negOne)
+    (c : ℤ) (hz : F2Word.sum (w1 ++ w2) = (c, cntI (w1 ++ w2))) (x k : ℤ) :
+    ((x, k), (x, k + 1)) ∈ edgesFrom (0, 0) (boundaryWordOf w1 w2) ↔
+      (0 ≤ k ∧ k < cntI (w1 ++ w2) ∧ x = colN (w1 ++ w2) (0, 0) k) := by
+  have key : halfE (c, cntI (w1 ++ w2)) ((x, k), (x, k + 1)) =
+      ((c - x, cntI (w1 ++ w2) - k - 1 + 1), (c - x, cntI (w1 ++ w2) - k - 1)) := by
+    ext <;> simp [halfE]
+    all_goals ring
+  rw [mem_walk_iff, hz, key, or_iff_left (no_S w1 w2 hU (c - x) (cntI (w1 ++ w2) - k - 1))]
+  exact RD.N x k
+
+theorem walk_S (w1 w2 : F2Word) (RD : RunData (w1 ++ w2)) (hU : ∀ x ∈ w1 ++ w2, x = .one ∨ x = .i ∨ x = .negOne)
+    (c : ℤ) (hz : F2Word.sum (w1 ++ w2) = (c, cntI (w1 ++ w2))) (x k : ℤ) :
+    ((x, k + 1), (x, k)) ∈ edgesFrom (0, 0) (boundaryWordOf w1 w2) ↔
+      (0 ≤ cntI (w1 ++ w2) - k - 1 ∧ cntI (w1 ++ w2) - k - 1 < cntI (w1 ++ w2) ∧
+        c - x = colN (w1 ++ w2) (0, 0) (cntI (w1 ++ w2) - k - 1)) := by
+  have key : halfE (c, cntI (w1 ++ w2)) ((x, k + 1), (x, k)) =
+      ((c - x, cntI (w1 ++ w2) - k - 1), (c - x, cntI (w1 ++ w2) - k - 1 + 1)) := by
+    ext <;> simp [halfE]
+    all_goals ring
+  rw [mem_walk_iff, hz, key, or_iff_right (no_S w1 w2 hU x k)]
+  exact RD.N (c - x) (cntI (w1 ++ w2) - k - 1)
+
 end FLatticePaper.Tiles.RegionBoundary
