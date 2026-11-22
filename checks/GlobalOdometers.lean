@@ -1,3 +1,4 @@
 import FLatticePaper.Plane.GlobalOdometers
 
 #print axioms FLatticePaper.GlobalOdometers.global_odometers
+#print axioms FLatticePaper.GlobalOdometers.global_odometers_pair

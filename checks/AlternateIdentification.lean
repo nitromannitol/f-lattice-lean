@@ -1,0 +1,20 @@
+import FLatticePaper.Construction.AlternateIdentification
+
+/-! Axioms of the alternate target and its branch criterion (task 46). -/
+
+#print axioms FLatticePaper.Construction.alternateTarget_eq_min
+#print axioms FLatticePaper.Construction.HeightTile.Agrees.congr_target
+#print axioms FLatticePaper.Construction.HeightTile.Agrees.alternateTarget_of_branches
+#print axioms FLatticePaper.Construction.alternateJets_even_zero
+#print axioms FLatticePaper.Construction.ordinaryAlternate_even_first_eq
+#print axioms FLatticePaper.Construction.ordinaryAlternate_even_first_agrees
+#print axioms FLatticePaper.Construction.ordinaryAlternate_even_identifies
+#print axioms FLatticePaper.Construction.ordinaryAlternate_even_identifies_register
+#print axioms FLatticePaper.Construction.alternateJets_even_four_eq
+#print axioms FLatticePaper.Construction.ordinaryAlternate_even_copy_four_eq
+#print axioms FLatticePaper.Construction.ordinaryAlternate_even_copy_four_agrees
+#print axioms FLatticePaper.Construction.exists_proper_of_even_digit
+#print axioms FLatticePaper.Construction.ordinaryAlternate_even_identifies_four
+#print axioms FLatticePaper.Construction.HeightTile.Agrees.restore_then_place
+#print axioms FLatticePaper.Construction.alternateSeventhCopy_agrees_of_donor
+#print axioms FLatticePaper.Construction.ordinaryAlternate_even_identifies_seventh
