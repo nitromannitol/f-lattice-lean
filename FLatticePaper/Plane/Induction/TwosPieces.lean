@@ -1823,4 +1823,142 @@ theorem tie_leaf (k : ℕ) (w1 w2 : ℤ) (hw : w2 = w1 + (2 * (k : ℤ) + 4)) (h
   subst hw
   exact twos_tie_min k w1 h1 h2
 
+/-- The identification on the tile: `min(A, C) = V` at every point of `(A ∪ B ∪ C) \ D`, for every `k`. -/
+theorem twos_tile_min (k : ℕ) (w1 w2 : ℤ) (hE : (w1, w2) ∈ paperNearLadderTile (2 * (k : ℤ) + 4)) :
+    min ((frameAt (List.replicate (k + 1) Digit.two)).sheetA
+        (quarterTurnField (standardField (conjWord (List.replicate (k + 1) Digit.two))))
+        (w1, w2 - 1))
+      ((frameAt (List.replicate (k + 1) Digit.two)).sheetC
+        (quarterTurnField (standardField (conjWord (List.replicate (k + 1) Digit.two))))
+        (w1, w2 - 1)) = paperNearLadderValue (2 * (k : ℤ) + 4) (w1, w2) := by
+  obtain ⟨hU, hnD⟩ := hE
+  simp only [paperNearLadderA, paperNearLadderB, paperNearLadderC, paperNearLadderD, Set.mem_union,
+    Set.mem_insert_iff, Set.mem_singleton_iff, Set.mem_setOf_eq, Prod.mk.injEq] at hU hnD
+  rcases hU with ((⟨hA1, hA2⟩ | ⟨hA1, hA2⟩) | ⟨hB1, hB2, hB3⟩) | ⟨hC1, hC2, hC3, hC4, hC5, hC6⟩
+  · -- the point (-1, 2d+1) of A
+    obtain ⟨h1, h2⟩ := leftEdgeTop_piece k w1 w2 hA1 (by omega)
+    exact min_tile_right _ _ _ 2 h1 h2 (by norm_num)
+  · -- the point (d+1, d-1) of A
+    obtain ⟨h1, h2⟩ := apexA_piece k w1 w2 (by omega) (by omega)
+    exact min_tile_left _ _ _ 2 h1 h2 (by norm_num)
+  · -- the tie line B
+    exact tie_leaf k w1 w2 (by omega) (by omega) (by omega)
+  · -- the box C minus D: split by the band of w2
+    have hT : w2 ≤ 2 ∨ (3 ≤ w2 ∧ w2 ≤ 2 * (k : ℤ) + 4) ∨ w2 = 2 * (k : ℤ) + 5 ∨
+        (2 * (k : ℤ) + 6 ≤ w2 ∧ w2 ≤ 4 * (k : ℤ) + 7) ∨ w2 = 4 * (k : ℤ) + 8 ∨
+        (4 * (k : ℤ) + 9 ≤ w2 ∧ w2 ≤ 6 * (k : ℤ) + 9) ∨ 6 * (k : ℤ) + 10 ≤ w2 := by
+      omega
+    rcases hT with hT | hT | hT | hT | hT | hT | hT
+    · -- band w2 ≤ 2: corners and the first lower row
+      obtain rfl | rfl : w2 = 1 ∨ w2 = 2 := by omega
+      · have hw : w1 = 0 ∨ w1 = 1 ∨ w1 = 2 := by omega
+        rcases hw with rfl | rfl | rfl
+        · obtain ⟨h1, h2⟩ := cornerZeroOne_piece k
+          exact min_tile0 _ _ _ h1 h2
+        · obtain ⟨h1, h2⟩ := cornerOneOne_piece k
+          exact min_tile0 _ _ _ h1 h2
+        · obtain ⟨h1, h2⟩ := cornerTwoOne_piece k
+          exact min_tile_left _ _ _ 1 h1 h2 (by norm_num)
+      · have hw : w1 = 0 ∨ w1 = 1 ∨ w1 = 2 ∨ w1 = 3 := by omega
+        rcases hw with rfl | rfl | rfl | rfl
+        · obtain ⟨h1, h2⟩ := cornerZeroTwo_piece k
+          exact min_tile_right _ _ _ 1 h1 h2 (by norm_num)
+        · obtain ⟨h1, h2⟩ := cornerOneTwo_piece k
+          exact min_tile0 _ _ _ h1 h2
+        · obtain ⟨h1, h2⟩ := lowerA1_piece k 2 2 (by norm_num) (by norm_num) (by omega)
+            (by norm_num) (by norm_num)
+          exact min_tile_left _ _ _ _ h1 h2 (by norm_num)
+        · obtain ⟨h1, h2⟩ := lowerA1_piece k 3 2 (by norm_num) (by norm_num) (by omega)
+            (by norm_num) (by norm_num)
+          exact min_tile_left _ _ _ _ h1 h2 (by norm_num)
+    · -- band 3 <= w2 <= d: the zero column, the lower tie, and the lower edge
+      have hw : w1 = 0 ∨ (1 ≤ w1 ∧ w1 ≤ w2 - 1) ∨ w2 ≤ w1 := by omega
+      rcases hw with hw | hw | hw
+      · obtain ⟨h1, h2⟩ := zeroColumn_piece k w1 w2 hw (by omega) (by omega)
+        exact min_tile_right _ _ _ 1 h1 h2 (by norm_num)
+      · obtain ⟨h1, h2⟩ := lower_tie_piece k w1 w2 (by omega) (by omega) (by omega) (by omega)
+        exact min_tile0 _ _ _ h1 h2
+      · obtain ⟨h1, h2⟩ := lowerA1_piece k w1 w2 (by omega) (by omega) (by omega) hw (by omega)
+        exact min_tile_left _ _ _ _ h1 h2 (by omega)
+    · -- the row w2 = d+1
+      have hw : w1 = 0 ∨ w1 = 1 ∨ (2 ≤ w1 ∧ w1 ≤ 2 * (k : ℤ) + 4) ∨ w1 = 2 * (k : ℤ) + 5 := by
+        omega
+      rcases hw with hw | hw | hw | hw
+      · obtain ⟨h1, h2⟩ := zeroColumnTop_piece k w1 w2 hw (by omega)
+        exact min_tile_right _ _ _ 1 h1 h2 (by norm_num)
+      · exact tie_leaf k w1 w2 (by omega) (by omega) (by omega)
+      · obtain ⟨h1, h2⟩ := upA1_piece k w1 w2 (by omega) (by omega) (by omega) (by omega) (by omega)
+        exact min_tile_left _ _ _ 1 h1 h2 (by norm_num)
+      · obtain ⟨h1, h2⟩ := columnDPlusOne_piece k w1 w2 hw (by omega) (by omega)
+        exact min_tile_left _ _ _ 2 h1 h2 (by norm_num)
+    · -- the band d+2 <= w2 <= 2d-1
+      have hw : w1 = -1 ∨ (0 ≤ w1 ∧ w1 ≤ w2 - (2 * (k : ℤ) + 5)) ∨ w1 = w2 - (2 * (k : ℤ) + 4) ∨
+          (w2 - (2 * (k : ℤ) + 3) ≤ w1 ∧ w1 ≤ 2 * (k : ℤ) + 4) ∨ w1 = 2 * (k : ℤ) + 5 := by
+        omega
+      rcases hw with hw | hw | hw | hw | hw
+      · obtain ⟨h1, h2⟩ := leftEdge_piece k w1 w2 hw (by omega) (by omega)
+        exact min_tile_right _ _ _ 2 h1 h2 (by norm_num)
+      · obtain ⟨h1, h2⟩ := upC1_piece k w1 w2 hw.1 (by omega) (by omega) hw.2
+        exact min_tile_right _ _ _ 1 h1 h2 (by norm_num)
+      · exact tie_leaf k w1 w2 (by omega) (by omega) (by omega)
+      · have hw2 : w2 = 4 * (k : ℤ) + 7 ∨ w2 ≤ 4 * (k : ℤ) + 6 := by omega
+        rcases hw2 with hw2 | hw2
+        · obtain ⟨h1, h2⟩ := columnDTwoLess_piece k w1 w2 (by omega) hw2
+          exact min_tile_left _ _ _ 1 h1 h2 (by norm_num)
+        · obtain ⟨h1, h2⟩ := upA1_piece k w1 w2 (by omega) (by omega) hw2 (by omega) (by omega)
+          exact min_tile_left _ _ _ 1 h1 h2 (by norm_num)
+      · obtain ⟨h1, h2⟩ := columnDPlusOne_piece k w1 w2 hw (by omega) (by omega)
+        exact min_tile_left _ _ _ 2 h1 h2 (by norm_num)
+    · -- the row w2 = 2d
+      have hw : w1 = -1 ∨ w1 = 0 ∨ (1 ≤ w1 ∧ w1 ≤ 2 * (k : ℤ) + 3) ∨ w1 = 2 * (k : ℤ) + 4 := by
+        omega
+      rcases hw with hw | hw | hw | hw
+      · obtain ⟨h1, h2⟩ := leftEdgeDouble_piece k w1 w2 hw hT
+        exact min_tile_right _ _ _ 2 h1 h2 (by norm_num)
+      · obtain ⟨h1, h2⟩ := diagonalEven_piece k w1 w2 (by omega) (by omega) (by omega)
+        exact min_tile_right _ _ _ 1 h1 h2 (by norm_num)
+      · obtain ⟨h1, h2⟩ := band2_tie_piece k w1 w2 (by omega) (by omega) (by omega) (by omega)
+          (by omega)
+        exact min_tile0 _ _ _ h1 h2
+      · obtain ⟨h1, h2⟩ := columnDTwo_piece k w1 w2 hw hT
+        exact min_tile_left _ _ _ 1 h1 h2 (by norm_num)
+    · -- the band 2d+1 <= w2 <= 3d-3
+      have hw : w1 = w2 - (4 * (k : ℤ) + 9) ∨ w1 = w2 - (4 * (k : ℤ) + 8) ∨
+          (w2 - (4 * (k : ℤ) + 7) ≤ w1 ∧ w1 ≤ 2 * (k : ℤ) + 3) ∨ w1 = 2 * (k : ℤ) + 4 := by
+        omega
+      rcases hw with hw | hw | hw | hw
+      · obtain ⟨h1, h2⟩ := diagonalOdd_piece k w1 w2 (by omega) (by omega) (by omega)
+        exact min_tile_right _ _ _ 2 h1 h2 (by norm_num)
+      · obtain ⟨h1, h2⟩ := diagonalEven_piece k w1 w2 (by omega) (by omega) (by omega)
+        exact min_tile_right _ _ _ 1 h1 h2 (by norm_num)
+      · obtain ⟨h1, h2⟩ := band2_tie_piece k w1 w2 (by omega) (by omega) (by omega) (by omega)
+          (by omega)
+        exact min_tile0 _ _ _ h1 h2
+      · obtain ⟨h1, h2⟩ := columnDAbove_piece k w1 w2 hw (by omega) (by omega)
+        exact min_tile_left _ _ _ 1 h1 h2 (by norm_num)
+    · -- the top rows w2 = 3d-2 and 3d-1
+      have hw2 : w2 = 6 * (k : ℤ) + 10 ∨ w2 = 6 * (k : ℤ) + 11 := by omega
+      rcases hw2 with hw2 | hw2
+      · have hw : w1 = 2 * (k : ℤ) + 1 ∨ w1 = 2 * (k : ℤ) + 2 ∨ w1 = 2 * (k : ℤ) + 3 ∨
+            w1 = 2 * (k : ℤ) + 4 := by
+          omega
+        rcases hw with hw | hw | hw | hw
+        · obtain ⟨h1, h2⟩ := diagonalOdd_piece k w1 w2 (by omega) (by omega) (by omega)
+          exact min_tile_right _ _ _ 2 h1 h2 (by norm_num)
+        · obtain ⟨h1, h2⟩ := diagonalEven_piece k w1 w2 (by omega) (by omega) (by omega)
+          exact min_tile_right _ _ _ 1 h1 h2 (by norm_num)
+        · obtain ⟨h1, h2⟩ := columnDTop_piece k w1 w2 hw hw2
+          exact min_tile0 _ _ _ h1 h2
+        · obtain ⟨h1, h2⟩ := columnDTopLess_piece k w1 w2 hw hw2
+          exact min_tile_left _ _ _ 1 h1 h2 (by norm_num)
+      · have hw : w1 = 2 * (k : ℤ) + 2 ∨ w1 = 2 * (k : ℤ) + 3 ∨ w1 = 2 * (k : ℤ) + 4 := by
+          omega
+        rcases hw with hw | hw | hw
+        · obtain ⟨h1, h2⟩ := diagonalTop_piece k w1 w2 hw hw2
+          exact min_tile_right _ _ _ 1 h1 h2 (by norm_num)
+        · obtain ⟨h1, h2⟩ := columnDTopCorner_piece k w1 w2 hw hw2
+          exact min_tile0 _ _ _ h1 h2
+        · obtain ⟨h1, h2⟩ := columnDTopMax_piece k w1 w2 hw hw2
+          exact min_tile0 _ _ _ h1 h2
+
 end FLatticePaper.Induction
