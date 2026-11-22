@@ -382,7 +382,7 @@ theorem minusPc_one (o : Orientation) (w : BinaryWord) (hn : 3 ≤ w.length)
   rw [hf1, Qf_mid o (wℓ w) w.length hpal hlast 1 le_rfl (by omega), add_assoc, ccO_add_shift]
   rw [hpal 1 le_rfl (by omega)]
 
-theorem minusPc_mid (o : Orientation) (w : BinaryWord) (hn : 3 ≤ w.length)
+theorem minusPc_mid (o : Orientation) (w : BinaryWord)
     (hpal : ∀ i, 1 ≤ i → i ≤ w.length - 2 → wℓ w (w.length - 1 - i) = wℓ w i)
     (hlast : ccO o (wℓ w (w.length - 1)) = 0) (j : ℕ) (h2 : 2 ≤ j) (hj : j ≤ w.length - 2) :
     minusPc o w j = pieceAt (wℓ w j) (flagO o (wℓ w) j) (posO o (wℓ w) j + shadowO o (wℓ w j)) := by
@@ -477,7 +477,7 @@ theorem stacked_decomp (o : Orientation) (w : BinaryWord) (hn : 3 ≤ w.length)
         rw [minusPc_one o w hn hpal hlast hf1] at hx
         exact Or.inl (Or.inl (Or.inr hx))
       · refine Or.inl (Or.inr ⟨j, ⟨h1, by omega⟩, ?_⟩)
-        rw [minusPc_mid o w hn hpal hlast j h1 h2] at hx
+        rw [minusPc_mid o w hpal hlast j h1 h2] at hx
         exact hx
       · subst h
         rw [minusPc_last o w hn hpal hlast] at hx
@@ -485,7 +485,7 @@ theorem stacked_decomp (o : Orientation) (w : BinaryWord) (hn : 3 ≤ w.length)
     · rintro (((h | h) | ⟨a, ⟨ha1, ha2⟩, hx⟩) | h)
       · exact ⟨0, by omega, by rw [minusPc_zero o w hm0]; exact h⟩
       · exact ⟨1, by omega, by rw [minusPc_one o w hn hpal hlast hf1]; exact h⟩
-      · exact ⟨a, by omega, by rw [minusPc_mid o w hn hpal hlast a ha1 (by omega)]; exact hx⟩
+      · exact ⟨a, by omega, by rw [minusPc_mid o w hpal hlast a ha1 (by omega)]; exact hx⟩
       · exact ⟨w.length - 1, by omega, by rw [minusPc_last o w hn hpal hlast]; exact h⟩
   rw [hP, hM, hL]
   ext x
