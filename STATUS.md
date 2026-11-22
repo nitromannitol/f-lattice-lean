@@ -166,6 +166,8 @@ lake env lean checks/OrdinaryStandardCover.lean
 lake env lean checks/OrdinaryTables.lean
 lake env lean checks/OrdinaryComparisons.lean
 lake env lean checks/OrdinaryAgreement.lean
+lake env lean checks/PlaneIdentification.lean
+lake env lean checks/NearQPrices.lean
 lake env lean checks/PropBaseCases.lean
 lake env lean checks/BinaryWords.lean
 lake env lean checks/BoundaryStrings.lean
