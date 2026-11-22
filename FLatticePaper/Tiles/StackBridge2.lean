@@ -352,4 +352,60 @@ theorem sh_bridge (o : Orientation) (ℓ : ℕ → Letter) (q : ℕ) (hq : 1 ≤
     rw [stateOf_sh_getD o ℓ q m hm7]
     simp only [decide_eq_true_eq, Finset.filter_nonempty_iff, img_pair_iff, hY, iff_self]
 
+theorem eq_map_range_of_getD {β : Type} (l : List β) (g : ℕ → β) (n : ℕ) (d : β)
+    (hlen : l.length = n) (h : ∀ i < n, l.getD i d = g i) : l = (List.range n).map g := by
+  apply List.ext_getElem
+  · simp [hlen]
+  · intro k hk1 hk2
+    have hkn : k < n := by simpa [hlen] using hk1
+    have hkd := h k hkn
+    rw [List.getD_eq_getElem _ _ hk1] at hkd
+    simp only [List.getElem_map, List.getElem_range]
+    exact hkd
+
+theorem bits_row_length (o : Orientation) (ℓ : ℕ → Letter) (m : ℕ) (i : ℕ) (hi : i < 8) :
+    ((stateOf o ℓ m).bits.getD i []).length = 6 := by
+  unfold stateOf
+  dsimp only
+  rw [getD_map_range _ 8 i [] hi]
+  simp
+
+/-- The summary of the union of `q + 2` letters is the transition of the summary of `q + 1` letters. -/
+theorem stateOf_succ (o : Orientation) (ℓ : ℕ → Letter) (q : ℕ) (hq : 1 ≤ q) :
+    stateOf o ℓ (q + 2) = transWS o (stateOf o ℓ (q + 1)) (ℓ (q + 1)) := by
+  have hne : (stateOf o ℓ (q + 2)).ne =
+      (List.range 8).map (fun i => newNe o (stateOf o ℓ (q + 1)) (ℓ (q + 1)) i) :=
+    eq_map_range_of_getD _ _ 8 false (by simp [stateOf]) (fun i hi => ne_bridge o ℓ q hq i hi)
+  have hrow : ∀ i < 8, (stateOf o ℓ (q + 2)).bits.getD i [] =
+      newRowBits o (stateOf o ℓ (q + 1)) (ℓ (q + 1)) i := by
+    intro i hi
+    unfold newRowBits
+    exact eq_map_range_of_getD _ _ 6 false (bits_row_length o ℓ (q + 2) i hi) (fun j hj =>
+      (stateOf_bits_getD o ℓ (q + 1) i j hi hj).trans (bits_bridge o ℓ q hq i j hi hj).symm)
+  have hbits : (stateOf o ℓ (q + 2)).bits =
+      (List.range 8).map (fun i => newRowBits o (stateOf o ℓ (q + 1)) (ℓ (q + 1)) i) :=
+    eq_map_range_of_getD _ _ 8 [] (by simp [stateOf]) hrow
+  have hsh : (stateOf o ℓ (q + 2)).sh =
+      (List.range 7).map (fun k => newSh o (stateOf o ℓ (q + 1)) (ℓ (q + 1)) k) :=
+    eq_map_range_of_getD _ _ 7 false (by simp [stateOf]) (fun k hk => sh_bridge o ℓ q hq k hk)
+  unfold transWS
+  have key : ∀ x y : WS, x.lastL = y.lastL → x.secondL = y.secondL → x.ne = y.ne → x.bits = y.bits →
+      x.sh = y.sh → x = y := by
+    intro x y h1 h2 h3 h4 h5
+    cases x
+    cases y
+    dsimp only at h1 h2 h3 h4 h5
+    subst h1
+    subst h2
+    subst h3
+    subst h4
+    subst h5
+    rfl
+  apply key
+  · rfl
+  · rfl
+  · exact hne
+  · exact hbits
+  · exact hsh
+
 end FLatticePaper.Tiles
