@@ -27,6 +27,10 @@ import FLatticePaper.Construction.Native
 import FLatticePaper.Construction.NativeCoverage
 import FLatticePaper.Construction.OrdinaryStandardCover
 import FLatticePaper.Construction.OrdinaryAgreement
+import FLatticePaper.Construction.NearQPrices
+import FLatticePaper.Construction.PlaneIdentification
+import FLatticePaper.Construction.RawOrigin
+import FLatticePaper.Construction.NominalAgreement
 import FLatticePaper.Construction.OrdinaryComparisons
 import FLatticePaper.Construction.OrdinaryTables
 import FLatticePaper.Construction.PlacedAssembly
