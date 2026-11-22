@@ -463,8 +463,9 @@ theorem altFactsWord_all
 /-- `lemma:global_odometers` for both odometers at a birth `(w, p)` of `fraction = n/d`: the standard one (`global_odometers`),
 and the alternate `ĝ = altTarget w p` with its identification of the constructor's alternate tile (`htileAlt`) and the
 coverage of that tile (`hcovAlt`). The alternate is the even `planeAlternate` at even births and the odd target of w2
-(`alternateOddTarget`) at odd births; the latter needs the chart `alternateOddChart` to be even (`hchart`), which the Laplacian
-transfer uses. The distinctness in the fixed coordinates of `eq:periodicity`: the difference is not integer affine, the
+(`alternateOddTarget`) at odd births; the latter needs the chart `alternateOddChart` to be even, which `evenSite_alternateOddChart` gives
+for the ordinary odd births (words ending in 1 or 3); the corrected odd births (ending in 2) are not covered: the named input `hord`
+requires every odd birth to end in 1 or 3, and the Laplacian transfer uses the chart parity. The distinctness in the fixed coordinates of `eq:periodicity`: the difference is not integer affine, the
 Laplacians differ somewhere, and the explicit increments hold (the transverse increment `-1` at even births; at odd births the
 kernel increment `-1 + slope·kernel`, whose affine term is the transverse slope of the odd parent).
 
