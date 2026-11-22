@@ -33,6 +33,7 @@ import FLatticePaper.Construction.RawOrigin
 import FLatticePaper.Construction.NominalAgreement
 import FLatticePaper.Construction.ConjugatePeriods
 import FLatticePaper.Construction.StructuralSuccess
+import FLatticePaper.Construction.OverlapSites
 import FLatticePaper.Construction.ScheduleKinds
 import FLatticePaper.Construction.OrdinaryComparisons
 import FLatticePaper.Construction.OrdinaryTables
