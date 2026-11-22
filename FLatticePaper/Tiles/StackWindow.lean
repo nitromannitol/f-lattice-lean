@@ -117,11 +117,11 @@ def okS (o : Orientation) (s : WS) (a : Letter) : Bool :=
 def stateOf (o : Orientation) (ℓ : ℕ → Letter) (m : ℕ) : WS :=
   { lastL := ℓ (m - 1)
     secondL := ℓ 1
-    ne := (List.range 8).map (fun i => decide
+    ne := (List.range 8).map (fun (i : ℕ) => decide
       ((lamO o ℓ m).filter (fun p => p.2 = (posO o ℓ (m - 1)).2 + ((i : ℤ) - 4))).Nonempty)
-    bits := (List.range 8).map (fun i => (List.range 6).map (fun j => decide
+    bits := (List.range 8).map (fun (i : ℕ) => (List.range 6).map (fun (j : ℕ) => decide
       (((posO o ℓ (m - 1)).1 + ((j : ℤ) - 2), (posO o ℓ (m - 1)).2 + ((i : ℤ) - 4)) ∈ lamO o ℓ m)))
-    sh := (List.range 7).map (fun k => decide
+    sh := (List.range 7).map (fun (k : ℕ) => decide
       (((lamO o ℓ m).image Prod.fst).filter (fun x =>
         (x, (posO o ℓ (m - 1)).2 + ((k : ℤ) - 4)) ∈ lamO o ℓ m ∧
         (x, (posO o ℓ (m - 1)).2 + ((k : ℤ) - 4) + 1) ∈ lamO o ℓ m)).Nonempty) }
