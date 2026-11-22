@@ -178,45 +178,46 @@ theorem circlePacking_of_localPremises
   circlePacking_of_odometersTheorem (odometersTheorem_of_localPremises h) matrix
 
 /-- The headline `theorem:odometers` from the open inputs only: at every proper word, the I1 and I2 zone witnesses
-(`StarZoneInputs`), the I3 sheet inputs (`SheetLocalInputs`), the V arc range (`VArcInputs`), the slip local permits
-(`PermitLocal`), and the S3 no-fort inputs (`S3NoFortInputs`). The packets, the conjugate induction, the S1 and S2 window,
-the halo, the recurrence of the sheet minimum and the S3 rank are proved inside. -/
+(`StarZoneInputs`), the I3 sheet inputs (`SheetLocalInputs`), the V arc range (`VArcInputs`), the odd black no-rise premise
+(`OddBlackNoRise`, the one case of the slip permits that the local data do not exclude), and the S3 no-fort inputs
+(`S3NoFortInputs`). The packets, the conjugate induction, the S1 and S2 window, the halo, the recurrence of the sheet
+minimum, the slip permits and the S3 rank are proved inside. -/
 theorem odometersTheorem_of_openLocalInputs
     (hstar : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → Induction.StarZoneInputs word)
     (hsheet : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → Induction.SheetLocalInputs word)
     (harc : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → Induction.VArcInputs (frameAt word) (standardField word))
-    (hpermit : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → PermitLocal (standardField word)
-      (slipPermits (standardField word) (fun z => standardField word (z + (frameAt word).shortShift))))
+    (hodd : ∀ word : Word, (∃ x ∈ word, x ≠ .three) →
+      OddBlackNoRise (standardField word) (frameAt word).shortShift)
     (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → Induction.S3NoFortInputs (frameAt word) (standardField word)) :
     OdometersTheorem := by
   have hpk := Induction.packet_standardField_of_inputs hstar hsheet
   refine odometersTheorem_of_packets (fun word _ => hpk word) ?_
   intro word hw
   exact Induction.starEstimates_of_inputs word hw (hpk (Induction.conjWord word)) (hpk word) (hstar word hw)
-    (hsheet word hw) (harc word hw) (hpermit word hw) (hbulk word hw)
+    (hsheet word hw) (harc word hw) (hodd word hw) (hbulk word hw)
 
 /-- `theorem:hyperbola` from the open inputs. -/
 theorem hyperbola_of_openLocalInputs
     (hstar : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → Induction.StarZoneInputs word)
     (hsheet : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → Induction.SheetLocalInputs word)
     (harc : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → Induction.VArcInputs (frameAt word) (standardField word))
-    (hpermit : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → PermitLocal (standardField word)
-      (slipPermits (standardField word) (fun z => standardField word (z + (frameAt word).shortShift))))
+    (hodd : ∀ word : Word, (∃ x ∈ word, x ≠ .three) →
+      OddBlackNoRise (standardField word) (frameAt word).shortShift)
     (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → Induction.S3NoFortInputs (frameAt word) (standardField word))
     (t : ℝ) (ht : 0 ≤ t) (hu : t ≤ 1) :
     symmetricCircleMatrix t (1 - t) (-Real.sqrt (t ^ 2 + (1 - t) ^ 2)) ∈ frontier symmetricGrowthSet :=
-  hyperbola_of_odometersTheorem (odometersTheorem_of_openLocalInputs hstar hsheet harc hpermit hbulk) t ht hu
+  hyperbola_of_odometersTheorem (odometersTheorem_of_openLocalInputs hstar hsheet harc hodd hbulk) t ht hu
 
 /-- `theorem:circle_packing` from the open inputs. -/
 theorem circlePacking_of_openLocalInputs
     (hstar : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → Induction.StarZoneInputs word)
     (hsheet : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → Induction.SheetLocalInputs word)
     (harc : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → Induction.VArcInputs (frameAt word) (standardField word))
-    (hpermit : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → PermitLocal (standardField word)
-      (slipPermits (standardField word) (fun z => standardField word (z + (frameAt word).shortShift))))
+    (hodd : ∀ word : Word, (∃ x ∈ word, x ≠ .three) →
+      OddBlackNoRise (standardField word) (frameAt word).shortShift)
     (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → Induction.S3NoFortInputs (frameAt word) (standardField word))
     (matrix : Matrix (Fin 2) (Fin 2) ℝ) :
     matrix ∈ integerSuperharmonicMatrices ↔ ∃ s t : ℤ, (harmonicPeak s t - matrix).PosSemidef :=
-  circlePacking_of_odometersTheorem (odometersTheorem_of_openLocalInputs hstar hsheet harc hpermit hbulk) matrix
+  circlePacking_of_odometersTheorem (odometersTheorem_of_openLocalInputs hstar hsheet harc hodd hbulk) matrix
 
 end FLatticePaper
