@@ -1576,4 +1576,62 @@ theorem cornerZeroOne_piece (k : ℕ) :
     apply mul_left_cancel₀ (by norm_num : (4 : ℤ) ≠ 0)
     linear_combination 2 * hC - 2 * hQ + hH - hpar - 2 * hcV
 
+/-- The corner `(1,1)`: `A = V = 0` via `(0,-1)` and `C = V = 0` via `(0,0)`. -/
+theorem cornerOneOne_piece (k : ℕ) :
+    (frameAt (List.replicate (k + 1) Digit.two)).sheetA
+        (quarterTurnField (standardField (conjWord (List.replicate (k + 1) Digit.two))))
+        ((1 : ℤ), (1 : ℤ) - 1) = paperNearLadderValue (2 * (k : ℤ) + 4) ((1 : ℤ), (1 : ℤ)) ∧
+    (frameAt (List.replicate (k + 1) Digit.two)).sheetC
+        (quarterTurnField (standardField (conjWord (List.replicate (k + 1) Digit.two))))
+        ((1 : ℤ), (1 : ℤ) - 1) = paperNearLadderValue (2 * (k : ℤ) + 4) ((1 : ℤ), (1 : ℤ)) := by
+  have hA : ((1 : ℤ), (1 : ℤ)) ∉ paperNearLadderA (2 * (k : ℤ) + 4) := by
+    simp only [paperNearLadderA, Set.mem_insert_iff, Set.mem_singleton_iff, Prod.mk.injEq]
+    omega
+  have hB : ((1 : ℤ), (1 : ℤ)) ∉ paperNearLadderB (2 * (k : ℤ) + 4) := by
+    simp only [paperNearLadderB, Set.mem_setOf_eq]
+    omega
+  have hV : paperNearLadderValue (2 * (k : ℤ) + 4) ((1 : ℤ), (1 : ℤ)) = 0 := by
+    rw [paperNearLadderValue_off _ _ _ hA hB,
+      min_eq_left (by omega : (0 : ℤ) ≤ 2 * (k : ℤ) + 4 - 1),
+      min_eq_left (by omega : (0 : ℤ) ≤ 2 * (2 * (k : ℤ) + 4) - 1),
+      max_eq_right (by omega : (1 : ℤ) - 1 - (2 * (k : ℤ) + 4) ≤ 0)]
+    norm_num
+  rw [hV]
+  constructor
+  · have hmem : (-2 * (k : ℤ) - 1, 2 * (k : ℤ) + 3) ∈
+        (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites :=
+      BaseMask.mem_stairEven_raw_iff.mpr ⟨⟨by omega, by omega⟩, ⟨by omega, by omega⟩,
+        by unfold BaseMask.StairEvenCorner; omega⟩
+    have hA' := sheetA_via k 1 1 0 (-1) (-2 * (k : ℤ) - 1) (2 * (k : ℤ) + 3)
+      (by ring) (by ring) hmem
+    have hc : ¬ BaseMask.StairEvenCorner (2 * (k : ℤ) + 3) (-2 * (k : ℤ) - 1, 2 * (k : ℤ) + 3) := by
+      unfold BaseMask.StairEvenCorner
+      omega
+    rw [stairEvenValue_formula, if_neg hc,
+      min_eq_left (by omega : -2 * (k : ℤ) - 1 - 1 ≤ 0)] at hA'
+    rw [transverseGrade_one, periodDenominator_one] at hA'
+    have hQ := two_mul_triangle (2 * (k : ℤ) + 3)
+    have hcV := stairEvenConstantV_double (2 * (k : ℤ) + 3)
+    have hH := harmonicGrid_exact ((1 : ℤ) - 1, 1 - 2)
+    simp only at hH
+    have hpar : ((1 : ℤ) - 1 + (1 - 2)) % 2 = 1 := by
+      omega
+    apply mul_left_cancel₀ (by norm_num : (4 : ℤ) ≠ 0)
+    linear_combination 2 * hA' - 2 * hQ + hH - hpar - 2 * hcV
+  · have hmem : ((2 : ℤ), (0 : ℤ)) ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites :=
+      BaseMask.mem_stairEven_raw_iff.mpr ⟨⟨by omega, by omega⟩, ⟨by omega, by omega⟩,
+        by unfold BaseMask.StairEvenCorner; omega⟩
+    have hC := sheetC_via k 1 1 0 0 2 0 (by ring) (by ring) hmem
+    have hc : ¬ BaseMask.StairEvenCorner (2 * (k : ℤ) + 3) ((2 : ℤ), (0 : ℤ)) := by
+      unfold BaseMask.StairEvenCorner
+      omega
+    rw [stairEvenValue_formula, if_neg hc, min_eq_right (by omega : (0 : ℤ) ≤ 2 - 1)] at hC
+    have hQ := two_mul_triangle 0
+    have hH := harmonicGrid_exact ((1 : ℤ), 1 - 3)
+    simp only at hH
+    have hpar : ((1 : ℤ) + (1 - 3)) % 2 = 1 := by
+      omega
+    apply mul_left_cancel₀ (by norm_num : (4 : ℤ) ≠ 0)
+    linear_combination 2 * hC - 2 * hQ + hH - hpar
+
 end FLatticePaper.Induction
