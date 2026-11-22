@@ -11,6 +11,7 @@ import FLatticePaper.Plane.Induction.LocalPremisesRestricted
 import FLatticePaper.Plane.RestrictedBellmanRank
 import FLatticePaper.Plane.Induction.OpenLocal
 import FLatticePaper.Plane.Induction.TwosInduction
+import FLatticePaper.Plane.Induction.TwosPeriods
 
 /-! The two headline theorems from `theorem:odometers` at every reduced interior slope. -/
 
@@ -290,6 +291,33 @@ theorem odometersTheorem_of_nearOne_twos
     OdometersTheorem :=
   odometersTheorem_of_openLocalInputs_twos
     (fun k => Induction.twos_packet_of_stripInputs k (hper k) (hS k) (hbin k)) hstar hsheet harc hodd hbulk
+
+/-- `theorem:odometers` from the open local inputs at the proper words that are not powers of two. The powers of two are
+the standard fields of `2^(k+1)`, identified with the physical near-one field on the whole plane
+(`Induction.twos_standardField_eq_rotate`): their periods, reflection and binarity are proved, and only the zero and
+harmonic strip facts on the closed polygon of `2^(k+1)` remain as the hypotheses `hzero`, `hharm`. -/
+theorem odometersTheorem_of_nearOne_standard
+    (hzero : ∀ k : ℕ, ∀ z ∈ (frameAt (List.replicate (k + 1) Digit.two)).closedPolygon,
+      1 - (frameAt (List.replicate (k + 1) Digit.two)).child.den ≤
+        (frameAt (List.replicate (k + 1) Digit.two)).tGrade z →
+      standardField (List.replicate (k + 1) Digit.two) z = 0)
+    (hharm : ∀ k : ℕ, ∀ z ∈ (frameAt (List.replicate (k + 1) Digit.two)).closedPolygon,
+      (frameAt (List.replicate (k + 1) Digit.two)).sGrade z ≤
+        2 * ((frameAt (List.replicate (k + 1) Digit.two)).child.den +
+          (frameAt (List.replicate (k + 1) Digit.two)).child.num) - 1 →
+      standardField (List.replicate (k + 1) Digit.two) z = harmonicGrid z)
+    (hstar : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word → Induction.StarZoneInputs word)
+    (hsheet : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      Induction.SheetLocalInputs word)
+    (harc : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      Induction.VArcInputs (frameAt word) (standardField word))
+    (hodd : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      OddBlackNoRise (standardField word) (frameAt word).shortShift)
+    (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      Induction.S3NoFortInputs (frameAt word) (standardField word)) :
+    OdometersTheorem :=
+  odometersTheorem_of_openLocalInputs_twos
+    (fun k => Induction.twos_packet_standard k (hzero k) (hharm k)) hstar hsheet harc hodd hbulk
 
 /-- `theorem:hyperbola` from the open inputs. -/
 theorem hyperbola_of_openLocalInputs
