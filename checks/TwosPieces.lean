@@ -33,3 +33,7 @@ import FLatticePaper.Plane.Induction.TwosPieces
 #print axioms FLatticePaper.Induction.cornerTwoOne_piece
 #print axioms FLatticePaper.Induction.cornerZeroTwo_piece
 #print axioms FLatticePaper.Induction.cornerOneTwo_piece
+#print axioms FLatticePaper.Induction.min_tile0
+#print axioms FLatticePaper.Induction.min_tile_left
+#print axioms FLatticePaper.Induction.min_tile_right
+#print axioms FLatticePaper.Induction.tie_leaf

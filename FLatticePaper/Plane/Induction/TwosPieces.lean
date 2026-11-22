@@ -1801,4 +1801,26 @@ theorem cornerOneTwo_piece (k : ℕ) :
     apply mul_left_cancel₀ (by norm_num : (4 : ℤ) ≠ 0)
     linear_combination 2 * hC - 2 * hQ + hH - hpar
 
+/-- Two values with one equal to the staircase `V` and the other at least `V`: the minimum is `V`. -/
+theorem min_tile0 (V x y : ℤ) (h1 : x = V) (h2 : y = V) : min x y = V := by
+  omega
+
+theorem min_tile_left (V x y b : ℤ) (h1 : x = V) (h2 : y = V + b) (hb : 0 ≤ b) : min x y = V := by
+  omega
+
+theorem min_tile_right (V x y a : ℤ) (h1 : x = V + a) (h2 : y = V) (ha : 0 ≤ a) : min x y = V := by
+  omega
+
+/-- The tie line `w2 = w1 + d` of the tile: the minimum is the staircase value (`twos_tie_min`). -/
+theorem tie_leaf (k : ℕ) (w1 w2 : ℤ) (hw : w2 = w1 + (2 * (k : ℤ) + 4)) (h1 : 1 ≤ w1)
+    (h2 : w1 ≤ 2 * (k : ℤ) + 3) :
+    min ((frameAt (List.replicate (k + 1) Digit.two)).sheetA
+        (quarterTurnField (standardField (conjWord (List.replicate (k + 1) Digit.two))))
+        (w1, w2 - 1))
+      ((frameAt (List.replicate (k + 1) Digit.two)).sheetC
+        (quarterTurnField (standardField (conjWord (List.replicate (k + 1) Digit.two))))
+        (w1, w2 - 1)) = paperNearLadderValue (2 * (k : ℤ) + 4) (w1, w2) := by
+  subst hw
+  exact twos_tie_min k w1 h1 h2
+
 end FLatticePaper.Induction
