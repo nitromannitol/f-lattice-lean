@@ -20,3 +20,5 @@ nominal agreement. -/
 #print axioms FLatticePaper.Construction.nominal_even_two_of_zone
 #print axioms FLatticePaper.Construction.nominal_even_four_of_mirror
 #print axioms FLatticePaper.Construction.nominal_even_five_of_mirror
+#print axioms FLatticePaper.Construction.nominal_even_four_of_upper
+#print axioms FLatticePaper.Construction.nominal_even_five_of_upper
