@@ -56,7 +56,7 @@ theorem piece_upper {l : Letter} {e : Bool} {p x : Site} (hx : x ∈ pieceAt l e
   simp only [Prod.fst_sub, Prod.snd_sub] at h
   omega
 
-theorem piece_lower {l : Letter} {p x : Site} (hx : x ∈ pieceAt l false p) : p.1 ≤ x.1 ∧ p.2 ≤ x.2 := by
+theorem stack_piece_lower {l : Letter} {p x : Site} (hx : x ∈ pieceAt l false p) : p.1 ≤ x.1 ∧ p.2 ≤ x.2 := by
   have h := tile_bound_plain l (x - p) ((piece_mem_iff l false p x).1 hx)
   simp only [Prod.fst_sub, Prod.snd_sub] at h
   omega
@@ -122,13 +122,13 @@ theorem lamO_bounds_v (ℓ : ℕ → Letter) (k : ℕ) (hk : 1 ≤ k) :
   intro x hx
   rcases mem_lamO_cases .vertical ℓ k hk x hx with ⟨j, hj, h⟩ | ⟨j, hj2, hjk, h⟩ | h | h
   · rw [flagO_vertical] at h
-    obtain ⟨l1, l2⟩ := piece_lower h
+    obtain ⟨l1, l2⟩ := stack_piece_lower h
     obtain ⟨u1, u2⟩ := piece_upper h
     have m1 := posO_fst_anti_v ℓ hj
     have m2 := posO_snd_mono .vertical ℓ hj
     constructor <;> omega
   · rw [flagO_vertical] at h
-    obtain ⟨l1, l2⟩ := piece_lower h
+    obtain ⟨l1, l2⟩ := stack_piece_lower h
     obtain ⟨u1, u2⟩ := piece_upper h
     simp only [Prod.fst_add, Prod.snd_add] at l1 l2 u1 u2
     obtain ⟨s1, s2⟩ := shadowO_v (ℓ j)
@@ -137,12 +137,12 @@ theorem lamO_bounds_v (ℓ : ℕ → Letter) (k : ℕ) (hk : 1 ≤ k) :
     constructor <;> omega
   · have hm : m0Piece .vertical = pieceAt .q false (1, 1) := rfl
     rw [hm] at h
-    obtain ⟨l1, l2⟩ := piece_lower h
+    obtain ⟨l1, l2⟩ := stack_piece_lower h
     obtain ⟨u1, u2⟩ := piece_upper h
     have n1 := posO_fst_nonpos_v ℓ k
     have n2 := posO_snd_nonneg .vertical ℓ k
     constructor <;> simp only at l1 l2 u1 u2 <;> omega
-  · obtain ⟨l1, l2⟩ := piece_lower h
+  · obtain ⟨l1, l2⟩ := stack_piece_lower h
     obtain ⟨u1, u2⟩ := piece_upper h
     simp only [Prod.fst_add, Prod.snd_add] at l1 l2 u1 u2
     obtain ⟨s1, s2⟩ := shadowO_v (ℓ 1)
