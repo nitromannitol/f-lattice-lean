@@ -164,5 +164,7 @@ import FLatticePaper.Tiles.StackFinalAssembly
 import FLatticePaper.Tiles.TilingCriteria
 import FLatticePaper.Tiles.StandardTiles
 import FLatticePaper.Tiles.AlternateTiles
+import FLatticePaper.Tiles.LCorrections
+import FLatticePaper.Tiles.AlternateConstructor
 
 /-! Root import for the corrected F-lattice paper. -/
