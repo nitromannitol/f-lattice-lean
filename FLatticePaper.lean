@@ -176,6 +176,12 @@ import FLatticePaper.Tiles.StackFinalAssembly
 import FLatticePaper.Tiles.TilingCriteria
 import FLatticePaper.Tiles.StandardTiles
 import FLatticePaper.Tiles.BottomEdges
+import FLatticePaper.Tiles.AdmissibleStatement
+import FLatticePaper.Tiles.AdmissibleFinal
+import FLatticePaper.Tiles.AdmissibleFamilies
+import FLatticePaper.Tiles.AdmissibleBridge
+import FLatticePaper.Tiles.AdmissibleForms
+import FLatticePaper.Tiles.AdmissibleLists
 import FLatticePaper.Tiles.AlternateTiles
 import FLatticePaper.Tiles.LCorrections
 import FLatticePaper.Tiles.AlternateConstructor
