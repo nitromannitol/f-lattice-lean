@@ -346,4 +346,75 @@ theorem minus_index (o : Orientation) (w : BinaryWord) (j : ℕ) (hj : j < w.len
     rfl
 
 
+
+/-! ### The decomposition -/
+
+theorem stacked_eq_PM (o : Orientation) (w : BinaryWord) (hw : w ≠ []) :
+    stackedSites o w = (Finset.range w.length).biUnion (plusPc o w) ∪
+      (Finset.range w.length).biUnion (minusPc o w) := by
+  ext x
+  rw [mem_stackedSites o w hw x, Finset.mem_union, Finset.mem_biUnion, Finset.mem_biUnion]
+  constructor
+  · rintro (⟨k, hk, hx⟩ | ⟨j, hj, hx⟩)
+    · rw [plus_index o w k hk] at hx
+      exact Or.inl ⟨k, Finset.mem_range.2 hk, hx⟩
+    · rw [minus_index o w j hj] at hx
+      exact Or.inr ⟨j, Finset.mem_range.2 hj, hx⟩
+  · rintro (⟨k, hk, hx⟩ | ⟨j, hj, hx⟩)
+    · have hk' := Finset.mem_range.1 hk
+      rw [← plus_index o w k hk'] at hx
+      exact Or.inl ⟨k, hk', hx⟩
+    · have hj' := Finset.mem_range.1 hj
+      rw [← minus_index o w j hj'] at hx
+      exact Or.inr ⟨j, hj', hx⟩
+
+theorem minusPc_zero (o : Orientation) (w : BinaryWord) (hm0 : m0Piece o = pieceAt (wℓ w (w.length - 1)) false (familyShift o)) :
+    minusPc o w 0 = m0Piece o := by
+  unfold minusPc
+  rw [Qf_zero, zero_add, Nat.sub_zero, hm0]
+  rfl
+
+theorem minusPc_one (o : Orientation) (w : BinaryWord) (hn : 3 ≤ w.length)
+    (hpal : ∀ i, 1 ≤ i → i ≤ w.length - 2 → wℓ w (w.length - 1 - i) = wℓ w i)
+    (hlast : ccO o (wℓ w (w.length - 1)) = 0) (hf1 : flagR o (wℓ w) w.length 1 = false) :
+    minusPc o w 1 = pieceAt (wℓ w 1) false (posO o (wℓ w) 1 + shadowO o (wℓ w 1)) := by
+  unfold minusPc
+  rw [hf1, Qf_mid o (wℓ w) w.length hpal hlast 1 le_rfl (by omega), add_assoc, ccO_add_shift]
+  rw [hpal 1 le_rfl (by omega)]
+
+theorem minusPc_mid (o : Orientation) (w : BinaryWord) (hn : 3 ≤ w.length)
+    (hpal : ∀ i, 1 ≤ i → i ≤ w.length - 2 → wℓ w (w.length - 1 - i) = wℓ w i)
+    (hlast : ccO o (wℓ w (w.length - 1)) = 0) (j : ℕ) (h2 : 2 ≤ j) (hj : j ≤ w.length - 2) :
+    minusPc o w j = pieceAt (wℓ w j) (flagO o (wℓ w) j) (posO o (wℓ w) j + shadowO o (wℓ w j)) := by
+  obtain ⟨j', rfl⟩ : ∃ j', j = j' + 1 := ⟨j - 1, by omega⟩
+  have hl1 := hpal j' (by omega) (by omega)
+  have hl2 := hpal (j' + 1) (by omega) hj
+  have hf : flagR o (wℓ w) w.length (j' + 1) = flagO o (wℓ w) (j' + 1) := by
+    simp only [flagR, flagO]
+    rw [hl1, hl2]
+  unfold minusPc
+  rw [hf, hl2, Qf_mid o (wℓ w) w.length hpal hlast (j' + 1) (by omega) hj, add_assoc, ccO_add_shift]
+
+theorem minusPc_last (o : Orientation) (w : BinaryWord) (hn : 3 ≤ w.length)
+    (hpal : ∀ i, 1 ≤ i → i ≤ w.length - 2 → wℓ w (w.length - 1 - i) = wℓ w i)
+    (hlast : ccO o (wℓ w (w.length - 1)) = 0) :
+    minusPc o w (w.length - 1) = pieceAt (wℓ w 0) (decide (o = Orientation.horizontal) &&
+      decide (wℓ w 1 = Letter.q) && decide (wℓ w 0 = Letter.q))
+      (posO o (wℓ w) (w.length - 1) + (plusStepO o (wℓ w 0) + ccO o (wℓ w 0) -
+        plusStepO o (wℓ w (w.length - 1)) + familyShift o)) := by
+  unfold minusPc
+  have hf : flagR o (wℓ w) w.length (w.length - 1) = (decide (o = Orientation.horizontal) &&
+      decide (wℓ w 1 = Letter.q) && decide (wℓ w 0 = Letter.q)) := by
+    have e : w.length - 1 = (w.length - 2) + 1 := by omega
+    rw [e]
+    simp only [flagR]
+    rw [show w.length - 1 - (w.length - 2) = 1 by omega, show w.length - 1 - ((w.length - 2) + 1) = 0 by omega]
+  rw [hf, Nat.sub_self, Qf_last o (wℓ w) w.length hn hpal hlast, add_assoc]
+
+theorem plusPc_last (o : Orientation) (w : BinaryWord) (hflag : flagO o (wℓ w) (w.length - 1) = false) :
+    plusPc o w (w.length - 1) = pieceAt (wℓ w (w.length - 1)) false (posO o (wℓ w) (w.length - 1)) := by
+  unfold plusPc
+  rw [hflag]
+
+
 end FLatticePaper.Tiles
