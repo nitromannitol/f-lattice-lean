@@ -169,6 +169,7 @@ import FLatticePaper.Tiles.WordFacts3
 import FLatticePaper.Tiles.SuccessorProof
 import FLatticePaper.Tiles.RowConvexCrossing
 import FLatticePaper.MainTheorems
+import FLatticePaper.Plane.GlobalOdometers
 import FLatticePaper.Construction.BaseCaseRecurrence
 import FLatticePaper.Construction.PropBaseCases
 import FLatticePaper.Tiles.StackedStringConnected
@@ -214,4 +215,3 @@ import FLatticePaper.Tiles.RestoredAlternate
 import FLatticePaper.Tiles.AlternateInheritance
 
 /-! Root import for the corrected F-lattice paper. -/
-import FLatticePaper.Plane.GlobalOdometers
