@@ -2208,4 +2208,82 @@ theorem twos_E_arith (d z1 v : ℤ) (hd : 4 ≤ d)
     clear hev hod hu0 huP ho1 ho2 hvt1
     omega
 
+/-- The child of `2^(k+1)` is `(2k+3)/(2k+5)`. -/
+theorem twos_child_num_den (k : ℕ) :
+    (frameAt (List.replicate (k + 1) Digit.two)).child.num = 2 * (k : ℤ) + 3 ∧
+      (frameAt (List.replicate (k + 1) Digit.two)).child.den = 2 * (k : ℤ) + 5 := by
+  rw [child_replicate_two_succ]
+  unfold Fraction.rotate
+  split_ifs with h
+  · exact ⟨by show (2 * (k : ℤ) + 4) - 1 = 2 * (k : ℤ) + 3; ring,
+      by show (2 * (k : ℤ) + 4) + 1 = 2 * (k : ℤ) + 5; ring⟩
+  · exfalso
+    simp only at h
+    omega
+
+/-- Every point of the closed polygon of `2^(k+1)` lies in the tile shifted by `(0,-1)`, or is one of the two
+boundary points `(-1, d)`, `(d+1, 2d-2)` (here `d = 2k+4`). -/
+theorem closedPolygon_twos_tile (k : ℕ) (z : Site)
+    (hz : z ∈ (frameAt (List.replicate (k + 1) Digit.two)).closedPolygon) :
+    (z.1, z.2 + 1) ∈ paperNearLadderTile (2 * (k : ℤ) + 4) ∨
+      z = (-1, 2 * (k : ℤ) + 4) ∨ z = (2 * (k : ℤ) + 5, 4 * (k : ℤ) + 6) := by
+  obtain ⟨hn, hd⟩ := twos_child_num_den k
+  have hT : (frameAt (List.replicate (k + 1) Digit.two)).child.periodDenominator =
+      2 * ((2 * (k : ℤ) + 4) * (2 * (k : ℤ) + 4) + 2 * (2 * (k : ℤ) + 4) - 1) := by
+    simp only [Fraction.periodDenominator, hn, hd]
+    ring
+  obtain ⟨z1, z2⟩ := z
+  rw [ChildFrame.mem_closedPolygon_iff] at hz
+  simp only [ChildFrame.tGrade, ChildFrame.sGrade, hn, hd, hT, EvenSite] at hz
+  have hu0 : 0 ≤ (2 * (k : ℤ) + 4 + 1) * z1 + (z2 - z1) := by
+    rcases hz with ⟨_, _, _, h3, _⟩ | ⟨_, _, _, h3, _⟩ <;> linarith
+  have huP : (2 * (k : ℤ) + 4 + 1) * z1 + (z2 - z1) ≤
+      (2 * (k : ℤ) + 4) * (2 * (k : ℤ) + 4) + 2 * (2 * (k : ℤ) + 4) - 1 + (2 * (k : ℤ) + 4) - 1 := by
+    rcases hz with ⟨_, _, _, _, h4⟩ | ⟨_, _, _, _, h4⟩ <;> linarith
+  have hev : (z2 - z1) % 2 = 0 → 2 - 2 * ((2 * (k : ℤ) + 4) * (2 * (k : ℤ) + 4) + 2 * (2 * (k : ℤ) + 4) - 1) ≤
+      -2 * z1 - (2 * (k : ℤ) + 4 + 1) * (z2 - z1) ∧
+      -2 * z1 - (2 * (k : ℤ) + 4 + 1) * (z2 - z1) ≤ 2 * (2 * (k : ℤ) + 4) - 2 := by
+    intro hv
+    rcases hz with ⟨_, h1, h2, _, _⟩ | ⟨ho, _⟩
+    · exact ⟨by linarith, by linarith⟩
+    · exfalso
+      omega
+  have hod : (z2 - z1) % 2 = 1 → (2 * (k : ℤ) + 4) - 1 - 2 * ((2 * (k : ℤ) + 4) * (2 * (k : ℤ) + 4) + 2 * (2 * (k : ℤ) + 4) - 1) ≤
+      -2 * z1 - (2 * (k : ℤ) + 4 + 1) * (z2 - z1) ∧
+      -2 * z1 - (2 * (k : ℤ) + 4 + 1) * (z2 - z1) ≤ (2 * (k : ℤ) + 4) + 1 := by
+    intro hv
+    rcases hz with ⟨he, _, _, _, _⟩ | ⟨_, h1, h2, _, _⟩
+    · exfalso
+      omega
+    · exact ⟨by linarith, by linarith⟩
+  have key := twos_E_arith (2 * (k : ℤ) + 4) z1 (z2 - z1) (by omega) hu0 huP hev hod
+  show (z1, z2 + 1) ∈ paperNearLadderTile (2 * (k : ℤ) + 4) ∨
+      (z1, z2) = (-1, 2 * (k : ℤ) + 4) ∨ (z1, z2) = (2 * (k : ℤ) + 5, 4 * (k : ℤ) + 6)
+  rcases key with ⟨h1, h2, h3, h4, h5, h6, h7, h8⟩ | ⟨hA1, hA2⟩ | ⟨hA1, hA2⟩ | ⟨hP1, hP2⟩ | ⟨hP1, hP2⟩
+  · left
+    have hC : (z1, z2 + 1) ∈ paperNearLadderC (2 * (k : ℤ) + 4) := by
+      simp only [paperNearLadderC, Set.mem_setOf_eq]
+      omega
+    refine ⟨Set.mem_union_right _ hC, ?_⟩
+    simp only [paperNearLadderD, Set.mem_setOf_eq]
+    omega
+  · left
+    refine ⟨Set.mem_union_left _ (Set.mem_union_left _ ?_), ?_⟩
+    · simp only [paperNearLadderA, Set.mem_insert_iff, Set.mem_singleton_iff, Prod.mk.injEq]
+      left
+      constructor <;> omega
+    · simp only [paperNearLadderD, Set.mem_setOf_eq]
+      omega
+  · left
+    refine ⟨Set.mem_union_left _ (Set.mem_union_left _ ?_), ?_⟩
+    · simp only [paperNearLadderA, Set.mem_insert_iff, Set.mem_singleton_iff, Prod.mk.injEq]
+      right
+      constructor <;> omega
+    · simp only [paperNearLadderD, Set.mem_setOf_eq]
+      omega
+  · right; left
+    exact Prod.ext (by omega) (by omega)
+  · right; right
+    exact Prod.ext (by omega) (by omega)
+
 end FLatticePaper.Induction
