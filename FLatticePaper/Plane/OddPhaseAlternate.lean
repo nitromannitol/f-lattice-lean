@@ -1,6 +1,8 @@
 import FLatticePaper.Plane.GlobalOdometers
 import FLatticePaper.Construction.AlternateIdentification
 import FLatticePaper.Construction.NearOneBaseCases
+import FLatticePaper.Tiles.StandardSimple
+import FLatticePaper.Construction.OddChartParity
 
 /-! The alternate identification at every birth, with the odd alternate's target of w2 (`alternateOddTarget`).
 
@@ -489,13 +491,11 @@ theorem global_odometers_pair {fraction : Fraction} (hint : fraction.Interior) {
         (standardField (List.replicate k Digit.three)) x =
       stairEvenAltField (2 * (k : ℤ) + 3) (standardField (List.replicate k Digit.three)) x + c)
     (bdOdd : ∀ v : Word, StandardBoundaryOdd v) (bdEven : ∀ v : Word, StandardBoundaryEven v)
-    (simpleOdd : ∀ v : Word, IsSimpleTile (cellTileOf (oddTile v)))
-    (simpleEven : ∀ v : Word, IsSimpleTile (cellTileOf (evenTile v)))
     (tile : HeightTile Site)
     (htile : ∃ gauge : ℤ, tile.Agrees (planeTarget w p) gauge)
     (hsites : (p = .even ∧ tile.sites = evenTile w) ∨ (p = .odd ∧ tile.sites = oddTile w) ∨
       fraction.modifiedDeck.Covers tile.sites)
-    (hchart : p = .odd → EvenSite (alternateOddChart w))
+    (hord : p = .odd → (w.getLast? = some Digit.one ∨ w.getLast? = some Digit.three))
     (altTile : HeightTile Site) (htileAlt : ∃ gauge : ℤ, altTile.Agrees (altTarget w p) gauge)
     (hcovAlt : fraction.modifiedDeck.Covers altTile.sites) :
     ((∃ c : ℤ, ∀ (x : Site) (hx : x ∈ tile.sites), planeTarget w p x = tile.height ⟨x, hx⟩ + c) ∧
@@ -535,7 +535,9 @@ theorem global_odometers_pair {fraction : Fraction} (hint : fraction.Interior) {
   have hpk : ∀ u : Word, (frameAt u).Packet (standardField u) := packet_all hstar hsheet
   have hAll : ∀ u : Word, AlternateFactsWord u :=
     altFactsWord_all hstar hsheet harc hodd hbulk hbaseTwoId hbaseThree
-  have hstd := global_odometers hint hbirth hstar hsheet harc hodd hbulk bdOdd bdEven simpleOdd simpleEven
+  have hstd := global_odometers hint hbirth hstar hsheet harc hodd hbulk bdOdd bdEven
+    (fun v => FLatticePaper.Tiles.StandardSimple.simpleOdd_of_standardBoundaryWord (fun u => ⟨bdOdd u, bdEven u⟩) v)
+    (fun v => FLatticePaper.Tiles.StandardSimple.simpleEven_of_standardBoundaryWord (fun u => ⟨bdOdd u, bdEven u⟩) v)
     tile htile hsites
   have hstdSP : SatisfiesPeriodicity fraction (planeTarget w p) := hstd.2.1
   obtain ⟨gauge, hag⟩ := htileAlt
@@ -561,7 +563,7 @@ theorem global_odometers_pair {fraction : Fraction} (hint : fraction.Interior) {
         fun h => Parity.noConfusion h⟩
     | odd =>
       obtain ⟨h1, h2, h3, h4, h5, h6, h7⟩ :=
-        odd_altTarget_facts w hbirth hint hpk hAll hstdSP (hchart rfl)
+        odd_altTarget_facts w hbirth hint hpk hAll hstdSP (evenSite_alternateOddChart w (hord rfl))
       exact ⟨h1, h2, h3, h4, h5, h6, fun h => Parity.noConfusion h, fun _ => h7⟩
   obtain ⟨hAS, hAGr, hAB, hAS2, hAR, hAN, hInc⟩ := hfacts
   refine ⟨hstd, ⟨-gauge, fun x hx => ?_⟩, hAS, hAGr, exists_tilt hint.inUnitInterval hAS, hAB, hAS2, hAR,
