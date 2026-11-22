@@ -243,4 +243,346 @@ theorem ordinaryAlternate_odd_first_agrees_of_gap (parents : TileParents) (befor
   rw [hc s h.1 h.2]
   ring
 
+/-! ## Phase zero: the shear and the copies that are F-pure -/
+
+theorem oddStdChart_phase_zero (w : Word) (h : phase w = 0) : oddStdChart w = 0 := by
+  unfold oddStdChart
+  simp [h]
+
+/-- **The phase-zero shear.** In phase zero the odd target is the standard odd target at zero shift, and on the window
+`0 ≤ gap ≤ 2` the raw odd target is that target plus `min 0 (1 − gap)`: the gap is the drop of the standard field of the swapped word
+at the quarter-turned point, and the alternate target takes the minimum of the field and its translate plus one. -/
+theorem alternateOddRawTarget_eq_planeTarget_phase_zero (w : Word) (hph : phase w = 0) (x : Site)
+    (h0 : 0 ≤ shearGap w x) (h2 : shearGap w x ≤ 2) :
+    alternateOddRawTarget w x = planeTarget w .odd x + min 0 (1 - shearGap w x) := by
+  have hδ : alternateOddDelta w = 0 := by
+    unfold alternateOddDelta
+    simp [hph]
+  have hs : alternateOddSlope w = 0 := by
+    unfold alternateOddSlope
+    simp [hph]
+  have hg : shearGap w x =
+      standardField (w.map Digit.swapTwoThree) (QuarterTurn.counterclockwise.mapSite (0, -1) x) -
+        standardField (w.map Digit.swapTwoThree)
+          (QuarterTurn.counterclockwise.mapSite (0, -1) x + alternateSigma (w.map Digit.swapTwoThree)) := by
+    unfold shearGap
+    rw [hδ, sub_zero]
+  have hmin : alternateTarget (w.map Digit.swapTwoThree) (QuarterTurn.counterclockwise.mapSite (0, -1) x) =
+      min (standardField (w.map Digit.swapTwoThree) (QuarterTurn.counterclockwise.mapSite (0, -1) x))
+        (standardField (w.map Digit.swapTwoThree)
+          (QuarterTurn.counterclockwise.mapSite (0, -1) x + alternateSigma (w.map Digit.swapTwoThree)) + 1) :=
+    alternateTarget_eq_min (QuarterTurn.counterclockwise.mapSite (0, -1) x) (by linarith) (by linarith)
+  unfold alternateOddRawTarget
+  rw [planeTarget_odd_eq, hδ, hs]
+  unfold quarterTurnField
+  simp only [sub_zero, Prod.fst_zero, Prod.snd_zero, zero_mul, add_zero]
+  rw [hmin]
+  omega
+
+/-- **The first copy of the odd ordinary alternate agrees with the raw odd target in phase zero**, on the window `0 ≤ gap ≤ 1`
+of its sites (the copy is F-pure there, and the shear constant is zero). -/
+theorem ordinaryAlternate_odd_first_agrees_phase_zero (parents : TileParents) (beforePush : Word) (digit : Digit) {g : ℤ}
+    (hph : phase (beforePush ++ [digit]) = 0)
+    (hstd : (ordinaryStandardCopy parents (beforePush ++ [digit]) .odd 0).val.Agrees
+      (fun y => planeTarget (beforePush ++ [digit]) .odd (y - oddStdChart (beforePush ++ [digit]))) g)
+    (hgap : ∀ s ∈ (ordinaryStandardCopy parents (beforePush ++ [digit]) .odd 0).val.sites,
+      0 ≤ shearGap (beforePush ++ [digit]) s ∧ shearGap (beforePush ++ [digit]) s ≤ 1) :
+    (ordinaryAlternateSchedule parents beforePush digit .odd).first.val.Agrees
+      (alternateOddRawTarget (beforePush ++ [digit])) g := by
+  have hshear : ∀ s ∈ (ordinaryStandardCopy parents (beforePush ++ [digit]) .odd 0).val.sites,
+      alternateOddRawTarget (beforePush ++ [digit]) s =
+        planeTarget (beforePush ++ [digit]) .odd (s - oddStdChart (beforePush ++ [digit])) + 0 := by
+    intro s hs
+    have h := hgap s hs
+    rw [alternateOddRawTarget_eq_planeTarget_phase_zero _ hph s h.1 (by linarith [h.2]),
+      oddStdChart_phase_zero _ hph, sub_zero, min_eq_left (by linarith [h.2]), add_zero]
+  simpa using ordinaryAlternate_odd_first_agrees parents beforePush digit hstd hshear
+
+/-- **The copy in slot four of the odd ordinary alternate agrees with the raw odd target in phase zero**, on the window `0 ≤ gap ≤ 1`
+of the standard copy five on its sites (F-pure, zero shear). -/
+theorem ordinaryAlternate_odd_copy_four_agrees_phase_zero (parents : TileParents) (word : Word) (h : phase word = 0) {g : ℤ}
+    (hstd : (ordinaryStandardCopy parents word .odd 5).val.Agrees (planeTarget word .odd) g)
+    (hgap : ∀ s ∈ (ordinaryStandardCopy parents word .odd 5).val.sites,
+      0 ≤ shearGap word s ∧ shearGap word s ≤ 1) :
+    (placedBySlot (alternateJets word .odd) (standardSources parents .even) 4).val.Agrees
+      (alternateOddRawTarget word) g := by
+  have hshear : ∀ s ∈ (ordinaryStandardCopy parents word .odd 5).val.sites,
+      alternateOddRawTarget word s = planeTarget word .odd s + 0 := by
+    intro s hs
+    have h' := hgap s hs
+    rw [alternateOddRawTarget_eq_planeTarget_phase_zero word h s h'.1 (by linarith [h'.2]),
+      min_eq_left (by linarith [h'.2]), add_zero]
+  simpa using ordinaryAlternate_odd_copy_four_agrees parents word h hstd hshear
+
+/-! ## The copies by their standard type: the G-branch, the chart shear on the whole window, and the coincident copies -/
+
+theorem min_shift_aux (a b : ℤ) : min a (b + 1) = b + min (a - b) 1 := by
+  omega
+
+/-- The G-branch standard target of an odd word: the standard field of the swapped word at the quarter-turned point translated by
+`σ`, with the harmonic grid and the transverse slope of the raw target. -/
+noncomputable def alternateOddGPlane (word : Word) : Field := fun x =>
+  standardField (word.map Digit.swapTwoThree)
+      (QuarterTurn.counterclockwise.mapSite (0, -1) (x - alternateOddDelta word) +
+        alternateSigma (word.map Digit.swapTwoThree)) +
+    harmonicGrid (x - alternateOddDelta word) +
+    ((alternateOddSlope word).1 * x.1 + (alternateOddSlope word).2 * x.2)
+
+/-- **The raw odd target is the G-branch target plus the capped gap**, on the window `0 ≤ gap ≤ 2` (both phases): the alternate target
+is `F(· + σ) + min(gap, 1)` there, so the raw target is `alternateOddGPlane + min(gap, 1)` with no constant. -/
+theorem alternateOddRawTarget_eq_gPlane_add_min (word : Word) (x : Site)
+    (hlo : 0 ≤ shearGap word x) (hhi : shearGap word x ≤ 2) :
+    alternateOddRawTarget word x = alternateOddGPlane word x + min (shearGap word x) 1 := by
+  have hmin := alternateTarget_eq_min (word := word.map Digit.swapTwoThree)
+    (QuarterTurn.counterclockwise.mapSite (0, -1) (x - alternateOddDelta word)) hlo hhi
+  unfold alternateOddRawTarget alternateOddGPlane quarterTurnField
+  rw [hmin, min_shift_aux]
+  unfold shearGap
+  ring
+
+/-- **A copy on the G-branch agrees with the raw odd target**, with constant `g − 1`, when the gap of its sites lies in `[1, 2]` (there
+the capped gap is one). -/
+theorem HeightTile.Agrees.alternateOddRawTarget_of_gPlane {word : Word} {tile : HeightTile Site} {g : ℤ}
+    (h : tile.Agrees (alternateOddGPlane word) g)
+    (hwin : ∀ s ∈ tile.sites, 1 ≤ shearGap word s ∧ shearGap word s ≤ 2) :
+    tile.Agrees (alternateOddRawTarget word) (g - 1) := by
+  intro s
+  have hw := hwin s.1 s.2
+  rw [h s, alternateOddRawTarget_eq_gPlane_add_min word s.1 (by linarith [hw.1]) hw.2, min_eq_right hw.1]
+  ring
+
+/-- **The chart shear on the whole window** (phase one): on the sites where the gap lies in `[0, 2]`, the raw odd target is the
+standard odd target at the chart-shifted point, plus `min(gap, 1)` and a constant independent of the site. -/
+theorem alternateOddRawTarget_eq_planeTarget_chart_min (word : Word) (hph : phase word = 1)
+    (hpk : (frameAt (word.map Digit.swapTwoThree)).Packet (standardField (word.map Digit.swapTwoThree))) :
+    ∃ c : ℤ, ∀ x : Site, 0 ≤ shearGap word x → shearGap word x ≤ 2 →
+      alternateOddRawTarget word x = planeTarget word .odd (x - oddStdChart word) + min (shearGap word x) 1 + c := by
+  obtain ⟨ch, hch⟩ := harmonicGrid_shift (parentsAt word).odd.num (parentsAt word).odd.den
+  refine ⟨ch - ((parentsAt word).odd.num * (parentsAt word).even.den - (parentsAt word).odd.den * (parentsAt word).even.num),
+    fun x hg1 hg2 => ?_⟩
+  have hδ : alternateOddDelta word = ((parentsAt word).odd.num - (parentsAt word).odd.den - (parentsAt word).even.den,
+      (parentsAt word).odd.num + (parentsAt word).odd.den - (parentsAt word).even.num) := by
+    unfold alternateOddDelta
+    simp [hph, transverseJet, kernelJet]
+  have hchart : oddStdChart word = (-(parentsAt word).even.den, -(parentsAt word).even.num) := by
+    unfold oddStdChart
+    simp [hph, kernelJet]
+  have hslope : alternateOddSlope word = ((parentsAt word).odd.num, -(parentsAt word).odd.den) := by
+    unfold alternateOddSlope
+    simp [hph]
+  have hzrot : QuarterTurn.counterclockwise.mapSite (0, -1) (x - alternateOddDelta word) +
+      (-((parentsAt word).odd.num + (parentsAt word).odd.den), (parentsAt word).odd.num - (parentsAt word).odd.den) =
+      QuarterTurn.counterclockwise.mapSite (0, -1) (x - oddStdChart word) := by
+    rw [quarterTurn_site, quarterTurn_site, hδ, hchart]
+    ext
+    · simp
+      ring
+    · simp
+      ring
+  have hσ := alternateSigma_eq_rot_add_period word hph
+  have hper : ∀ y : Site, standardField (word.map Digit.swapTwoThree)
+      (y + ((frameAt (word.map Digit.swapTwoThree)).child.den, (frameAt (word.map Digit.swapTwoThree)).child.num)) =
+      standardField (word.map Digit.swapTwoThree) y :=
+    fun y => standardField_child_kernel_period _ hpk y
+  have hFσ : standardField (word.map Digit.swapTwoThree)
+      (QuarterTurn.counterclockwise.mapSite (0, -1) (x - alternateOddDelta word) + alternateSigma (word.map Digit.swapTwoThree)) =
+      standardField (word.map Digit.swapTwoThree)
+        (QuarterTurn.counterclockwise.mapSite (0, -1) (x - alternateOddDelta word) +
+          (-((parentsAt word).odd.num + (parentsAt word).odd.den), (parentsAt word).odd.num - (parentsAt word).odd.den)) := by
+    rw [hσ, ← add_assoc]
+    exact hper _
+  have hS : standardField (word.map Digit.swapTwoThree)
+      (QuarterTurn.counterclockwise.mapSite (0, -1) (x - alternateOddDelta word) + alternateSigma (word.map Digit.swapTwoThree)) =
+      standardField (word.map Digit.swapTwoThree) (QuarterTurn.counterclockwise.mapSite (0, -1) (x - oddStdChart word)) := by
+    rw [hFσ, hzrot]
+  have hh : harmonicGrid (x - alternateOddDelta word) =
+      harmonicGrid (x - oddStdChart word) -
+        ((parentsAt word).odd.num * (x - oddStdChart word).1 - (parentsAt word).odd.den * (x - oddStdChart word).2) + ch := by
+    rw [← hch]
+    congr 1
+    rw [hδ, hchart]
+    ext
+    · simp
+      ring
+    · simp
+      ring
+  have hmin : alternateTarget (word.map Digit.swapTwoThree)
+      (QuarterTurn.counterclockwise.mapSite (0, -1) (x - alternateOddDelta word)) =
+      standardField (word.map Digit.swapTwoThree)
+          (QuarterTurn.counterclockwise.mapSite (0, -1) (x - alternateOddDelta word) +
+            alternateSigma (word.map Digit.swapTwoThree)) +
+        min (standardField (word.map Digit.swapTwoThree)
+            (QuarterTurn.counterclockwise.mapSite (0, -1) (x - alternateOddDelta word)) -
+          standardField (word.map Digit.swapTwoThree)
+            (QuarterTurn.counterclockwise.mapSite (0, -1) (x - alternateOddDelta word) +
+              alternateSigma (word.map Digit.swapTwoThree))) 1 := by
+    rw [alternateTarget_eq_min (word := word.map Digit.swapTwoThree)
+      (QuarterTurn.counterclockwise.mapSite (0, -1) (x - alternateOddDelta word)) hg1 hg2, min_shift_aux]
+  unfold shearGap
+  unfold alternateOddRawTarget
+  rw [planeTarget_odd_eq]
+  unfold quarterTurnField
+  rw [hmin, hS, hh, hslope]
+  simp only [hchart, Prod.fst_sub, Prod.snd_sub]
+  ring
+
+/-- **A coincident copy agrees with the raw odd target** (phase one). A copy that is the standard odd target at zero shift, on the
+window `0 ≤ gap ≤ 2`, agrees with the raw target when the chart-shifted target plus the capped gap is the zero-shift target plus a
+constant `κ` on its sites (the branch identity, named). The agreement constant is `g − κ − c`. -/
+theorem HeightTile.Agrees.alternateOddRawTarget_of_coincident {word : Word} (hph : phase word = 1)
+    (hpk : (frameAt (word.map Digit.swapTwoThree)).Packet (standardField (word.map Digit.swapTwoThree)))
+    {tile : HeightTile Site} {g κ : ℤ}
+    (htile : tile.Agrees (planeTarget word .odd) g)
+    (hwin : ∀ s ∈ tile.sites, 0 ≤ shearGap word s ∧ shearGap word s ≤ 2)
+    (hbr : ∀ s ∈ tile.sites, planeTarget word .odd (s - oddStdChart word) + min (shearGap word s) 1 =
+      planeTarget word .odd s + κ) :
+    ∃ k : ℤ, tile.Agrees (alternateOddRawTarget word) k := by
+  obtain ⟨c, hc⟩ := alternateOddRawTarget_eq_planeTarget_chart_min word hph hpk
+  refine ⟨g - κ - c, ?_⟩
+  intro s
+  have hw := hwin s.1 s.2
+  have hb := hbr s.1 s.2
+  rw [htile s, hc s.1 hw.1 hw.2, hb]
+  ring
+
+/-! ## The sheet facts of the odd alternate copies, and the copy list -/
+
+/-- The tile in slot `k` of the odd ordinary alternate of `w` (the placed copy). -/
+noncomputable def oddSlotTile (parents : TileParents) (w : Word) (k : Fin 6) : HeightTile Site :=
+  (placedBySlot (alternateJets w .odd) (standardSources parents .even) k).val
+
+/-- **The named sheet facts and window facts of the copies of the odd ordinary alternate of `w`.** Each copy is, on its sites, one of
+the standard expressions of the swapped word (the F-branch `alternateOddPlane`, the G-branch `alternateOddGPlane`, or the zero-shift
+standard target `planeTarget`), or a copy of the raw target itself; the windows are the gap ranges of the copies on their sites. The
+standard identities and windows are checked numerically for the odd words of length at most three
+(`scripts/odd_copy_candidates.py`, `scripts/odd_copy_gap.py`). -/
+structure OddAlternateFacts (parents : TileParents) (w : Word) : Prop where
+  firstStd : ∃ g : ℤ, (ordinaryStandardCopy parents w .odd 0).val.Agrees
+    (fun y => planeTarget w .odd (y - oddStdChart w)) g
+  firstWin1 : phase w = 1 → ∀ s ∈ (ordinaryStandardCopy parents w .odd 0).val.sites,
+    1 ≤ shearGap w s ∧ shearGap w s ≤ 2
+  firstWin0 : phase w = 0 → ∀ s ∈ (ordinaryStandardCopy parents w .odd 0).val.sites,
+    0 ≤ shearGap w s ∧ shearGap w s ≤ 1
+  coStd4 : phase w = 1 → ∃ g : ℤ, (ordinaryStandardCopy parents w .odd 4).val.Agrees (planeTarget w .odd) g
+  coWin4 : phase w = 1 → ∀ s ∈ (ordinaryStandardCopy parents w .odd 4).val.sites,
+    0 ≤ shearGap w s ∧ shearGap w s ≤ 2
+  coBr4 : phase w = 1 → ∀ s ∈ (ordinaryStandardCopy parents w .odd 4).val.sites,
+    planeTarget w .odd (s - oddStdChart w) + min (shearGap w s) 1 = planeTarget w .odd s + 1
+  coStd5 : phase w = 0 → ∃ g : ℤ, (ordinaryStandardCopy parents w .odd 5).val.Agrees (planeTarget w .odd) g
+  coWin5 : phase w = 0 → ∀ s ∈ (ordinaryStandardCopy parents w .odd 5).val.sites,
+    0 ≤ shearGap w s ∧ shearGap w s ≤ 1
+  plane1 : phase w = 1 → ∃ g : ℤ, (oddSlotTile parents w 1).Agrees (alternateOddPlane w) g
+  planeWin1 : phase w = 1 → ∀ s ∈ (oddSlotTile parents w 1).sites, 0 ≤ shearGap w s ∧ shearGap w s ≤ 1
+  plane3 : phase w = 1 → ∃ g : ℤ, (oddSlotTile parents w 3).Agrees (alternateOddPlane w) g
+  planeWin3 : phase w = 1 → ∀ s ∈ (oddSlotTile parents w 3).sites, 0 ≤ shearGap w s ∧ shearGap w s ≤ 1
+  gplane4 : phase w = 1 → ∃ g : ℤ, (oddSlotTile parents w 4).Agrees (alternateOddGPlane w) g
+  gWin4 : phase w = 1 → ∀ s ∈ (oddSlotTile parents w 4).sites, 1 ≤ shearGap w s ∧ shearGap w s ≤ 2
+  coincident5 : phase w = 1 → ∃ g : ℤ, (oddSlotTile parents w 5).Agrees (planeTarget w .odd) g
+  coWin5' : phase w = 1 → ∀ s ∈ (oddSlotTile parents w 5).sites, 0 ≤ shearGap w s ∧ shearGap w s ≤ 2
+  coBr5 : phase w = 1 → ∀ s ∈ (oddSlotTile parents w 5).sites,
+    planeTarget w .odd (s - oddStdChart w) + min (shearGap w s) 1 = planeTarget w .odd s + 2
+  gplane1 : phase w = 0 → ∃ g : ℤ, (oddSlotTile parents w 1).Agrees (alternateOddGPlane w) g
+  gWin1 : phase w = 0 → ∀ s ∈ (oddSlotTile parents w 1).sites, 1 ≤ shearGap w s ∧ shearGap w s ≤ 2
+  gplane3 : phase w = 0 → ∃ g : ℤ, (oddSlotTile parents w 3).Agrees (alternateOddGPlane w) g
+  gWin3 : phase w = 0 → ∀ s ∈ (oddSlotTile parents w 3).sites, 1 ≤ shearGap w s ∧ shearGap w s ≤ 2
+  raw2 : phase w = 0 → ∃ k : ℤ, (oddSlotTile parents w 2).Agrees (alternateOddRawTarget w) k
+  raw5 : phase w = 0 → ∃ k : ℤ, (oddSlotTile parents w 5).Agrees (alternateOddRawTarget w) k
+
+/-- **The slots of the odd alternate other than the copies two and four (phase one) and two and four (phase zero)**, discharged from the
+named sheet facts: in phase one the slots one and three are on the F-branch, slot four on the G-branch, slot five is the coincident
+copy; in phase zero the slots one and three are on the G-branch, and the slots two and five are named as copies of the raw target. -/
+theorem ordinaryAlternate_odd_hslot_of_facts (parents : TileParents) (w : Word)
+    (hpk : (frameAt (w.map Digit.swapTwoThree)).Packet (standardField (w.map Digit.swapTwoThree)))
+    (F : OddAlternateFacts parents w) :
+    ∀ s ∈ afterSeventhAlternate .odd, (phase w = 1 → s ≠ 2) → (phase w = 0 → s ≠ 4) → ∃ g : ℤ,
+      (placedBySlot (alternateJets w .odd) (standardSources parents .even) s).val.Agrees
+        (alternateOddRawTarget w) g := by
+  intro s hs h1s h0s
+  simp only [afterSeventhAlternate, List.mem_cons, List.mem_nil_iff, or_false] at hs
+  rcases phase_eq_zero_or_one w with hph | hph
+  · rcases hs with rfl | rfl | rfl | rfl | rfl
+    · obtain ⟨k, hk⟩ := F.raw2 hph
+      exact ⟨k, hk⟩
+    · obtain ⟨g, hg⟩ := F.gplane3 hph
+      exact ⟨g - 1, HeightTile.Agrees.alternateOddRawTarget_of_gPlane hg (F.gWin3 hph)⟩
+    · obtain ⟨g, hg⟩ := F.gplane1 hph
+      exact ⟨g - 1, HeightTile.Agrees.alternateOddRawTarget_of_gPlane hg (F.gWin1 hph)⟩
+    · exact absurd rfl (h0s hph)
+    · obtain ⟨k, hk⟩ := F.raw5 hph
+      exact ⟨k, hk⟩
+  · rcases hs with rfl | rfl | rfl | rfl | rfl
+    · exact absurd rfl (h1s hph)
+    · obtain ⟨g, hg⟩ := F.plane3 hph
+      exact ⟨g, HeightTile.Agrees.alternateOddRawTarget_of_branch hg (F.planeWin3 hph)⟩
+    · obtain ⟨g, hg⟩ := F.plane1 hph
+      exact ⟨g, HeightTile.Agrees.alternateOddRawTarget_of_branch hg (F.planeWin1 hph)⟩
+    · obtain ⟨g, hg⟩ := F.gplane4 hph
+      exact ⟨g - 1, HeightTile.Agrees.alternateOddRawTarget_of_gPlane hg (F.gWin4 hph)⟩
+    · obtain ⟨g, hg⟩ := F.coincident5 hph
+      exact HeightTile.Agrees.alternateOddRawTarget_of_coincident hph hpk hg (F.coWin5' hph) (F.coBr5 hph)
+
+/-- **The copy list of the odd ordinary alternate, down to the named sheet facts.** The identity of `ordinaryAlternate_odd_identifies_copies`
+with its shear hypotheses discharged from the window facts (the first copy and the standard copies four and five, by the phase-one
+and phase-zero shears), and its slot hypothesis discharged by `ordinaryAlternate_odd_hslot_of_facts`. -/
+theorem ordinaryAlternate_odd_identifies_copies_of_facts (parents : TileParents) (beforePush : Word) (digit : Digit)
+    (hnb : ¬ FLatticePaper.Tiles.Standard.IsBase (beforePush ++ [digit]))
+    (context : String)
+    (hpk : (frameAt ((beforePush ++ [digit]).map Digit.swapTwoThree)).Packet
+      (standardField ((beforePush ++ [digit]).map Digit.swapTwoThree)))
+    (F : OddAlternateFacts parents (beforePush ++ [digit]))
+    {g0 : ℤ} (hdonor : parents.alternateEven.val.Agrees (alternateTarget beforePush) g0)
+    (hmid : ¬ FLatticePaper.Tiles.Standard.IsBase (beforePush ++ [digit]) → ∃ k : ℤ,
+      ∀ s ∈ (alternateOddSeventhCopy parents beforePush digit).val.sites,
+        alternateOddRawTarget (beforePush ++ [digit]) s =
+          alternateTarget beforePush
+              (s - ((seventhAlternateJet beforePush digit .odd).1 +
+                alternateRestoration (beforePush ++ [digit]) .even)) +
+            ((seventhAlternateJet beforePush digit .odd).2.1 * s.1 +
+              (seventhAlternateJet beforePush digit .odd).2.2 * s.2) + k)
+    (hcon : HeightTile.OrderedContacts (ordinaryAlternateSchedule parents beforePush digit .odd).first.val.sites
+      (ordinaryAlternateSchedule parents beforePush digit .odd).copies) :
+    ∃ result, (ordinaryAlternateSchedule parents beforePush digit .odd).eval .tile context = .ok result ∧
+      ∃ g : ℤ, result.val.Agrees
+        (fun site => alternateOddRawTarget (beforePush ++ [digit]) (site +
+          ((ordinaryAlternateSchedule parents beforePush digit .odd).raw hcon).val.boxOrigin
+            ((ordinaryAlternateSchedule parents beforePush digit .odd).raw hcon).property)) g := by
+  have hshear0 : ∃ k : ℤ, ∀ s ∈ (ordinaryStandardCopy parents (beforePush ++ [digit]) .odd 0).val.sites,
+      alternateOddRawTarget (beforePush ++ [digit]) s =
+        planeTarget (beforePush ++ [digit]) .odd (s - oddStdChart (beforePush ++ [digit])) + k := by
+    rcases phase_eq_zero_or_one (beforePush ++ [digit]) with hph | hph
+    · refine ⟨0, fun s hs => ?_⟩
+      have h := F.firstWin0 hph s hs
+      rw [alternateOddRawTarget_eq_planeTarget_phase_zero _ hph s h.1 (by linarith [h.2]),
+        oddStdChart_phase_zero _ hph, sub_zero, min_eq_left (by linarith [h.2]), add_zero]
+    · obtain ⟨c, hc⟩ := alternateOddRawTarget_eq_planeTarget_chart_min _ hph hpk
+      refine ⟨1 + c, fun s hs => ?_⟩
+      have h := F.firstWin1 hph s hs
+      rw [hc s (by linarith [h.1]) h.2, min_eq_right h.1]
+      ring
+  have hco1 : phase (beforePush ++ [digit]) = 1 →
+      (∃ g : ℤ, (ordinaryStandardCopy parents (beforePush ++ [digit]) .odd 4).val.Agrees
+        (planeTarget (beforePush ++ [digit]) .odd) g) ∧
+      (∃ k : ℤ, ∀ s ∈ (ordinaryStandardCopy parents (beforePush ++ [digit]) .odd 4).val.sites,
+        alternateOddRawTarget (beforePush ++ [digit]) s = planeTarget (beforePush ++ [digit]) .odd s + k) := by
+    intro hph
+    refine ⟨F.coStd4 hph, ?_⟩
+    obtain ⟨c, hc⟩ := alternateOddRawTarget_eq_planeTarget_chart_min _ hph hpk
+    refine ⟨1 + c, fun s hs => ?_⟩
+    have hw := F.coWin4 hph s hs
+    have hb := F.coBr4 hph s hs
+    rw [hc s hw.1 hw.2, hb]
+    ring
+  have hco0 : phase (beforePush ++ [digit]) = 0 →
+      (∃ g : ℤ, (ordinaryStandardCopy parents (beforePush ++ [digit]) .odd 5).val.Agrees
+        (planeTarget (beforePush ++ [digit]) .odd) g) ∧
+      (∃ k : ℤ, ∀ s ∈ (ordinaryStandardCopy parents (beforePush ++ [digit]) .odd 5).val.sites,
+        alternateOddRawTarget (beforePush ++ [digit]) s = planeTarget (beforePush ++ [digit]) .odd s + k) := by
+    intro hph
+    refine ⟨F.coStd5 hph, 0, fun s hs => ?_⟩
+    have h := F.coWin5 hph s hs
+    rw [alternateOddRawTarget_eq_planeTarget_phase_zero _ hph s h.1 (by linarith [h.2]),
+      min_eq_left (by linarith [h.2]), add_zero]
+  exact ordinaryAlternate_odd_identifies_copies parents beforePush digit hnb context F.firstStd hshear0 hco1 hco0
+    hdonor hmid (ordinaryAlternate_odd_hslot_of_facts parents (beforePush ++ [digit]) hpk F) hcon
+
 end FLatticePaper.Construction
