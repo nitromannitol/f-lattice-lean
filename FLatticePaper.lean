@@ -31,6 +31,7 @@ import FLatticePaper.Construction.NearQPrices
 import FLatticePaper.Construction.PlaneIdentification
 import FLatticePaper.Construction.RawOrigin
 import FLatticePaper.Construction.NominalAgreement
+import FLatticePaper.Construction.ConjugatePeriods
 import FLatticePaper.Construction.OrdinaryComparisons
 import FLatticePaper.Construction.OrdinaryTables
 import FLatticePaper.Construction.PlacedAssembly
