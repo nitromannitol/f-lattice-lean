@@ -227,5 +227,6 @@ import FLatticePaper.Tiles.AlternateAgreement
 import FLatticePaper.Construction.AlternateIdentification
 import FLatticePaper.Construction.OddChartParity
 import FLatticePaper.Construction.OddAlternateCopies
+import FLatticePaper.Construction.OddShear
 
 /-! Root import for the corrected F-lattice paper. -/
