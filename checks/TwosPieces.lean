@@ -16,3 +16,4 @@ import FLatticePaper.Plane.Induction.TwosPieces
 #print axioms FLatticePaper.Induction.leftEdgeTop_piece
 #print axioms FLatticePaper.Induction.zeroColumn_piece
 #print axioms FLatticePaper.Induction.zeroColumnTop_piece
+#print axioms FLatticePaper.Induction.diagonalEven_piece
