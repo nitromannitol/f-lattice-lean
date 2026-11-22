@@ -128,4 +128,99 @@ theorem enlarged_succ (o : Orientation) (L : BinaryWord) (k : ℕ) (hk : k + 1 <
   rw [List.getD_cons_succ, List.getD_eq_getElem?_getD, List.getElem?_zipWith]
   simp [List.getElem?_tail, List.getElem?_eq_getElem h1, List.getElem?_eq_getElem h2]
 
+
+/-! ### The palindrome identities -/
+
+/-- The offset of a shadow relative to the minus family shift. -/
+def ccO (o : Orientation) (l : Letter) : Site := shadowO o l - familyShift o
+
+theorem ccO_add_shift (o : Orientation) (l : Letter) : ccO o l + familyShift o = shadowO o l := by
+  unfold ccO
+  exact sub_add_cancel _ _
+
+/-- The consecutive-letter identity behind the palindrome: a reversed step and a plus step differ by the offsets. -/
+theorem key_identity (o : Orientation) (a b : Letter) :
+    revStepO o a b + ccO o a = plusStepO o b + ccO o b := by
+  cases o <;> cases a <;> cases b <;> decide
+
+/-- The palindrome in the middle of an almost palindrome, as an identity of letters. -/
+theorem almost_pal_index (w : BinaryWord) (hA : IsAlmostPalindrome w) (i : ℕ) (h1 : 1 ≤ i)
+    (h2 : i ≤ w.length - 2) : wℓ w (w.length - 1 - i) = wℓ w i := by
+  obtain ⟨f, l, mid, hmid, rfl⟩ := hA
+  have hkey : ∀ t (ht : t < mid.length), mid[t] = mid[mid.length - 1 - t]'(by omega) := by
+    intro t ht
+    have h3 := List.getElem_reverse (l := mid) (i := t) (by simpa using ht)
+    simp only [hmid] at h3
+    exact h3
+  have hget : ∀ t (ht : t < mid.length), wℓ (f :: (mid ++ [l])) (t + 1) = mid[t] := by
+    intro t ht
+    unfold wℓ
+    rw [List.getD_cons_succ, List.getD_append _ _ _ _ (by simpa using ht), List.getD_eq_getElem _ _ ht]
+  have hlen : (f :: (mid ++ [l])).length = mid.length + 2 := by
+    simp only [List.length_cons, List.length_append, List.length_nil]
+  rw [hlen] at h2 ⊢
+  obtain ⟨s, rfl⟩ : ∃ s, i = s + 1 := ⟨i - 1, by omega⟩
+  have e1 : mid.length + 2 - 1 - (s + 1) = (mid.length - (s + 1)) + 1 := by omega
+  rw [e1, hget _ (by omega), hget s (by omega), hkey s (by omega)]
+  congr 1
+  omega
+
+theorem Qf_mid (o : Orientation) (ℓ : ℕ → Letter) (n : ℕ)
+    (hpal : ∀ i, 1 ≤ i → i ≤ n - 2 → ℓ (n - 1 - i) = ℓ i) (hlast : ccO o (ℓ (n - 1)) = 0) :
+    ∀ j, 1 ≤ j → j ≤ n - 2 → Qf o ℓ n j = posO o ℓ j + ccO o (ℓ j) := by
+  intro j hj
+  induction j, hj using Nat.le_induction with
+  | base =>
+    intro _
+    have h1 : ℓ (n - 2) = ℓ 1 := by
+      have := hpal 1 le_rfl (by omega)
+      rwa [show n - 1 - 1 = n - 2 from by omega] at this
+    have hq1 : Qf o ℓ n 1 = revStepO o (ℓ (n - 1)) (ℓ (n - 2)) := by
+      have := Qf_succ o ℓ n 0
+      simpa [Qf_zero] using this
+    have hp1 : posO o ℓ 1 = plusStepO o (ℓ 1) := by
+      simp [posO]
+    rw [hq1, hp1, h1]
+    have hk := key_identity o (ℓ (n - 1)) (ℓ 1)
+    rw [hlast, add_zero] at hk
+    exact hk
+  | succ j hj ih =>
+    intro hjn
+    rw [Qf_succ, ih (by omega), posO_succ]
+    have a1 := hpal j hj (by omega)
+    have a2 : ℓ (n - 2 - j) = ℓ (j + 1) := by
+      have := hpal (j + 1) (by omega) (by omega)
+      rwa [show n - 1 - (j + 1) = n - 2 - j from by omega] at this
+    rw [a1, a2]
+    have hk := key_identity o (ℓ j) (ℓ (j + 1))
+    calc posO o ℓ j + ccO o (ℓ j) + revStepO o (ℓ j) (ℓ (j + 1))
+        = posO o ℓ j + (revStepO o (ℓ j) (ℓ (j + 1)) + ccO o (ℓ j)) := by abel
+      _ = posO o ℓ j + (plusStepO o (ℓ (j + 1)) + ccO o (ℓ (j + 1))) := by rw [hk]
+      _ = posO o ℓ j + plusStepO o (ℓ (j + 1)) + ccO o (ℓ (j + 1)) := by abel
+
+theorem Qf_last (o : Orientation) (ℓ : ℕ → Letter) (n : ℕ) (hn : 3 ≤ n)
+    (hpal : ∀ i, 1 ≤ i → i ≤ n - 2 → ℓ (n - 1 - i) = ℓ i) (hlast : ccO o (ℓ (n - 1)) = 0) :
+    Qf o ℓ n (n - 1) = posO o ℓ (n - 1) + (plusStepO o (ℓ 0) + ccO o (ℓ 0) - plusStepO o (ℓ (n - 1))) := by
+  obtain ⟨m, rfl⟩ : ∃ m, n = m + 3 := ⟨n - 3, by omega⟩
+  have hA : Qf o ℓ (m + 3) (m + 2) = Qf o ℓ (m + 3) (m + 1) + revStepO o (ℓ (m + 3 - 1 - (m + 1)))
+      (ℓ (m + 3 - 2 - (m + 1))) := Qf_succ o ℓ (m + 3) (m + 1)
+  have e1 : m + 3 - 1 - (m + 1) = 1 := by omega
+  have e0 : m + 3 - 2 - (m + 1) = 0 := by omega
+  have eL : m + 3 - 1 = m + 2 := by omega
+  rw [e1, e0] at hA
+  have hm1 : ℓ (m + 1) = ℓ 1 := by
+    have := hpal 1 le_rfl (by omega)
+    rwa [show m + 3 - 1 - 1 = m + 1 from by omega] at this
+  have hQ := Qf_mid o ℓ (m + 3) hpal hlast (m + 1) (by omega) (by omega)
+  have hk := key_identity o (ℓ 1) (ℓ 0)
+  have hP : posO o ℓ (m + 2) = posO o ℓ (m + 1) + plusStepO o (ℓ (m + 2)) := posO_succ o ℓ (m + 1)
+  show Qf o ℓ (m + 3) (m + 2) = posO o ℓ (m + 2) + _
+  rw [hA, hQ, hm1, eL, hP]
+  calc posO o ℓ (m + 1) + ccO o (ℓ 1) + revStepO o (ℓ 1) (ℓ 0)
+      = posO o ℓ (m + 1) + (revStepO o (ℓ 1) (ℓ 0) + ccO o (ℓ 1)) := by abel
+    _ = posO o ℓ (m + 1) + (plusStepO o (ℓ 0) + ccO o (ℓ 0)) := by rw [hk]
+    _ = posO o ℓ (m + 1) + plusStepO o (ℓ (m + 2)) + (plusStepO o (ℓ 0) + ccO o (ℓ 0) - plusStepO o (ℓ (m + 2))) := by
+      abel
+
+
 end FLatticePaper.Tiles
