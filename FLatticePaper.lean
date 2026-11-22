@@ -169,5 +169,6 @@ import FLatticePaper.Tiles.StandardTiles
 import FLatticePaper.Tiles.AlternateTiles
 import FLatticePaper.Tiles.LCorrections
 import FLatticePaper.Tiles.AlternateConstructor
+import FLatticePaper.Tiles.PseudoSquareLiteral
 
 /-! Root import for the corrected F-lattice paper. -/
