@@ -141,6 +141,8 @@ lake env lean checks/StandardTiles.lean
 lake env lean checks/AlternateTiles.lean
 lake env lean checks/AlternateConstructor.lean
 lake env lean checks/LCorrections.lean
+lake env lean checks/ScheduleKinds.lean
+lake env lean checks/StructuralSuccess.lean
 lake env lean checks/CutGradeS3.lean
 lake env lean checks/S3NoFort.lean
 lake env lean checks/StarRangeProof.lean
