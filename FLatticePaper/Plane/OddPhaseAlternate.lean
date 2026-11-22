@@ -18,7 +18,7 @@ namespace FLatticePaper.OddPhaseAlternate
 
 open FLatticePaper FLatticePaper.Farey FLatticePaper.Construction FLatticePaper.Induction FLatticePaper.Tiles
 open FLatticePaper.Tiles.Standard FLatticePaper.Tiles.DeckCoverage FLatticePaper.Tiles.StandardBoundary
-open FLatticePaper.Tiles.StandardClause FLatticePaper.GlobalOdometers
+open FLatticePaper.Tiles.StandardClause FLatticePaper.GlobalOdometers FLatticePaper.BaseAlternate
 
 /-! ### Linear algebra of the chart translation -/
 
@@ -321,13 +321,13 @@ theorem satisfiesPeriodicity_affineShift {fr : Fraction} {Q : Field} (hodd : fr.
 translation cancels against the standard field's periodicity (`M·kernel = 0`), and the quarter-turn difference drops by `1`
 (`odd_alt_increments`). -/
 theorem oddAlternate_increment (w : Word) {fr : Fraction} (hfr : (parentsAt w).current .odd = fr)
-    (hpk : (frameAt (swapW w)).Packet (standardField (swapW w))) (hS : StarEstimates (swapW w))
+    (hpk : (frameAt (swapW w)).Packet (standardField (swapW w))) (hA : AlternateFactsWord (swapW w))
     (hGSP : SatisfiesPeriodicity fr (planeTarget w .odd)) (hodd : fr.Odd) (hpos : 0 < fr.periodDenominator)
     (T : Site) (a b : ℤ) (x : Site) :
     (oddAlternate w T a b (x + fr.modifiedDeck.kernel) - planeTarget w .odd (x + fr.modifiedDeck.kernel)) -
         (oddAlternate w T a b x - planeTarget w .odd x) =
       -1 + (a * (fr.modifiedDeck.kernel).1 + b * (fr.modifiedDeck.kernel).2) := by
-  have hz := odd_alt_increments w hfr hpk hS (x - T)
+  have hz := odd_alt_increments w hfr hpk hA (x - T)
   obtain ⟨cG, hcG⟩ := hGSP fr.modifiedDeck.kernel ⟨1, 0, by ext <;> simp [PeriodDeck.combine]⟩
   have hkC : dotProduct (siteVector T) (fr.matrix.mulVec (siteVector fr.modifiedDeck.kernel)) = 0 := by
     rw [kernel_eq_combine fr, dot_mulVec_combine fr hodd hpos T 1 0]
@@ -371,7 +371,7 @@ noncomputable def altTarget (w : Word) : Parity → Field
 
 /-- The facts of the odd target of w2 at an odd birth, from the facts of `planeAlternate`. -/
 theorem odd_altTarget_facts (w : Word) {fr : Fraction} (hfr : (parentsAt w).current .odd = fr) (hint : fr.Interior)
-    (hpk : ∀ u : Word, (frameAt u).Packet (standardField u)) (hS : ∀ u : Word, StarEstimates u)
+    (hpk : ∀ u : Word, (frameAt u).Packet (standardField u)) (hAll : ∀ u : Word, AlternateFactsWord u)
     (hGSP : SatisfiesPeriodicity fr (planeTarget w .odd)) (hchart : EvenSite (alternateOddChart w)) :
     SatisfiesPeriodicity fr (alternateOddTarget w) ∧ HasQuadraticGrowth (alternateOddTarget w) fr.matrix ∧
       (∀ x, laplacian (alternateOddTarget w) x = -1 ∨ laplacian (alternateOddTarget w) x = 0) ∧
@@ -380,14 +380,14 @@ theorem odd_altTarget_facts (w : Word) {fr : Fraction} (hfr : (parentsAt w).curr
       (∀ x, (alternateOddTarget w (x + fr.modifiedDeck.kernel) - planeTarget w .odd (x + fr.modifiedDeck.kernel)) -
           (alternateOddTarget w x - planeTarget w .odd x) =
         -1 + ((alternateOddSlope w).1 * (fr.modifiedDeck.kernel).1 + (alternateOddSlope w).2 * (fr.modifiedDeck.kernel).2)) := by
-  obtain ⟨hQ1, hQ2, hQ3, hQ4, hQ5, -⟩ := alternate_facts_birth w .odd hfr hint hpk hS
+  obtain ⟨hQ1, hQ2, hQ3, hQ4, hQ5, -⟩ := alternate_facts_birth w .odd hfr hint hAll
   have hodd : fr.Odd := by
     rw [← hfr]
     exact (parentsAt_valid w).current_odd_parity
   have hpos : 0 < fr.periodDenominator := Fraction.periodDenominator_pos hint.inUnitInterval
   have hfun : alternateOddTarget w = oddAlternate w (alternateOddChart w) (alternateOddSlope w).1
       (alternateOddSlope w).2 := alternateOddTarget_eq w
-  have hinc := fun x => oddAlternate_increment w hfr (hpk (swapW w)) (hS (swapW w)) hGSP hodd hpos
+  have hinc := fun x => oddAlternate_increment w hfr (hpk (swapW w)) (hAll (swapW w)) hGSP hodd hpos
     (alternateOddChart w) (alternateOddSlope w).1 (alternateOddSlope w).2 x
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
   · rw [hfun]
@@ -422,6 +422,39 @@ theorem odd_altTarget_facts (w : Word) {fr : Fraction} (hfr : (parentsAt w).curr
     rw [hfun]
     exact hinc x
 
+/-- The alternate facts of every word: the base words `3^k` from the explicit base alternate (`hbaseThree`), the powers of two
+and the proper words from their star estimates. -/
+theorem altFactsWord_all
+    (hstar : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word → StarZoneInputs word)
+    (hsheet : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word → SheetLocalInputs word)
+    (harc : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word →
+      VArcInputs (frameAt word) (standardField word))
+    (hodd : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word →
+      OddBlackNoRise (standardField word) (frameAt word).shortShift)
+    (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word →
+      S3NoFortInputs (frameAt word) (standardField word))
+    (hbaseTwos : ∀ k : ℕ, StarEstimates (List.replicate (k + 1) Digit.two))
+    (hbaseThree : ∀ k : ℕ, ∃ c : ℤ, ∀ x, (frameAt (List.replicate k Digit.three)).alternate
+        (standardField (List.replicate k Digit.three)) x =
+      stairEvenAltField (2 * (k : ℤ) + 3) (standardField (List.replicate k Digit.three)) x + c) :
+    ∀ u : Word, AlternateFactsWord u := by
+  have hpk : ∀ u : Word, (frameAt u).Packet (standardField u) := packet_all hstar hsheet
+  intro u
+  by_cases hall : ∀ x ∈ u, x = Digit.three
+  · obtain ⟨k, rfl⟩ : ∃ k : ℕ, u = List.replicate k Digit.three :=
+      ⟨u.length, List.eq_replicate_iff.mpr ⟨rfl, hall⟩⟩
+    exact reciprocal_alternateFactsWord k (hbaseThree k)
+  · have hproper : ∃ x ∈ u, x ≠ Digit.three := by
+      by_contra h
+      push Not at h
+      exact hall h
+    by_cases htw : IsTwoPow u
+    · obtain ⟨k, rfl⟩ := htw
+      exact alternateFactsWord_of_star _ (hpk _) (hbaseTwos k)
+    · exact alternateFactsWord_of_star u (hpk u) (starEstimates_of_inputs u hproper (hpk (conjWord u)) (hpk u)
+        (hstar u hproper htw) (hsheet u hproper htw) (harc u hproper htw) (hodd u hproper htw)
+        (hbulk u hproper htw))
+
 /-- `lemma:global_odometers` for both odometers at a birth `(w, p)` of `fraction = n/d`: the standard one (`global_odometers`),
 and the alternate `ĝ = altTarget w p` with its identification of the constructor's alternate tile (`htileAlt`) and the
 coverage of that tile (`hcovAlt`). The alternate is the even `planeAlternate` at even births and the odd target of w2
@@ -442,7 +475,10 @@ theorem global_odometers_pair {fraction : Fraction} (hint : fraction.Interior) {
       OddBlackNoRise (standardField word) (frameAt word).shortShift)
     (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word →
       S3NoFortInputs (frameAt word) (standardField word))
-    (hbase : ∀ u : Word, ((∀ x ∈ u, x = Digit.three) ∨ IsTwoPow u) → StarEstimates u)
+    (hbaseTwos : ∀ k : ℕ, StarEstimates (List.replicate (k + 1) Digit.two))
+    (hbaseThree : ∀ k : ℕ, ∃ c : ℤ, ∀ x, (frameAt (List.replicate k Digit.three)).alternate
+        (standardField (List.replicate k Digit.three)) x =
+      stairEvenAltField (2 * (k : ℤ) + 3) (standardField (List.replicate k Digit.three)) x + c)
     (bdOdd : ∀ v : Word, StandardBoundaryOdd v) (bdEven : ∀ v : Word, StandardBoundaryEven v)
     (simpleOdd : ∀ v : Word, IsSimpleTile (cellTileOf (oddTile v)))
     (simpleEven : ∀ v : Word, IsSimpleTile (cellTileOf (evenTile v)))
@@ -488,7 +524,8 @@ theorem global_odometers_pair {fraction : Fraction} (hint : fraction.Interior) {
           -1 + ((alternateOddSlope w).1 * (fraction.modifiedDeck.kernel).1 +
             (alternateOddSlope w).2 * (fraction.modifiedDeck.kernel).2))) := by
   have hpk : ∀ u : Word, (frameAt u).Packet (standardField u) := packet_all hstar hsheet
-  have hS : ∀ u : Word, StarEstimates u := starEstimates_all hpk hstar hsheet harc hodd hbulk hbase
+  have hAll : ∀ u : Word, AlternateFactsWord u :=
+    altFactsWord_all hstar hsheet harc hodd hbulk hbaseTwos hbaseThree
   have hstd := global_odometers hint hbirth hstar hsheet harc hodd hbulk bdOdd bdEven simpleOdd simpleEven
     tile htile hsites
   have hstdSP : SatisfiesPeriodicity fraction (planeTarget w p) := hstd.2.1
@@ -510,12 +547,12 @@ theorem global_odometers_pair {fraction : Fraction} (hint : fraction.Interior) {
               (alternateOddSlope w).2 * (fraction.modifiedDeck.kernel).2))) := by
     cases p with
     | even =>
-      obtain ⟨h1, h2, h3, h4, h5, h6⟩ := alternate_facts_birth w .even hbirth hint hpk hS
-      exact ⟨h1, h2, h3, h4, h5, h6, fun _ => even_alt_increments w hbirth (hpk w) (hS w),
+      obtain ⟨h1, h2, h3, h4, h5, h6⟩ := alternate_facts_birth w .even hbirth hint hAll
+      exact ⟨h1, h2, h3, h4, h5, h6, fun _ => even_alt_increments w hbirth (hpk w) (hAll w),
         fun h => Parity.noConfusion h⟩
     | odd =>
       obtain ⟨h1, h2, h3, h4, h5, h6, h7⟩ :=
-        odd_altTarget_facts w hbirth hint hpk hS hstdSP (hchart rfl)
+        odd_altTarget_facts w hbirth hint hpk hAll hstdSP (hchart rfl)
       exact ⟨h1, h2, h3, h4, h5, h6, fun h => Parity.noConfusion h, fun _ => h7⟩
   obtain ⟨hAS, hAGr, hAB, hAS2, hAR, hAN, hInc⟩ := hfacts
   refine ⟨hstd, ⟨-gauge, fun x hx => ?_⟩, hAS, hAGr, exists_tilt hint.inUnitInterval hAS, hAB, hAS2, hAR,
