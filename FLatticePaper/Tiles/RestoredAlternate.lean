@@ -9,6 +9,11 @@ the even child takes the odd alternate retained tile restored by `alternateResto
 literal base tiles `altBase`. The recursion is the literal one with the restored children in place of the literal children;
 the alternate retained tiles are the restored children of the birth words, unrestored (as the constructor stores them).
 
+The base words take the constructor's own base masks (`BaseRun.registers` of the pure run, normalised, alternate current
+tiles), not the PROVISIONAL TeX alternate base tiles `altBase`: the constructor's alternate base registers are explicit Lean
+objects (the masks `stairOddAlt`, `stairEvenAlt`, `ladderOddAlt`, `ladderEvenAlt` of BaseMasks.lean). Numerically they agree
+with the TeX alternate base tiles for the pure words of length at most 3 (the native logs, task 43).
+
 `restoredChildren_fst`, `restoredChildren_snd` unfold the definition on non-base words. The structural lemma of
 AlternateOrdinary.lean, applied to a state whose registers are the parents' registers, is then the statement that the
 ordinary alternate schedule of a word has the sites of `restoredChildren` of that word. -/
@@ -16,11 +21,23 @@ ordinary alternate schedule of a word has the sites of `restoredChildren` of tha
 namespace FLatticePaper.Tiles.RestoredAlternate
 
 open FLatticePaper FLatticePaper.Farey FLatticePaper.Construction FLatticePaper.Tiles FLatticePaper.Tiles.Standard
-open FLatticePaper.Tiles.Alternate FLatticePaper.Tiles.AlternateOrdinary
+open FLatticePaper.Tiles.Alternate FLatticePaper.Tiles.AlternateOrdinary FLatticePaper.Construction
+
+/-- The base run of a pure word (`[]` for the empty word; `twos` or `threes` of the length minus one otherwise). -/
+def pureRun : Word → BaseRun
+  | [] => .empty
+  | .one :: _ => .empty
+  | .two :: rest => .twos rest.length
+  | .three :: rest => .threes rest.length
+
+/-- The alternate children of a base word: the constructor's own normalised alternate current tiles of its base run. -/
+def baseAltChildren (pre : Word) : Tile × Tile :=
+  (((pureRun pre).registers.llCenter).alternate.currentOdd.val.sites,
+    ((pureRun pre).registers.llCenter).alternate.currentEven.val.sites)
 
 /-- The restored alternate children of the prefix `pre` from its state `s`. -/
 def restoredChildren (pre : Word) (s : AState) : Tile × Tile :=
-  if IsBase pre then altBase pre
+  if IsBase pre then baseAltChildren pre
   else altPair (phase pre == 1) (lastDigit pre) s.std.tOdd s.std.tEven
     (shift s.aOdd (alternateRestoration pre .odd)) (shift s.aEven (alternateRestoration pre .even))
     s.std.par.odd s.std.par.even
@@ -64,6 +81,27 @@ theorem restoredChildren_snd (w : Word) (hw : ¬ IsBase w) (s : AState) :
         s.std.par.odd s.std.par.even).2 := by
   unfold restoredChildren
   rw [if_neg hw]
+
+/-- The base run of a pure word has that word. -/
+theorem pureRun_word (w : Word) (hw : IsBase w) : (pureRun w).word = w := by
+  rcases w with _ | ⟨d, rest⟩
+  · rfl
+  · rcases hw with h | h | h
+    · simp at h
+    · have hd : d = Digit.three := h _ (by simp)
+      subst hd
+      have hr : rest = List.replicate rest.length Digit.three := by
+        rw [List.eq_replicate_iff]
+        exact ⟨rfl, fun b hb => h b (by simp [hb])⟩
+      simp only [pureRun, BaseRun.word]
+      rw [List.replicate_succ, ← hr]
+    · have hd : d = Digit.two := h _ (by simp)
+      subst hd
+      have hr : rest = List.replicate rest.length Digit.two := by
+        rw [List.eq_replicate_iff]
+        exact ⟨rfl, fun b hb => h b (by simp [hb])⟩
+      simp only [pureRun, BaseRun.word]
+      rw [List.replicate_succ, ← hr]
 
 /-- The last letter of a word extended by one letter. -/
 theorem lastDigit_snoc (w : Word) (d : Digit) : lastDigit (w ++ [d]) = d := by

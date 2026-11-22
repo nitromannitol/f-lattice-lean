@@ -12,3 +12,4 @@ import FLatticePaper.Tiles.RestoredAlternate
 #print axioms FLatticePaper.Tiles.RestoredAlternate.restoredChildren_fst
 #print axioms FLatticePaper.Tiles.RestoredAlternate.ordinaryAlternate_odd_eq_restored
 #print axioms FLatticePaper.Tiles.RestoredAlternate.ordinaryAlternate_even_eq_restored
+#print axioms FLatticePaper.Tiles.RestoredAlternate.pureRun_word
