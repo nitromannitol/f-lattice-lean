@@ -12,6 +12,8 @@ import FLatticePaper.Plane.Induction.StandardField
 import FLatticePaper.Plane.Induction.OpenLocal
 import FLatticePaper.Tiles.DeckCoverage
 import FLatticePaper.Tiles.SeamSymm
+import FLatticePaper.Plane.HarmonicConstant
+import FLatticePaper.Plane.Induction.AlternateFacts
 
 /-! `lemma:global_odometers` for the standard odometers (global_recurrence.tex 56-101), for every birth parity.
 
@@ -373,5 +375,213 @@ theorem global_odometers {fraction : Fraction} (hint : fraction.Interior) {w : W
   · have := hag ⟨x, hx⟩
     linarith
   · exact unique_of_covers tile hcov hSP hH hcc hag hHt x
+
+
+/-! ### The alternate odometer and the distinctness -/
+
+/-- The plane alternate of a birth: `ĝ = ⌈(g + g(· + σ))/2⌉` of the even child, or the quarter turn of the swapped word's
+alternate at odd births (the same convention as `planeTarget`). -/
+noncomputable def planeAlternate (w : Word) : Parity → Field
+  | .even => (frameAt w).alternate (standardField w)
+  | .odd => quarterTurnField ((frameAt (swapW w)).alternate (standardField (swapW w)))
+
+theorem planeAlternate_even (w : Word) : planeAlternate w .even = (frameAt w).alternate (standardField w) := rfl
+
+theorem planeAlternate_odd (w : Word) :
+    planeAlternate w .odd = quarterTurnField ((frameAt (swapW w)).alternate (standardField (swapW w))) := rfl
+
+/-- The star estimates of every word: the base words (pure words and powers of two) are named, the proper words come from
+the open local inputs. -/
+theorem starEstimates_all (hpk : ∀ u : Word, (frameAt u).Packet (standardField u))
+    (hstar : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word → StarZoneInputs word)
+    (hsheet : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word → SheetLocalInputs word)
+    (harc : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word →
+      VArcInputs (frameAt word) (standardField word))
+    (hodd : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word →
+      OddBlackNoRise (standardField word) (frameAt word).shortShift)
+    (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word →
+      S3NoFortInputs (frameAt word) (standardField word))
+    (hbase : ∀ u : Word, ((∀ x ∈ u, x = Digit.three) ∨ IsTwoPow u) → StarEstimates u) (u : Word) :
+    StarEstimates u := by
+  by_cases hall : ∀ x ∈ u, x = Digit.three
+  · exact hbase u (Or.inl hall)
+  · have hproper : ∃ x ∈ u, x ≠ Digit.three := by
+      by_contra h
+      push Not at h
+      exact hall h
+    by_cases htw : IsTwoPow u
+    · exact hbase u (Or.inr htw)
+    · exact starEstimates_of_inputs u hproper (hpk (conjWord u)) (hpk u) (hstar u hproper htw)
+        (hsheet u hproper htw) (harc u hproper htw) (hodd u hproper htw) (hbulk u hproper htw)
+
+/-- The even alternate of a word with its star estimates: the periods, growth, binary Laplacian, recurrence and the
+non-integer-affine difference from the standard field. -/
+theorem alternate_facts_word (u : Word) (hpk : (frameAt u).Packet (standardField u)) (hS : StarEstimates u) :
+    SatisfiesPeriodicity (frameAt u).child ((frameAt u).alternate (standardField u)) ∧
+      HasQuadraticGrowth ((frameAt u).alternate (standardField u)) (frameAt u).child.matrix ∧
+      (∀ x, laplacian ((frameAt u).alternate (standardField u)) x = -1 ∨
+        laplacian ((frameAt u).alternate (standardField u)) x = 0) ∧
+      Superharmonic ((frameAt u).alternate (standardField u)) ∧
+      Recurrent ((frameAt u).alternate (standardField u)) ∧
+      ¬ IntegerAffine (fun x => (frameAt u).alternate (standardField u) x - standardField u x) := by
+  obtain ⟨hU, hNS, rank, hrank⟩ := hS
+  exact (frameAt u).alternate_facts hpk.periods hU hNS hrank
+
+/-- The quarter turn of an even alternate: the same facts at the odd type (the transfer of `odometersTheoremAt_of_rotate`). -/
+theorem alternate_quarterTurn_facts {fr : Fraction} {A G : Field} (hodd : fr.Odd)
+    (hinterval : fr.InUnitInterval) (hA : SatisfiesPeriodicity fr.rotate A)
+    (hgrA : HasQuadraticGrowth A fr.rotate.matrix)
+    (hbinA : ∀ x, laplacian A x = -1 ∨ laplacian A x = 0) (hsupA : Superharmonic A) (hrecA : Recurrent A)
+    (hnot : ¬ IntegerAffine (fun x => A x - G x)) :
+    SatisfiesPeriodicity fr (quarterTurnField A) ∧ HasQuadraticGrowth (quarterTurnField A) fr.matrix ∧
+      (∀ x, laplacian (quarterTurnField A) x = -1 ∨ laplacian (quarterTurnField A) x = 0) ∧
+      Superharmonic (quarterTurnField A) ∧ Recurrent (quarterTurnField A) ∧
+      ¬ IntegerAffine (fun x => quarterTurnField A x - quarterTurnField G x) := by
+  have hT : (fr.periodDenominator : ℝ) ≠ 0 := by
+    have := Fraction.periodDenominator_pos hinterval
+    exact_mod_cast this.ne'
+  have hoff : ¬ EvenSite (0, -1) := by decide
+  have hq : Superharmonic (quarterTurnField A) ∧ Recurrent (quarterTurnField A) :=
+    Recurrent.quarterTurn (correction := harmonicGrid) hrecA hsupA QuarterTurn.counterclockwise (0, -1) hoff
+      (fun x => harmonicGrid_harmonic x)
+  have hdiff : (fun x => quarterTurnField A x - quarterTurnField G x) =
+      fun x => (fun y => A y - G y) (-x.2, x.1 - 1) := by
+    funext x
+    simp only [quarterTurnField_eq]
+    ring
+  refine ⟨satisfiesPeriodicity_quarterTurn hodd hT hA, ?_, fun x => quarterTurnField_binary hbinA x, hq.1,
+    hq.2, ?_⟩
+  · rw [quarterTurnField_eq]
+    exact growth_of_affine_remainder hgrA harmonicGrid _ _ _ (growth_identity hodd hT)
+  · rw [hdiff]
+    exact not_integerAffine_comp_quarterTurn hnot
+
+/-- The alternate facts of a birth `(w, p)` of `fr`, at both parities: the quarter turn at the odd birth. -/
+theorem alternate_facts_birth (w : Word) (p : Parity) {fr : Fraction} (hfr : (parentsAt w).current p = fr)
+    (hint : fr.Interior) (hpk : ∀ u : Word, (frameAt u).Packet (standardField u))
+    (hS : ∀ u : Word, StarEstimates u) :
+    SatisfiesPeriodicity fr (planeAlternate w p) ∧ HasQuadraticGrowth (planeAlternate w p) fr.matrix ∧
+      (∀ x, laplacian (planeAlternate w p) x = -1 ∨ laplacian (planeAlternate w p) x = 0) ∧
+      Superharmonic (planeAlternate w p) ∧ Recurrent (planeAlternate w p) ∧
+      ¬ IntegerAffine (fun x => planeAlternate w p x - planeTarget w p x) := by
+  subst hfr
+  cases p with
+  | even =>
+    rw [planeAlternate_even, planeTarget_even]
+    exact alternate_facts_word w (hpk w) (hS w)
+  | odd =>
+    have hodd : ((parentsAt w).current .odd).Odd := (parentsAt_valid w).current_odd_parity
+    have hch : (frameAt (swapW w)).child = ((parentsAt w).current .odd).rotate := (current_swap w).1
+    obtain ⟨hA1, hA2, hA3, hA4, hA5, hA6⟩ := alternate_facts_word (swapW w) (hpk (swapW w)) (hS (swapW w))
+    rw [hch] at hA1 hA2
+    rw [planeAlternate_odd, planeTarget_odd]
+    exact alternate_quarterTurn_facts hodd hint.inUnitInterval hA1 hA2 hA3 hA4 hA5 hA6
+
+/-- The incoming neighbours average to the site. -/
+theorem incoming_add (x : Site) : incomingNeg x + incomingPos x = x + x := by
+  by_cases h : EvenSite x
+  · rw [HarmonicConstant.incomingNeg_even h, HarmonicConstant.incomingPos_even h]
+    simp only [Prod.mk_add_mk]
+    congr 1; ring
+  · rw [HarmonicConstant.incomingNeg_odd h, HarmonicConstant.incomingPos_odd h]
+    simp only [Prod.mk_add_mk]
+    congr 1; ring
+
+theorem dotProduct_siteVector_eq (b : Fin 2 → ℝ) (x : Site) :
+    dotProduct b (siteVector x) = b 0 * (x.1 : ℝ) + b 1 * (x.2 : ℝ) := by
+  simp only [dotProduct, Fin.sum_univ_two, siteVector, Matrix.cons_val_zero, Matrix.cons_val_one]
+
+theorem dot_siteVector_zero (b : Fin 2 → ℝ) : dotProduct b (siteVector (0 : Site)) = 0 := by
+  rw [dotProduct_siteVector_eq]
+  simp
+
+theorem dot_siteVector_one_zero (b : Fin 2 → ℝ) : dotProduct b (siteVector ((1 : ℤ), (0 : ℤ))) = b 0 := by
+  rw [dotProduct_siteVector_eq]
+  simp
+
+theorem dot_siteVector_zero_one (b : Fin 2 → ℝ) : dotProduct b (siteVector ((0 : ℤ), (1 : ℤ))) = b 1 := by
+  rw [dotProduct_siteVector_eq]
+  simp
+
+/-- The deck contains `(kN, lN)` for `N = det`. -/
+theorem det_mul_mem_span (deck : PeriodDeck) (k l : ℤ) : (k * deck.det, l * deck.det) ∈ deck.span := by
+  refine ⟨k * deck.transverse.2 - l * deck.transverse.1, l * deck.kernel.1 - k * deck.kernel.2, ?_⟩
+  ext <;> simp [PeriodDeck.combine, PeriodDeck.det] <;> ring
+
+/-- Two fields with `eq:periodicity` and a non-integer-affine difference have different Laplacians somewhere: a harmonic
+difference of this kind is periodic up to a real linear function, hence constant by the maximum principle, hence integer
+affine. -/
+theorem laplacian_differs {fraction : Fraction} (hinterval : fraction.InUnitInterval) {H F : Field}
+    (hH : SatisfiesPeriodicity fraction H) (hF : SatisfiesPeriodicity fraction F)
+    (hnot : ¬ IntegerAffine (fun x => H x - F x)) : ∃ x, laplacian H x ≠ laplacian F x := by
+  by_contra hcon
+  push Not at hcon
+  have hD : ∀ v ∈ fraction.modifiedDeck.span, ∃ c : ℤ, ∀ x : Site,
+      (((H (x + v) - F (x + v) : ℤ)) : ℝ) = (((H x - F x : ℤ)) : ℝ) +
+        dotProduct (siteVector x) ((0 : Matrix (Fin 2) (Fin 2) ℝ).mulVec (siteVector v)) + (c : ℝ) := by
+    intro v hv
+    refine ⟨(H v - H 0) - (F v - F 0), fun x => ?_⟩
+    have h1 := sat_shift fraction.matrix fraction.modifiedDeck hH hv x
+    have h2 := sat_shift fraction.matrix fraction.modifiedDeck hF hv x
+    simp only [Matrix.zero_mulVec, dotProduct_zero, add_zero]
+    push_cast at h1 h2 ⊢
+    linarith
+  have hdet : 0 < fraction.modifiedDeck.det := Fraction.det_modifiedDeck_pos hinterval
+  have hsym0 : ∀ x y : Site, dotProduct (siteVector x) ((0 : Matrix (Fin 2) (Fin 2) ℝ).mulVec (siteVector y)) =
+      dotProduct (siteVector y) ((0 : Matrix (Fin 2) (Fin 2) ℝ).mulVec (siteVector x)) := by
+    intro x y
+    simp
+  obtain ⟨b, hb⟩ := exists_tilt_of_deck (H := fun y => H y - F y) (0 : Matrix (Fin 2) (Fin 2) ℝ)
+    fraction.modifiedDeck hdet hsym0 hD
+  obtain ⟨E, hE⟩ : ∃ E : Site → ℝ, ∀ x, E x = (((H x - F x : ℤ)) : ℝ) - dotProduct b (siteVector x) :=
+    ⟨fun x => (((H x - F x : ℤ)) : ℝ) - dotProduct b (siteVector x), fun x => rfl⟩
+  have h0 : ∀ y : Site, matrixQuadratic (0 : Matrix (Fin 2) (Fin 2) ℝ) y = 0 := by
+    intro y
+    unfold matrixQuadratic
+    simp
+  have hEper : ∀ v ∈ fraction.modifiedDeck.span, ∀ x, E (x + v) = E x := by
+    intro v hv x
+    have h := hb v hv x
+    dsimp only at h
+    rw [h0, h0] at h
+    rw [hE, hE]
+    linarith
+  have hharm : ∀ x : Site, E (incomingNeg x) + E (incomingPos x) = 2 * E x := by
+    intro x
+    have hl := hcon x
+    unfold laplacian at hl
+    have hr : (H (incomingNeg x) : ℝ) + H (incomingPos x) - 2 * H x =
+        (F (incomingNeg x) : ℝ) + F (incomingPos x) - 2 * F x := by
+      have := congrArg (fun z : ℤ => (z : ℝ)) hl
+      push_cast at this
+      linarith
+    have hd : dotProduct b (siteVector (incomingNeg x)) + dotProduct b (siteVector (incomingPos x)) =
+        2 * dotProduct b (siteVector x) := by
+      rw [← dotProduct_add, ← siteVector_add, incoming_add, siteVector_add, dotProduct_add]
+      ring
+    rw [hE, hE, hE]
+    push_cast at hr ⊢
+    linarith
+  have hN : (0 : ℤ) < fraction.modifiedDeck.det := hdet
+  have hconst := HarmonicConstant.harmonic_periodic_constant E fraction.modifiedDeck.det hN
+    (fun x k l => hEper _ (det_mul_mem_span fraction.modifiedDeck k l) x) hharm
+  have hb0 : b 0 = ((H ((1 : ℤ), (0 : ℤ)) - F ((1 : ℤ), (0 : ℤ)) : ℤ) : ℝ) - ((H 0 - F 0 : ℤ) : ℝ) := by
+    have h1 := hconst ((1 : ℤ), (0 : ℤ))
+    rw [hE, hE, dot_siteVector_one_zero, dot_siteVector_zero] at h1
+    linarith
+  have hb1 : b 1 = ((H ((0 : ℤ), (1 : ℤ)) - F ((0 : ℤ), (1 : ℤ)) : ℤ) : ℝ) - ((H 0 - F 0 : ℤ) : ℝ) := by
+    have h1 := hconst ((0 : ℤ), (1 : ℤ))
+    rw [hE, hE, dot_siteVector_zero_one, dot_siteVector_zero] at h1
+    linarith
+  apply hnot
+  refine ⟨((H ((1 : ℤ), (0 : ℤ)) - F ((1 : ℤ), (0 : ℤ))) - (H 0 - F 0),
+    (H ((0 : ℤ), (1 : ℤ)) - F ((0 : ℤ), (1 : ℤ))) - (H 0 - F 0)), H 0 - F 0, fun x => ?_⟩
+  have hx := hconst x
+  rw [hE, hE, dot_siteVector_zero, dotProduct_siteVector_eq, hb0, hb1] at hx
+  have key : (((H x - F x : ℤ)) : ℝ) = ((((H ((1 : ℤ), (0 : ℤ)) - F ((1 : ℤ), (0 : ℤ))) - (H 0 - F 0)) * x.1 +
+      ((H ((0 : ℤ), (1 : ℤ)) - F ((0 : ℤ), (1 : ℤ))) - (H 0 - F 0)) * x.2 + (H 0 - F 0) : ℤ) : ℝ) := by
+    push_cast at hx ⊢
+    linear_combination hx
+  exact_mod_cast key
 
 end FLatticePaper.GlobalOdometers
