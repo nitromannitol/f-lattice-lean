@@ -21,7 +21,7 @@ def afterFirstStandard : Parity → List (Fin 6)
   | .odd => [1, 4, 5, 2, 3]
   | .even => [2, 3, 1, 4, 5]
 
-private def afterSeventhAlternate : Parity → List (Fin 6)
+def afterSeventhAlternate : Parity → List (Fin 6)
   | .odd => [2, 3, 1, 4, 5]
   | .even => [1, 4, 2, 3, 5]
 
