@@ -107,6 +107,9 @@ import FLatticePaper.Plane.Induction.StarRangeProof
 import FLatticePaper.Plane.Induction.StarRangeArgument
 import FLatticePaper.Plane.Induction.BaseRange
 import FLatticePaper.Plane.Induction.BaseInputsProof
+import FLatticePaper.Plane.Induction.BaseGeometry
+import FLatticePaper.Plane.Induction.BaseReflection
+import FLatticePaper.Plane.Induction.BaseUpper
 import FLatticePaper.Plane.Induction.PermitMonotone
 import FLatticePaper.Plane.Induction.OpenInputsProof
 import FLatticePaper.Plane.Induction.RootCalibration
