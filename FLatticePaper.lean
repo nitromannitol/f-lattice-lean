@@ -25,6 +25,7 @@ import FLatticePaper.Construction.LadderReflection
 import FLatticePaper.Construction.LadderRotation
 import FLatticePaper.Construction.Native
 import FLatticePaper.Construction.NativeCoverage
+import FLatticePaper.Construction.OrdinaryStandardCover
 import FLatticePaper.Construction.PlacedAssembly
 import FLatticePaper.Construction.PureZeroLevels
 import FLatticePaper.Construction.StaircaseCoverage
