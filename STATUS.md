@@ -145,6 +145,7 @@ lake env lean checks/ScheduleKinds.lean
 lake env lean checks/StructuralSuccess.lean
 lake env lean checks/OverlapSites.lean
 lake env lean checks/RegisterFamily.lean
+lake env lean checks/BaseFamily.lean
 lake env lean checks/CutGradeS3.lean
 lake env lean checks/S3NoFort.lean
 lake env lean checks/StarRangeProof.lean
