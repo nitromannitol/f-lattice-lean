@@ -1,0 +1,17 @@
+Task 33 numerics: alternate tiles of def:alternate_tiles (PROVISIONAL TeX reading), words up to length 4
+base alternate tiles of prop:base_cases normalised to lowest cell = origin (NORMALISE_BASE=True)
+
+standard tiles (sanity, port of StandardTiles.lean): normalised and ChildRot failures: 0 of 121 words
+
+alternate tiles, non-base words: 112 words, 224 child tiles
+  A1 normalised: 24 failing tiles; smallest ('13', 'odd')
+  A2 row convex: 110 failing tiles; smallest ('1', 'odd', 2)
+  A3 hole free: 11 failing tiles; smallest ('31', 'odd')
+  A4 point symmetric: 11 failing tiles; smallest ('31', 'odd')
+  A5 rotation identity (tF): 186 failing tiles; smallest ('1', 'odd', (-9, -6), (-7, -2))
+  lower-left vertex != origin: 24 tiles; smallest ('13', 'odd', (-8, 0))
+
+rotation identity R(T-hat(p0)) = T-hat(R p0) + tF: holds 50, shape mismatch 22 (smallest ('21', 'even')), translation only 152
+
+covering (IsAlmostTiling clause 2, vertices, window 6, translates |k|,|k'|<=8): 224 child tiles, 0 uncovered
+cell multiplicity > 1 (overlapping subtiles, expected by the TeX): 224 of 224 child tiles
