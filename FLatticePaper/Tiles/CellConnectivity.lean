@@ -37,7 +37,7 @@ theorem rtg_mono' {r p : GInt → GInt → Prop} (hrp : ∀ a b, r a b → p a b
   | tail _ hbc ih => exact ih.tail (hrp _ _ hbc)
 
 /-- The reflexive transitive closure of a symmetric relation is symmetric. -/
-theorem rtg_symm' {r : GInt → GInt → Prop} (hr : ∀ a b, r a b → r b a) {x y : GInt}
+theorem cellRel_rtg_symm {r : GInt → GInt → Prop} (hr : ∀ a b, r a b → r b a) {x y : GInt}
     (h : Relation.ReflTransGen r x y) : Relation.ReflTransGen r y x := by
   induction h with
   | refl => exact Relation.ReflTransGen.refl
@@ -60,7 +60,7 @@ theorem edgeConnectedIn_union {A B : CellTile} (hA : EdgeConnectedIn A) (hB : Ed
     · exact rtg_mono_cellRel Finset.subset_union_left (hA x hxA c hcA)
     · exact rtg_mono_cellRel Finset.subset_union_right (hB x hxB c hcB)
   intro x hx y hy
-  exact (toC x hx).trans (rtg_symm' (cellRel_symm (A ∪ B)) (toC y hy))
+  exact (toC x hx).trans (cellRel_rtg_symm (cellRel_symm (A ∪ B)) (toC y hy))
 
 /-- A set that contains an edge-connected core and whose other cells are edge-adjacent to the core is edge-connected. -/
 theorem edgeConnectedIn_of_core {T S : CellTile} (hS : EdgeConnectedIn S) (hST : S ⊆ T)
@@ -74,6 +74,6 @@ theorem edgeConnectedIn_of_core {T S : CellTile} (hS : EdgeConnectedIn S) (hST :
   obtain ⟨s, hs, hxs⟩ := toS x hx
   obtain ⟨s', hs', hys⟩ := toS y hy
   have hss : Relation.ReflTransGen (CellRel T) s s' := rtg_mono_cellRel hST (hS s hs s' hs')
-  exact hxs.trans (hss.trans (rtg_symm' (cellRel_symm T) hys))
+  exact hxs.trans (hss.trans (cellRel_rtg_symm (cellRel_symm T) hys))
 
 end FLatticePaper.Tiles
