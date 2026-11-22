@@ -17,7 +17,7 @@ def kernelJet (fraction : Fraction) : TileJet :=
 def transverseJet (fraction : Fraction) : TileJet :=
   ((fraction.num - fraction.den, fraction.num + fraction.den), (fraction.num, -fraction.den))
 
-private def doubleFirst (first second third fourth step : TileJet) : Fin 6 → TileJet :=
+def doubleFirst (first second third fourth step : TileJet) : Fin 6 → TileJet :=
   ![first, first + step, second, second + step, third, fourth]
 
 private def doubleLast (first second third fourth step : TileJet) : Fin 6 → TileJet :=
