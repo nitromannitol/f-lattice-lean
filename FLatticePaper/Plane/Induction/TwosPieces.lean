@@ -1320,4 +1320,70 @@ theorem columnDTopLess_piece (k : ℕ) (w1 w2 : ℤ) (hw1 : w1 = 2 * (k : ℤ) +
     apply mul_left_cancel₀ (by norm_num : (4 : ℤ) ≠ 0)
     linear_combination 2 * hC - 2 * hQ + hH + hP - hpar + 2 * hcV
 
+/-- The point `(d, 3d-1)`: `A = V` via `(-3,1)` and `C = V` via `(-2,1)`. -/
+theorem columnDTopMax_piece (k : ℕ) (w1 w2 : ℤ) (hw1 : w1 = 2 * (k : ℤ) + 4)
+    (hw2 : w2 = 6 * (k : ℤ) + 11) :
+    (frameAt (List.replicate (k + 1) Digit.two)).sheetA
+        (quarterTurnField (standardField (conjWord (List.replicate (k + 1) Digit.two))))
+        (w1, w2 - 1) = paperNearLadderValue (2 * (k : ℤ) + 4) (w1, w2) ∧
+    (frameAt (List.replicate (k + 1) Digit.two)).sheetC
+        (quarterTurnField (standardField (conjWord (List.replicate (k + 1) Digit.two))))
+        (w1, w2 - 1) = paperNearLadderValue (2 * (k : ℤ) + 4) (w1, w2) := by
+  subst hw1 hw2
+  have hA : (2 * (k : ℤ) + 4, 6 * (k : ℤ) + 11) ∉ paperNearLadderA (2 * (k : ℤ) + 4) := by
+    simp only [paperNearLadderA, Set.mem_insert_iff, Set.mem_singleton_iff, Prod.mk.injEq]
+    omega
+  have hB : (2 * (k : ℤ) + 4, 6 * (k : ℤ) + 11) ∉ paperNearLadderB (2 * (k : ℤ) + 4) := by
+    simp only [paperNearLadderB, Set.mem_setOf_eq]
+    omega
+  have hV : paperNearLadderValue (2 * (k : ℤ) + 4) (2 * (k : ℤ) + 4, 6 * (k : ℤ) + 11) =
+      -((6 * (k : ℤ) + 11 - (2 * (k : ℤ) + 4)) ^ 2 / 4) - 4 * (k : ℤ) - 7 := by
+    rw [paperNearLadderValue_off _ _ _ hA hB,
+      min_eq_right (by omega : 2 * (k : ℤ) + 4 - (6 * (k : ℤ) + 11) ≤ 0),
+      min_eq_right (by omega : 2 * (2 * (k : ℤ) + 4) - (6 * (k : ℤ) + 11) ≤ 0),
+      max_eq_left (by omega : (0 : ℤ) ≤ 6 * (k : ℤ) + 11 - (2 * (k : ℤ) + 4) - (2 * (k : ℤ) + 4))]
+    ring
+  rw [hV]
+  constructor
+  · have hmem : (2 * (k : ℤ) + 2, (1 : ℤ)) ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites :=
+      BaseMask.mem_stairEven_raw_iff.mpr ⟨⟨by omega, by omega⟩, ⟨by omega, by omega⟩,
+        by unfold BaseMask.StairEvenCorner; omega⟩
+    have hA' := sheetA_via k (2 * (k : ℤ) + 4) (6 * (k : ℤ) + 11) (-3) 1 (2 * (k : ℤ) + 2) 1
+      (by ring) (by ring) hmem
+    have hc : ¬ BaseMask.StairEvenCorner (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 2, (1 : ℤ)) := by
+      unfold BaseMask.StairEvenCorner
+      omega
+    rw [stairEvenValue_formula, if_neg hc,
+      min_eq_right (by omega : (0 : ℤ) ≤ 2 * (k : ℤ) + 2 - 1)] at hA'
+    rw [transverseGrade_one, periodDenominator_one] at hA'
+    have hQ := two_mul_triangle 1
+    have hcV := stairEvenConstantV_double (2 * (k : ℤ) + 3)
+    have hH := harmonicGrid_exact (2 * (k : ℤ) + 4 - 1, 6 * (k : ℤ) + 11 - 2)
+    simp only at hH
+    have hP := sq_div4_add_mod2 (6 * (k : ℤ) + 11 - (2 * (k : ℤ) + 4))
+    have hpar : (2 * (k : ℤ) + 4 - 1 + (6 * (k : ℤ) + 11 - 2)) % 2 =
+        1 - (6 * (k : ℤ) + 11 - (2 * (k : ℤ) + 4)) % 2 := by
+      omega
+    apply mul_left_cancel₀ (by norm_num : (4 : ℤ) ≠ 0)
+    linear_combination 2 * hA' - 2 * hQ + hH + hP - hpar + 2 * hcV
+  · have hmem : ((0 : ℤ), (1 : ℤ)) ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites :=
+      BaseMask.mem_stairEven_raw_iff.mpr ⟨⟨by omega, by omega⟩, ⟨by omega, by omega⟩,
+        by unfold BaseMask.StairEvenCorner; omega⟩
+    have hC := sheetC_via k (2 * (k : ℤ) + 4) (6 * (k : ℤ) + 11) (-2) 1 0 1 (by ring) (by ring) hmem
+    have hc : ¬ BaseMask.StairEvenCorner (2 * (k : ℤ) + 3) ((0 : ℤ), (1 : ℤ)) := by
+      unfold BaseMask.StairEvenCorner
+      omega
+    rw [stairEvenValue_formula, if_neg hc, min_eq_left (by omega : (0 : ℤ) - 1 ≤ 0)] at hC
+    rw [transverseGrade_one, periodDenominator_one] at hC
+    have hQ := two_mul_triangle 1
+    have hcV := stairEvenConstantV_double (2 * (k : ℤ) + 3)
+    have hH := harmonicGrid_exact (2 * (k : ℤ) + 4, 6 * (k : ℤ) + 11 - 3)
+    simp only at hH
+    have hP := sq_div4_add_mod2 (6 * (k : ℤ) + 11 - (2 * (k : ℤ) + 4))
+    have hpar : (2 * (k : ℤ) + 4 + (6 * (k : ℤ) + 11 - 3)) % 2 =
+        1 - (6 * (k : ℤ) + 11 - (2 * (k : ℤ) + 4)) % 2 := by
+      omega
+    apply mul_left_cancel₀ (by norm_num : (4 : ℤ) ≠ 0)
+    linear_combination 2 * hC - 2 * hQ + hH + hP - hpar + 2 * hcV
+
 end FLatticePaper.Induction
