@@ -1,0 +1,13 @@
+import FLatticePaper.Tiles.SeamFinal
+import FLatticePaper.Tiles.CheckerFree
+import FLatticePaper.Tiles.CellConnectivity
+import FLatticePaper.Tiles.RestoredAlternate
+import FLatticePaper.Tiles.AlternateInheritance
+
+#print axioms FLatticePaper.Tiles.SeamFinal.standardBoundaryWord_of_seams
+#print axioms FLatticePaper.Tiles.walk_dropLast_nodup
+#print axioms FLatticePaper.Tiles.edgeConnectedIn_union
+#print axioms FLatticePaper.Tiles.RestoredAlternate.ordinaryAlternate_odd_eq_restored
+#print axioms FLatticePaper.Tiles.RestoredAlternate.ordinaryAlternate_even_eq_restored
+#print axioms FLatticePaper.Tiles.AlternateInheritance.ordinaryAlternate_odd_inherits
+#print axioms FLatticePaper.Tiles.AlternateInheritance.ordinaryAlternate_even_inherits
