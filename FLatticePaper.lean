@@ -196,5 +196,6 @@ import FLatticePaper.Tiles.BoundaryTransport
 import FLatticePaper.Tiles.BaseCellIdentities
 import FLatticePaper.Tiles.StandardBaseWords
 import FLatticePaper.Tiles.OrdinaryStandard
+import FLatticePaper.Construction.MissingSites
 
 /-! Root import for the corrected F-lattice paper. -/
