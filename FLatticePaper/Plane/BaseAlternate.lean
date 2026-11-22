@@ -4,6 +4,11 @@ import FLatticePaper.Plane.Induction.ReciprocalInputs
 import FLatticePaper.Plane.Induction.StandardField
 import FLatticePaper.Construction.AlternateStaircaseRotation
 import FLatticePaper.Construction.AlternateStaircaseRank
+import FLatticePaper.Construction.AlternateLadderRank
+import FLatticePaper.Construction.AlternateLadderRotation
+import FLatticePaper.Plane.Induction.TwosPacket
+import FLatticePaper.Plane.Induction.TwosPeriods
+import FLatticePaper.Construction.PropBaseCases
 
 /-! The alternate facts of a word, from its midpoint `frame.alternate (standardField u)`.
 
@@ -57,11 +62,39 @@ theorem isBurningRank_add_const {α : Type*} [LT α] {A : Field} {rank : Site �
   rw [laplacian_add_const]
   exact h x
 
+/-- Adding a harmonic function preserves recurrence (the difference against a superharmonic competitor shifts). -/
+theorem recurrent_add_harmonic {F L : Field} (hF : Recurrent F) (hL : ∀ x, laplacian L x = 0) :
+    Recurrent (fun y => F y + L y) := by
+  intro C hC sites h
+  have hCL : Superharmonic (fun y => C y - L y) := by
+    intro x
+    have h1 := hC x
+    have h2 := hL x
+    simp only [laplacian] at h1 h2 ⊢
+    linarith
+  have key := hF (fun y => C y - L y) hCL sites h
+  have e1 : maxDifference (fun y => F y + L y) C sites h.1 =
+      maxDifference F (fun y => C y - L y) sites h.1 := by
+    unfold maxDifference
+    congr 2
+    funext s
+    ring
+  have e2 : maxDifference (fun y => F y + L y) C (incomingBoundaryFinset sites)
+      (incomingBoundaryFinset_nonempty h.1) =
+      maxDifference F (fun y => C y - L y) (incomingBoundaryFinset sites)
+        (incomingBoundaryFinset_nonempty h.1) := by
+    unfold maxDifference
+    congr 2
+    funext s
+    ring
+  rw [e1, e2]
+  exact key
+
 /-- The alternate facts of a frame whose midpoint is a constant translate of an explicit base alternate `A`, with the explicit
 burning rank of `A`, the generator identity of `A`, and the non-integer-affine difference of `A` from the standard field. -/
 theorem alternateFacts_of_explicit (frame : ChildFrame) {F A : Field} {cU cV c : ℤ}
     (hA : HasGeneratorPeriods frame.child A cU (cV - 1)) (hint : frame.child.InUnitInterval)
-    {rank : Site → ℤ} (hrank : IsBurningRank A rank)
+    (hbin : ∀ x, laplacian A x = -1 ∨ laplacian A x = 0) (hsup : Superharmonic A) (hrec : Recurrent A)
     (hnot : ¬ IntegerAffine (fun x => A x - F x))
     (hid : ∀ x, frame.alternate F x = A x + c) :
     HasGeneratorPeriods frame.child (frame.alternate F) cU (cV - 1) ∧
@@ -81,13 +114,18 @@ theorem alternateFacts_of_explicit (frame : ChildFrame) {F A : Field} {cU cV c :
         (A x + c) - frame.child.transverseGrade x + (cV - 1)
       rw [hA.2 x]
       ring
-  have hR := isBurningRank_add_const hrank c
+  have hconst : ∀ x, laplacian (fun y => A y + c) x = laplacian A x := fun x => laplacian_add_const A c x
+  have hrecShift : Recurrent (fun y => A y + c) := by
+    have h := recurrent_add_harmonic hrec (L := fun _ => c) (fun x => by simp only [laplacian]; ring)
+    exact h
   refine ⟨hper, satisfiesPeriodicity_of_generatorPeriods hint hper, generator_periods_growth hint hper, ?_,
-    hR.superharmonic, hR.recurrent, ?_⟩
+    ?_, hrecShift, ?_⟩
   · intro x
-    rcases hR x with ⟨h1, -, -⟩ | ⟨h1, -⟩
-    · exact Or.inl h1
-    · exact Or.inr h1
+    rw [hconst]
+    exact hbin x
+  · intro x
+    rw [hconst]
+    exact hsup x
   · show ¬ IntegerAffine (fun x => A x + c - F x)
     have : (fun x => A x + c - F x) = fun x => (A x - F x) + c := by
       funext x
@@ -135,6 +173,92 @@ theorem reciprocal_alternateFactsWord (k : ℕ)
       ((frameAt (List.replicate k Digit.three)).coherentConstantV - 1) := by
     rw [hchild, hcU, hcV]
     exact hA
-  exact alternateFacts_of_explicit (frameAt (List.replicate k Digit.three)) hAframe hint' hrank hnot hc
+  have hbin : ∀ x, laplacian (stairEvenAltField (2 * (k : ℤ) + 3) (standardField (List.replicate k Digit.three))) x =
+      -1 ∨ laplacian (stairEvenAltField (2 * (k : ℤ) + 3) (standardField (List.replicate k Digit.three))) x = 0 := by
+    intro x
+    rcases hrank x with ⟨h1, -, -⟩ | ⟨h1, -⟩
+    · exact Or.inl h1
+    · exact Or.inr h1
+  exact alternateFacts_of_explicit (frameAt (List.replicate k Digit.three)) hAframe hint' hbin hrank.superharmonic
+    hrank.recurrent hnot hc
+
+
+/-- The explicit rotated alternate `rotateLadderAltField` in the form of the quarter turn: the Laplacian at a site is the
+Laplacian of the base field at the mapped site. -/
+theorem rotateLadderAltField_eq' (den : ℤ) (S : Field) :
+    rotateLadderAltField den S = fun point => S (QuarterTurn.counterclockwise.mapSite (2 * den - 2, 1) point) +
+      (centeredQuarterTurnCorrection point + (point.1 + 1)) := by
+  funext point
+  have hshift : QuarterTurn.counterclockwise.mapSite (2 * den, 1) point - (2, 0) =
+      QuarterTurn.counterclockwise.mapSite (2 * den - 2, 1) point := by
+    apply Prod.ext <;> dsimp [QuarterTurn.mapSite, QuarterTurn.turn] <;> omega
+  simp only [rotateLadderAltField, rotateLadderField, hshift, add_assoc]
+
+theorem harmonic_ladderAltCorrection' :
+    Harmonic (fun point : Site => centeredQuarterTurnCorrection point + (point.1 + 1)) := by
+  intro point
+  have h := harmonic_centeredQuarterTurnCorrection point
+  have hline : (incomingNeg point).1 + (incomingPos point).1 = 2 * point.1 := by
+    by_cases he : EvenSite point
+    · simp only [incomingNeg, incomingPos, if_pos he]
+      omega
+    · simp only [incomingNeg, incomingPos, if_neg he]
+      omega
+  simp only [laplacian] at h ⊢
+  omega
+
+/-- The binary Laplacian of the rotated alternate, from the binary Laplacian of its base field. -/
+theorem rotateLadderAltField_binary {den : ℤ} {S : Field} (hS : ∀ x, laplacian S x = -1 ∨ laplacian S x = 0)
+    (x : Site) : laplacian (rotateLadderAltField den S) x = -1 ∨ laplacian (rotateLadderAltField den S) x = 0 := by
+  have hodd : ¬ EvenSite (2 * den - 2, 1) := by
+    unfold EvenSite
+    dsimp only
+    omega
+  have h := laplacian_quarterTurn_add_harmonic QuarterTurn.counterclockwise (2 * den - 2, 1) hodd S
+    (fun point => centeredQuarterTurnCorrection point + (point.1 + 1)) harmonic_ladderAltCorrection' x
+  rw [rotateLadderAltField_eq', h]
+  exact hS _
+
+/-- The twos standard field's alternate facts from the explicit rotated alternate: the base field of the ladder alternate
+agrees with its raw tile and has the periods, and the midpoint agrees with the rotated alternate up to a constant. -/
+theorem twos_alternateFactsWord (k : ℕ)
+    (hid : ∃ S : Field, (BaseMask.ladderOddAlt.raw (2 * (k : ℤ) + 4)).Agrees S 0 ∧
+      HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4)) S (-1) (ladderOddAltConstantV (2 * (k : ℤ) + 4)) ∧
+      ∃ c : ℤ, ∀ x, (frameAt (List.replicate (k + 1) Digit.two)).alternate
+        (standardField (List.replicate (k + 1) Digit.two)) x =
+        rotateLadderAltField (2 * (k : ℤ) + 4) S x + c) :
+    AlternateFactsWord (List.replicate (k + 1) Digit.two) := by
+  obtain ⟨S, hagreeS, hperS, c, hc⟩ := hid
+  have hden : BaseMask.ladderOddAlt.Valid (2 * (k : ℤ) + 4) := ⟨by omega, by omega⟩
+  have heven : (2 * (k : ℤ) + 4) % 2 = 0 := by omega
+  obtain ⟨correction, -, -, hrankS⟩ := ladderOddAlt_exists_burningRank hden hagreeS hperS
+  have hbinS : ∀ x, laplacian S x = -1 ∨ laplacian S x = 0 := by
+    intro x
+    rcases hrankS x with ⟨h1, -, -⟩ | ⟨h1, -⟩
+    · exact Or.inl h1
+    · exact Or.inr h1
+  have hA := rotateLadderAltField_periods heven hperS
+  have hrot : (Fraction.mk 1 (2 * (k : ℤ) + 4)).rotate = (frameAt (List.replicate (k + 1) Digit.two)).child := by
+    rw [twos_child_eq k, rotate_ladder_fraction]
+  -- the standard field's periods, from an explicit base field of the ladder
+  obtain ⟨Sstd, hagStd, hperStd, -, -, -⟩ := ladderOdd_exists_recurrent_extension hden
+  have hstd := twos_standardField_periods k hagStd hperStd
+  have hstd' : HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4)).rotate
+      (standardField (List.replicate (k + 1) Digit.two)) 0 (ladderEvenConstantV (2 * (k : ℤ) + 4)) := by
+    rw [hrot]
+    exact hstd
+  have hnot := ladderEvenAlt_sub_standard_not_integerAffine heven hstd' hA
+  have hcoh := twos_coherentConstants k
+  have hAframe : HasGeneratorPeriods (frameAt (List.replicate (k + 1) Digit.two)).child
+      (rotateLadderAltField (2 * (k : ℤ) + 4) S) (frameAt (List.replicate (k + 1) Digit.two)).coherentConstantU
+      ((frameAt (List.replicate (k + 1) Digit.two)).coherentConstantV - 1) := by
+    rw [hcoh.1, hcoh.2, ← hrot]
+    exact hA
+  have hint : (frameAt (List.replicate (k + 1) Digit.two)).child.InUnitInterval := by
+    rw [← hrot]
+    exact ladder_rotate_inUnitInterval hden.1 hden.2
+  obtain ⟨hsupA, hrecA⟩ := rotateLadderAltField_recurrent hrankS.recurrent hrankS.superharmonic
+  exact alternateFacts_of_explicit (frameAt (List.replicate (k + 1) Digit.two)) hAframe hint
+    (rotateLadderAltField_binary hbinS) hsupA hrecA hnot hc
 
 end FLatticePaper.BaseAlternate

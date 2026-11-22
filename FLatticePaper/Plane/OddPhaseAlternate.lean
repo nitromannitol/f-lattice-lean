@@ -433,7 +433,10 @@ theorem altFactsWord_all
       OddBlackNoRise (standardField word) (frameAt word).shortShift)
     (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word →
       S3NoFortInputs (frameAt word) (standardField word))
-    (hbaseTwos : ∀ k : ℕ, StarEstimates (List.replicate (k + 1) Digit.two))
+    (hbaseTwoId : ∀ k : ℕ, ∃ S : Field, (BaseMask.ladderOddAlt.raw (2 * (k : ℤ) + 4)).Agrees S 0 ∧
+      HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4)) S (-1) (ladderOddAltConstantV (2 * (k : ℤ) + 4)) ∧
+      ∃ c : ℤ, ∀ x, (frameAt (List.replicate (k + 1) Digit.two)).alternate
+        (standardField (List.replicate (k + 1) Digit.two)) x = rotateLadderAltField (2 * (k : ℤ) + 4) S x + c)
     (hbaseThree : ∀ k : ℕ, ∃ c : ℤ, ∀ x, (frameAt (List.replicate k Digit.three)).alternate
         (standardField (List.replicate k Digit.three)) x =
       stairEvenAltField (2 * (k : ℤ) + 3) (standardField (List.replicate k Digit.three)) x + c) :
@@ -450,7 +453,7 @@ theorem altFactsWord_all
       exact hall h
     by_cases htw : IsTwoPow u
     · obtain ⟨k, rfl⟩ := htw
-      exact alternateFactsWord_of_star _ (hpk _) (hbaseTwos k)
+      exact twos_alternateFactsWord k (hbaseTwoId k)
     · exact alternateFactsWord_of_star u (hpk u) (starEstimates_of_inputs u hproper (hpk (conjWord u)) (hpk u)
         (hstar u hproper htw) (hsheet u hproper htw) (harc u hproper htw) (hodd u hproper htw)
         (hbulk u hproper htw))
@@ -463,8 +466,11 @@ transfer uses. The distinctness in the fixed coordinates of `eq:periodicity`: th
 Laplacians differ somewhere, and the explicit increments hold (the transverse increment `-1` at even births; at odd births the
 kernel increment `-1 + slope·kernel`, whose affine term is the transverse slope of the odd parent).
 
-The inputs include `hbase`: the star estimates of the base words (pure words and powers of two), which the library does not
-derive for the standard fields at those words. -/
+The base words need no star estimates: at `3^k` the alternate is the explicit base alternate `stairEvenAltField` up to a
+constant (`hbaseThree`), and at `2^k` the rotated explicit alternate `rotateLadderAltField` up to a constant (`hbaseTwoId`,
+with its base field `S`). Both are plane identities between the midpoint and the explicit base fields, which the base-case
+proposition of the paper states (the unique recurrent extension of the base alternate tile).
+-/
 theorem global_odometers_pair {fraction : Fraction} (hint : fraction.Interior) {w : Word} {p : Parity}
     (hbirth : (parentsAt w).current p = fraction)
     (hstar : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word → StarZoneInputs word)
@@ -475,7 +481,10 @@ theorem global_odometers_pair {fraction : Fraction} (hint : fraction.Interior) {
       OddBlackNoRise (standardField word) (frameAt word).shortShift)
     (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word →
       S3NoFortInputs (frameAt word) (standardField word))
-    (hbaseTwos : ∀ k : ℕ, StarEstimates (List.replicate (k + 1) Digit.two))
+    (hbaseTwoId : ∀ k : ℕ, ∃ S : Field, (BaseMask.ladderOddAlt.raw (2 * (k : ℤ) + 4)).Agrees S 0 ∧
+      HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4)) S (-1) (ladderOddAltConstantV (2 * (k : ℤ) + 4)) ∧
+      ∃ c : ℤ, ∀ x, (frameAt (List.replicate (k + 1) Digit.two)).alternate
+        (standardField (List.replicate (k + 1) Digit.two)) x = rotateLadderAltField (2 * (k : ℤ) + 4) S x + c)
     (hbaseThree : ∀ k : ℕ, ∃ c : ℤ, ∀ x, (frameAt (List.replicate k Digit.three)).alternate
         (standardField (List.replicate k Digit.three)) x =
       stairEvenAltField (2 * (k : ℤ) + 3) (standardField (List.replicate k Digit.three)) x + c)
@@ -525,7 +534,7 @@ theorem global_odometers_pair {fraction : Fraction} (hint : fraction.Interior) {
             (alternateOddSlope w).2 * (fraction.modifiedDeck.kernel).2))) := by
   have hpk : ∀ u : Word, (frameAt u).Packet (standardField u) := packet_all hstar hsheet
   have hAll : ∀ u : Word, AlternateFactsWord u :=
-    altFactsWord_all hstar hsheet harc hodd hbulk hbaseTwos hbaseThree
+    altFactsWord_all hstar hsheet harc hodd hbulk hbaseTwoId hbaseThree
   have hstd := global_odometers hint hbirth hstar hsheet harc hodd hbulk bdOdd bdEven simpleOdd simpleEven
     tile htile hsites
   have hstdSP : SatisfiesPeriodicity fraction (planeTarget w p) := hstd.2.1
