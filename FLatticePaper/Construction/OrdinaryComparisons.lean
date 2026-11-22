@@ -48,4 +48,23 @@ theorem overlapWeak_of_agrees {α : Type*} {incoming : HeightTile α} {occupied 
     have := h site
     omega
 
+/-- Comparison 3 from the nominal agreement: a contact equality exists exactly when the copy meets the occupied union,
+which is the chronological contact of the insertion. -/
+theorem contactEquality_of_agrees {α : Type*} [DecidableEq α] {incoming : HeightTile α} {occupied : Finset α} {target : α → ℤ} {gauge : ℤ}
+    (h : incoming.Agrees target gauge) (contact : (occupied ∩ incoming.sites).Nonempty) :
+    ContactEquality incoming occupied target gauge := by
+  obtain ⟨site, hsite⟩ := contact
+  obtain ⟨hold, hin⟩ := Finset.mem_inter.mp hsite
+  refine ⟨⟨site, hin⟩, hold, ?_⟩
+  have := h ⟨site, hin⟩
+  simp only at this ⊢
+  omega
+
+/-- The three comparisons from the nominal agreement and one chronological contact. -/
+theorem fits_of_agrees {α : Type*} [DecidableEq α] {incoming : HeightTile α} {occupied : Finset α} {target : α → ℤ} {gauge : ℤ}
+    (h : incoming.Agrees target gauge) (contact : (occupied ∩ incoming.sites).Nonempty) :
+    incoming.Fits occupied target :=
+  (fits_iff_three incoming occupied target).mpr
+    ⟨gauge, freshEquality_of_agrees h, overlapWeak_of_agrees h, contactEquality_of_agrees h contact⟩
+
 end FLatticePaper.Construction
