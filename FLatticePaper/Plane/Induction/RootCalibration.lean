@@ -170,4 +170,48 @@ theorem rootGap_ge_one_eps_neg (frame : ChildFrame) (Fp : Field) (hε : frame.ep
     ring
   exact rootGap_ge_one_of_monotone (fun j => frame.sheetC Fp (w j) - frame.sheetA Fp (w j)) d hmono h1
 
+/-- The nontied root step, sheet level: if the sheet A agrees with `h` on the star of a root `w` whose gap is at least
+one, and the input gaps are unit, then `min(A, C) = h` on the complete star. -/
+theorem min_eq_of_root_gap (A C h : Site → ℤ) (w : Site)
+    (hgap : 1 ≤ C w - A w)
+    (hunit : ∀ u, FLatticePaper.Edge u w → -1 ≤ (C u - A u) - (C w - A w) ∧ (C u - A u) - (C w - A w) ≤ 1)
+    (hA : ∀ u, u = w ∨ FLatticePaper.Edge u w → A u = h u) :
+    ∀ u, u = w ∨ FLatticePaper.Edge u w → min (A u) (C u) = h u := by
+  intro u hu
+  rcases hu with h' | hE
+  · have hle : A w ≤ C w := by linarith
+    rw [h', min_eq_left hle, hA w (Or.inl rfl)]
+  · have hu' := hunit u hE
+    have hle : A u ≤ C u := by linarith [hu'.1]
+    rw [min_eq_left hle, hA u (Or.inr hE)]
+
+/-- On the branch `eps = +1` the shift vanishes, so the sheet `A` is the field itself. -/
+theorem sheetA_eq_of_eps_pos (frame : ChildFrame) (Fp : Field) (hε : frame.eps = 1) (z : Site) :
+    frame.sheetA Fp z = Fp z := by
+  have hW : frame.phaseW = 1 := by unfold ChildFrame.phaseW; rw [hε]; norm_num
+  have hshift : frame.sheetShift = 0 := by unfold ChildFrame.sheetShift; rw [hW]; simp
+  unfold ChildFrame.sheetA; rw [hshift, sub_zero]
+
+/-- The sp-guard of the audit for a site: `-2 D + 1 <= sp(u) <= 2 D + 2 N - 1` with `sp = (D + N) u_1 + (D - N) u_2`,
+for the odd parent `N/D`. -/
+def ChildFrame.spGuard (frame : ChildFrame) (u : Site) : Prop :=
+  -2 * frame.parents.odd.den + 1 ≤
+      (frame.parents.odd.den + frame.parents.odd.num) * u.1 + (frame.parents.odd.den - frame.parents.odd.num) * u.2 ∧
+    (frame.parents.odd.den + frame.parents.odd.num) * u.1 + (frame.parents.odd.den - frame.parents.odd.num) * u.2 ≤
+      2 * frame.parents.odd.den + 2 * frame.parents.odd.num - 1
+
+/-- (I2), eps = +1, nontied roots. Named inputs: the parent harmonic strip `Fp = h0` on the sp-guarded sites, and the
+sp-guard on the star. Then `min(A, C) = h0` on the complete star of a root with `Psi >= 1` and unit input gaps. -/
+theorem i2_nontied_min_eq_harmonic (frame : ChildFrame) (Fp : Field) (hε : frame.eps = 1)
+    (hstrip : ∀ x : Site, frame.spGuard x → Fp x = harmonicGrid x)
+    (w : Site) (hgap : 1 ≤ frame.sheetC Fp w - frame.sheetA Fp w)
+    (hunit : ∀ u, FLatticePaper.Edge u w →
+      -1 ≤ (frame.sheetC Fp u - frame.sheetA Fp u) - (frame.sheetC Fp w - frame.sheetA Fp w) ∧
+        (frame.sheetC Fp u - frame.sheetA Fp u) - (frame.sheetC Fp w - frame.sheetA Fp w) ≤ 1)
+    (hguard : ∀ u, u = w ∨ FLatticePaper.Edge u w → frame.spGuard u) :
+    ∀ u, u = w ∨ FLatticePaper.Edge u w →
+      min (frame.sheetA Fp u) (frame.sheetC Fp u) = harmonicGrid u :=
+  min_eq_of_root_gap (frame.sheetA Fp) (frame.sheetC Fp) harmonicGrid w hgap hunit
+    (fun u hu => by rw [sheetA_eq_of_eps_pos frame Fp hε u]; exact hstrip u (hguard u hu))
+
 end FLatticePaper.Induction
