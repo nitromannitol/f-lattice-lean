@@ -12,3 +12,4 @@ import FLatticePaper.Construction.OddShear
 #print axioms FLatticePaper.Construction.alternateSigma_eq_rot_add_period
 #print axioms FLatticePaper.Construction.min_shear_aux
 #print axioms FLatticePaper.Construction.alternateOddRawTarget_eq_planeTarget_add_one
+#print axioms FLatticePaper.Construction.ordinaryAlternate_odd_first_agrees_of_gap

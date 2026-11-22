@@ -214,4 +214,33 @@ theorem alternateOddRawTarget_eq_planeTarget_add_one (w : Word) (hph : phase w =
   simp only [hchart, Prod.fst_sub, Prod.snd_sub]
   ring
 
+/-! ## The first copy of the odd alternate, from the shear identity -/
+
+/-- The gap of the swapped word at the quarter-turned point of a site: the drop of the standard field of the swapped word between the
+point and its `σ`-translate. -/
+noncomputable def shearGap (w : Word) (s : Site) : ℤ :=
+  standardField (w.map Digit.swapTwoThree)
+      (QuarterTurn.counterclockwise.mapSite (0, -1) (s - alternateOddDelta w)) -
+    standardField (w.map Digit.swapTwoThree)
+      (QuarterTurn.counterclockwise.mapSite (0, -1) (s - alternateOddDelta w) + alternateSigma (w.map Digit.swapTwoThree))
+
+/-- **The first copy of the odd ordinary alternate agrees with the raw odd target in phase one**, with the shear constant supplied by
+the shear identity. The only named input left on the copy's sites is the window `1 ≤ gap ≤ 2` (the sheet fact of the first copy). -/
+theorem ordinaryAlternate_odd_first_agrees_of_gap (parents : TileParents) (beforePush : Word) (digit : Digit) {g : ℤ}
+    (hph : phase (beforePush ++ [digit]) = 1)
+    (hpk : (frameAt ((beforePush ++ [digit]).map Digit.swapTwoThree)).Packet
+      (standardField ((beforePush ++ [digit]).map Digit.swapTwoThree)))
+    (hstd : (ordinaryStandardCopy parents (beforePush ++ [digit]) .odd 0).val.Agrees
+      (fun y => planeTarget (beforePush ++ [digit]) .odd (y - oddStdChart (beforePush ++ [digit]))) g)
+    (hgap : ∀ s ∈ (ordinaryStandardCopy parents (beforePush ++ [digit]) .odd 0).val.sites,
+      1 ≤ shearGap (beforePush ++ [digit]) s ∧ shearGap (beforePush ++ [digit]) s ≤ 2) :
+    ∃ k : ℤ, (ordinaryAlternateSchedule parents beforePush digit .odd).first.val.Agrees
+      (alternateOddRawTarget (beforePush ++ [digit])) (g - k) := by
+  obtain ⟨c, hc⟩ := alternateOddRawTarget_eq_planeTarget_add_one (beforePush ++ [digit]) hph hpk
+  refine ⟨1 + c, ordinaryAlternate_odd_first_agrees parents beforePush digit hstd ?_⟩
+  intro s hs
+  have h := hgap s hs
+  rw [hc s h.1 h.2]
+  ring
+
 end FLatticePaper.Construction
