@@ -21,3 +21,4 @@ import FLatticePaper.Plane.Induction.TwosPieces
 #print axioms FLatticePaper.Induction.diagonalTop_piece
 #print axioms FLatticePaper.Induction.columnDTop_piece
 #print axioms FLatticePaper.Induction.columnDTopCorner_piece
+#print axioms FLatticePaper.Induction.columnDTwoLess_piece
