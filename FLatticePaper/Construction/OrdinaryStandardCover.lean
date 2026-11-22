@@ -107,4 +107,36 @@ theorem ordinaryStandard_output_covers (deck : PeriodDeck) (parents : TileParent
     deck.Covers out.val.sites :=
   (ordinaryStandard_eval_covers_iff deck parents word parity context out hEval).mpr hUnion
 
+/-- The parent tiles that the ordinary schedule reads are covered by the two frames of the child
+word, whenever the register state covers the frames of the word before the digit. -/
+theorem parents_cover_of_registers (registers : TileRegisters) (beforePush : Word) (digit : Digit)
+    (hregs : registers.llCenter.Covers (parentsAt beforePush)) :
+    (parentsAt (beforePush ++ [digit])).odd.modifiedDeck.Covers
+        (registers.parentsFor digit).odd.val.sites ∧
+      (parentsAt (beforePush ++ [digit])).even.modifiedDeck.Covers
+        (registers.parentsFor digit).even.val.sites := by
+  rw [parentsAt_append_singleton]
+  cases digit with
+  | one => exact ⟨hregs.standardOdd, hregs.standardEven⟩
+  | two => exact ⟨hregs.standardOdd, hregs.standardRetainedEven⟩
+  | three => exact ⟨hregs.standardRetainedOdd, hregs.standardEven⟩
+
+/-- Task 23, conditional form. The parent covers from the register state feed the union claim
+`core`, which gives covering of the successful ordinary standard output. The claim `core` is the
+open hand step: it is the statement that the six placed copies cover the child's modified deck. -/
+theorem ordinaryStandard_output_covers_of_core (registers : TileRegisters) (beforePush : Word)
+    (digit : Digit) (parity : Parity) (context : String) (out : NonemptyTile)
+    (hregs : registers.llCenter.Covers (parentsAt beforePush))
+    (hEval : (ordinaryStandardSchedule (registers.parentsFor digit) (beforePush ++ [digit])
+      parity).eval .tile context = .ok out)
+    (core : (parentsAt (beforePush ++ [digit])).odd.modifiedDeck.Covers
+          (registers.parentsFor digit).odd.val.sites →
+        (parentsAt (beforePush ++ [digit])).even.modifiedDeck.Covers
+          (registers.parentsFor digit).even.val.sites →
+        ((parentsAt (beforePush ++ [digit])).current parity).modifiedDeck.Covers
+          (ordinaryStandardSites (registers.parentsFor digit) (beforePush ++ [digit]) parity)) :
+    ((parentsAt (beforePush ++ [digit])).current parity).modifiedDeck.Covers out.val.sites := by
+  obtain ⟨hOdd, hEven⟩ := parents_cover_of_registers registers beforePush digit hregs
+  exact ordinaryStandard_output_covers _ _ _ _ _ _ hEval (core hOdd hEven)
+
 end FLatticePaper.Construction
