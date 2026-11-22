@@ -30,3 +30,4 @@ import FLatticePaper.Plane.Induction.TwosPieces
 #print axioms FLatticePaper.Induction.apexA_piece
 #print axioms FLatticePaper.Induction.cornerZeroOne_piece
 #print axioms FLatticePaper.Induction.cornerOneOne_piece
+#print axioms FLatticePaper.Induction.cornerTwoOne_piece
