@@ -12,6 +12,7 @@ import FLatticePaper.Plane.RestrictedBellmanRank
 import FLatticePaper.Plane.Induction.OpenLocal
 import FLatticePaper.Plane.Induction.TwosInduction
 import FLatticePaper.Plane.Induction.TwosPeriods
+import FLatticePaper.Plane.Induction.TwosStripFacts
 
 /-! The two headline theorems from `theorem:odometers` at every reduced interior slope. -/
 
@@ -318,6 +319,26 @@ theorem odometersTheorem_of_nearOne_standard
     OdometersTheorem :=
   odometersTheorem_of_openLocalInputs_twos
     (fun k => Induction.twos_packet_standard k (hzero k) (hharm k)) hstar hsheet harc hodd hbulk
+
+/-- `theorem:odometers` from the open local inputs at the proper words that are not powers of two. The powers of two are
+now unconditional base words: their standard fields are the physical near-one field on the whole plane
+(`Induction.twos_standardField_eq_rotate`), with the zero and harmonic strip facts on the closed polygon proved
+(`Induction.twos_zero_strip`, `Induction.twos_harm_strip`). -/
+theorem odometersTheorem_of_nearOne_unconditional
+    (hstar : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word → Induction.StarZoneInputs word)
+    (hsheet : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      Induction.SheetLocalInputs word)
+    (harc : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      Induction.VArcInputs (frameAt word) (standardField word))
+    (hodd : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      OddBlackNoRise (standardField word) (frameAt word).shortShift)
+    (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      Induction.S3NoFortInputs (frameAt word) (standardField word)) :
+    OdometersTheorem :=
+  odometersTheorem_of_openLocalInputs_twos
+    (fun k => Induction.twos_packet_standard k
+      (fun _ hz ht => Induction.twos_zero_strip k hz ht) (fun _ hz hs => Induction.twos_harm_strip k hz hs))
+    hstar hsheet harc hodd hbulk
 
 /-- `theorem:hyperbola` from the open inputs. -/
 theorem hyperbola_of_openLocalInputs
