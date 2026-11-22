@@ -172,6 +172,7 @@ import FLatticePaper.MainTheorems
 import FLatticePaper.Plane.HarmonicConstant
 import FLatticePaper.Plane.Induction.AlternateFacts
 import FLatticePaper.Plane.GlobalOdometers
+import FLatticePaper.Plane.OddPhaseAlternate
 import FLatticePaper.Construction.BaseCaseRecurrence
 import FLatticePaper.Construction.PropBaseCases
 import FLatticePaper.Tiles.StackedStringConnected
