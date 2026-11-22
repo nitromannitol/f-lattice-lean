@@ -208,6 +208,9 @@ import FLatticePaper.Tiles.BaseFamilies
 import FLatticePaper.Tiles.RowChain
 import FLatticePaper.Tiles.ArcRows
 import FLatticePaper.Tiles.StandardDischarge
+import FLatticePaper.Tiles.RegionBoundary
+import FLatticePaper.Tiles.RegionRuns
+import FLatticePaper.Tiles.RegionArith
 import FLatticePaper.Tiles.StandardSimple
 import FLatticePaper.Tiles.ArcInequality
 import FLatticePaper.Tiles.CheckerFree
