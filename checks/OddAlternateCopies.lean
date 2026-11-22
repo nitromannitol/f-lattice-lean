@@ -8,3 +8,6 @@ import FLatticePaper.Construction.OddAlternateCopies
 #print axioms FLatticePaper.Construction.alternateOddRawTarget_eq_of_branch
 #print axioms FLatticePaper.Construction.HeightTile.Agrees.alternateOddRawTarget_of_branch
 #print axioms FLatticePaper.Construction.ordinaryAlternate_odd_first_agrees
+#print axioms FLatticePaper.Construction.ordinaryAlternate_odd_copy_two_agrees
+#print axioms FLatticePaper.Construction.ordinaryAlternate_odd_copy_four_agrees
+#print axioms FLatticePaper.Construction.ordinaryAlternate_odd_identifies_copies
