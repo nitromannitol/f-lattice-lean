@@ -1,5 +1,6 @@
 import FLatticePaper.Tiles.BottomEdges
 import FLatticePaper.Tiles.StandardClauseA
+import FLatticePaper.Tiles.AdmissibleStatement
 
 /-! The boundary-word edges of the standard tiles, from the bottom-edge recursion of `BottomEdges.lean` (w3).
 
@@ -79,12 +80,28 @@ def StandardBoundaryEven (w : Word) : Prop :=
 /-- `StandardBoundaryWord w`: both tiles of `w` have the boundary-word form (the input `StandardBoundaryWord`). -/
 def StandardBoundaryWord (w : Word) : Prop := StandardBoundaryOdd w ∧ StandardBoundaryEven w
 
+/-- The admissibility of the odd standard tile's words: `w1 = oddBottom w` and `-i w2 = (bottomEdges (swap w)).2`
+(`bottomEdges_admissible`, task 51). -/
+theorem admissible_oddStandard (w : Word) :
+    Admissible (oddBottom w) ∧ Admissible ((oddRight w).map Unit4.mulNegI) := by
+  refine ⟨(bottomEdges_admissible w).1, ?_⟩
+  unfold oddRight
+  rw [mulNegI_mulI_list]
+  exact (bottomEdges_admissible _).2
+
+/-- The admissibility of the even standard tile's words: `w1 = evenBottom w` and `-i w2 = (bottomEdges (swap w)).1`. -/
+theorem admissible_evenStandard (w : Word) :
+    Admissible (evenBottom w) ∧ Admissible ((evenRight w).map Unit4.mulNegI) := by
+  refine ⟨(bottomEdges_admissible w).2, ?_⟩
+  unfold evenRight
+  rw [mulNegI_mulI_list]
+  exact (bottomEdges_admissible _).1
+
 /-- The standard inputs of clause (a), with the lattice sums discharged by w3's theorems and the rotation identities
-(`sum_oddBottom`, `sum_oddRight`, `sum_evenBottom`, `sum_evenRight`). The remaining inputs are the boundary words,
-admissibility (w3's next result), simplicity, and the packing hypothesis. -/
+(`sum_oddBottom`, `sum_oddRight`, `sum_evenBottom`, `sum_evenRight`) and the admissibility discharged by
+`bottomEdges_admissible` (`admissible_oddStandard`, `admissible_evenStandard`). The remaining inputs are the simplicity
+of the tiles and the packing hypothesis. -/
 def standardInputsOf (bd : ∀ w, StandardBoundaryWord w)
-    (admO : ∀ w, Admissible (oddBottom w) ∧ Admissible ((oddRight w).map Unit4.mulNegI))
-    (admE : ∀ w, Admissible (evenBottom w) ∧ Admissible ((evenRight w).map Unit4.mulNegI))
     (simpleO : ∀ w, IsSimpleTile (cellTileOf (oddTile w)))
     (simpleE : ∀ w, IsSimpleTile (cellTileOf (evenTile w)))
     (packO : ∀ w, NoFirstCrossing (cellTileOf (oddTile w)) (almostV₁ (oddBottom w)) (almostV₂ (oddRight w)) ∧
@@ -100,17 +117,16 @@ def standardInputsOf (bd : ∀ w, StandardBoundaryWord w)
   bdEven := fun w => (bd w).2
   sumOdd := fun w => ⟨sum_oddBottom w, sum_oddRight w⟩
   sumEven := fun w => ⟨sum_evenBottom w, sum_evenRight w⟩
-  admOdd := admO
-  admEven := admE
+  admOdd := admissible_oddStandard
+  admEven := admissible_evenStandard
   simpleOdd := simpleO
   simpleEven := simpleE
   packOdd := packO
   packEven := packE
 
-/-- Clause (a) for the odd tile of every word, from the boundary-word input and the other named inputs. -/
+/-- Clause (a) for the odd tile of every word, from the boundary-word input, the simplicity and packing inputs (the
+admissibility is discharged by `bottomEdges_admissible`). -/
 theorem clauseA_standard_odd (bd : ∀ w, StandardBoundaryWord w)
-    (admO : ∀ w, Admissible (oddBottom w) ∧ Admissible ((oddRight w).map Unit4.mulNegI))
-    (admE : ∀ w, Admissible (evenBottom w) ∧ Admissible ((evenRight w).map Unit4.mulNegI))
     (simpleO : ∀ w, IsSimpleTile (cellTileOf (oddTile w)))
     (simpleE : ∀ w, IsSimpleTile (cellTileOf (evenTile w)))
     (packO : ∀ w, NoFirstCrossing (cellTileOf (oddTile w)) (almostV₁ (oddBottom w)) (almostV₂ (oddRight w)) ∧
@@ -119,12 +135,10 @@ theorem clauseA_standard_odd (bd : ∀ w, StandardBoundaryWord w)
       NoFarAdjacency (cellTileOf (evenTile w)) (almostV₁ (evenBottom w)) (almostV₂ (evenRight w)))
     (w : Word) :
     IsRegularAlmostTiling (cellTileOf (oddTile w)) (texV1Odd (fracOdd w)) (texV2 (fracOdd w)) :=
-  clauseA_odd (standardInputsOf bd admO admE simpleO simpleE packO packE) w
+  clauseA_odd (standardInputsOf bd simpleO simpleE packO packE) w
 
 /-- Clause (a) for the even tile of every word. -/
 theorem clauseA_standard_even (bd : ∀ w, StandardBoundaryWord w)
-    (admO : ∀ w, Admissible (oddBottom w) ∧ Admissible ((oddRight w).map Unit4.mulNegI))
-    (admE : ∀ w, Admissible (evenBottom w) ∧ Admissible ((evenRight w).map Unit4.mulNegI))
     (simpleO : ∀ w, IsSimpleTile (cellTileOf (oddTile w)))
     (simpleE : ∀ w, IsSimpleTile (cellTileOf (evenTile w)))
     (packO : ∀ w, NoFirstCrossing (cellTileOf (oddTile w)) (almostV₁ (oddBottom w)) (almostV₂ (oddRight w)) ∧
@@ -133,6 +147,6 @@ theorem clauseA_standard_even (bd : ∀ w, StandardBoundaryWord w)
       NoFarAdjacency (cellTileOf (evenTile w)) (almostV₁ (evenBottom w)) (almostV₂ (evenRight w)))
     (w : Word) :
     IsRegularAlmostTiling (cellTileOf (evenTile w)) (texV1Even (fracEven w)) (texV2 (fracEven w)) :=
-  clauseA_even (standardInputsOf bd admO admE simpleO simpleE packO packE) w
+  clauseA_even (standardInputsOf bd simpleO simpleE packO packE) w
 
 end FLatticePaper.Tiles.StandardBoundary
