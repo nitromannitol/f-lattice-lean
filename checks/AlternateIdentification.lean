@@ -15,3 +15,6 @@ import FLatticePaper.Construction.AlternateIdentification
 #print axioms FLatticePaper.Construction.ordinaryAlternate_even_copy_four_agrees
 #print axioms FLatticePaper.Construction.exists_proper_of_even_digit
 #print axioms FLatticePaper.Construction.ordinaryAlternate_even_identifies_four
+#print axioms FLatticePaper.Construction.HeightTile.Agrees.restore_then_place
+#print axioms FLatticePaper.Construction.alternateSeventhCopy_agrees_of_donor
+#print axioms FLatticePaper.Construction.ordinaryAlternate_even_identifies_seventh
