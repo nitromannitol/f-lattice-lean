@@ -32,7 +32,7 @@ def digitChar : Digit → Char
   | .two => '2'
   | .three => '3'
 
-def wordString (w : Word) : String := String.mk (w.map digitChar)
+def wordString (w : Word) : String := String.ofList (w.map digitChar)
 
 def cellsOf (t : NonemptyTile) : String :=
   let codes : List ℕ := (Finset.image encode t.val.sites).sort (· ≤ ·)
