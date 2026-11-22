@@ -138,6 +138,7 @@ lake env lean checks/StackedStringGeneral.lean
 lake env lean checks/TilingCriteria.lean
 lake env lean checks/TilingExample.lean
 lake env lean checks/StandardTiles.lean
+lake env lean checks/PseudoSquareLiteral.lean
 lake env lean checks/AlternateTiles.lean
 lake env lean checks/AlternateConstructor.lean
 lake env lean checks/LCorrections.lean
