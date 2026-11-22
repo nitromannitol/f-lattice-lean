@@ -10,6 +10,7 @@ import FLatticePaper.Plane.Induction.LocalPremises
 import FLatticePaper.Plane.Induction.LocalPremisesRestricted
 import FLatticePaper.Plane.RestrictedBellmanRank
 import FLatticePaper.Plane.Induction.OpenLocal
+import FLatticePaper.Plane.Induction.TwosInduction
 
 /-! The two headline theorems from `theorem:odometers` at every reduced interior slope. -/
 
@@ -195,6 +196,100 @@ theorem odometersTheorem_of_openLocalInputs
   intro word hw
   exact Induction.starEstimates_of_inputs word hw (hpk (Induction.conjWord word)) (hpk word) (hstar word hw)
     (hsheet word hw) (harc word hw) (hodd word hw) (hbulk word hw)
+
+/-- The packet induction with the powers of two as base cases, and the star estimates at the other proper words, give
+`theorem:odometers`. The child of `2^(k+1)` is the base fraction `R(1/(2k+4))`, whose odometer theorem holds by
+`odometersTheoremAt_base`, so its star estimates are not needed. -/
+theorem odometersTheorem_of_packets_twos
+    (hpacket : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → (frameAt word).Packet (standardField word))
+    (hest : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word → StarEstimates word) :
+    OdometersTheorem := by
+  refine Induction.odometersTheorem_of_even ?_
+  intro fraction hint hred heven
+  obtain ⟨birth, hbirth, -⟩ := existsUnique_birth fraction hint hred
+  obtain ⟨word, parity⟩ := birth
+  have hparity : parity = Parity.even := by
+    cases parity with
+    | even => rfl
+    | odd =>
+      exfalso
+      have hodd : fraction.Odd := by
+        rw [← hbirth]
+        exact (parentsAt_valid word).current_odd_parity
+      unfold Fraction.Odd at hodd
+      unfold Fraction.Even at heven
+      omega
+  subst hparity
+  have hchild : (⟨parentsAt word, parentsAt_valid word⟩ : Induction.ChildFrame).child = fraction := hbirth
+  by_cases hall : ∀ x ∈ word, x = .three
+  · obtain ⟨k, hk⟩ : ∃ k : ℕ, word = List.replicate k Digit.three :=
+      ⟨word.length, List.eq_replicate_iff.mpr ⟨rfl, hall⟩⟩
+    subst hk
+    have hfr : fraction = ⟨1, 2 * (k : ℤ) + 3⟩ := by
+      rw [← hchild]
+      exact reciprocalFrame_child k
+    rw [hfr]
+    exact (odometersTheoremAt_base (by omega)).1
+  · push Not at hall
+    by_cases htw : Induction.IsTwoPow word
+    · obtain ⟨k, hk⟩ := htw
+      subst hk
+      have hfr : fraction = Fraction.rotate ⟨1, 2 * (k : ℤ) + 4⟩ := by
+        rw [← hchild]
+        exact Induction.child_replicate_two_succ k
+      rw [hfr]
+      exact (odometersTheoremAt_base (d := 2 * (k : ℤ) + 4) (by omega)).2
+    · have hp := hpacket word hall
+      obtain ⟨hU, hNS, rank, hrank⟩ := hest word hall htw
+      have key := Induction.ChildFrame.odometersTheoremAt_of_standard
+        (⟨parentsAt word, parentsAt_valid word⟩ : Induction.ChildFrame) hp.periods hU hNS hrank
+      rw [hchild] at key
+      exact key
+
+/-- `theorem:odometers` from the open local inputs at the proper words that are not powers of two, and the packets of the
+powers of two. The old `odometersTheorem_of_openLocalInputs` is kept as it was. -/
+theorem odometersTheorem_of_openLocalInputs_twos
+    (htwo : ∀ k : ℕ, (frameAt (List.replicate (k + 1) Digit.two)).Packet
+      (standardField (List.replicate (k + 1) Digit.two)))
+    (hstar : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word → Induction.StarZoneInputs word)
+    (hsheet : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      Induction.SheetLocalInputs word)
+    (harc : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      Induction.VArcInputs (frameAt word) (standardField word))
+    (hodd : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      OddBlackNoRise (standardField word) (frameAt word).shortShift)
+    (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      Induction.S3NoFortInputs (frameAt word) (standardField word)) :
+    OdometersTheorem := by
+  have hpk := Induction.packet_standardField_of_twos htwo hstar hsheet
+  refine odometersTheorem_of_packets_twos (fun word _ => hpk word) ?_
+  intro word hw htw
+  exact Induction.starEstimates_of_inputs word hw (hpk (Induction.conjWord word)) (hpk word)
+    (hstar word hw htw) (hsheet word hw htw) (harc word hw htw) (hodd word hw htw) (hbulk word hw htw)
+
+/-- `theorem:odometers` from the open local inputs at the proper words that are not powers of two, with the powers of two
+taken from the near-one constants: the periods of their standard fields, with the strip inputs and the polygon binarity
+of those fields (`Induction.twos_packet_of_stripInputs`). -/
+theorem odometersTheorem_of_nearOne_twos
+    (hper : ∀ k : ℕ, HasGeneratorPeriods (frameAt (List.replicate (k + 1) Digit.two)).child
+      (standardField (List.replicate (k + 1) Digit.two)) 0 (Construction.ladderEvenConstantV (2 * (k : ℤ) + 4)))
+    (hS : ∀ k : ℕ, (frameAt (List.replicate (k + 1) Digit.two)).StripInputs
+      (standardField (List.replicate (k + 1) Digit.two)))
+    (hbin : ∀ k : ℕ, ∀ z ∈ (frameAt (List.replicate (k + 1) Digit.two)).closedPolygon,
+      laplacian (standardField (List.replicate (k + 1) Digit.two)) z = -1 ∨
+        laplacian (standardField (List.replicate (k + 1) Digit.two)) z = 0)
+    (hstar : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word → Induction.StarZoneInputs word)
+    (hsheet : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      Induction.SheetLocalInputs word)
+    (harc : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      Induction.VArcInputs (frameAt word) (standardField word))
+    (hodd : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      OddBlackNoRise (standardField word) (frameAt word).shortShift)
+    (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      Induction.S3NoFortInputs (frameAt word) (standardField word)) :
+    OdometersTheorem :=
+  odometersTheorem_of_openLocalInputs_twos
+    (fun k => Induction.twos_packet_of_stripInputs k (hper k) (hS k) (hbin k)) hstar hsheet harc hodd hbulk
 
 /-- `theorem:hyperbola` from the open inputs. -/
 theorem hyperbola_of_openLocalInputs
