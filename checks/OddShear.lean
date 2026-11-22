@@ -13,3 +13,7 @@ import FLatticePaper.Construction.OddShear
 #print axioms FLatticePaper.Construction.min_shear_aux
 #print axioms FLatticePaper.Construction.alternateOddRawTarget_eq_planeTarget_add_one
 #print axioms FLatticePaper.Construction.ordinaryAlternate_odd_first_agrees_of_gap
+#print axioms FLatticePaper.Construction.oddStdChart_phase_zero
+#print axioms FLatticePaper.Construction.alternateOddRawTarget_eq_planeTarget_phase_zero
+#print axioms FLatticePaper.Construction.ordinaryAlternate_odd_first_agrees_phase_zero
+#print axioms FLatticePaper.Construction.ordinaryAlternate_odd_copy_four_agrees_phase_zero

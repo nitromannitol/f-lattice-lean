@@ -243,4 +243,75 @@ theorem ordinaryAlternate_odd_first_agrees_of_gap (parents : TileParents) (befor
   rw [hc s h.1 h.2]
   ring
 
+/-! ## Phase zero: the shear and the copies that are F-pure -/
+
+theorem oddStdChart_phase_zero (w : Word) (h : phase w = 0) : oddStdChart w = 0 := by
+  unfold oddStdChart
+  simp [h]
+
+/-- **The phase-zero shear.** In phase zero the odd target is the standard odd target at zero shift, and on the window
+`0 ≤ gap ≤ 2` the raw odd target is that target plus `min 0 (1 − gap)`: the gap is the drop of the standard field of the swapped word
+at the quarter-turned point, and the alternate target takes the minimum of the field and its translate plus one. -/
+theorem alternateOddRawTarget_eq_planeTarget_phase_zero (w : Word) (hph : phase w = 0) (x : Site)
+    (h0 : 0 ≤ shearGap w x) (h2 : shearGap w x ≤ 2) :
+    alternateOddRawTarget w x = planeTarget w .odd x + min 0 (1 - shearGap w x) := by
+  have hδ : alternateOddDelta w = 0 := by
+    unfold alternateOddDelta
+    simp [hph]
+  have hs : alternateOddSlope w = 0 := by
+    unfold alternateOddSlope
+    simp [hph]
+  have hg : shearGap w x =
+      standardField (w.map Digit.swapTwoThree) (QuarterTurn.counterclockwise.mapSite (0, -1) x) -
+        standardField (w.map Digit.swapTwoThree)
+          (QuarterTurn.counterclockwise.mapSite (0, -1) x + alternateSigma (w.map Digit.swapTwoThree)) := by
+    unfold shearGap
+    rw [hδ, sub_zero]
+  have hmin : alternateTarget (w.map Digit.swapTwoThree) (QuarterTurn.counterclockwise.mapSite (0, -1) x) =
+      min (standardField (w.map Digit.swapTwoThree) (QuarterTurn.counterclockwise.mapSite (0, -1) x))
+        (standardField (w.map Digit.swapTwoThree)
+          (QuarterTurn.counterclockwise.mapSite (0, -1) x + alternateSigma (w.map Digit.swapTwoThree)) + 1) :=
+    alternateTarget_eq_min (QuarterTurn.counterclockwise.mapSite (0, -1) x) (by linarith) (by linarith)
+  unfold alternateOddRawTarget
+  rw [planeTarget_odd_eq, hδ, hs]
+  unfold quarterTurnField
+  simp only [sub_zero, Prod.fst_zero, Prod.snd_zero, zero_mul, add_zero]
+  rw [hmin]
+  omega
+
+/-- **The first copy of the odd ordinary alternate agrees with the raw odd target in phase zero**, on the window `0 ≤ gap ≤ 1`
+of its sites (the copy is F-pure there, and the shear constant is zero). -/
+theorem ordinaryAlternate_odd_first_agrees_phase_zero (parents : TileParents) (beforePush : Word) (digit : Digit) {g : ℤ}
+    (hph : phase (beforePush ++ [digit]) = 0)
+    (hstd : (ordinaryStandardCopy parents (beforePush ++ [digit]) .odd 0).val.Agrees
+      (fun y => planeTarget (beforePush ++ [digit]) .odd (y - oddStdChart (beforePush ++ [digit]))) g)
+    (hgap : ∀ s ∈ (ordinaryStandardCopy parents (beforePush ++ [digit]) .odd 0).val.sites,
+      0 ≤ shearGap (beforePush ++ [digit]) s ∧ shearGap (beforePush ++ [digit]) s ≤ 1) :
+    (ordinaryAlternateSchedule parents beforePush digit .odd).first.val.Agrees
+      (alternateOddRawTarget (beforePush ++ [digit])) g := by
+  have hshear : ∀ s ∈ (ordinaryStandardCopy parents (beforePush ++ [digit]) .odd 0).val.sites,
+      alternateOddRawTarget (beforePush ++ [digit]) s =
+        planeTarget (beforePush ++ [digit]) .odd (s - oddStdChart (beforePush ++ [digit])) + 0 := by
+    intro s hs
+    have h := hgap s hs
+    rw [alternateOddRawTarget_eq_planeTarget_phase_zero _ hph s h.1 (by linarith [h.2]),
+      oddStdChart_phase_zero _ hph, sub_zero, min_eq_left (by linarith [h.2]), add_zero]
+  simpa using ordinaryAlternate_odd_first_agrees parents beforePush digit hstd hshear
+
+/-- **The copy in slot four of the odd ordinary alternate agrees with the raw odd target in phase zero**, on the window `0 ≤ gap ≤ 1`
+of the standard copy five on its sites (F-pure, zero shear). -/
+theorem ordinaryAlternate_odd_copy_four_agrees_phase_zero (parents : TileParents) (word : Word) (h : phase word = 0) {g : ℤ}
+    (hstd : (ordinaryStandardCopy parents word .odd 5).val.Agrees (planeTarget word .odd) g)
+    (hgap : ∀ s ∈ (ordinaryStandardCopy parents word .odd 5).val.sites,
+      0 ≤ shearGap word s ∧ shearGap word s ≤ 1) :
+    (placedBySlot (alternateJets word .odd) (standardSources parents .even) 4).val.Agrees
+      (alternateOddRawTarget word) g := by
+  have hshear : ∀ s ∈ (ordinaryStandardCopy parents word .odd 5).val.sites,
+      alternateOddRawTarget word s = planeTarget word .odd s + 0 := by
+    intro s hs
+    have h' := hgap s hs
+    rw [alternateOddRawTarget_eq_planeTarget_phase_zero word h s h'.1 (by linarith [h'.2]),
+      min_eq_left (by linarith [h'.2]), add_zero]
+  simpa using ordinaryAlternate_odd_copy_four_agrees parents word h hstd hshear
+
 end FLatticePaper.Construction
