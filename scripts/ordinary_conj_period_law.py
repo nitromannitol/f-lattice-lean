@@ -59,3 +59,46 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+def radius_main():
+    """Largest box radius (2, 4, 6, 8) on which z -> Fp(z+p) - Fp(z) is affine, for p = L^{-1}(K_s) and L^{-1}(T_s)."""
+    st = Counter()
+    for L in (1, 2, 3):
+        import itertools as it
+        for w in it.product((1, 2, 3), repeat=L):
+            if all(x == 3 for x in w):
+                continue
+            Fp = m.parts(tuple(w) + (1,))[0]
+            sw = tuple(m.swap(list(w)))
+            K_s, T_s = lattice(m.Frame(list(sw)))
+            for name, u in (("K_s", K_s), ("T_s", T_s)):
+                p = (u[1], -u[0])
+                best = 0
+                for R in (2, 4, 6, 8):
+                    if not affine_on_box(Fp, p, R):
+                        break
+                    best = R
+                st[(name, "largest R", best)] += 1
+    for key in sorted(st, key=str):
+        print(key, st[key])
+
+
+def affine_on_box(Fp, p, R):
+    g = {}
+    for x in range(-R - 2, R + 3):
+        for y in range(-R - 2, R + 3):
+            g[(x, y)] = Fp((x + p[0], y + p[1])) - Fp((x, y))
+    for x in range(-R, R + 1):
+        for y in range(-R, R + 1):
+            for dx, dy in ((1, 0), (0, 1)):
+                a = (x, y)
+                b = (x + dx, y + dy)
+                c = (x + 2 * dx, y + 2 * dy)
+                if g[c] - 2 * g[b] + g[a] != 0:
+                    return False
+    return True
+
+
+if __name__ == "__main__":
+    radius_main()
