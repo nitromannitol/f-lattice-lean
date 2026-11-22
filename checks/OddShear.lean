@@ -22,3 +22,5 @@ import FLatticePaper.Construction.OddShear
 #print axioms FLatticePaper.Construction.HeightTile.Agrees.alternateOddRawTarget_of_gPlane
 #print axioms FLatticePaper.Construction.alternateOddRawTarget_eq_planeTarget_chart_min
 #print axioms FLatticePaper.Construction.HeightTile.Agrees.alternateOddRawTarget_of_coincident
+#print axioms FLatticePaper.Construction.ordinaryAlternate_odd_hslot_of_facts
+#print axioms FLatticePaper.Construction.ordinaryAlternate_odd_identifies_copies_of_facts
