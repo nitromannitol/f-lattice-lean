@@ -21,3 +21,8 @@ import FLatticePaper.Construction.AlternateIdentification
 #print axioms FLatticePaper.Construction.alternateCopy_of_sheetC_gbranch
 #print axioms FLatticePaper.Construction.ordinaryAlternate_even_copy_three_of_sheetC
 #print axioms FLatticePaper.Construction.ordinaryAlternate_even_identifies_two
+#print axioms FLatticePaper.Construction.alternateOddChart_eq_delta
+#print axioms FLatticePaper.Construction.alternateOddTarget_eq_raw_shift
+#print axioms FLatticePaper.Construction.alternateOddSeventhCopy_agrees_of_donor
+#print axioms FLatticePaper.Construction.ordinaryAlternate_odd_identifies_raw
+#print axioms FLatticePaper.Construction.ordinaryAlternate_odd_identifies

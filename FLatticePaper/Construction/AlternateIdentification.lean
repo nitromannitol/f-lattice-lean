@@ -580,4 +580,154 @@ theorem ordinaryAlternate_even_identifies_two (parents : TileParents) (beforePus
       · exact hslot s hs hs4 h3)
     hcon
 
+/-! ## The odd alternate: the raw target, its relation to the llCenter target, and the seventh copy -/
+
+/-- The transverse chart offset of the odd alternate in phase one: `transverse offset of the odd parent − kernel offset of the
+even parent`, zero in phase zero. The llCenter chart is `alternateOddDelta − alternateOddLowerLeft`. -/
+def alternateOddDelta (word : Word) : Site :=
+  if phase word = 1 then (transverseJet (parentsAt word).odd).1 - (kernelJet (parentsAt word).even).1 else 0
+
+theorem alternateOddChart_eq_delta (word : Word) :
+    alternateOddChart word = alternateOddDelta word - alternateOddLowerLeft word := rfl
+
+/-- The odd alternate target in the raw coordinates of the constructor (before the llCenter normalisation): the quarter turn of
+the alternate midpoint of the swapped word, shifted by `alternateOddDelta`, plus the transverse slope in phase one. -/
+noncomputable def alternateOddRawTarget (word : Word) : Field := fun x =>
+  quarterTurnField (alternateTarget (word.map Digit.swapTwoThree)) (x - alternateOddDelta word) +
+    ((alternateOddSlope word).1 * x.1 + (alternateOddSlope word).2 * x.2)
+
+/-- **The llCenter target is the raw target read at the lower-left shift.** `alternateOddTarget w z` equals
+`alternateOddRawTarget w (z + LL) − slope · LL`, with `LL = alternateOddLowerLeft w`. -/
+theorem alternateOddTarget_eq_raw_shift (word : Word) (x : Site) :
+    alternateOddTarget word x =
+      alternateOddRawTarget word (x + alternateOddLowerLeft word) -
+        ((alternateOddSlope word).1 * (alternateOddLowerLeft word).1 +
+          (alternateOddSlope word).2 * (alternateOddLowerLeft word).2) := by
+  have h : x - alternateOddChart word = (x + alternateOddLowerLeft word) - alternateOddDelta word := by
+    rw [alternateOddChart_eq_delta]
+    abel
+  unfold alternateOddTarget alternateOddRawTarget
+  rw [h]
+  simp only [Prod.fst_add, Prod.snd_add]
+  ring
+
+/-- The seventh copy of the odd ordinary alternate: the even alternate tile of the parent (its donor, whose target is the
+alternate midpoint of the parent), restored by the even restoration and placed at the odd seventh jet. -/
+def alternateOddSeventhCopy (parents : TileParents) (beforePush : Word) (digit : Digit) : NonemptyTile :=
+  (seventhAlternateJet beforePush digit .odd).place
+    (FLatticePaper.Tiles.AlternateOrdinary.oldAlternate parents (beforePush ++ [digit]) .odd)
+
+/-- **The odd donor induction for the seventh copy.** If the even alternate tile of the parent agrees with the alternate target
+of the parent (the induction hypothesis), and the midpoint identity holds on the sites of the odd seventh copy (named), then the
+seventh copy agrees with the raw odd target of the word. -/
+theorem alternateOddSeventhCopy_agrees_of_donor (parents : TileParents) (beforePush : Word) (digit : Digit) {g0 : ℤ}
+    (hdonor : parents.alternateEven.val.Agrees (alternateTarget beforePush) g0) (k : ℤ)
+    (hmid : ∀ s ∈ (alternateOddSeventhCopy parents beforePush digit).val.sites,
+      alternateOddRawTarget (beforePush ++ [digit]) s =
+        alternateTarget beforePush
+            (s - ((seventhAlternateJet beforePush digit .odd).1 +
+              alternateRestoration (beforePush ++ [digit]) .even)) +
+          ((seventhAlternateJet beforePush digit .odd).2.1 * s.1 + (seventhAlternateJet beforePush digit .odd).2.2 * s.2) +
+          k) :
+    (alternateOddSeventhCopy parents beforePush digit).val.Agrees
+      (alternateOddRawTarget (beforePush ++ [digit])) (g0 - k) := by
+  have hp := HeightTile.Agrees.restore_then_place hdonor (alternateRestoration (beforePush ++ [digit]) .even)
+    (seventhAlternateJet beforePush digit .odd)
+  intro s
+  have h1 : (alternateOddSeventhCopy parents beforePush digit).val.height s =
+      alternateTarget beforePush
+          (s.1 - ((seventhAlternateJet beforePush digit .odd).1 +
+            alternateRestoration (beforePush ++ [digit]) .even)) +
+        ((seventhAlternateJet beforePush digit .odd).2.1 * s.1.1 +
+          (seventhAlternateJet beforePush digit .odd).2.2 * s.1.2) + g0 := hp s
+  have h2 := hmid s.1 s.2
+  rw [h1, h2]
+  ring
+
+/-- **The ordinary odd alternate agrees with the raw odd target**, from the first copy, the seventh copy (the donor induction
+`alternateOddSeventhCopy_agrees_of_donor`, with the midpoint identity named for a non-base word), the slots after the seventh
+(named) and the contacts. -/
+theorem ordinaryAlternate_odd_identifies_raw (parents : TileParents) (beforePush : Word) (digit : Digit)
+    (hnb : ¬ FLatticePaper.Tiles.Standard.IsBase (beforePush ++ [digit]))
+    (context : String)
+    (hfirst : ∃ g : ℤ, (ordinaryAlternateSchedule parents beforePush digit .odd).first.val.Agrees
+      (alternateOddRawTarget (beforePush ++ [digit])) g)
+    {g0 : ℤ} (hdonor : parents.alternateEven.val.Agrees (alternateTarget beforePush) g0)
+    (hmid : ¬ FLatticePaper.Tiles.Standard.IsBase (beforePush ++ [digit]) → ∃ k : ℤ,
+      ∀ s ∈ (alternateOddSeventhCopy parents beforePush digit).val.sites,
+        alternateOddRawTarget (beforePush ++ [digit]) s =
+          alternateTarget beforePush
+              (s - ((seventhAlternateJet beforePush digit .odd).1 +
+                alternateRestoration (beforePush ++ [digit]) .even)) +
+            ((seventhAlternateJet beforePush digit .odd).2.1 * s.1 +
+              (seventhAlternateJet beforePush digit .odd).2.2 * s.2) + k)
+    (hslot : ∀ s ∈ afterSeventhAlternate .odd, ∃ g : ℤ,
+      (placedBySlot (alternateJets (beforePush ++ [digit]) .odd) (standardSources parents .even) s).val.Agrees
+        (alternateOddRawTarget (beforePush ++ [digit])) g)
+    (hcon : HeightTile.OrderedContacts (ordinaryAlternateSchedule parents beforePush digit .odd).first.val.sites
+      (ordinaryAlternateSchedule parents beforePush digit .odd).copies) :
+    ∃ result, (ordinaryAlternateSchedule parents beforePush digit .odd).eval .tile context = .ok result ∧
+      ∃ g : ℤ, result.val.Agrees
+        (fun site => alternateOddRawTarget (beforePush ++ [digit]) (site +
+          ((ordinaryAlternateSchedule parents beforePush digit .odd).raw hcon).val.boxOrigin
+            ((ordinaryAlternateSchedule parents beforePush digit .odd).raw hcon).property)) g := by
+  obtain ⟨g1, hg1⟩ := hfirst
+  refine FLatticePaper.Tiles.AlternateAgreement.ordinaryAlternate_output_agrees_of_seven parents beforePush digit .odd
+    context hg1 ?_ hslot hcon
+  exact (fun hn => by
+    obtain ⟨k, hk⟩ := hmid hn
+    exact ⟨g0 - k, alternateOddSeventhCopy_agrees_of_donor parents beforePush digit hdonor k hk⟩) hnb
+
+/-- **The ordinary odd alternate agrees with its llCenter target `alternateOddTarget`.** The raw output is shifted by its
+lower-left site (`llCenter`); the named hypothesis `hLL` is the normalisation formula: the lower-left of the raw output is
+`alternateOddLowerLeft` (the lexicographic minimum of the offsets of the seven copies; checked numerically on the odd outputs of
+length at most three, scripts/odd_chart_formula.py). -/
+theorem ordinaryAlternate_odd_identifies (parents : TileParents) (beforePush : Word) (digit : Digit)
+    (hnb : ¬ FLatticePaper.Tiles.Standard.IsBase (beforePush ++ [digit]))
+    (context : String)
+    (hfirst : ∃ g : ℤ, (ordinaryAlternateSchedule parents beforePush digit .odd).first.val.Agrees
+      (alternateOddRawTarget (beforePush ++ [digit])) g)
+    {g0 : ℤ} (hdonor : parents.alternateEven.val.Agrees (alternateTarget beforePush) g0)
+    (hmid : ¬ FLatticePaper.Tiles.Standard.IsBase (beforePush ++ [digit]) → ∃ k : ℤ,
+      ∀ s ∈ (alternateOddSeventhCopy parents beforePush digit).val.sites,
+        alternateOddRawTarget (beforePush ++ [digit]) s =
+          alternateTarget beforePush
+              (s - ((seventhAlternateJet beforePush digit .odd).1 +
+                alternateRestoration (beforePush ++ [digit]) .even)) +
+            ((seventhAlternateJet beforePush digit .odd).2.1 * s.1 +
+              (seventhAlternateJet beforePush digit .odd).2.2 * s.2) + k)
+    (hslot : ∀ s ∈ afterSeventhAlternate .odd, ∃ g : ℤ,
+      (placedBySlot (alternateJets (beforePush ++ [digit]) .odd) (standardSources parents .even) s).val.Agrees
+        (alternateOddRawTarget (beforePush ++ [digit])) g)
+    (hcon : HeightTile.OrderedContacts (ordinaryAlternateSchedule parents beforePush digit .odd).first.val.sites
+      (ordinaryAlternateSchedule parents beforePush digit .odd).copies)
+    (hLL : ∀ result, (ordinaryAlternateSchedule parents beforePush digit .odd).eval .tile context = .ok result →
+      result.val.lowerLeft result.property +
+        ((ordinaryAlternateSchedule parents beforePush digit .odd).raw hcon).val.boxOrigin
+          ((ordinaryAlternateSchedule parents beforePush digit .odd).raw hcon).property =
+        alternateOddLowerLeft (beforePush ++ [digit])) :
+    ∃ result, (ordinaryAlternateSchedule parents beforePush digit .odd).eval .tile context = .ok result ∧
+      ∃ g : ℤ, (result.val.llCenter result.property).Agrees (alternateOddTarget (beforePush ++ [digit])) g := by
+  obtain ⟨result, hres, g, hagree⟩ := ordinaryAlternate_odd_identifies_raw parents beforePush digit hnb context hfirst
+    hdonor hmid hslot hcon
+  refine ⟨result, hres, g + (alternateOddSlope (beforePush ++ [digit])).1 * (alternateOddLowerLeft (beforePush ++ [digit])).1 +
+    (alternateOddSlope (beforePush ++ [digit])).2 * (alternateOddLowerLeft (beforePush ++ [digit])).2, ?_⟩
+  have hplace := HeightTile.Agrees.place hagree (-(result.val.lowerLeft result.property)) 0
+  have hLLres := hLL result hres
+  unfold HeightTile.llCenter
+  intro site
+  have h1 := hplace site
+  rw [h1, alternateOddTarget_eq_raw_shift, ← hLLres]
+  have harg : site - -(result.val.lowerLeft result.property) +
+      ((ordinaryAlternateSchedule parents beforePush digit .odd).raw hcon).val.boxOrigin
+        ((ordinaryAlternateSchedule parents beforePush digit .odd).raw hcon).property =
+      site + (result.val.lowerLeft result.property +
+        ((ordinaryAlternateSchedule parents beforePush digit .odd).raw hcon).val.boxOrigin
+          ((ordinaryAlternateSchedule parents beforePush digit .odd).raw hcon).property) := by
+    abel
+  dsimp only
+  rw [harg]
+  simp only [Prod.fst_zero, Prod.snd_zero, zero_mul, add_zero]
+  ring
+
 end FLatticePaper.Construction
