@@ -1,4 +1,5 @@
 import FLatticePaper.Tiles.NearStairBoundary
+import FLatticePaper.Tiles.StandardBaseWords
 import FLatticePaper.Tiles.NearLadderBoundary
 import FLatticePaper.Tiles.BaseCellIdentities
 
@@ -9,3 +10,6 @@ import FLatticePaper.Tiles.BaseCellIdentities
 #print axioms FLatticePaper.Tiles.NearLadderBoundary.cellTileOf_nladderN
 #print axioms FLatticePaper.Tiles.NearLadderBoundary.nladderN_boundary
 #print axioms FLatticePaper.Tiles.NearLadderBoundary.nladderN_two_boundary
+#print axioms FLatticePaper.Tiles.StandardBaseWords.standardBoundaryWord_nil
+#print axioms FLatticePaper.Tiles.StandardBaseWords.standardBoundaryWord_three
+#print axioms FLatticePaper.Tiles.StandardBaseWords.standardBoundaryWord_two
