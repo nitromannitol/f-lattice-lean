@@ -417,4 +417,80 @@ theorem plusPc_last (o : Orientation) (w : BinaryWord) (hflag : flagO o (wℓ w)
   rw [hflag]
 
 
+/-- The stacked sites of an almost palindrome: the local union of its first `n - 1` letters, the last plus tile and
+the last minus tile. -/
+theorem stacked_decomp (o : Orientation) (w : BinaryWord) (hn : 3 ≤ w.length)
+    (hpal : ∀ i, 1 ≤ i → i ≤ w.length - 2 → wℓ w (w.length - 1 - i) = wℓ w i)
+    (hlast : ccO o (wℓ w (w.length - 1)) = 0)
+    (hm0 : m0Piece o = pieceAt (wℓ w (w.length - 1)) false (familyShift o))
+    (hf1 : flagR o (wℓ w) w.length 1 = false)
+    (hPn : flagO o (wℓ w) (w.length - 1) = false) :
+    stackedSites o w = lamO o (wℓ w) (w.length - 1) ∪
+      pieceAt (wℓ w (w.length - 1)) false (posO o (wℓ w) (w.length - 1)) ∪
+      pieceAt (wℓ w 0) (decide (o = Orientation.horizontal) && decide (wℓ w 1 = Letter.q) &&
+        decide (wℓ w 0 = Letter.q))
+        (posO o (wℓ w) (w.length - 1) + (plusStepO o (wℓ w 0) + ccO o (wℓ w 0) -
+          plusStepO o (wℓ w (w.length - 1)) + familyShift o)) := by
+  have hw : w ≠ [] := by
+    rintro rfl
+    simp at hn
+  rw [stacked_eq_PM o w hw]
+  have hL : lamO o (wℓ w) (w.length - 1) =
+      (Finset.range (w.length - 1)).biUnion (fun k => pieceAt (wℓ w k) (flagO o (wℓ w) k) (posO o (wℓ w) k)) ∪
+      (Finset.Ico 2 (w.length - 1)).biUnion (fun k => pieceAt (wℓ w k) (flagO o (wℓ w) k)
+        (posO o (wℓ w) k + shadowO o (wℓ w k))) ∪ m0Piece o ∪
+      pieceAt (wℓ w 1) false (posO o (wℓ w) 1 + shadowO o (wℓ w 1)) := by
+    unfold lamO
+    rw [if_pos (by omega), if_pos (by omega)]
+  have hP : (Finset.range w.length).biUnion (plusPc o w) =
+      (Finset.range (w.length - 1)).biUnion (fun k => pieceAt (wℓ w k) (flagO o (wℓ w) k) (posO o (wℓ w) k)) ∪
+      pieceAt (wℓ w (w.length - 1)) false (posO o (wℓ w) (w.length - 1)) := by
+    ext x
+    simp only [Finset.mem_biUnion, Finset.mem_range, Finset.mem_union]
+    constructor
+    · rintro ⟨k, hk, hx⟩
+      by_cases hk' : k = w.length - 1
+      · rw [hk'] at hx
+        rw [plusPc_last o w hPn] at hx
+        exact Or.inr hx
+      · exact Or.inl ⟨k, by omega, hx⟩
+    · rintro (⟨k, hk, hx⟩ | hx)
+      · exact ⟨k, by omega, hx⟩
+      · exact ⟨w.length - 1, by omega, by rw [plusPc_last o w hPn]; exact hx⟩
+  have hM : (Finset.range w.length).biUnion (minusPc o w) =
+      m0Piece o ∪ pieceAt (wℓ w 1) false (posO o (wℓ w) 1 + shadowO o (wℓ w 1)) ∪
+      (Finset.Ico 2 (w.length - 1)).biUnion (fun k => pieceAt (wℓ w k) (flagO o (wℓ w) k)
+        (posO o (wℓ w) k + shadowO o (wℓ w k))) ∪
+      pieceAt (wℓ w 0) (decide (o = Orientation.horizontal) && decide (wℓ w 1 = Letter.q) &&
+        decide (wℓ w 0 = Letter.q))
+        (posO o (wℓ w) (w.length - 1) + (plusStepO o (wℓ w 0) + ccO o (wℓ w 0) -
+          plusStepO o (wℓ w (w.length - 1)) + familyShift o)) := by
+    ext x
+    simp only [Finset.mem_biUnion, Finset.mem_range, Finset.mem_union, Finset.mem_Ico]
+    constructor
+    · rintro ⟨j, hj, hx⟩
+      rcases (show j = 0 ∨ j = 1 ∨ (2 ≤ j ∧ j ≤ w.length - 2) ∨ j = w.length - 1 by omega) with h | h | ⟨h1, h2⟩ | h
+      · subst h
+        rw [minusPc_zero o w hm0] at hx
+        exact Or.inl (Or.inl (Or.inl hx))
+      · subst h
+        rw [minusPc_one o w hn hpal hlast hf1] at hx
+        exact Or.inl (Or.inl (Or.inr hx))
+      · refine Or.inl (Or.inr ⟨j, ⟨h1, by omega⟩, ?_⟩)
+        rw [minusPc_mid o w hn hpal hlast j h1 h2] at hx
+        exact hx
+      · subst h
+        rw [minusPc_last o w hn hpal hlast] at hx
+        exact Or.inr hx
+    · rintro (((h | h) | ⟨a, ⟨ha1, ha2⟩, hx⟩) | h)
+      · exact ⟨0, by omega, by rw [minusPc_zero o w hm0]; exact h⟩
+      · exact ⟨1, by omega, by rw [minusPc_one o w hn hpal hlast hf1]; exact h⟩
+      · exact ⟨a, by omega, by rw [minusPc_mid o w hn hpal hlast a ha1 (by omega)]; exact hx⟩
+      · exact ⟨w.length - 1, by omega, by rw [minusPc_last o w hn hpal hlast]; exact h⟩
+  rw [hP, hM, hL]
+  ext x
+  simp only [Finset.mem_union]
+  tauto
+
 end FLatticePaper.Tiles
+
