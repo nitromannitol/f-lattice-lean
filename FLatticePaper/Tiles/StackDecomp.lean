@@ -223,4 +223,127 @@ theorem Qf_last (o : Orientation) (ℓ : ℕ → Letter) (n : ℕ) (hn : 3 ≤ n
       abel
 
 
+
+/-! ### Membership in the stacked sites, index by index -/
+
+theorem len_enlarged (o : Orientation) (L : BinaryWord) (hL : L ≠ []) :
+    (enlargedFlags o L).length = L.length := by
+  have h1 : 1 ≤ L.length := List.length_pos_iff.2 hL
+  unfold enlargedFlags
+  simp only [List.length_cons, List.length_zipWith, List.length_tail]
+  omega
+
+theorem len_stringPos (o : Orientation) (rev : Bool) (L : BinaryWord) (hL : L ≠ []) :
+    (stringPositions o rev L).length = L.length := by
+  have h1 : 1 ≤ L.length := List.length_pos_iff.2 hL
+  unfold stringPositions
+  cases rev <;> simp only [Bool.false_eq_true, if_false, if_true, List.length_scanl,
+    List.length_map, List.length_tail, List.length_zipWith] <;> omega
+
+theorem mem_familySites (o : Orientation) (rev : Bool) (L : BinaryWord) (hL : L ≠ []) (shift x : Site) :
+    x ∈ familySites o rev L shift ↔ ∃ k, k < L.length ∧
+      x ∈ pieceAt (L.getD k Letter.p) ((enlargedFlags o L).getD k false)
+        ((stringPositions o rev L).getD k 0 + shift) := by
+  have hF := len_enlarged o L hL
+  have hP := len_stringPos o rev L hL
+  unfold familySites
+  rw [List.mem_flatMap]
+  constructor
+  · rintro ⟨t, ht, hx⟩
+    obtain ⟨k, hk, rfl⟩ := List.mem_iff_getElem.1 ht
+    have hkL : k < L.length := by
+      simp only [List.length_zip, hF, hP] at hk
+      omega
+    simp only [List.getElem_zip] at hx
+    rw [List.mem_map] at hx
+    obtain ⟨c, hc, hcx⟩ := hx
+    refine ⟨k, hkL, ?_⟩
+    have e1 : L.getD k Letter.p = L[k] := List.getD_eq_getElem _ _ hkL
+    have e2 : (enlargedFlags o L).getD k false = (enlargedFlags o L)[k]'(by omega) :=
+      List.getD_eq_getElem _ _ (by omega)
+    have e3 : (stringPositions o rev L).getD k 0 = (stringPositions o rev L)[k]'(by omega) :=
+      List.getD_eq_getElem _ _ (by omega)
+    rw [mem_pieceAt, e1, e2, e3]
+    refine ⟨c, hc, ?_⟩
+    rw [← hcx]
+    exact Prod.ext (by simp only [Prod.fst_add]; ring) (by simp only [Prod.snd_add]; ring)
+  · rintro ⟨k, hk, hx⟩
+    rw [mem_pieceAt] at hx
+    obtain ⟨c, hc, hcx⟩ := hx
+    have e1 : L.getD k Letter.p = L[k] := List.getD_eq_getElem _ _ hk
+    have e2 : (enlargedFlags o L).getD k false = (enlargedFlags o L)[k]'(by omega) :=
+      List.getD_eq_getElem _ _ (by omega)
+    have e3 : (stringPositions o rev L).getD k 0 = (stringPositions o rev L)[k]'(by omega) :=
+      List.getD_eq_getElem _ _ (by omega)
+    rw [e1, e2] at hc
+    rw [e3] at hcx
+    refine ⟨(L[k], ((enlargedFlags o L)[k]'(by omega), (stringPositions o rev L)[k]'(by omega))), ?_, ?_⟩
+    · apply List.mem_iff_getElem.2
+      refine ⟨k, ?_, ?_⟩
+      · simp only [List.length_zip, hF, hP]
+        omega
+      · simp only [List.getElem_zip]
+    · rw [List.mem_map]
+      refine ⟨c, hc, ?_⟩
+      rw [← hcx]
+      exact Prod.ext (by simp only [Prod.fst_add]; ring) (by simp only [Prod.snd_add]; ring)
+
+theorem mem_stackedSites (o : Orientation) (w : BinaryWord) (hw : w ≠ []) (x : Site) :
+    x ∈ stackedSites o w ↔
+      (∃ k, k < w.length ∧ x ∈ pieceAt (w.getD k Letter.p) ((enlargedFlags o w).getD k false)
+          ((stringPositions o false w).getD k 0 + (0, 0))) ∨
+      (∃ j, j < w.length ∧ x ∈ pieceAt (w.reverse.getD j Letter.p) ((enlargedFlags o w.reverse).getD j false)
+          ((stringPositions o true w.reverse).getD j 0 + familyShift o)) := by
+  have hr : w.reverse ≠ [] := by simpa using hw
+  unfold stackedSites
+  rw [List.mem_toFinset, List.mem_append, mem_familySites o false w hw, mem_familySites o true w.reverse hr]
+  simp only [List.length_reverse]
+
+/-- The reversed word reads the letters of `w` backwards. -/
+theorem reverse_getD_letter (w : BinaryWord) (j : ℕ) (hj : j < w.length) :
+    w.reverse.getD j Letter.p = wℓ w (w.length - 1 - j) := by
+  unfold wℓ
+  rw [List.getD_eq_getElem _ _ (by simp; omega),
+    List.getD_eq_getElem _ _ (show w.length - 1 - j < w.length by omega), List.getElem_reverse]
+
+/-- The flag of the minus tile of index `j`. -/
+def flagR (o : Orientation) (ℓ : ℕ → Letter) (n : ℕ) : ℕ → Bool
+  | 0 => false
+  | j + 1 => decide (o = Orientation.horizontal) && decide (ℓ (n - 1 - j) = Letter.q) &&
+      decide (ℓ (n - 1 - (j + 1)) = Letter.q)
+
+/-- The plus tile of index `k` of the stacked string, as the local union has it. -/
+def plusPc (o : Orientation) (w : BinaryWord) (k : ℕ) : Finset Site :=
+  pieceAt (wℓ w k) (flagO o (wℓ w) k) (posO o (wℓ w) k)
+
+/-- The minus tile of index `j` of the stacked string. -/
+def minusPc (o : Orientation) (w : BinaryWord) (j : ℕ) : Finset Site :=
+  pieceAt (wℓ w (w.length - 1 - j)) (flagR o (wℓ w) w.length j) (Qf o (wℓ w) w.length j + familyShift o)
+
+theorem plus_index (o : Orientation) (w : BinaryWord) (k : ℕ) (hk : k < w.length) :
+    pieceAt (w.getD k Letter.p) ((enlargedFlags o w).getD k false)
+        ((stringPositions o false w).getD k 0 + (0, 0)) = plusPc o w k := by
+  unfold plusPc
+  rw [plus_position_eq o w k hk]
+  simp only [Prod.mk_zero_zero, add_zero]
+  cases k with
+  | zero => rfl
+  | succ k' =>
+    rw [enlarged_succ o w k' hk]
+    rfl
+
+theorem minus_index (o : Orientation) (w : BinaryWord) (j : ℕ) (hj : j < w.length) :
+    pieceAt (w.reverse.getD j Letter.p) ((enlargedFlags o w.reverse).getD j false)
+        ((stringPositions o true w.reverse).getD j 0 + familyShift o) = minusPc o w j := by
+  unfold minusPc
+  rw [minus_position_eq o w j hj, reverse_getD_letter w j hj]
+  cases j with
+  | zero => rfl
+  | succ j' =>
+    have hlt : j' + 1 < w.reverse.length := by simp; omega
+    rw [enlarged_succ o w.reverse j' hlt, reverse_getD_letter w j' (by omega),
+      reverse_getD_letter w (j' + 1) hj]
+    rfl
+
+
 end FLatticePaper.Tiles
