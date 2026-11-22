@@ -3,6 +3,7 @@ import FLatticePaper.Plane.Induction.OpenInputsProof
 import FLatticePaper.Plane.Induction.S3NoFort
 import FLatticePaper.Plane.Induction.ChildNumerator
 import FLatticePaper.Plane.RestrictedBellmanRank
+import FLatticePaper.Plane.Induction.SlipPermits
 
 /-! The open inputs of the induction, as named structures (task 38, item 3).
 
@@ -115,20 +116,21 @@ theorem S1S2_of_sheet_inputs (word : Word) (hproper : ∃ x ∈ word, x ≠ Digi
   have base := base_range_of_inputs (frameAt word) hS hagree hper0 hper hreflF hbinF hbinM hrecM arcs
   exact S1S2_of_base (frameAt word) (child_num_ge_three hproper) hS hagree hper0 hper hreflF hbinF base
 
-/-- The three star estimates of a proper word: S1, S2, and the constrained rank from the S3 inputs. -/
+/-- The three star estimates of a proper word: S1, S2, and the constrained rank. The slip permits are derived from S1, S2
+and the binarity, up to the premise `OddBlackNoRise` (the one case of `PermitLocal` the local data do not exclude). -/
 theorem starEstimates_of_inputs (word : Word) (hproper : ∃ x ∈ word, x ≠ Digit.three)
     (hG : (frameAt (conjWord word)).Packet (standardField (conjWord word)))
     (hpk : (frameAt word).Packet (standardField word))
     (hstar : StarZoneInputs word) (hsheet : SheetLocalInputs word)
     (arcs : VArcInputs (frameAt word) (standardField word))
-    (hS3p : PermitLocal (standardField word)
-      (slipPermits (standardField word) (fun z => standardField word (z + (frameAt word).shortShift))))
+    (hodd : OddBlackNoRise (standardField word) (frameAt word).shortShift)
     (hS3n : S3NoFortInputs (frameAt word) (standardField word)) :
     HasUnitSlip (standardField word) (fun z => standardField word (z + (frameAt word).shortShift)) ∧
       NoEvenSlipSaddle (standardField word) (fun z => standardField word (z + (frameAt word).shortShift)) ∧
       ∃ rank : Site → ℤ, IsConstrainedBurningRank (standardField word) rank
         (slipPermits (standardField word) (fun z => standardField word (z + (frameAt word).shortShift))) := by
   obtain ⟨hU, hNS⟩ := S1S2_of_sheet_inputs word hproper hG hstar hsheet arcs
+  have hS3p := permitLocal_of_star_data (evenSite_shortShift (frameAt word)) hpk.binary hU hNS hodd
   have hno := restrictedNoFort_S3_of_inputs (frameAt word) hpk.periods hpk.binary hS3p hS3n
   obtain ⟨rank, hrank⟩ := S3_of_packet_restrictedNoFort word hpk hS3p hno
   exact ⟨hU, hNS, rank, hrank⟩
