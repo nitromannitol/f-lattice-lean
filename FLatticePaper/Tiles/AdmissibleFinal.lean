@@ -134,7 +134,7 @@ theorem OneI_cons (x : Unit4) (w : F2Word) (hx : x = Unit4.one ∨ x = Unit4.i) 
   · rw [h]; exact hx
   · exact hw y h
 
-theorem admissible_pal (E : F2Word) (hE : E.reverse = E) (hmono : OneI E)
+theorem admissible_of_palindrome_core (E : F2Word) (hE : E.reverse = E) (hmono : OneI E)
     (hh : E.head? = some Unit4.one) (hl : E.getLast? = some Unit4.one) : Admissible E :=
   ⟨hmono, hh, hl, Or.inl hE⟩
 
@@ -419,14 +419,14 @@ theorem bottomEdges_fam4 (j : ℕ) (rest : Word) :
 /-- The base cases: the edges of `2^n` are palindromes. -/
 theorem adm_base2 (n : ℕ) : Admissible (baseTwoEdges n).1 ∧ Admissible (baseTwoEdges n).2 := by
   constructor
-  · apply admissible_pal
+  · apply admissible_of_palindrome_core
     · unfold baseTwoEdges; exact block_rev _
     · unfold baseTwoEdges
       exact OneI_append _ _ (OneI_append _ _ OneI_1 (oneI_letters _)) (OneI_lit _ (by
         intro x hx; simp only [List.mem_cons, List.mem_nil_iff, or_false] at hx; rcases hx with rfl | rfl <;> simp))
     · unfold baseTwoEdges; simp
     · unfold baseTwoEdges; dsimp only; rw [List.getLast?_append_of_ne_nil _ (by simp)]; simp
-  · apply admissible_pal
+  · apply admissible_of_palindrome_core
     · unfold baseTwoEdges; exact block_rev _
     · unfold baseTwoEdges
       exact OneI_append _ _ (OneI_append _ _ OneI_1 (oneI_letters _)) (OneI_lit _ (by
@@ -455,7 +455,7 @@ theorem adm_base3 (n : ℕ) (hn : 1 ≤ n) : Admissible (baseThreeEdges n).1 ∧
       exact OneI_append _ _ (OneI_rep _) (OneI_cons _ _ (Or.inr rfl) (OneI_rep _))
     exact admissible_of_c _ (List.replicate (2 * n) Unit4.one ++ [Unit4.i] ++ List.replicate (2 * n) Unit4.one)
       hE' (by simp [List.reverse_replicate]) hifb hmono
-  · apply admissible_pal
+  · apply admissible_of_palindrome_core
     · unfold baseThreeEdges
       dsimp only
       rw [oneOne_eq, ← rep_succ1 (2 * (n + 1))]
