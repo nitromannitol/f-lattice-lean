@@ -41,4 +41,11 @@ theorem freshEquality_of_agrees {α : Type*} {incoming : HeightTile α} {occupie
     have := h site
     omega
 
+/-- Comparison 2 from the nominal agreement: the weak overlap inequality holds with equality. -/
+theorem overlapWeak_of_agrees {α : Type*} {incoming : HeightTile α} {occupied : Finset α} {target : α → ℤ} {gauge : ℤ}
+    (h : incoming.Agrees target gauge) : OverlapWeak incoming occupied target gauge :=
+  fun site _ => by
+    have := h site
+    omega
+
 end FLatticePaper.Construction

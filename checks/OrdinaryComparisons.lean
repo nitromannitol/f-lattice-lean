@@ -4,3 +4,4 @@ import FLatticePaper.Construction.OrdinaryComparisons
 
 #print axioms FLatticePaper.Construction.fits_iff_three
 #print axioms FLatticePaper.Construction.freshEquality_of_agrees
+#print axioms FLatticePaper.Construction.overlapWeak_of_agrees
