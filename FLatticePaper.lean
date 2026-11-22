@@ -129,5 +129,6 @@ import FLatticePaper.Construction.BaseCaseRecurrence
 import FLatticePaper.Construction.PropBaseCases
 import FLatticePaper.Tiles.StackedStringConnected
 import FLatticePaper.Tiles.StackFinalAssembly
+import FLatticePaper.Tiles.StandardTiles
 
 /-! Root import for the corrected F-lattice paper. -/
