@@ -144,6 +144,7 @@ import FLatticePaper.Plane.Induction.TwosPacket
 import FLatticePaper.Plane.Induction.TwosInduction
 import FLatticePaper.Plane.Induction.TwosNearOne
 import FLatticePaper.Plane.Induction.TwosPeriods
+import FLatticePaper.Plane.Induction.TwosStripFacts
 import FLatticePaper.Construction.NearOneBaseCases
 import FLatticePaper.Construction.BaseCases
 import FLatticePaper.Construction.OffsetTables
