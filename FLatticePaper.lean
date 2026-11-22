@@ -130,6 +130,7 @@ import FLatticePaper.Plane.Induction.TwosField
 import FLatticePaper.Plane.Induction.TwosSheets
 import FLatticePaper.Plane.Induction.TwosChain
 import FLatticePaper.Plane.Induction.TwosReciprocal
+import FLatticePaper.Plane.Induction.TwosTiePiece
 import FLatticePaper.Plane.Induction.TwosStrips
 import FLatticePaper.Plane.Induction.TwosZeroPiece
 import FLatticePaper.Construction.NearOneBaseCases
