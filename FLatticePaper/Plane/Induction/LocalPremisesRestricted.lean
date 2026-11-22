@@ -24,6 +24,12 @@ namespace FLatticePaper.Induction
 open Farey FLatticePaper
 open scoped Matrix
 
+/-- The I3A grade: the cut grade `K = P + J_η` of the conjugate frame, with the parity sign `η = ε` of the word, transported
+to `Fp` by the quarter turn `z ↦ (−z₂, z₁ − 1)`. The sign `η = ε` makes the second slip the step `Up`, the same for every
+word. -/
+noncomputable def i3aGrade (word : Word) (x : Site) : ℤ :=
+  (frameAt (conjWord word)).cutGrade (standardField (conjWord word)) 1 1 (frameAt word).eps (-x.2, x.1 - 1)
+
 /-- The local premises at a proper word, with the two signed ranks of (I3) replaced by the restricted-fort form: the
 local permits and the absence of restricted forts, for the two permit relations of `Fp`, in the frame's transverse
 grade. Every other clause is that of `LocalPremises`. -/
@@ -43,7 +49,7 @@ def LocalPremises' (word : Word) : Prop :=
   -- restricted forts in the transverse grade
   (∀ c i : Site, FLatticePaper.Edge i c → -1 ≤ Ξ i - Ξ c ∧ Ξ i - Ξ c ≤ 1) ∧
   PermitLocal Fp (fun c i => Ξ i ≤ Ξ c) ∧
-  RestrictedNoFort Fp frame.tGrade (fun c i => Ξ i ≤ Ξ c) ∧
+  RestrictedNoFort Fp (i3aGrade word) (fun c i => Ξ i ≤ Ξ c) ∧
   PermitLocal Fp (fun c i => Ξ (c + frame.sheetOffset) ≤ Ξ (i + frame.sheetOffset)) ∧
   RestrictedNoFort Fp frame.tGrade (fun c i => Ξ (c + frame.sheetOffset) ≤ Ξ (i + frame.sheetOffset)) ∧
   -- S1, S2: the difference `D = F − F(· + σ)` takes values in {0, 1, 2} on E and its inputs, with no 0–2 edge
@@ -57,7 +63,7 @@ def LocalPremises' (word : Word) : Prop :=
         (starDiff F frame.shortShift e = 2 ∧ starDiff F frame.shortShift u = 0))) ∧
   -- S3: the local permits and the absence of restricted forts in the grade half-spaces
   PermitLocal F (slipPermits F (fun z => F (z + frame.shortShift))) ∧
-  RestrictedNoFort F frame.tGrade (slipPermits F (fun z => F (z + frame.shortShift)))
+  RestrictedNoFort F (frame.cutGrade F 1 1 1) (slipPermits F (fun z => F (z + frame.shortShift)))
 
 /-- The conjugate of a proper word has its chain potential with the stated closed form: `Ξ` is `Fp` minus its
 translate by the sheet offset, minus the sibling slope, up to a constant. -/
@@ -199,16 +205,44 @@ theorem laplacian_fp_add_deck {word : Word} (h : ∃ x ∈ word, x ≠ Digit.thr
     ext <;> simp [mulI] <;> ring
   rw [hZ, hij, laplacian_add_combine hper]
 
+/-- The I3A grade has constant increments along the odd parent's deck: the quarter turn carries the odd deck to the
+rotated deck, which is the child deck of the conjugate frame, where `cutGrade_add_combine` gives the increment. -/
+theorem i3aGrade_deck {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
+    (hG : (frameAt (conjWord word)).Packet (standardField (conjWord word))) :
+    ∀ step ∈ (parentsAt word).odd.modifiedDeck.span, ∃ increment : ℤ,
+      ∀ site, i3aGrade word (site + step) = i3aGrade word site + increment := by
+  intro step hstep
+  have hodd : (parentsAt word).odd.Odd := (parentsAt_valid word).odd_parity
+  have hchild : (frameAt (conjWord word)).child = (parentsAt word).odd.rotate := frameAt_conj_child h
+  obtain ⟨i, j, hij⟩ := mulI_mem_span_rotate hodd hstep
+  rw [← hchild] at hij
+  refine ⟨-i + j * (frameAt word).eps, fun site => ?_⟩
+  have hZ : (-(site + step).2, (site + step).1 - 1) = (-site.2, site.1 - 1) + mulI step := by
+    ext <;> simp [mulI] <;> ring
+  unfold i3aGrade
+  rw [hZ, hij, ChildFrame.cutGrade_add_combine (frameAt (conjWord word)) (standardField (conjWord word)) hG.periods]
+  ring
+
+/-- The tGrade has the linear increments along the odd parent's deck. -/
+theorem tGrade_add_odd_deck (word : Word) :
+    ∀ step ∈ (parentsAt word).odd.modifiedDeck.span, ∃ increment : ℤ,
+      ∀ site, (frameAt word).tGrade (site + step) = (frameAt word).tGrade site + increment :=
+  fun step _ => ⟨(frameAt word).tGrade step, fun site => by
+    unfold ChildFrame.tGrade
+    simp only [Prod.fst_add, Prod.snd_add]
+    ring⟩
+
 /-- The constrained burning rank of the quarter-turned parent for a deck-invariant permit relation, from its local
 permits and the absence of restricted forts (`exists_constrainedBurningRank_of_restrictedNoFort`). -/
 theorem constrainedRank_of_variant {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hG : (frameAt (conjWord word)).Packet (standardField (conjWord word)))
-    {permits : Site → Site → Prop}
+    {permits : Site → Site → Prop} {grade : Site → ℤ}
+    (hgrade : ∀ step ∈ (parentsAt word).odd.modifiedDeck.span, ∃ increment : ℤ,
+      ∀ site, grade (site + step) = grade site + increment)
     (hperm : ∀ step ∈ (parentsAt word).odd.modifiedDeck.span, ∀ site input : Site,
       permits (site + step) (input + step) ↔ permits site input)
     (hlocal : PermitLocal (quarterTurnField (standardField (conjWord word))) permits)
-    (hno : RestrictedNoFort (quarterTurnField (standardField (conjWord word)))
-      (frameAt word).tGrade permits) :
+    (hno : RestrictedNoFort (quarterTurnField (standardField (conjWord word))) grade permits) :
     ∃ rank : Site → ℤ, IsConstrainedBurningRank (quarterTurnField (standardField (conjWord word))) rank permits := by
   have hodd : (parentsAt word).odd.Odd := (parentsAt_valid word).odd_parity
   have hint : (parentsAt word).odd.InUnitInterval := (parentsAt_valid word).odd_bounds
@@ -218,12 +252,6 @@ theorem constrainedRank_of_variant {word : Word} (h : ∃ x ∈ word, x ≠ Digi
   have hbin : ∀ site, laplacian (quarterTurnField (standardField (conjWord word))) site = -1 ∨
       laplacian (quarterTurnField (standardField (conjWord word))) site = 0 :=
     fun site => quarterTurnField_binary hG.binary site
-  have hgrade : ∀ step ∈ (parentsAt word).odd.modifiedDeck.span, ∃ increment : ℤ,
-      ∀ site, (frameAt word).tGrade (site + step) = (frameAt word).tGrade site + increment :=
-    fun step _ => ⟨(frameAt word).tGrade step, fun site => by
-      unfold ChildFrame.tGrade
-      simp only [Prod.fst_add, Prod.snd_add]
-      ring⟩
   obtain ⟨scale, remainder, budget, -, -, -, hrank⟩ := exists_constrainedBurningRank_of_restrictedNoFort hcover
     (fun step hstep => evenSite_of_mem_span_odd hodd hstep)
     (fun step hstep site => laplacian_fp_add_deck h hG hstep site) hgrade hperm hlocal hbin hno
@@ -237,8 +265,8 @@ theorem localPremises_of_variant {word : Word} (h : ∃ x ∈ word, x ≠ Digit.
   obtain ⟨hI1, hI2, hunit, hlocA, hnoA, hlocC, hnoC, hS1, hS2, hS2', hS3a, hS3b⟩ := hloc
   dsimp only [LocalPremises]
   refine ⟨hI1, hI2, hunit, ?_, ?_, hS1, hS2, hS2', hS3a, hS3b⟩
-  · exact constrainedRank_of_variant h hG (permitA_invariant h hG) hlocA hnoA
-  · exact constrainedRank_of_variant h hG (permitC_invariant h hG) hlocC hnoC
+  · exact constrainedRank_of_variant h hG (i3aGrade_deck h hG) (permitA_invariant h hG) hlocA hnoA
+  · exact constrainedRank_of_variant h hG (tGrade_add_odd_deck word) (permitC_invariant h hG) hlocC hnoC
 
 /-- The packets of all words, from the variant of the local premises at every proper word. -/
 theorem packet_of_localPremises' (h : ∀ w : Word, (∃ x ∈ w, x ≠ Digit.three) → LocalPremises' w) :

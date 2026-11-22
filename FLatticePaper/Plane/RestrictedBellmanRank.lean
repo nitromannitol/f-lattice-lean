@@ -450,12 +450,13 @@ theorem slipPermits_add_deck {F : Field} {K V σ : Site} {cU cV : ℤ} {g : Site
   constructor <;> intro h <;> linarith
 
 /-- S3 for a child frame: with the generator periods, the binary Laplacian, the local permits and the absence of
-restricted forts in the `t`-grade half-spaces, the sewn field has a constrained burning rank for the slip permits. -/
+restricted forts in the half-spaces of the grade `K = cutGrade F 1 1 1`, the sewn field has a constrained burning rank
+for the slip permits. -/
 theorem S3_of_restrictedNoFort (frame : ChildFrame) {F : Field} {cU cV : ℤ}
     (hper : HasGeneratorPeriods frame.child F cU cV)
     (hbin : ∀ z, laplacian F z = -1 ∨ laplacian F z = 0)
     (hlocal : PermitLocal F (slipPermits F (fun z => F (z + frame.shortShift))))
-    (hno : RestrictedNoFort F frame.tGrade (slipPermits F (fun z => F (z + frame.shortShift)))) :
+    (hno : RestrictedNoFort F (frame.cutGrade F 1 1 1) (slipPermits F (fun z => F (z + frame.shortShift)))) :
     ∃ rank : Site → ℤ, IsConstrainedBurningRank F rank (slipPermits F (fun z => F (z + frame.shortShift))) := by
   have hKspan : frame.child.modifiedDeck.kernel ∈ frame.child.modifiedDeck.span :=
     ⟨1, 0, by simp [PeriodDeck.combine]⟩
@@ -478,9 +479,9 @@ theorem S3_of_restrictedNoFort (frame : ChildFrame) {F : Field} {cU cV : ℤ}
     rintro step ⟨i, j, rfl⟩ site
     exact laplacian_add_combine hper site i j
   have hgrade : ∀ step ∈ frame.child.modifiedDeck.span, ∃ increment : ℤ,
-      ∀ site, frame.tGrade (site + step) = frame.tGrade site + increment := by
+      ∀ site, frame.cutGrade F 1 1 1 (site + step) = frame.cutGrade F 1 1 1 site + increment := by
     rintro step ⟨i, j, rfl⟩
-    exact ⟨-(j * frame.child.periodDenominator), fun site => by rw [frame.tGrade_add_combine]; ring⟩
+    exact ⟨-i + j, fun site => by rw [frame.cutGrade_add_combine F hper 1 1 1 i j site]; ring⟩
   have hgσ : ∀ z, frame.child.transverseGrade (z + frame.shortShift) =
       frame.child.transverseGrade z + frame.child.transverseGrade frame.shortShift := by
     intro z
@@ -504,7 +505,7 @@ theorem S3_of_restrictedNoFort (frame : ChildFrame) {F : Field} {cU cV : ℤ}
 theorem S3_of_packet_restrictedNoFort (word : Word) (hpk : (frameAt word).Packet (standardField word))
     (hlocal : PermitLocal (standardField word)
       (slipPermits (standardField word) (fun z => standardField word (z + (frameAt word).shortShift))))
-    (hno : RestrictedNoFort (standardField word) (frameAt word).tGrade
+    (hno : RestrictedNoFort (standardField word) ((frameAt word).cutGrade (standardField word) 1 1 1)
       (slipPermits (standardField word) (fun z => standardField word (z + (frameAt word).shortShift)))) :
     ∃ rank : Site → ℤ, IsConstrainedBurningRank (standardField word) rank
       (slipPermits (standardField word) (fun z => standardField word (z + (frameAt word).shortShift))) :=
