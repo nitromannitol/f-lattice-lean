@@ -141,4 +141,27 @@ theorem covers_of_eq_even (I : StandardInputsNoPack) {P : Finset Site} {w : Word
   subst h
   exact deck_covers_even I w
 
+/-! ### Removing sites that are congruent to kept sites -/
+
+/-- The span of a period deck is closed under addition. -/
+theorem span_add (deck : PeriodDeck) {a b : Site} (ha : a ∈ deck.span) (hb : b ∈ deck.span) :
+    a + b ∈ deck.span := by
+  obtain ⟨i, j, rfl⟩ := ha
+  obtain ⟨i', j', rfl⟩ := hb
+  refine ⟨i + i', j + j', ?_⟩
+  apply Prod.ext <;> simp only [PeriodDeck.combine, Prod.fst_add, Prod.snd_add] <;> ring
+
+/-- A tile whose dropped sites are each congruent mod the deck to a kept site still covers the deck, if the full set
+covers it. -/
+theorem covers_of_removed (deck : PeriodDeck) {S T : Finset Site} (hS : deck.Covers S)
+    (hsub : ∀ x ∈ S, x ∉ T → ∃ y ∈ T, x - y ∈ deck.span) : deck.Covers T := by
+  intro site
+  obtain ⟨rep, hrep, hspan⟩ := hS site
+  by_cases hT : rep ∈ T
+  · exact ⟨rep, hT, hspan⟩
+  · obtain ⟨y, hy, hyspan⟩ := hsub rep hrep hT
+    refine ⟨y, hy, ?_⟩
+    have h := span_add deck hspan hyspan
+    rwa [sub_add_sub_cancel] at h
+
 end FLatticePaper.Tiles.DeckCoverage
