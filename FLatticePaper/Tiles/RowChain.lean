@@ -116,4 +116,29 @@ theorem cellRowChain_no_checker {C : CellTile} (hC : CellRowChain C) (v : GInt) 
     · exact h3 (hR y (x - 1) x z h1 hz2 (by omega) hxz)
     · exact h4 (hR (y - 1) z (x - 1) x hz1 h2 (by omega) (by omega))
 
+/-- A cell set whose cells are described by a predicate `P` (in the coordinates `(column, row)`) is a row chain when
+the rows of `P` lie in a range `[Y₀, Y₁]`, the rows are convex, and each row `b` of the range has a witness column
+`w b` in row `b` (and in row `b + 1` when `b < Y₁`). -/
+theorem cellRowChain_of_witness (C : CellTile) (P : ℤ → ℤ → Prop) (hP : ∀ a b, (a, b) ∈ C ↔ P a b)
+    (Y₀ Y₁ : ℤ) (w : ℤ → ℤ)
+    (hrange : ∀ a b, P a b → Y₀ ≤ b ∧ b ≤ Y₁)
+    (hconv : ∀ b a₁ a₂ a₃, P a₁ b → P a₃ b → a₁ ≤ a₂ → a₂ ≤ a₃ → P a₂ b)
+    (hwit : ∀ b, Y₀ ≤ b → b ≤ Y₁ → P (w b) b ∧ (b < Y₁ → P (w b) (b + 1))) :
+    CellRowChain C := by
+  refine ⟨?_, ?_, ?_⟩
+  · intro b x₁ x₂ x₃ h₁ h₃ hle₁ hle₂
+    rw [hP] at h₁ h₃ ⊢
+    exact hconv b x₁ x₂ x₃ h₁ h₃ hle₁ hle₂
+  · rintro b ⟨x, hx⟩ ⟨x', hx'⟩
+    rw [hP] at hx hx'
+    obtain ⟨h0, h1⟩ := hrange x b hx
+    obtain ⟨h0', h1'⟩ := hrange x' (b + 1) hx'
+    obtain ⟨hw1, hw2⟩ := hwit b h0 (by omega)
+    exact ⟨w b, (hP _ _).2 hw1, (hP _ _).2 (hw2 (by omega))⟩
+  · rintro b₁ b₂ b ⟨x₁, h₁⟩ ⟨x₂, h₂⟩ hb₁ hb₂
+    rw [hP] at h₁ h₂
+    obtain ⟨g0, g1⟩ := hrange x₁ b₁ h₁
+    obtain ⟨g0', g1'⟩ := hrange x₂ b₂ h₂
+    exact ⟨w b, (hP _ _).2 (hwit b (by omega) (by omega)).1⟩
+
 end FLatticePaper.Tiles
