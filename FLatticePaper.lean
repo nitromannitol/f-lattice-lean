@@ -153,5 +153,6 @@ import FLatticePaper.Tiles.StackedStringConnected
 import FLatticePaper.Tiles.StackFinalAssembly
 import FLatticePaper.Tiles.TilingCriteria
 import FLatticePaper.Tiles.StandardTiles
+import FLatticePaper.Tiles.AlternateTiles
 
 /-! Root import for the corrected F-lattice paper. -/
