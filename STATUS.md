@@ -143,6 +143,7 @@ lake env lean checks/AlternateConstructor.lean
 lake env lean checks/LCorrections.lean
 lake env lean checks/ScheduleKinds.lean
 lake env lean checks/StructuralSuccess.lean
+lake env lean checks/OverlapSites.lean
 lake env lean checks/CutGradeS3.lean
 lake env lean checks/S3NoFort.lean
 lake env lean checks/StarRangeProof.lean
