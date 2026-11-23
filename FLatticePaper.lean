@@ -486,5 +486,6 @@ import FLatticePaper.Plane.Induction.FreeLevels
 import FLatticePaper.Plane.Induction.PriceDeck
 import FLatticePaper.Plane.Induction.FreeEnum
 import FLatticePaper.Plane.Induction.FreeCover
+import FLatticePaper.Plane.Induction.PsiCalibration
 
 /-! Root import for the corrected F-lattice paper. -/
