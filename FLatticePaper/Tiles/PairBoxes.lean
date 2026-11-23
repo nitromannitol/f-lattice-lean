@@ -1,7 +1,9 @@
 import FLatticePaper.Tiles.PairMargins
 import FLatticePaper.Tiles.PairCellWindows
 
-/-! Task 53, item 2 (covering reduction), section 4: the first box facet.
+/-! Task 53, item 2 (covering reduction), section 4: the lower t bound on the box of `P` at zero offset, for the sign
+`δ = dr − ne = +1` (the note's W0 pairing; the flag-true odd child, with P at zero offset, is `δ = −1`, see `PairBoxesP0`).
+The first box facet.
 
 The source `P` at offset `0` (the flag-true odd child) covers the cell points `B0 + uU + vV` with `0 ≤ u, v ≤ α`, `α = d/(d + e)`
 (`d = d_P`, `e = d_Q`, `δ = dr − ne = 1`). Its lower `t` window at an odd site is `t ≥ n − T`. The real `t` on the box is
