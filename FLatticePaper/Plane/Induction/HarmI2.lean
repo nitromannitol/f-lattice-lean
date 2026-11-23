@@ -335,6 +335,12 @@ theorem geo_window (N D nq dq n d z1 z2 W : ℤ) (hnN : n = 2 * N + nq) (hdD : d
     rw [hm3] at hcid
     nlinarith
 
+/-- The other sheet at `ε = −1` (`W = 0`) minus `h₀` is the residue `R(z)`. -/
+theorem sheetA_eq_harmR (F : Site → ℤ) (dq nq : ℤ) (z : Site) :
+    quarterTurnField F (z.1 - (1 - 0) * dq, z.2 - (1 - 0) * nq) - harmonicGrid z = harmR F dq nq z := by
+  unfold harmR
+  simp only [sub_zero, one_mul]
+
 end HarmI2
 
 end FLatticePaper.Induction
