@@ -1,0 +1,6 @@
+import FLatticePaper.Plane.Induction.SquareClauses
+
+#print axioms FLatticePaper.SquareClauses.forced_sound
+#print axioms FLatticePaper.SquareClauses.forced_unseeded_empty
+#print axioms FLatticePaper.SquareClauses.squareClauses_of_strict
+#print axioms FLatticePaper.SquareClauses.forced_selected_of_strict
