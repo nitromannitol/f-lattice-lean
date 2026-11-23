@@ -147,4 +147,30 @@ theorem chain_in_band (word : Word) {G : Field} {K : ℤ} {Rel : Site → Site �
     chainPot word G p1 = K ∧ chainPot word G p2 = K :=
   FLatticePaper.W1TieBand.chain_sandwich hmono h0 h1 h2 hz hp0
 
+/-- At an M-white tie the A sheet is white: `laplacian A c = 0` (the nonnegative deficit sum `A − M` at the inputs equals `lap A c`). -/
+theorem lapA_zero_of_mwhite (frame : ChildFrame) (Fp : Field)
+    (hbin : ∀ x, laplacian Fp x = -1 ∨ laplacian Fp x = 0) (c : Site)
+    (hM : laplacian (frame.sheetMin Fp) c = 0) (htie : frame.sheetC Fp c = frame.sheetA Fp c) :
+    laplacian (frame.sheetA Fp) c = 0 := by
+  have hMc : frame.sheetMin Fp c = frame.sheetA Fp c := by
+    show min (frame.sheetA Fp c) (frame.sheetC Fp c) = frame.sheetA Fp c
+    rw [htie, min_self]
+  have eM : (frame.sheetMin Fp (incomingNeg c) - frame.sheetMin Fp c) +
+      (frame.sheetMin Fp (incomingPos c) - frame.sheetMin Fp c) = 0 := hM
+  have eA : laplacian (frame.sheetA Fp) c =
+      (frame.sheetA Fp (incomingNeg c) - frame.sheetA Fp c) + (frame.sheetA Fp (incomingPos c) - frame.sheetA Fp c) := rfl
+  have hMsum : frame.sheetMin Fp (incomingNeg c) + frame.sheetMin Fp (incomingPos c) = 2 * frame.sheetA Fp c := by
+    linarith [eM, hMc]
+  have hA1 : frame.sheetMin Fp (incomingNeg c) ≤ frame.sheetA Fp (incomingNeg c) := min_le_left _ _
+  have hA2 : frame.sheetMin Fp (incomingPos c) ≤ frame.sheetA Fp (incomingPos c) := min_le_left _ _
+  have hAsum : laplacian (frame.sheetA Fp) c =
+      (frame.sheetA Fp (incomingNeg c) - frame.sheetMin Fp (incomingNeg c)) +
+        (frame.sheetA Fp (incomingPos c) - frame.sheetMin Fp (incomingPos c)) := by
+    rw [eA]
+    linarith [hMsum]
+  have hAnn : 0 ≤ laplacian (frame.sheetA Fp) c := by linarith [hAsum, hA1, hA2]
+  rcases sheetA_binary frame Fp hbin c with h | h
+  · linarith
+  · exact h
+
 end FLatticePaper.W1TieInputs
