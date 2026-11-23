@@ -87,4 +87,23 @@ theorem sitesFrom_append (vert rev : Bool) (a : Letter) (A B : List Letter) (o :
   unfold sitesFrom
   rw [origins_append vert rev a A B o pos, List.flatMap_append]
 
+/-- **The enlarged pair (tips).** In a forward horizontal string, a `q` that follows a `q` at origin `pos` has the tips
+`(pos₁ + 2, pos₂)` and `(pos₁, pos₂ + 2)`: its origin is `pos + (1, 1)`, and its base tips are `(−1, 1)` and `(1, −1)`. -/
+theorem sitesFrom_qq_tips (pos : ℤ × ℤ) (rest : List Letter) :
+    (pos.1 + 2, pos.2) ∈ sitesFrom false false (some Letter.q) pos (Letter.q :: rest) ∧
+      (pos.1, pos.2 + 2) ∈ sitesFrom false false (some Letter.q) pos (Letter.q :: rest) := by
+  have h : sitesFrom false false (some Letter.q) pos (Letter.q :: rest) =
+      (baseSites Letter.q true).map (fun b => (pos.1 + 1 + b.1, pos.2 + 1 + b.2)) ++
+        sitesFrom false false (some Letter.q) (pos.1 + 1, pos.2 + 1) rest := by
+    unfold sitesFrom
+    rfl
+  rw [h]
+  constructor
+  · apply List.mem_append_left
+    refine List.mem_map.mpr ⟨(1, -1), by simp [baseSites], ?_⟩
+    exact Prod.ext (by dsimp only; ring) (by dsimp only; ring)
+  · apply List.mem_append_left
+    refine List.mem_map.mpr ⟨(-1, 1), by simp [baseSites], ?_⟩
+    exact Prod.ext (by dsimp only; ring) (by dsimp only; ring)
+
 end FLatticePaper.Tiles.SiteConcat
