@@ -341,4 +341,60 @@ theorem T3H_box (d n e r : ℤ) (hn : 1 ≤ n) (hnd : n < d) (hdn : d ≠ 2 * n 
       have h' := Int.lt_add_one_iff.mp (Int.cast_lt.mp h)
       linarith
 
+/-- The finite check for `(d, n, e, r) = (2, 1, 3, 1)`: on integer points the box `[0, α] × [α/2, α]` is owned by
+`P = ⟨1, 2⟩` at `(z₁ + 1, z₂ − 3)`. The real estimates of `T3H_box` lose the one integer step that the odd lower
+`s`-facet needs; here the cell relations are cleared of denominators (`82 u`, `82 v`) and `omega` finishes. -/
+theorem T3H_31 (z1 z2 : ℤ) (u v : ℚ)
+    (hz1 : (z1 : ℚ) - 1 / 2 = u * 7 - v * 4) (hz2 : (z2 : ℚ) + 1 / 2 = u * 3 + v * 10)
+    (hu0 : 0 ≤ u) (hu1 : u ≤ 4 / 7) (hv0 : 2 / 7 ≤ v) (hv1 : v ≤ 4 / 7) :
+    InH ⟨1, 2⟩ (z1 + 1, z2 - 3) := by
+  have hA : (82 : ℚ) * u = 10 * z1 + 4 * z2 - 3 := by linear_combination (-10 : ℚ) * hz1 - 4 * hz2
+  have hB : (82 : ℚ) * v = 7 * z2 - 3 * z1 + 5 := by linear_combination 3 * hz1 - 7 * hz2
+  have h1 : (0 : ℚ) ≤ 10 * z1 + 4 * z2 - 3 := by linarith
+  have h2 : (7 : ℚ) * (10 * z1 + 4 * z2 - 3) ≤ 328 := by linarith
+  have h3 : (164 : ℚ) ≤ 7 * (7 * z2 - 3 * z1 + 5) := by linarith
+  have h4 : (7 : ℚ) * (7 * z2 - 3 * z1 + 5) ≤ 328 := by linarith
+  have h1' : (0 : ℤ) ≤ 10 * z1 + 4 * z2 - 3 := by exact_mod_cast h1
+  have h2' : (7 : ℤ) * (10 * z1 + 4 * z2 - 3) ≤ 328 := by exact_mod_cast h2
+  have h3' : (164 : ℤ) ≤ 7 * (7 * z2 - 3 * z1 + 5) := by exact_mod_cast h3
+  have h4' : (7 : ℤ) * (7 * z2 - 3 * z1 + 5) ≤ 328 := by exact_mod_cast h4
+  rcases Int.emod_two_eq_zero_or_one (z1 + z2) with hpar | hpar
+  · have hev : decide ((z1 + 1 + (z2 - 3)) % 2 = 0) = true :=
+      decide_eq_true (by show (z1 + 1 + (z2 - 3)) % 2 = 0; omega)
+    rw [inH_P_iff 2 1 (z1 + 1, z2 - 3) true hev (muP_two' 2 1 (by norm_num))]
+    have hA1 : aOf ⟨1, 2⟩ true = 1 := by decide
+    have hL0 : lOf ⟨1, 2⟩ true = 0 := by decide
+    rw [hA1, hL0]
+    norm_num
+    omega
+  · have hev : decide ((z1 + 1 + (z2 - 3)) % 2 = 0) = false :=
+      decide_eq_false (by show ¬ ((z1 + 1 + (z2 - 3)) % 2 = 0); omega)
+    rw [inH_P_iff 2 1 (z1 + 1, z2 - 3) false hev (muP_two' 2 1 (by norm_num))]
+    have hA1 : aOf ⟨1, 2⟩ false = 1 := by decide
+    have hL1 : lOf ⟨1, 2⟩ false = 1 := by decide
+    rw [hA1, hL1]
+    norm_num
+    omega
+
+/-- The `T3H` box for every pair with `d ≠ 2n` or `2d < e`, and also for the single pair `(2, 1, 3, 1)` (`T3H_31`). -/
+theorem T3H_gen (d n e r : ℤ) (hn : 1 ≤ n) (hnd : n < d)
+    (hdn : d ≠ 2 * n ∨ 2 * d < e ∨ (d = 2 ∧ n = 1 ∧ e = 3 ∧ r = 1)) (hr : 1 ≤ r) (hre : r < e)
+    (hdet : d * r - n * e = -1) (hodd : (d + n) % 2 = 1) (heven : (e + r) % 2 = 0)
+    (z : ℤ × ℤ) (u v α : ℚ)
+    (hz1 : (z.1 : ℚ) - 1 / 2 = u * (2 * (d : ℚ) + e) + v * ((2 * (n : ℚ) + r) - (2 * (d : ℚ) + e)))
+    (hz2 : (z.2 : ℚ) + 1 / 2 = u * (2 * (n : ℚ) + r) + v * ((2 * (d : ℚ) + e) + (2 * (n : ℚ) + r)))
+    (hα : α * (2 * (d : ℚ) + e) = 2 * (d : ℚ))
+    (hu0 : 0 ≤ u) (hu1 : u ≤ α) (hv0 : α ≤ 2 * v) (hv1 : v ≤ α) :
+    InH ⟨n, d⟩ (z.1 - (n - d), z.2 - (n + d)) := by
+  rcases hdn with h | h | ⟨rfl, rfl, rfl, rfl⟩
+  · exact T3H_box d n e r hn hnd (Or.inl h) hr hre hdet hodd heven z u v α hz1 hz2 hα hu0 hu1 hv0 hv1
+  · exact T3H_box d n e r hn hnd (Or.inr h) hr hre hdet hodd heven z u v α hz1 hz2 hα hu0 hu1 hv0 hv1
+  · have e1 : z.1 - (1 - 2) = z.1 + 1 := by ring
+    have e2 : z.2 - (1 + 2) = z.2 - 3 := by ring
+    rw [e1, e2]
+    have hz1' : (z.1 : ℚ) - 1 / 2 = u * 7 - v * 4 := by push_cast at hz1; linear_combination hz1
+    have hz2' : (z.2 : ℚ) + 1 / 2 = u * 3 + v * 10 := by push_cast at hz2; linear_combination hz2
+    have hα7 : α * 7 = 4 := by push_cast at hα; linear_combination hα
+    exact T3H_31 z.1 z.2 u v hz1' hz2' hu0 (by linarith) (by linarith) (by linarith)
+
 end FLatticePaper.Tiles.PairEvenW1P

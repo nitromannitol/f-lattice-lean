@@ -102,7 +102,7 @@ theorem memF (d n e r : ℤ) (hd : 2 ≤ d) (hdn : d ≠ 2 * n ∨ 2 * d < e) (h
       (RF4H d n e r hn hnd hr hre hdet hodd heven z u v α β hz1 hz2 hα hβ hu0 h1 h2 hv1)
 
 /-- **Membership, flag true.** Every integer point of the cell lies in `evenChildS true`. -/
-theorem memT (d n e r : ℤ) (hd : 2 ≤ d) (hdn : d ≠ 2 * n ∨ 2 * d < e) (hn : 1 ≤ n) (hnd : n < d) (hr : 1 ≤ r) (hre : r < e)
+theorem memT (d n e r : ℤ) (hd : 2 ≤ d) (hdn : d ≠ 2 * n ∨ 2 * d < e ∨ (d = 2 ∧ n = 1 ∧ e = 3 ∧ r = 1)) (hn : 1 ≤ n) (hnd : n < d) (hr : 1 ≤ r) (hre : r < e)
     (hdet : d * r - n * e = -1) (hodd : (d + n) % 2 = 1) (heven : (e + r) % 2 = 0)
     (z : ℤ × ℤ) (u v α β : ℚ)
     (hz1 : (z.1 : ℚ) - 1 / 2 = u * (2 * (d : ℚ) + e) + v * ((2 * (n : ℚ) + r) - (2 * (d : ℚ) + e)))
@@ -129,7 +129,7 @@ theorem memT (d n e r : ℤ) (hd : 2 ≤ d) (hdn : d ≠ 2 * n ∨ 2 * d < e) (h
     refine Or.inl (Or.inl (Or.inr (?_)))
     exact mem_shift_of (f := ⟨n, d⟩) z (texV2 ⟨n, d⟩) ((z.1 - (n - d), z.2 - (n + d)))
       (by ext <;> simp [texV2])
-      (T3H_box d n e r hn hnd hdn hr hre hdet hodd heven z u v α hz1 hz2 hα hu0 h1 h2 h3)
+      (T3H_gen d n e r hn hnd hdn hr hre hdet hodd heven z u v α hz1 hz2 hα hu0 h1 h2 h3)
   · simp only [evenChildS, Set.mem_union]
     refine Or.inl (Or.inr (?_))
     exact mem_shift_of (f := ⟨n, d⟩) z (texV1Even ⟨r, e⟩ + texV2 ⟨r, e⟩) ((z.1 - r, z.2 - (2 * r + e)))
@@ -199,7 +199,7 @@ theorem propEven_F (d n e r : ℤ) (hd : 2 ≤ d) (hdn : d ≠ 2 * n ∨ 2 * d <
     exact memF d n e r hd hdn hn hnd hr hre hdet hodd heven z u v α β hz1 hz2 hα hβ hu0 hu1 hv0 hv1
 
 /-- **`propEven`, flag true.** -/
-theorem propEven_T (d n e r : ℤ) (hd : 2 ≤ d) (hdn : d ≠ 2 * n ∨ 2 * d < e) (hn : 1 ≤ n) (hnd : n < d) (hr : 1 ≤ r) (hre : r < e)
+theorem propEven_T (d n e r : ℤ) (hd : 2 ≤ d) (hdn : d ≠ 2 * n ∨ 2 * d < e ∨ (d = 2 ∧ n = 1 ∧ e = 3 ∧ r = 1)) (hn : 1 ≤ n) (hnd : n < d) (hr : 1 ≤ r) (hre : r < e)
     (hdet : d * r - n * e = -1) (hodd : (d + n) % 2 = 1) (heven : (e + r) % 2 = 0) :
     QuotientCover (evenChildS true (HSet ⟨n, d⟩) (HSet ⟨r, e⟩) ⟨n, d⟩ ⟨r, e⟩)
       (perU ⟨2 * n + r, 2 * d + e⟩) (perV ⟨2 * n + r, 2 * d + e⟩) := by
@@ -227,11 +227,18 @@ theorem propEven_parents_F (d n e r : ℤ) (hd : 2 ≤ d) (hdn : d ≠ 2 * n ∨
   exact propEven_F d n e r hd hdn hn hnd hr hre hdet hodd heven
 
 /-- `propEven` in the form of `PairHyps`, flag true. -/
-theorem propEven_parents_T (d n e r : ℤ) (hd : 2 ≤ d) (hdn : d ≠ 2 * n ∨ 2 * d < e) (hn : 1 ≤ n) (hnd : n < d) (hr : 1 ≤ r) (hre : r < e)
+theorem propEven_parents_T (d n e r : ℤ) (hd : 2 ≤ d) (hdn : d ≠ 2 * n ∨ 2 * d < e ∨ (d = 2 ∧ n = 1 ∧ e = 3 ∧ r = 1)) (hn : 1 ≤ n) (hnd : n < d) (hr : 1 ≤ r) (hre : r < e)
     (hdet : d * r - n * e = -1) (hodd : (d + n) % 2 = 1) (heven : (e + r) % 2 = 0) :
     QuotientCover (evenChildS (decide ((⟨n, d⟩ : Fraction).det ⟨r, e⟩ = 1)) (HSet ⟨n, d⟩) (HSet ⟨r, e⟩) ⟨n, d⟩ ⟨r, e⟩)
       (perU ((Parents.mk ⟨n, d⟩ ⟨r, e⟩).current .even)) (perV ((Parents.mk ⟨n, d⟩ ⟨r, e⟩).current .even)) := by
   rw [flag_true d n e r hdet, parents_even_eq d n e r]
   exact propEven_T d n e r hd hdn hn hnd hr hre hdet hodd heven
+
+/-- The single pair `(P, Q) = (⟨1,2⟩, ⟨1,3⟩)` at flag true: `d = 2n` and `2d = 4 ≥ e = 3`, covered by the finite
+check `T3H_31` of `T3H_gen`. Its even child is `X = 2P + Q = ⟨3,7⟩`. -/
+theorem propEven_T_31 : QuotientCover (evenChildS true (HSet ⟨1, 2⟩) (HSet ⟨1, 3⟩) ⟨1, 2⟩ ⟨1, 3⟩)
+    (perU ⟨2 * 1 + 1, 2 * 2 + 3⟩) (perV ⟨2 * 1 + 1, 2 * 2 + 3⟩) :=
+  propEven_T 2 1 3 1 (by decide) (Or.inr (Or.inr ⟨rfl, rfl, rfl, rfl⟩)) (by decide) (by decide) (by decide)
+    (by decide) (by decide) (by decide) (by decide)
 
 end FLatticePaper.Tiles.PairEvenCover
