@@ -1,26 +1,23 @@
-import FLatticePaper.Plane.Induction.SlipReflect
+import FLatticePaper.Plane.Induction.RawB
 
-/-! Task 69 (a): the A-case for `−σ` (the negative sign of the slip).
+/-! Task 69 (a)/(b): the A-case for `−σ` (the negative sign of the slip).
 
 For a rising pair `(c, i)` for `−σ` with both `Ψ ≥ 1`, the reflection `R` gives a rising pair for `σ` at `(Rc, Ri)`, so the
 exit cases are the lower-exit lemmas of the `σ`-cover at the reflected pair, and the common chart is the `σ`-common chart
 transported by `R` (`common_chart_option` at `(Rc, Ri)`). Two options remain:
 * first chart, `c − σ ∈ E`: `F (c − σ) = min (A c, C c + 2) = A c`, so `D_−(c) = 0` is even and cannot rise;
 * negative chart, `c + εU_q ∈ E`: `F (z − σ) = F (z + εU_q)` (the `U`-period of `F`), so the rise is
-  `min (a c, B c) − min (a i, B i) = 1` with `a z = A (z + εU_q) − A z`, `B z = C (z + εU_q) − A z`. With the unit bound
-  `0 ≤ a ≤ 1` and the monotonicity of `B` along the retained edge, the rise forces `a c = 1`, `a i = 0` on a retained edge,
-  which `nonfree_drop_excluded` excludes.
+  `min (a c, B c) − min (a i, B i) = 1` with `a z = A (z + εU_q) − A z`, `B z = C (z + εU_q) − A z`. The unit increments of
+  `a` come from `HasUnitPrice` (`a_unit_bound`); the monotonicity `B c ≤ B i` on the retained edge comes from the policy's
+  raw-slip field (`hbmono_of_raw`); the endpoint range `0 ≤ a i`, `a c ≤ 1` is the named leaf `hA01`. Then the rise forces
+  `a c = 1`, `a i = 0` on a retained edge, which `nonfree_drop_excluded` excludes.
 
-Named leaves (the two paper facts): `hG1`, the parent polygon contains `zTurn (I − (z − l_v))` for `z ∈ E` (with the price
-range this is the unit bound), and `hbmono`, the raw slip `B` does not decrease along the matched edges. -/
+Named leaves: `hA01` (the price range of `a` on `E`, i.e. `0 ≤ a ≤ 1`: the polygon membership of the parent point, which is
+not derivable from the unit increments alone; see `neg_chart_arith`). -/
 
 namespace FLatticePaper.Induction
 
 open Farey FLatticePaper
-
-/-- The shift `εU_q = ε (d_q, n_q)` of the even parent (the shift of the negative chart). -/
-def ChildFrame.uq (frame : ChildFrame) : Site :=
-  (frame.eps * frame.parents.even.den, frame.eps * frame.parents.even.num)
 
 theorem ChildFrame.tGrade_neg (frame : ChildFrame) (x : Site) : frame.tGrade (-x) = -frame.tGrade x := by
   unfold ChildFrame.tGrade
@@ -140,37 +137,8 @@ theorem sheetC_sub_shortShift {word : Word} (h : ∃ x ∈ word, x ≠ Digit.thr
   rw [sub_add_cancel] at this
   omega
 
-/-- The jump of the sheet `A` over `εU_q` is the jump of the parent field at `z − l_v`. -/
-theorem sheetA_uq_eq_jumpA {word : Word} (z : Site) :
-    (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) (z + (frameAt word).uq) -
-        (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) z =
-      jumpA (frameAt word) (quarterTurnField (standardField (conjWord word)))
-        (z - (frameAt word).sheetShift) := by
-  unfold ChildFrame.sheetA jumpA
-  have e : z + (frameAt word).uq - (frameAt word).sheetShift =
-      (z - (frameAt word).sheetShift) +
-        ((frameAt word).eps * (frameAt word).parents.even.den,
-          (frameAt word).eps * (frameAt word).parents.even.num) := by
-    refine Prod.ext ?_ ?_
-    · simp only [ChildFrame.uq, Prod.fst_sub, Prod.fst_add]
-      ring
-    · simp only [ChildFrame.uq, Prod.snd_sub, Prod.snd_add]
-      ring
-  rw [e]
-
-/-- The unit bound `0 ≤ A (z + εU_q) − A z ≤ 1` for `z ∈ E`, from the parent polygon (leaf `hG1`) and the price range. -/
-theorem unit_of_polygon {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hSE : StrongEstimates (conjWord word)) {z : Site}
-    (hG1 : zTurn ((1, -1) - (z - (frameAt word).sheetShift)) ∈ (frameAt (conjWord word)).closedPolygon) :
-    0 ≤ (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) (z + (frameAt word).uq) -
-        (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) z ∧
-      (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) (z + (frameAt word).uq) -
-        (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) z ≤ 1 := by
-  rw [sheetA_uq_eq_jumpA, jumpA_eq_cutPrice h hSE]
-  have hp := hSE.priceRange _ hG1
-  constructor <;> linarith [hp.1, hp.2]
-
-/-- The retention for a black centre with `Ψ ≥ 1` (the argument of `sheetPolicyA_of_strict`, for either sign). -/
+/-- The retention for a black centre with `Ψ ≥ 1` and an edge `i → c` (sign-independent: the colour argument of
+`sheetPolicyA_of_strict`). -/
 theorem sheetPolicyA_of_black {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
     {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
@@ -222,12 +190,14 @@ theorem sheetPolicyA_of_black {word : Word} (h : ∃ x ∈ word, x ≠ Digit.thr
   · rw [h2]
     exact hret.2
 
-/-- The integer core of the negative chart: the rise `min (a c, B c) − min (a i, B i) = 1` with `0 ≤ a ≤ 1`, `B c ≤ B i`
-forces `a c = 1` and `a i = 0`. -/
+/-- The integer core of the negative chart. The rise is `min (a c, B c) − min (a i, B i) = 1` (with `mc, mi` the two
+minima); with the unit increment `a c ≤ a i + 1`, the endpoint range `0 ≤ a i`, `a c ≤ 1`, and `B c ≤ B i`, it forces
+`a c = 1` and `a i = 0`. -/
 theorem neg_chart_arith (Ac Ai Ac1 Ai1 Cc1 Ci1 mc mi : ℤ)
     (hmc1 : mc ≤ Ac1) (hmc2 : mc ≤ Cc1)
     (hmi3 : mi = Ai1 ∨ mi = Ci1)
-    (hac0 : 0 ≤ Ac1 - Ac) (hac1 : Ac1 - Ac ≤ 1) (hai0 : 0 ≤ Ai1 - Ai) (hai1 : Ai1 - Ai ≤ 1)
+    (hunit : Ac1 - Ac ≤ Ai1 - Ai + 1)
+    (hrng0 : 0 ≤ Ai1 - Ai) (hrng1 : Ac1 - Ac ≤ 1)
     (hb : Cc1 - Ac ≤ Ci1 - Ai)
     (hrise : (Ai - mi) - (Ac - mc) = 1) :
     Ac1 - Ac = 1 ∧ Ai1 - Ai = 0 := by
@@ -257,17 +227,15 @@ theorem neg_first_excluded {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
   norm_num at hpar
 
 /-- The negative chart for `−σ` with `c + εU_q, i + εU_q ∈ E`: the rise forces the jump `a` from `1` to `0` on the retained
-edge `(c − l_v, i − l_v)`, which `nonfree_drop_excluded` excludes. -/
+edge `(c − l_v, i − l_v)`, which `nonfree_drop_excluded` excludes. The leaf `hA01` is the endpoint range of `a` on `E`. -/
 theorem neg_adjacent_excluded {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
     {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
-    (hG1 : ∀ z ∈ (frameAt word).closedPolygon,
-      zTurn ((1, -1) - (z - (frameAt word).sheetShift)) ∈ (frameAt (conjWord word)).closedPolygon)
-    (hbmono : ∀ c i, Edge i c → sheetPolicyA P (frameAt word).sheetShift c i →
-      (frameAt word).sheetC (quarterTurnField (standardField (conjWord word))) (c + (frameAt word).uq) -
-          (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) c ≤
-        (frameAt word).sheetC (quarterTurnField (standardField (conjWord word))) (i + (frameAt word).uq) -
-          (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) i)
+    (hA01 : ∀ z ∈ (frameAt word).closedPolygon,
+      0 ≤ (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) (z + (frameAt word).uq) -
+          (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) z ∧
+        (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) (z + (frameAt word).uq) -
+          (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) z ≤ 1)
     {c i : Site} (hr : RisingBlackPair (standardField word) (-(frameAt word).shortShift) c i)
     (hcE : c ∈ (frameAt word).closedPolygon) (hiE : i ∈ (frameAt word).closedPolygon)
     (hcu : c + (frameAt word).uq ∈ (frameAt word).closedPolygon)
@@ -300,12 +268,11 @@ theorem neg_adjacent_excluded {word : Word} (h : ∃ x ∈ word, x ≠ Digit.thr
     (sub_eq_add_neg i _).symm
   rw [e1, e2, (frameAt word).F_sub_shortShift hpk c, (frameAt word).F_sub_shortShift hpk i, hFc, hFi,
     hG _ hcu, hG _ hiu] at hrise
-  -- the unit bounds and the monotonicity of `B` along the retained edge
-  obtain ⟨hac0, hac1⟩ := unit_of_polygon h hSE (hG1 c hcE)
-  obtain ⟨hai0, hai1⟩ := unit_of_polygon h hSE (hG1 i hiE)
+  -- the unit increment, the endpoint range, and the monotonicity of `B` along the retained edge
   have hret : sheetPolicyA P (frameAt word).sheetShift c i :=
     sheetPolicyA_of_black h hSE hpk P hcE hr.1 hr.2.1 hΨc
-  have hb := hbmono c i hr.1 hret
+  have hb := hbmono_of_raw h hSE P c i hret
+  have hunit := (a_unit_bound h hSE hr.1).1
   obtain ⟨h1, h0⟩ := neg_chart_arith
     ((frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) c)
     ((frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) i)
@@ -318,7 +285,7 @@ theorem neg_adjacent_excluded {word : Word} (h : ∃ x ∈ word, x ≠ Digit.thr
     (min ((frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) (i + (frameAt word).uq))
       ((frameAt word).sheetC (quarterTurnField (standardField (conjWord word))) (i + (frameAt word).uq)))
     (min_le_left _ _) (min_le_right _ _) (min_choice _ _)
-    hac0 hac1 hai0 hai1 hb hrise
+    (by linarith [hunit]) (hA01 i hiE).1 (hA01 c hcE).2 hb hrise
   have j1 : jumpA (frameAt word) (quarterTurnField (standardField (conjWord word)))
       (c - (frameAt word).sheetShift) = 1 := by
     rw [← sheetA_uq_eq_jumpA c]
@@ -330,18 +297,16 @@ theorem neg_adjacent_excluded {word : Word} (h : ∃ x ∈ word, x ≠ Digit.thr
   exact nonfree_drop_excluded (x := c - (frameAt word).sheetShift) (x' := i - (frameAt word).sheetShift)
     h hSE P hret j1 j0
 
-/-- **The A-case for `−σ` (task 69 (a)).** A rising `−σ` pair with centre in `E` and both `Ψ ≥ 1` is impossible, given
-the two named leaves `hG1` (the parent polygon) and `hbmono` (the monotonicity of the raw slip). -/
+/-- **The A-case for `−σ` (task 69 (a)).** A rising `−σ` pair with centre in `E` and both `Ψ ≥ 1` is impossible, given the
+endpoint range leaf `hA01`. -/
 theorem neg_sign_excluded {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
     {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
-    (hG1 : ∀ z ∈ (frameAt word).closedPolygon,
-      zTurn ((1, -1) - (z - (frameAt word).sheetShift)) ∈ (frameAt (conjWord word)).closedPolygon)
-    (hbmono : ∀ c i, Edge i c → sheetPolicyA P (frameAt word).sheetShift c i →
-      (frameAt word).sheetC (quarterTurnField (standardField (conjWord word))) (c + (frameAt word).uq) -
-          (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) c ≤
-        (frameAt word).sheetC (quarterTurnField (standardField (conjWord word))) (i + (frameAt word).uq) -
-          (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) i)
+    (hA01 : ∀ z ∈ (frameAt word).closedPolygon,
+      0 ≤ (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) (z + (frameAt word).uq) -
+          (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) z ∧
+        (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) (z + (frameAt word).uq) -
+          (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) z ≤ 1)
     {c i : Site} (hr : RisingBlackPair (standardField word) (-(frameAt word).shortShift) c i)
     (hcE : c ∈ (frameAt word).closedPolygon) (hΨc : 1 ≤ sheetDiffW word c) (hΨi : 1 ≤ sheetDiffW word i) :
     False := by
@@ -378,26 +343,24 @@ theorem neg_sign_excluded {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
             ((frameAt word).eps * (frameAt word).parents.even.den,
               (frameAt word).eps * (frameAt word).parents.even.num)] at h3
           exact h3
-        exact neg_adjacent_excluded h hSE hpk P hG1 hbmono hr hcE hiE hcu hiu hΨc hΨi
+        exact neg_adjacent_excluded h hSE hpk P hA01 hr hcE hiE hcu hiu hΨc hΨi
     · exact (frameAt word).not_rising_of_input_exit hpk hn3 hnd ⟨hcE', hiE', hr'.1, not_le.mp hni⟩ hr'
   · exact (frameAt word).not_rising_of_centre_exit hpk hn3 hnd ⟨hcE', hiE', hr'.1, not_le.mp hnc⟩ hr'
 
-/-- `NoBlackPairRise` from the A-case for `σ` (proved), the A-case for `−σ` (this file, given the leaves `hG1`, `hbmono`)
-and the tie leaf `hTie` (task 69 (b)). -/
+/-- `NoBlackPairRise` from the A-case for `σ` (proved), the A-case for `−σ` (this file, given the range leaf `hA01`) and the
+tie leaf `hTie` (task 69 (b)). -/
 theorem noBlackPairRise_of_leaves {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
     {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
-    (hG1 : ∀ z ∈ (frameAt word).closedPolygon,
-      zTurn ((1, -1) - (z - (frameAt word).sheetShift)) ∈ (frameAt (conjWord word)).closedPolygon)
-    (hbmono : ∀ c i, Edge i c → sheetPolicyA P (frameAt word).sheetShift c i →
-      (frameAt word).sheetC (quarterTurnField (standardField (conjWord word))) (c + (frameAt word).uq) -
-          (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) c ≤
-        (frameAt word).sheetC (quarterTurnField (standardField (conjWord word))) (i + (frameAt word).uq) -
-          (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) i)
+    (hA01 : ∀ z ∈ (frameAt word).closedPolygon,
+      0 ≤ (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) (z + (frameAt word).uq) -
+          (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) z ∧
+        (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) (z + (frameAt word).uq) -
+          (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) z ≤ 1)
     (hTie : ∀ c i, RisingBlackPair (standardField word) (frameAt word).shortShift c i →
       c ∈ (frameAt word).closedPolygon → (sheetDiffW word c = 0 ∨ sheetDiffW word i = 0) → False) :
     NoBlackPairRise (standardField word) (frameAt word).shortShift :=
   noBlackPairRise_of_signs h hSE hpk P
-    (fun _ _ hr hc hΨc hΨi => neg_sign_excluded h hSE hpk P hG1 hbmono hr hc hΨc hΨi) hTie
+    (fun _ _ hr hc hΨc hΨi => neg_sign_excluded h hSE hpk P hA01 hr hc hΨc hΨi) hTie
 
 end FLatticePaper.Induction

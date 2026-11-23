@@ -8,7 +8,7 @@ fields are exactly the properties the Q3 argument uses (paragraphs 3, 6, 7 and t
 
 * `retained`, `quota`: the retained edges; a black centre retains both inputs, a white one at least one (`RetainQuota`).
   This is the retention of the chosen parent edge at a black or tied minimum.
-* `priceNonincreasing`, `bNondecreasing`: the conjugate's price `P'` does not increase (so `p = c₀ − P'(Z·)` does not
+* `priceNonincreasing`, `rawSlipNonincreasing`: the conjugate's price `P'` and raw slip `D'_η` do not increase (so `p = c₀ − P'(Z·)` does not
   decrease, task 63) and the raw slip `b` does not decrease along the retained edges.
 * `chainNonincreasing`: the chain potential `Φ_η` does not increase along them (the chain gap monotonicity).
 * `reflection`: reflection about `I = (1, −1)` maps retained edges to retained edges (`f(I − x) = f(x)`).
@@ -36,9 +36,11 @@ structure OldPolicyData (frame : ChildFrame) (G : Field) (seed : Site → Site �
   the retained edges. By paragraph 5, `p(x) = c₀ − P'(Zx)` with `Z x = (−x₂, x₁ − 1)`, so this is `p` nondecreasing along
   the transported policy (task 63; the current frame's `parentShift` plays no role). -/
   priceNonincreasing : NonincreasingAlong (frame.price G) retained
-  /-- The raw slip `b` of paragraph 7 does not decrease along the retained edges. -/
-  bFun : Site → ℤ
-  bNondecreasing : NondecreasingAlong bFun retained
+  /-- The conjugate's raw slip `D'_η(y) = G y − G (y + η σ_c)` (`σ_c` the conjugate's short shift, `η = ±1`) does not
+  increase along the retained edges. By paragraph 6 the raw slip `b` of the sheets is `(1 + ε) − D'_ε(Z ·)`, so `b` does not
+  decrease along the retained edges (task 69 (b)). -/
+  rawSlipNonincreasing : ∀ η : ℤ, (η = 1 ∨ η = -1) →
+    NonincreasingAlong (fun y => G y - G (y + η • frame.shortShift)) retained
   /-- The chain potential `Φ_η` does not increase along the retained edges, for `η = ±1`. -/
   chainNonincreasing : ∀ η : ℤ, (η = 1 ∨ η = -1) → NonincreasingAlong (frame.chainPotential G η) retained
   /-- Reflection about `I`: retained edges are carried to retained edges. -/
