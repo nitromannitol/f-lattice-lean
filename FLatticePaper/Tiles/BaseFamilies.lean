@@ -1,140 +1,179 @@
-import FLatticePaper.Tiles.RowChain
-import FLatticePaper.Tiles.BaseCellIdentities
+import FLatticePaper.Tiles.SiteJunction
+import FLatticePaper.Tiles.HorizontalGlue
+import FLatticePaper.Tiles.StandardTiles
 
-/-! Task 53, step 1: the base families. The cell tiles of the base tiles `stairF d`, `ladderF d`, `nstairN d`, `nladderN d`
-are row chains (`CellRowChain`), hence edge-connected and free of checkerboard vertices, for all `d` in the ranges used
-by the recursion. The stair and ladder cell tiles are the repo's `stairCells`, `ladderCells`
-(`BaseCellIdentities`); the near families are computed here from the site membership and shifted. -/
+/-! Task 53, marksIn (base families): the horizontal strings of the words `3^k` and `2^k`, and of `q p^m`, lie in the base tiles.
+
+The strings are runs: a run of `q`s advances by `(1,1)` per tile and a run of `p`s by `(2,0)`; a `qq` pair is enlarged. The
+bounds below are proved by induction over the snoc recursion (`stringSites_snoc_mem`), and each base tile is a filter over a box,
+so membership is linear arithmetic (`omega`). -/
 
 namespace FLatticePaper.Tiles.BaseFamilies
 
-open FLatticePaper FLatticePaper.Farey FLatticePaper.Construction FLatticePaper.Tiles FLatticePaper.Tiles.Standard
-  FLatticePaper.Tiles.StandardClause FLatticePaper.Tiles.BaseCellIdentities
+open FLatticePaper.Farey FLatticePaper.Tiles FLatticePaper.Tiles.Standard FLatticePaper.Tiles.SiteStrings
+open FLatticePaper.Tiles.SiteJunction FLatticePaper.Tiles.SiteConcat FLatticePaper.Tiles.HorizontalGlue
 
-/-- The cells of `nstairF d`: the lower-left corners whose four corners lie in `nstairF d`. -/
-def nstairCellP (d a b : ℤ) : Prop :=
-  (0 ≤ a ∧ a ≤ d ∧ 1 ≤ b ∧ b ≤ 2 * d - 2 ∧ 0 ≤ b - a ∧ b - a ≤ d - 1) ∨ (a = 0 ∧ b = d) ∨ (a = d ∧ b = d - 1)
+theorem sumStep_rep_q (k : ℕ) : sumStep (List.replicate k Letter.q) = ((k : ℤ), (k : ℤ)) := by
+  induction k with
+  | zero => simp [sumStep]
+  | succ k ih =>
+    rw [List.replicate_succ, sumStep, ih]
+    refine Prod.ext ?_ ?_
+    all_goals simp [stepH]
+    all_goals ring
 
-/-- The cells of `nladderF d`: the lower-left corners whose four corners lie in `nladderF d`. -/
-def nladderCellP (d a b : ℤ) : Prop :=
-  ((-1 ≤ a ∧ a ≤ d ∧ 1 ≤ b ∧ b ≤ 3 * d - 2 ∧ 0 ≤ b - a ∧ b - a ≤ 2 * d) ∧
-      ¬(a = -1 ∧ b < d + 2) ∧ ¬(a = d ∧ 2 * d - 3 < b)) ∨
-    (a = -1 ∧ b = 2 * d) ∨ (a = d ∧ b = d - 1)
+theorem sumStep_rep_p (k : ℕ) : sumStep (List.replicate k Letter.p) = ((2 * (k : ℤ)), 0) := by
+  induction k with
+  | zero => simp [sumStep]
+  | succ k ih =>
+    rw [List.replicate_succ, sumStep, ih]
+    refine Prod.ext ?_ ?_
+    all_goals simp [stepH]
+    all_goals ring
 
-theorem mem_cellTileOf_nstairF (d : ℤ) (hd : 2 ≤ d) (a b : ℤ) :
-    (a, b) ∈ cellTileOf (nstairF d) ↔ nstairCellP d a b := by
-  rw [mem_cellTileOf, cellCorners_subset_iff]
-  simp only [mem_nstairF hd, nstairCellP]
-  constructor <;> intro h <;> omega
+theorem getLast?_rep_succ (k : ℕ) (a : Letter) : (List.replicate (k + 1) a).getLast? = some a := by
+  simp [List.replicate_succ']
 
-theorem mem_cellTileOf_nladderF (d : ℤ) (hd : 2 ≤ d) (a b : ℤ) :
-    (a, b) ∈ cellTileOf (nladderF d) ↔ nladderCellP d a b := by
-  rw [mem_cellTileOf, cellCorners_subset_iff]
-  simp only [mem_nladderF hd, nladderCellP]
-  constructor <;> intro h <;> omega
+/-- Membership in the string of `A ++ [l]`: a site of `A`, or a site of the last tile, which is at `sumStep A.tail + stepH l`
+from the origin, enlarged exactly when `A` ends with `q` and `l = q`. -/
+theorem stringSites_snoc_mem (A : List Letter) (hA : A ≠ []) (l : Letter) (z : ℤ × ℤ) :
+    z ∈ stringSites false false (A ++ [l]) ↔
+      z ∈ stringSites false false A ∨
+        ∃ b ∈ baseSites l (A.getLast? == some Letter.q && l == Letter.q),
+          z = (sumStep A.tail + stepH l) + b := by
+  obtain ⟨a, A', rfl⟩ := List.exists_cons_of_ne_nil hA
+  obtain ⟨pr, hpr⟩ : ∃ pr, (a :: A').getLast? = some pr := by
+    cases h : (a :: A').getLast? with
+    | none => simp at h
+    | some pr => exact ⟨pr, rfl⟩
+  have hs : startPos false false = (0, 0) := rfl
+  simp only [stringSites_eq_sitesFrom, hs]
+  rw [sitesFrom_append false false a A' [l] none (0, 0), hpr, List.mem_append]
+  apply or_congr Iff.rfl
+  rw [endOrigin_none_cons a A' (0, 0)]
+  simp [sitesFrom, origins, dxdy_false_false, stepH, baseSites]
+  constructor
+  · rintro ⟨x, y, hb, h⟩
+    refine ⟨x, y, hb, ?_⟩
+    rw [← h]
+    refine Prod.ext ?_ ?_ <;> simp
+  · rintro ⟨x, y, hb, h⟩
+    refine ⟨x, y, hb, ?_⟩
+    rw [h]
+    refine Prod.ext ?_ ?_ <;> simp
 
-/-- The near-one staircase `nstairN d` is `nstairF d` shifted down by one: its cell `(a, b)` is the cell `(a, b + 1)`. -/
-theorem mem_cellTileOf_nstairN (d : ℤ) (hd : 2 ≤ d) (a b : ℤ) :
-    (a, b) ∈ cellTileOf (nstairN d) ↔ nstairCellP d a (b + 1) := by
+/-! ### Bounds of the runs -/
+
+/-- The `q`-run `q^{k+1}`: its sites lie in the box `[0, k+1]²` and near the diagonal, `-2 ≤ y - x ≤ 2`. -/
+theorem qrun_bounds (k : ℕ) : ∀ z ∈ stringSites false false (List.replicate (k + 1) Letter.q),
+    0 ≤ z.1 ∧ z.1 ≤ (k : ℤ) + 1 ∧ 0 ≤ z.2 ∧ z.2 ≤ (k : ℤ) + 1 ∧ -2 ≤ z.2 - z.1 ∧ z.2 - z.1 ≤ 2 := by
+  induction k with
+  | zero =>
+    intro z hz
+    simp [stringSites, origins, baseSites, startPos] at hz
+    rcases hz with rfl | rfl | rfl | rfl <;> norm_num
+  | succ k ih =>
+    intro z hz
+    have e : List.replicate (k + 1 + 1) Letter.q = List.replicate (k + 1) Letter.q ++ [Letter.q] := by
+      simp [List.replicate_succ']
+    rw [e, stringSites_snoc_mem _ (by simp) Letter.q z] at hz
+    rcases hz with h | ⟨b, hb, rfl⟩
+    · have := ih z h
+      push_cast
+      omega
+    · have ht : (List.replicate (k + 1) Letter.q).tail = List.replicate k Letter.q := rfl
+      have hen : ((List.replicate (k + 1) Letter.q).getLast? == some Letter.q && Letter.q == Letter.q) = true := by
+        rw [getLast?_rep_succ]
+        simp
+      rw [hen] at hb
+      rw [ht, sumStep_rep_q]
+      simp only [baseSites, List.mem_cons, List.not_mem_nil, or_false] at hb
+      simp only [stepH]
+      push_cast
+      rcases hb with rfl | rfl | rfl | rfl | rfl | rfl <;> norm_num <;> omega
+
+/-- The `p`-run `q p^m`: its sites lie in `[0, 2m+1] × [0, 2]`, with `x + y ≤ 2m + 3`, and off the origin `x + y ≥ 1`. -/
+theorem prun_bounds (m : ℕ) : ∀ z ∈ stringSites false false (Letter.q :: List.replicate m Letter.p),
+    0 ≤ z.1 ∧ z.1 ≤ 2 * (m : ℤ) + 1 ∧ 0 ≤ z.2 ∧ z.2 ≤ 2 ∧ z.1 + z.2 ≤ 2 * (m : ℤ) + 3 ∧
+      (1 ≤ z.1 + z.2 ∨ (z.1 = 0 ∧ z.2 = 0)) := by
+  induction m with
+  | zero =>
+    intro z hz
+    simp [stringSites, origins, baseSites, startPos] at hz
+    rcases hz with rfl | rfl | rfl | rfl <;> norm_num
+  | succ m ih =>
+    intro z hz
+    have e : Letter.q :: List.replicate (m + 1) Letter.p = (Letter.q :: List.replicate m Letter.p) ++ [Letter.p] := by
+      simp [List.replicate_succ']
+    rw [e, stringSites_snoc_mem _ (by simp) Letter.p z] at hz
+    rcases hz with h | ⟨b, hb, rfl⟩
+    · have := ih z h
+      push_cast
+      omega
+    · have ht : (Letter.q :: List.replicate m Letter.p).tail = List.replicate m Letter.p := rfl
+      rw [ht, sumStep_rep_p]
+      simp only [baseSites] at hb
+      simp only [stepH]
+      push_cast
+      simp only [List.mem_cons, List.not_mem_nil, or_false] at hb
+      rcases hb with rfl | rfl | rfl | rfl | rfl | rfl <;> norm_num <;> omega
+
+/-! ### Membership in the base tiles -/
+
+/-- `z ∈ stairF (2m+1)` for `m ≥ 1`, from the bounds of `prun_bounds`. -/
+theorem stairF_mem (m : ℕ) (hm : 1 ≤ m) (z : ℤ × ℤ)
+    (hz : 0 ≤ z.1 ∧ z.1 ≤ 2 * (m : ℤ) + 1 ∧ 0 ≤ z.2 ∧ z.2 ≤ 2 ∧ z.1 + z.2 ≤ 2 * (m : ℤ) + 3 ∧
+      (1 ≤ z.1 + z.2 ∨ (z.1 = 0 ∧ z.2 = 0))) :
+    z ∈ stairF (2 * (m : ℤ) + 1) := by
+  obtain ⟨x, y⟩ := z
+  unfold stairF
+  rw [Finset.mem_filter, Finset.mem_product, Finset.mem_Icc, Finset.mem_Icc]
+  simp only at hz ⊢
+  have hm' : (1 : ℤ) ≤ m := by exact_mod_cast hm
+  omega
+
+/-- `z ∈ nstairN (2m+1)` for `m ≥ 1`: the shift of `nstairF` by `(0,-1)`, so `(z.1, z.2 + 1) ∈ nstairF`. -/
+theorem nstairN_mem (m : ℕ) (hm : 1 ≤ m) (z : ℤ × ℤ)
+    (hz : (0 ≤ z.1 ∧ z.1 ≤ 2 * (m : ℤ) + 2 ∧ 1 ≤ z.2 + 1 ∧ z.2 + 1 ≤ 4 * (m : ℤ) + 1 ∧
+        -1 ≤ (z.2 + 1) - z.1 ∧ (z.2 + 1) - z.1 ≤ 2 * (m : ℤ) + 1) ∨
+      (z.1 = 0 ∧ z.2 + 1 = 2 * (m : ℤ) + 2) ∨ (z.1 = 2 * (m : ℤ) + 2 ∧ z.2 + 1 = 2 * (m : ℤ))) :
+    z ∈ nstairN (2 * (m : ℤ) + 1) := by
+  obtain ⟨x, y⟩ := z
   unfold nstairN
-  rw [mem_cellTileOf, cellCorners_subset_iff]
-  simp only [mem_shift, mem_nstairF hd, nstairCellP, Prod.fst_sub, Prod.snd_sub]
-  constructor <;> intro h <;> omega
+  rw [mem_shift]
+  unfold nstairF
+  rw [Finset.mem_filter, Finset.mem_product, Finset.mem_Icc, Finset.mem_Icc]
+  simp only [Prod.fst_sub, Prod.snd_sub] at hz ⊢
+  have hm' : (1 : ℤ) ≤ m := by exact_mod_cast hm
+  omega
 
-/-- The near-one ladder `nladderN d` is `nladderF d` shifted down by one. -/
-theorem mem_cellTileOf_nladderN (d : ℤ) (hd : 2 ≤ d) (a b : ℤ) :
-    (a, b) ∈ cellTileOf (nladderN d) ↔ nladderCellP d a (b + 1) := by
+/-- `z ∈ nladderN (2m+2)` for `m ≥ 1`: the shift of `nladderF` by `(0,-1)`. -/
+theorem nladderN_mem (m : ℕ) (hm : 1 ≤ m) (z : ℤ × ℤ)
+    (hz : (-1 ≤ z.1 ∧ z.1 ≤ 2 * (m : ℤ) + 3 ∧ 1 ≤ z.2 + 1 ∧ z.2 + 1 ≤ 6 * (m : ℤ) + 5 ∧
+        -1 ≤ (z.2 + 1) - z.1 ∧ (z.2 + 1) - z.1 ≤ 4 * (m : ℤ) + 5 ∧ ¬(z.1 = -1 ∧ z.2 + 1 ≤ 2 * (m : ℤ) + 3) ∧
+        ¬(z.1 = 2 * (m : ℤ) + 3 ∧ 4 * (m : ℤ) + 3 ≤ z.2 + 1)) ∨
+      (z.1 = 2 * (m : ℤ) + 3 ∧ z.2 + 1 = 2 * (m : ℤ) + 1)) :
+    z ∈ nladderN (2 * (m : ℤ) + 2) := by
+  obtain ⟨x, y⟩ := z
   unfold nladderN
-  rw [mem_cellTileOf, cellCorners_subset_iff]
-  simp only [mem_shift, mem_nladderF hd, nladderCellP, Prod.fst_sub, Prod.snd_sub]
-  constructor <;> intro h <;> omega
+  rw [mem_shift]
+  unfold nladderF
+  rw [Finset.mem_filter, Finset.mem_product, Finset.mem_Icc, Finset.mem_Icc]
+  simp only [Prod.fst_sub, Prod.snd_sub] at hz ⊢
+  have hm' : (1 : ℤ) ≤ m := by exact_mod_cast hm
+  omega
 
-/-! ### The staircase and the ladder (repo cell tiles) -/
-
-theorem cellRowChain_stairCells (d : ℤ) (hd : 3 ≤ d) : CellRowChain (stairCells d) :=
-  cellRowChain_of_witness (stairCells d) (fun a b => stairInT d a b) (fun a b => mem_stairCells d hd (a, b))
-    0 d (fun b => if b ≤ d - 1 then 1 - b else 1)
-    (by
-      intro a b h
-      unfold stairInT at h
-      omega)
-    (by
-      intro b a₁ a₂ a₃ h₁ h₃ h12 h23
-      unfold stairInT at h₁ h₃ ⊢
-      omega)
-    (by
-      intro b hb0 hb1
-      try dsimp only
-      refine ⟨?_, fun hlt => ?_⟩ <;> unfold stairInT <;> split_ifs <;> omega)
-
-theorem cellRowChain_ladderCells (d : ℤ) (hd : 4 ≤ d) : CellRowChain (ladderCells d) :=
-  cellRowChain_of_witness (ladderCells d) (fun a b => ladderInT d a b) (fun a b => mem_ladderCells d hd (a, b))
-    0 (d + 1) (fun b => if b = 0 then 0 else if b ≤ d - 1 then 1 - b else if b = d then 3 else d + 1)
-    (by
-      intro a b h
-      unfold ladderInT at h
-      omega)
-    (by
-      intro b a₁ a₂ a₃ h₁ h₃ h12 h23
-      unfold ladderInT at h₁ h₃ ⊢
-      omega)
-    (by
-      intro b hb0 hb1
-      try dsimp only
-      refine ⟨?_, fun hlt => ?_⟩ <;> unfold ladderInT <;> split_ifs <;> omega)
-
-/-! ### The near families: row chains of the shifted cell sets -/
-
-theorem cellRowChain_nstairN (d : ℤ) (hd : 2 ≤ d) : CellRowChain (cellTileOf (nstairN d)) :=
-  cellRowChain_of_witness (cellTileOf (nstairN d)) (fun a b => nstairCellP d a (b + 1))
-    (fun a b => mem_cellTileOf_nstairN d hd a b) 0 (2 * d - 3) (fun b => if b + 1 ≤ d then b + 1 else d)
-    (by
-      intro a b h
-      unfold nstairCellP at h
-      omega)
-    (by
-      intro b a₁ a₂ a₃ h₁ h₃ h12 h23
-      unfold nstairCellP at h₁ h₃ ⊢
-      omega)
-    (by
-      intro b hb0 hb1
-      try dsimp only
-      refine ⟨?_, fun hlt => ?_⟩ <;> unfold nstairCellP <;> split_ifs <;> omega)
-
-theorem cellRowChain_nladderN (d : ℤ) (hd : 2 ≤ d) : CellRowChain (cellTileOf (nladderN d)) :=
-  cellRowChain_of_witness (cellTileOf (nladderN d)) (fun a b => nladderCellP d a (b + 1))
-    (fun a b => mem_cellTileOf_nladderN d hd a b) 0 (3 * d - 3) (fun b => if b + 1 ≤ d - 1 then b + 1 else d - 1)
-    (by
-      intro a b h
-      unfold nladderCellP at h
-      omega)
-    (by
-      intro b a₁ a₂ a₃ h₁ h₃ h12 h23
-      unfold nladderCellP at h₁ h₃ ⊢
-      omega)
-    (by
-      intro b hb0 hb1
-      try dsimp only
-      refine ⟨?_, fun hlt => ?_⟩ <;> unfold nladderCellP <;> split_ifs <;> omega)
-
-/-! ### The base families as cell tiles of the base tiles -/
-
-/-- The cell tile of `stairF d` (`d ≥ 3`) is a row chain. -/
-theorem cellRowChain_stairF (d : ℤ) (hd : 3 ≤ d) : CellRowChain (cellTileOf (stairF d)) := by
-  rw [cellTileOf_stairF d hd]
-  exact cellRowChain_stairCells d hd
-
-/-- The cell tile of `ladderF d` (`d ≥ 4`) is a row chain. -/
-theorem cellRowChain_ladderF (d : ℤ) (hd : 4 ≤ d) : CellRowChain (cellTileOf (ladderF d)) := by
-  rw [cellTileOf_ladderF d hd]
-  exact cellRowChain_ladderCells d hd
-
-/-- The cell tile of `nstairN d` (`d ≥ 3`, odd in the recursion) is a row chain. -/
-theorem cellRowChain_nstairN' (d : ℤ) (hd : 3 ≤ d) : CellRowChain (cellTileOf (nstairN d)) :=
-  cellRowChain_nstairN d (by omega)
-
-/-- The cell tile of `nladderN d` (`d ≥ 4`, even in the recursion) is a row chain. -/
-theorem cellRowChain_nladderN' (d : ℤ) (hd : 4 ≤ d) : CellRowChain (cellTileOf (nladderN d)) :=
-  cellRowChain_nladderN d (by omega)
+/-- `z ∈ ladderF (2n+2)` for `n ≥ 0`, from the bounds of the two parts of `q p^n q p^{n+1}`. -/
+theorem ladderF_mem (n : ℕ) (z : ℤ × ℤ)
+    (hz : (0 ≤ z.1 ∧ z.1 ≤ 2 * (n : ℤ) + 1 ∧ 0 ≤ z.2 ∧ z.2 ≤ 2 ∧ z.1 + z.2 ≤ 2 * (n : ℤ) + 3 ∧
+        (1 ≤ z.1 + z.2 ∨ (z.1 = 0 ∧ z.2 = 0))) ∨
+      (2 * (n : ℤ) + 1 ≤ z.1 ∧ z.1 ≤ 4 * (n : ℤ) + 4 ∧ 1 ≤ z.2 ∧ z.2 ≤ 3 ∧
+        z.1 + z.2 ≤ 4 * (n : ℤ) + 7)) :
+    z ∈ ladderF (2 * (n : ℤ) + 2) := by
+  obtain ⟨x, y⟩ := z
+  unfold ladderF
+  rw [Finset.mem_filter, Finset.mem_product, Finset.mem_Icc, Finset.mem_Icc]
+  simp only at hz ⊢
+  omega
 
 end FLatticePaper.Tiles.BaseFamilies

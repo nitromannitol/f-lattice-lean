@@ -327,6 +327,8 @@ import FLatticePaper.Tiles.CeilBlocks
 import FLatticePaper.Tiles.HorizontalGlue
 import FLatticePaper.Tiles.HorizontalStep
 import FLatticePaper.Tiles.HorizontalInduction
+import FLatticePaper.Tiles.BaseFamilies
+import FLatticePaper.Tiles.BaseInvariant
 import FLatticePaper.Plane.Induction.S3FreeBoundary
 import FLatticePaper.Plane.Induction.ParentCoordinates
 import FLatticePaper.Plane.Induction.Q3Arithmetic
