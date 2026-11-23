@@ -286,6 +286,8 @@ import FLatticePaper.Plane.Induction.W1Exit
 import FLatticePaper.Plane.Induction.W1Strips
 import FLatticePaper.Plane.Induction.W1Window
 import FLatticePaper.Plane.Induction.W1Top
+import FLatticePaper.Plane.Induction.W1Lower
+import FLatticePaper.Plane.Induction.W1Seeds
 import FLatticePaper.Plane.Induction.Q3Field
 import FLatticePaper.Plane.Induction.Q3Paragraph8
 import FLatticePaper.Plane.Induction.Q3VStar
