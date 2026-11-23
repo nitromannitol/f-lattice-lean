@@ -201,3 +201,11 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 
 - `oddBlackNoRise_of_leaves`: `OddBlackNoRise (standardField word) σ` from `oddBlackNoRise_standard` (OddRise.lean), with `NoBlackPairRise` from `noBlackPairRise_of_leaves` (the conjugate's strong estimates and the old policy). The named leaves are `hslip` (the word's slip range on E), `hU` (the word's unit slip, the `F1_unitSlip` field of the word's slip fields, which also needs `StarZoneInputs` and `VArcInputs`), and `hTie` (the option-2 ties with a mixed star, and a tied target under a strict centre).
 - Checks: `checks/OddAssembly.lean` (1 `#print axioms`, standard). Root build `FLatticePaper` clean (2584 jobs), zero warnings and errors.
+
+### Task 69 final status (TieReduce.lean; the narrowed leaves; supersedes the hslip, hU and hTie rows)
+
+- DISCHARGED from the conjugate's strong estimates: `slipRange_of_strong` (the word's slip range `0 ≤ D_+ ≤ 2` on `E`, via `slipFields_of_strong` with `arcInputs_of_strong`, which use `openInputs_of_strong`), `hU_of_strong` (the word's unit slip), and `packet_of_strong` (the word's packet, via `packet_of_openInputs_step`). So `hslip`, `hU` and `hpk` are no longer hypotheses.
+- Configuration `Ψ c = 1, Ψ i = 0` is EXCLUDED by `sheetDiff_mono_A`: `strict_centre_target` gives `Ψ i ≥ Ψ c` for any rising pair with a strict centre (the retention `sheetPolicyA_of_black` holds for either sign), so the strict centre forces a strict target.
+- `tie_excluded_of_narrow`: every tie `Ψ c = 0 ∨ Ψ i = 0` on a rising σ pair is excluded, except option-2 ties whose centre has an input with `Ψ = −1`. The `Ψ ≤ −1` ties reflect to the strict-centre case; the option-1 ties are excluded by parity; the option-2 ties with a `Ψ = +1` input reflect to a −σ option-2 tie with a `−1` input; the option-2 ties with all inputs `≤ 0` are excluded by `plus_adjacent_nonpos_excluded`.
+- EXACT REMAINING LEAVES (Q16): `hResP` (σ) and `hResN` (−σ): an option-2 rising pair with a tied centre (`Ψ c = 0`) and an input with `Ψ = −1`. Nothing else is assumed beyond the conjugate's `StrongEstimates` and the `OldPolicyData` `P`.
+- Checks: `checks/TieReduce.lean` (6 `#print axioms`, standard only, no `sorryAx`). Zero warnings and errors in the sandbox logs; root build `FLatticePaper` clean.
