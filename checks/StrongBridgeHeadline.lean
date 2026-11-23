@@ -1,0 +1,9 @@
+import FLatticePaper.StrongHeadline
+
+#print axioms FLatticePaper.odometersTheorem_of_strongResidual
+#print axioms FLatticePaper.hyperbola_of_strongResidual
+#print axioms FLatticePaper.circlePacking_of_strongResidual
+#print axioms FLatticePaper.Induction.strongEstimates_of_residual_all
+#print axioms FLatticePaper.Induction.openInputs_of_strong
+#print axioms FLatticePaper.Induction.arcInputs_of_strong
+#print axioms FLatticePaper.starEstimates_of_strong
