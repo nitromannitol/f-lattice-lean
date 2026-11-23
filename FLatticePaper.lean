@@ -377,6 +377,7 @@ import FLatticePaper.Plane.Induction.HResP
 import FLatticePaper.Plane.Induction.NegTieNonfree
 import FLatticePaper.Plane.Induction.StrictNonfree
 import FLatticePaper.Plane.Induction.ConjFreeRoot
+import FLatticePaper.Plane.Induction.EvenWindow
 import FLatticePaper.Plane.Induction.HWeb
 import FLatticePaper.Plane.Induction.W1Collar
 import FLatticePaper.Plane.Induction.W1CollarBox

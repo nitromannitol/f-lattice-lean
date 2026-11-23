@@ -431,3 +431,15 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - OPEN INPUT `hsy`: the neighbour zero strip is not automatic from HRootWeb arithmetic (brute force, scratchpad/neighbour_strip.py): it fails for a `+D` step from a regular value (top `N+D−1`), a `+D` or `+N` step from `N+D`, and a `−D` step from `0`.
 - Checks: `checks/ConjFreeRoot.lean` (guards). Root build clean; sandbox logs clean.
 - Not in this step: the freeH case of the conjugate free site (V-block, link 3).
+
+### Task 72 (case (b), the even window hWin and the even neighbour zero): EvenWindow.lean
+
+- PROVED `harmonicGrid_zTurn`: `h(Zx) = −h(x)` for all `x`.
+- PROVED `odd_band_conj`: for the conjugate word, `F = h` on odd sites with conjugate `s` in `[2 − 3d_c + n_c, 3d_c + n_c − 2]`, from `lower_odd_h0` (odd seed `SeedFields.odd_bottom`, price range, drifts), `HasStrips.2` on `[1 − 2d_c, 2(d_c + n_c) − 1]`, and `odd_h0_upper`.
+- PROVED `even_window_zero_of_strong` (= hWin): for even `x` with `1 − r ≤ t_p x ≤ 2r − 1`, `quarterTurnField G x = 0`. Here `Zx` is odd with `s_c(Zx) = 2(t_p x − N)` in the odd band (conj child `(D−N, D+N)`), so `G(Zx) = h(Zx) = −h(x)`.
+- PROVED `evenSite_add_eps_uq_iff`: `x + εU_q` has the same site parity as `x` (`Fraction.Even` gives `num + den` even), so the partner is also even.
+- PROVED `jumpA_zero_of_even_window`: even `x` with `t_p x` and `t_p x + 1` both in the extended window gives `jumpA x = 0`.
+- CORRECTION recorded: the earlier parity-flip assumption was wrong, `εU_q` preserves parity.
+- Neighbour zero (hsy) by parity, brute force over N, D (scratchpad/neighbour_samepar.py): even neighbour needs extended at `T`, `T+1` (`jumpA_zero_of_even_window`); odd neighbour needs ordinary at `T`, `T+1` (`jumpA_zero_of_strip`). The only residual classes are the exceptional H roots: `u = N+D` with an even root and `+N` step when `D = N+1`, and `u = D+1` with an odd root and `+D` step when `N = 1`.
+- Checks: `checks/EvenWindow.lean` (guards). Root build clean; sandbox logs clean.
+- Not in this step: the exceptional residual (link 3), and the Lean assembly of hsy from these parity cases.
