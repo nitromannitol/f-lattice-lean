@@ -319,5 +319,6 @@ import FLatticePaper.Plane.Induction.ChartWitness
 import FLatticePaper.Plane.Induction.HWeb
 import FLatticePaper.Plane.Induction.W1Collar
 import FLatticePaper.Plane.Induction.W1CollarBox
+import FLatticePaper.Plane.Induction.W1ZeroStrip
 
 /-! Root import for the corrected F-lattice paper. -/
