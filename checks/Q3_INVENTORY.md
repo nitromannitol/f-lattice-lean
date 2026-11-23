@@ -324,3 +324,47 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - The root hypotheses are NOT derived here: H-EN root `c+2 ≤ t(z)` (next endpoint in the even H spectrum) and `s(z) < T+2−2d` (box); H-NES root `n+2 ≤ t(z) ≤ d−2` (internal) and `2n−2 < s(z) < T+2−3d+n` (box); V-NW root `2n+2−c ≤ s(z) ≤ L−2` and `L−1−T+d < t(z) < d` (endpoint spectra); V-WNE root `2 ≤ s(z) ≤ 2n−2` and `2L−1−T < t(z) < n`. They hold on every route for all children with `d ≤ 31` (`scripts/passage_root_hypotheses.py`, `scripts/passage_window_claims.py`).
 - Numeric support: spectral avoidance alone excludes every H middle and the odd V middle; the two even V middles need the `E`-argument above (`scripts/spectrum_avoidance_check.py`).
 - Checks: `checks/ShortPassages.lean` (nine guards, standard axioms only). Root build clean.
+
+### Task 72 (FIXED_FREE §5-§6 and the staircase box of the free H trace): FreeTraceBox.lean, CanonicalDirections.lean
+
+- PROVED `FreeTraceBox.freeH_box`: every `z ∈ ChildFrame.freeH` satisfies `1 ≤ z.1 ≤ d`, `0 ≤ z.2 ≤ n − 1`. Proof from `mem_closedPolygon_iff`, `hSpectrum`, `tGrade_parity` and the integer lemmas `box_even`/`box_odd` (the integer bounds `x ≥ 1`, `x ≤ d`, `y ≥ 0`, `y ≤ n − 1` each follow from the polygon bounds; no numeric input).
+- NOT PROVED (refuted as stated): "root ∈ freeH implies the route windows". Counterexample `(n, d) = (1, 3)`, root `(2, 0)`: it is a free even H site with `t = 2 < c + 2 = 4`, and its E-step `(3, 0)` is itself a free H site. `scripts/free_trace_route_check.py` (d ≤ 15): for `H_EN` and `V_NW` the window holds exactly when the E-step site is not a free site; for `H_NES` and `V_WNE` the window is sufficient, not necessary.
+- PROVED §5 (`CanonicalDirections.lean`): `prescribedH_internal_even/odd`, `prescribedV_internal_even/odd`, `prescribedH_H0`, `prescribedV_V0`, `prescribedH_hLast_sub_U` (north), `prescribedV_vLast_sub_V` (`η` east), `prescribedV_odd_minus_one` (north), `prescribedV_even_minus_one` (west). The tip-specific starts `Vp+ex` and `Vp` are not yet shown to be internal V sites.
+- PROVED §6: `tip_W0_middle_nonfree` (`v + (1,1)`, `ε = −1`, `t(v) = −B`, `s(v) = 2ε`, under `0 ≤ B`, `5L ≤ T − B`) and `tip_W1_middle_nonfree` (`v + (−1,0)`, `ε = +1`, same hypotheses). These take the tip values of `TIP_THEOREM.md` as hypotheses; the tip's own `t(v)`, `s(v)` are not derived here.
+- Checks: `checks/FreeTraceBox.lean`, `checks/CanonicalDirections.lean` (standard axioms or subsets). Root build clean; sandbox logs grep-clean for warning, error, sorry.
+
+### Task 72 (option b and TIP_THEOREM): RouteSteps.lean, CutTipEscape.lean
+
+- PROVED `RouteSteps.freeV_odd_box`: every odd `z ∈ freeV` has `1 − c ≤ x ≤ 0`, `1 ≤ y ≤ L − 2` (integer lemma `vbox_odd`; no numerics). Proof: `s ≤ L−2` forces `x ≤ 0`; `s ≥ 2−c` forces `y ≥ 1`; for `y ≥ L−1` the `s`-window gives `x = 1−c` (parity contradiction) or `x ≤ −c` (contradicting `t ≥ n−T`); `s ≥ 2−c` gives `x ≥ 1−c`.
+- PROVED `RouteSteps.freeH_even_s_lt`: every even `z ∈ freeH` has `s(z) < T + 2 − 2d`.
+- PROVED `RouteSteps.H_EN_of_step`: an even `z ∈ freeH` with `z + (1,0) ∉ freeH` has nonfree middle `z + (1,0)` (the window `c + 2 ≤ t(z)` is the contrapositive: `t ≤ c` makes the E-step a free site).
+- PROVED `RouteSteps.V_NW_of_step`: an odd `z ∈ freeV` with `z + (0,1) ∉ freeV` has nonfree middle `z + (0,1)`.
+- H_NES and V_WNE keep their windows (the source's "internal" midpoint conditions; endpoints H_0, H_last, V_0 are separate).
+- Numeric recheck with `n ≥ 3` (scripts/free_trace_window_check.py): window ⟺ step not free for H_EN and V_NW.
+- PROVED (abstract game, RestrictedBellmanRank) `CutTipEscape.two_edge_escape`: a white root `r` with a white permitted input `u` whose permitted input `y` has grade below the level escapes at depth 2. Instances `tip_W0_escape` (root `v+(1,0)`, `v` even) and `tip_W1_escape` (root `v`, even): the two incoming steps of the tip routes are `incomingPos`/`incomingNeg` as in TIP_THEOREM.
+- NOT PROVED: whiteness of the middles and the grade decrease at the port (field values from TIP_THEOREM); the forced-direction identification of the rejected input.
+- Checks: `checks/RouteSteps.lean`, `checks/CutTipEscape.lean`. Sandbox logs clean for warning, error, sorry (one lint warning fixed).
+
+### Task 72 (TIP_THEOREM hypotheses, whiteness): TipWhiteness.lean
+
+- PROVED `TipWhiteness.laplacian_eq_zero_of_odd_strip`: an odd site whose vertical star has `s ∈ [1 − 2d + c, 2L − 1 − c]` is white for any field with `HasStrips` (the harmonic s-strip), by `harmonicGrid_harmonic`.
+- PROVED `W1_middle_white`: the W1 middle `v + (−1,0)` is white from `s(v) = 2` alone (its star has `s = 2 − L ± c`, inside the strip).
+- PROVED `W1_root_freeV`, `W0_root_freeV`: the tip roots `v` (W1) and `v + (1,0)` (W0) are free V sites, from the tip values `t(v) = −B`, `s(v) = 2` (W1) or `s(v) = −2` (W0) and `0 ≤ B`, `5L ≤ T − B`. Hence white by `ChildFrame.laplacian_eq_zero_of_freeV`.
+- PROVED `W1_tip_white` (root and middle) and `W0_tip_root_white`.
+- NOT PROVED: the whiteness of the W0 middle `v + (1,1)`. Its east input has `s = 3d + n − 2`, outside the harmonic s-strip `[1 − 2d, 2L − 1]`, so it needs the two-sheet evaluation of TIP_THEOREM (`fA`, `fC`).
+- NOT PROVED: the existence of the tip vertex `v` with `t(v) = −B`, `s(v) = 2ε` from the parent data (the tip values stay hypotheses); the permits and the grade drop `0 → −1` at the port.
+- Checks: `checks/TipWhiteness.lean`. Root build clean; sandbox logs clean for warning, error, sorry.
+
+### Task 72 (TIP_THEOREM tip vertex): TipVertex.lean
+
+- PROVED `TipVertex.tGrade_tipVertex`, `sGrade_tipVertex`, `evenSite_tipVertex`: the tip vertex is the parent's V vertex `V_p = (n_p − d_p, n_p + d_p)` in child coordinates, with `t(V_p) = −B`, `B = L d_p + c n_p`, and `s(V_p) = 2 eps` (identities using `eps_eq`). This derives the tip values that TIP_THEOREM states, so they are no longer hypotheses. The phase is `eps`: W1 is `eps = 1`, W0 is `eps = −1`.
+- PROVED `TipVertex.W1_tip_white_of_eps`, `W0_root_white_of_eps`: the W1 root and middle, and the W0 root, are white for `HasStrips F`, given `eps` and the nonbase bounds `0 ≤ B`, `5L ≤ T − B` (kept as hypotheses).
+- Checks: `checks/TipVertex.lean`. Root build clean; sandbox logs clean.
+
+### Task 72 (TIP_THEOREM, the W1 escape with grade wired): TipEscape.lean
+
+- PROVED `FLatticePaper.tipJ_port_lt_root`: with `J = ceil(D/2)` (`tipJ D = (D+1)/2`), `J(−2) < J(−1)`: the boundary profiles `D = −1` (root, `J = 0`) and `D = −2` (port, `J = −1`) give the drop.
+- PROVED `FLatticePaper.tip_W1_escape_profiles`: the W1 cut tip (`eps = 1`) escapes at depth two in the restricted game with grade `J_η = tipJ (slip F η)`, given `HasStrips`, the nonbase bounds, the boundary profiles (named hypotheses `hD0`, `hD1`, sourced from ANCESTRAL_PSI_V_CUT_PROOF §§1–3 and VArcOffers), and the permits of the two route edges (`hru`, `hpu`, kept general; the source's permits are `slipPermits`, i.e. the sheet gap condition, not yet derived).
+- Whiteness of the root and middle comes from `TipVertex.W1_tip_white_of_eps` (no hypothesis).
+- NOT PROVED: the W0 middle (sheet evaluation), the permits from the sheet gap, and the boundary profiles themselves.
+- Checks: `checks/TipEscape.lean`. Root build clean; sandbox logs clean.

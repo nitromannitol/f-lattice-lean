@@ -289,6 +289,10 @@ import FLatticePaper.Tiles.SiteRot
 import FLatticePaper.Tiles.SiteVertCover
 import FLatticePaper.Tiles.SiteHull
 import FLatticePaper.Tiles.SiteHullOdd
+import FLatticePaper.Tiles.SiteHullEven
+import FLatticePaper.Tiles.SiteBoundary
+import FLatticePaper.Tiles.SiteBoundaryCover
+import FLatticePaper.Tiles.SiteBoundaryInner
 import FLatticePaper.Plane.Induction.S3FreeBoundary
 import FLatticePaper.Plane.Induction.ParentCoordinates
 import FLatticePaper.Plane.Induction.Q3Arithmetic
@@ -349,6 +353,13 @@ import FLatticePaper.CanonicalHeadline
 import FLatticePaper.Plane.Induction.UniformEscape
 import FLatticePaper.Plane.Induction.NonfreeRoot
 import FLatticePaper.Plane.Induction.ShortPassages
+import FLatticePaper.Plane.Induction.FreeTraceBox
+import FLatticePaper.Plane.Induction.CanonicalDirections
+import FLatticePaper.Plane.Induction.RouteSteps
+import FLatticePaper.Plane.Induction.CutTipEscape
+import FLatticePaper.Plane.Induction.TipWhiteness
+import FLatticePaper.Plane.Induction.TipEscape
+import FLatticePaper.Plane.Induction.TipVertex
 import FLatticePaper.Plane.Induction.HWeb
 import FLatticePaper.Plane.Induction.W1Collar
 import FLatticePaper.Plane.Induction.W1CollarBox
