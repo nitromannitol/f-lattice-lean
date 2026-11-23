@@ -589,3 +589,11 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - Helpers: `t_parity` (`t(a,b) ≡ a + b mod 2` for odd `n`, `d`), `s_le_even` (`L s = kT + 2nt`, `k ≤ L − 2`, `t ≤ 0` give `s ≤ T − 2d + 2n + 1`), `s_le_odd` (`k ≤ L − 1`, `t ≤ n − 2` give `s ≤ T − d + n − 1`).
 - Checks: `checks/CollarBottomCases.lean`. Root build clean; sandbox logs clean.
 - Next: the four-corner step (corners of `squareCorners (c1−1) c2` are strict given the centre band and `T > 3(d+n)`), then the glue to `collarBase` (class B) and the top, left and right classes.
+
+### Task 72 (hcollar, band (a), bottom class): CollarBottomSquare.lean
+
+- PROVED `band_even_of_witness` and `band_odd_of_witness`: a strict centre `c` (not `(1,1)` when even) with a free H witness `v`, `|v − c|∞ ≤ 1`, has the even band `2L − 2 < s(c) ≤ T − 2d + 2n + 1`, `2 − L ≤ t(c) ≤ 0`, or the odd band `L + 2n < s(c) ≤ T − d + n − 1`, `−d ≤ t(c) ≤ n − 2`. The witness parity selects the direct core (EE, EO, OE, OO). Helpers `even_t_lower`, `odd_t_range` read the spectrum with the parity identity.
+- PROVED `corners_of_even`, `corners_of_odd`: the four corners of `squareCorners (c1 − 1) c2` are strict under the band and `T > 3(d + n)` (`T_gt`).
+- PROVED `bottom_square_strict`: a strict bottom centre `c ≠ (1,1)` with `BottomArc` has `∀ c' ∈ squareCorners (c1 − 1) c2, StrictInterior c'`. This is the bottom (class B) part of `hstrict`.
+- Checks: `checks/CollarBottomSquare.lean`. Root build clean; sandbox logs clean.
+- Still open for hstrict: the top class (reflection `z ↦ R − z`), the left and right classes, the mixed classes (black, excluded by laplacian 0), and the glue `collarBase` case split.
