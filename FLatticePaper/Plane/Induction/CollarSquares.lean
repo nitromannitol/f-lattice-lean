@@ -71,4 +71,9 @@ theorem vMinus_centre_mem (c : Site) : c ∈ squareCorners (c.1 - 1) (c.2 - 1) :
   obtain ⟨x, y⟩ := c
   simp [squareCorners]
 
+/-- The centre is the upper-left corner of the lower-right (top-arc) square `squareCorners c.1 (c.2 − 1)`. -/
+theorem top_centre_mem (c : Site) : c ∈ squareCorners c.1 (c.2 - 1) := by
+  obtain ⟨x, y⟩ := c
+  simp [squareCorners]
+
 end FLatticePaper.Induction
