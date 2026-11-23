@@ -1,0 +1,5 @@
+import FLatticePaper.Plane.Induction.W1HagreeNonfree
+
+#print axioms FLatticePaper.W1HagreeNonfree.zTurn_neighbors
+#print axioms FLatticePaper.W1HagreeNonfree.sheetPolicyA_pointer_retained
+#print axioms FLatticePaper.W1HagreeNonfree.hagree_at_nonfree_root
