@@ -2,6 +2,7 @@ import FLatticePaper.Plane.Induction.StrongResidual
 import FLatticePaper.Plane.Induction.MatchedPolicy
 import FLatticePaper.Plane.Induction.W1Pointers
 import FLatticePaper.Plane.Induction.W1ZeroPitch
+import FLatticePaper.Plane.Induction.ComparisonEmpty
 
 /-! # Task 79 (hagree): the zero-pitch rank of the conjugate policy, its transport to the sheets, and the C policy as a reflection
 
@@ -95,5 +96,16 @@ theorem hagree_at_reflected_tie {frame : ChildFrame} {G : Field} {seed : Site �
         (zTurn (FLatticePaper.W1Pointers.pointerOf (sheetPolicyA P lv) c - lv))) :
     sheetPolicyC P lv (reflectionI + lv + lv) c (FLatticePaper.W1Pointers.pointerOf (sheetPolicyA P lv) c) :=
   sheetPolicyC_of_sheetPolicyA P lv c _ hroot (FLatticePaper.W1Pointers.pointerOf_retained F _ hq c hbin)
+
+/-- **Uniqueness of forced inputs** (task 79, step 2 of the forcing argument): under a satisfying white selection of `F`, a white site
+has at most one forced input, so two forced arrows of `F` at a white coincide (`forced_sound`, the empty clause excluded). -/
+theorem forced_input_unique {F : Field} {sel : Site → Site}
+    (hsel : ∀ c, laplacian F c = 0 → sel c = incomingNeg c ∨ sel c = incomingPos c)
+    (hsq : ∀ a b : ℤ, SquareClauses.SquareClauseSat F sel a b) {c i j : Site}
+    (hi : SquareClauses.ForcedEdge F (fun _ _ => False) c i)
+    (hj : SquareClauses.ForcedEdge F (fun _ _ => False) c j) : i = j := by
+  have h1 := SquareClauses.forced_sound F (fun _ _ => False) sel hsel (fun _ _ h => h.elim) hsq c i hi
+  have h2 := SquareClauses.forced_sound F (fun _ _ => False) sel hsel (fun _ _ h => h.elim) hsq c j hj
+  exact h1.symm.trans h2
 
 end FLatticePaper.W1Hagree
