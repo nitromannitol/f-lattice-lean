@@ -1,6 +1,8 @@
 import FLatticePaper.Graph
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.LinearCombination
+import Mathlib.Tactic.Linarith
+import Mathlib.Data.Int.ConditionallyCompleteOrder
 
 /-! Task 42: the weight change on a fixed graph (fix Q4-I3, "External facts").
 
@@ -88,5 +90,52 @@ theorem detUV_mul_lat (U V : Site) (x1 x2 : ℤ) :
     latPt U V (x1 * V.2 - x2 * V.1) (U.1 * x2 - U.2 * x1) = (detUV U V * x1, detUV U V * x2) := by
   unfold latPt detUV
   ext <;> simp <;> ring
+
+
+/-! Walks and the Bellman rank. `RetWalk ret z e n`: a chain of `n` retained steps from `z` to `e`. -/
+
+inductive RetWalk (ret : Site → Site → Prop) : Site → Site → ℕ → Prop
+  | nil (z : Site) : RetWalk ret z z 0
+  | cons {z i e : Site} {n : ℕ} : ret z i → RetWalk ret i e n → RetWalk ret z e (n + 1)
+
+/-- The values `n + lam (w e − w z)` of the retained walks from `z`. -/
+def retVal (ret : Site → Site → Prop) (w : Site → ℤ) (lam : ℤ) (z : Site) : Set ℤ :=
+  {v | ∃ e : Site, ∃ n : ℕ, RetWalk ret z e n ∧ v = (n : ℤ) + lam * (w e - w z)}
+
+/-- The Bellman rank `lam · w z + sup of the walk values from z`. -/
+noncomputable def bellmanRank (ret : Site → Site → Prop) (w : Site → ℤ) (lam : ℤ) (z : Site) : ℤ :=
+  lam * w z + sSup (retVal ret w lam z)
+
+theorem retVal_nonempty (ret : Site → Site → Prop) (w : Site → ℤ) (lam : ℤ) (z : Site) :
+    (retVal ret w lam z).Nonempty :=
+  ⟨((0 : ℕ) : ℤ) + lam * (w z - w z), z, 0, RetWalk.nil z, rfl⟩
+
+theorem retVal_cons {ret : Site → Site → Prop} {w : Site → ℤ} {lam : ℤ} {c i : Site} (hc : ret c i)
+    {v : ℤ} (hv : v ∈ retVal ret w lam i) :
+    1 + lam * (w i - w c) + v ∈ retVal ret w lam c := by
+  obtain ⟨e, n, hW, rfl⟩ := hv
+  refine ⟨e, n + 1, RetWalk.cons hc hW, ?_⟩
+  push_cast
+  ring
+
+/-- Along a retained step the Bellman rank strictly drops, provided the walk values are bounded above. -/
+theorem bellmanRank_lt {ret : Site → Site → Prop} {w : Site → ℤ} {lam : ℤ}
+    (hb : ∀ z, BddAbove (retVal ret w lam z)) {c i : Site} (hc : ret c i) :
+    bellmanRank ret w lam i < bellmanRank ret w lam c := by
+  have e : lam * (w i - w c) = lam * w i - lam * w c := by ring
+  have key : sSup (retVal ret w lam i) ≤ sSup (retVal ret w lam c) - (1 + lam * (w i - w c)) :=
+    csSup_le (retVal_nonempty ret w lam i) (fun v hv => by
+      have h := le_csSup (hb c) (retVal_cons hc hv)
+      linarith)
+  unfold bellmanRank
+  linarith
+
+/-- Retained walks are carried by a step-preserving translation. -/
+theorem retWalk_translate {ret : Site → Site → Prop} (d : Site)
+    (hstep : ∀ c i, ret c i → ret (c + d) (i + d)) {z e : Site} {n : ℕ} (h : RetWalk ret z e n) :
+    RetWalk ret (z + d) (e + d) n := by
+  induction h with
+  | nil z => exact RetWalk.nil (z + d)
+  | cons hr _ ih => exact RetWalk.cons (hstep _ _ hr) ih
 
 end FLatticePaper.WeightChange
