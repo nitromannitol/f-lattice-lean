@@ -221,3 +221,11 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - PROVED: `contact_black_E`: at a black centre `c ∈ E` with `F c = m c` for a binary `m ≤ F` on `E`, both inputs are contacts (`contact_black` with the inputs in `E`, `black_input_mem`).
 - NOT FORMALIZED: the conclusion of paragraph 4 (`P` and `J_η` do not increase along black and forced white edges). It needs the unit-proof transfer through the finite square proof of `SquareClauses` (`forced_sound`) and the W1 exclusion of the resulting empty clause (the unseeded system of `F` by even translation and affine addition). These are the named inputs of paragraph 4 and are not yet stated as Lean hypotheses.
 - Checks: `checks/ComparisonFields.lean` (4 `#print axioms`, standard only). Zero warnings and errors in the sandbox logs.
+
+### Task 70 part 2 (c) status (ComparisonTransfer.lean: P, J₊, J₋ monotone on black and forced white edges)
+
+- PROVED, no hypotheses beyond `StrongEstimates`: `price_nonincrease_black`, `jplus_nonincrease_black`, `jminus_nonincrease_black` (black roots: a contact root has both inputs as contacts by `contact_black_E`; otherwise the value bound of the range applies).
+- PROVED from the two named hypotheses below: `price_nonincrease_forced`, `jplus_nonincrease_forced`, `jminus_nonincrease_forced`. The forced-contact step `forced_contact_transfer` is the only use of (T) and (W).
+- HYPOTHESIS (T), the contained unit-proof transfer (`hT`): a contact forced-white root whose forced input is not a contact produces a finite empty clause `EC m` for its comparison field `m` (source: B2_INDEPENDENT_PRERANK_AUDIT §3). The Lean form is the one-step statement for `SquareClauses.ForcedEdge`; the source gives it as an induction on the contained unit proof, which is not formalized.
+- HYPOTHESIS (W), the W1 no-refutation transferred to `m` (`hW : ¬ EC m`): the unseeded closure of each comparison field has no empty clause (source: §3, "the current W1 global no-refutation statement transfers to it"). `EC` is an abstract predicate here; no Lean statement of the global W1 no-refutation exists in the repo (`SquareClauses.unseeded_forces_standard_window` is one concrete window).
+- Checks: `checks/ComparisonTransfer.lean` (six `#guard_msgs` on `#print axioms`, each exactly the standard three). Zero warnings in the build.
