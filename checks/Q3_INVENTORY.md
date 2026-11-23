@@ -407,3 +407,10 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - NOT PROVED: `hNegTie` (the negative tied-target exclusion). Its proof is `neg_adjacent_excluded` with `sheetPolicyA_of_tie` for the retention and the old-root analysis in place of `blackRoot_of_black` (the root is white): `nonfree_root_forced_nonfree` for a nonfree old root, and `H_drop_excluded` / the V-block with the Q19 exceptional endpoint for a free old root.
 - Also generalized `TieCentre`: `tie_sheetA_white` and `sheetPolicyA_of_tie` accept `Ψ j ≤ −1`.
 - Checks: `checks/HResP.lean`. Root build clean; sandbox logs clean.
+
+### Task 72 (hNegTie, case (a): nonfree old root): NegTieNonfree.lean
+
+- PROVED `negTie_drop_of_nonfree`: in the negative tied-target configuration (rising `−σ` pair `(c, i)`, tied centre, strict target `Ψ i ≥ 1`, an input `j` with `Ψ j ≤ −1`, both endpoints shifted by `+uq` in `E`) with the old root `zTurn (c − l_v)` nonfree in the conjugate frame, the configuration is excluded. The retention is `sheetPolicyA_of_tie`; the jumps `a(c − l_v) = 1`, `a(i − l_v) = 0` are the negative-chart arithmetic of `neg_adjacent_excluded`; the root condition is `nonfree_root_forced_nonfree` (black or the forced retained edge), closed by `nonfree_drop_excluded`.
+- The hypothesis `hW1` (the conjugate's `W1Forced`) is the input of the covers, not derived here.
+- NOT PROVED (case (b)): a free old root in the conjugate frame. Missing: (i) the strict-interior ⟹ nonfree count (FIXED_FREE §7), (ii) the H-web of the translate of the old root by `−V` or `−K` (`hweb_of_freeH` is stated for free H sites of the physical frame, and the correspondence with the conjugate's free sets via `zTurn` is not in Lean), (iii) the V-block for the translate and the exceptional endpoint of Q19 (`exceptional_drop_excluded` with `exceptional_hT_proved` is proved, but the old root must be the exceptional vertex).
+- Checks: `checks/NegTieNonfree.lean`. Root build clean; sandbox logs clean.

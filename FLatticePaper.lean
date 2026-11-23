@@ -354,6 +354,7 @@ import FLatticePaper.Plane.Induction.TieOneInput
 import FLatticePaper.Plane.Induction.TieCentre
 import FLatticePaper.Plane.Induction.SheetDownJump
 import FLatticePaper.Plane.Induction.HResP
+import FLatticePaper.Plane.Induction.NegTieNonfree
 import FLatticePaper.Plane.Induction.HWeb
 import FLatticePaper.Plane.Induction.W1Collar
 import FLatticePaper.Plane.Induction.W1CollarBox
