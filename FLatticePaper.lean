@@ -435,5 +435,7 @@ import FLatticePaper.Plane.Induction.W1Finite
 import FLatticePaper.Plane.Induction.W1Step
 import FLatticePaper.Plane.Induction.W1Bridge
 import FLatticePaper.Plane.Induction.W1OffCollar
+import FLatticePaper.Plane.Induction.W1OffCollarCases
+import FLatticePaper.Plane.Induction.W1CollarFrame
 
 /-! Root import for the corrected F-lattice paper. -/

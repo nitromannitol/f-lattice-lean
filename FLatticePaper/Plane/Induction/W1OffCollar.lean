@@ -159,3 +159,134 @@ theorem witA_even (n d : ℤ) (hn : 3 ≤ n) (hnd : n + 2 ≤ d) (hcop : IsCopri
     exact ⟨by omega, by omega, by omega⟩
 
 end FLatticePaper.W1OffCollar
+
+namespace FLatticePaper.W1OffCollar
+
+open FLatticePaper FLatticePaper.W1
+
+theorem t_even_of (n d : ℤ) (hno : n % 2 = 1) (hdo : d % 2 = 1) (z : Site) (hev : EvenSite z) :
+    w1t n d z % 2 = 0 := by
+  have := FLatticePaper.W1Exit.parity_t n d z.1 z.2 hno hdo
+  unfold w1t
+  simp only [EvenSite] at hev
+  omega
+
+theorem t_odd_of (n d : ℤ) (hno : n % 2 = 1) (hdo : d % 2 = 1) (z : Site) (hev : ¬ EvenSite z) :
+    w1t n d z % 2 = 1 := by
+  have := FLatticePaper.W1Exit.parity_t n d z.1 z.2 hno hdo
+  unfold w1t
+  simp only [EvenSite] at hev
+  omega
+
+/-- The identity `n · s − (d + n) · t = T · y` on the lattice. -/
+theorem lattice_id (n d : ℤ) (z : Site) :
+    n * w1s n d z - (d + n) * w1t n d z = w1T n d * z.2 := by
+  unfold w1s w1t w1T
+  ring
+
+/-- `T` is `(2L')² − 2n²` with `L = d + n = 2L'`: `T = 2 (2L'² − n²)`. -/
+theorem T_half (n d L' : ℤ) (hL : d + n = 2 * L') :
+    w1T n d = 2 * (2 * L' * L' - n * n) := by
+  have h : w1T n d = (d + n) ^ 2 - 2 * n ^ 2 := by
+    unfold w1T
+    ring
+  rw [h, hL]
+  ring
+
+/-- Coprimality of `L'` and `T' = 2L'² − n²` from the coprimality of `n` and `d`. -/
+theorem coprime_half (n d L' : ℤ) (hcop : IsCoprime n d) (hL : d + n = 2 * L') :
+    IsCoprime L' (2 * L' * L' - n * n) := by
+  have hnL : IsCoprime n (2 * L') := by
+    obtain ⟨u, v, huv⟩ := hcop
+    refine ⟨u - v, v, ?_⟩
+    have hd : d = 2 * L' - n := by omega
+    rw [hd] at huv
+    linear_combination huv
+  have hnL' : IsCoprime n L' := hnL.of_mul_right_right
+  have hLn : IsCoprime L' n := hnL'.symm
+  have hLnn : IsCoprime L' (n * n) := hLn.mul_right hLn
+  have hTn : IsCoprime L' (2 * L' * L' - n * n) := by
+    have e : 2 * L' * L' - n * n = -(n * n) + L' * (2 * L') := by ring
+    rw [e]
+    exact (hLnn.neg_right).add_mul_left_right _
+  exact hTn
+
+/-- A strict even site has `s ≠ 2L`: the lattice forces `t = 2n − T' m` with `T'` odd, and the strict range leaves `m = 1`. -/
+theorem no_strict_even_s2L (n d : ℤ) (hn : 3 ≤ n) (hnd : n + 2 ≤ d) (hcop : IsCoprime n d)
+    (hno : n % 2 = 1) (hdo : d % 2 = 1) (z : Site) (hev : EvenSite z) (hz : StrictInterior n d z)
+    (hs : w1s n d z = 2 * (d + n)) : False := by
+  rw [strict_even n d z hev] at hz
+  obtain ⟨h1, h2, h3, h4⟩ := hz
+  have ht := t_even_of n d hno hdo z hev
+  obtain ⟨L', hL⟩ : ∃ L' : ℤ, d + n = 2 * L' := ⟨(d + n) / 2, by omega⟩
+  have hT := T_half n d L' hL
+  have hid := lattice_id n d z
+  rw [hs, hT, hL] at hid
+  have key : L' * (2 * n - w1t n d z) = (2 * L' * L' - n * n) * z.2 := by
+    have h2' : (2 : ℤ) * (L' * (2 * n - w1t n d z)) = 2 * ((2 * L' * L' - n * n) * z.2) := by
+      linear_combination hid
+    exact mul_left_cancel₀ (two_ne_zero) h2'
+  have hcL := coprime_half n d L' hcop hL
+  have hdvd : (2 * L' * L' - n * n) ∣ L' * (2 * n - w1t n d z) := ⟨z.2, by linear_combination key⟩
+  obtain ⟨m, hm⟩ := (hcL.symm).dvd_of_dvd_mul_left hdvd
+  have hnn : (n * n) % 2 = 1 := by
+    rw [Int.mul_emod, hno]
+    norm_num
+  have hTodd : (2 * L' * L' - n * n) % 2 = 1 := by
+    have : 2 * L' * L' - n * n = 2 * (L' * L') - n * n := by ring
+    rw [this]
+    omega
+  have hL' : n + 1 ≤ L' := by omega
+  have hT0 : 0 < 2 * L' * L' - n * n := by nlinarith
+  have hm1 : 1 ≤ m := by
+    by_contra hc
+    have hc' : m < 1 := not_le.mp hc
+    nlinarith
+  have hm2 : m ≤ 1 := by
+    by_contra hc
+    have hc' : 1 < m := not_le.mp hc
+    nlinarith
+  have hm1' : m = 1 := by omega
+  subst hm1'
+  omega
+
+/-- A strict odd site has `s ≠ L`: the lattice forces `n − t = T' m` with `T'` odd, and the strict range leaves `m = 1`, while `n − t` is even. -/
+theorem no_strict_odd_sL (n d : ℤ) (hn : 3 ≤ n) (hnd : n + 2 ≤ d) (hcop : IsCoprime n d)
+    (hno : n % 2 = 1) (hdo : d % 2 = 1) (z : Site) (hod : ¬ EvenSite z) (hz : StrictInterior n d z)
+    (hs : w1s n d z = d + n) : False := by
+  rw [strict_odd n d z hod] at hz
+  obtain ⟨h1, h2, h3, h4⟩ := hz
+  have ht := t_odd_of n d hno hdo z hod
+  obtain ⟨L', hL⟩ : ∃ L' : ℤ, d + n = 2 * L' := ⟨(d + n) / 2, by omega⟩
+  have hT := T_half n d L' hL
+  have hid := lattice_id n d z
+  rw [hs, hT, hL] at hid
+  have key : L' * (n - w1t n d z) = (2 * L' * L' - n * n) * z.2 := by
+    have h2' : (2 : ℤ) * (L' * (n - w1t n d z)) = 2 * ((2 * L' * L' - n * n) * z.2) := by
+      linear_combination hid
+    exact mul_left_cancel₀ (two_ne_zero) h2'
+  have hcL := coprime_half n d L' hcop hL
+  have hdvd : (2 * L' * L' - n * n) ∣ L' * (n - w1t n d z) := ⟨z.2, by linear_combination key⟩
+  obtain ⟨m, hm⟩ := (hcL.symm).dvd_of_dvd_mul_left hdvd
+  have hnn : (n * n) % 2 = 1 := by
+    rw [Int.mul_emod, hno]
+    norm_num
+  have hTodd : (2 * L' * L' - n * n) % 2 = 1 := by
+    have : 2 * L' * L' - n * n = 2 * (L' * L') - n * n := by ring
+    rw [this]
+    omega
+  have hL' : n + 1 ≤ L' := by omega
+  have hT0 : 0 < 2 * L' * L' - n * n := by nlinarith
+  have hm1 : 1 ≤ m := by
+    by_contra hc
+    have hc' : m < 1 := not_le.mp hc
+    nlinarith
+  have hm2 : m ≤ 1 := by
+    by_contra hc
+    have hc' : 1 < m := not_le.mp hc
+    nlinarith
+  have hm1' : m = 1 := by omega
+  subst hm1'
+  omega
+
+end FLatticePaper.W1OffCollar
