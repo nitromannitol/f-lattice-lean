@@ -3,6 +3,10 @@ import Mathlib.Tactic.Ring
 import Mathlib.Tactic.LinearCombination
 import Mathlib.Tactic.Linarith
 import Mathlib.Data.Int.ConditionallyCompleteOrder
+import Mathlib.Algebra.Order.Ring.Abs
+import Mathlib.Algebra.Order.Group.Abs
+import Mathlib.Data.Int.Interval
+import Mathlib.Data.Finset.Prod
 
 /-! Task 42: the weight change on a fixed graph (fix Q4-I3, "External facts").
 
@@ -181,5 +185,76 @@ theorem bellmanRank_add {ret : Site → Site → Prop} {w : Site → ℤ} {lam :
   unfold bellmanRank
   rw [retVal_add_eq hiff hw z, hw z]
   ring
+
+
+/-! Finite representatives of the deck: every site is a deck translate of a site in a fixed finite box. -/
+
+/-- The integer identity behind the decomposition: `D (e − (i U + j V)) = p U + q V` for the remainders `p, q`. -/
+theorem deck_rep_identity (U V e : Site) (i j x y p q : ℤ)
+    (hx : (U.1 * V.2 - U.2 * V.1) * i + p = x) (hy : (U.1 * V.2 - U.2 * V.1) * j + q = y)
+    (hxd : x = e.1 * V.2 - e.2 * V.1) (hyd : y = U.1 * e.2 - U.2 * e.1) :
+    (U.1 * V.2 - U.2 * V.1) * (e.1 - (i * U.1 + j * V.1)) = p * U.1 + q * V.1 ∧
+      (U.1 * V.2 - U.2 * V.1) * (e.2 - (i * U.2 + j * V.2)) = p * U.2 + q * V.2 := by
+  constructor
+  · linear_combination (-U.1) * hx + (-V.1) * hy - U.1 * hxd - V.1 * hyd
+  · linear_combination (-U.2) * hx + (-V.2) * hy - U.2 * hxd - V.2 * hyd
+
+/-- A bound on a coordinate: if `D r = p a + q b` with remainders `0 ≤ p, q < |D|`, then `|r| ≤ |a| + |b|`. -/
+theorem abs_le_of_det_eq {D r p q a b : ℤ} (hD : D ≠ 0) (hp0 : 0 ≤ p) (hpD : p < |D|) (hq0 : 0 ≤ q)
+    (hqD : q < |D|) (h : D * r = p * a + q * b) : |r| ≤ |a| + |b| := by
+  have hpos : 0 < |D| := abs_pos.mpr hD
+  have e1 : |D * r| = |D| * |r| := abs_mul D r
+  have e2 : |p * a + q * b| ≤ |p * a| + |q * b| := abs_add_le _ _
+  have e3 : |p * a| = p * |a| := by rw [abs_mul, abs_of_nonneg hp0]
+  have e4 : |q * b| = q * |b| := by rw [abs_mul, abs_of_nonneg hq0]
+  rw [h] at e1
+  have key : |D| * |r| ≤ |D| * (|a| + |b|) := by
+    nlinarith [mul_nonneg (sub_nonneg.2 hpD.le) (abs_nonneg a),
+      mul_nonneg (sub_nonneg.2 hqD.le) (abs_nonneg b)]
+  exact le_of_mul_le_mul_left key hpos
+
+/-- **Finite deck representatives.** For a nondegenerate deck basis `U, V`, the sites are covered by finitely many deck
+translates: every `e` equals `r + i U + j V` with `r` in a fixed finite box. -/
+theorem exists_deck_box (U V : Site) (hD : U.1 * V.2 - U.2 * V.1 ≠ 0) :
+    ∃ S : Finset Site, ∀ e : Site, ∃ r ∈ S, ∃ i j : ℤ, e = r + latPt U V i j := by
+  obtain ⟨B, hB⟩ : ∃ B : ℤ, B = |U.1| + |V.1| + |U.2| + |V.2| := ⟨_, rfl⟩
+  refine ⟨Finset.Icc (-B) B ×ˢ Finset.Icc (-B) B, fun e => ?_⟩
+  obtain ⟨x, hxd⟩ : ∃ x : ℤ, x = e.1 * V.2 - e.2 * V.1 := ⟨_, rfl⟩
+  obtain ⟨y, hyd⟩ : ∃ y : ℤ, y = U.1 * e.2 - U.2 * e.1 := ⟨_, rfl⟩
+  obtain ⟨i, hi⟩ : ∃ i : ℤ, i = x / (U.1 * V.2 - U.2 * V.1) := ⟨_, rfl⟩
+  obtain ⟨j, hj⟩ : ∃ j : ℤ, j = y / (U.1 * V.2 - U.2 * V.1) := ⟨_, rfl⟩
+  obtain ⟨p, hp⟩ : ∃ p : ℤ, p = x % (U.1 * V.2 - U.2 * V.1) := ⟨_, rfl⟩
+  obtain ⟨q, hq⟩ : ∃ q : ℤ, q = y % (U.1 * V.2 - U.2 * V.1) := ⟨_, rfl⟩
+  have hx : (U.1 * V.2 - U.2 * V.1) * i + p = x := by
+    rw [hi, hp]
+    linarith [Int.emod_def x (U.1 * V.2 - U.2 * V.1)]
+  have hy : (U.1 * V.2 - U.2 * V.1) * j + q = y := by
+    rw [hj, hq]
+    linarith [Int.emod_def y (U.1 * V.2 - U.2 * V.1)]
+  have hp0 : 0 ≤ p := by
+    rw [hp]
+    exact Int.emod_nonneg _ hD
+  have hpD : p < |U.1 * V.2 - U.2 * V.1| := by
+    rw [hp, Int.abs_eq_natAbs]
+    exact_mod_cast Int.emod_lt x hD
+  have hq0 : 0 ≤ q := by
+    rw [hq]
+    exact Int.emod_nonneg _ hD
+  have hqD : q < |U.1 * V.2 - U.2 * V.1| := by
+    rw [hq, Int.abs_eq_natAbs]
+    exact_mod_cast Int.emod_lt y hD
+  obtain ⟨h1, h2⟩ := deck_rep_identity U V e i j x y p q hx hy hxd hyd
+  have hb1 := abs_le_of_det_eq hD hp0 hpD hq0 hqD h1
+  have hb2 := abs_le_of_det_eq hD hp0 hpD hq0 hqD h2
+  have hB1 : |e.1 - (i * U.1 + j * V.1)| ≤ B := by
+    rw [hB]
+    linarith [abs_nonneg U.2, abs_nonneg V.2]
+  have hB2 : |e.2 - (i * U.2 + j * V.2)| ≤ B := by
+    rw [hB]
+    linarith [abs_nonneg U.1, abs_nonneg V.1]
+  refine ⟨(e.1 - (i * U.1 + j * V.1), e.2 - (i * U.2 + j * V.2)), ?_, i, j, ?_⟩
+  · rw [Finset.mem_product, Finset.mem_Icc, Finset.mem_Icc]
+    exact ⟨abs_le.mp hB1, abs_le.mp hB2⟩
+  · ext <;> simp [latPt]
 
 end FLatticePaper.WeightChange
