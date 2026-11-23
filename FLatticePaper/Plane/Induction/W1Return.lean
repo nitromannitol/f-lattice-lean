@@ -44,9 +44,9 @@ when the C policy retains it, which is the agreement of the two arrows at ties. 
 monotonicity of the matched policies (both inputs of a tie are ties, so `Ψ(i) ≥ 0` and `Ψ(i) ≤ 0` already hold); it is the named
 hypothesis `hagree` (the archive's §5 rank descent along the tie band). Left as a hypothesis until the fixer answers Q15. -/
 theorem tie_common_arrow (F : Field) (QA QC : Site → Site → Prop) (psi : Site → ℤ) (hqA : RetainQuota F QA)
-    (hagree : ∀ c, psi c = 0 → QC c (pointerOf QA c)) (c : Site) (hbin : laplacian F c = -1 ∨ laplacian F c = 0)
-    (htie : psi c = 0) :
+    (hagree : ∀ c, psi c = 0 → laplacian F c = 0 → QC c (pointerOf QA c)) (c : Site)
+    (hbin : laplacian F c = -1 ∨ laplacian F c = 0) (htie : psi c = 0) (hwhite : laplacian F c = 0) :
     QA c (pointerOf QA c) ∧ QC c (pointerOf QA c) :=
-  ⟨pointerOf_retained F QA hqA c hbin, hagree c htie⟩
+  ⟨pointerOf_retained F QA hqA c hbin, hagree c htie hwhite⟩
 
 end FLatticePaper.W1Return
