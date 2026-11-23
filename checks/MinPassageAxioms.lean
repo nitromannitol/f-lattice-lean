@@ -1,0 +1,5 @@
+import FLatticePaper.Plane.Induction.MinPassage
+
+#print axioms FLatticePaper.MinPassage.minK_white_forced_plus
+#print axioms FLatticePaper.MinPassage.minK_white_forced_minus
+#print axioms FLatticePaper.PassagePR.price_nonincrease_forced_of_sat_PR

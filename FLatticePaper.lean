@@ -452,5 +452,7 @@ import FLatticePaper.Plane.Induction.SheetFort
 import FLatticePaper.Plane.Induction.ScheduleClosure
 import FLatticePaper.Plane.Induction.StripsM
 import FLatticePaper.Plane.Induction.KMinBridge
+import FLatticePaper.Plane.Induction.PassagePR
+import FLatticePaper.Plane.Induction.MinPassage
 
 /-! Root import for the corrected F-lattice paper. -/
