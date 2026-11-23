@@ -1,78 +1,77 @@
 import FLatticePaper.Construction.OddCovering
 import FLatticePaper.Plane.Induction.TwosInduction
 
-/-! Task 37, steps 2 and 3: nominal agreement of the odd ordinary standard copies with the odd plane target.
+/-! Task 37, steps 2-3: nominal agreement of the odd ordinary standard copies with the odd plane target.
 
-The odd output of a word `w` is the six copies `placedBySlot (standardJets w .odd) (standardSources parents .odd)`. The
-powers of two `IsTwoPow w` are excluded: their odd outputs come from the base registers of the pure runs, not from the
-ordinary schedule (the lead's decision), so the statement carries the hypothesis `¬ IsTwoPow w`.
+The odd output of a word `w` is the six copies `placedBySlot (standardJets w .odd) (standardSources parents .odd)`, and the
+powers of two `IsTwoPow w` are excluded (the lead's decision: their odd outputs come from the base registers of the pure
+runs). Each donor tile sits at a chart: its agreement is with the target translated by the jet of its donor slot
+`donorSlot slot` (slots 0-3 use the even donor, whose chart is the jet of slot 0; slots 4, 5 the odd donor, whose chart is
+the jet of slot 4). The copy of a slot is the donor placed at its own jet `J`, so its heights are the target translated by
+`J.1 - chart` plus the slope `J.2`. It agrees with the target exactly when that residual is constant on the copy sites.
 
-Proved here: a copy with a zero jet is its donor (`copy_of_zero_jet`), so phase zero slot zero and phase one slot four
-are the donor agreements `hEven` and `hOdd`. The remaining slots, with non-zero offsets, are the named input `hrest`; the
-offset algebra for them needs the representative route of step 1 and the sheet identity on the conjugate polygon, and is
-not a translation identity on all sites (checked numerically; see the report). -/
+Proved here: the residual is zero for the two slots that are their own donor slot (slots 0 and 4), so these copies agree
+outright from the chart inputs. For the slots 1, 2, 3, 5 the residual is the named input `hres`: a translation identity of
+the odd target on the copy sites (it does not hold on all sites; see the report). -/
 
 namespace FLatticePaper.Construction
 
 open Farey HeightTile FLatticePaper.Induction
 
-/-- The odd standard jet of slot zero is zero in phase zero. -/
-theorem standardJets_odd_zero_of_phase_zero (word : Word) (h : phase word = 0) :
-    standardJets word .odd 0 = 0 := by
-  unfold standardJets
-  simp [h, doubleFirst]
+/-- The donor slot of a slot: the chart of its donor is the jet of this slot. Slots 0-3 use the even donor (slot 0),
+slots 4, 5 the odd donor (slot 4). -/
+def donorSlot : Fin 6 → Fin 6 := ![0, 0, 0, 0, 4, 4]
 
-/-- The odd standard jet of slot four is zero in phase one. -/
-theorem standardJets_odd_four_of_phase_one (word : Word) (h : phase word = 1) :
-    standardJets word .odd 4 = 0 := by
-  unfold standardJets
-  simp [h, doubleFirst]
+/-- The slope of the odd standard jet of a slot that is its own donor slot is zero. -/
+theorem standardJets_odd_slope_zero (word : Word) (s : Fin 6) (hs : donorSlot s = s) :
+    (standardJets word .odd s).2 = 0 := by
+  have hs' : s = 0 ∨ s = 4 := by
+    fin_cases s <;> simp_all [donorSlot]
+  rcases hs' with rfl | rfl <;> unfold standardJets <;> by_cases hp : phase word = 0 <;>
+    simp [hp, doubleFirst, kernelJet]
 
-/-- A copy with a zero jet is its donor: the agreement passes through the placement unchanged. -/
-theorem copy_of_zero_jet (parents : TileParents) (word : Word) (parity : Parity) (slot : Fin 6)
-    {target : FLatticePaper.Site → ℤ} {g : ℤ} (hz : standardJets word parity slot = 0)
-    (hd : (standardSources parents parity slot).val.Agrees target g) :
-    (ordinaryStandardCopy parents word parity slot).val.Agrees target g := by
-  have h := hd.place 0 0
-  unfold ordinaryStandardCopy placedBySlot TileJet.place
-  rw [hz]
-  simpa [NonemptyTile.place] using h
+/-- Placing a donor with its jet agrees with the target when the residual is constant on the copy sites. -/
+theorem copy_agrees_of_residual (parents : TileParents) (word : Word) (slot : Fin 6) (chart : Site) {g : ℤ}
+    (hd : (standardSources parents .odd slot).val.Agrees (fun x => planeTarget word .odd (x + chart)) g)
+    (hres : ∃ c : ℤ, ∀ x ∈ (ordinaryStandardCopy parents word .odd slot).val.sites,
+      planeTarget word .odd (x - (standardJets word .odd slot).1 + chart) +
+        ((standardJets word .odd slot).2.1 * x.1 + (standardJets word .odd slot).2.2 * x.2) =
+        planeTarget word .odd x + c) :
+    ∃ g' : ℤ, (ordinaryStandardCopy parents word .odd slot).val.Agrees (planeTarget word .odd) g' := by
+  obtain ⟨c, hc⟩ := hres
+  refine ⟨g + c, ?_⟩
+  unfold ordinaryStandardCopy placedBySlot TileJet.place NonemptyTile.place
+  intro x
+  have h := (hd.place (standardJets word .odd slot).1 (standardJets word .odd slot).2) x
+  have hx := hc x.1 x.2
+  dsimp only at h
+  rw [h]
+  linarith
 
-/-- Step 2, the two zero-offset slots of the odd output: slot zero in phase zero is the even donor, and slot four in
-phase one is the odd donor, both agreeing with the odd plane target. -/
-theorem odd_copy_zero_offset_agrees (parents : TileParents) (word : Word)
-    (hEven : phase word = 0 → ∃ g : ℤ, parents.even.val.Agrees (planeTarget word .odd) g)
-    (hOdd : phase word = 1 → ∃ g : ℤ, parents.odd.val.Agrees (planeTarget word .odd) g) :
-    (phase word = 0 → ∃ g : ℤ, (ordinaryStandardCopy parents word .odd 0).val.Agrees
-      (planeTarget word .odd) g) ∧
-    (phase word = 1 → ∃ g : ℤ, (ordinaryStandardCopy parents word .odd 4).val.Agrees
-      (planeTarget word .odd) g) := by
-  constructor
-  · intro h
-    obtain ⟨g, hg⟩ := hEven h
-    exact ⟨g, copy_of_zero_jet parents word .odd 0 (standardJets_odd_zero_of_phase_zero word h) hg⟩
-  · intro h
-    obtain ⟨g, hg⟩ := hOdd h
-    exact ⟨g, copy_of_zero_jet parents word .odd 4 (standardJets_odd_four_of_phase_one word h) hg⟩
-
-/-- **Step 3: nominal agreement of the six copies of an odd ordinary standard output with the odd plane target, for
-every word except the powers of two.** The two zero-offset copies are discharged from the donor agreements `hEven`
-(phase zero, slot zero) and `hOdd` (phase one, slot four). The four remaining copies of each phase have non-zero offsets
-and are the named input `hrest`, for words that are not powers of two. -/
+/-- Step 3: nominal agreement of the six copies of an odd ordinary standard output with the odd plane target, for every
+word that is not a power of two. The donors are given at their charts (`hDonor`); the copies of slots 0 and 4 are
+discharged; the copies of slots 1, 2, 3, 5 are the named residual identities `hres` on their copy sites. -/
 theorem ordinaryStandard_nominal_odd (parents : TileParents) (word : Word) (hnot : ¬ IsTwoPow word)
-    (hEven : phase word = 0 → ∃ g : ℤ, parents.even.val.Agrees (planeTarget word .odd) g)
-    (hOdd : phase word = 1 → ∃ g : ℤ, parents.odd.val.Agrees (planeTarget word .odd) g)
-    (hrest : ¬ IsTwoPow word → ∀ slot : Fin 6,
-      ¬ ((phase word = 0 ∧ slot = 0) ∨ (phase word = 1 ∧ slot = 4)) →
-        ∃ g : ℤ, (ordinaryStandardCopy parents word .odd slot).val.Agrees (planeTarget word .odd) g) :
+    (hDonor : ∀ slot : Fin 6, ∃ g : ℤ, (standardSources parents .odd slot).val.Agrees
+      (fun x => planeTarget word .odd (x + (standardJets word .odd (donorSlot slot)).1)) g)
+    (hres : ¬ IsTwoPow word → ∀ slot : Fin 6, donorSlot slot ≠ slot → ∃ c : ℤ,
+      ∀ x ∈ (ordinaryStandardCopy parents word .odd slot).val.sites,
+        planeTarget word .odd (x - (standardJets word .odd slot).1 +
+            (standardJets word .odd (donorSlot slot)).1) +
+          ((standardJets word .odd slot).2.1 * x.1 + (standardJets word .odd slot).2.2 * x.2) =
+        planeTarget word .odd x + c) :
     ∀ slot : Fin 6, ∃ g : ℤ, (ordinaryStandardCopy parents word .odd slot).val.Agrees
       (planeTarget word .odd) g := by
-  obtain ⟨hz0, hz4⟩ := odd_copy_zero_offset_agrees parents word hEven hOdd
   intro slot
-  by_cases hzero : (phase word = 0 ∧ slot = 0) ∨ (phase word = 1 ∧ slot = 4)
-  · rcases hzero with ⟨h, rfl⟩ | ⟨h, rfl⟩
-    · exact hz0 h
-    · exact hz4 h
-  · exact hrest hnot slot hzero
+  by_cases h : donorSlot slot = slot
+  · obtain ⟨g, hg⟩ := hDonor slot
+    rw [h] at hg
+    have hs := standardJets_odd_slope_zero word slot h
+    have h1 : (standardJets word .odd slot).2.1 = 0 := by simpa using congrArg Prod.fst hs
+    have h2 : (standardJets word .odd slot).2.2 = 0 := by simpa using congrArg Prod.snd hs
+    exact copy_agrees_of_residual parents word slot (standardJets word .odd slot).1 hg
+      ⟨0, fun x _ => by simp [h1, h2]⟩
+  · obtain ⟨g, hg⟩ := hDonor slot
+    exact copy_agrees_of_residual parents word slot _ hg (hres hnot slot h)
 
 end FLatticePaper.Construction
