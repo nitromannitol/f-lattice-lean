@@ -1,0 +1,6 @@
+import FLatticePaper.Plane.Induction.I3Application
+
+#print axioms FLatticePaper.Induction.i3_chainPotential_unit_of_frame
+#print axioms FLatticePaper.Induction.i3_chainPotential_unit_of_strong
+#print axioms FLatticePaper.Induction.ChildFrame.i3_laplacian_chainSheet
+#print axioms FLatticePaper.Induction.ChildFrame.i3_noCrossStars_shift
