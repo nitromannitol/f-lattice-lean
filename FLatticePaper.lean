@@ -352,6 +352,8 @@ import FLatticePaper.Plane.Induction.NonfreeRoot
 import FLatticePaper.Plane.Induction.ShortPassages
 import FLatticePaper.Plane.Induction.FreeTraceBox
 import FLatticePaper.Plane.Induction.CanonicalDirections
+import FLatticePaper.Plane.Induction.RouteSteps
+import FLatticePaper.Plane.Induction.CutTipEscape
 import FLatticePaper.Plane.Induction.HWeb
 import FLatticePaper.Plane.Induction.W1Collar
 import FLatticePaper.Plane.Induction.W1CollarBox
