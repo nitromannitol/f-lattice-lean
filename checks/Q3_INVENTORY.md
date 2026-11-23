@@ -420,3 +420,14 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - PROVED `FLatticePaper.Induction.strictInterior_nonfree`: a site of `StrictInterior` (parity-resolved `b − T < t < a`, `h < s < T + c`) is nonfree. The H trace: the windows of `avoid_H_even_low` / `avoid_H_odd_low` exclude every translate `t − jT`. The V trace: a free V translate `s + iT` lies in the parity range of `E` and in `vSpectrum`; odd strict interior points and even ones with `s > L − 2` are excluded for every `i`; even ones with `s ≤ L − 2` are the exceptional case: `i = 0`, `j = 0` (other `j` leave `E`), and the left neighbour lies in `E`.
 - Checks: `checks/StrictNonfree.lean`. Root build clean; sandbox logs clean.
 - Not in this step: links 2 and 3 of case (b).
+
+### Task 72 (case (b), link 2: conjugate coordinates at the old root): ConjFreeRoot.lean
+
+- PROVED `conj_tGrade_zTurn`: `t_c(zTurn x) = (d_p + n_p) − s_p(x)`; `conj_sGrade_zTurn`: `s_c(zTurn x) = 2 (t_p(x) − n_p)`; `conj_periodDenominator`: `T_c = 2 T_p` (`oddParentPeriod`). Conjugate child is `rotate(odd)`, so `conj_child_num_den` applies.
+- PROVED `conj_freeV_hweb`: a free conjugate V site `zTurn x + combine i j` gives `HRootWeb (n_p) (d_p) (t_p x + i T_p)`.
+- PROVED `parentTGrade_translate_V`: `t_p(x − iV_p) = t_p x + i T_p`.
+- PROVED `jumpA_zero_of_strip`: `1 − d_p ≤ t_p x ∧ t_p x + 1 ≤ n_p + 2 d_p − 1` gives `jumpA x = 0`.
+- PROVED `H_translate_drop_excluded`: with `jumpA x = 1`, `jumpA y = 0`, `HRootWeb (t_p x + i T_p)` and the neighbour zero strip `hsy` at `t_p y + i T_p`, we get `False` (the translation by `−iV_p` shifts `a` by `−i` at both points, so `a(x) = a(y) = i`).
+- OPEN INPUT `hsy`: the neighbour zero strip is not automatic from HRootWeb arithmetic (brute force, scratchpad/neighbour_strip.py): it fails for a `+D` step from a regular value (top `N+D−1`), a `+D` or `+N` step from `N+D`, and a `−D` step from `0`.
+- Checks: `checks/ConjFreeRoot.lean` (guards). Root build clean; sandbox logs clean.
+- Not in this step: the freeH case of the conjugate free site (V-block, link 3).
