@@ -1,0 +1,4 @@
+import FLatticePaper.Tiles.StandardPacking
+
+#print axioms FLatticePaper.Tiles.StandardDischarge.clauseA_standard_odd_of_boundary
+#print axioms FLatticePaper.Tiles.StandardDischarge.clauseA_standard_even_of_boundary
