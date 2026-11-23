@@ -452,3 +452,10 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - PROVED `H_drop_regular`: with the H-web at the root, `jump x = 1`, `jump y = 0`, the neighbour step by parity, and `u ≠ N+D`, the configuration is impossible (root zero gives `1 − i = 0`, neighbour zero gives `−i = 0`).
 - Residual: `u = N+D` (exceptional H root), where the regular bands fail only for an even root with `+N` step at `D = N+1` and an odd root with `+D` step at `N = 1`. This is link 3.
 - Checks: `checks/NeighbourDrop.lean` (guards). Root build clean; sandbox logs clean.
+
+### Task 72 (link 3 residual, numerical check): scripts/rising_pair_check.py
+
+- Question: does a rising tied configuration (RisingBlackPair with shift −σ, tie at the centre) ever have its old root at `t_p = N+D` or `D+1`?
+- Answer (words over {1,2,3} of length ≤ 4, 112 words, both shift signs): the slip increment `(F i − F(i+σ)) − (F c − F(c+σ))` over all black centres `c` (lap = −1, `(F c − F(c+σ))` odd, `lap F (c+σ) = −1`) and their inputs `i` is `0` in every one of the 32930 (+σ) and 31766 (−σ) cases. No rising black pair exists, so the residual `u = N+D` never occurs on these fields.
+- Consequence: the residual is excluded by the rising-pair statement itself (`NoBlackPairRise`, `OddRise.lean`: slip increment `≠ 1` at black pairs). A Lean proof of the residual needs that exclusion as a local fact; not yet derived from `W1_CONSTRUCTOR` §4.
+- Not committed Lean: no change to the Lean sources in this step.
