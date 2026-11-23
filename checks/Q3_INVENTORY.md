@@ -368,3 +368,21 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - Whiteness of the root and middle comes from `TipVertex.W1_tip_white_of_eps` (no hypothesis).
 - NOT PROVED: the W0 middle (sheet evaluation), the permits from the sheet gap, and the boundary profiles themselves.
 - Checks: `checks/TipEscape.lean`. Root build clean; sandbox logs clean.
+
+### Task 72 (TIP_THEOREM, the W0 middle through the sheets): W0Sheets.lean
+
+- PROVED the V_p jet `W0Sheets.quarterTurnField_add_tipVertex`: `Fp (x + V_p) = Fp x + (harmonicGrid (x + V_p) − harmonicGrid x)` for `Fp = quarterTurnField (standardField (conjWord w))`. The quarter turn sends `V_p` to minus the conjugate kernel `(d_p + n_p, d_p − n_p)`; `G` is periodic along it with constant `0` (`coherentConstantU_eq_zero`).
+- PROVED the harmonic translations `harmonicGrid_add_tipVertex` (`+V_p`, constant `s` with `2s = −n_p − d_p − T_p`), `harmonicGrid_sub_Vq` (`−V_q`), and `harmonicGrid_two_one`.
+- PROVED the sheet identities at `eps = −1`: `sheetA_of_eps` (`Fp(z − U_q)`), `sheetC_of_eps` (`Fp(z − V_q) + a_q·z + c_e`), with `sheetShift = U_q`, `sheetOffset = V_q − U_q`, `sheetConstant = (T_q − d_q − n_q)/2`.
+- PROVED `tipEast_mem`: `(2,1) + V_p` is in the closed polygon (odd branch).
+- PROVED `tipEast_standard`: `standardField word ((2,1) + V_p) = harmonicGrid ((2,1) + V_p)`, via `standardField_eq_sheetMin_of_strong`; the first sheet uses the parent zero band at `(2,1) − U_q` (`zeroStrip_of_strong`, with `parentTGrade = 2n_p − d_p + 1`), the second the odd parent harmonic band at `(2,1) − V_q` (`W1Hstrong.hStrong_of_strong`, with `parentSGrade = 3d_p + n_p − 2`), and `np ≤ dp − 1` from the child's properness.
+- PROVED `W0_middle_white`: `laplacian (standardField word) (V_p + (1,1)) = 0`, from the harmonic strip (for the middle and its west input, `s = −2 + 2d` and `s = −2 + c`) and `tipEast_standard` (the east input). This closes the W0 middle of TIP_THEOREM.
+- Hypotheses: `h`, `StrongEstimates (conjWord word)`, `SeedFields (conjWord word)`, `(frameAt word).Packet (standardField word)`, `eps = −1`, and the nonbase bounds `0 ≤ tipB`, `5L ≤ T − tipB`.
+- Checks: `checks/W0Sheets.lean`. Root build clean; sandbox logs clean.
+- Also fixed: `FLatticePaper.lean` was missing the `TipEscape` import; added with `W0Sheets`.
+
+### Task 72 (queue Q16, the one-input tie): TieOneInput.lean
+
+- PROVED `FLatticePaper.other_input_of_tie`: at a black minimum `M = min(A, C)` with `M c = A c`, `M i = A i` and `A` white at `c`, the other input `j` has `C j = A j − 1` (`Ψ j = −1`). This is the algebraic identity `ΔA − ΔM = 1` on the star; no policy is used.
+- NOT PROVED: `hResP` and `hResN` (the leaves of `TieReduce.tie_excluded_of_narrow`). Still needed: the A-policy retention at the tied centre (from the `Ψ j = −1` input and `sheetDiff_mono_A`), the rising-pair slip increment and the old-root cases (`nonfree_drop_excluded`, Q3's H-star and V-star estimates), and the exceptional endpoint (Q19).
+- Checks: `checks/TieOneInput.lean`. Sandbox logs clean.
