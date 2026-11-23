@@ -566,3 +566,34 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - Corrected the arc rule. `BottomArc` is now the direct free-H witness only; the V-translate witness is `TopArc` with the lower-right square `squareCorners c.1 (c.2 − 1)` (`top_centre_mem`). The earlier merged definition put the top arc into the bottom square, which fails for odd top centres (numerics with the corrected box: 33 failures at word length 3).
 - Numerics with the corrected box (words ≤ 3): pure classes B → upper-left, T → lower-right, L → upper-right, R → lower-left, with every strict corner strict. The mixed classes BL, BR, TL, TR (33 each) are the four black corners and are excluded by laplacian 0.
 - Checks: `checks/CollarGlue.lean` (unchanged). Root build clean; sandbox logs clean.
+
+### Task 72 (hcollar, band (a), H-arc upper bounds): CollarUpper.lean
+
+- PROVED `L_mul_sGrade`: `L · s(x) = (x₁ + x₂) · T + 2 n · t(x)` for every site.
+- PROVED `even_H_k_bounds`: an even H point of the closed polygon has `x₁ + x₂ ≤ L − 2`, and `x₁ + x₂ = L − 2` forces `(d − 1, n − 1)`.
+- PROVED `odd_H_k_bounds`: an odd H point has `x₁ + x₂ ≤ L − 1`, and `x₁ + x₂ = L − 1` forces `(d, n − 1)`.
+- Checks: `checks/CollarUpper.lean`. Root build clean; sandbox logs clean.
+
+### Task 72 (hcollar, band (a), bottom direct cases): CollarBottomCases.lean
+
+- PROVED `strict_even_iff`, `strict_odd_iff`: the `StrictInterior` predicate in explicit grade form (even: `L − 2 − T < t`, `t < 2`, `2n < s`, `s < T` with `L = d + n`; odd: `d − T < t < n`, `L − 2 < s < T + 2 − d + n`).
+- PROVED `even_H_l1`: an even H point with `x₁ + x₂ = 2` is `(2, 0)`.
+- PROVED `odd_H_cases`: an odd H point is `(1, 0)`, `(3, 0)`, or has `s(v) > 3L`.
+- PROVED `even_direct_arith`: for an even strict centre `c ≠ (1,1)` with an even H witness `v`, `|c − v|∞ ≤ 1`, the band `2L − 2 < s(c) ≤ T − 2d + 2n + 1` and `2 − L ≤ t(c) ≤ 0` hold.
+- PROVED `odd_direct_even_arith`: for an odd strict centre with an even H witness, `L + 2n < s(c) ≤ T − d + n − 1` and `−d ≤ t(c) ≤ n − 2`.
+- Still open for the direct bottom band: the even-centre/odd-witness and odd-centre/odd-witness cores, the four-corner step (the collar square of a bottom centre is `squareCorners (c1−1) c2`, so all four corners need strictness; the corners follow from the centre band and `T > 3(d+n)`), and the glue to `collarBase`.
+- Checks: `checks/CollarBottomCases.lean`. Root build clean; sandbox logs clean.
+- Statement change (CollarGlue.lean): `hstrict` now assumes `StrictInterior c` for the centre. `hcollar_of_chains` already had a strict centre (its argument `_hcS` was unused), and the numerics show that laplacian-0 collar centres need not be strict (e.g. `(0,0)` for child `(1,3)` with the lattice-free collar predicate), so the strict premise is the honest hypothesis. The consumer's `hcollar` conclusion is unchanged.
+- PROVED `even_direct_odd_arith` (even strict centre, odd H witness): `v = (1,0)` is excluded by strictness and `c ≠ (1,1)`; otherwise `s(v) ≥ 3L`, and the even band follows.
+- PROVED `odd_direct_odd_arith` (odd strict centre, odd H witness with `v = (1,0)`, `(3,0)` or `s(v) > 3L`): the odd band `L + 2n < s(c) ≤ T − d + n − 1`, `−d ≤ t(c) ≤ n − 2`.
+- Helpers: `t_parity` (`t(a,b) ≡ a + b mod 2` for odd `n`, `d`), `s_le_even` (`L s = kT + 2nt`, `k ≤ L − 2`, `t ≤ 0` give `s ≤ T − 2d + 2n + 1`), `s_le_odd` (`k ≤ L − 1`, `t ≤ n − 2` give `s ≤ T − d + n − 1`).
+- Checks: `checks/CollarBottomCases.lean`. Root build clean; sandbox logs clean.
+- Next: the four-corner step (corners of `squareCorners (c1−1) c2` are strict given the centre band and `T > 3(d+n)`), then the glue to `collarBase` (class B) and the top, left and right classes.
+
+### Task 72 (hcollar, band (a), bottom class): CollarBottomSquare.lean
+
+- PROVED `band_even_of_witness` and `band_odd_of_witness`: a strict centre `c` (not `(1,1)` when even) with a free H witness `v`, `|v − c|∞ ≤ 1`, has the even band `2L − 2 < s(c) ≤ T − 2d + 2n + 1`, `2 − L ≤ t(c) ≤ 0`, or the odd band `L + 2n < s(c) ≤ T − d + n − 1`, `−d ≤ t(c) ≤ n − 2`. The witness parity selects the direct core (EE, EO, OE, OO). Helpers `even_t_lower`, `odd_t_range` read the spectrum with the parity identity.
+- PROVED `corners_of_even`, `corners_of_odd`: the four corners of `squareCorners (c1 − 1) c2` are strict under the band and `T > 3(d + n)` (`T_gt`).
+- PROVED `bottom_square_strict`: a strict bottom centre `c ≠ (1,1)` with `BottomArc` has `∀ c' ∈ squareCorners (c1 − 1) c2, StrictInterior c'`. This is the bottom (class B) part of `hstrict`.
+- Checks: `checks/CollarBottomSquare.lean`. Root build clean; sandbox logs clean.
+- Still open for hstrict: the top class (reflection `z ↦ R − z`), the left and right classes, the mixed classes (black, excluded by laplacian 0), and the glue `collarBase` case split.
