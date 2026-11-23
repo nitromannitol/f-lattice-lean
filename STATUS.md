@@ -384,6 +384,8 @@ lake env lean checks/PairBoxesP0Axioms.lean
 lake env lean checks/PairBoxesP0EvenAxioms.lean
 lake env lean checks/PairOwnerP0Axioms.lean
 lake env lean checks/PairQAboxAxioms.lean
+lake env lean checks/PairQBBoxAxioms.lean
+lake env lean checks/PairCoverW1Axioms.lean
 lake env lean checks/VArcLongitudinal.lean
 lake env lean checks/VArcOffers.lean
 lake env lean checks/ParentStepDischarge.lean
