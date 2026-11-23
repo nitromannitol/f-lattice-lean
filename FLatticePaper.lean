@@ -441,5 +441,6 @@ import FLatticePaper.Plane.Induction.W1NonfreeOut
 import FLatticePaper.Plane.Induction.W1NonfreeSheet
 import FLatticePaper.Plane.Induction.W1NonfreeHsq
 import FLatticePaper.Plane.Induction.W1NonfreeHsqNonneg
+import FLatticePaper.Plane.Induction.W1NonfreeHsqC
 
 /-! Root import for the corrected F-lattice paper. -/
