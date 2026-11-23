@@ -2,6 +2,7 @@ import FLatticePaper.Plane.Induction.ZoneCase
 import FLatticePaper.Plane.Induction.StrongEstimates
 import FLatticePaper.Plane.Induction.PolygonGeometry
 import FLatticePaper.Plane.Induction.Packet
+import FLatticePaper.Plane.Induction.ZeroRegion
 
 /-! # The frame-level facts of the zone of I1 (task 49, the wrapper of step (d))
 
@@ -156,6 +157,50 @@ theorem det_conj (U : ChildFrame) (N D : ℤ) (hb : U.child.num = D - N) (hr : U
     ring
   rw [he, ← hb, ← hr, hcn, hcd]
   ring
+
+theorem child_num_eq (V : ChildFrame) : V.child.num = 2 * V.parents.odd.num + V.parents.even.num := by
+  unfold ChildFrame.child Parents.current Parents.combine
+  ring
+
+theorem child_den_eq (V : ChildFrame) : V.child.den = 2 * V.parents.odd.den + V.parents.even.den := by
+  unfold ChildFrame.child Parents.current Parents.combine
+  ring
+
+theorem eps_eq (V : ChildFrame) :
+    V.eps = V.parents.odd.num * V.parents.even.den - V.parents.even.num * V.parents.odd.den := by
+  unfold ChildFrame.eps Fraction.det
+  ring
+
+/-- The four bounds of the zone box, from the closed polygon of the word (both parities). -/
+theorem closed_bounds (V : ChildFrame) (z : Site) (hz : z ∈ V.closedPolygon) :
+    V.child.num * z.1 - V.child.den * z.2 ≤ V.child.den + V.child.num - 1 ∧
+    2 - V.child.den + V.child.num ≤ (V.child.den + V.child.num) * z.1 + (V.child.den - V.child.num) * z.2 ∧
+    (V.child.den + V.child.num) * z.1 + (V.child.den - V.child.num) * z.2
+      ≤ V.child.den * V.child.den + 2 * V.child.den * V.child.num - V.child.num * V.child.num
+        + V.child.den + V.child.num - 2 := by
+  obtain ⟨hn0, hnd, hdn, hd3, hT⟩ := V.child_facts
+  simp only [ChildFrame.closedPolygon, Set.mem_setOf_eq] at hz
+  unfold ChildFrame.tGrade at *
+  by_cases he : EvenSite z
+  · rw [if_pos he] at hz
+    obtain ⟨h1, h2, h3, h4⟩ := hz
+    rw [hT] at h1 h4
+    unfold ChildFrame.sGrade at h3 h4
+    refine ⟨by nlinarith, by nlinarith, by nlinarith⟩
+  · rw [if_neg he] at hz
+    obtain ⟨h1, h2, h3, h4⟩ := hz
+    rw [hT] at h1
+    unfold ChildFrame.sGrade at h3 h4
+    refine ⟨by nlinarith, by nlinarith, by nlinarith⟩
+
+/-- The zone box: `t(z) ≥ 1 − d` on the closed polygon of the word forces `0 ≤ z₁ ≤ d`, `0 ≤ z₂ ≤ n`. -/
+theorem box_of_closed (V : ChildFrame) (z : Site) (hz : z ∈ V.closedPolygon)
+    (ht : 1 - V.child.den ≤ V.tGrade z) :
+    0 ≤ z.1 ∧ z.1 ≤ V.child.den ∧ 0 ≤ z.2 ∧ z.2 ≤ V.child.num := by
+  obtain ⟨hn0, hnd, -, -, -⟩ := V.child_facts
+  obtain ⟨b1, b2, b3⟩ := closed_bounds V z hz
+  unfold ChildFrame.tGrade at ht
+  exact ZeroRegion.zeroRegion_box V.child.num V.child.den z.1 z.2 hn0 hnd ht b1 b2 b3
 
 end ZoneI1
 
