@@ -3,6 +3,8 @@ import FLatticePaper.Plane.Induction.W1MReflect
 import FLatticePaper.Plane.Induction.W1MRank
 import FLatticePaper.Plane.Induction.W1Hagree
 import FLatticePaper.Plane.Induction.SheetReflection
+import FLatticePaper.Plane.Induction.W1Inherited
+import FLatticePaper.Plane.Induction.W1SheetSquare
 
 /-! # Task 85 (final): hagree at M-white ties, from the A descent and the centre reflection
 
@@ -138,5 +140,25 @@ theorem hagree_M_tie (word : Word) (h : ∃ x ∈ word, x ≠ Digit.three)
     pointerOf_eq_of _ c o p0 ho hp0in hRo hrej hop0
   rw [hpt]
   exact hCo
+
+/-- **hagree at M-white ties from the inherited policy** (task 86). For the policy data `P : OldPolicyRanked` of the conjugate (quota,
+monotonicity, base rank, strict rank), the C policy retains the A pointer at every M-white tie, given the parent square data `hpar` at
+the M-white ties. The quota, the chain monotonicity and the `(−1, 2η)` increments are inherited (`P.quota`, `P.chainNonincreasing`,
+`rankIncr_two_of_ranked`); the exchange is the packet's (`sheetExchange_of_packet`); the square data is `sheet_square_of_parent`. -/
+theorem hagree_M_tie_of_ranked (word : Word) (h : ∃ x ∈ word, x ≠ Digit.three)
+    (hSE : StrongEstimates (conjWord word)) {seed : Site → Site → Prop}
+    (P : FLatticePaper.W1Phase.OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    (hpar : ∀ c : Site, (frameAt word).sheetC (FqW word) c = (frameAt word).sheetA (FqW word) c →
+      laplacian (MW word) c = 0 →
+      FLatticePaper.W1SheetSquare.ParentSquare P.retained (zTurn (c - (frameAt word).sheetShift))) :
+    ∀ c : Site, (frameAt word).sheetC (FqW word) c = (frameAt word).sheetA (FqW word) c →
+      laplacian (MW word) c = 0 →
+      sheetQC P.retained (frameAt word).sheetShift (frameAt word).centre c
+        (FLatticePaper.W1Pointers.pointerOf (sheetQ P.retained (frameAt word).sheetShift) c) :=
+  hagree_M_tie word h hSE P.retained P.quota
+    (P.chainNonincreasing (frameAt word).eps (frameAt word).eps_unit)
+    (FLatticePaper.W1Inherited.rankIncr_two_of_ranked P (child_det_ne_zero (conjWord word)) hSE.priceDrift hSE.slipDrift
+      (frameAt word).eps_unit)
+    (fun c hT hM => FLatticePaper.W1SheetSquare.sheet_square_of_parent (frameAt word).evenSite_sheetShift c (hpar c hT hM))
 
 end FLatticePaper.W1MFinal
