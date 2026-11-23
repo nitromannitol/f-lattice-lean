@@ -270,6 +270,7 @@ import FLatticePaper.Plane.Induction.SquareClauses
 import FLatticePaper.Tiles.PackAssembly
 import FLatticePaper.Tiles.StandardPacking
 import FLatticePaper.Tiles.IncrementCounts
+import FLatticePaper.Tiles.SiteStrings
 import FLatticePaper.Plane.Induction.S3FreeBoundary
 import FLatticePaper.Plane.Induction.ParentCoordinates
 import FLatticePaper.Plane.Induction.Q3Arithmetic
@@ -292,10 +293,16 @@ import FLatticePaper.Plane.Induction.W1Hc
 import FLatticePaper.Plane.Induction.W1Vside
 import FLatticePaper.Plane.Induction.W1Hexc
 import FLatticePaper.Plane.Induction.W1Hstrong
+import FLatticePaper.Plane.Induction.W1Oddchild
 import FLatticePaper.Plane.Induction.Q3Field
 import FLatticePaper.Plane.Induction.Q3Paragraph8
 import FLatticePaper.Plane.Induction.Q3VStar
 import FLatticePaper.Plane.Induction.Q3Para10
 import FLatticePaper.Plane.Induction.Q3White
+import FLatticePaper.Plane.Induction.Q3Rise
+import FLatticePaper.Plane.Induction.OldPolicy
+import FLatticePaper.Plane.Induction.NoBlackPair
+import FLatticePaper.Plane.Induction.MatchedPolicy
+import FLatticePaper.Plane.Induction.SheetCases
 
 /-! Root import for the corrected F-lattice paper. -/
