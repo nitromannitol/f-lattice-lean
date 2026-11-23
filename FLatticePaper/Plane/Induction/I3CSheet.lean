@@ -188,4 +188,121 @@ theorem i3_permitC_of_strong {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.thr
     · exact Or.inl (hsub c _ a)
     · exact Or.inr (hsub c _ b)
 
+theorem i3_tGrade_add (frame : ChildFrame) (x k : Site) :
+    frame.tGrade (x + k) - frame.tGrade x = frame.child.num * k.1 - frame.child.den * k.2 := by
+  unfold ChildFrame.tGrade
+  simp only [Prod.fst_add, Prod.snd_add]
+  ring
+
+theorem i3_odd_modifiedDeck_kernel (f : Fraction) (hodd : f.Odd) :
+    f.modifiedDeck.kernel = (2 * f.den, 2 * f.num) := by
+  have hm : f.periodMultiplicity = 2 := by
+    unfold Fraction.periodMultiplicity
+    have h1 : (f.num + f.den) % 2 = 1 := hodd
+    exact if_neg (by omega)
+  simp only [Fraction.modifiedDeck, hm]
+
+theorem i3_odd_modifiedDeck_transverse (f : Fraction) :
+    f.modifiedDeck.transverse = (f.num - f.den, f.num + f.den) := by
+  simp only [Fraction.modifiedDeck, Fraction.unmodifiedDeck]
+
+theorem i3_child_num (word : Word) :
+    (frameAt word).child.num = 2 * (parentsAt word).odd.num + (parentsAt word).even.num := by
+  show 2 * (parentsAt word).odd.num + 1 * (parentsAt word).even.num = _
+  ring
+
+theorem i3_child_den (word : Word) :
+    (frameAt word).child.den = 2 * (parentsAt word).odd.den + (parentsAt word).even.den := by
+  show 2 * (parentsAt word).odd.den + 1 * (parentsAt word).even.den = _
+  ring
+
+/-- **The restricted no-fort condition of the C sheet** (the field `noC`): the reflected chain rank with weights `(a_*, 2)`
+has increments `−2η` and `−a_*` along the odd deck, which are the increments of `tGrade` (from `eps = N d − D n`). -/
+theorem i3_noC_of_strong {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (h : StrongEstimates (conjWord word)) :
+    RestrictedNoFort (quarterTurnField (standardField (conjWord word))) (frameAt word).tGrade
+      (fun c i => sheetChainPotential word (standardField (conjWord word)) (c + (frameAt word).sheetOffset) ≤
+        sheetChainPotential word (standardField (conjWord word)) (i + (frameAt word).sheetOffset)) := by
+  have hη := (frameAt word).eps_unit
+  obtain ⟨cp, hmH, hqH, hrank⟩ := h.chain_data (frameAt word).eps hη
+  obtain ⟨K', hid⟩ := i3_chainSheet_identity hw h.packet
+  have he := i3_evenSite_sheetOffset word
+  have hsl : ∀ c, laplacian (fun x => (frameAt word).siblingSlope (x + (frameAt word).sheetOffset)) c = 0 :=
+    fun c => i3_laplacian_siblingSlope_shift (frameAt word) _ c
+  have hlap := fun c => i3_laplacian_shift_of_identity he hsl hid c
+  have hT := i3_retainQuota_shift_Z (R := ReflectedPolicy (frameAt (conjWord word)).centre
+    ((frameAt word).eps • (frameAt (conjWord word)).shortShift - (frameAt (conjWord word)).parentShift) cp) he hlap hqH
+  have hodd : (parentsAt word).odd.Odd := (parentsAt_valid word).odd_parity
+  have hbnd := (parentsAt_valid word).odd_bounds
+  have hebnd := (parentsAt_valid word).even_bounds
+  have hcn := i3_child_num word
+  have hcd := i3_child_den word
+  have hpos_a : 0 < (frameAt word).child.den * ((parentsAt word).odd.den + (parentsAt word).odd.num) +
+      (frameAt word).child.num * ((parentsAt word).odd.den - (parentsAt word).odd.num) := by
+    rw [hcn, hcd]
+    obtain ⟨hD, hN0, hNle⟩ := hbnd
+    obtain ⟨hd, hn0, hnle⟩ := hebnd
+    have h1 : 0 ≤ (2 * (parentsAt word).odd.num + (parentsAt word).even.num) *
+        ((parentsAt word).odd.den - (parentsAt word).odd.num) :=
+      mul_nonneg (by linarith) (by linarith)
+    have h2 : 0 < (2 * (parentsAt word).odd.den + (parentsAt word).even.den) *
+        ((parentsAt word).odd.den + (parentsAt word).odd.num) :=
+      mul_pos (by linarith) (by linarith)
+    nlinarith
+  obtain ⟨rk, lam, hlam, hstrict, hU, hV⟩ :=
+    hrank ((frameAt word).child.den * ((parentsAt word).odd.den + (parentsAt word).odd.num) +
+      (frameAt word).child.num * ((parentsAt word).odd.den - (parentsAt word).odd.num)) 2 hpos_a (by norm_num)
+  -- the C-rank R(x) = rk(Z(x + e)) has increments −2η along the kernel and −a_* along the transverse
+  have hK : ∀ x, rk (i3Z (x + (parentsAt word).odd.modifiedDeck.kernel + (frameAt word).sheetOffset)) -
+      rk (i3Z (x + (frameAt word).sheetOffset)) =
+      lam * ((frameAt word).tGrade (x + (parentsAt word).odd.modifiedDeck.kernel) - (frameAt word).tGrade x) := by
+    intro x
+    have hz : i3Z (x + (parentsAt word).odd.modifiedDeck.kernel + (frameAt word).sheetOffset) =
+        i3Z (x + (frameAt word).sheetOffset) +
+          (frameAt (conjWord word)).child.modifiedDeck.transverse := by
+      rw [add_right_comm x _ (frameAt word).sheetOffset, i3Z_add, i3_child_kernel hw]
+    have hgK : (frameAt word).tGrade (x + (parentsAt word).odd.modifiedDeck.kernel) - (frameAt word).tGrade x =
+        -(2 * (frameAt word).eps) := by
+      rw [i3_tGrade_add, i3_odd_modifiedDeck_kernel _ hodd]
+      dsimp only
+      have he' : (frameAt word).eps = (parentsAt word).odd.num * (frameAt word).child.den -
+          (parentsAt word).odd.den * (frameAt word).child.num := (frameAt word).eps_eq
+      linear_combination 2 * he'
+    rw [hz, hV (i3Z (x + (frameAt word).sheetOffset)), hgK]
+    ring
+  have hT' : ∀ x, rk (i3Z (x + (parentsAt word).odd.modifiedDeck.transverse + (frameAt word).sheetOffset)) -
+      rk (i3Z (x + (frameAt word).sheetOffset)) =
+      lam * ((frameAt word).tGrade (x + (parentsAt word).odd.modifiedDeck.transverse) - (frameAt word).tGrade x) := by
+    intro x
+    have hz : i3Z (x + (parentsAt word).odd.modifiedDeck.transverse + (frameAt word).sheetOffset) =
+        i3Z (x + (frameAt word).sheetOffset) + -(frameAt (conjWord word)).child.modifiedDeck.kernel := by
+      rw [add_right_comm x _ (frameAt word).sheetOffset, i3Z_add, i3_child_transverse hw]
+    have hU' := hU (i3Z (x + (frameAt word).sheetOffset) + -(frameAt (conjWord word)).child.modifiedDeck.kernel)
+    rw [neg_add_cancel_right] at hU'
+    have hgT : (frameAt word).tGrade (x + (parentsAt word).odd.modifiedDeck.transverse) - (frameAt word).tGrade x =
+        -((frameAt word).child.den * ((parentsAt word).odd.den + (parentsAt word).odd.num) +
+          (frameAt word).child.num * ((parentsAt word).odd.den - (parentsAt word).odd.num)) := by
+      rw [i3_tGrade_add, i3_odd_modifiedDeck_transverse]
+      dsimp only
+      ring
+    rw [hz, hgT]
+    linear_combination (-1 : ℤ) * hU'
+  have hbin : ∀ c, laplacian (quarterTurnField (standardField (conjWord word))) c = -1 ∨
+      laplacian (quarterTurnField (standardField (conjWord word))) c = 0 :=
+    fun c => quarterTurnField_binary h.packet.binary c
+  have hcon_T := isConstrainedBurningRank_of_strict_quota
+    (rank := fun x => rk (i3Z (x + (frameAt word).sheetOffset))) hbin hT
+    (fun c i _ hp => hstrict _ _ hp)
+  have hsub : ∀ c i, ReflectedPolicy (frameAt (conjWord word)).centre
+      ((frameAt word).eps • (frameAt (conjWord word)).shortShift - (frameAt (conjWord word)).parentShift) cp
+      (i3Z (c + (frameAt word).sheetOffset)) (i3Z (i + (frameAt word).sheetOffset)) →
+      sheetChainPotential word (standardField (conjWord word)) (c + (frameAt word).sheetOffset) ≤
+        sheetChainPotential word (standardField (conjWord word)) (i + (frameAt word).sheetOffset) := by
+    intro c i hp
+    rw [i3_sheet_eq_chainPotential, i3_sheet_eq_chainPotential]
+    exact hmH (i3Z (c + (frameAt word).sheetOffset)) (i3Z (i + (frameAt word).sheetOffset)) hp
+  have hcon := IsConstrainedBurningRank.mono hcon_T hsub
+  have hint : (parentsAt word).odd.InUnitInterval := (parentsAt_valid word).odd_bounds
+  exact restrictedNoFort_of_constrained_rankGrade (Fraction.det_modifiedDeck_pos hint)
+    (fun x => rk (i3Z (x + (frameAt word).sheetOffset))) lam hlam hcon hK hT'
+
 end FLatticePaper.Induction
