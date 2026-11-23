@@ -213,7 +213,9 @@ theorem noBlackPairRise_of_charts {word : Word} (hw : ∃ x ∈ word, x ≠ Digi
       FirstChartEdge P c i ∨ AdjacentChartEdge P c i ∨ exitSameSlip c i ∨
       (∃ x x', parentPolicy P x x' ∧
         jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x = 1 ∧
-        jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x' = 0) ∨
+        jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x' = 0 ∧
+        (laplacian (standardField (conjWord word)) (zTurn x) = -1 ∨
+          SquareClauses.ForcedEdge (standardField (conjWord word)) seed (zTurn x) (zTurn x'))) ∨
       (∃ x, HRootWeb (frameAt word).parents.odd.num (frameAt word).parents.odd.den
           ((frameAt word).parentTGrade x) ∧
         jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x = 1) ∨
@@ -224,11 +226,11 @@ theorem noBlackPairRise_of_charts {word : Word} (hw : ∃ x ∈ word, x ≠ Digi
     NoBlackPairRise (standardField word) (frameAt word).shortShift := by
   intro c hc hpar hbs i hi hone
   have hr : RisingBlackPair (standardField word) (frameAt word).shortShift c i := ⟨hi, hc, hpar, hbs, hone⟩
-  rcases hcover c i hr with h1 | h1 | h1 | ⟨x, x', hpol, j1, j0⟩ | ⟨x, hw', j1⟩ | hblk | j0
+  rcases hcover c i hr with h1 | h1 | h1 | ⟨x, x', hpol, j1, j0, hroot⟩ | ⟨x, hw', j1⟩ | hblk | j0
   · exact first_chart_excluded hw hSE P h1 hr
   · exact adjacent_chart_excluded hw hSE P h1 hr
   · exact hexit c i h1 hr
-  · exact nonfree_drop_excluded hw hSE P hpol j1 j0
+  · exact nonfree_drop_excluded hw hSE P hpol j1 j0 hroot
   · exact H_drop_excluded hw hSE x hw' j1
   · exact (frameAt word).not_rising_of_blockPair hpk hc hbs hblk
   · exact exceptional_drop_excluded hw hSE _ (exceptional_hT_proved hw hSE) j0

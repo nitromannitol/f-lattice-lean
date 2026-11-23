@@ -28,7 +28,9 @@ theorem noBlackPairRise_of_sheet_cases {word : Word} (h : ∃ x ∈ word, x ≠ 
       firstCommon c i ∨ adjacentPositive c i ∨ exitSameSlip c i ∨
       (∃ x x', parentPolicy P x x' ∧
         jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x = 1 ∧
-        jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x' = 0) ∨
+        jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x' = 0 ∧
+        (laplacian (standardField (conjWord word)) (zTurn x) = -1 ∨
+          SquareClauses.ForcedEdge (standardField (conjWord word)) seed (zTurn x) (zTurn x'))) ∨
       (∃ x, HRootWeb (frameAt word).parents.odd.num (frameAt word).parents.odd.den
           ((frameAt word).parentTGrade x) ∧
         jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x = 1) ∨
@@ -44,11 +46,11 @@ theorem noBlackPairRise_of_sheet_cases {word : Word} (h : ∃ x ∈ word, x ≠ 
     NoBlackPairRise (standardField word) (frameAt word).shortShift := by
   intro c hc hpar hbs i hi hone
   have hr : RisingBlackPair (standardField word) (frameAt word).shortShift c i := ⟨hi, hc, hpar, hbs, hone⟩
-  rcases hcover c i hr with h1 | h1 | h1 | ⟨x, x', hpol, j1, j0⟩ | ⟨x, hw, j1⟩ | hblk | j0
+  rcases hcover c i hr with h1 | h1 | h1 | ⟨x, x', hpol, j1, j0, hroot⟩ | ⟨x, hw, j1⟩ | hblk | j0
   · exact hfirst c i h1 hr
   · exact hadj c i h1 hr
   · exact hexit c i h1 hr
-  · exact nonfree_drop_excluded h hSE P hpol j1 j0
+  · exact nonfree_drop_excluded h hSE P hpol j1 j0 hroot
   · exact H_drop_excluded h hSE x hw j1
   · exact (frameAt word).not_rising_of_blockPair hpk hc hbs hblk
   · exact exceptional_drop_excluded h hSE _ hT j0

@@ -1,5 +1,6 @@
 import FLatticePaper.Plane.Induction.S3Canonical
 import FLatticePaper.Plane.Induction.OldPolicy
+import FLatticePaper.Plane.Induction.ReflectionI
 
 /-! Task 71: the canonical signed policy at a word, and its producing direction to `OldPolicyData`.
 
@@ -38,8 +39,8 @@ structure CanonicalSignedPolicy (frame : ChildFrame) (F : Field) extends Canonic
   rawSlipMinus : NonincreasingAlong (fun y => F y - F (y + (-1 : ℤ) • frame.shortShift)) policy
   /-- The chain potential `Φ_η` does not increase along the policy, for `η = ±1` (Q1.md l.40). -/
   chainNonincreasing : ∀ η : ℤ, (η = 1 ∨ η = -1) → NonincreasingAlong (frame.chainPotential F η) policy
-  /-- Reflection about `I`: the policy is carried to itself. -/
-  reflection : ∀ c i, policy c i → policy (reflectionI - c) (reflectionI - i)
+  /-- A retained edge is an edge of the graph: the retained input is an input of its centre. -/
+  policyEdge : ∀ c i, policy c i → Edge i c
   /-- The prescribed west input at the exceptional vertex when `ε = 1`. -/
   westAtException : frame.eps = 1 →
     policy (frame.parents.odd.num - frame.parents.odd.den + 1, frame.parents.odd.den + frame.parents.odd.num - 1)
@@ -92,15 +93,36 @@ theorem rawSlip_of_canonical {frame : ChildFrame} {F : Field} (C : CanonicalSign
   · exact rawSlipPlus_of_canonical C
   · exact C.rawSlipMinus
 
-/-- **The producing direction (task 71).** The canonical signed policy at a frame gives an `OldPolicyData` with the empty seed. -/
-def oldPolicyData_of_canonical {frame : ChildFrame} {F : Field} (C : CanonicalSignedPolicy frame F) :
+/-- The reflection about `I` at the roots of `OldPolicyData.reflection`: a black root (both inputs retained, and `I − c` is black
+by the symmetry `F (I − z) = F z`) or a forced-white edge (its reflection is forced, `forced_reflectI`). -/
+theorem reflection_of_canonical {frame : ChildFrame} {F : Field} (hF : ∀ z, F (reflectionI - z) = F z)
+    (C : CanonicalSignedPolicy frame F) :
+    ∀ c i, C.policy c i → (laplacian F c = -1 ∨ ForcedEdge F (fun _ _ => False) c i) →
+      C.policy (reflectionI - c) (reflectionI - i) := by
+  intro c i h hroot
+  rcases hroot with hb | hfe
+  · have hbI : laplacian F (reflectionI - c) = -1 := by
+      rw [laplacian_reflectI hF]
+      exact hb
+    have hE := edge_reflectI (C.policyEdge c i h)
+    rcases hE with e | e
+    · rw [e]
+      exact (C.quota.1 (reflectionI - c) hbI).1
+    · rw [e]
+      exact (C.quota.1 (reflectionI - c) hbI).2
+  · exact forcedRetained_of_canonical C _ _ (forced_reflectI hF hfe)
+
+/-- **The producing direction (task 71).** The canonical signed policy at a frame gives an `OldPolicyData` with the empty seed, given
+the `I`-symmetry of the field (task 72). -/
+def oldPolicyData_of_canonical {frame : ChildFrame} {F : Field} (hF : ∀ z, F (reflectionI - z) = F z)
+    (C : CanonicalSignedPolicy frame F) :
     OldPolicyData frame F (fun _ _ => False) where
   retained := C.policy
   quota := C.quota
   priceNonincreasing := price_nonincreasing_of_canonical C
   rawSlipNonincreasing := rawSlip_of_canonical C
   chainNonincreasing := C.chainNonincreasing
-  reflection := C.reflection
+  reflection := reflection_of_canonical hF C
   forcedRetained := forcedRetained_of_canonical C
   westAtException := C.westAtException
 
