@@ -1,4 +1,7 @@
-"""Task 67 numerics: the bare common-primary-chart claim of SHORT_SLIP_COMMON_CHART (false as stated).
+"""Task 67 numerics (RETRACTED as a refutation in task 68): the bare arithmetic below is NOT the common-chart claim. It omits the shift by
+2 eps C, the t-support and the parity validity of the frames; w1_common_chart_proper.py tests the claim under its hypotheses (0 failures).
+
+Original note: the bare common-primary-chart claim of SHORT_SLIP_COMMON_CHART (false as stated).
 
 For the even/odd E s-windows I_0 = [0, T+2n] and I_1 = [2-d+n, T+d+n-2] (T = d^2+2dn-n^2, L = d+n), and all even s, s' with |s - s'| <= L,
 the claim asks for a common primary index k with s - kT in the window of s and s' - kT in the window of s'. The bare claim fails:
