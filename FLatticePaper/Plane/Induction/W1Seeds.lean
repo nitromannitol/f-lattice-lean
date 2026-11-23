@@ -1,6 +1,8 @@
 import FLatticePaper.Plane.Induction.W1Top
 import FLatticePaper.Plane.Induction.Q3Paragraph8
 import FLatticePaper.Construction.NominalAgreement
+import FLatticePaper.Plane.Induction.StrongInduction
+import FLatticePaper.Plane.Induction.SheetFacts
 
 /-! Task 50: the two zero seeds of the paired induction as inherited data (archive `.work/fields/escape/newzeros/`).
 
@@ -317,5 +319,66 @@ theorem even_zero_of_parent {w : Word} (hproper : ∃ x ∈ w, x ≠ Digit.three
   have hper : Function.Periodic (standardField w) (frameAt w).child.modifiedDeck.kernel :=
     fun site => by simpa using hG.1 site
   rw [hk, (hper.zsmul k) (seedPoint (frameAt w)), hF0]
+
+/-- **The even seed from the packets (task 51, item 1).** `hG` and `hM` of `even_zero_of_parent` are discharged from the
+packet of the conjugate word and the open inputs of `w`: the packet of `w` is `packet_of_openInputs_step` (its periods
+give `hG`, the zero-character `U` period), and the sheet minimum respects the periods on `E` by `stripInputs_sheetMin`
+and `respectsPeriodsOn_of_heightInputs` (`hM`). The remaining named input is the second-branch sign `hC`. -/
+theorem even_zero_of_packet {w : Word} (hproper : ∃ x ∈ w, x ≠ Digit.three)
+    (hpar : SeedFields (conjWord w))
+    (hconj : (frameAt (conjWord w)).Packet (standardField (conjWord w)))
+    (hO : OpenInputs w)
+    (hC : 0 ≤ (frameAt w).sheetC (quarterTurnField (standardField (conjWord w))) (seedPoint (frameAt w))) :
+    ∀ z : Site, EvenSite z →
+      (frameAt w).tGrade z = 2 - ((frameAt w).child.den + (frameAt w).child.num) → standardField w z = 0 := by
+  obtain ⟨hA0, hEq, hrefl, -⟩ := sheetFacts_of_conjPacket hproper hconj
+  obtain ⟨hC0, hGe, hbin⟩ := hO
+  have hS := (frameAt w).stripInputs_sheetMin hA0 hC0 hEq hGe hrefl
+  have hM := (frameAt w).respectsPeriodsOn_of_heightInputs hS.heightInputs
+  have hP := packet_of_openInputs_step hproper hconj ⟨hC0, hGe, hbin⟩
+  have hG : HasGeneratorPeriods (frameAt w).child (standardField w) 0 (frameAt w).coherentConstantV := by
+    have hp := hP.periods
+    rw [coherentConstantU_eq_zero] at hp
+    exact hp
+  exact even_zero_of_parent hproper hpar hG hM hC
+
+/-- **The odd zero and the odd bottom seed are one statement (task 51, item 3).** Through the quarter-turn `Z x = (−x₂, x₁ − 1)`,
+the line `t_p = 1 − d` (even sites) is the bottom line `s = 2 − 3d + n` (odd sites) of `standardField u`:
+`odd_zero ↔ odd_bottom`. The converse direction is the one the odd-child step has to supply. -/
+theorem odd_zero_iff_bottom {u : Word} :
+    (∀ x : Site, EvenSite x → parentN u * x.1 - parentD u * x.2 = 1 - (parentD u + parentN u) →
+      quarterTurnField (standardField u) x = 0) ↔
+    (∀ z : Site, ¬ EvenSite z → (frameAt u).sGrade z = 2 - 3 * (frameAt u).child.den + (frameAt u).child.num →
+      standardField u z = harmonicGrid z) := by
+  constructor
+  · intro hO z hz hs
+    exact odd_bottom_of_odd_zero hO z hz hs
+  · intro hB x hx hlev
+    have hev : ((frameAt u).child.num + (frameAt u).child.den) % 2 = 0 := (frameAt u).child_even
+    have hN2 : 2 * parentN u = (frameAt u).child.den - (frameAt u).child.num := by
+      unfold parentN; omega
+    have hD2 : 2 * parentD u = (frameAt u).child.den + (frameAt u).child.num := by
+      unfold parentD; omega
+    have hxe : ((x.1 + x.2) % 2 = 0) := hx
+    have hzodd : ¬ EvenSite (-x.2, x.1 - 1) := by
+      unfold EvenSite
+      show ¬ ((-x.2 + (x.1 - 1)) % 2 = 0)
+      omega
+    have hs : (frameAt u).sGrade (-x.2, x.1 - 1) =
+        2 - 3 * (frameAt u).child.den + (frameAt u).child.num := by
+      unfold ChildFrame.sGrade
+      show ((frameAt u).child.den + (frameAt u).child.num) * (-x.2) +
+          ((frameAt u).child.den - (frameAt u).child.num) * (x.1 - 1) = _
+      linear_combination 2 * hlev - (x.1 + 1) * hN2 + (x.2 - 1) * hD2
+    have hF := hB (-x.2, x.1 - 1) hzodd hs
+    have hZ : QuarterTurn.counterclockwise.mapSite (0, -1) x = (-x.2, x.1 - 1) := quarterTurn_site x
+    have hinv := harmonicGrid_quarter_inv (-x.2, x.1 - 1)
+    have hxeq : ((-x.2, x.1 - 1) : Site).2 + 1 = x.1 ∧ -((-x.2, x.1 - 1) : Site).1 = x.2 := by
+      constructor <;> simp
+    obtain ⟨h1, h2⟩ := hxeq
+    rw [h1, h2] at hinv
+    unfold quarterTurnField
+    rw [hZ, hF]
+    linarith
 
 end FLatticePaper.W1Seeds

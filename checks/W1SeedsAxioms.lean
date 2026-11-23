@@ -11,3 +11,5 @@ import FLatticePaper.Plane.Induction.W1Seeds
 #print axioms FLatticePaper.W1Seeds.shifted_level
 #print axioms FLatticePaper.W1Seeds.level_shift
 #print axioms FLatticePaper.W1Seeds.even_zero_of_parent
+#print axioms FLatticePaper.W1Seeds.even_zero_of_packet
+#print axioms FLatticePaper.W1Seeds.odd_zero_iff_bottom
