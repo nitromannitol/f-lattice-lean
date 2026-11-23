@@ -1,0 +1,211 @@
+import Mathlib.Data.Int.Basic
+import Mathlib.Tactic.Ring
+import Mathlib.Tactic.Linarith
+import Mathlib.Tactic.IntervalCases
+
+/-! # The explicit strict rank `Q_minus` of the reciprocal family (task 118, W1 base; w3's pure3 note
+`UNIFORM_GLOBAL_RECIPROCAL_STRICT_RANK`, and its z3 model `prove_rank.py`).
+
+Parameters: the odd denominator `d ≥ 3`; deck vectors `U = (d, 1)` and `V = (1 − d, d + 1)`; aliases `(i, j)` with
+`i ∈ [−2, 2]`, `j ∈ [−1, 1]`; `shiftP d p i j = p + i U + j V`.
+
+* `IsHc`, `IsVc`, `IsFreeP`: the H trace `{(j,0) : 1 ≤ j ≤ d}` and the V path `{(0,0)} ∪ {(1−j, j) : 1 ≤ j < d} ∪ {(2−d, d)}`.
+* `NativeP`: the native domain `[2−d, d] × [0, d+1]` with `1 ≤ x + y ≤ d + 2`, plus the two inserted corners.
+* `IsRepP`: the representative of its alias class: a free point, or a native point with no free alias translate and no lexicographically
+  larger native alias translate.
+* `valMinus`: the value of `Q_minus` on a representative.
+* `RankOf d p r`: `r` is the rank of `p`, the value at the alias translate that is a representative, with the deck correction
+  `− i·2d + j·2(d+1)`.
+
+Proved here: the representative of a free point is unique (no nonzero alias translate of a free point is free or a representative), so the
+rank of a free point is its own `valMinus`; and the two free-to-free gates `H_even` (`(x,0) → (x−1,0)`, drop 1) and `V_{d−1} → V_last`
+(drop 1). The bulk gates (targets outside the free classes) are the next stage. -/
+
+namespace FLatticePaper.PureRank
+
+open Classical
+
+abbrev Pt := ℤ × ℤ
+
+/-- The alias shift `p + i U + j V`. -/
+def shiftP (d : ℤ) (p : Pt) (i j : ℤ) : Pt :=
+  (p.1 + i * d + j * (1 - d), p.2 + i + j * (d + 1))
+
+/-- The aliases `(i, j)`. -/
+def IsAlias (i j : ℤ) : Prop := -2 ≤ i ∧ i ≤ 2 ∧ -1 ≤ j ∧ j ≤ 1
+
+/-- The H trace. -/
+def IsHc (d : ℤ) (p : Pt) : Prop := p.2 = 0 ∧ 1 ≤ p.1 ∧ p.1 ≤ d
+
+/-- The V path. -/
+def IsVc (d : ℤ) (p : Pt) : Prop :=
+  p = (0, 0) ∨ (p.1 + p.2 = 1 ∧ 1 ≤ p.2 ∧ p.2 < d) ∨ p = (2 - d, d)
+
+/-- The free classes: the H trace and the V path. -/
+def IsFreeP (d : ℤ) (p : Pt) : Prop := IsHc d p ∨ IsVc d p
+
+/-- The native domain, with the two inserted corners. -/
+def NativeP (d : ℤ) (p : Pt) : Prop :=
+  (2 - d ≤ p.1 ∧ p.1 ≤ d ∧ 0 ≤ p.2 ∧ p.2 ≤ d + 1 ∧ 1 ≤ p.1 + p.2 ∧ p.1 + p.2 ≤ d + 2) ∨
+    p = (0, 0) ∨ p = (2, d + 1)
+
+/-- `a` is lexicographically larger than `p` (first coordinate, then second). -/
+def LexGt (a p : Pt) : Prop := p.1 < a.1 ∨ (a.1 = p.1 ∧ p.2 < a.2)
+
+/-- `p` is the representative of its alias class. -/
+def IsRepP (d : ℤ) (p : Pt) : Prop :=
+  IsFreeP d p ∨
+    (NativeP d p ∧ (∀ i j, IsAlias i j → ¬ IsFreeP d (shiftP d p i j)) ∧
+      (∀ i j, IsAlias i j → NativeP d (shiftP d p i j) → ¬ LexGt (shiftP d p i j) p))
+
+/-- The value of `Q_minus` on a representative: H `2x + p₀`, V `−2y − p₀`, the line `x + y = d + 1` (`x ≥ 1`) `2x`,
+`x ≤ 0` `2x − 4 + p₀`, otherwise `4d − 4 − 2x + p₀`, with `p₀ = (x + y) mod 2`. -/
+noncomputable def valMinus (d : ℤ) (p : Pt) : ℤ :=
+  let p0 := (p.1 + p.2) % 2
+  if IsHc d p then 2 * p.1 + p0
+  else if IsVc d p then -2 * p.2 - p0
+  else if p.1 + p.2 = d + 1 ∧ 1 ≤ p.1 then 2 * p.1
+  else if p.1 ≤ 0 then 2 * p.1 - 4 + p0
+  else 4 * d - 4 - 2 * p.1 + p0
+
+/-- `r` is the rank of `p`: the `Q_minus` value at the alias translate that is a representative, with the deck correction. -/
+def RankOf (d : ℤ) (p : Pt) (r : ℤ) : Prop :=
+  ∃ i j, IsAlias i j ∧ IsRepP d (shiftP d p i j) ∧
+    r = valMinus d (shiftP d p i j) - i * (2 * d) + j * (2 * (d + 1))
+
+/-- **Free classes are alias-separated.** For a free point, a nonzero alias translate is not free. -/
+theorem free_translate_not_free (d : ℤ) (hd : 3 ≤ d) (p : Pt) (hp : IsFreeP d p) (i j : ℤ)
+    (hi : IsAlias i j) (hne : ¬ (i = 0 ∧ j = 0)) : ¬ IsFreeP d (shiftP d p i j) := by
+  obtain ⟨hi1, hi2, hj1, hj2⟩ := hi
+  obtain ⟨x, y⟩ := p
+  simp only [IsFreeP, IsHc, IsVc, shiftP, Prod.mk.injEq] at hp hne ⊢
+  interval_cases i <;> interval_cases j <;> omega
+
+/-- A nonzero alias translate of a free point is not a representative. -/
+theorem not_rep_of_free_translate (d : ℤ) (hd : 3 ≤ d) (p : Pt) (hp : IsFreeP d p) (i j : ℤ)
+    (hi : IsAlias i j) (hne : ¬ (i = 0 ∧ j = 0)) : ¬ IsRepP d (shiftP d p i j) := by
+  intro hr
+  rcases hr with hf | ⟨-, hnf, -⟩
+  · exact free_translate_not_free d hd p hp i j hi hne hf
+  · have hinv : shiftP d (shiftP d p i j) (-i) (-j) = p := by
+      obtain ⟨x, y⟩ := p
+      simp only [shiftP, Prod.mk.injEq]
+      constructor <;> ring
+    obtain ⟨hi1, hi2, hj1, hj2⟩ := hi
+    exact hnf (-i) (-j) ⟨by omega, by omega, by omega, by omega⟩ (by rw [hinv]; exact hp)
+
+/-- The rank of a free point is its own `Q_minus` value. -/
+theorem rankOf_free (d : ℤ) (hd : 3 ≤ d) (p : Pt) (hp : IsFreeP d p) (r : ℤ) (h : RankOf d p r) :
+    r = valMinus d p := by
+  obtain ⟨i, j, hi, hrep, rfl⟩ := h
+  by_cases h0 : i = 0 ∧ j = 0
+  · obtain ⟨rfl, rfl⟩ := h0
+    simp [shiftP]
+  · exact absurd hrep (not_rep_of_free_translate d hd p hp i j hi h0)
+
+/-- The H trace point `(x, 0)` has the value `2x` (the parity of `x` is even). -/
+theorem valMinus_H_even (d x : ℤ) (hx1 : 2 ≤ x) (hxd : x ≤ d) (hev : x % 2 = 0) :
+    valMinus d (x, 0) = 2 * x := by
+  unfold valMinus
+  rw [if_pos (show IsHc d (x, 0) from ⟨rfl, by omega, hxd⟩)]
+  simp only
+  omega
+
+/-- The H trace point `(x − 1, 0)` for even `x ≥ 2` has value `2x − 1`. -/
+theorem valMinus_H_odd (d x : ℤ) (hx : 1 ≤ x) (hxd : x ≤ d) (hodd : x % 2 = 1) :
+    valMinus d (x, 0) = 2 * x + 1 := by
+  unfold valMinus
+  rw [if_pos (show IsHc d (x, 0) from ⟨rfl, by omega, hxd⟩)]
+  simp only
+  omega
+
+/-- **Gate (H, even).** For an even `x ≥ 2` on the H trace, the W-input `(x−1, 0)` (also on the H trace) drops the rank by one. -/
+theorem gate_H_even (d : ℤ) (hd : 3 ≤ d) (x r r' : ℤ) (hx1 : 2 ≤ x) (hxd : x ≤ d) (hev : x % 2 = 0)
+    (hr : RankOf d (x, 0) r) (hr' : RankOf d (x - 1, 0) r') : r' < r := by
+  have hfree : IsFreeP d (x, 0) := Or.inl ⟨rfl, by omega, hxd⟩
+  have hfree' : IsFreeP d (x - 1, 0) := Or.inl ⟨rfl, by omega, by omega⟩
+  rw [rankOf_free d hd _ hfree r hr, rankOf_free d hd _ hfree' r' hr']
+  have h1 := valMinus_H_even d x hx1 hxd hev
+  have h2 : valMinus d (x - 1, 0) = 2 * x - 1 := by
+    unfold valMinus
+    rw [if_pos (show IsHc d (x - 1, 0) from ⟨rfl, by omega, by omega⟩)]
+    simp only
+    omega
+  rw [h1, h2]
+  omega
+
+/-- **Gate (V path).** The V point `V_{d−1} = (2−d, d−1)` (odd) sends its north input to `V_last = (2−d, d)`: drop one. -/
+theorem gate_V_last (d : ℤ) (hd : 3 ≤ d) (r r' : ℤ) (hr : RankOf d (2 - d, d - 1) r) (hr' : RankOf d (2 - d, d) r') :
+    r' < r := by
+  have hfree : IsFreeP d (2 - d, d - 1) := Or.inr (Or.inr (Or.inl ⟨by ring, by omega, by omega⟩))
+  have hfree' : IsFreeP d (2 - d, d) := Or.inr (Or.inr (Or.inr rfl))
+  rw [rankOf_free d hd _ hfree r hr, rankOf_free d hd _ hfree' r' hr']
+  have h1 : valMinus d (2 - d, d - 1) = -2 * d + 1 := by
+    unfold valMinus
+    rw [if_neg (show ¬ IsHc d (2 - d, d - 1) from fun h => by have := h.1; omega)]
+    rw [if_pos (show IsVc d (2 - d, d - 1) from Or.inr (Or.inl ⟨by ring, by omega, by omega⟩))]
+    simp only
+    omega
+  have h2 : valMinus d (2 - d, d) = -2 * d := by
+    unfold valMinus
+    rw [if_neg (show ¬ IsHc d (2 - d, d) from fun h => by have := h.1; omega)]
+    rw [if_pos (show IsVc d (2 - d, d) from Or.inr (Or.inr rfl))]
+    simp only
+    omega
+  rw [h1, h2]
+  omega
+
+/-- The prescribed retained direction at a free point: H even `W`, H odd `S` (and `N` at the endpoint `(d,0)`), V even `W`, V odd `N`. -/
+noncomputable def prescribedFree (d : ℤ) (p : Pt) : Pt :=
+  if (p.1 + p.2) % 2 = 0 then (-1, 0)
+  else if IsHc d p then (if p.1 = d then (0, 1) else (0, -1))
+  else (0, 1)
+
+/-- **Free-internal gates.** If a free point retains its prescribed direction and the target is free too, the rank drops. -/
+theorem free_internal_gate (d : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (x y dx dy : ℤ) (hp : IsFreeP d (x, y))
+    (hpres : (dx, dy) = prescribedFree d (x, y)) (hq : IsFreeP d (x + dx, y + dy))
+    (r r' : ℤ) (hr : RankOf d (x, y) r) (hr' : RankOf d (x + dx, y + dy) r') : r' < r := by
+  unfold prescribedFree at hpres
+  by_cases hev : (x + y) % 2 = 0
+  · rw [if_pos hev] at hpres
+    obtain ⟨rfl, rfl⟩ := Prod.mk.inj hpres
+    rcases hp with ⟨hy, hx1, hxd⟩ | hV
+    · subst hy
+      have hxe : x % 2 = 0 := by omega
+      refine gate_H_even d hd x r r' (by omega) hxd hxe hr ?_
+      rw [show x + -1 = x - 1 by ring] at hr'
+      exact hr'
+    · exfalso
+      simp only [IsFreeP, IsHc, IsVc, Prod.mk.injEq] at hq hV
+      omega
+  · rw [if_neg hev] at hpres
+    by_cases hHc : IsHc d (x, y)
+    · rw [if_pos hHc] at hpres
+      obtain ⟨hy, hx1, hxd⟩ := hHc
+      by_cases hxdd : x = d
+      · rw [if_pos hxdd] at hpres
+        obtain ⟨rfl, rfl⟩ := Prod.mk.inj hpres
+        exfalso
+        simp only [IsFreeP, IsHc, IsVc, Prod.mk.injEq] at hq
+        omega
+      · rw [if_neg hxdd] at hpres
+        obtain ⟨rfl, rfl⟩ := Prod.mk.inj hpres
+        exfalso
+        simp only [IsFreeP, IsHc, IsVc, Prod.mk.injEq] at hq
+        omega
+    · rw [if_neg hHc] at hpres
+      obtain ⟨rfl, rfl⟩ := Prod.mk.inj hpres
+      have hVp : IsVc d (x, y) := by
+        rcases hp with h | h
+        · exact absurd h hHc
+        · exact h
+      simp only [IsVc, IsFreeP, IsHc, Prod.mk.injEq] at hVp hq
+      have hxd1 : x = 2 - d := by omega
+      have hyd1 : y = d - 1 := by omega
+      subst hxd1
+      subst hyd1
+      refine gate_V_last d hd r r' hr ?_
+      rw [show 2 - d + 0 = 2 - d by ring, show d - 1 + 1 = d by ring] at hr'
+      exact hr'
+
+end FLatticePaper.PureRank
