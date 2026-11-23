@@ -208,4 +208,79 @@ theorem even_direct_arith (n d T p q l a b : ℤ) (hn : 0 < n) (hnd : n + 2 ≤ 
     have e : n * (p + e1) - d * (q + e2) = (n * p - d * q) + (n * e1 - d * e2) := by ring
     linarith
 
+/-- **The odd direct bottom corners, even witness.** The odd centre `c = (a, b)` is strict, the even H witness `v = (p, q)`
+with `c − v` odd. Conclusions: `L + 2n < s(c)`, `s(c) ≤ T − d + n − 1`, `−d ≤ t(c)`, `t(c) ≤ n − 2`. -/
+theorem odd_direct_even_arith (n d T p q l a b : ℤ) (hn : 0 < n) (hnd : n + 2 ≤ d)
+    (hnodd : n % 2 = 1) (hdodd : d % 2 = 1) (hT : T = d ^ 2 + 2 * d * n - n ^ 2)
+    (hcO : (a + b) % 2 = 1) (hcl : d - T < n * a - d * b) (hcu : n * a - d * b < n)
+    (hcs1 : d + n - 2 < (d + n) * a + (d - n) * b) (hcs2 : (d + n) * a + (d - n) * b < T + 2 - d + n)
+    (hvE : (p + q) % 2 = 0) (hvpl : 2 ≤ n * p - d * q)
+    (hvl : p + q = 2 * l) (hl1 : 1 ≤ l) (hvs : 2 * d * l + 2 * n ≤ (d + n) * p + (d - n) * q)
+    (hvk : p + q ≤ d + n - 2) (hl1' : l = 1 → p = 2 ∧ q = 0)
+    (ha : -1 ≤ a - p ∧ a - p ≤ 1) (hb : -1 ≤ b - q ∧ b - q ≤ 1) :
+    (d + n) + 2 * n < (d + n) * a + (d - n) * b ∧
+      (d + n) * a + (d - n) * b ≤ T - d + n - 1 ∧
+        -d ≤ n * a - d * b ∧ n * a - d * b ≤ n - 2 := by
+  have hT0 : 0 ≤ T := by rw [hT]; nlinarith
+  -- the parity of `t(c)`: odd, since `n`, `d` are odd and `a + b` is odd
+  have htpar : (n * a - d * b) % 2 = 1 := by
+    obtain ⟨k, hk⟩ : ∃ k, n = 2 * k + 1 := ⟨n / 2, by omega⟩
+    obtain ⟨m, hm⟩ : ∃ m, d = 2 * m + 1 := ⟨d / 2, by omega⟩
+    have : n * a - d * b = 2 * (k * a - m * b) + (a - b) := by
+      rw [hk, hm]
+      ring
+    omega
+  obtain ⟨e1, rfl⟩ : ∃ e1, a = p + e1 := ⟨a - p, by ring⟩
+  obtain ⟨e2, rfl⟩ : ∃ e2, b = q + e2 := ⟨b - q, by ring⟩
+  have hid : (d + n) * ((d + n) * (p + e1) + (d - n) * (q + e2)) =
+      ((p + e1) + (q + e2)) * T + 2 * n * (n * (p + e1) - d * (q + e2)) := by
+    rw [hT]
+    ring
+  have hpar : (e1 + e2) % 2 = 1 := by omega
+  have he1 : e1 = -1 ∨ e1 = 0 ∨ e1 = 1 := by omega
+  have he2 : e2 = -1 ∨ e2 = 0 ∨ e2 = 1 := by omega
+  have ht_c : n * (p + e1) - d * (q + e2) ≤ n - 2 := by
+    generalize hτ : n * (p + e1) - d * (q + e2) = τ at *
+    omega
+  have ht_lo : -d ≤ n * (p + e1) - d * (q + e2) := by
+    have hlo : -d ≤ n * e1 - d * e2 := by
+      rcases he1 with rfl | rfl | rfl <;> rcases he2 with rfl | rfl | rfl <;> first | linarith | omega
+    have e : n * (p + e1) - d * (q + e2) = (n * p - d * q) + (n * e1 - d * e2) := by ring
+    linarith
+  -- the lower band
+  have hlow : (d + n) + 2 * n < (d + n) * (p + e1) + (d - n) * (q + e2) := by
+    rcases (show l = 1 ∨ 2 ≤ l by omega) with hl | hl
+    · obtain ⟨hp, hq⟩ := hl1' hl
+      subst hp hq
+      rcases he1 with rfl | rfl | rfl <;> rcases he2 with rfl | rfl | rfl
+      all_goals first
+        | (exfalso; omega)
+        | (ring_nf at hcu hcs1 hcs2 hcl ⊢; linarith)
+    · have h2dl : 4 * d ≤ 2 * d * l := by
+        nlinarith
+      rcases he1 with rfl | rfl | rfl <;> rcases he2 with rfl | rfl | rfl
+      all_goals first
+        | linarith
+  -- the diagonal index: `k_c ≤ L − 1`
+  have hkc : (p + e1) + (q + e2) ≤ d + n - 1 := by
+    rcases he1 with rfl | rfl | rfl <;> rcases he2 with rfl | rfl | rfl
+    all_goals first
+      | omega
+  have hup : (d + n) * ((d + n) * (p + e1) + (d - n) * (q + e2)) ≤ (d + n) * (T - d + n - 1) := by
+    rw [hid]
+    have h1 : ((p + e1) + (q + e2)) * T ≤ (d + n - 1) * T :=
+      mul_le_mul_of_nonneg_right hkc hT0
+    have h2 : 2 * n * (n * (p + e1) - d * (q + e2)) ≤ 2 * n * (n - 2) :=
+      mul_le_mul_of_nonneg_left ht_c (by omega)
+    have h3 : (d + n) * (T - d + n - 1) = (d + n - 1) * T + ((d + n) * (T - d + n - 1) - (d + n - 1) * T) := by
+      ring
+    have h4 : (d + n) * (T - d + n - 1) - (d + n - 1) * T = T - (d + n) * (d - n + 1) := by ring
+    have h5 : T - (d + n) * (d - n + 1) ≥ 2 * n * (n - 2) := by
+      rw [hT]
+      nlinarith
+    nlinarith
+  refine ⟨hlow, ?_, ht_lo, ?_⟩
+  · exact le_of_mul_le_mul_left hup (by omega)
+  · exact ht_c
+
 end FLatticePaper.CollarBottomCases
