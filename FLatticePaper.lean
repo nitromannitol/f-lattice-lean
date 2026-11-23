@@ -405,5 +405,9 @@ import FLatticePaper.Plane.Induction.W1OddSeedId
 import FLatticePaper.Plane.Induction.W1OddZero
 import FLatticePaper.Plane.Induction.W1OddSeedZero
 import FLatticePaper.Plane.Induction.W1OddSeedY
+import FLatticePaper.Plane.Induction.W1OfferOne
+import FLatticePaper.Plane.Induction.W1OfferTwo
+import FLatticePaper.Plane.Induction.W1OddZeroWord
+import FLatticePaper.Plane.Induction.W1SeedFields
 
 /-! Root import for the corrected F-lattice paper. -/
