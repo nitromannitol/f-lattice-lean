@@ -318,6 +318,7 @@ import FLatticePaper.Plane.Induction.InputExit
 import FLatticePaper.Plane.Induction.ChartWitness
 import FLatticePaper.Plane.Induction.RepInputs
 import FLatticePaper.Plane.Induction.SlipReflect
+import FLatticePaper.Plane.Induction.NegChart
 import FLatticePaper.Plane.Induction.HWeb
 import FLatticePaper.Plane.Induction.W1Collar
 import FLatticePaper.Plane.Induction.W1CollarBox
