@@ -640,3 +640,43 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - Lean: `CanonicalSignedPolicy` now carries the minus permit `permittedMinus` (the analogue of `permitted`, `slipPermits F (fun z => F (z + (−1)•σ))`) in place of the bare field `rawSlipMinus`; `rawSlipMinus_of_canonical` derives the raw slip from it (as `rawSlipPlus_of_canonical` does for `+1`). `S3FreeBoundary`'s `prescribedH η`, `prescribedV η` already take `η ∈ {±1}`.
 - Not done: a general Lean proof of `permittedMinus` from the minus prescription (the plus `permitted` is also an input; the minus one is the same kind of input).
 - Checks: `checks/CanonicalSigned.lean`. Root build: see the commit.
+
+### Task 72 / Q20 (chain monotonicity, the both-free exclusion, grade layer): BothFreeGrades.lean
+
+Source: `.work/fields/canonical/strong_bulk/BOTH_FREE_RAW_PHI_EXCLUSION.md` §§1–3 (archive `paper/Supplement/standard-and-alternate-fields.zip`, member `canonical/strong_bulk/`), after `TWO_RANK_RAW_PHI_AUDIT.md`. Notation: `L = d + n`, `T = d² + 2dn − n²`, `σ = shortShift`, `z' = z + ησ`, `δ = parentShift`.
+
+PROVED here (`checks/BothFreeGrades.lean`):
+- §2 `prescribedH_shift_agree`: two free H representatives `z`, `z + ησ` have agreeing prescribed directions (`prescribedH η z = prescribedH (−η) (z + ησ)`). Uses `tGrade_shiftσ` (`t(z+ησ) = tz − 2η`), `evenSite_shiftσ`, `tGrade_hFirst` (`t(H_0) = n`), `tGrade_hLast` (`t(H_{d−1}) = d`), and the spectrum.
+- §2 `prescribedH_even_east`: an even H choice is east for both signs.
+- §3 `tGrade_vFirst` (`t V_0 = 0`), `tGrade_vLast` (`t V_{L−1} = L − T`), `prescribedV_vFirst`, `prescribedV_vLast`.
+- §3 `vFirst_class` (a free H translate of `V_0 + ησ` forces `η = −1`, `k = 0`), `vLast_class` (forces `η = 1`, `k = 1`), `vFirst_H_agree`, `vLast_H_agree`.
+- §3 `no_H_class_of_odd_V`, `no_H_class_of_even_V`: a V site with the named grade range has no free H translate `w − kV` (for every `k`).
+- §3 `V_H_choices_agree`: a free V root whose shift has a free H class has agreeing directions (given the named V-arc range `hArc`).
+- §1 `sGrade_parentShift` (`s(δ) = 2`), `star_in_strip` (`c ≥ 3`: the star's `s` and `s − 2` lie in `[1 − 2d, 2L − 1]`), `price_const_on_star_of_strips` (the price is constant on the star from `HasStrips`).
+
+External facts cited by the note, and where they stand in main:
+| fact (note) | in main | status |
+|---|---|---|
+| H spectrum: even `2..L−2`, odd `n..d` (§2) | `ChildFrame.hSpectrum` (S3FreeBoundary) | in main |
+| V spectrum (§1, §3) | `ChildFrame.vSpectrum` (S3FreeBoundary) | in main |
+| free H trace, free V cut | `ChildFrame.freeH`, `freeV` (S3FreeBoundary) | in main |
+| prescribed directions for `η = ±1` (§2, §3) | `ChildFrame.prescribedH`, `prescribedV` (S3FreeBoundary) | in main |
+| `t σ = −2`, `t(z + ησ) = tz − 2η` | `tGrade_shortShift` (ChildFrame), `tGrade_add_shift` (Q3Shift) | in main |
+| `σ` parity (even) | proved here (`shortShift_even`) | proved here |
+| harmonic h0 strip `[1 − 2d, 2L − 1]` on `s` (§1) | `ChildFrame.HasStrips` (Binary.lean:85), `Packet.strips` | in main (window matches the note) |
+| price cancellation: constant price on the V star (§1) | `price_eq_cutPrice_of_harmonic` (StrongPriceValues) | in main; applied here |
+| `s(δ) = 2`, `δ = εV_p` (§1) | `ChildFrame.parentShift` (ChildFrame.lean:23); `sGrade_parentShift` | in main / proved here |
+| `T > 3(d + n)` (no wraparound, §2) | `CollarBottomSquare.T_gt` | in main |
+| endpoints `V_0 = (0,0)`, `V_{L−1} = V + (1,−1)` and their grades | `vFirst`, `vLast` (S3FreeBoundary); grades proved here | in main / proved here |
+| odd V arc: first `(0,1)` at `t = −d`, last at `t = −T+L+d`, `t` decreasing (§3) | not in main | NAMED INPUT `hArc` (odd part) |
+| even V arc: `t` from 0 to `−T+L`, decrements `≥ L`, nonendpoints in `[−T+2L, −L]` (§3) | not in main | NAMED INPUT `hArc` (even part) |
+| star membership (which sites form the native V star, §1) | not in main | NAMED (the `StarS` predicate is on the grade) |
+| deck character of a `V + kU + lV` lift (§1, §2) | not in main | NAMED (lift-class statements not formalized) |
+| two-rank reduction: lexicographic ranks, tie policies, forced-white transfer, raw-rise reduction (TWO_RANK audit) | not in main | NAMED INPUT: `ChainPairData.chainNonincreasing` (CanonicalSigned) stays a field |
+| forced edges, unit forcing (`ForcedEdge`, `forced_sound`) | `CanonicalSigned.lean`, `S3*` | in main |
+| strict physical ranks (`rank`, `strictRank`) | `CanonicalPolicy` (S3Canonical) | in main |
+| binary field, unit slip (`HasUnitSlip`) | `AlternateMidpoint.lean` | in main |
+| sheet minimum `m = min(F, g + k)` (two-rank admission) | `sheetMin` (SheetPieces and neighbours) | in main |
+
+Scope to confirm with the lead: §1's star containment needs `c = d − n ≥ 3` (the note's "proper nonbase c ≥ 4"; both `d, n` odd, so `c` is even and `c ≥ 4`). Base `c < 3` is the note's separate literal check and is not covered.
+- Checks: `checks/BothFreeGrades.lean`. Root build clean; sandbox logs clean.
