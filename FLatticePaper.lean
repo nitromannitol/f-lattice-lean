@@ -419,5 +419,6 @@ import FLatticePaper.Plane.Induction.W1Hagree
 import FLatticePaper.Plane.Induction.W1MRank
 import FLatticePaper.Plane.Induction.W1HagreeNonfree
 import FLatticePaper.Plane.Induction.W1FreeSquare
+import FLatticePaper.Plane.Induction.W1FreeDescent
 
 /-! Root import for the corrected F-lattice paper. -/

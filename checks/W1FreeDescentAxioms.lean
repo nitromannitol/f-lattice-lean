@@ -1,0 +1,5 @@
+import FLatticePaper.Plane.Induction.W1FreeDescent
+
+#print axioms FLatticePaper.W1FreeDescent.other_input_outside
+#print axioms FLatticePaper.W1FreeDescent.free_forced_of_descent
+#print axioms FLatticePaper.W1FreeDescent.hagree_at_free_root
