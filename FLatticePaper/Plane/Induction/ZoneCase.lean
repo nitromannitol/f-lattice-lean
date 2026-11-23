@@ -199,6 +199,61 @@ theorem exc_form (N D nq dq w1 w2 : ℤ) (hD : 0 < D) (hε : (N * dq - nq * D) ^
 theorem harmonic_zero_one : harmonicGrid (0, 1) = -1 := by
   norm_num [harmonicGrid]
 
+/-- One step along the exceptional line: `h₀(w) + F(Z(w − V_q))` changes by `−2ε` when `w` moves by `U_p = (2D, 2N)`. -/
+theorem psi_step (F : Site → ℤ) (N D nq dq Nu Du epsU : ℤ) (H : ZoneHyp F N D Nu Du epsU) (m : ℤ) :
+    harmonicGrid (2 * (m + 1) * D, 2 * (m + 1) * N + 1)
+      + F (-(2 * (m + 1) * N + 1 - (nq + dq)), 2 * (m + 1) * D - (nq - dq) - 1)
+    = harmonicGrid (2 * m * D, 2 * m * N + 1)
+      + F (-(2 * m * N + 1 - (nq + dq)), 2 * m * D - (nq - dq) - 1)
+      - 2 * (N * dq - nq * D) := by
+  have hc : 2 * (-(D ^ 2 + 2 * D * N - N ^ 2) - N) = -2 * (D + N) * (D - N) - (D + N) ^ 2 + (D - N) ^ 2
+      - (D + N) + (D - N) := by ring
+  have hh := ZoneHarmonic.harmonicGrid_sub_shift (2 * (m + 1) * D, 2 * (m + 1) * N + 1) (D + N) (D - N)
+    (-(D ^ 2 + 2 * D * N - N ^ 2) - N) hc
+  have e1 : (2 * (m + 1) * D, 2 * (m + 1) * N + 1) - ((D + N) + (D - N), (D + N) - (D - N))
+      = (2 * m * D, 2 * m * N + 1) := by
+    ext <;> simp <;> ring
+  rw [e1] at hh
+  simp only at hh
+  have hT' := H.hT (-(2 * m * N + 1 - (nq + dq)), 2 * m * D - (nq - dq) - 1)
+  have e2 : (-(2 * m * N + 1 - (nq + dq)), 2 * m * D - (nq - dq) - 1) + (-2 * N, 2 * D)
+      = (-(2 * (m + 1) * N + 1 - (nq + dq)), 2 * (m + 1) * D - (nq - dq) - 1) := by
+    ext <;> simp <;> ring
+  rw [e2] at hT'
+  simp only at hT'
+  linear_combination hh + hT'
+
+/-- The exceptional line: `h₀(w_l) + F(Z(w_l − V_q)) = −1 − 2ε l` for `w_l = (2lD, 2lN + 1)`, given `ε = ±1`. -/
+theorem psi_line (F : Site → ℤ) (N D nq dq Nu Du epsU : ℤ) (H : ZoneHyp F N D Nu Du epsU)
+    (hε : N * dq - nq * D = 1 ∨ N * dq - nq * D = -1) (l : ℤ) :
+    harmonicGrid (2 * l * D, 2 * l * N + 1)
+      + F (-(2 * l * N + 1 - (nq + dq)), 2 * l * D - (nq - dq) - 1)
+    = -1 - 2 * (N * dq - nq * D) * l := by
+  induction l using Int.induction_on with
+  | zero =>
+    have e0 : (2 * (0 : ℤ) * D, 2 * (0 : ℤ) * N + 1) = (0, 1) := by
+      ext <;> simp
+    have hz : F (-(2 * (0 : ℤ) * N + 1 - (nq + dq)), 2 * (0 : ℤ) * D - (nq - dq) - 1) = 0 := by
+      have ht : (D - N) * (-(2 * (0 : ℤ) * N + 1 - (nq + dq))) - (D + N) * (2 * (0 : ℤ) * D - (nq - dq) - 1)
+          = 2 * N - 2 * (N * dq - nq * D) := by
+        ring
+      have hN := H.hN
+      have hND := H.hND
+      have h1 := H.hstrip (-(2 * (0 : ℤ) * N + 1 - (nq + dq)), 2 * (0 : ℤ) * D - (nq - dq) - 1)
+        (by rw [ht]; rcases hε with h | h <;> rw [h] <;> linarith)
+        (by rw [ht]; rcases hε with h | h <;> rw [h] <;> linarith)
+      exact h1
+    rw [e0, harmonic_zero_one, hz]
+    simp
+  | succ k ih =>
+    rw [psi_step F N D nq dq Nu Du epsU H k]
+    linear_combination ih
+  | pred k ih =>
+    have hs := psi_step F N D nq dq Nu Du epsU H (-(k : ℤ) - 1)
+    have e : (-(k : ℤ) - 1 + 1) = -(k : ℤ) := by ring
+    rw [e] at hs
+    linear_combination (-1 : ℤ) * hs + ih
+
 end ZoneCase
 
 end FLatticePaper.Induction
