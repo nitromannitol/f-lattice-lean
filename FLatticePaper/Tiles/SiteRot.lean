@@ -51,4 +51,57 @@ theorem vband_M_bounds (n d x y t s a l : ℤ) (hn : 0 < n) (hnd : n < d) (hodd 
       (by omega) (by omega) (by omega) (by rw [hT']; omega)
     omega
 
+/-- **The even vertical index.** For an even site-type fraction `(n, d)` (`n + d` even, `d` odd) the rotated site
+`ψ(x,y) = (2q − y, x + 2p − 1)` with `p = (d−n)/2`, `q = (d+n)/2` lies in the horizontal window of `(p, q)`, and `0 ≤ y − x ≤ 2d − 2`
+on the lower vertical band. -/
+theorem vband_M_even (n d x y t s a l : ℤ) (hn : 0 < n) (hnd : n < d) (heven : (d + n) % 2 = 0) (hdodd : d % 2 = 1)
+    (ht : t = n * x - d * y) (hs : s = (d + n) * x + (d - n) * y)
+    (hsite : ((x + y) % 2 = 1 → a = n ∧ l = min (d - n) (3 * n - d)) ∧
+      ((x + y) % 2 = 0 → a = min (2 * n) (d - n) ∧ l = 0))
+    (hH1 : a - (d ^ 2 + 2 * d * n - n ^ 2) ≤ t) (hH2 : t ≤ d + n - a) (hH3 : l ≤ s)
+    (hsband : s ≤ 2 * n - l) :
+    0 ≤ y - x ∧ y - x ≤ 2 * d - 2 := by
+  obtain ⟨p, hp⟩ : ∃ p : ℤ, d - n = 2 * p := ⟨(d - n) / 2, by omega⟩
+  obtain ⟨q, hq⟩ : ∃ q : ℤ, d + n = 2 * q := ⟨(d + n) / 2, by omega⟩
+  have hnq : n = q - p := by omega
+  have hdq : d = q + p := by omega
+  obtain ⟨x', hx'⟩ : ∃ x' : ℤ, x' = -y + 2 * q := ⟨_, rfl⟩
+  obtain ⟨y', hy'⟩ : ∃ y' : ℤ, y' = x + 2 * p - 1 := ⟨_, rfl⟩
+  obtain ⟨s0, hs0⟩ : ∃ s0 : ℤ, s0 = q * x + p * y := ⟨_, rfl⟩
+  have hs2 : s = 2 * s0 := by
+    rw [hs, hq, hp, hs0]
+    ring
+  have ht' : q - s0 = p * x' - q * y' := by
+    rw [hx', hy', hs0]
+    ring
+  have hs' : (q + p) * x' + (q - p) * y' = t + 2 * (q ^ 2 + 2 * q * p - p ^ 2) - (q - p) := by
+    rw [hx', hy', ht, hnq, hdq]
+    ring
+  have hT : (q + p) ^ 2 + 2 * (q + p) * (q - p) - (q - p) ^ 2 = 2 * (q ^ 2 + 2 * q * p - p ^ 2) := by ring
+  have hTd : d ^ 2 + 2 * d * n - n ^ 2 = 2 * (q ^ 2 + 2 * q * p - p ^ 2) := by
+    rw [hdq, hnq]
+    ring
+  have hp0 : 0 < p := by omega
+  have hpq : p < q := by omega
+  have hμ0 : (q + p) % 2 = 0 → (2 : ℤ) = 1 := fun h => by omega
+  rcases (show (x + y) % 2 = 0 ∨ (x + y) % 2 = 1 by omega) with hz | hz
+  · -- even site: `a = min(2n, d − n)`, `l = 0`; the rotated site is odd
+    obtain ⟨ha, hl⟩ := hsite.2 hz
+    rw [ha] at hH1 hH2
+    rw [hl] at hH3 hsband
+    have hMid := tband_m_bounds p q 2 x' y' (q - s0) ((q + p) * x' + (q - p) * y') p
+      (min (q - p) (3 * p - q)) hp0 hpq (fun _ => rfl) (fun h => by omega) ht' rfl
+      ⟨fun _ => ⟨rfl, rfl⟩, fun h => by omega⟩
+      (by omega) (by omega) (by rw [hs']; omega) (by rw [hs']; omega)
+    omega
+  · -- odd site: `a = n`, `l = min(d − n, 3n − d)`; the rotated site is even
+    obtain ⟨ha, hl⟩ := hsite.1 hz
+    rw [ha] at hH1 hH2
+    rw [hl] at hH3 hsband
+    have hMid := tband_m_bounds p q 2 x' y' (q - s0) ((q + p) * x' + (q - p) * y') (min (2 * p) (q - p)) 0
+      hp0 hpq (fun _ => rfl) (fun h => by omega) ht' rfl
+      ⟨fun h => by omega, fun _ => ⟨rfl, rfl⟩⟩
+      (by omega) (by omega) (by rw [hs']; omega) (by rw [hs']; omega)
+    omega
+
 end FLatticePaper.Tiles.SiteRot
