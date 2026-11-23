@@ -273,6 +273,7 @@ import FLatticePaper.Tiles.IncrementCounts
 import FLatticePaper.Tiles.SiteStrings
 import FLatticePaper.Tiles.SiteInduction
 import FLatticePaper.Tiles.SiteBaseDischarge
+import FLatticePaper.Tiles.SitePairScope
 import FLatticePaper.Plane.Induction.S3FreeBoundary
 import FLatticePaper.Plane.Induction.ParentCoordinates
 import FLatticePaper.Plane.Induction.Q3Arithmetic
