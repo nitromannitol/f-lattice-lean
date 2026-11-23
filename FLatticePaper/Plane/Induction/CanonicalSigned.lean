@@ -34,6 +34,11 @@ structure ChainPairData (frame : ChildFrame) (F : Field) (η : ℤ) (P : Site �
   /-- The opposite-sign policy on `F`: its raw slip `D_{−η}` does not increase along it. The g-policy is `c ↦ opp (c + ησ)`. -/
   opp : Site → Site → Prop
   oppRawSlip : NonincreasingAlong (fun y => F y - F (y + (-η) • frame.shortShift)) opp
+  /-- The opposite policy is a genuine quota policy of `F` (black keeps both inputs, white keeps one): the translated g-policy has its
+  quota (`TWO_RANK` local step, `hoppQuota`). -/
+  oppQuota : RetainQuota F opp
+  /-- The price does not increase along the opposite policy: the translated g-policy has `P_shift` nonincreasing (`hoppPrice`). -/
+  oppPrice : NonincreasingAlong (frame.price F) opp
   /-- The chain potential `Φ_η = D_η + P(· + ησ)` does not increase along the F-policy `P` (§4). -/
   chainNonincreasing : NonincreasingAlong (frame.chainPotential F η) P
 

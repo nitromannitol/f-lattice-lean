@@ -41,6 +41,14 @@ theorem incomingPos_add (x s : Site) (hs : (s.1 + s.2) % 2 = 0) :
   simp only [evenSite_add_iff x s hs]
   split_ifs <;> ext <;> simp only [Prod.fst_add, Prod.snd_add] <;> ring
 
+/-- An edge is preserved by an even translation. -/
+theorem edge_add_of_even {y x : Site} (s : Site) (hs : (s.1 + s.2) % 2 = 0) (h : FLatticePaper.Edge y x) :
+    FLatticePaper.Edge (y + s) (x + s) := by
+  unfold FLatticePaper.Edge at h ⊢
+  rcases h with h | h
+  · exact Or.inl (by rw [incomingNeg_add x s hs, h])
+  · exact Or.inr (by rw [incomingPos_add x s hs, h])
+
 /-- The Laplacian of a translate by an even step is the Laplacian at the translated site. -/
 theorem laplacian_translate (F : Field) (s : Site) (hs : (s.1 + s.2) % 2 = 0) (c : Site) :
     laplacian (fun x => F (x + s)) c = laplacian F (c + s) := by
@@ -61,7 +69,8 @@ theorem local_two_rank (F g D Ps : Site → ℤ) (P G : Site → Site → Prop)
     {z u : Site} (hu : P z u) (hin : u = incomingNeg z ∨ u = incomingPos z)
     (hunit : Ps u ≤ Ps z + 1) (hrise : D z + Ps z < D u + Ps u) :
     laplacian g z = 0 ∧ laplacian F z = 0 ∧
-      D (incomingNeg z) = D z ∧ D (incomingPos z) = D z ∧ Ps u = Ps z + 1 := by
+      D (incomingNeg z) = D z ∧ D (incomingPos z) = D z ∧ Ps u = Ps z + 1 ∧
+      ∃ v, (v = incomingNeg z ∨ v = incomingPos z) ∧ v ≠ u ∧ G z v := by
   have hDu : D u ≤ D z := hDP z u hu
   have hPu : Ps u = Ps z + 1 := by omega
   have hDu' : D u = D z := by omega
@@ -103,7 +112,20 @@ theorem local_two_rank (F g D Ps : Site → ℤ) (P G : Site → Site → Prop)
       omega
     · exact h
   have hLDz : laplacian D z = 0 := by omega
-  refine ⟨hgw, hF0, ?_, ?_, hPu⟩ <;> omega
+  have hD1 : D (incomingNeg z) = D z := by omega
+  have hD2 : D (incomingPos z) = D z := by omega
+  have hother : ∃ v, (v = incomingNeg z ∨ v = incomingPos z) ∧ v ≠ u ∧ G z v := by
+    have hne := FLatticePaper.incomingNeg_ne_incomingPos z
+    rcases hin with h | h
+    · refine ⟨incomingPos z, Or.inr rfl, by rw [h]; exact hne.symm, ?_⟩
+      rcases hGwhite z hgw with h' | h'
+      · exact absurd (by rw [h]; exact h') hnotG
+      · exact h'
+    · refine ⟨incomingNeg z, Or.inl rfl, by rw [h]; exact hne, ?_⟩
+      rcases hGwhite z hgw with h' | h'
+      · exact h'
+      · exact absurd (by rw [h]; exact h') hnotG
+  exact ⟨hgw, hF0, hD1, hD2, hPu, hother⟩
 
 /-- Shifting by `(η • σ)` and back by `((−η) • σ)` is the identity. -/
 theorem add_neg_smul_cancel (frame : ChildFrame) (η : ℤ) (x : Site) :
@@ -128,7 +150,8 @@ theorem rise_local_frame (frame : ChildFrame) {F : Field} (C : CanonicalSignedPo
     (hrise : frame.chainPotential F η z < frame.chainPotential F η u) :
     laplacian F (z + η • frame.shortShift) = 0 ∧ laplacian F z = 0 ∧
       frame.slip F η (incomingNeg z) = frame.slip F η z ∧ frame.slip F η (incomingPos z) = frame.slip F η z ∧
-      frame.price F (u + η • frame.shortShift) = frame.price F (z + η • frame.shortShift) + 1 := by
+      frame.price F (u + η • frame.shortShift) = frame.price F (z + η • frame.shortShift) + 1 ∧
+      ∃ v, (v = incomingNeg z ∨ v = incomingPos z) ∧ v ≠ u ∧ opp (z + η • frame.shortShift) (v + η • frame.shortShift) := by
   have hs : (frame.shortShift.1 + frame.shortShift.2) % 2 = 0 :=
     FLatticePaper.BothFreeGrades.shortShift_even frame
   have hsη : ((η • frame.shortShift).1 + (η • frame.shortShift).2) % 2 = 0 := by
@@ -181,12 +204,12 @@ theorem rise_local_frame (frame : ChildFrame) {F : Field} (C : CanonicalSignedPo
       frame.slip F η u + frame.price F (u + η • frame.shortShift) := by
     unfold ChildFrame.chainPotential at hrise
     exact hrise
-  obtain ⟨hg, hF, hna, hpa, hPs⟩ := local_two_rank F (fun x => F (x + η • frame.shortShift)) (frame.slip F η)
+  obtain ⟨hg, hF, hna, hpa, hPs, hv⟩ := local_two_rank F (fun x => F (x + η • frame.shortShift)) (frame.slip F η)
     (fun x => frame.price F (x + η • frame.shortShift)) C.policy
     (fun c i => opp (c + η • frame.shortShift) (i + η • frame.shortShift))
     (fun x => rfl) hlapF hlapg C.quota.1 hGblack hGwhite hDP hDG hPsG hu hin
     (hunit z u hu) hrise'
-  refine ⟨?_, hF, hna, hpa, hPs⟩
+  refine ⟨?_, hF, hna, hpa, hPs, hv⟩
   rw [laplacian_translate F _ hsη] at hg
   exact hg
 
