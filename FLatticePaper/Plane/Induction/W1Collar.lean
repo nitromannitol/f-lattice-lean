@@ -153,7 +153,7 @@ site since `L = d + n` and `d − n` are even (`n`, `d` odd), and this is record
 theorem left_even_pos (n d N D x y k : ℤ) (hn : 0 < n) (hnd : n + 2 ≤ d) (hN : 0 < N) (hD : 0 < D)
     (hε : N * d - D * n = 1) (hk : x + y = 2 * k)
     (h1 : d + n - (d ^ 2 + 2 * d * n - n ^ 2) ≤ n * x - d * y) (h2 : n * x - d * y ≤ 0)
-    (h3 : 2 * n < (d + n) * x + (d - n) * y) (h4 : (d + n) * x + (d - n) * y ≤ 2 * (d + n) - 2) :
+    (h3 : 2 * n < (d + n) * x + (d - n) * y) (h4 : (d + n) * x + (d - n) * y ≤ 2 * (d + n)) :
     2 * N ≤ (D + N) * x + (D - N) * y ∧ (D + N) * x + (D - N) * y ≤ 2 * (D + N) - 2 := by
   have hT : 0 < d ^ 2 + 2 * d * n - n ^ 2 := by nlinarith
   have hC : 0 < D * (d + n) + N * (d - n) := by nlinarith
@@ -184,7 +184,7 @@ theorem left_even_pos (n d N D x y k : ℤ) (hn : 0 < n) (hnd : n + 2 ≤ d) (hN
 theorem left_even_neg (n d N D x y k : ℤ) (hn : 0 < n) (hnd : n + 2 ≤ d) (hN : 0 < N) (hD : 0 < D)
     (hε : N * d - D * n = -1) (hk : x + y = 2 * k)
     (h1 : d + n - (d ^ 2 + 2 * d * n - n ^ 2) ≤ n * x - d * y) (h2 : n * x - d * y ≤ 0)
-    (h3 : 2 * n < (d + n) * x + (d - n) * y) (h4 : (d + n) * x + (d - n) * y ≤ 2 * (d + n) - 2) :
+    (h3 : 2 * n < (d + n) * x + (d - n) * y) (h4 : (d + n) * x + (d - n) * y ≤ 2 * (d + n)) :
     2 * N + 2 ≤ (D + N) * x + (D - N) * y ∧ (D + N) * x + (D - N) * y ≤ 2 * (D + N) := by
   have hT : 0 < d ^ 2 + 2 * d * n - n ^ 2 := by nlinarith
   have hC : 0 < D * (d + n) + N * (d - n) := by nlinarith

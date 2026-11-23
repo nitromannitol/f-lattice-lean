@@ -309,5 +309,6 @@ import FLatticePaper.Plane.Induction.SheetPieces
 import FLatticePaper.Plane.Induction.ExitSlip
 import FLatticePaper.Plane.Induction.SheetCover
 import FLatticePaper.Plane.Induction.W1Collar
+import FLatticePaper.Plane.Induction.W1CollarBox
 
 /-! Root import for the corrected F-lattice paper. -/
