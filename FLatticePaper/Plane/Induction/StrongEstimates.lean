@@ -42,6 +42,13 @@ def RankWithIncrements (retained : Site → Site → Prop) (U V : Site) (p q : �
   ∃ rank : Site → ℤ, ∃ lam : ℤ, 0 < lam ∧ (∀ x i, retained x i → rank i < rank x) ∧
     (∀ z, rank (z + U) - rank z = p * lam) ∧ (∀ z, rank (z + V) - rank z = q * lam)
 
+/-- The odd parent `N / D` of the current word whose conjugate is `u`, read from the child of `u`: `D − N` is the numerator and
+`D + N` the denominator of the earlier child (the fix's `b` and `r`). -/
+def parentN (u : Word) : ℤ := ((frameAt u).child.den - (frameAt u).child.num) / 2
+
+/-- The denominator `D` of the odd parent of the current word whose conjugate is `u`, see `parentN`. -/
+def parentD (u : Word) : ℤ := ((frameAt u).child.den + (frameAt u).child.num) / 2
+
 /-- The strong estimates of the standard field of a word `u`, the earlier word of an induction step. -/
 structure StrongEstimates (u : Word) : Prop where
   /-- The packet of the standard field: periods, strips, reflection, binarity. -/
@@ -67,6 +74,17 @@ structure StrongEstimates (u : Word) : Prop where
         (frameAt u).slip (standardField u) η z = 0 ∧
       (frameAt u).slip (standardField u) η (z + (frameAt u).child.modifiedDeck.transverse) -
         (frameAt u).slip (standardField u) η z = 2 * η
+  /-- The zero strip of the quarter-turned earlier field in the parent transverse coordinate `t_p = N x₁ − D x₂`:
+  `f = h₀ + F_u(Z ·) = quarterTurnField (standardField u)` vanishes for `1 − D ≤ t_p ≤ N + 2D − 1` (fix Q4-strips, the zero
+  region). Checked numerically on the proper words of length at most three. -/
+  zeroStripInterval : ∀ x : Site,
+    1 - parentD u ≤ parentN u * x.1 - parentD u * x.2 →
+      parentN u * x.1 - parentD u * x.2 ≤ parentN u + 2 * parentD u - 1 →
+        quarterTurnField (standardField u) x = 0
+  /-- The even-parity extension of the zero strip at `t_p = −D`: `f = 0` at the even sites with `t_p = −D` (fix Q4-strips,
+  `f_even(−D) = 0`). Checked numerically on the proper words of length at most three. -/
+  zeroEvenLine : ∀ x : Site, (x.1 + x.2) % 2 = 0 →
+    parentN u * x.1 - parentD u * x.2 = -parentD u → quarterTurnField (standardField u) x = 0
   /-- F1, the slip: unit increments of `F` against its σ-translate on every edge. -/
   F1_unitSlip : HasUnitSlip (standardField u) (fun z => standardField u (z + (frameAt u).shortShift))
   /-- F1, the slip: no-cross stars. -/
