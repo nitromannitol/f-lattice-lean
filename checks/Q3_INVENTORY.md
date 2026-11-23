@@ -394,3 +394,9 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - PROVED `retained_of_quota` (the quota pick).
 - NOT PROVED (still needed for `hResP`): the old-root argument. The retained edge must be `nonfree_drop_excluded`'s `parentPolicy` edge with `jumpA (c − lv) = 1` and `jumpA (i − lv) = 0`, which comes from the rising-pair slip structure (positive `σ`), and then either `nonfree_root_forced_nonfree` (nonfree old root) or the free-root exclusions (`H_drop_excluded`, the V-block) with the exceptional endpoint (Q19).
 - Checks: `checks/TieCentre.lean`. Root build clean; sandbox logs clean.
+
+### Task 72 (hResP, step 1, the positive-chart identity): SheetDownJump.lean
+
+- PROVED `sheetA_sub_uq_eq_cutPrice`: `A (z − uq) − A z = cutPrice − price G (Z (z − l_v))` for the sheet `A = sheetA Fp`, from the paragraph-5 identity `paragraph5_field_identity_of_strong` at `z − l_v`, with `uq = εU_q`.
+- NOT PROVED: the value of the jump at the rising pair. The positive chart needs which sheet wins at `c − uq` (Q3's "at a tie choose a target winner"), which fixes `A (c − uq) − A c ∈ {0, −1}` and so the jump; that argument is not yet formal.
+- Checks: `checks/SheetDownJump.lean`. Root build clean; sandbox logs clean.
