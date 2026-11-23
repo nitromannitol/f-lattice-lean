@@ -696,3 +696,18 @@ Scope to confirm with the lead: §1's star containment needs `c = d − n ≥ 3`
 - PROVED `minus_permit_H`: at a free H site, the minus prescription is permitted for the raw slip `D₋(w) = F w − F(w − σ)`: `slipPermits F (w ↦ F(w + (−1)•σ)) z (z + prescribedH (−1) z)`. The zero strip of `HasStrips` (`F = 0` on grades `[1 − d, n + 2d − 1]`) carries the four values `F z, F (z+ε), F (z−σ), F (z+ε−σ)`, since the H spectrum and its unit neighbours lie in that band (`n ≥ 1`, `n + 2 ≤ d`).
 - Remaining for `permittedMinus`: the V-site permits (harmonic values on the translates) and the white edges (the selection), which need the field values.
 - Checks: `checks/MinusPermit.lean`. Root build clean (0 `^warning` lines).
+
+### Task 72 / Q20 (two-rank raw Φ, the local step): TwoRank.lean
+
+- PROVED `local_two_rank` (abstract) and `rise_local_frame` (frame): at a retained F-policy edge `z → u` with `Φ_η(z) < Φ_η(u)`
+  (`Φ_η = D_η + P(· + ησ)`, `ChildFrame.chainPotential`), the rise forces `ΔD = 0`, `ΔP_shift = 1`; the translated opposite g-policy
+  rejects `u`, so `g` is white (its quota) and retains the other input; a black `F` would give `Lap D = −1` against `Lap D = 0`, so
+  `F` is white; both inputs of `z` have `D = D(z)`. Conclusion: `F(z + ησ)` and `F(z)` white, both inputs tied, `P(u+ησ) = P(z+ησ)+1`.
+- Named inputs of `rise_local_frame` (not derived here): `opp` with `RetainQuota F opp` (`hoppQuota`, not yet a `ChainPairData`
+  field), `hoppPrice` (the price does not increase along the opposite policy), `hunit` (unit shifted-price increments on F-policy
+  edges). `oppRawSlip` is the existing `ChainPairData` field; `rawSlip{Plus,Minus}_of_canonical` supply `D` monotonicity on `C.policy`.
+- NOT derived: (i) the rise's roots are free (the audit's finite unit forcing transfer; needs the minimum-admission acyclic policies);
+  (ii) the both-free exclusion from the grade lemmas of BothFreeGrades, which needs the policy's selected input at free roots equal to
+  the prescribed direction for the sign convention of the audit (`(−1,η)` original, `(−1,−η)` shifted); `CanonicalSignedPolicy.freePrescribed`
+  gives only uniqueness of the selection. Hence `ChainPairData.chainNonincreasing` is still a named field.
+- Checks: `checks/TwoRank.lean` (five `#print axioms`). Root build: 0 warnings, 0 linter notes.

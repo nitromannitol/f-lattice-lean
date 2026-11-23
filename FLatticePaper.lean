@@ -401,6 +401,7 @@ import FLatticePaper.Plane.Induction.BothFreeGrades
 import FLatticePaper.Plane.Induction.ArcRanges
 import FLatticePaper.Plane.Induction.ChildGap
 import FLatticePaper.Plane.Induction.MinusPermit
+import FLatticePaper.Plane.Induction.TwoRank
 import FLatticePaper.Plane.Induction.HWeb
 import FLatticePaper.Plane.Induction.W1Collar
 import FLatticePaper.Plane.Induction.W1CollarBox
