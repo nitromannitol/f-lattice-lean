@@ -443,3 +443,12 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - Neighbour zero (hsy) by parity, brute force over N, D (scratchpad/neighbour_samepar.py): even neighbour needs extended at `T`, `T+1` (`jumpA_zero_of_even_window`); odd neighbour needs ordinary at `T`, `T+1` (`jumpA_zero_of_strip`). The only residual classes are the exceptional H roots: `u = N+D` with an even root and `+N` step when `D = N+1`, and `u = D+1` with an odd root and `+D` step when `N = 1`.
 - Checks: `checks/EvenWindow.lean` (guards). Root build clean; sandbox logs clean.
 - Not in this step: the exceptional residual (link 3), and the Lean assembly of hsy from these parity cases.
+
+### Task 72 (case (b), the regular H drop and the neighbour zero): NeighbourDrop.lean
+
+- PROVED `evenSite_add_vec_iff`: the vertical translate `−iV_p` preserves site parity (coordinate sum changes by `−2in`).
+- PROVED `odd_neighbour_strip`: for `u ≠ N+D` and step `±N` (odd neighbour), the neighbour and its partner lie in the ordinary zero strip.
+- PROVED `even_neighbour_window`: for `u ≠ N+D` and step `±D` (even neighbour), the neighbour and its partner lie in the extended window.
+- PROVED `H_drop_regular`: with the H-web at the root, `jump x = 1`, `jump y = 0`, the neighbour step by parity, and `u ≠ N+D`, the configuration is impossible (root zero gives `1 − i = 0`, neighbour zero gives `−i = 0`).
+- Residual: `u = N+D` (exceptional H root), where the regular bands fail only for an even root with `+N` step at `D = N+1` and an odd root with `+D` step at `N = 1`. This is link 3.
+- Checks: `checks/NeighbourDrop.lean` (guards). Root build clean; sandbox logs clean.
