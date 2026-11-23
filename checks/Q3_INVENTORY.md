@@ -291,3 +291,11 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - PROVED `andOr_rank_of_restrictedNoFort`: the rank of `andOr_rank_of_escape` with that horizon, from the restricted no-fort condition alone.
 - The stopping bound `t + m K(z_t) ≤ m K(z_0) + m + m² d_0` of Q1 l.32 is the value bound `restrictedValue_le_of_uniform_escape` (`horizon · K + (horizon + horizon² · bound)`, `bound = d_0`), already formal in RestrictedBellmanRank. Not re-proved.
 - Checks: `checks/UniformEscape.lean` (two guards, standard axioms only). Root build clean (no warnings in the root log).
+
+### Task 72 (nonfree bridge): a nonfree site has a deck translate in StrictInterior (NonfreeBridge.lean)
+
+- DEFINED: `Nonfree frame z := ∀ v ∈ span, z + v ∉ freeH ∪ freeV` (not on the free H/V set modulo the deck, the lead's wording).
+- PROVED `outside_SI_free`: a point `w` of the closed polygon outside `W1.StrictInterior` lies in `freeH ∪ freeV`, or `w − V` or `w − K` does. Case analysis on the parity of `w` and on the failing strict inequality. Deck vectors: `K = (d, n)` (`s(K) = T`, `t(K) = 0`) and `V = (n − d, n + d)` (`t(V) = −T`, `s(V) = 0`). The upper t-strip is in `freeH` directly, the lower t-strip is in `freeH` after `−V`, the lower s-strip is in `freeV` directly, the upper s-strip is in `freeV` after `−K`.
+- PROVED `nonfree_bridge`: `Nonfree frame z → ∃ v ∈ span, StrictInterior (z + v)` (`exists_shift_mem` puts a translate into the closed polygon).
+- Numeric (scripts/nonfree_bridge_check.py): for 47 odd children `n/d` (`n + 2 ≤ d`, coprime, `d ≤ 21`) and sites in a box, both "no translate on E and boundary spectrum" and "no translate in freeH or freeV" give a strict-interior translate. A first run with a deck window `R = 4` gave failures only at the box corners, which vanished for `R ≥ 8`.
+- Checks: `checks/NonfreeBridge.lean` (two guards, standard axioms only). Module log has no warnings.
