@@ -468,5 +468,6 @@ import FLatticePaper.Plane.Induction.PsiCalibration
 import FLatticePaper.Plane.Induction.ArcPsi
 import FLatticePaper.Plane.Induction.HEnum
 import FLatticePaper.Plane.Induction.EHPrice
+import FLatticePaper.Plane.Induction.PriceInputs
 
 /-! Root import for the corrected F-lattice paper. -/
