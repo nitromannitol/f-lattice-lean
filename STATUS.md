@@ -330,6 +330,8 @@ lake env lean checks/SiteBoundaryInnerAxioms.lean
 lake env lean checks/SiteConcatAxioms.lean
 lake env lean checks/PairMarginsAxioms.lean
 lake env lean checks/BaseWordsQuadAxioms.lean
+lake env lean checks/PairNominalAxioms.lean
+lake env lean checks/PairCellFormsAxioms.lean
 lake env lean checks/VArcLongitudinal.lean
 lake env lean checks/VArcOffers.lean
 lake env lean checks/ParentStepDischarge.lean
