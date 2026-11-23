@@ -373,5 +373,8 @@ import FLatticePaper.Plane.Induction.StrongDeckSpan
 import FLatticePaper.Plane.Induction.StrongSourceRep
 import FLatticePaper.Plane.Induction.StrongChartSlip
 import FLatticePaper.Plane.Induction.StrongVStar
+import FLatticePaper.Plane.Induction.W1ArcBottom
+import FLatticePaper.Plane.Induction.W1VShift
+import FLatticePaper.Plane.Induction.W1ConjPrice
 
 /-! Root import for the corrected F-lattice paper. -/
