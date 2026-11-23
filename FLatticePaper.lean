@@ -306,6 +306,9 @@ import FLatticePaper.Tiles.PairOwnerP0
 import FLatticePaper.Tiles.PairQAbox
 import FLatticePaper.Tiles.PairQBBox
 import FLatticePaper.Tiles.PairCoverW1
+import FLatticePaper.Tiles.PairW0P
+import FLatticePaper.Tiles.PairW0Q
+import FLatticePaper.Tiles.PairCoverW0
 import FLatticePaper.Plane.Induction.S3FreeBoundary
 import FLatticePaper.Plane.Induction.ParentCoordinates
 import FLatticePaper.Plane.Induction.Q3Arithmetic
