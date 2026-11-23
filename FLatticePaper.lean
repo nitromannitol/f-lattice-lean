@@ -347,6 +347,7 @@ import FLatticePaper.Plane.Induction.CanonicalDirections
 import FLatticePaper.Plane.Induction.RouteSteps
 import FLatticePaper.Plane.Induction.CutTipEscape
 import FLatticePaper.Plane.Induction.TipWhiteness
+import FLatticePaper.Plane.Induction.TipVertex
 import FLatticePaper.Plane.Induction.HWeb
 import FLatticePaper.Plane.Induction.W1Collar
 import FLatticePaper.Plane.Induction.W1CollarBox

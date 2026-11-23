@@ -354,3 +354,9 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - NOT PROVED: the whiteness of the W0 middle `v + (1,1)`. Its east input has `s = 3d + n − 2`, outside the harmonic s-strip `[1 − 2d, 2L − 1]`, so it needs the two-sheet evaluation of TIP_THEOREM (`fA`, `fC`).
 - NOT PROVED: the existence of the tip vertex `v` with `t(v) = −B`, `s(v) = 2ε` from the parent data (the tip values stay hypotheses); the permits and the grade drop `0 → −1` at the port.
 - Checks: `checks/TipWhiteness.lean`. Root build clean; sandbox logs clean for warning, error, sorry.
+
+### Task 72 (TIP_THEOREM tip vertex): TipVertex.lean
+
+- PROVED `TipVertex.tGrade_tipVertex`, `sGrade_tipVertex`, `evenSite_tipVertex`: the tip vertex is the parent's V vertex `V_p = (n_p − d_p, n_p + d_p)` in child coordinates, with `t(V_p) = −B`, `B = L d_p + c n_p`, and `s(V_p) = 2 eps` (identities using `eps_eq`). This derives the tip values that TIP_THEOREM states, so they are no longer hypotheses. The phase is `eps`: W1 is `eps = 1`, W0 is `eps = −1`.
+- PROVED `TipVertex.W1_tip_white_of_eps`, `W0_root_white_of_eps`: the W1 root and middle, and the W0 root, are white for `HasStrips F`, given `eps` and the nonbase bounds `0 ≤ B`, `5L ≤ T − B` (kept as hypotheses).
+- Checks: `checks/TipVertex.lean`. Root build clean; sandbox logs clean.
