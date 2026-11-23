@@ -573,3 +573,13 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - PROVED `even_H_k_bounds`: an even H point of the closed polygon has `x₁ + x₂ ≤ L − 2`, and `x₁ + x₂ = L − 2` forces `(d − 1, n − 1)`.
 - PROVED `odd_H_k_bounds`: an odd H point has `x₁ + x₂ ≤ L − 1`, and `x₁ + x₂ = L − 1` forces `(d, n − 1)`.
 - Checks: `checks/CollarUpper.lean`. Root build clean; sandbox logs clean.
+
+### Task 72 (hcollar, band (a), bottom direct cases): CollarBottomCases.lean
+
+- PROVED `strict_even_iff`, `strict_odd_iff`: the `StrictInterior` predicate in explicit grade form (even: `L − 2 − T < t`, `t < 2`, `2n < s`, `s < T` with `L = d + n`; odd: `d − T < t < n`, `L − 2 < s < T + 2 − d + n`).
+- PROVED `even_H_l1`: an even H point with `x₁ + x₂ = 2` is `(2, 0)`.
+- PROVED `odd_H_cases`: an odd H point is `(1, 0)`, `(3, 0)`, or has `s(v) > 3L`.
+- PROVED `even_direct_arith`: for an even strict centre `c ≠ (1,1)` with an even H witness `v`, `|c − v|∞ ≤ 1`, the band `2L − 2 < s(c) ≤ T − 2d + 2n + 1` and `2 − L ≤ t(c) ≤ 0` hold.
+- PROVED `odd_direct_even_arith`: for an odd strict centre with an even H witness, `L + 2n < s(c) ≤ T − d + n − 1` and `−d ≤ t(c) ≤ n − 2`.
+- Still open for the direct bottom band: the even-centre/odd-witness and odd-centre/odd-witness cores, the four-corner step (the collar square of a bottom centre is `squareCorners (c1−1) c2`, so all four corners need strictness; the corners follow from the centre band and `T > 3(d+n)`), and the glue to `collarBase`.
+- Checks: `checks/CollarBottomCases.lean`. Root build clean; sandbox logs clean.
