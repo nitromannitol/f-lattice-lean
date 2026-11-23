@@ -1,5 +1,6 @@
 import FLatticePaper.Tiles.PairQAbox
 import FLatticePaper.Tiles.EvenIneq
+import FLatticePaper.Tiles.EvenP21
 
 /-! Task 53, item 2 (covering reduction), section 13: the even child `X = 2P + Q` at flag false (`δ = dr − ne = +1`).
 
@@ -25,7 +26,7 @@ theorem four_beta_lt {β x D e : ℚ} (hD : 0 < D) (hβ : β * D = e) (h : 4 * e
   nlinarith [mul_le_mul_of_nonneg_right hc hD.le]
 
 /-- **The box `[0, β]²` of the flag-false even child is owned by `Q` at `0`.** -/
-theorem F1_box (d n e r : ℤ) (hd : 3 ≤ d) (hn : 1 ≤ n) (hnd : n < d) (hr : 1 ≤ r) (hre : r < e)
+theorem F1_box (d n e r : ℤ) (hd : 2 ≤ d) (hn : 1 ≤ n) (hnd : n < d) (hr : 1 ≤ r) (hre : r < e)
     (hdet : d * r - n * e = 1) (hodd : (d + n) % 2 = 1) (heven : (e + r) % 2 = 0)
     (z : ℤ × ℤ) (u v β : ℚ)
     (hz1 : (z.1 : ℚ) - 1 / 2 = u * (2 * (d : ℚ) + e) + v * ((2 * (n : ℚ) + r) - (2 * (d : ℚ) + e)))
@@ -174,22 +175,46 @@ theorem F1_box (d n e r : ℤ) (hd : 3 ≤ d) (hn : 1 ≤ n) (hnd : n < d) (hr :
         exact_mod_cast h
     rcases le_total e (2 * r) with hle | hle
     · rw [min_eq_left (show e - r ≤ 3 * r - e by omega)] at hSupO ⊢
-      have hq : (4 : ℚ) * e < (2 * (r : ℚ) + 1 - e) * (2 * d + e) := by
-        exact_mod_cast A1_ineq d n e r (by omega) (by omega) (by omega) hre hdet heven hle
-      have hA1r : 4 * β < 2 * (r : ℚ) + 1 - e := four_beta_lt hD hβ hq
-      refine ⟨hT0, hT1, ?_, hSupO⟩
-      have h : (((e - r - 1 : ℤ)) : ℚ) < ((((e + r) * z.1 + (e - r) * z.2 : ℤ)) : ℚ) := by
-        push_cast; linarith [hLoS, hA1r]
-      have h' := Int.lt_iff_add_one_le.mp (Int.cast_lt.mp h)
-      linarith
-    · rw [min_eq_right (show 3 * r - e ≤ e - r by omega)] at hSupO ⊢
-      have hq : (4 : ℚ) * e < ((e : ℚ) + 1 - 2 * r) * (2 * d + e) := by
-        exact_mod_cast A2_ineq d n e r (by omega) (by omega) (by omega) hre hdet heven (by omega)
-      have hA2r : 4 * β < (e : ℚ) + 1 - 2 * r := four_beta_lt hD hβ hq
-      refine ⟨hT0, hT1, ?_, hSupO⟩
-      have h : (((3 * r - e - 1 : ℤ)) : ℚ) < ((((e + r) * z.1 + (e - r) * z.2 : ℤ)) : ℚ) := by
-        push_cast; linarith [hLoS, hA2r]
-      have h' := Int.lt_iff_add_one_le.mp (Int.cast_lt.mp h)
-      linarith
+      have hS3 : e - r ≤ (e + r) * z.1 + (e - r) * z.2 := by
+        rcases (show d = 2 ∨ 3 ≤ d by omega) with hd2 | hd3
+        · -- `P = (2,1)`: the lattice step `F1_lat`
+          have hn1 : n = 1 := by omega
+          subst hd2
+          subst hn1
+          have he : e = 2 * r - 1 := by omega
+          subst he
+          obtain ⟨m, hm⟩ : ∃ m : ℤ, r = 2 * m + 1 := ⟨(r - 1) / 2, by omega⟩
+          have hm1 : 1 ≤ m := by omega
+          have hz1' : (z.1 : ℚ) - 1 / 2 = u * (2 * (r : ℚ) + 3) - v * ((r : ℚ) + 1) := by
+            push_cast at hz1; linear_combination hz1
+          have hz2' : (z.2 : ℚ) + 1 / 2 = u * ((r : ℚ) + 2) + v * (3 * (r : ℚ) + 5) := by
+            push_cast at hz2; linear_combination hz2
+          have hβ' : β * (2 * (r : ℚ) + 3) = 2 * (r : ℚ) - 1 := by
+            push_cast at hβ; linear_combination hβ
+          have hlat := FLatticePaper.Tiles.EvenP21.F1_lat r m z.1 z.2 hm hm1 u v β hz1' hz2' hβ' hu0 hv1
+          linarith [hlat]
+        · have hq : (4 : ℚ) * e < (2 * (r : ℚ) + 1 - e) * (2 * d + e) := by
+            exact_mod_cast A1_ineq d n e r hd3 (by omega) (by omega) hre hdet heven hle
+          have hA1r : 4 * β < 2 * (r : ℚ) + 1 - e := four_beta_lt hD hβ hq
+          have h : (((e - r - 1 : ℤ)) : ℚ) < ((((e + r) * z.1 + (e - r) * z.2 : ℤ)) : ℚ) := by
+            push_cast; linarith [hLoS, hA1r]
+          have h' := Int.lt_iff_add_one_le.mp (Int.cast_lt.mp h)
+          linarith
+      exact ⟨hT0, hT1, hS3, hSupO⟩
+    · rcases (show d = 2 ∨ 3 ≤ d by omega) with hd2 | hd3
+      · exfalso
+        subst hd2
+        have hn1 : n = 1 := by omega
+        subst hn1
+        omega
+      · rw [min_eq_right (show 3 * r - e ≤ e - r by omega)] at hSupO ⊢
+        have hq : (4 : ℚ) * e < ((e : ℚ) + 1 - 2 * r) * (2 * d + e) := by
+          exact_mod_cast A2_ineq d n e r hd3 (by omega) (by omega) hre hdet heven (by omega)
+        have hA2r : 4 * β < (e : ℚ) + 1 - 2 * r := four_beta_lt hD hβ hq
+        refine ⟨hT0, hT1, ?_, hSupO⟩
+        have h : (((3 * r - e - 1 : ℤ)) : ℚ) < ((((e + r) * z.1 + (e - r) * z.2 : ℤ)) : ℚ) := by
+          push_cast; linarith [hLoS, hA2r]
+        have h' := Int.lt_iff_add_one_le.mp (Int.cast_lt.mp h)
+        linarith
 
 end FLatticePaper.Tiles.PairEvenW0Q

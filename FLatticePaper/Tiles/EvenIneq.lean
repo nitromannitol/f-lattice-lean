@@ -87,7 +87,7 @@ theorem A2_ineq (d n e r : ℤ) (hd : 3 ≤ d) (hn : 1 ≤ n) (hr : 1 ≤ r) (hr
   nlinarith [mul_nonneg (show (0:ℤ) ≤ p by omega) (show (0:ℤ) ≤ d - 2 * n - 1 by omega)]
 
 /-- `C1`: when `e ≤ 3r`. -/
-theorem C1_ineq (d n e r : ℤ) (hd : 3 ≤ d) (hn : 1 ≤ n) (hr : 1 ≤ r) (hre : r < e)
+theorem C1_ineq (d n e r : ℤ) (hd : 2 ≤ d) (hn : 1 ≤ n) (hr : 1 ≤ r) (hre : r < e)
     (hdet : d * r - n * e = 1) (hodd : (d + n) % 2 = 1) (hle : e ≤ 3 * r) :
     4 * e < (3 * r - e + 2) * (2 * d + e) := by
   obtain ⟨q, hq⟩ : ∃ q, q = 3 * r - e := ⟨_, rfl⟩
@@ -112,7 +112,7 @@ theorem C1_ineq (d n e r : ℤ) (hd : 3 ≤ d) (hn : 1 ≤ n) (hr : 1 ≤ r) (hr
     nlinarith [mul_nonneg (show (0:ℤ) ≤ q - 2 by omega) (show (0:ℤ) ≤ 2 * d + e by omega)]
 
 /-- `C2`: when `e ≥ 3r`. -/
-theorem C2_ineq (d n e r : ℤ) (hd : 3 ≤ d) (hn : 1 ≤ n) (hr : 1 ≤ r) (hre : r < e)
+theorem C2_ineq (d n e r : ℤ) (hd : 2 ≤ d) (hn : 1 ≤ n) (hr : 1 ≤ r) (hre : r < e)
     (hdet : d * r - n * e = 1) (hge : 3 * r ≤ e) :
     4 * e < (e - 3 * r + 2) * (2 * d + e) := by
   obtain ⟨q, hq⟩ : ∃ q, q = e - 3 * r := ⟨_, rfl⟩
@@ -140,7 +140,7 @@ theorem eq_r_one_of_e_eq_three_r (d n r : ℤ) (hr : 1 ≤ r)
   · nlinarith
   · nlinarith
 
-theorem BT_ineq (d n e r : ℤ) (hd : 3 ≤ d) (hn : 1 ≤ n) (hr : 1 ≤ r) (hre : r < e)
+theorem BT_ineq (d n e r : ℤ) (hd : 2 ≤ d) (hn : 1 ≤ n) (hr : 1 ≤ r) (hre : r < e)
     (hdet : d * r - n * e = -1) : 4 * e < (r + 1) * (2 * d + e) := by
   have hne : e ≤ n * e := by nlinarith
   rcases (show r = 1 ∨ r = 2 ∨ 3 ≤ r by omega) with h | h | h
@@ -217,7 +217,7 @@ theorem A2T_ineq (d n e r : ℤ) (hd : 3 ≤ d) (hr : 1 ≤ r) (hre : r < e)
     nlinarith
   · nlinarith [mul_nonneg (show (0 : ℤ) ≤ 2 * r + p by omega) (show (0 : ℤ) ≤ p - 3 by omega)]
 
-theorem PTlo1_ineq (d n e r : ℤ) (hd : 3 ≤ d) (hr : 1 ≤ r) (hre : r < e)
+theorem PTlo1_ineq (d n e r : ℤ) (hd : 2 ≤ d) (hr : 1 ≤ r) (hre : r < e)
     (hdet : d * r - n * e = -1) (heven : (e + r) % 2 = 0) (hge : 3 * r ≤ e) :
     4 * (e - r) < (e - 3 * r + 2) * (2 * d + e) := by
   obtain ⟨q, hq⟩ : ∃ q, q = e - 3 * r := ⟨_, rfl⟩
@@ -235,7 +235,7 @@ theorem PTlo1_ineq (d n e r : ℤ) (hd : 3 ≤ d) (hr : 1 ≤ r) (hre : r < e)
   · omega
   · omega
 
-theorem PTlo2_ineq (d n e r : ℤ) (hd : 3 ≤ d) (hr : 1 ≤ r) (hre : r < e)
+theorem PTlo2_ineq (d n e r : ℤ) (hd : 2 ≤ d) (hr : 1 ≤ r) (hre : r < e)
     (hdet : d * r - n * e = -1) (heven : (e + r) % 2 = 0) (hle : e ≤ 3 * r) :
     4 * (e - r) < (3 * r - e + 2) * (2 * d + e) := by
   obtain ⟨s, hs⟩ : ∃ s, s = 3 * r - e := ⟨_, rfl⟩
@@ -253,7 +253,7 @@ theorem PTlo2_ineq (d n e r : ℤ) (hd : 3 ≤ d) (hr : 1 ≤ r) (hre : r < e)
     nlinarith
   · nlinarith [mul_nonneg (show (0 : ℤ) ≤ s - 3 by omega) (show (0 : ℤ) ≤ r by omega)]
 
-theorem PTslo1_ineq (d e r : ℤ) (hd : 3 ≤ d) (hr : 1 ≤ r) (hre : r < e) (hle : e ≤ 2 * r) :
+theorem PTslo1_ineq (d e r : ℤ) (hd : 2 ≤ d) (hr : 1 ≤ r) (hre : r < e) (hle : e ≤ 2 * r) :
     2 * (e - r) < (2 * r + 1 - e) * (2 * d + e) := by
   obtain ⟨m, hm⟩ : ∃ m, m = 2 * r - e := ⟨_, rfl⟩
   have hm0 : 0 ≤ m := by omega
@@ -261,7 +261,7 @@ theorem PTslo1_ineq (d e r : ℤ) (hd : 3 ≤ d) (hr : 1 ≤ r) (hre : r < e) (h
   subst he
   nlinarith [mul_nonneg hm0 (show (0 : ℤ) ≤ 2 * r - m - 1 by omega), mul_nonneg hm0 (show (0 : ℤ) ≤ 2 * d by omega)]
 
-theorem PTslo2_ineq (d e r : ℤ) (hd : 3 ≤ d) (hr : 1 ≤ r) (hre : r < e) (hge : 2 * r ≤ e) :
+theorem PTslo2_ineq (d e r : ℤ) (hd : 2 ≤ d) (hr : 1 ≤ r) (hre : r < e) (hge : 2 * r ≤ e) :
     2 * (e - r) < (e + 1 - 2 * r) * (2 * d + e) := by
   obtain ⟨p, hp⟩ : ∃ p, p = e - 2 * r := ⟨_, rfl⟩
   have hp0 : 0 ≤ p := by omega
@@ -269,7 +269,7 @@ theorem PTslo2_ineq (d e r : ℤ) (hd : 3 ≤ d) (hr : 1 ≤ r) (hre : r < e) (h
   subst he
   nlinarith [mul_nonneg hp0 (show (0 : ℤ) ≤ p + 2 * r - 1 by omega), mul_nonneg hp0 (show (0 : ℤ) ≤ 2 * d by omega)]
 
-theorem half_ineq (d n e r : ℤ) (hd : 3 ≤ d) (hr : 1 ≤ r)
+theorem half_ineq (d n e r : ℤ) (hd : 2 ≤ d) (hr : 1 ≤ r)
     (hdet : d * r - n * e = -1) (h3 : e = 3 * r) : e < 2 * d := by
   subst h3
   have hr1 : r = 1 := eq_r_one_of_e_eq_three_r d n r hr hdet

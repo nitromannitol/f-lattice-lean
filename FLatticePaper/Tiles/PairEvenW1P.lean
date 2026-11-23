@@ -172,7 +172,7 @@ theorem d_ne_two_n' (d n e r : ℤ) (hd : 3 ≤ d) (hdet : d * r - n * e = -1) :
   omega
 
 /-- **The box `[0, α] × [α/2, α]` of the flag-true even child is owned by `P` at `V_P`.** -/
-theorem T3H_box (d n e r : ℤ) (hn : 1 ≤ n) (hnd : n < d) (hd : 3 ≤ d) (hr : 1 ≤ r) (hre : r < e)
+theorem T3H_box (d n e r : ℤ) (hn : 1 ≤ n) (hnd : n < d) (hdn : d ≠ 2 * n ∨ 2 * d < e) (hr : 1 ≤ r) (hre : r < e)
     (hdet : d * r - n * e = -1) (hodd : (d + n) % 2 = 1) (heven : (e + r) % 2 = 0)
     (z : ℤ × ℤ) (u v α : ℚ)
     (hz1 : (z.1 : ℚ) - 1 / 2 = u * (2 * (d : ℚ) + e) + v * ((2 * (n : ℚ) + r) - (2 * (d : ℚ) + e)))
@@ -184,7 +184,6 @@ theorem T3H_box (d n e r : ℤ) (hn : 1 ≤ n) (hnd : n < d) (hd : 3 ≤ d) (hr 
   have hDi : (0 : ℤ) < 2 * d + e := by omega
   have hD : (0 : ℚ) < 2 * (d : ℚ) + e := by exact_mod_cast hDi
   have hmu : muOf ⟨n, d⟩ = 2 := muP_two' d n hodd
-  have hd2 : d ≠ 2 * n := d_ne_two_n' d n e r hd hdet
   have hc : (0 : ℚ) < (d : ℚ) - n := by exact_mod_cast (show (0 : ℤ) < d - n by omega)
   have heQ : (0 : ℚ) < e := by exact_mod_cast (show (0 : ℤ) < e by omega)
   have hnQ : (0 : ℚ) < n := by exact_mod_cast (show (0 : ℤ) < n by omega)
@@ -294,8 +293,20 @@ theorem T3H_box (d n e r : ℤ) (hn : 1 ≤ n) (hnd : n < d) (hd : 3 ≤ d) (hr 
     have hL1 : L ≤ d - n := by rw [hL]; exact min_le_left _ _
     have hL2 : L ≤ 3 * n - d := by rw [hL]; exact min_le_right _ _
     have hLcase : L = d - n ∨ L = 3 * n - d := by rw [hL]; exact min_choice _ _
-    have hLn : L ≤ n - 1 := by omega
-    have hLq : (L : ℚ) ≤ n - 1 := by exact_mod_cast hLn
+    have hLn : L ≤ n := by omega
+    have hLq : (L : ℚ) ≤ n := by exact_mod_cast hLn
+    have hαL : 2 * α < (n : ℚ) - L + 1 := by
+      rcases (show L + 1 ≤ n ∨ L = n by omega) with h1 | h1
+      · have : (L : ℚ) + 1 ≤ n := by exact_mod_cast h1
+        linarith only [hα1, this]
+      · have hdn2 : 2 * d < e := hdn.resolve_left (fun h => h (by omega))
+        have h2d : (2 : ℚ) * d < e := by exact_mod_cast hdn2
+        have e2 : 2 * α * (2 * (d : ℚ) + e) = 4 * d := by linear_combination 2 * hα
+        have hα1' : 2 * α < 1 := by
+          apply lt_of_mul_lt_mul_right _ hD.le
+          linarith only [e2, h2d]
+        have : (L : ℚ) = n := by exact_mod_cast h1
+        linarith only [hα1', this]
     have hpar' : ¬ (((z.1 - (n - d)) + (z.2 - (n + d))) % 2 = 0) := by omega
     have hev : decide ((((z.1 - (n - d), z.2 - (n + d)) : ℤ × ℤ).1 + (z.1 - (n - d), z.2 - (n + d)).2) % 2 = 0) = false :=
       decide_eq_false hpar'
@@ -304,12 +315,12 @@ theorem T3H_box (d n e r : ℤ) (hn : 1 ≤ n) (hnd : n < d) (hd : 3 ≤ d) (hr 
     have hl : lOf ⟨n, d⟩ false = L := by rw [hL]; simp [lOf]
     rw [hA, hl]
     dsimp only
-    have hdn : (n : ℚ) < d := by exact_mod_cast hnd
+    have hndQ : (n : ℚ) < d := by exact_mod_cast hnd
     refine ⟨?_, ?_, ?_, ?_⟩
     · have h : ((n - (d ^ 2 + 2 * d * n - n ^ 2) - 1 : ℤ) : ℚ) < ((n * (z.1 - (n - d)) - d * (z.2 - (n + d)) : ℤ) : ℚ) := by
         push_cast
         rw [hTP] at hlo_t
-        linarith only [hlo_t, hdn]
+        linarith only [hlo_t, hndQ]
       have h' := Int.lt_iff_add_one_le.mp (Int.cast_lt.mp h)
       linarith
     · have h : ((n * (z.1 - (n - d)) - d * (z.2 - (n + d)) : ℤ) : ℚ) < ((d + 1 : ℤ) : ℚ) := by
@@ -319,14 +330,14 @@ theorem T3H_box (d n e r : ℤ) (hn : 1 ≤ n) (hnd : n < d) (hd : 3 ≤ d) (hr 
       linarith
     · have h : (((L - 1) : ℤ) : ℚ) < (((d + n) * (z.1 - (n - d)) + (d - n) * (z.2 - (n + d)) : ℤ) : ℚ) := by
         push_cast
-        linarith only [hlo_s, hα1, hLq]
+        linarith only [hlo_s, hαL]
       have h' := Int.lt_iff_add_one_le.mp (Int.cast_lt.mp h)
       linarith
     · have h : (((d + n) * (z.1 - (n - d)) + (d - n) * (z.2 - (n + d)) : ℤ) : ℚ) <
           ((2 * (d ^ 2 + 2 * d * n - n ^ 2) + 2 * n - L + 1 : ℤ) : ℚ) := by
         push_cast
         rw [hTP] at hhi_s
-        linarith only [hhi_s, hLq, hn1]
+        linarith only [hhi_s, hLq]
       have h' := Int.lt_add_one_iff.mp (Int.cast_lt.mp h)
       linarith
 
