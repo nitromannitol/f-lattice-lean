@@ -284,3 +284,10 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - DERIVED `forcedWhiteUnique_of_canonical` (CanonicalSigned): `white_policy` plus `forced_sound` on the selection.
 - CHANGED: the reflection hypothesis and `nonfree_drop_excluded` use unseeded forced edges (W1 is unseeded).
 - Checks: `checks/NonfreeRoot.lean` (three guards), `checks/CanonicalSigned.lean` and `checks/ReflectionI.lean` pass. Root build clean (no warnings in the root log).
+
+### Task 72 (Q1 paragraphs 7–8): the uniform escape horizon (UniformEscape.lean)
+
+- PROVED `uniform_escape_horizon`: under `RestrictedNoFort`, a deck cover `sites`, the binary Laplacian and the deck covariance of the escape game, there is one horizon `m ≥ 1` with `RestrictedEscapesWithin (grade site) m site` for every site. The depths are finite on the cover (`restrictedNoFort_iff_cover`), escape is equivariant under the deck (`restrictedEscapesWithin_add`), and the depth is monotone in the horizon; the maximum over the finite cover is the horizon (`Finset.sup`).
+- PROVED `andOr_rank_of_restrictedNoFort`: the rank of `andOr_rank_of_escape` with that horizon, from the restricted no-fort condition alone.
+- The stopping bound `t + m K(z_t) ≤ m K(z_0) + m + m² d_0` of Q1 l.32 is the value bound `restrictedValue_le_of_uniform_escape` (`horizon · K + (horizon + horizon² · bound)`, `bound = d_0`), already formal in RestrictedBellmanRank. Not re-proved.
+- Checks: `checks/UniformEscape.lean` (two guards, standard axioms only). Root build clean (no warnings in the root log).
