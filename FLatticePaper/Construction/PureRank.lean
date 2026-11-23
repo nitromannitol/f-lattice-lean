@@ -665,4 +665,224 @@ theorem free_root_gate (d : ℤ) (hd : 3 ≤ d) (x y dx dy : ℤ) (hf : IsFreeP 
         (by rwa [show x + 0 = x by ring, show 1 - x + 1 = 2 - x by ring] at hr)
     · exfalso; omega
 
+/-! ## The bulk gates (step (ii)): drops along the parity-axis edges that the white predicate can retain
+
+Interior points (native, not free, below the top row, off the anti-diagonal, not `(d,1)`) and the boundary families. Each gate
+states that every rank of the target is below the rank of the source. The retained edges are a subset of the listed directions, which
+the white predicate (next section) establishes. -/
+
+set_option hygiene false in
+/-- The target-side analysis of a gate: every representative translate of the target has a rank below the bound. -/
+macro "gate_tac" : tactic => `(tactic| (
+  obtain ⟨i, j, hi, hrep, rfl⟩ := hr
+  obtain ⟨hi1, hi2, hj1, hj2⟩ := hi
+  rcases rep_cases d _ hrep with hF | hR
+  all_goals
+    interval_cases i <;> interval_cases j <;>
+    (unfold valMinus; simp only [shiftP, IsHc, IsVc, IsFreeP, NativeP, Prod.mk.injEq] at *; split_ifs <;> omega)))
+
+/-- Interior values for `x ≥ 1`, off the diagonal `x+y = d+1`: `valMinus = 4d − 4 − 2x + parity`. -/
+theorem valMinus_int_right (d x y : ℤ) (hf : ¬ IsFreeP d (x, y)) (hx : 1 ≤ x) (hdiag : x + y ≠ d + 1) :
+    valMinus d (x, y) = 4 * d - 4 - 2 * x + (x + y) % 2 := by
+  have h1 : ¬ IsHc d (x, y) := fun h => hf (Or.inl h)
+  have h2 : ¬ IsVc d (x, y) := fun h => hf (Or.inr h)
+  have h3 : ¬ (x + y = d + 1 ∧ 1 ≤ x) := fun h => hdiag h.1
+  dsimp only [valMinus]
+  rw [if_neg h1, if_neg h2, if_neg h3, if_neg (show ¬ (x ≤ 0) by omega)]
+
+/-- Interior values for `x ≥ 1` on the diagonal `x+y = d+1`: `valMinus = 2x`. -/
+theorem valMinus_int_diag (d x y : ℤ) (hf : ¬ IsFreeP d (x, y)) (hx : 1 ≤ x) (hdiag : x + y = d + 1) :
+    valMinus d (x, y) = 2 * x := by
+  have h1 : ¬ IsHc d (x, y) := fun h => hf (Or.inl h)
+  have h2 : ¬ IsVc d (x, y) := fun h => hf (Or.inr h)
+  dsimp only [valMinus]
+  rw [if_neg h1, if_neg h2, if_pos (show x + y = d + 1 ∧ 1 ≤ x from ⟨hdiag, hx⟩)]
+
+/-- The interior value on the left: `valMinus = 2x − 4 + parity` for an interior point with `x ≤ 0`. -/
+theorem valMinus_int_left (d x y : ℤ) (hf : ¬ IsFreeP d (x, y)) (hx : x ≤ 0) :
+    valMinus d (x, y) = 2 * x - 4 + (x + y) % 2 := by
+  have h1 : ¬ IsHc d (x, y) := fun h => by
+    obtain ⟨-, h1x, -⟩ := h
+    have : 1 ≤ x := h1x
+    omega
+  have h2 : ¬ IsVc d (x, y) := fun h => hf (Or.inr h)
+  have h3 : ¬ (x + y = d + 1 ∧ 1 ≤ x) := fun h => by omega
+  dsimp only [valMinus]
+  rw [if_neg h1, if_neg h2, if_neg h3, if_pos hx]
+
+set_option maxHeartbeats 1000000 in
+/-- Interior even point with `x ≤ 0` (its retained edge is `(−1, 0)`): the target `(x−1, y)` has every rank below the point's rank. -/
+theorem gate_int_left_even (d x y : ℤ) (hd : 3 ≤ d) (hn : NativeP d (x, y)) (hf : ¬ IsFreeP d (x, y))
+    (hpar : (x + y) % 2 = 0) (hx : x ≤ 0) (r : ℤ) (hr : RankOf d (x - 1, y) r) :
+    r < valMinus d (x, y) := by
+  rw [valMinus_int_left d x y hf hx]
+  have hb : 2 - d ≤ x ∧ 0 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2 ∧ y ≤ d + 1 := by
+    unfold NativeP at hn
+    unfold IsFreeP IsHc IsVc at hf
+    simp only [Prod.mk.injEq] at hn hf
+    omega
+  obtain ⟨hb1, hb2, hb3, hb4, hb5⟩ := hb
+  clear hn hf
+  obtain ⟨i, j, hi, hrep, rfl⟩ := hr
+  obtain ⟨hi1, hi2, hj1, hj2⟩ := hi
+  rcases rep_cases d _ hrep with hF | hR
+  all_goals
+    interval_cases i <;> interval_cases j <;>
+    (unfold valMinus; simp only [shiftP, IsHc, IsVc, IsFreeP, NativeP, Prod.mk.injEq] at *; split_ifs <;> omega)
+
+set_option maxHeartbeats 1000000 in
+/-- Interior even point with `x ≥ 1` off the diagonal: the target `(x+1, y)` has every rank below the point's. -/
+theorem gate_int_right_even (d x y : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (hn : NativeP d (x, y)) (hf : ¬ IsFreeP d (x, y))
+    (hy : y ≤ d) (hdiag : x + y ≠ d + 1) (h5 : ¬ (x = d ∧ y = 1)) (hx : 1 ≤ x) (hpar : (x + y) % 2 = 0)
+    (r : ℤ) (hr : RankOf d (x + 1, y) r) : r < valMinus d (x, y) := by
+  rw [valMinus_int_right d x y hf hx hdiag]
+  have hb : 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2 := by
+    unfold NativeP at hn
+    unfold IsFreeP IsHc IsVc at hf
+    simp only [Prod.mk.injEq] at hn hf
+    omega
+  obtain ⟨hb1, hb2, hb3, hb4, hb5⟩ := hb
+  clear hn hf hdiag
+  gate_tac
+
+set_option maxHeartbeats 1000000 in
+/-- Interior even point on the diagonal `x + y = d+1` with `x ≥ 1`: the target `(x+1, y)` has every rank below `2x`. -/
+theorem gate_int_diag_right (d x y : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (hn : NativeP d (x, y))
+    (hf : ¬ IsFreeP d (x, y)) (h5 : ¬ (x = d ∧ y = 1)) (hx : 1 ≤ x) (hdiag : x + y = d + 1)
+    (r : ℤ) (hr : RankOf d (x + 1, y) r) : r < valMinus d (x, y) := by
+  rw [valMinus_int_diag d x y hf hx hdiag]
+  have hb : 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2 := by
+    unfold NativeP at hn
+    unfold IsFreeP IsHc IsVc at hf
+    simp only [Prod.mk.injEq] at hn hf
+    omega
+  obtain ⟨hb1, hb2, hb3, hb4, hb5⟩ := hb
+  clear hn hf
+  gate_tac
+
+set_option maxHeartbeats 1000000 in
+/-- The point `(1, y)` (even, off the diagonal, `y < d`): the left neighbour `(0, y)` has every rank below the point's. -/
+theorem gate_int_one_left (d x y : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (hn : NativeP d (x, y))
+    (hf : ¬ IsFreeP d (x, y)) (hy : y ≤ d) (hx1 : x = 1) (hdiag : x + y ≠ d + 1)
+    (hpar : (x + y) % 2 = 0) (r : ℤ) (hr : RankOf d (x - 1, y) r) : r < valMinus d (x, y) := by
+  rw [valMinus_int_right d x y hf (by omega) hdiag]
+  have hb : 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2 := by
+    unfold NativeP at hn
+    unfold IsFreeP IsHc IsVc at hf
+    simp only [Prod.mk.injEq] at hn hf
+    omega
+  obtain ⟨hb1, hb2, hb3, hb4, hb5⟩ := hb
+  clear hn hf hdiag
+  gate_tac
+
+set_option maxHeartbeats 1000000 in
+/-- The point `(1, d)` (on the diagonal): its left neighbour `(0, d)` has every rank below `2`. -/
+theorem gate_int_one_diag_left (d x y : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1)
+    (hf : ¬ IsFreeP d (x, y)) (hy : y ≤ d) (hx1 : x = 1) (hdiag : x + y = d + 1)
+    (r : ℤ) (hr : RankOf d (x - 1, y) r) : r < valMinus d (x, y) := by
+  rw [valMinus_int_diag d x y hf (by omega) hdiag]
+  have hb : 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2 := by
+    unfold IsFreeP IsHc IsVc at hf
+    simp only [Prod.mk.injEq] at hf
+    omega
+  obtain ⟨hb1, hb2, hb3, hb4, hb5⟩ := hb
+  clear hf hdiag
+  gate_tac
+
+set_option maxHeartbeats 1000000 in
+/-- Odd interior point on the left: the neighbour `(x, y−1)` has every rank below the point's. -/
+theorem gate_int_odd_left_down (d x y : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (hn : NativeP d (x, y))
+    (hf : ¬ IsFreeP d (x, y)) (hy : y ≤ d) (hx : x ≤ 0) (hodd : (x + y) % 2 = 1)
+    (r : ℤ) (hr : RankOf d (x, y - 1) r) : r < valMinus d (x, y) := by
+  rw [valMinus_int_left d x y hf hx]
+  have hb : 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2 := by
+    unfold NativeP at hn
+    unfold IsFreeP IsHc IsVc at hf
+    simp only [Prod.mk.injEq] at hn hf
+    omega
+  obtain ⟨hb1, hb2, hb3, hb4, hb5⟩ := hb
+  clear hn
+  gate_tac
+
+set_option maxHeartbeats 1000000 in
+/-- Odd interior point on the left: the neighbour `(x, y+1)` has every rank below the point's. -/
+theorem gate_int_odd_left_up (d x y : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (hn : NativeP d (x, y))
+    (hf : ¬ IsFreeP d (x, y)) (hy : y ≤ d) (hx : x ≤ 0) (hodd : (x + y) % 2 = 1)
+    (r : ℤ) (hr : RankOf d (x, y + 1) r) : r < valMinus d (x, y) := by
+  rw [valMinus_int_left d x y hf hx]
+  have hb : 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2 := by
+    unfold NativeP at hn
+    unfold IsFreeP IsHc IsVc at hf
+    simp only [Prod.mk.injEq] at hn hf
+    omega
+  obtain ⟨hb1, hb2, hb3, hb4, hb5⟩ := hb
+  clear hn
+  gate_tac
+
+set_option maxHeartbeats 1000000 in
+/-- Odd interior point on the right: the neighbour `(x, y−1)` has every rank below the point's. -/
+theorem gate_int_odd_right_down (d x y : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (hn : NativeP d (x, y))
+    (hf : ¬ IsFreeP d (x, y)) (hy : y ≤ d) (h4 : x + y ≠ d + 2) (hx : 1 ≤ x) (hodd : (x + y) % 2 = 1)
+    (r : ℤ) (hr : RankOf d (x, y - 1) r) : r < valMinus d (x, y) := by
+  rw [valMinus_int_right d x y hf hx (by omega)]
+  have hb : 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2 := by
+    unfold NativeP at hn
+    unfold IsFreeP IsHc IsVc at hf
+    simp only [Prod.mk.injEq] at hn hf
+    omega
+  obtain ⟨hb1, hb2, hb3, hb4, hb5⟩ := hb
+  clear hn
+  gate_tac
+
+set_option maxHeartbeats 1000000 in
+/-- Odd interior point on the right: the neighbour `(x, y+1)` has every rank below the point's. -/
+theorem gate_int_odd_right_up (d x y : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (hn : NativeP d (x, y))
+    (hf : ¬ IsFreeP d (x, y)) (hy : y ≤ d) (hx : 1 ≤ x) (hodd : (x + y) % 2 = 1)
+    (r : ℤ) (hr : RankOf d (x, y + 1) r) : r < valMinus d (x, y) := by
+  rw [valMinus_int_right d x y hf hx (by omega)]
+  have hb : 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2 := by
+    unfold NativeP at hn
+    unfold IsFreeP IsHc IsVc at hf
+    simp only [Prod.mk.injEq] at hn hf
+    omega
+  obtain ⟨hb1, hb2, hb3, hb4, hb5⟩ := hb
+  clear hn
+  gate_tac
+
+set_option maxHeartbeats 1000000 in
+/-- The top row point `(x, d+1)` with `x` even, `x ≤ 0`: its neighbour `(x−1, d+1)` has every rank below `2x − 4`. -/
+theorem gate_top_even (d x : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (hx1 : 2 - d ≤ x) (hx2 : x ≤ 0)
+    (hev : x % 2 = 0) (r : ℤ) (hr : RankOf d (x - 1, d + 1) r) : r < 2 * x - 4 := by
+  gate_tac
+
+set_option maxHeartbeats 1000000 in
+/-- The top row point `(x, d+1)` with `x` odd, `x ≤ 0`: its neighbour `(x, d)` has every rank below `2x − 3`. -/
+theorem gate_top_odd (d x : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (hx1 : 2 - d ≤ x) (hx2 : x ≤ 0)
+    (hod : x % 2 = 1) (r : ℤ) (hr : RankOf d (x, d) r) : r < 2 * x - 3 := by
+  gate_tac
+
+set_option maxHeartbeats 1000000 in
+/-- The top row point `(1, d+1)`: its upper neighbour `(1, d+2)` has every rank below `−1`. -/
+theorem gate_top_one (d : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (r : ℤ) (hr : RankOf d (1, d + 2) r) :
+    r < -1 := by
+  gate_tac
+
+set_option maxHeartbeats 1000000 in
+/-- The corner `(2, d+1)`: its left neighbour `(1, d+1)` has every rank below `0`. -/
+theorem gate_corner (d : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (r : ℤ) (hr : RankOf d (1, d + 1) r) :
+    r < 0 := by
+  gate_tac
+
+set_option maxHeartbeats 1000000 in
+/-- The anti-diagonal point `(x, d+2−x)` with `2 ≤ x ≤ d`: its upper neighbour has every rank below `2x − 3`. -/
+theorem gate_anti (d x : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (hx2 : 2 ≤ x) (hxd : x ≤ d) (r : ℤ)
+    (hr : RankOf d (x, d + 3 - x) r) : r < 2 * x - 3 := by
+  gate_tac
+
+set_option maxHeartbeats 1000000 in
+/-- The point `(d, 1)`: its left neighbour `(d−1, 1)` has every rank below `2d`. -/
+theorem gate_fifth (d : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (r : ℤ) (hr : RankOf d (d - 1, 1) r) :
+    r < 2 * d := by
+  gate_tac
+
 end FLatticePaper.PureRank
