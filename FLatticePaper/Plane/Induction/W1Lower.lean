@@ -144,7 +144,13 @@ theorem delta_eq_price (frame : ChildFrame) (F : Field) (z : Site) :
   linarith
 
 /-- **The lower odd h0 interval.** For an odd site with `s ∈ [2 − 3d + n, 1 − 2d]`, `F = h0`, given the named seed on the bottom
-line `s = 2 − 3d + n` (`hseed`), the price range and drift, and the ordinary h0 strip. -/
+line `s = 2 − 3d + n` (`hseed`), the price range and drift, and the ordinary h0 strip.
+
+Source of `hseed` (task 49; paths under `.work/fields/`): `escape/newzeros/NO_ODD_SLIP_AUDIT.md` §2: the odd conjugate has its
+even-parity zero at `t_p = 1 − d`, and `J⁻¹(x, y) = (y+1, −x)` carries it to `h = 0` on odd sites with `s = 2 − 3d + n`; §4 gives
+the pure initialization. It lies below the ordinary strip of `StrongEstimates` (`zeroStripInterval`), so it is not contained in it.
+Its I-reflection partner `s = 3d + n − 2` is `seed_bottom_iff_top` (W1Top). Numerically on the exact line for the proper words of
+length ≤ 4 (`scripts/w1_seed_check.py`). -/
 theorem lower_odd_h0 (frame : ChildFrame) {F : Field}
     (hstrips : frame.HasStrips F)
     (hPR : ∀ z ∈ frame.closedPolygon, frame.cutPrice - 1 ≤ frame.price F z ∧ frame.price F z ≤ frame.cutPrice)

@@ -86,7 +86,13 @@ theorem child_T_ge_L (frame : ChildFrame) : frame.child.den + frame.child.num �
 
 /-- **The lower even zero interval.** Let `F` be periodic under the kernel with the strip inputs of the child, let `F` be
 nonnegative-slip on the closed polygon (`hslip`), and let `F` vanish at the even sites of the mutual seed level `t = 2 − L`
-(`hseed`). Then `F = 0` at every even site with `2 − L ≤ t ≤ 1 − d`. -/
+(`hseed`). Then `F = 0` at every even site with `2 − L ≤ t ≤ 1 − d`.
+
+Source of `hseed` (task 49; paths under `.work/fields/`): the even-role chain `escape/newzeros/PARITY_ZERO_INTERVAL_EXTENSION.md`
+(seed `G(2−L) = 0`); its propagation `escape/newzeros/PAIR_INDUCTION.md` (even child branches, using the parent's odd seed);
+the pure initialization `escape/newzeros/BASE_TWO_PIXEL_ZEROS.md` §1, §3 and `escape/newzeros/NO_ODD_SLIP_AUDIT.md` §4.
+Not in `StrongEstimates`: `t = 2 − L` lies below the ordinary zero strip `[1 − d, n + 2d − 1]`. Numerically on the exact line for
+the proper words of length ≤ 4 (`scripts/w1_seed_check.py`, 0 failures). -/
 theorem even_zero_lower (frame : ChildFrame) {F : Field}
     (hper : HasGeneratorPeriods frame.child F 0 frame.coherentConstantV)
     (hstrips : frame.HasStrips F)
