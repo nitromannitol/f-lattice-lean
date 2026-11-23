@@ -341,6 +341,60 @@ theorem sheetA_eq_harmR (F : Site → ℤ) (dq nq : ℤ) (z : Site) :
   unfold harmR
   simp only [sub_zero, one_mul]
 
+/-- An integer `c` with `2c = −2αβ − α² + β² − α + β` (the constant of the harmonic shift along `(α+β, α−β)`). -/
+theorem exists_const (α β : ℤ) : ∃ c : ℤ, 2 * c = -2 * α * β - α ^ 2 + β ^ 2 - α + β := by
+  obtain ⟨k, hk⟩ := Int.even_mul_succ_self α
+  obtain ⟨l, hl⟩ := Int.even_mul_succ_self β
+  exact ⟨-α * β - k + l, by linear_combination hk - hl⟩
+
+/-- `F ∘ Z` is invariant under the shift `2V_p`. -/
+theorem F_Z_two (F : Site → ℤ) (N D : ℤ) (hK : ∀ y : Site, F (y + (D + N, D - N)) = F y) (a : Site) :
+    F (-(a.2 + 2 * (D + N)), a.1 - 2 * (D - N) - 1) = F (-a.2, a.1 - 1) := by
+  have h1 := ZoneHarmonic.fZ_add_Vp F N D hK a
+  have h2 := ZoneHarmonic.fZ_add_Vp F N D hK (a.1 - (D - N), a.2 + (D + N))
+  have e : (-(a.2 + 2 * (D + N)), a.1 - 2 * (D - N) - 1)
+      = (-((a.2 + (D + N)) + (D + N)), (a.1 - (D - N)) - (D - N) - 1) := by
+    rw [Prod.mk.injEq]
+    constructor <;> ring
+  simp only at h2
+  rw [e, h2, h1]
+
+/-- The other sheet at `ε = +1` (`W = 1`) minus `h₀` is the residue at `z − V`, `V = (n − d, n + d)`, `n = 2N + n_q`,
+`d = 2D + d_q` (the identity of the fix's harmonic region, with the parent argument `u − U_q + 2V_p`). -/
+theorem sheetC_eq_harmR (F : Site → ℤ) (N D nq dq cq : ℤ)
+    (hK : ∀ y : Site, F (y + (D + N, D - N)) = F y) (hε : N * dq - nq * D = 1)
+    (hcq : 2 * cq = dq * dq + 2 * dq * nq - nq * nq - dq - nq) (z : Site) :
+    quarterTurnField F (z.1 - (1 - 1) * dq - (nq - dq + (N * dq - nq * D) * dq),
+        z.2 - (1 - 1) * nq - (nq + dq + (N * dq - nq * D) * nq))
+      + (nq * (z.1 - (1 - 1) * dq) - dq * (z.2 - (1 - 1) * nq)) + (cq + 2 * 1) - harmonicGrid z
+    = harmR F dq nq (z.1 - ((2 * N + nq) - (2 * D + dq)), z.2 - ((2 * N + nq) + (2 * D + dq))) := by
+  obtain ⟨c1, hc1⟩ := exists_const (2 * N) (-2 * D)
+  obtain ⟨c2, hc2⟩ := exists_const (2 * N + nq) (-(2 * D + dq))
+  have hK2 : 2 * (c1 - c2 + cq + 2 + 4 * D * nq + 2 * D * dq - 2 * N * nq) = 0 := by
+    linear_combination hc1 - hc2 + hcq - 4 * hε
+  have hconst : c1 - c2 + cq + 2 + 4 * D * nq + 2 * D * dq - 2 * N * nq = 0 := by linarith
+  rw [hε]
+  have hA := F_Z_two F N D hK (z.1 - ((2 * N + nq) - (2 * D + dq)) - dq, z.2 - ((2 * N + nq) + (2 * D + dq)) - nq)
+  have hH1 := ZoneHarmonic.harmonicGrid_sub_shift
+    (z.1 - (1 - 1) * dq - (nq - dq + 1 * dq), z.2 - (1 - 1) * nq - (nq + dq + 1 * nq)) (2 * N) (-2 * D) c1 hc1
+  have e1 : (z.1 - (1 - 1) * dq - (nq - dq + 1 * dq), z.2 - (1 - 1) * nq - (nq + dq + 1 * nq))
+      - (2 * N + -2 * D, 2 * N - -2 * D)
+      = (z.1 - ((2 * N + nq) - (2 * D + dq)) - dq, z.2 - ((2 * N + nq) + (2 * D + dq)) - nq) := by
+    rw [Prod.mk_sub_mk, Prod.mk.injEq]
+    constructor <;> ring
+  rw [e1] at hH1
+  have hH2 := ZoneHarmonic.harmonicGrid_sub_shift z (2 * N + nq) (-(2 * D + dq)) c2 hc2
+  have e2 : z - ((2 * N + nq) + -(2 * D + dq), (2 * N + nq) - -(2 * D + dq))
+      = (z.1 - ((2 * N + nq) - (2 * D + dq)), z.2 - ((2 * N + nq) + (2 * D + dq))) := by
+    rw [Prod.mk_sub_mk, Prod.mk.injEq]
+    constructor <;> ring
+  rw [e2] at hH2
+  unfold harmR
+  unfold quarterTurnField
+  simp only [quarterTurn_site]
+  ring_nf at hA hH1 hH2 hconst ⊢
+  linear_combination hA + hH1 - hH2 + hconst
+
 end HarmI2
 
 end FLatticePaper.Induction
