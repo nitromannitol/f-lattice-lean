@@ -156,6 +156,8 @@ lake env lean checks/BaseFamilies.lean
 lake env lean checks/JunctionGlue.lean
 lake env lean checks/ArcRows.lean
 lake env lean checks/ArcInequality.lean
+lake env lean checks/RowsOfBoundary.lean
+lake env lean checks/RegisterInduction.lean
 lake env lean checks/StandardSimple.lean
 lake env lean checks/StandardDischarge.lean
 lake env lean checks/RegionBoundary.lean
@@ -194,6 +196,7 @@ lake env lean checks/BaseHalo.lean
 lake env lean checks/S1S2Window.lean
 lake env lean checks/ChildNumerator.lean
 lake env lean checks/OpenLocal.lean
+lake env lean checks/I3Local.lean
 lake env lean checks/GlobalOdometers.lean
 lake env lean checks/ThreesMidpoint.lean
 lake env lean checks/SlipPermits.lean
