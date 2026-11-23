@@ -193,7 +193,7 @@ theorem hH_of_phaseW0 (frame : ChildFrame) (F : Field) (EHv Ψ : Site → ℤ) (
   fun z hz => (FLatticePaper.PriceH.price_arc_W0 (frame.price F) EHv Ψ frame.cutPrice frame.freeH h0 hh0 hP hEH hΨ0 hΨ hΨnn).2.2 z hz
 
 /-- **The bottom bound from the phase W1 of `PriceH`** (`P(z) = c₀ − 1 − E_H(refl z)`), the same conclusion. -/
-theorem hH_of_phaseW1 (frame : ChildFrame) (F : Field) (EHv Ψ refl : Site → ℤ) (h0 : Site)
+theorem hH_of_phaseW1 (frame : ChildFrame) (F : Field) (EHv Ψ : Site → ℤ) (refl : Site → Site) (h0 : Site)
     (hh0 : h0 ∈ frame.freeH)
     (hP : ∀ z ∈ frame.freeH, frame.price F z = frame.cutPrice - 1 - EHv (refl z))
     (hEH : ∀ z ∈ frame.freeH, EHv (refl z) = min 0 (Ψ (refl z) - 1))
