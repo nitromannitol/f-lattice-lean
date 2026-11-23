@@ -1,0 +1,5 @@
+import FLatticePaper.Plane.Induction.SheetFort
+
+#print axioms FLatticePaper.SheetFort.interior_fort_of_no_boundary
+#print axioms FLatticePaper.SheetFort.sheet_fort_no_interior
+#print axioms FLatticePaper.SheetFort.sheet_fan_north_contradiction

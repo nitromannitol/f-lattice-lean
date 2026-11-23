@@ -52,14 +52,15 @@ theorem even_incomingPos_of_odd (v : Site) (h : ¬ EvenSite v) : EvenSite (incom
   simp only
   omega
 
-/-- **Both inputs of an even contact of a true fort are contacts in the fort** (the zero horizontal deficit of the parabola). -/
+
+/-- **Both inputs of an even contact of a true fort are contacts in the fort** (the zero horizontal deficit of the parabola). The window
+bound `m ≤ F` is needed at the two inputs only. -/
 theorem even_contact_both {F m : Field} {S : Set Site} (hfort : IsIncomingFort F S) {v : Site} (hv : v ∈ S)
-    (hc : F v = m v) (he : laplacian m v = 0) (hle : ∀ x, m x ≤ F x) :
+    (hc : F v = m v) (he : laplacian m v = 0) (h1 : m (incomingNeg v) ≤ F (incomingNeg v))
+    (h2 : m (incomingPos v) ≤ F (incomingPos v)) :
     incomingNeg v ∈ S ∧ incomingPos v ∈ S ∧ F (incomingNeg v) = m (incomingNeg v) ∧
       F (incomingPos v) = m (incomingPos v) := by
   have hsum := excess_sum (F := F) (m := m) hc
-  have h1 := hle (incomingNeg v)
-  have h2 := hle (incomingPos v)
   rcases hfort v hv with ⟨hl, hsome⟩ | ⟨hl, hn, hp⟩
   · exfalso
     rw [hl, he] at hsum
@@ -69,133 +70,159 @@ theorem even_contact_both {F m : Field} {S : Set Site} (hfort : IsIncomingFort F
     · omega
     · omega
 
-/-- **One fan step**: from a contact of `S` there is a contact of `S` as the next point, the east input at an even contact. -/
-theorem fan_step {F m : Field} {S : Set Site} (hfort : IsIncomingFort F S)
+/-- The window bound `m ≤ F` at the inputs of every point satisfying the interior predicate `P` (the fan's interior). -/
+def WindowOn (P : Site → Prop) (F m : Field) : Prop :=
+  ∀ x, P x → ∀ i : Site, (i = incomingNeg x ∨ i = incomingPos x) → m i ≤ F i
+
+/-- **One fan step**: from a contact of `S` at an interior point, the next point is a contact of `S`: the east input at an even contact,
+a contacting input in `S` at an odd contact. -/
+theorem fan_step {F m : Field} {S : Set Site} {P : Site → Prop} (hfort : IsIncomingFort F S)
     (hm : ∀ x, laplacian m x = -1 ∨ laplacian m x = 0) (hme : ∀ x, EvenSite x → laplacian m x = 0)
-    (hle : ∀ x, m x ≤ F x) {v : Site} (hv : v ∈ S) (hc : F v = m v) :
+    (hwin : WindowOn P F m) {v : Site} (hP : P v) (hv : v ∈ S) (hc : F v = m v) :
     ∃ w : Site, w ∈ S ∧ F w = m w ∧ (EvenSite v → w = incomingPos v) ∧
       (w = incomingNeg v ∨ w = incomingPos v) := by
+  have h1 := hwin v hP (incomingNeg v) (Or.inl rfl)
+  have h2 := hwin v hP (incomingPos v) (Or.inr rfl)
   by_cases he : EvenSite v
-  · obtain ⟨_, hp, _, ep⟩ := even_contact_both hfort hv hc (hme v he) hle
+  · obtain ⟨_, hp, _, ep⟩ := even_contact_both hfort hv hc (hme v he) h1 h2
     exact ⟨incomingPos v, hp, ep, fun _ => rfl, Or.inr rfl⟩
-  · obtain ⟨i, hi, hiS, hic⟩ := fort_contact_input hfort hv hc hm hle
+  · obtain ⟨i, hi, hiS, hic⟩ := fort_contact_input hfort hv hc hm h1 h2
     exact ⟨i, hiS, hic, fun h => absurd h he, hi⟩
 
 /-- The contacts of `S` for `F` and `m`. -/
 abbrev FanT (F m : Field) (S : Set Site) : Type := {v : Site // v ∈ S ∧ F v = m v}
 
-/-- **The fan path** from a contact: the iterate of the chosen step. -/
-theorem fan_path_exists {F m : Field} {S : Set Site} (hfort : IsIncomingFort F S)
+/-- The step rules of a fan at a point `v`. -/
+def FanRules {F m : Field} {S : Set Site} (next : FanT F m S → FanT F m S) (v : FanT F m S) : Prop :=
+  (EvenSite v.1 → (next v).1 = incomingPos v.1) ∧ ((next v).1 = incomingNeg v.1 ∨ (next v).1 = incomingPos v.1)
+
+/-- A fan step function obeying the rules at every interior point, from the one-step existence. -/
+theorem fan_path_exists {F m : Field} {S : Set Site} {P : Site → Prop} (hfort : IsIncomingFort F S)
     (hm : ∀ x, laplacian m x = -1 ∨ laplacian m x = 0) (hme : ∀ x, EvenSite x → laplacian m x = 0)
-    (hle : ∀ x, m x ≤ F x) :
-    ∃ next : FanT F m S → FanT F m S, ∀ v : FanT F m S,
-      (EvenSite v.1 → (next v).1 = incomingPos v.1) ∧ ((next v).1 = incomingNeg v.1 ∨ (next v).1 = incomingPos v.1) := by
-  have hex : ∀ v : FanT F m S, ∃ w : FanT F m S,
-      (EvenSite v.1 → w.1 = incomingPos v.1) ∧ (w.1 = incomingNeg v.1 ∨ w.1 = incomingPos v.1) := by
+    (hwin : WindowOn P F m) :
+    ∃ next : FanT F m S → FanT F m S, ∀ v : FanT F m S, P v.1 → FanRules next v := by
+  have hex : ∀ v : FanT F m S, ∃ w : FanT F m S, (P v.1 → FanRules (fun _ => w) v) := by
     intro v
-    obtain ⟨w, hwS, hwc, hE, hI⟩ := fan_step hfort hm hme hle v.2.1 v.2.2
-    exact ⟨⟨w, hwS, hwc⟩, hE, hI⟩
+    by_cases hPv : P v.1
+    · obtain ⟨w, hwS, hwc, hE, hI⟩ := fan_step hfort hm hme hwin hPv v.2.1 v.2.2
+      exact ⟨⟨w, hwS, hwc⟩, fun _ => ⟨hE, hI⟩⟩
+    · exact ⟨v, fun h => absurd h hPv⟩
   choose next hnext using hex
-  exact ⟨next, hnext⟩
+  exact ⟨fun v => next v, fun v hPv => hnext v hPv⟩
 
-theorem step_x_even {F m : Field} {S : Set Site} {next : FanT F m S → FanT F m S}
-    (hnext : ∀ v : FanT F m S, (EvenSite v.1 → (next v).1 = incomingPos v.1) ∧
-      ((next v).1 = incomingNeg v.1 ∨ (next v).1 = incomingPos v.1))
-    (v : FanT F m S) (he : EvenSite v.1) : (next v).1.1 = v.1.1 + 1 := by
-  rw [(hnext v).1 he, incomingPos_of_even _ he]
+/-- A step function from a contact of `S` at the start, with the north input at an odd start: the override keeps the rules. -/
+theorem fan_path_exists_north {F m : Field} {S : Set Site} {P : Site → Prop} (hfort : IsIncomingFort F S)
+    (hm : ∀ x, laplacian m x = -1 ∨ laplacian m x = 0) (hme : ∀ x, EvenSite x → laplacian m x = 0)
+    (hwin : WindowOn P F m) (v0 : Site) (hv0S : v0 ∈ S) (hv0c : F v0 = m v0) (hodd : ¬ EvenSite v0)
+    (hnS : incomingPos v0 ∈ S) (hnc : F (incomingPos v0) = m (incomingPos v0)) :
+    ∃ next : FanT F m S → FanT F m S, (∀ v : FanT F m S, P v.1 → FanRules next v) ∧
+      (next ⟨v0, hv0S, hv0c⟩).1 = incomingPos v0 := by
+  classical
+  obtain ⟨next, hnext⟩ := fan_path_exists hfort hm hme hwin
+  let start : FanT F m S := ⟨v0, hv0S, hv0c⟩
+  let north : FanT F m S := ⟨incomingPos v0, hnS, hnc⟩
+  refine ⟨fun v => if v = start then north else next v, fun v hPv => ?_, ?_⟩
+  · by_cases hvs : v = start
+    · rw [hvs]
+      dsimp only [FanRules]
+      rw [if_pos rfl]
+      exact ⟨fun h => absurd h hodd, Or.inr rfl⟩
+    · dsimp only [FanRules]
+      rw [if_neg hvs]
+      exact hnext v hPv
+  · show (if start = start then north else next start).1 = incomingPos v0
+    rw [if_pos rfl]
 
-theorem step_x_odd {F m : Field} {S : Set Site} {next : FanT F m S → FanT F m S}
-    (hnext : ∀ v : FanT F m S, (EvenSite v.1 → (next v).1 = incomingPos v.1) ∧
-      ((next v).1 = incomingNeg v.1 ∨ (next v).1 = incomingPos v.1))
-    (v : FanT F m S) (ho : ¬ EvenSite v.1) : (next v).1.1 = v.1.1 := by
-  rcases (hnext v).2 with h | h
-  · rw [h, incomingNeg_of_odd _ ho]
-  · rw [h, incomingPos_of_odd _ ho]
+/-- The step rules at a point, read from the fan's rules. -/
+theorem rules_of_fanRules {F m : Field} {S : Set Site} {next : FanT F m S → FanT F m S} {v : FanT F m S}
+    (h : FanRules next v) : (EvenSite v.1 → (next v).1 = incomingPos v.1) ∧
+      ((next v).1 = incomingNeg v.1 ∨ (next v).1 = incomingPos v.1) := h
 
-theorem step_parity_even {F m : Field} {S : Set Site} {next : FanT F m S → FanT F m S}
-    (hnext : ∀ v : FanT F m S, (EvenSite v.1 → (next v).1 = incomingPos v.1) ∧
-      ((next v).1 = incomingNeg v.1 ∨ (next v).1 = incomingPos v.1))
-    (v : FanT F m S) (he : EvenSite v.1) : ¬ EvenSite (next v).1 := by
-  rw [(hnext v).1 he]
+theorem step_x_even {F m : Field} {S : Set Site} {next : FanT F m S → FanT F m S} {v : FanT F m S}
+    (h : FanRules next v) (he : EvenSite v.1) : (next v).1.1 = v.1.1 + 1 := by
+  rw [h.1 he, incomingPos_of_even _ he]
+
+theorem step_x_odd {F m : Field} {S : Set Site} {next : FanT F m S → FanT F m S} {v : FanT F m S}
+    (h : FanRules next v) (ho : ¬ EvenSite v.1) : (next v).1.1 = v.1.1 := by
+  rcases h.2 with h' | h'
+  · rw [h', incomingNeg_of_odd _ ho]
+  · rw [h', incomingPos_of_odd _ ho]
+
+theorem step_parity_even {F m : Field} {S : Set Site} {next : FanT F m S → FanT F m S} {v : FanT F m S}
+    (h : FanRules next v) (he : EvenSite v.1) : ¬ EvenSite (next v).1 := by
+  rw [h.1 he]
   exact not_even_incomingPos_of_even _ he
 
-theorem step_parity_odd {F m : Field} {S : Set Site} {next : FanT F m S → FanT F m S}
-    (hnext : ∀ v : FanT F m S, (EvenSite v.1 → (next v).1 = incomingPos v.1) ∧
-      ((next v).1 = incomingNeg v.1 ∨ (next v).1 = incomingPos v.1))
-    (v : FanT F m S) (ho : ¬ EvenSite v.1) : EvenSite (next v).1 := by
-  rcases (hnext v).2 with h | h
-  · rw [h]
+theorem step_parity_odd {F m : Field} {S : Set Site} {next : FanT F m S → FanT F m S} {v : FanT F m S}
+    (h : FanRules next v) (ho : ¬ EvenSite v.1) : EvenSite (next v).1 := by
+  rcases h.2 with h' | h'
+  · rw [h']
     exact even_incomingNeg_of_odd _ ho
-  · rw [h]
+  · rw [h']
     exact even_incomingPos_of_odd _ ho
 
-/-- Two steps advance the `x`-coordinate by one, whatever the parity. -/
-theorem fan_x_two_steps {F m : Field} {S : Set Site} {next : FanT F m S → FanT F m S}
-    (hnext : ∀ v : FanT F m S, (EvenSite v.1 → (next v).1 = incomingPos v.1) ∧
-      ((next v).1 = incomingNeg v.1 ∨ (next v).1 = incomingPos v.1))
-    (start : FanT F m S) (n : ℕ) :
+/-- Two steps advance the `x`-coordinate by one, when the rules hold along the path. -/
+theorem fan_x_two_steps {F m : Field} {S : Set Site} {next : FanT F m S → FanT F m S} (start : FanT F m S) (n : ℕ)
+    (hr : ∀ k : ℕ, FanRules next (next^[k] start)) :
     ((next^[n + 2] start).1).1 = ((next^[n] start).1).1 + 1 := by
-  rw [Function.iterate_succ_apply', Function.iterate_succ_apply']
+  have e1 : next^[n + 1] start = next (next^[n] start) := Function.iterate_succ_apply' next n start
+  have e2 : next^[n + 2] start = next (next^[n + 1] start) := Function.iterate_succ_apply' next (n + 1) start
   by_cases he : EvenSite ((next^[n] start).1)
-  · have hx1 := step_x_even hnext (next^[n] start) he
-    have hodd := step_parity_even hnext (next^[n] start) he
-    have hx2 := step_x_odd hnext (next (next^[n] start)) hodd
-    rw [hx2, hx1]
-  · have hx1 := step_x_odd hnext (next^[n] start) he
-    have hev := step_parity_odd hnext (next^[n] start) he
-    have hx2 := step_x_even hnext (next (next^[n] start)) hev
-    rw [hx2, hx1]
+  · have hx1 : ((next^[n + 1] start).1).1 = ((next^[n] start).1).1 + 1 := by
+      rw [e1]
+      exact step_x_even (hr n) he
+    have hodd : ¬ EvenSite ((next^[n + 1] start).1) := by
+      rw [e1]
+      exact step_parity_even (hr n) he
+    have hx2 := step_x_odd (hr (n + 1)) hodd
+    rw [e2, hx2, hx1]
+  · have hx1 : ((next^[n + 1] start).1).1 = ((next^[n] start).1).1 := by
+      rw [e1]
+      exact step_x_odd (hr n) he
+    have hev : EvenSite ((next^[n + 1] start).1) := by
+      rw [e1]
+      exact step_parity_odd (hr n) he
+    have hx2 := step_x_even (hr (n + 1)) hev
+    rw [e2, hx2, hx1]
 
-/-- **The first exit of the fan** (ALL_SLOPE_STEP, the fan stops at its first boundary terminal): from a contact of the fort `S` the
-fan path reaches a contact of `S` outside the strict interior, through strict-interior contacts only. -/
-theorem fan_first_exit {F m : Field} {S : Set Site} (hfort : IsIncomingFort F S)
-    (hm : ∀ x, laplacian m x = -1 ∨ laplacian m x = 0) (hme : ∀ x, EvenSite x → laplacian m x = 0)
-    (hle : ∀ x, m x ≤ F x) (n d : ℤ) (hn : 1 ≤ n) (hnd : n + 2 ≤ d)
-    (v0 : Site) (hv0S : v0 ∈ S) (hv0c : F v0 = m v0) :
-    ∃ k : ℕ, (∃ next : FanT F m S → FanT F m S,
-      (∀ v : FanT F m S, (EvenSite v.1 → (next v).1 = incomingPos v.1) ∧
-        ((next v).1 = incomingNeg v.1 ∨ (next v).1 = incomingPos v.1)) ∧
-      (next^[k] ⟨v0, hv0S, hv0c⟩).1 ∈ S ∧ F (next^[k] ⟨v0, hv0S, hv0c⟩).1 = m (next^[k] ⟨v0, hv0S, hv0c⟩).1 ∧
-      ¬ FLatticePaper.W1.StrictInterior n d (next^[k] ⟨v0, hv0S, hv0c⟩).1 ∧
-      ∀ j < k, FLatticePaper.W1.StrictInterior n d (next^[j] ⟨v0, hv0S, hv0c⟩).1) := by
-  obtain ⟨next, hnext⟩ := fan_path_exists hfort hm hme hle
-  set start : FanT F m S := ⟨v0, hv0S, hv0c⟩ with hstart
-  have hfin := FLatticePaper.W1Finite.strictInterior_finite n d hn hnd
-  have hex : ∃ k : ℕ, ¬ FLatticePaper.W1.StrictInterior n d (next^[k] start).1 := by
+/-- **The first exit of a fan** (ALL_SLOPE_STEP, the fan stops at its first boundary terminal), for any step function obeying the rules at
+the interior points `P`, when the interior is finite: a contact of `S` outside `P`, reached through interior contacts. -/
+theorem fan_first_exit_of {F m : Field} {S : Set Site} {P : Site → Prop} (next : FanT F m S → FanT F m S)
+    (hr : ∀ v : FanT F m S, P v.1 → FanRules next v) (hfinP : {c | P c}.Finite) (start : FanT F m S) :
+    ∃ k : ℕ, ¬ P (next^[k] start).1 ∧ ∀ j < k, P (next^[j] start).1 := by
+  have hex : ∃ k : ℕ, ¬ P (next^[k] start).1 := by
     by_contra hall
-    have hall2 : ∀ k : ℕ, FLatticePaper.W1.StrictInterior n d (next^[k] start).1 := fun k => by
+    have hall2 : ∀ k : ℕ, P (next^[k] start).1 := fun k => by
       by_contra h
       exact hall ⟨k, h⟩
-    obtain ⟨M, hM⟩ := (hfin.image Prod.fst).bddAbove
-    -- the x-coordinate grows by one every two steps, so it is unbounded on the path
-    have hgrow : ∀ k : ℕ, ((next^[2 * k] start).1).1 = v0.1 + k := by
+    have hrk : ∀ k : ℕ, FanRules next (next^[k] start) := fun k => hr _ (hall2 k)
+    obtain ⟨M, hM⟩ := (hfinP.image Prod.fst).bddAbove
+    have hgrow : ∀ k : ℕ, ((next^[2 * k] start).1).1 = start.1.1 + k := by
       intro k
       induction k with
-      | zero => simp [hstart]
+      | zero => simp
       | succ k ih =>
-        rw [show 2 * (k + 1) = 2 * k + 2 by ring, fan_x_two_steps hnext start (2 * k), ih]
+        rw [show 2 * (k + 1) = 2 * k + 2 by ring, fan_x_two_steps start (2 * k) hrk, ih]
         push_cast
         ring
-    have hk : (((M - v0.1).toNat + 1 : ℕ) : ℤ) = (M - v0.1).toNat + 1 := by push_cast; ring
-    have hbound := hM ⟨(next^[2 * ((M - v0.1).toNat + 1)] start).1, hall2 _, rfl⟩
+    have hbound := hM ⟨(next^[2 * ((M - start.1.1).toNat + 1)] start).1, hall2 _, rfl⟩
     rw [hgrow] at hbound
-    have htoNat : ((M - v0.1).toNat : ℤ) ≥ M - v0.1 := Int.self_le_toNat _
+    have htoNat : ((M - start.1.1).toNat : ℤ) ≥ M - start.1.1 := Int.self_le_toNat _
     push_cast at hbound
     omega
   classical
-  refine ⟨Nat.find hex, next, hnext, (next^[Nat.find hex] start).2.1, (next^[Nat.find hex] start).2.2,
-    Nat.find_spec hex, fun j hj => ?_⟩
-  have := Nat.find_min hex hj
-  exact not_not.mp this
+  refine ⟨Nat.find hex, Nat.find_spec hex, fun j hj => ?_⟩
+  exact not_not.mp (Nat.find_min hex hj)
 
-/-- **The fan contradiction** (FIXED_FREE §9): a true fort of `F` containing a fan contact, under the paid exclusion of every boundary
-contact of `S` (the terminal's removal), is impossible. -/
-theorem fan_paid_contradiction {F m : Field} {S : Set Site} (hfort : IsIncomingFort F S)
+/-- **The first exit of a fan from a contact of a fort** (existence of the step function). -/
+theorem fan_first_exit {F m : Field} {S : Set Site} {P : Site → Prop} (hfort : IsIncomingFort F S)
     (hm : ∀ x, laplacian m x = -1 ∨ laplacian m x = 0) (hme : ∀ x, EvenSite x → laplacian m x = 0)
-    (hle : ∀ x, m x ≤ F x) (n d : ℤ) (hn : 1 ≤ n) (hnd : n + 2 ≤ d)
-    (v0 : Site) (hv0S : v0 ∈ S) (hv0c : F v0 = m v0)
-    (hpaid : ∀ v : Site, v ∈ S → F v = m v → ¬ FLatticePaper.W1.StrictInterior n d v → False) : False := by
-  obtain ⟨k, next, _, hmem, hcon, hout, _⟩ := fan_first_exit hfort hm hme hle n d hn hnd v0 hv0S hv0c
-  exact hpaid _ hmem hcon hout
+    (hwin : WindowOn P F m) (hfinP : {c | P c}.Finite) (v0 : Site) (hv0S : v0 ∈ S) (hv0c : F v0 = m v0) :
+    ∃ k : ℕ, (∃ next : FanT F m S → FanT F m S, (∀ v : FanT F m S, P v.1 → FanRules next v) ∧
+      (next^[k] ⟨v0, hv0S, hv0c⟩).1 ∈ S ∧ F (next^[k] ⟨v0, hv0S, hv0c⟩).1 = m (next^[k] ⟨v0, hv0S, hv0c⟩).1 ∧
+      ¬ P (next^[k] ⟨v0, hv0S, hv0c⟩).1 ∧ ∀ j < k, P (next^[j] ⟨v0, hv0S, hv0c⟩).1) := by
+  obtain ⟨next, hr⟩ := fan_path_exists hfort hm hme hwin
+  obtain ⟨k, hk, hj⟩ := fan_first_exit_of next hr hfinP ⟨v0, hv0S, hv0c⟩
+  exact ⟨k, next, hr, (next^[k] ⟨v0, hv0S, hv0c⟩).2.1, (next^[k] ⟨v0, hv0S, hv0c⟩).2.2, hk, hj⟩
 
 end FLatticePaper.FanPropagation

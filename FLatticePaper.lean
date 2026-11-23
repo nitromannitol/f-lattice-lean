@@ -448,5 +448,6 @@ import FLatticePaper.Plane.Induction.QuadraticCap
 import FLatticePaper.Plane.Induction.ContactCone
 import FLatticePaper.Plane.Induction.FanPropagation
 import FLatticePaper.Plane.Induction.FanTerminal
+import FLatticePaper.Plane.Induction.SheetFort
 
 /-! Root import for the corrected F-lattice paper. -/
