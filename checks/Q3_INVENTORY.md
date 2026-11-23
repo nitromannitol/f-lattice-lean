@@ -314,3 +314,13 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - Reduction to `main`: none of the passage, tip or fan steps is a Lean lemma. The Lean facts used: `ChildFrame.freeH/freeV` (S3FreeBoundary), `Q3White.laplacian_eq_zero_of_freeV`, `Q3Para10.index_of_freeV`/`block_mem_freeV`/`VpI_not_freeV`, and `NonfreeBridge.outside_SI_free` (task 72).
 - Named steps: FIXED_FREE_GAME_AUDIT §3–§9 and TIP_THEOREM, ALL_SLOPE_STEP sections are listed with file paths in the report.
 - Scope: a numeric check, not the per-entry implications (E), (P), (F).
+
+### Task 72 (FIXED_FREE §3-§4): the short-passage middles are nonfree, for all parameters (ShortPassages.lean)
+
+- PROVED `nonfree_of_avoid`: a site is nonfree when the H spectrum avoids all `t − jT` and the V spectrum all `s + iT` (deck translates of a site have `t − jT`, `s + iT`).
+- PROVED window lemmas (all parameters, arithmetic with `T ≥ 3L`): `avoid_H_odd_high` (`d < t < T+n`), `avoid_H_odd_low` (`d−T < t < n`), `avoid_H_even_high` (`L−2 < t < T+2`), `avoid_H_even_low` (`L−2−T < t < 2`), `avoid_V_high` (`L−2 < s < T+2−c`), `avoid_V_low` (`L−2−T < s < 2−c`).
+- PROVED `nonfree_V_even_left`: an even V middle with `2n+2 ≤ s ≤ 2d−2` (its left neighbour lies in `E`, and its `i = 0` translates are off `E`). PROVED `nonfree_V_even_neg`: an even V middle with `L−2−T < s < 0` (its `i = 0` translates have negative `s`, so they are off `E`).
+- PROVED the four route theorems, from the root hypotheses of FIXED_FREE §3–§4: `H_EN_middle_nonfree`, `H_NES_middle1_nonfree`, `H_NES_middle2_nonfree`, `V_NW_middle_nonfree`, `V_WNE_middle0_nonfree`, `V_WNE_middle1_nonfree`.
+- The root hypotheses are NOT derived here: H-EN root `c+2 ≤ t(z)` (next endpoint in the even H spectrum) and `s(z) < T+2−2d` (box); H-NES root `n+2 ≤ t(z) ≤ d−2` (internal) and `2n−2 < s(z) < T+2−3d+n` (box); V-NW root `2n+2−c ≤ s(z) ≤ L−2` and `L−1−T+d < t(z) < d` (endpoint spectra); V-WNE root `2 ≤ s(z) ≤ 2n−2` and `2L−1−T < t(z) < n`. They hold on every route for all children with `d ≤ 31` (`scripts/passage_root_hypotheses.py`, `scripts/passage_window_claims.py`).
+- Numeric support: spectral avoidance alone excludes every H middle and the odd V middle; the two even V middles need the `E`-argument above (`scripts/spectrum_avoidance_check.py`).
+- Checks: `checks/ShortPassages.lean` (nine guards, standard axioms only). Root build clean.
