@@ -346,6 +346,88 @@ theorem I1_core_minus (F : Site → ℤ) (N D nq dq Nu Du epsU cq : ℤ) (H : Zo
     simp only at hf0
     linarith
 
+/-- Step (d), the case `ε = +1` (`W = 1`) in the point `w = z − U`: the sheet is nonnegative. -/
+theorem I1_core_plus_w (F : Site → ℤ) (N D nq dq Nu Du epsU : ℤ) (H : ZoneHyp F N D Nu Du epsU)
+    (hε : N * dq - nq * D = 1) (hdq : 0 < 2 * D + dq)
+    (hzs : ∀ x : Site, 1 - D ≤ N * x.1 - D * x.2 → N * x.1 - D * x.2 ≤ N + 2 * D - 1 → quarterTurnField F x = 0)
+    (hzev : ∀ x : Site, (x.1 + x.2) % 2 = 0 → N * x.1 - D * x.2 = -D → quarterTurnField F x = 0)
+    (w1 w2 : ℤ) (hw1 : -(2 * D + dq) ≤ w1) (hw1' : w1 ≤ 0) (hw2 : -(2 * N + nq) ≤ w2) (hw2' : w2 ≤ 0)
+    (ht1 : 1 - (2 * D + dq) ≤ (2 * N + nq) * w1 - (2 * D + dq) * w2)
+    (ht2 : (2 * N + nq) * w1 - (2 * D + dq) * w2 ≤ (2 * D + dq) + (2 * N + nq) - 1)
+    (hj : D + N ≤ (D - N) * (-w2) - (D + N) * (w1 - 1)) :
+    0 ≤ harmonicGrid (w1, w2) + F (-(w2 - (nq + dq)), w1 - (nq - dq) - 1) := by
+  have hN := H.hN
+  have hND := H.hND
+  have hr := H.hr
+  have hD2 : 2 ≤ D := by omega
+  have hmin := zone_plus_nonneg F N D nq dq Nu Du epsU H hε hD2 (w1, w2) (by simp only; exact hj)
+  simp only at hmin
+  have hb := tp_window N D nq dq w1 w2 (by omega) hdq (by rw [hε]; linarith) ht1 ht2
+    (by rw [hε]; linarith) (by rw [hε]; linarith)
+  obtain ⟨hlo', hhi'⟩ := hb
+  by_cases hs : N * w1 - D * w2 = -D
+  · obtain ⟨k, hk1, hk2⟩ := exc_form N D nq dq w1 w2 (by omega) (by rw [hε]; norm_num) hs
+    rcases Int.even_or_odd k with ⟨l, hl⟩ | ⟨l, hl⟩
+    · have e1 : w1 = 2 * l * D := by rw [hk1, hl]; ring
+      have e2 : w2 = 2 * l * N + 1 := by rw [hk2, hl]; ring
+      subst e1 e2
+      have hpsi := psi_line F N D nq dq Nu Du epsU H (Or.inl hε) l
+      have hl2 : l ≤ -1 := by nlinarith
+      rw [hpsi, hε]
+      linarith
+    · have e1 : w1 = (2 * l + 1) * D := by rw [hk1, hl]
+      have e2 : w2 = (2 * l + 1) * N + 1 := by rw [hk2, hl]
+      obtain ⟨c, hc⟩ : ∃ c : ℤ, D + N = 2 * c + 1 := ⟨(D + N - 1) / 2, by omega⟩
+      have hsum : w1 + w2 = 2 * (2 * l * c + l + c + 1) := by
+        rw [e1, e2]
+        linear_combination (2 * l + 1) * hc
+      have hpar : (w1 + w2) % 2 = 0 := by
+        rw [hsum]
+        simp
+      have hf : quarterTurnField F (w1, w2) = 0 := hzev (w1, w2) hpar hs
+      unfold quarterTurnField at hf
+      rw [quarterTurn_site] at hf
+      simp only at hf
+      linarith
+  · have key : ∀ p : ℤ, -D ≤ p → p ≠ -D → 1 - D ≤ p := fun p h1 h2 => by omega
+    have hs1 : 1 - D ≤ N * w1 - D * w2 := key _ hlo' hs
+    have hf0 : quarterTurnField F (w1, w2) = 0 := hzs (w1, w2) hs1 hhi'
+    unfold quarterTurnField at hf0
+    rw [quarterTurn_site] at hf0
+    simp only at hf0
+    linarith
+
+/-- Step (d), the case `ε = +1`: the sheet at `z` is nonnegative on the zone. -/
+theorem I1_core_plus (F : Site → ℤ) (N D nq dq Nu Du epsU cq : ℤ) (H : ZoneHyp F N D Nu Du epsU)
+    (hε : N * dq - nq * D = 1) (hdq : 0 < 2 * D + dq)
+    (hcq : 2 * cq = dq * dq + 2 * dq * nq - nq * nq - dq - nq)
+    (hzs : ∀ x : Site, 1 - D ≤ N * x.1 - D * x.2 → N * x.1 - D * x.2 ≤ N + 2 * D - 1 → quarterTurnField F x = 0)
+    (hzev : ∀ x : Site, (x.1 + x.2) % 2 = 0 → N * x.1 - D * x.2 = -D → quarterTurnField F x = 0)
+    (z1 z2 : ℤ) (hz1 : 0 ≤ z1) (hz1' : z1 ≤ 2 * D + dq) (hz2 : 0 ≤ z2) (hz2' : z2 ≤ 2 * N + nq)
+    (ht1 : 1 - (2 * D + dq) ≤ (2 * N + nq) * z1 - (2 * D + dq) * z2)
+    (ht2 : (2 * N + nq) * z1 - (2 * D + dq) * z2 ≤ (2 * D + dq) + (2 * N + nq) - 1) :
+    0 ≤ quarterTurnField F (z1 - (1 - 1) * dq - (nq - dq + (N * dq - nq * D) * dq),
+          z2 - (1 - 1) * nq - (nq + dq + (N * dq - nq * D) * nq))
+      + (nq * (z1 - (1 - 1) * dq) - dq * (z2 - (1 - 1) * nq)) + (cq + 2 * 1) := by
+  have hN := H.hN
+  have hND := H.hND
+  have hsheet := ZoneSheet.sheet_eq_harmonic F N D nq dq cq 1 z1 z2 (Or.inr ⟨rfl, hε⟩) hcq
+    (fun x => ZoneHarmonic.quarterTurnField_add_Up F N D H.hT x)
+  rw [hsheet]
+  simp only [one_mul]
+  rw [qtf_sub_h0]
+  have hj : D + N ≤ (D - N) * (-(z2 - (2 * N + nq))) - (D + N) * (z1 - (2 * D + dq) - 1) :=
+    tG_ge_of_box N D nq dq z1 z2 hN hND hz1' hz2'
+  have et : (2 * N + nq) * (z1 - (2 * D + dq)) - (2 * D + dq) * (z2 - (2 * N + nq))
+      = (2 * N + nq) * z1 - (2 * D + dq) * z2 := by ring
+  have ht1' : 1 - (2 * D + dq) ≤ (2 * N + nq) * (z1 - (2 * D + dq)) - (2 * D + dq) * (z2 - (2 * N + nq)) := by
+    rw [et]; exact ht1
+  have ht2' : (2 * N + nq) * (z1 - (2 * D + dq)) - (2 * D + dq) * (z2 - (2 * N + nq))
+      ≤ (2 * D + dq) + (2 * N + nq) - 1 := by
+    rw [et]; exact ht2
+  exact I1_core_plus_w F N D nq dq Nu Du epsU H hε hdq hzs hzev (z1 - (2 * D + dq)) (z2 - (2 * N + nq))
+    (by linarith) (by linarith) (by linarith) (by linarith) ht1' ht2' hj
+
 end ZoneCase
 
 end FLatticePaper.Induction
