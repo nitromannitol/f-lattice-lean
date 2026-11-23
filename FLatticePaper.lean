@@ -321,6 +321,12 @@ import FLatticePaper.Tiles.EncUpper
 import FLatticePaper.Tiles.EncFam
 import FLatticePaper.Tiles.EncPieces
 import FLatticePaper.Tiles.SiteSourcesAll
+import FLatticePaper.Tiles.SiteJunction
+import FLatticePaper.Tiles.ParentInterior
+import FLatticePaper.Tiles.CeilBlocks
+import FLatticePaper.Tiles.HorizontalGlue
+import FLatticePaper.Tiles.HorizontalStep
+import FLatticePaper.Tiles.HorizontalInduction
 import FLatticePaper.Plane.Induction.S3FreeBoundary
 import FLatticePaper.Plane.Induction.ParentCoordinates
 import FLatticePaper.Plane.Induction.Q3Arithmetic
