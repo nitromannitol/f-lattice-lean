@@ -7,8 +7,8 @@ With the even parent `n_q/d_q`, its kernel `U_q = (d_q, n_q)`, its transverse `V
   `t_p(−e) = D (d_q + n_q) + N (d_q − n_q) − 1`
 (fix Q3.md paragraph 5; checked numerically on words of length ≤ 4). The identity uses `ε = N d_q − n_q D` and `ε² = 1`.
 
-This file does not state the shift identity `p(x) = c₀ − P′(Zx)` with the shift `ε U_q`: the codebase's
-`quarterTurnField_sub_shift` uses `δ₀ = (−ε(N+D), ε(N−D))`, which equals `−ε U_q` only on a few words (see the report). -/
+The shift identity `p(x) = c₀ − P′(Zx)` with the shift `ε U_q` is in `Q3Bridge.lean` (`paragraph5_field_identity`),
+proved from the codebase's `quarterTurnField_sub_shift` and the `U_p`-periodicity, with the lattice bridge as a hypothesis. -/
 
 namespace FLatticePaper.Induction
 
