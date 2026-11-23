@@ -8,9 +8,8 @@ increments on every edge. The inputs are the unit slip and the unit price of `G`
 signed policies: the quota of `G` with `Φ` nonincreasing along its retained edges, and the quota of the chain sheet with
 `Φ` nondecreasing along the reflected chain policy.
 
-`i3_chainPotential_unit_of_strong`: the same at the earlier word `u`, from `StrongEstimates u`. The monotonicity of `Φ` along
-the policy of `G` is passed as a hypothesis: `StrongEstimates` currently states it along `G`, and the corrected form along
-`Φ` is supplied by the merge of the policy field. -/
+`i3_chainPotential_unit_of_strong`: the same at the earlier word `u = conjWord word`, from `StrongEstimates u`: its corrected
+`F2F3` (monotonicity of `Φ` along the policy of `G`) and its `F2F4` chain data. The phase is `ε_u`, the sign of `u`'s frame. -/
 
 namespace FLatticePaper.Induction
 
@@ -193,17 +192,15 @@ theorem i3_chainPotential_unit_of_frame (frame : ChildFrame) (G : Field) (hP : f
   simp only [hΦ]
   exact hk
 
-/-- **The chain potential of the earlier word has unit increments**, from its strong estimates. The monotonicity of the
-potential along the policy of the standard field is the corrected `F2F3` (`hmono`). -/
-theorem i3_chainPotential_unit_of_strong {u : Word} (h : StrongEstimates u)
-    (hmono : ∃ policy : Site → Site → Prop, RetainQuota (standardField u) policy ∧
-      NonincreasingAlong (fun z => (frameAt u).chainPotential (standardField u) (frameAt u).eps z) policy) :
+/-- **The chain potential of the earlier word has unit increments**, from its strong estimates (the corrected `F2F3`, the
+monotonicity of the potential along the policy of the standard field, and the `F2F4` chain data). -/
+theorem i3_chainPotential_unit_of_strong {u : Word} (h : StrongEstimates u) :
     ∀ c i, Edge i c →
       -1 ≤ (frameAt u).chainPotential (standardField u) (frameAt u).eps i
           - (frameAt u).chainPotential (standardField u) (frameAt u).eps c ∧
         (frameAt u).chainPotential (standardField u) (frameAt u).eps i
           - (frameAt u).chainPotential (standardField u) (frameAt u).eps c ≤ 1 := by
-  obtain ⟨relF, hqF, hmF⟩ := hmono
+  obtain ⟨relF, hqF, hmF, -⟩ := h.F2F3_policy
   obtain ⟨cp, -, R, w, hmH, hqH, -⟩ := h.F2F4_chain
   exact i3_chainPotential_unit_of_frame (frameAt u) (standardField u) h.packet h.F1_unitSlip
     h.F1_unitPrice h.F1_noPriceSaddle hqF hqH hmF hmH
