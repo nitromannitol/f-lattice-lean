@@ -275,6 +275,66 @@ theorem geo_le (n d z1 z2 : ℤ) (hn : 1 ≤ n) (hnd : n + 2 ≤ d)
     nlinarith
   nlinarith
 
+/-- The window of the harmonic region for the shifted point `u = z − W(n − d, n + d)`: the sign `−ε u₂ ∈ [0, L]`, the range
+`1 − r ≤ s_p(u) ≤ 2r + 1` and the condition `s_p(u) ≥ 2r ⇒ −ε u₂ ≥ r` (the fix's region of the harmonic step). -/
+theorem geo_window (N D nq dq n d z1 z2 W : ℤ) (hnN : n = 2 * N + nq) (hdD : d = 2 * D + dq)
+    (hW : (W = 0 ∧ N * dq - nq * D = -1) ∨ (W = 1 ∧ N * dq - nq * D = 1))
+    (hN : 1 ≤ N) (hND : N < D)
+    (hn : 1 ≤ n) (hnd : n + 2 ≤ d) (hr : (D + N) % 2 = 1)
+    (hT : 1 - (d * d + 2 * d * n - n * n) ≤ n * z1 - d * z2)
+    (hB : n * z1 - d * z2 ≤ d + n - 1)
+    (hA : 2 - d + n ≤ (d + n) * z1 + (d - n) * z2)
+    (hD : (d + n) * z1 + (d - n) * z2 ≤ 2 * (d + n) - 1) :
+    0 ≤ -(N * dq - nq * D) * (z2 - W * (n + d)) ∧
+    1 - (D + N) ≤ (D + N) * (z1 - W * (n - d)) + (D - N) * (z2 - W * (n + d)) ∧
+    (D + N) * (z1 - W * (n - d)) + (D - N) * (z2 - W * (n + d)) ≤ 2 * (D + N) + 1 ∧
+    (2 * (D + N) ≤ (D + N) * (z1 - W * (n - d)) + (D - N) * (z2 - W * (n + d)) →
+      (D + N) ≤ -(N * dq - nq * D) * (z2 - W * (n + d))) := by
+  have hz2lo := geo_nonneg n d z1 z2 hn hnd hA hB
+  have hz2hi := geo_le n d z1 z2 hn hnd hT hD
+  have hid : (n + d) * ((D + N) * (z1 - W * (n - d)) + (D - N) * (z2 - W * (n + d)))
+      = (D + N) * ((d + n) * z1 + (d - n) * z2) - 2 * (N * dq - nq * D) * (z2 - W * (n + d)) := by
+    subst hnN hdD
+    ring
+  have hc0 : 0 ≤ -(N * dq - nq * D) * (z2 - W * (n + d)) := by
+    rcases hW with ⟨h0, he⟩ | ⟨h1, he⟩
+    · rw [he, h0]; linarith
+    · rw [he, h1]; linarith
+  have hcU : -(N * dq - nq * D) * (z2 - W * (n + d)) ≤ n + d := by
+    rcases hW with ⟨h0, he⟩ | ⟨h1, he⟩
+    · rw [he, h0]; linarith
+    · rw [he, h1]; linarith
+  generalize hc : -(N * dq - nq * D) * (z2 - W * (n + d)) = c at hc0 hcU ⊢
+  have hcid : (n + d) * ((D + N) * (z1 - W * (n - d)) + (D - N) * (z2 - W * (n + d)))
+      = (D + N) * ((d + n) * z1 + (d - n) * z2) + 2 * c := by
+    rw [hid, ← hc]; ring
+  generalize hm : (D + N) * (z1 - W * (n - d)) + (D - N) * (z2 - W * (n + d)) = m at hcid ⊢
+  have hr0 : 0 < D + N := by omega
+  have hnd0 : 0 < d + n := by omega
+  have hmlo : 1 - (D + N) ≤ m := by
+    by_contra hcon
+    have hm' : m ≤ -(D + N) := by omega
+    nlinarith
+  have hmhi : m ≤ 2 * (D + N) + 1 := by
+    by_contra hcon
+    have hm' : 2 * (D + N) + 2 ≤ m := by omega
+    nlinarith
+  refine ⟨hc0, hmlo, hmhi, ?_⟩
+  intro hbig
+  have hbig' : 2 * (D + N) ≤ m := hbig
+  generalize hs : (d + n) * z1 + (d - n) * z2 = s at hcid hA hD
+  by_cases hm2 : m = 2 * (D + N)
+  · rw [hm2] at hcid
+    by_cases hs1 : s = 2 * (d + n) - 1
+    · rw [hs1] at hcid
+      have h2c : 2 * c = D + N := by nlinarith
+      omega
+    · have hq : 2 ≤ 2 * (d + n) - s := by omega
+      nlinarith
+  · have hm3 : m = 2 * (D + N) + 1 := by omega
+    rw [hm3] at hcid
+    nlinarith
+
 end HarmI2
 
 end FLatticePaper.Induction
