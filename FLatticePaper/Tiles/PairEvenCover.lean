@@ -241,4 +241,41 @@ theorem propEven_T_31 : QuotientCover (evenChildS true (HSet ⟨1, 2⟩) (HSet �
   propEven_T 2 1 3 1 (by decide) (Or.inr (Or.inr ⟨rfl, rfl, rfl, rfl⟩)) (by decide) (by decide) (by decide)
     (by decide) (by decide) (by decide) (by decide)
 
+/-- At flag false, `d = 2n` forces `(d,n) = (2,1)` and `2d < e`: `e = 2r − 1` with `r < e` and parity leaves `e ≥ 5`. -/
+theorem hdn_F (d n e r : ℤ) (hn : 1 ≤ n) (hre : r < e) (hdet : d * r - n * e = 1)
+    (heven : (e + r) % 2 = 0) : d ≠ 2 * n ∨ 2 * d < e := by
+  by_cases h1 : d = 2 * n
+  · subst h1
+    have hdvd : n ∣ 1 := ⟨2 * r - e, by linear_combination (-1 : ℤ) * hdet⟩
+    have hn1 : n ≤ 1 := Int.le_of_dvd (by norm_num) hdvd
+    have hn' : n = 1 := by omega
+    subst hn'
+    by_cases h2 : 2 * (2 * 1) < e
+    · exact Or.inr h2
+    · exfalso; omega
+  · exact Or.inl h1
+
+/-- At flag true, `d = 2n` forces `(d,n) = (2,1)`; then `2d < e`, or `(e,r) = (3,1)` is the single pair. -/
+theorem hdn_T (d n e r : ℤ) (hn : 1 ≤ n) (hr : 1 ≤ r) (hdet : d * r - n * e = -1)
+    (heven : (e + r) % 2 = 0) : d ≠ 2 * n ∨ 2 * d < e ∨ (d = 2 ∧ n = 1 ∧ e = 3 ∧ r = 1) := by
+  by_cases h1 : d = 2 * n
+  · subst h1
+    have hdvd : n ∣ 1 := ⟨-(2 * r - e), by linear_combination hdet⟩
+    have hn1 : n ≤ 1 := Int.le_of_dvd (by norm_num) hdvd
+    have hn' : n = 1 := by omega
+    subst hn'
+    by_cases h2 : 2 * (2 * 1) < e
+    · exact Or.inr (Or.inl h2)
+    · exact Or.inr (Or.inr ⟨by omega, rfl, by omega, by omega⟩)
+  · exact Or.inl h1
+
+/-- The cover for every proper pair `(P, Q) = (⟨n,d⟩, ⟨r,e⟩)` with `det = ±1`, at either flag. -/
+theorem propEven_any (d n e r : ℤ) (hn : 1 ≤ n) (hnd : n < d) (hr : 1 ≤ r) (hre : r < e)
+    (hdet : d * r - n * e = 1 ∨ d * r - n * e = -1) (hodd : (d + n) % 2 = 1) (heven : (e + r) % 2 = 0) :
+    QuotientCover (evenChildS (decide ((⟨n, d⟩ : Fraction).det ⟨r, e⟩ = 1)) (HSet ⟨n, d⟩) (HSet ⟨r, e⟩) ⟨n, d⟩ ⟨r, e⟩)
+      (perU ((Parents.mk ⟨n, d⟩ ⟨r, e⟩).current .even)) (perV ((Parents.mk ⟨n, d⟩ ⟨r, e⟩).current .even)) := by
+  rcases hdet with h | h
+  · exact propEven_parents_F d n e r (by omega) (hdn_F d n e r hn hre h heven) hn hnd hr hre h hodd heven
+  · exact propEven_parents_T d n e r (by omega) (hdn_T d n e r hn hr h heven) hn hnd hr hre h hodd heven
+
 end FLatticePaper.Tiles.PairEvenCover
