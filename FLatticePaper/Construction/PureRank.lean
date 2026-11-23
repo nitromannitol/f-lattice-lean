@@ -373,4 +373,134 @@ theorem rankOf_unique (d : ℤ) (hd : 3 ≤ d) (p : Pt) (r r' : ℤ) (h : RankOf
     · exact not_rep_of_free_translate d hd q hqf _ _ hki hk hrep'
     · exact not_rep_of_bulk_translate d hd q hrep hqf _ _ hki hk hrep'
 
+/-! ## The families of the native domain (step (ii))
+
+The native domain splits into six families: free points (F0), the top row `y = d+1, x ≤ 1` (F2, represented by the H point
+`(x+d−1, 0)`), the corner `(2,d+1)` (F3, represented by `(2−d, d)`), the anti-diagonal `x+y = d+2, y ≤ d` (F4, represented by
+`(x−d, y−1)`), the point `(d,1)` (F5, represented by `(0,0)`), and the interior (F1, its own representative). -/
+
+/-- An interior point is its own representative. -/
+theorem rep_interior (d : ℤ) (x y : ℤ) (hn : NativeP d (x, y)) (hf : ¬ IsFreeP d (x, y))
+    (hy : y ≤ d) (h4 : x + y ≠ d + 2) (h5 : ¬ (x = d ∧ y = 1)) : IsRepP d (x, y) := by
+  have hn' := hn
+  unfold NativeP at hn'
+  simp only [Prod.mk.injEq] at hn'
+  unfold IsFreeP IsHc IsVc at hf
+  simp only [Prod.mk.injEq] at hf
+  right
+  refine ⟨hn, ?_, ?_⟩
+  · intro i j hij hfree
+    obtain ⟨hi1, hi2, hj1, hj2⟩ := hij
+    unfold IsFreeP IsHc IsVc at hfree
+    simp only [shiftP, Prod.mk.injEq] at hfree
+    interval_cases i <;> interval_cases j <;> omega
+  · intro i j hij hnat hlex
+    obtain ⟨hi1, hi2, hj1, hj2⟩ := hij
+    unfold NativeP at hnat
+    simp only [shiftP, Prod.mk.injEq] at hnat
+    unfold LexGt at hlex
+    simp only [shiftP] at hlex
+    interval_cases i <;> interval_cases j <;> omega
+
+/-- The top row point `(x, d+1)` with `x ≤ 1` is translated by `(0,−1)` onto the H point `(x+d−1, 0)`. -/
+theorem rankOf_top (d : ℤ) (x : ℤ) (hx1 : 2 - d ≤ x) (hx2 : x ≤ 1) :
+    RankOf d (x, d + 1) (valMinus d (x + d - 1, 0) - 2 * (d + 1)) := by
+  have hs : shiftP d (x, d + 1) 0 (-1) = (x + d - 1, 0) := by
+    simp only [shiftP, Prod.mk.injEq]
+    constructor <;> ring
+  refine ⟨0, -1, ⟨by norm_num, by norm_num, by norm_num, by norm_num⟩, ?_, ?_⟩
+  · rw [hs]
+    left
+    unfold IsFreeP
+    left
+    unfold IsHc
+    exact ⟨rfl, by show 1 ≤ x + d - 1; omega, by show x + d - 1 ≤ d; omega⟩
+  · rw [hs]
+    ring
+
+/-- The corner `(2, d+1)` is translated by `(−1,0)` onto the V-last point `(2−d, d)`. -/
+theorem rankOf_corner (d : ℤ) :
+    RankOf d (2, d + 1) (valMinus d (2 - d, d) + 2 * d) := by
+  have hs : shiftP d (2, d + 1) (-1) 0 = (2 - d, d) := by
+    simp only [shiftP, Prod.mk.injEq]
+    constructor <;> ring
+  refine ⟨-1, 0, ⟨by norm_num, by norm_num, by norm_num, by norm_num⟩, ?_, ?_⟩
+  · rw [hs]
+    left
+    unfold IsFreeP
+    right
+    unfold IsVc
+    exact Or.inr (Or.inr rfl)
+  · rw [hs]
+    ring
+
+/-- The anti-diagonal point `(x, y)` with `x + y = d+2` and `y ≤ d` is translated by `(−1,0)` onto the V point `(x−d, y−1)`. -/
+theorem rankOf_anti (d : ℤ) (x y : ℤ) (hs : x + y = d + 2) (hxd : x ≤ d) (hyd : y ≤ d) :
+    RankOf d (x, y) (valMinus d (x - d, y - 1) + 2 * d) := by
+  have e : shiftP d (x, y) (-1) 0 = (x - d, y - 1) := by
+    simp only [shiftP, Prod.mk.injEq]
+    constructor <;> ring
+  refine ⟨-1, 0, ⟨by norm_num, by norm_num, by norm_num, by norm_num⟩, ?_, ?_⟩
+  · rw [e]
+    left
+    unfold IsFreeP
+    right
+    unfold IsVc
+    simp only [Prod.mk.injEq]
+    omega
+  · rw [e]
+    ring
+
+/-- The point `(d,1)` is translated by `(−1,0)` onto the origin. -/
+theorem rankOf_fifth (d : ℤ) :
+    RankOf d (d, 1) (valMinus d (0, 0) + 2 * d) := by
+  have e : shiftP d (d, 1) (-1) 0 = (0, 0) := by
+    simp only [shiftP, Prod.mk.injEq]
+    constructor <;> ring
+  refine ⟨-1, 0, ⟨by norm_num, by norm_num, by norm_num, by norm_num⟩, ?_, ?_⟩
+  · rw [e]
+    left
+    unfold IsFreeP
+    right
+    unfold IsVc
+    exact Or.inl rfl
+  · rw [e]
+    ring
+
+/-- The rank of a native point, by family. -/
+noncomputable def qRank (d : ℤ) (p : Pt) : ℤ :=
+  if IsFreeP d p then valMinus d p
+  else if p.2 = d + 1 ∧ p.1 ≤ 1 then valMinus d (p.1 + d - 1, 0) - 2 * (d + 1)
+  else if p = (2, d + 1) then valMinus d (2 - d, d) + 2 * d
+  else if p.1 + p.2 = d + 2 then valMinus d (p.1 - d, p.2 - 1) + 2 * d
+  else if p = (d, 1) then valMinus d (0, 0) + 2 * d
+  else valMinus d p
+
+/-- Every native point has its family rank as a rank. -/
+theorem rankOf_qRank (d : ℤ) (hd : 3 ≤ d) (x y : ℤ) (hn : NativeP d (x, y)) :
+    RankOf d (x, y) (qRank d (x, y)) := by
+  have hb : 2 - d ≤ x ∧ x ≤ d ∧ 0 ≤ y ∧ y ≤ d + 1 := nativeP_bounds d (by omega) (x, y) hn
+  obtain ⟨hx1, hx2, -, hy2⟩ := hb
+  have hn' := hn
+  unfold NativeP at hn'
+  simp only [Prod.mk.injEq] at hn'
+  simp only [qRank, Prod.mk.injEq]
+  split_ifs with h1 h2 h3 h4 h5
+  · exact rankOf_self d (x, y) (Or.inl h1)
+  · obtain ⟨rfl, h2'⟩ := h2
+    exact rankOf_top d x hx1 h2'
+  · obtain ⟨rfl, rfl⟩ := h3
+    exact rankOf_corner d
+  · have hyd : y ≤ d := by omega
+    exact rankOf_anti d x y h4 hx2 hyd
+  · rw [h5.1, h5.2]
+    exact rankOf_fifth d
+  · have hyd : y ≤ d := by omega
+    exact rankOf_self d (x, y) (rep_interior d x y hn h1 hyd h4 h5)
+
+/-- **The rank of a native point is its family rank.** Any rank of a native point equals `qRank`, by the uniqueness of the rank. -/
+theorem rankOf_eq_qRank (d : ℤ) (hd : 3 ≤ d) (x y : ℤ) (hn : NativeP d (x, y)) (r : ℤ)
+    (h : RankOf d (x, y) r) : r = qRank d (x, y) :=
+  rankOf_unique d hd (x, y) r _ h (rankOf_qRank d hd x y hn)
+
 end FLatticePaper.PureRank

@@ -19,3 +19,10 @@ import FLatticePaper.Construction.PureRank
 #print axioms FLatticePaper.PureRank.shiftP_shiftP
 #print axioms FLatticePaper.PureRank.window_alias
 #print axioms FLatticePaper.PureRank.rankOf_unique
+#print axioms FLatticePaper.PureRank.rep_interior
+#print axioms FLatticePaper.PureRank.rankOf_top
+#print axioms FLatticePaper.PureRank.rankOf_corner
+#print axioms FLatticePaper.PureRank.rankOf_anti
+#print axioms FLatticePaper.PureRank.rankOf_fifth
+#print axioms FLatticePaper.PureRank.rankOf_qRank
+#print axioms FLatticePaper.PureRank.rankOf_eq_qRank
