@@ -172,6 +172,33 @@ theorem zone_plus_nonneg (F : Site → ℤ) (N D nq dq Nu Du epsU : ℤ) (H : Zo
     rw [h1, h2]
     simp
 
+/-- The transverse grade of `Z w` is at most `r` when `w = z` lies in the box `0 ≤ z₁`, `0 ≤ z₂` (for `ε = −1`). -/
+theorem tG_le_of_box (N D z1 z2 : ℤ) (hN : 0 < N) (hND : N < D) (hz1 : 0 ≤ z1) (hz2 : 0 ≤ z2) :
+    (D - N) * (-z2) - (D + N) * (z1 - 1) ≤ D + N := by
+  nlinarith
+
+/-- The transverse grade of `Z(z − U)` is at least `r` for `z` in the box `z₁ ≤ d`, `z₂ ≤ n` (for `ε = +1`). -/
+theorem tG_ge_of_box (N D nq dq z1 z2 : ℤ) (hN : 0 < N) (hND : N < D) (hz1 : z1 ≤ 2 * D + dq)
+    (hz2 : z2 ≤ 2 * N + nq) :
+    D + N ≤ (D - N) * (-(z2 - (2 * N + nq))) - (D + N) * (z1 - (2 * D + dq) - 1) := by
+  nlinarith
+
+/-- The exceptional line `N w₁ − D w₂ = −D` is `w = (kD, kN + 1)`, given `N d_q − n_q D = ±1`. -/
+theorem exc_form (N D nq dq w1 w2 : ℤ) (hD : 0 < D) (hε : (N * dq - nq * D) ^ 2 = 1)
+    (h : N * w1 - D * w2 = -D) :
+    ∃ k : ℤ, w1 = k * D ∧ w2 = k * N + 1 := by
+  refine ⟨(N * dq - nq * D) * (dq * (w2 - 1) - nq * w1), ?_, ?_⟩
+  · linear_combination ((N * dq - nq * D) * dq) * h - w1 * hε
+  · have hk : D * (w2 - 1 - N * ((N * dq - nq * D) * (dq * (w2 - 1) - nq * w1))) = 0 := by
+      linear_combination (-1 : ℤ) * h + N * (((N * dq - nq * D) * dq) * h - w1 * hε)
+    rcases mul_eq_zero.mp hk with h0 | h0
+    · omega
+    · linarith
+
+/-- The value `h₀(0,1) = −1`. -/
+theorem harmonic_zero_one : harmonicGrid (0, 1) = -1 := by
+  norm_num [harmonicGrid]
+
 end ZoneCase
 
 end FLatticePaper.Induction
