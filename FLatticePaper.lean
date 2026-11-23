@@ -260,5 +260,6 @@ import FLatticePaper.Construction.OddShear
 import FLatticePaper.StrongHeadline
 import FLatticePaper.Plane.Induction.BaseStrip
 import FLatticePaper.Plane.Induction.ZoneI1
+import FLatticePaper.Plane.Induction.ParentStepDischarge
 
 /-! Root import for the corrected F-lattice paper. -/
