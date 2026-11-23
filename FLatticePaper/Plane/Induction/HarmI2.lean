@@ -167,6 +167,91 @@ theorem G_minus_three (F : Site → ℤ) (N D Nu Du epsU : ℤ) (H : ZoneCase.Zo
   rw [hneg, hpos, hZ, hσ0, hσ1] at hlap
   rcases hlap with h | h <;> linarith
 
+theorem harmR_ge_G (F : Site → ℤ) (N D nq dq : ℤ) (hN : 0 < N) (hND : N < D) (hevQ : (nq + dq) % 2 = 0)
+    (hps : ∀ x x' : Site, (x.1 + x.2) % 2 = (x'.1 + x'.2) % 2 →
+      N * x.1 - D * x.2 = N * x'.1 - D * x'.2 + 1 →
+      ((N * x.1 - D * x.2 < N) → quarterTurnField F x' ≤ quarterTurnField F x) ∧
+      (N ≤ N * x.1 - D * x.2 → quarterTurnField F x ≤ quarterTurnField F x'))
+    (hzs : ∀ x : Site, 1 - D ≤ N * x.1 - D * x.2 → N * x.1 - D * x.2 ≤ N + 2 * D - 1 →
+      quarterTurnField F x = 0)
+    (hε : N * dq - nq * D = 1 ∨ N * dq - nq * D = -1) (u : Site)
+    (hm1 : 1 - (D + N) ≤ (D + N) * u.1 + (D - N) * u.2)
+    (hm2 : (D + N) * u.1 + (D - N) * u.2 ≤ 2 * (D + N) + 1)
+    (hy : 0 ≤ -(N * dq - nq * D) * u.2) :
+    F (-u.2, u.1 - 1) ≤ harmR F dq nq u := by
+  have key := key_le F N D nq dq hN hND hevQ hps hzs hε u hm1 hm2 hy
+  unfold harmR
+  unfold quarterTurnField at key ⊢
+  simp only [quarterTurn_site] at key ⊢
+  linarith
+
+theorem harmR_nonneg (F : Site → ℤ) (N D Nu Du epsU nq dq : ℤ) (H : ZoneCase.ZoneHyp F N D Nu Du epsU)
+    (hsharm : ∀ y : Site, 1 - 2 * (D + N) ≤ 2 * D * y.1 + 2 * N * y.2 →
+      2 * D * y.1 + 2 * N * y.2 ≤ 2 * (2 * D) - 1 → F y = harmonicGrid y)
+    (hbin : ∀ c : Site, laplacian F c = -1 ∨ laplacian F c = 0)
+    (hevQ : (nq + dq) % 2 = 0)
+    (hps : ∀ x x' : Site, (x.1 + x.2) % 2 = (x'.1 + x'.2) % 2 →
+      N * x.1 - D * x.2 = N * x'.1 - D * x'.2 + 1 →
+      ((N * x.1 - D * x.2 < N) → quarterTurnField F x' ≤ quarterTurnField F x) ∧
+      (N ≤ N * x.1 - D * x.2 → quarterTurnField F x ≤ quarterTurnField F x'))
+    (hzs : ∀ x : Site, 1 - D ≤ N * x.1 - D * x.2 → N * x.1 - D * x.2 ≤ N + 2 * D - 1 →
+      quarterTurnField F x = 0)
+    (hε : N * dq - nq * D = 1 ∨ N * dq - nq * D = -1) (u : Site)
+    (hm1 : 1 - (D + N) ≤ (D + N) * u.1 + (D - N) * u.2)
+    (hm2 : (D + N) * u.1 + (D - N) * u.2 ≤ 2 * (D + N) + 1)
+    (hy : 0 ≤ -(N * dq - nq * D) * u.2)
+    (hbig : 2 * (D + N) ≤ (D + N) * u.1 + (D - N) * u.2 → (D + N) ≤ -(N * dq - nq * D) * u.2) :
+    0 ≤ harmR F dq nq u := by
+  have hN := H.hN
+  have hND := H.hND
+  have hA := harmR_ge_G F N D nq dq hN hND hevQ hps hzs hε u hm1 hm2 hy
+  by_cases hlow : (D + N) * u.1 + (D - N) * u.2 ≤ 2 * (D + N) - 1
+  · have hz := G_zero F N D Nu Du epsU H u hm1 hlow
+    linarith
+  · have hge : 2 * (D + N) ≤ (D + N) * u.1 + (D - N) * u.2 := by
+      have h1 := Int.lt_iff_add_one_le.mp (not_le.mp hlow)
+      linarith
+    have hbigD := hbig hge
+    have hF : -1 ≤ F (-u.2, u.1 - 1) := by
+      rcases (show (D + N) * u.1 + (D - N) * u.2 = 2 * (D + N) ∨
+          (D + N) * u.1 + (D - N) * u.2 = 2 * (D + N) + 1 from by
+            generalize (D + N) * u.1 + (D - N) * u.2 = mv at hge hm2 ⊢
+            omega) with h | h
+      · rw [G_minus_two F N D Nu Du epsU H hsharm u h]
+      · exact G_minus_three F N D Nu Du epsU H hbin u h
+    rcases hε with hε1 | hε1
+    · rw [hε1] at hbigD hy
+      have hsh := harmR_shift_Vp F N D nq dq H.hK u
+      rw [hε1] at hsh
+      have hu' : (D + N) * (u.1 + -(D - N)) + (D - N) * (u.2 + (D + N)) = (D + N) * u.1 + (D - N) * u.2 := by
+        ring
+      have hG' : F (-(u.2 + (D + N)), u.1 + -(D - N) - 1) = F (-u.2, u.1 - 1) := by
+        rw [show u.1 + -(D - N) - 1 = u.1 - (D - N) - 1 by ring]
+        exact ZoneHarmonic.fZ_add_Vp F N D H.hK u
+      have hA' := harmR_ge_G F N D nq dq hN hND hevQ hps hzs (Or.inl hε1) (u.1 + -(D - N), u.2 + (D + N))
+        (by simp only; rw [hu']; exact hm1) (by simp only; rw [hu']; exact hm2)
+        (by simp only; rw [hε1]; linarith)
+      simp only at hA' hG'
+      linarith
+    · rw [hε1] at hbigD hy
+      have hsh := harmR_shift_Vp F N D nq dq H.hK (u.1 + (D - N), u.2 - (D + N))
+      have e : (u.1 + (D - N) + -(D - N), u.2 - (D + N) + (D + N)) = u := by
+        ext <;> simp
+        ring
+      rw [e, hε1] at hsh
+      have hu' : (D + N) * (u.1 + (D - N)) + (D - N) * (u.2 - (D + N)) = (D + N) * u.1 + (D - N) * u.2 := by
+        ring
+      have hG' : F (-(u.2 - (D + N)), u.1 + (D - N) - 1) = F (-u.2, u.1 - 1) := by
+        have h := ZoneHarmonic.fZ_add_Vp F N D H.hK (u.1 + (D - N), u.2 - (D + N))
+        rw [show -(u.2 - (D + N) + (D + N)) = -u.2 by ring,
+          show u.1 + (D - N) - (D - N) - 1 = u.1 - 1 by ring] at h
+        exact h.symm
+      have hA' := harmR_ge_G F N D nq dq hN hND hevQ hps hzs (Or.inr hε1) (u.1 + (D - N), u.2 - (D + N))
+        (by simp only; rw [hu']; exact hm1) (by simp only; rw [hu']; exact hm2)
+        (by simp only; rw [hε1]; linarith)
+      simp only at hA' hG'
+      linarith
+
 end HarmI2
 
 end FLatticePaper.Induction
