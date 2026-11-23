@@ -19,22 +19,26 @@ def dO (p : Parents) : ℤ := p.odd.den - p.odd.num
 def dE (p : Parents) : ℤ := p.even.den - p.even.num
 
 theorem dO_step_one (p : Parents) : dO (p.step .one) = dO p + dE p := by
-  simp only [dO, dE, Parents.step, Parents.current, Parents.combine] <;> ring
+  simp only [dO, dE, Parents.step, Parents.current, Parents.combine]
+  ring
 
 theorem dE_step_one (p : Parents) : dE (p.step .one) = 2 * dO p + dE p := by
-  simp only [dO, dE, Parents.step, Parents.current, Parents.combine] <;> ring
+  simp only [dO, dE, Parents.step, Parents.current, Parents.combine]
+  ring
 
 theorem dO_step_two (p : Parents) : dO (p.step .two) = dO p + dE p := by
-  simp only [dO, dE, Parents.step, Parents.current, Parents.combine] <;> ring
+  simp only [dO, dE, Parents.step, Parents.current, Parents.combine]
+  ring
 
 theorem dE_step_two (p : Parents) : dE (p.step .two) = dE p := by
-  simp only [dO, dE, Parents.step, Parents.current, Parents.combine] <;> ring
+  simp only [dE, Parents.step]
 
 theorem dO_step_three (p : Parents) : dO (p.step .three) = dO p := by
-  simp only [dO, dE, Parents.step, Parents.current, Parents.combine] <;> ring
+  simp only [dO, Parents.step]
 
 theorem dE_step_three (p : Parents) : dE (p.step .three) = 2 * dO p + dE p := by
-  simp only [dO, dE, Parents.step, Parents.current, Parents.combine] <;> ring
+  simp only [dO, dE, Parents.step, Parents.current, Parents.combine]
+  ring
 
 /-- Along any walk the odd gap stays at least `1` and the even gap stays nonnegative and never decreases. -/
 theorem walk_inv : ∀ (w : Word) (p : Parents), 1 ≤ dO p → 0 ≤ dE p →

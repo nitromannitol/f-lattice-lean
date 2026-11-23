@@ -94,7 +94,7 @@ theorem odd_core (n d T x l A B : ℤ) (hn : 1 ≤ n) (hnd : n + 2 ≤ d)
 theorem even_range_core (n d T x l A B : ℤ) (hn : 1 ≤ n) (hnd : n + 2 ≤ d)
     (hT : T = d ^ 2 + 2 * d * n - n ^ 2)
     (hAx : A = d * x + (d - n) * l) (hBx : B = (d - n) * x + 2 * d * l)
-    (hA0 : 0 ≤ A) (hA2 : 2 * A ≤ d + n - 2) (hB1 : 2 - (d + n) ≤ B) (hB2 : B ≤ T - 2)
+    (hA0 : 0 ≤ A) (hA2 : 2 * A ≤ d + n - 2) (_hB1 : 2 - (d + n) ≤ B) (hB2 : B ≤ T - 2)
     (hcase : T - 2 * n < B ∨ A ≤ n) (hl1 : 1 ≤ l) (hl2 : l ≤ d - 2) :
     -(d ^ 2 + 2 * d * n - n ^ 2) + 2 * (d + n) ≤ -B ∧ -B ≤ -(d + n) := by
   have hdpos : 0 < d := by omega
