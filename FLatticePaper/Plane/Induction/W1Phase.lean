@@ -21,12 +21,13 @@ square-level condition `PhaseOK` is a property of the chosen squares, not of all
 namespace FLatticePaper.W1Phase
 
 open Farey FLatticePaper FLatticePaper.SquareClauses FLatticePaper.AndOrRank FLatticePaper.Induction FLatticePaper.W1
+open FLatticePaper.W1Witness
 open FLatticePaper.W1Forcing
 
 /-- The earlier canonical policy with its rank: an integer function strictly decreasing along the retained edges (the archive's F2F3
 rank of the conjugate's policy). -/
 structure OldPolicyRanked (frame : ChildFrame) (G : Field) (seed : Site → Site → Prop)
-    extends OldPolicyData frame G seed where
+    extends OldPolicyWitness frame G seed where
   /-- The rank of the policy. -/
   rank : Site → ℤ
   /-- The rank strictly decreases along every retained edge. -/
@@ -45,13 +46,13 @@ def sheetRankC {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} 
 /-- The A-sheet rank decreases along the transported A policy. -/
 theorem sheetRankA_decr {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
     (P : OldPolicyRanked frame G seed) (lv : Site) {c i : Site}
-    (h : sheetPolicyA P.toOldPolicyData lv c i) : sheetRankA P lv i < sheetRankA P lv c :=
+    (h : sheetPolicyA P.toOldPolicyWitness.toOldPolicyData lv c i) : sheetRankA P lv i < sheetRankA P lv c :=
   P.rank_decr (zTurn (c - lv)) (zTurn (i - lv)) h
 
 /-- The C-sheet rank decreases along the transported C policy (the reflection of the A policy). -/
 theorem sheetRankC_decr {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
     (P : OldPolicyRanked frame G seed) (lv centre : Site) {c i : Site}
-    (h : sheetPolicyC P.toOldPolicyData lv centre c i) :
+    (h : sheetPolicyC P.toOldPolicyWitness.toOldPolicyData lv centre c i) :
     sheetRankC P lv centre i < sheetRankC P lv centre c :=
   sheetRankA_decr P lv (c := centre - c) (i := centre - i) h
 
@@ -208,12 +209,168 @@ theorem forcing_of_sheet {frame : ChildFrame} {G : Field} {seed : Site → Site 
         (laplacian F c' = 0 ∧ out c' ∈ squareCorners a b ∧ (out c' = incomingNeg c' ∨ out c' = incomingPos c'))) ∧
       (∀ c' ∈ squareCorners a b, c' ≠ c → laplacian F c' = 0 →
         PhaseOK psi c c' ∧
-          Relation.TransGen (phasePolicy psi (sheetPolicyA P.toOldPolicyData lv)
-            (sheetPolicyC P.toOldPolicyData lv centre) c) c c')) :
+          Relation.TransGen (phasePolicy psi (sheetPolicyA P.toOldPolicyWitness.toOldPolicyData lv)
+            (sheetPolicyC P.toOldPolicyWitness.toOldPolicyData lv centre) c) c c')) :
     ∀ c, StrictInterior n d c → laplacian F c = 0 →
       ForcedEdgeIn F (StrictInterior n d) (fun _ _ => False) c (out c) :=
-  forcing_of_phase_policy n d F out psi (sheetPolicyA P.toOldPolicyData lv)
-    (sheetPolicyC P.toOldPolicyData lv centre) (sheetRankA P lv) (sheetRankC P lv centre)
+  forcing_of_phase_policy n d F out psi (sheetPolicyA P.toOldPolicyWitness.toOldPolicyData lv)
+    (sheetPolicyC P.toOldPolicyWitness.toOldPolicyData lv centre) (sheetRankA P lv) (sheetRankC P lv centre)
     (fun _ _ h => sheetRankA_decr P lv h) (fun _ _ h => sheetRankC_decr P lv centre h) hfin hout hsq
+
+/-! The transport of the private squares by the sheet map `c ↦ zTurn (c − lv)`. -/
+
+/-- The inverse of the parent transform `zTurn`. -/
+def zTurnInv (q : Site) : Site := (q.2 + 1, -q.1)
+
+theorem zTurn_zTurnInv (q : Site) : zTurn (zTurnInv q) = q := by
+  ext <;> simp [zTurn, zTurnInv]
+
+theorem zTurnInv_zTurn (x : Site) : zTurnInv (zTurn x) = x := by
+  ext <;> simp [zTurn, zTurnInv]
+
+/-- The child site over a parent site `q` under the sheet transform of shift `lv`. -/
+def sheetImg (lv q : Site) : Site := zTurnInv q + lv
+
+theorem zTurn_sheetImg_sub (lv q : Site) : zTurn (sheetImg lv q - lv) = q := by
+  unfold sheetImg
+  rw [add_sub_cancel_right]
+  exact zTurn_zTurnInv q
+
+theorem sheetImg_zTurn (lv c : Site) : sheetImg lv (zTurn (c - lv)) = c := by
+  unfold sheetImg
+  rw [zTurnInv_zTurn, sub_add_cancel]
+
+/-- A chain of retained lattice edges of the parent from `p` transports to a chain of the A sheet policy from every child site over `p`. -/
+theorem transGen_sheet_img {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed)
+    (lv : Site) {p q : Site} (h : Relation.TransGen (fun x y => P.retained x y ∧ Edge y x) p q) :
+    ∀ c, zTurn (c - lv) = p → Relation.TransGen (sheetPolicyA P.toOldPolicyWitness.toOldPolicyData lv) c (sheetImg lv q) := by
+  induction h with
+  | single h =>
+    intro c hc
+    apply Relation.TransGen.single
+    simp only [sheetPolicyA, parentPolicy]
+    rw [hc, zTurn_sheetImg_sub]
+    exact h.1
+  | tail _ h ih =>
+    intro c hc
+    apply Relation.TransGen.tail (ih c hc)
+    simp only [sheetPolicyA, parentPolicy]
+    rw [zTurn_sheetImg_sub, zTurn_sheetImg_sub]
+    exact h.1
+
+/-- The image of a parent square is a child square: the four corners go to the four corners of `squareCorners (b+1+lv₁) (−a−1+lv₂)`. -/
+theorem sheetImg_mem (lv : Site) (a b : ℤ) {q : Site} (hq : q ∈ squareCorners a b) :
+    sheetImg lv q ∈ squareCorners (b + 1 + lv.1) (-a - 1 + lv.2) := by
+  obtain ⟨x, y⟩ := q
+  simp only [squareCorners, Finset.mem_insert, Finset.mem_singleton, Prod.ext_iff] at hq ⊢
+  simp only [sheetImg, zTurnInv, Prod.fst_add, Prod.snd_add]
+  omega
+
+/-- Every corner of the child square is the image of a corner of the parent square. -/
+theorem sheet_corner_of_mem (lv : Site) (a b : ℤ) {c' : Site}
+    (hc' : c' ∈ squareCorners (b + 1 + lv.1) (-a - 1 + lv.2)) :
+    ∃ q ∈ squareCorners a b, sheetImg lv q = c' := by
+  obtain ⟨x, y⟩ := c'
+  simp only [squareCorners, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq] at hc'
+  rcases hc' with ⟨h1, h2⟩ | ⟨h1, h2⟩ | ⟨h1, h2⟩ | ⟨h1, h2⟩
+  · refine ⟨(a + 1, b), by simp [squareCorners], ?_⟩
+    simp only [sheetImg, zTurnInv, Prod.ext_iff, Prod.fst_add, Prod.snd_add]
+    omega
+  · refine ⟨(a + 1, b + 1), by simp [squareCorners], ?_⟩
+    simp only [sheetImg, zTurnInv, Prod.ext_iff, Prod.fst_add, Prod.snd_add]
+    omega
+  · refine ⟨(a, b), by simp [squareCorners], ?_⟩
+    simp only [sheetImg, zTurnInv, Prod.ext_iff, Prod.fst_add, Prod.snd_add]
+    omega
+  · refine ⟨(a, b + 1), by simp [squareCorners], ?_⟩
+    simp only [sheetImg, zTurnInv, Prod.ext_iff, Prod.fst_add, Prod.snd_add]
+    omega
+
+/-- **The private square transported.** A parent square `squareCorners a b` through its root `p`, whose other corners are reached from
+`p` by retained edges, transports to the child square `squareCorners (b+1+lv₁) (−a−1+lv₂)` through the child root `c` over `p`: the
+child root lies in it, and every other corner is reached from `c` by the A sheet policy. -/
+theorem sheet_private_square {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed)
+    (lv : Site) (a b : ℤ) {p c : Site} (hp : p ∈ squareCorners a b) (hc : zTurn (c - lv) = p)
+    (hchain : ∀ q ∈ squareCorners a b, q ≠ p → Relation.TransGen (fun x y => P.retained x y ∧ Edge y x) p q) :
+    c ∈ squareCorners (b + 1 + lv.1) (-a - 1 + lv.2) ∧
+      ∀ c' ∈ squareCorners (b + 1 + lv.1) (-a - 1 + lv.2), c' ≠ c →
+        Relation.TransGen (sheetPolicyA P.toOldPolicyWitness.toOldPolicyData lv) c c' := by
+  have hcp : c = sheetImg lv p := by
+    rw [← hc, sheetImg_zTurn]
+  subst hcp
+  refine ⟨sheetImg_mem lv a b hp, fun c' hc' hne => ?_⟩
+  obtain ⟨q, hq, rfl⟩ := sheet_corner_of_mem lv a b hc'
+  have hqp : q ≠ p := fun h => hne (by rw [h])
+  exact transGen_sheet_img P lv (hchain q hq hqp) (sheetImg lv p) (zTurn_sheetImg_sub lv p)
+
+/-- **The private witness transported.** At a child white `c` over a forced parent white `p` (the parent's witness square is private,
+`OldPolicyWitness.privateSquare`), the transported child square contains `c`, and its other corners are reached from `c` along the
+A sheet policy. This is the chain required by the phase return `hRS` on the transported square. -/
+theorem sheet_private_of_forced {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed)
+    (lv : Site) {p c i : Site} (hc : zTurn (c - lv) = p) (hF : ForcedEdge G seed p i) (hns : ¬ seed p i)
+    (hw : laplacian G p = 0) :
+    ∃ a b : ℤ, p ∈ squareCorners a b ∧ c ∈ squareCorners (b + 1 + lv.1) (-a - 1 + lv.2) ∧
+      ∀ c' ∈ squareCorners (b + 1 + lv.1) (-a - 1 + lv.2), c' ≠ c →
+        Relation.TransGen (sheetPolicyA P.toOldPolicyWitness.toOldPolicyData lv) c c' := by
+  obtain ⟨a, b, hp, hchain⟩ := P.privateSquare p i hF hns hw
+  obtain ⟨hcmem, hch⟩ := sheet_private_square P lv a b hp hc hchain
+  exact ⟨a, b, hp, hcmem, hch⟩
+
+/-! The four core squares of §3 of the archive, in the parent's coordinates: the roots `H0 = (1,0)` (grades `(N, Lp)`), `V0 = (0,0)`
+(`tp = 0`) and `Vlast = (1,−1)` (the period `I`, `sp = 2N`). The bottom collars take the upper-left square of `H0` and `V0`; the W1 left
+collar takes the upper-right square of `H0` and `Vlast`; the W0 right collar takes the lower-left square of `V0` (`Hlast` is not identified
+in Lean). Each is private for the sheet policy once its parent square is private for the parent policy (the parent's core claim, a
+hypothesis here; the archive's W1 witness at the root). The child squares are the explicit corner sets displayed in each statement. -/
+
+/-- The bottom H0 core square: the parent upper-left square of `(1,0)`, i.e. `squareCorners 0 0`; the child square is
+`squareCorners (1 + lv₁) (lv₂ − 1)`, over the child root `(1 + lv₁, lv₂ − 1)`. -/
+theorem collar_H0_upperLeft {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed)
+    (lv : Site) {c : Site} (hc : zTurn (c - lv) = (1, 0))
+    (hchain : ∀ q ∈ squareCorners 0 0, q ≠ (1, 0) →
+      Relation.TransGen (fun x y => P.retained x y ∧ Edge y x) (1, 0) q) :
+    c ∈ squareCorners (0 + 1 + lv.1) (-0 - 1 + lv.2) ∧
+      ∀ c' ∈ squareCorners (0 + 1 + lv.1) (-0 - 1 + lv.2), c' ≠ c →
+        Relation.TransGen (sheetPolicyA P.toOldPolicyWitness.toOldPolicyData lv) c c' :=
+  sheet_private_square P lv 0 0 (by simp [squareCorners]) hc hchain
+
+/-- The bottom V0 core square: the parent upper-left square of `(0,0)`, i.e. `squareCorners (−1) 0`. -/
+theorem collar_V0_upperLeft {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed)
+    (lv : Site) {c : Site} (hc : zTurn (c - lv) = (0, 0))
+    (hchain : ∀ q ∈ squareCorners (-1) 0, q ≠ (0, 0) →
+      Relation.TransGen (fun x y => P.retained x y ∧ Edge y x) (0, 0) q) :
+    c ∈ squareCorners (0 + 1 + lv.1) (-(-1) - 1 + lv.2) ∧
+      ∀ c' ∈ squareCorners (0 + 1 + lv.1) (-(-1) - 1 + lv.2), c' ≠ c →
+        Relation.TransGen (sheetPolicyA P.toOldPolicyWitness.toOldPolicyData lv) c c' :=
+  sheet_private_square P lv (-1) 0 (by simp [squareCorners]) hc hchain
+
+/-- The W1 left H0 core square: the parent upper-right square of `(1,0)`, i.e. `squareCorners 1 0`. -/
+theorem collar_H0_upperRight {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed)
+    (lv : Site) {c : Site} (hc : zTurn (c - lv) = (1, 0))
+    (hchain : ∀ q ∈ squareCorners 1 0, q ≠ (1, 0) →
+      Relation.TransGen (fun x y => P.retained x y ∧ Edge y x) (1, 0) q) :
+    c ∈ squareCorners (0 + 1 + lv.1) (-1 - 1 + lv.2) ∧
+      ∀ c' ∈ squareCorners (0 + 1 + lv.1) (-1 - 1 + lv.2), c' ≠ c →
+        Relation.TransGen (sheetPolicyA P.toOldPolicyWitness.toOldPolicyData lv) c c' :=
+  sheet_private_square P lv 1 0 (by simp [squareCorners]) hc hchain
+
+/-- The W1 left Vlast core square: the parent upper-right square of `(1,−1)`, i.e. `squareCorners 1 (−1)`. -/
+theorem collar_Vlast_upperRight {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed)
+    (lv : Site) {c : Site} (hc : zTurn (c - lv) = (1, -1))
+    (hchain : ∀ q ∈ squareCorners 1 (-1), q ≠ (1, -1) →
+      Relation.TransGen (fun x y => P.retained x y ∧ Edge y x) (1, -1) q) :
+    c ∈ squareCorners (-1 + 1 + lv.1) (-1 - 1 + lv.2) ∧
+      ∀ c' ∈ squareCorners (-1 + 1 + lv.1) (-1 - 1 + lv.2), c' ≠ c →
+        Relation.TransGen (sheetPolicyA P.toOldPolicyWitness.toOldPolicyData lv) c c' :=
+  sheet_private_square P lv 1 (-1) (by simp [squareCorners]) hc hchain
+
+/-- The W0 right V0 core square: the parent lower-left square of `(0,0)`, i.e. `squareCorners (−1) (−1)`. -/
+theorem collar_V0_lowerLeft {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed)
+    (lv : Site) {c : Site} (hc : zTurn (c - lv) = (0, 0))
+    (hchain : ∀ q ∈ squareCorners (-1) (-1), q ≠ (0, 0) →
+      Relation.TransGen (fun x y => P.retained x y ∧ Edge y x) (0, 0) q) :
+    c ∈ squareCorners (-1 + 1 + lv.1) (-(-1) - 1 + lv.2) ∧
+      ∀ c' ∈ squareCorners (-1 + 1 + lv.1) (-(-1) - 1 + lv.2), c' ≠ c →
+        Relation.TransGen (sheetPolicyA P.toOldPolicyWitness.toOldPolicyData lv) c c' :=
+  sheet_private_square P lv (-1) (-1) (by simp [squareCorners]) hc hchain
 
 end FLatticePaper.W1Phase
