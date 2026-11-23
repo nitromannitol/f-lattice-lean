@@ -269,4 +269,108 @@ theorem rankOf_translate (d : ℤ) (p : Pt) (i j : ℤ) (hi : IsAlias i j) (hrep
     RankOf d p (valMinus d (shiftP d p i j) - i * (2 * d) + j * (2 * (d + 1))) :=
   ⟨i, j, hi, hrep, rfl⟩
 
+/-- Native points lie in the strip `2 − d ≤ x ≤ d`, `0 ≤ y ≤ d + 1`. -/
+theorem nativeP_bounds (d : ℤ) (hd : 2 ≤ d) (p : Pt) (hp : NativeP d p) :
+    2 - d ≤ p.1 ∧ p.1 ≤ d ∧ 0 ≤ p.2 ∧ p.2 ≤ d + 1 := by
+  obtain ⟨x, y⟩ := p
+  rcases hp with ⟨h1, h2, h3, h4, -, -⟩ | h | h
+  · exact ⟨h1, h2, h3, h4⟩
+  · simp only [Prod.mk.injEq] at h
+    obtain ⟨rfl, rfl⟩ := h
+    exact ⟨by omega, by omega, by omega, by omega⟩
+  · simp only [Prod.mk.injEq] at h
+    obtain ⟨rfl, rfl⟩ := h
+    exact ⟨by omega, by omega, by omega, by omega⟩
+
+/-- Free points are native. -/
+theorem freeP_native (d : ℤ) (hd : 3 ≤ d) (p : Pt) (hp : IsFreeP d p) : NativeP d p := by
+  obtain ⟨x, y⟩ := p
+  simp only [IsFreeP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hp ⊢
+  omega
+
+/-- The composition of two alias shifts is the shift by the sum. -/
+theorem shiftP_shiftP (d : ℤ) (p : Pt) (i j i' j' : ℤ) :
+    shiftP d (shiftP d p i j) i' j' = shiftP d p (i + i') (j + j') := by
+  obtain ⟨x, y⟩ := p
+  simp only [shiftP, Prod.mk.injEq]
+  constructor <;> ring
+
+/-- **The finite window (the note's complete alias window).** Two native points differ by an alias: `|i| ≤ 2`, `|j| ≤ 1`.
+Proof by the deck coordinates: `i·T = (d+1)Δx + (d−1)Δy` and `j·T = dΔy − Δx` with `T = d² + 2d − 1`. -/
+theorem window_alias (d : ℤ) (hd : 3 ≤ d) (p q : Pt) (hp : NativeP d p) (hq : NativeP d q) (i j : ℤ)
+    (h : q = shiftP d p i j) : -2 ≤ i ∧ i ≤ 2 ∧ -1 ≤ j ∧ j ≤ 1 := by
+  obtain ⟨hp1, hp2, hp3, hp4⟩ := nativeP_bounds d (by omega) p hp
+  obtain ⟨hq1, hq2, hq3, hq4⟩ := nativeP_bounds d (by omega) q hq
+  have hT : (0:ℤ) < d * d + 2 * d - 1 := by nlinarith
+  have hi : i * (d * d + 2 * d - 1) = (d + 1) * (q.1 - p.1) + (d - 1) * (q.2 - p.2) := by
+    subst h
+    simp only [shiftP]
+    ring
+  have hj : j * (d * d + 2 * d - 1) = d * (q.2 - p.2) - (q.1 - p.1) := by
+    subst h
+    simp only [shiftP]
+    ring
+  have hdx1 : q.1 - p.1 ≤ 2 * d - 2 := by omega
+  have hdx2 : -(2 * d - 2) ≤ q.1 - p.1 := by omega
+  have hdy1 : q.2 - p.2 ≤ d + 1 := by omega
+  have hdy2 : -(d + 1) ≤ q.2 - p.2 := by omega
+  have hd1 : (0:ℤ) ≤ d + 1 := by omega
+  have hd2 : (0:ℤ) ≤ d - 1 := by omega
+  have hd0 : (0:ℤ) ≤ d := by omega
+  have hA1 : (d + 1) * (q.1 - p.1) ≤ (d + 1) * (2 * d - 2) := mul_le_mul_of_nonneg_left hdx1 hd1
+  have hA2 : -((d + 1) * (2 * d - 2)) ≤ (d + 1) * (q.1 - p.1) := by nlinarith
+  have hB1 : (d - 1) * (q.2 - p.2) ≤ (d - 1) * (d + 1) := mul_le_mul_of_nonneg_left hdy1 hd2
+  have hB2 : -((d - 1) * (d + 1)) ≤ (d - 1) * (q.2 - p.2) := by nlinarith
+  have hC1 : d * (q.2 - p.2) ≤ d * (d + 1) := mul_le_mul_of_nonneg_left hdy1 hd0
+  have hC2 : -(d * (d + 1)) ≤ d * (q.2 - p.2) := by nlinarith
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · by_contra hc
+    have h3 : (3:ℤ) ≤ -i := by omega
+    have h4 : 3 * (d * d + 2 * d - 1) ≤ -i * (d * d + 2 * d - 1) := mul_le_mul_of_nonneg_right h3 hT.le
+    nlinarith
+  · by_contra hc
+    have h3 : (3:ℤ) ≤ i := by omega
+    have h4 : 3 * (d * d + 2 * d - 1) ≤ i * (d * d + 2 * d - 1) := mul_le_mul_of_nonneg_right h3 hT.le
+    nlinarith
+  · by_contra hc
+    have h3 : (2:ℤ) ≤ -j := by omega
+    have h4 : 2 * (d * d + 2 * d - 1) ≤ -j * (d * d + 2 * d - 1) := mul_le_mul_of_nonneg_right h3 hT.le
+    nlinarith
+  · by_contra hc
+    have h3 : (2:ℤ) ≤ j := by omega
+    have h4 : 2 * (d * d + 2 * d - 1) ≤ j * (d * d + 2 * d - 1) := mul_le_mul_of_nonneg_right h3 hT.le
+    nlinarith
+
+/-- **Rank uniqueness.** The rank of a point is determined: two alias translates that are representatives coincide,
+because their difference is an alias (the window) and a nonzero alias translate of a representative is not a representative. -/
+theorem rankOf_unique (d : ℤ) (hd : 3 ≤ d) (p : Pt) (r r' : ℤ) (h : RankOf d p r) (h' : RankOf d p r') : r = r' := by
+  obtain ⟨i, j, hi, hrep, rfl⟩ := h
+  obtain ⟨i', j', hi', hrep', rfl⟩ := h'
+  have hnat : ∀ a b, IsAlias a b → IsRepP d (shiftP d p a b) → NativeP d (shiftP d p a b) := by
+    intro a b _ hr
+    rcases hr with hf | ⟨hn, -, -⟩
+    · exact freeP_native d hd _ hf
+    · exact hn
+  have hnq : NativeP d (shiftP d p i j) := hnat i j hi hrep
+  have hnq' : NativeP d (shiftP d p i' j') := hnat i' j' hi' hrep'
+  by_cases hk : i' - i = 0 ∧ j' - j = 0
+  · obtain ⟨hk1, hk2⟩ := hk
+    have e1 : i' = i := by omega
+    have e2 : j' = j := by omega
+    subst e1; subst e2
+    rfl
+  · exfalso
+    set q := shiftP d p i j with hqdef
+    have hq' : shiftP d p i' j' = shiftP d q (i' - i) (j' - j) := by
+      rw [hqdef, shiftP_shiftP]
+      congr 1 <;> ring_nf
+    have hwin := window_alias d hd q (shiftP d p i' j') hnq hnq' (i' - i) (j' - j) hq'
+    have hki : IsAlias (i' - i) (j' - j) := by
+      obtain ⟨a1, a2, a3, a4⟩ := hwin
+      exact ⟨a1, a2, a3, a4⟩
+    rw [hq'] at hrep'
+    by_cases hqf : IsFreeP d q
+    · exact not_rep_of_free_translate d hd q hqf _ _ hki hk hrep'
+    · exact not_rep_of_bulk_translate d hd q hrep hqf _ _ hki hk hrep'
+
 end FLatticePaper.PureRank
