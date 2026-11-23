@@ -298,5 +298,6 @@ import FLatticePaper.Plane.Induction.Q3Para10
 import FLatticePaper.Plane.Induction.Q3White
 import FLatticePaper.Plane.Induction.Q3Rise
 import FLatticePaper.Plane.Induction.OldPolicy
+import FLatticePaper.Plane.Induction.NoBlackPair
 
 /-! Root import for the corrected F-lattice paper. -/
