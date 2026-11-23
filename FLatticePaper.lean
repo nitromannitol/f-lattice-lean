@@ -428,5 +428,8 @@ import FLatticePaper.Plane.Induction.W1MSheet
 import FLatticePaper.Plane.Induction.W1MFinal
 import FLatticePaper.Plane.Induction.W1Inherited
 import FLatticePaper.Plane.Induction.W1SheetSquare
+import FLatticePaper.Plane.Induction.W1PrivateSquare
+import FLatticePaper.Plane.Induction.W1NonfreeSquare
+import FLatticePaper.Plane.Induction.W1ForcedPhase
 
 /-! Root import for the corrected F-lattice paper. -/

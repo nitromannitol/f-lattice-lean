@@ -5,6 +5,7 @@ import FLatticePaper.Plane.Induction.W1Hagree
 import FLatticePaper.Plane.Induction.SheetReflection
 import FLatticePaper.Plane.Induction.W1Inherited
 import FLatticePaper.Plane.Induction.W1SheetSquare
+import FLatticePaper.Plane.Induction.W1NonfreeSquare
 
 /-! # Task 85 (final): hagree at M-white ties, from the A descent and the centre reflection
 
@@ -160,5 +161,32 @@ theorem hagree_M_tie_of_ranked (word : Word) (h : ∃ x ∈ word, x ≠ Digit.th
     (FLatticePaper.W1Inherited.rankIncr_two_of_ranked P (child_det_ne_zero (conjWord word)) hSE.priceDrift hSE.slipDrift
       (frameAt word).eps_unit)
     (fun c hT hM => FLatticePaper.W1SheetSquare.sheet_square_of_parent (frameAt word).evenSite_sheetShift c (hpar c hT hM))
+
+/-- **hagree at M-white ties, with the nonfree square data discharged** (task 88). For the inherited policy `P` of the conjugate with empty seed,
+the parent square data at the M-white ties is needed only at free parent roots (`hfree`): at a nonfree parent root it is
+`parentSquare_nonfree` (the top unit of the forced derivation of the retained input, from `W1Forced`). -/
+theorem hagree_M_tie_of_inherited (word : Word) (h : ∃ x ∈ word, x ≠ Digit.three)
+    (hSE : StrongEstimates (conjWord word)) {seed : Site → Site → Prop}
+    (P : FLatticePaper.W1Phase.OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    (hs : seed = fun _ _ => False)
+    (hW1 : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
+      (standardField (conjWord word)))
+    (hfree : ∀ c : Site, (frameAt word).sheetC (FqW word) c = (frameAt word).sheetA (FqW word) c →
+      laplacian (MW word) c = 0 →
+      ¬ Nonfree (frameAt (conjWord word)) (zTurn (c - (frameAt word).sheetShift)) →
+      FLatticePaper.W1SheetSquare.ParentSquare P.retained (zTurn (c - (frameAt word).sheetShift))) :
+    ∀ c : Site, (frameAt word).sheetC (FqW word) c = (frameAt word).sheetA (FqW word) c →
+      laplacian (MW word) c = 0 →
+      sheetQC P.retained (frameAt word).sheetShift (frameAt word).centre c
+        (FLatticePaper.W1Pointers.pointerOf (sheetQ P.retained (frameAt word).sheetShift) c) := by
+  have hbinF : ∀ x, laplacian (FqW word) x = -1 ∨ laplacian (FqW word) x = 0 :=
+    fun x => quarterTurnField_binary hSE.packet.binary x
+  have hlvE : EvenSite (frameAt word).sheetShift := (frameAt word).evenSite_sheetShift
+  refine hagree_M_tie_of_ranked word h hSE P ?_
+  intro c hT hM
+  by_cases hnf : Nonfree (frameAt (conjWord word)) (zTurn (c - (frameAt word).sheetShift))
+  · exact FLatticePaper.W1NonfreeSquare.parentSquare_nonfree P.toOldPolicyWitness.toOldPolicyData hs hSE.packet hW1
+      (FLatticePaper.W1NonfreeSquare.parent_white_of_mwhite word hbinF hlvE c hM hT) hnf
+  · exact hfree c hT hM hnf
 
 end FLatticePaper.W1MFinal

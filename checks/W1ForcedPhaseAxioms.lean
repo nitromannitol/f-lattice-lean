@@ -1,0 +1,4 @@
+import FLatticePaper.Plane.Induction.W1ForcedPhase
+
+#print axioms FLatticePaper.W1ForcedPhase.w1Forced_of_strict_squares
+#print axioms FLatticePaper.W1ForcedPhase.w1Forced_of_ranked

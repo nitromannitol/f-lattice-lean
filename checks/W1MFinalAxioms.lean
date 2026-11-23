@@ -1,9 +1,7 @@
 import FLatticePaper.Plane.Induction.W1MFinal
-import FLatticePaper.Plane.Induction.W1Inherited
-import FLatticePaper.Plane.Induction.W1SheetSquare
-import FLatticePaper.Plane.Induction.W1Return
+import FLatticePaper.Plane.Induction.W1PrivateSquare
+import FLatticePaper.Plane.Induction.W1NonfreeSquare
 
-#print axioms FLatticePaper.W1Inherited.rankIncr_two_of_ranked
-#print axioms FLatticePaper.W1SheetSquare.sheet_square_of_parent
-#print axioms FLatticePaper.W1MFinal.hagree_M_tie_of_ranked
-#print axioms FLatticePaper.W1Return.tie_common_arrow
+#print axioms FLatticePaper.W1PrivateSquare.parentSquare_of_forced
+#print axioms FLatticePaper.W1NonfreeSquare.parentSquare_nonfree
+#print axioms FLatticePaper.W1MFinal.hagree_M_tie_of_inherited
