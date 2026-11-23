@@ -124,3 +124,10 @@ A separate, shorter write-up (`flattice-simple-proof`, `short-proof.tex` with it
 - Finite cylinders. Proposition `prop:strip` and Lemma `lem:cutoff` give a finite recurrence certificate for an individual periodic pattern (window $N+(N-1)J$) once a periodic choice with strictly negative quotient cycles is given.
 - What it does not settle. The write-up states that an all-word proof still needs the signed choices (the signed decreasing policy) at every child, which "does not follow from the period vectors alone" and uses the corrected induction's interior estimates (Section `sec:farey`, last paragraphs). So the open local inputs of the headline theorems (the archive's premises B0-B2) are not settled by it.
 - Its all-word note records the reflection of the alternate, $H_+(C-z)=H_-(z)+L(z)-\tfrac12\nabla L\cdot\sigma$ with $L$ integer affine, which exchanges the two signed midpoints; this is a candidate explanation of the affine slope found in the odd alternate of odd phase (`alternateOddTarget`).
+
+## Independent fixes adopted
+
+Answers of an independent check of the open questions (fixes Q2, Q3, Q4) are adopted as follows; the target statements are unchanged.
+
+- Q4, sign convention: the root cover of the harmonic zone in `StarZoneInputs` ([OpenLocal.lean](FLatticePaper/Plane/Induction/OpenLocal.lean)) is required only at $\varepsilon=1$. As first stated it was required at both signs and fails at $\varepsilon=-1$ (word $2$, site $(0,1)$: $\Psi=-1$, with $\Psi=-2,0$ at the two possible centres); at $\varepsilon=-1$ the comparison is $\Psi\le0$, the mirror clause.
+- Q4 (I1, I2), Q2 (the $V$ arcs), Q4 (I3: the earlier threshold, the unit bound and the signed grades) and Q3 (no rising input at an odd black site): written proofs of these inputs at a proper word from the strong estimates of the strictly earlier conjugate (its slip and primitive-price ranges with their drifts, its strips and zero-strip extension, its signed retained graph with ranks of arbitrary weights, the chain mate's reflected graph). They are being formalized; the production of those strong estimates at the current word (Q1) remains open.
