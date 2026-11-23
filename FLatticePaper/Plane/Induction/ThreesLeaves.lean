@@ -14,7 +14,7 @@ theorem mem_TS_iff' (d : ℤ) (p : Site) : p ∈ (BaseMask.stairEven.raw d).site
       (BaseMask.StairEvenCorner d p ∨ (1 ≤ p.1 + p.2 ∧ p.1 + p.2 ≤ d + 2)) :=
   BaseMask.mem_stairEven_raw_iff
 
-theorem leaf_K0L0 (d c : ℤ) (hd : 3 ≤ d) (hc : 2 * c = -d ^ 2 - 3 * d) (RF : Site → ℤ)
+theorem leaf_K0L0 (d c : ℤ) (hd : 3 ≤ d) (_hc : 2 * c = -d ^ 2 - 3 * d) (RF : Site → ℤ)
     (hred : ∀ (y : Site) (i j : ℤ), y ∈ (BaseMask.stairEven.raw d).sites →
       2 * RF (y + thr d i j) = Mt d y + 2 * j * (y.1 - d * y.2 + c) - (d ^ 2 + 2 * d - 1) * j * (j - 1))
     (y : Site) (hy : y ∈ (BaseMask.stairEven.raw d).sites) (a b : ℤ)
@@ -24,7 +24,7 @@ theorem leaf_K0L0 (d c : ℤ) (hd : 3 ≤ d) (hc : 2 * c = -d ^ 2 - 3 * d) (RF :
       RF (y + thr d a b + (1, 0)) + RF (y + thr d a b - (1, 0)) - 2 * RF (y + thr d a b) ≤ 1 ∧
       (RF (y + thr d a b + (1, 0)) + RF (y + thr d a b - (1, 0)) - 2 * RF (y + thr d a b) = 1 ↔
         stairEvenAltMarker d (y + thr d a b + (1, 0)) = 1) := by
-  clear hc
+  clear _hc
   obtain ⟨key, hmk⟩ := combo_identity d c RF hred y hy a b (0) (0) (0) (0) (y.1 + 1, y.2) (y.1 - 1, y.2) HK HL (by simp [thr]) (by simp [thr])
   rw [hmk, marker_tile d hd _ HK]
   generalize RF (y + thr d a b + (1, 0)) = A at key ⊢
@@ -47,7 +47,7 @@ theorem leaf_K0L0 (d c : ℤ) (hd : 3 ≤ d) (hc : 2 * c = -d ^ 2 - 3 * d) (RF :
   <;> refine ⟨by omega, by omega, ?_⟩
   <;> constructor <;> intro h <;> omega
 
-theorem leaf_K0L1 (d c : ℤ) (hd : 3 ≤ d) (hc : 2 * c = -d ^ 2 - 3 * d) (RF : Site → ℤ)
+theorem leaf_K0L1 (d c : ℤ) (hd : 3 ≤ d) (_hc : 2 * c = -d ^ 2 - 3 * d) (RF : Site → ℤ)
     (hred : ∀ (y : Site) (i j : ℤ), y ∈ (BaseMask.stairEven.raw d).sites →
       2 * RF (y + thr d i j) = Mt d y + 2 * j * (y.1 - d * y.2 + c) - (d ^ 2 + 2 * d - 1) * j * (j - 1))
     (y : Site) (hy : y ∈ (BaseMask.stairEven.raw d).sites) (a b : ℤ)
@@ -57,7 +57,7 @@ theorem leaf_K0L1 (d c : ℤ) (hd : 3 ≤ d) (hc : 2 * c = -d ^ 2 - 3 * d) (RF :
       RF (y + thr d a b + (1, 0)) + RF (y + thr d a b - (1, 0)) - 2 * RF (y + thr d a b) ≤ 1 ∧
       (RF (y + thr d a b + (1, 0)) + RF (y + thr d a b - (1, 0)) - 2 * RF (y + thr d a b) = 1 ↔
         stairEvenAltMarker d (y + thr d a b + (1, 0)) = 1) := by
-  clear hc
+  clear _hc
   obtain ⟨key, hmk⟩ := combo_identity d c RF hred y hy a b (0) (0) (-1) (0) (y.1 + 1, y.2) (y.1 - 1 + d, y.2 + 1) HK HL (by simp [thr]) (Prod.ext (by simp only [thr, Prod.fst_sub]; ring) (by simp only [thr, Prod.snd_sub]; ring))
   rw [hmk, marker_tile d hd _ HK]
   generalize RF (y + thr d a b + (1, 0)) = A at key ⊢
@@ -112,7 +112,7 @@ theorem leaf_K0L2 (d c : ℤ) (hd : 3 ≤ d) (hc : 2 * c = -d ^ 2 - 3 * d) (RF :
   <;> refine ⟨by omega, by omega, ?_⟩
   <;> constructor <;> intro h <;> omega
 
-theorem leaf_K1L0 (d c : ℤ) (hd : 3 ≤ d) (hc : 2 * c = -d ^ 2 - 3 * d) (RF : Site → ℤ)
+theorem leaf_K1L0 (d c : ℤ) (hd : 3 ≤ d) (_hc : 2 * c = -d ^ 2 - 3 * d) (RF : Site → ℤ)
     (hred : ∀ (y : Site) (i j : ℤ), y ∈ (BaseMask.stairEven.raw d).sites →
       2 * RF (y + thr d i j) = Mt d y + 2 * j * (y.1 - d * y.2 + c) - (d ^ 2 + 2 * d - 1) * j * (j - 1))
     (y : Site) (hy : y ∈ (BaseMask.stairEven.raw d).sites) (a b : ℤ)
@@ -122,7 +122,7 @@ theorem leaf_K1L0 (d c : ℤ) (hd : 3 ≤ d) (hc : 2 * c = -d ^ 2 - 3 * d) (RF :
       RF (y + thr d a b + (1, 0)) + RF (y + thr d a b - (1, 0)) - 2 * RF (y + thr d a b) ≤ 1 ∧
       (RF (y + thr d a b + (1, 0)) + RF (y + thr d a b - (1, 0)) - 2 * RF (y + thr d a b) = 1 ↔
         stairEvenAltMarker d (y + thr d a b + (1, 0)) = 1) := by
-  clear hc
+  clear _hc
   obtain ⟨key, hmk⟩ := combo_identity d c RF hred y hy a b (1) (0) (0) (0) (y.1 + 1 - d, y.2 - 1) (y.1 - 1, y.2) HK HL (Prod.ext (by simp only [thr, Prod.fst_sub]; ring) (by simp only [thr, Prod.snd_sub]; ring)) (by simp [thr])
   rw [hmk, marker_tile d hd _ HK]
   generalize RF (y + thr d a b + (1, 0)) = A at key ⊢
@@ -145,7 +145,7 @@ theorem leaf_K1L0 (d c : ℤ) (hd : 3 ≤ d) (hc : 2 * c = -d ^ 2 - 3 * d) (RF :
   <;> refine ⟨by omega, by omega, ?_⟩
   <;> constructor <;> intro h <;> omega
 
-theorem leaf_K1L1 (d c : ℤ) (hd : 3 ≤ d) (hc : 2 * c = -d ^ 2 - 3 * d) (RF : Site → ℤ)
+theorem leaf_K1L1 (d c : ℤ) (hd : 3 ≤ d) (_hc : 2 * c = -d ^ 2 - 3 * d) (RF : Site → ℤ)
     (hred : ∀ (y : Site) (i j : ℤ), y ∈ (BaseMask.stairEven.raw d).sites →
       2 * RF (y + thr d i j) = Mt d y + 2 * j * (y.1 - d * y.2 + c) - (d ^ 2 + 2 * d - 1) * j * (j - 1))
     (y : Site) (hy : y ∈ (BaseMask.stairEven.raw d).sites) (a b : ℤ)
@@ -155,7 +155,7 @@ theorem leaf_K1L1 (d c : ℤ) (hd : 3 ≤ d) (hc : 2 * c = -d ^ 2 - 3 * d) (RF :
       RF (y + thr d a b + (1, 0)) + RF (y + thr d a b - (1, 0)) - 2 * RF (y + thr d a b) ≤ 1 ∧
       (RF (y + thr d a b + (1, 0)) + RF (y + thr d a b - (1, 0)) - 2 * RF (y + thr d a b) = 1 ↔
         stairEvenAltMarker d (y + thr d a b + (1, 0)) = 1) := by
-  clear hc
+  clear _hc
   obtain ⟨key, hmk⟩ := combo_identity d c RF hred y hy a b (1) (0) (-1) (0) (y.1 + 1 - d, y.2 - 1) (y.1 - 1 + d, y.2 + 1) HK HL (Prod.ext (by simp only [thr, Prod.fst_sub]; ring) (by simp only [thr, Prod.snd_sub]; ring)) (Prod.ext (by simp only [thr, Prod.fst_sub]; ring) (by simp only [thr, Prod.snd_sub]; ring))
   rw [hmk, marker_tile d hd _ HK]
   generalize RF (y + thr d a b + (1, 0)) = A at key ⊢
@@ -178,7 +178,7 @@ theorem leaf_K1L1 (d c : ℤ) (hd : 3 ≤ d) (hc : 2 * c = -d ^ 2 - 3 * d) (RF :
   <;> refine ⟨by omega, by omega, ?_⟩
   <;> constructor <;> intro h <;> omega
 
-theorem leaf_K1L2 (d c : ℤ) (hd : 3 ≤ d) (hc : 2 * c = -d ^ 2 - 3 * d) (RF : Site → ℤ)
+theorem leaf_K1L2 (d c : ℤ) (hd : 3 ≤ d) (_hc : 2 * c = -d ^ 2 - 3 * d) (RF : Site → ℤ)
     (hred : ∀ (y : Site) (i j : ℤ), y ∈ (BaseMask.stairEven.raw d).sites →
       2 * RF (y + thr d i j) = Mt d y + 2 * j * (y.1 - d * y.2 + c) - (d ^ 2 + 2 * d - 1) * j * (j - 1))
     (y : Site) (hy : y ∈ (BaseMask.stairEven.raw d).sites) (a b : ℤ)
@@ -274,7 +274,7 @@ theorem leaf_K2L1 (d c : ℤ) (hd : 3 ≤ d) (hc : 2 * c = -d ^ 2 - 3 * d) (RF :
   <;> refine ⟨by omega, by omega, ?_⟩
   <;> constructor <;> intro h <;> omega
 
-theorem leaf_K2L2 (d c : ℤ) (hd : 3 ≤ d) (hc : 2 * c = -d ^ 2 - 3 * d) (RF : Site → ℤ)
+theorem leaf_K2L2 (d c : ℤ) (hd : 3 ≤ d) (_hc : 2 * c = -d ^ 2 - 3 * d) (RF : Site → ℤ)
     (hred : ∀ (y : Site) (i j : ℤ), y ∈ (BaseMask.stairEven.raw d).sites →
       2 * RF (y + thr d i j) = Mt d y + 2 * j * (y.1 - d * y.2 + c) - (d ^ 2 + 2 * d - 1) * j * (j - 1))
     (y : Site) (hy : y ∈ (BaseMask.stairEven.raw d).sites) (a b : ℤ)

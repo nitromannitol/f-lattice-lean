@@ -177,7 +177,7 @@ theorem combo_identity (d c : ℤ) (RF : Site → ℤ)
   have h0 := hred y a b hy
   refine ⟨?_, ?_⟩
   · rw [e1, e2]
-    simp only [thr, Prod.fst_sub, Prod.snd_sub, Prod.fst_add, Prod.snd_add] at h1 h2 h0 ⊢
+    simp only [thr, Prod.fst_sub, Prod.snd_sub] at h1 h2 h0 ⊢
     linear_combination h1 + h2 - 2 * h0
   · rw [e1, marker_thr]
 
