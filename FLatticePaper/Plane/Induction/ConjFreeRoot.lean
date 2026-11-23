@@ -70,6 +70,31 @@ theorem conj_freeV_hweb {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) {x
   unfold HRootWeb
   omega
 
+/-- **The sharp conjugate V band.** A free conjugate V site `zTurn x + combine i j` forces `1 ≤ t_p x + i T_p ≤ N + D − 1`.
+The conjugate `s`-grade is `2 (u − N)` with `u = t_p x + i T_p`, and the V spectrum `0 ≤ s ≤ 2 n_c` or `2 − d_c + n_c ≤ s ≤ L_c − 2`
+is, in `u`, `N ≤ u ≤ D` or `1 ≤ u ≤ N + D − 1`; the first lies in the second. So the exceptional values `0`, `N + D`, `D + 1` are
+excluded whenever they lie outside `[1, N + D − 1]`. -/
+theorem conj_freeV_band {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) {x : Site} {i j : ℤ}
+    (hf : zTurn x + (frameAt (conjWord word)).child.modifiedDeck.combine i j ∈ (frameAt (conjWord word)).freeV) :
+    1 ≤ (frameAt word).parentTGrade x + i * oddParentPeriod (frameAt word) ∧
+      (frameAt word).parentTGrade x + i * oddParentPeriod (frameAt word) ≤
+        (frameAt word).parents.odd.num + (frameAt word).parents.odd.den - 1 := by
+  have hc : (frameAt (conjWord word)).child = (frameAt word).parents.odd.rotate := frameAt_conj_child h
+  obtain ⟨hn, hd⟩ := conj_child_num_den hc
+  simp only [ChildFrame.freeV, Set.mem_setOf_eq] at hf
+  obtain ⟨-, -, hvs⟩ := hf
+  rw [sGrade_add_combine, conj_sGrade_zTurn h, conj_periodDenominator h] at hvs
+  have key : 2 * ((frameAt word).parentTGrade x - (frameAt word).parents.odd.num) +
+      i * (2 * oddParentPeriod (frameAt word)) =
+      2 * ((frameAt word).parentTGrade x + i * oddParentPeriod (frameAt word) - (frameAt word).parents.odd.num) := by
+    ring
+  rw [key] at hvs
+  unfold ChildFrame.vSpectrum at hvs
+  rw [hn, hd] at hvs
+  have hN := frameAt_odd_num_pos h
+  generalize (frameAt word).parentTGrade x + i * oddParentPeriod (frameAt word) = u at hvs ⊢
+  omega
+
 /-- The parent `t`-grade of the vertical translate `−i V_p` is `t_p x + i T_p`. -/
 theorem parentTGrade_translate_V (frame : ChildFrame) (x : Site) (i : ℤ) :
     frame.parentTGrade (x + (0 * (2 * frame.parents.odd.den) + -i * (frame.parents.odd.num - frame.parents.odd.den),

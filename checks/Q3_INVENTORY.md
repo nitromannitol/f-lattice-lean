@@ -459,3 +459,14 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - Answer (words over {1,2,3} of length ≤ 4, 112 words, both shift signs): the slip increment `(F i − F(i+σ)) − (F c − F(c+σ))` over all black centres `c` (lap = −1, `(F c − F(c+σ))` odd, `lap F (c+σ) = −1`) and their inputs `i` is `0` in every one of the 32930 (+σ) and 31766 (−σ) cases. No rising black pair exists, so the residual `u = N+D` never occurs on these fields.
 - Consequence: the residual is excluded by the rising-pair statement itself (`NoBlackPairRise`, `OddRise.lean`: slip increment `≠ 1` at black pairs). A Lean proof of the residual needs that exclusion as a local fact; not yet derived from `W1_CONSTRUCTOR` §4.
 - Not committed Lean: no change to the Lean sources in this step.
+
+### Task 72 (case (b), H drop along an edge with the sharp conjugate band): ConjFreeRoot.lean (`conj_freeV_band`), EdgeDrop.lean
+
+- PROVED `conj_freeV_band` (ConjFreeRoot): a free conjugate V site `zTurn x + combine i j` forces `1 ≤ t_p x + i T_p ≤ N + D − 1`. The conjugate V spectrum in `u = t_p x + i T_p` is `s = 2(u − N)` with `2 − 2N ≤ s ≤ 2D − 2` (or `N ≤ u ≤ D`, contained in the same band). Strictly sharper than `HRootWeb`, which also allowed `0`, `N + D`, `D + 1`.
+- Correction to the lead's parity labels: `s_c = 2(t_p − N)` is always even, so the V spectrum has no odd branch; the band is the single disjunct.
+- PROVED `edge_step_parent`: an edge from `c` changes `t_p` by `±N` from an even centre and `±D` from an odd centre.
+- PROVED `edge_parity_flip`, `evenSite_sub_even_iff`.
+- PROVED `H_drop_edge`: with the edge `i` of `c`, `jump(c − sheetShift) = 1`, `jump(i − sheetShift) = 0`, and the sharp band at the root, the configuration is impossible. The residual `u = N + D` is outside the band, so `H_drop_regular` applies without `hu`.
+- Consequence: the H-drop branch of hNegTie case (b) is closed by arithmetic, with no residual and no numerics.
+- Checks: `checks/EdgeDrop.lean`, `checks/ConjFreeRoot.lean` (guards). Root build clean; sandbox logs clean.
+- Next: the V block (conjugate freeH branch), with Q19.

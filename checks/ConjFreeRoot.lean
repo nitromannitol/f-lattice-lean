@@ -42,3 +42,9 @@ info: 'FLatticePaper.Induction.H_translate_drop_excluded' depends on axioms: [pr
 -/
 #guard_msgs in
 #print axioms FLatticePaper.Induction.H_translate_drop_excluded
+/--
+info: 'FLatticePaper.Induction.conj_freeV_band' depends on axioms: [propext, Classical.choice, Quot.sound]
+-/
+#guard_msgs in
+#print axioms FLatticePaper.Induction.conj_freeV_band
+
