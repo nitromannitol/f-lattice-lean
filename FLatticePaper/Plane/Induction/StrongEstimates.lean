@@ -97,7 +97,8 @@ structure StrongEstimates (u : Word) : Prop where
   increase, and for every pair of positive weights `(a, c)` a rank with increments `λ(−a, cη)` on the generators `U′`, `V′`
   (`U′`, `V′` the kernel and the transverse period of the earlier child, `η = ε`). -/
   F2F3_policy : ∃ policy : Site → Site → Prop,
-    RetainQuota (standardField u) policy ∧ NonincreasingAlong (standardField u) policy ∧
+    RetainQuota (standardField u) policy ∧
+      NonincreasingAlong ((frameAt u).chainPotential (standardField u) (frameAt u).eps) policy ∧
       ∀ a c : ℤ, 0 < a → 0 < c →
         RankWithIncrements policy (frameAt u).child.modifiedDeck.kernel (frameAt u).child.modifiedDeck.transverse
           (-a) (c * (frameAt u).eps)
