@@ -37,7 +37,7 @@ def reflH (word : Word) (z : Site) : Site :=
 
 /-- **The arc in phase W0**: `Ψ(H_j) ≥ 1` for `1 ≤ j < d`, from `Ψ(H_1) = 1` and the retained arc edges of the inherited policy. -/
 theorem psi_arc_W0 {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hW0 : (frameAt word).eps = -1) (H : ℕ → Site) (N : ℕ) (hH1 : H 1 = (2, 0))
     (hret : ∀ j, 1 ≤ j → j + 1 < N →
       sheetPolicyA P (frameAt word).sheetShift (H j) (H (j + 1))) :
@@ -51,7 +51,7 @@ theorem psi_arc_W0 {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : 
 
 /-- **The arc in phase W1**: the points `refl (H j)`; `Ψ(refl H_1) = 1` and `Ψ(refl H_0) = Ψ(H_last) = 0`. -/
 theorem psi_arc_W1 {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hW1 : (frameAt word).eps = 1) (H : ℕ → Site) (N : ℕ) (hH1 : H 1 = (2, 0))
     (hret : ∀ j, 1 ≤ j → j + 1 < N →
       sheetPolicyA P (frameAt word).sheetShift (reflH word (H j)) (reflH word (H (j + 1)))) :
@@ -71,7 +71,7 @@ theorem psi_arc_W1 {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : 
 /-- **The bottom bound in phase W0.** Given the arc enumeration (`H j` with `H 0 = (1,0)`, `H 1 = (2,0)`, covering the free H trace), the
 retained arc edges, and the H-price identities `P = c₀ − E_H`, `E_H = 1 + min(0,Ψ−1)`, the price is at most `c₀` on the free H trace. -/
 theorem bottom_W0 {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hW0 : (frameAt word).eps = -1) (H : ℕ → Site) (N : ℕ) (hN : 2 ≤ N) (hH0 : H 0 = (1, 0)) (hH1 : H 1 = (2, 0))
     (hret : ∀ j, 1 ≤ j → j + 1 < N → sheetPolicyA P (frameAt word).sheetShift (H j) (H (j + 1)))
     (hmem : ∀ j, j < N → H j ∈ (frameAt word).freeH)
@@ -103,7 +103,7 @@ theorem bottom_W0 {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : S
 /-- **The bottom bound in phase W1**: the same with the reflection `refl`, `refl(1,0) = H_last`, `Ψ(H_last) = 0`, and the H-price identities
 `P = c₀ − 1 − E_H(refl z)`, `E_H(refl z) = min(0, Ψ(refl z) − 1)`. -/
 theorem bottom_W1 {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hW1 : (frameAt word).eps = 1) (H : ℕ → Site) (N : ℕ) (hN : 2 ≤ N) (hH0 : H 0 = (1, 0)) (hH1 : H 1 = (2, 0))
     (hret : ∀ j, 1 ≤ j → j + 1 < N →
       sheetPolicyA P (frameAt word).sheetShift (reflH word (H j)) (reflH word (H (j + 1))))
