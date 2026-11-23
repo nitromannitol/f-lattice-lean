@@ -597,3 +597,19 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - PROVED `bottom_square_strict`: a strict bottom centre `c ≠ (1,1)` with `BottomArc` has `∀ c' ∈ squareCorners (c1 − 1) c2, StrictInterior c'`. This is the bottom (class B) part of `hstrict`.
 - Checks: `checks/CollarBottomSquare.lean`. Root build clean; sandbox logs clean.
 - Still open for hstrict: the top class (reflection `z ↦ R − z`), the left and right classes, the mixed classes (black, excluded by laplacian 0), and the glue `collarBase` case split.
+
+### Task 72 (hcollar, band (a), top class): CollarTop.lean
+
+- PROVED `strict_reflect` and `strict_reflect_centre`: the centre reflection `z ↦ R − z`, `R = centre = (n + 1, 2n + d − 1)`, preserves `StrictInterior` (`t ↦ L − T − t`, `s ↦ T + 2n − s`).
+- PROVED `freeH_reflect`: `w ∈ freeH` gives `R − (w + V) ∈ freeH` (the grade reflection `w ↦ (d + 1, n − 1) − w`, `t ↦ L − t`, `s ↦ T + 2n − s`), with the explicit polygon predicates `EDisj`, `SpecH` and the arithmetic `reflect_pure`.
+- PROVED `top_bottom_witness`: a top witness of `c` is a bottom witness of `R − c`.
+- PROVED `top_square_strict`: a strict top centre with `R − c ≠ (1,1)` has its top square `squareCorners c1 (c2 − 1)` strict, by reflection to `bottom_square_strict` at `R − c`.
+- Checks: `checks/CollarTop.lean`. Root build clean; sandbox logs clean.
+- Still open for hstrict: the left class (free V witness, square `squareCorners c1 c2`), the right class by reflection of the left, and the `hstrict` assembly with the laplacian exclusions `c ≠ (1,1)` and `R − c ≠ (1,1)` (from `laplacian_MW_one_one` and `lap_MW_reflect`).
+
+### Task 72 (hcollar, the collarBase split): CollarStrict.lean
+
+- PROVED `hstrict_of_strong`: `hstrict` for a word with `hw` and `hSE`, by the `collarBase` split. The bottom branch uses `bottom_square_strict` (with `c ≠ (1,1)` from `laplacian_MW_one_one`); the top branch uses `top_square_strict` (with `R − c ≠ (1,1)` from `lap_MW_reflect`). The left and right branches are the named inputs `hL` and `hR`.
+- PROVED `hcollar_discharged`: `hcollar` for a word from the chains and `hL`, `hR`.
+- OPEN: `hL` (left class, square `squareCorners c1 c2`) and `hR` (right class, square `squareCorners (c1−1) (c2−1)`). See the notes on the left class in the status message: the grade-level claim needs the non-top and non-bottom hypotheses, and a right-class reflection to the left class does not hold for `freeV` as stated.
+- Checks: `checks/CollarStrict.lean`. Root build clean; sandbox logs clean.
