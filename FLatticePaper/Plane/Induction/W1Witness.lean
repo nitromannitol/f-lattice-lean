@@ -13,12 +13,18 @@ namespace FLatticePaper.W1Witness
 
 open Farey FLatticePaper FLatticePaper.SquareClauses FLatticePaper.AndOrRank FLatticePaper.Induction FLatticePaper.W1
 
-/-- The earlier canonical policy with its strict-interior witnesses at the forced whites. -/
+/-- The earlier canonical policy with its strict-interior witnesses and private squares at the forced whites. -/
 structure OldPolicyWitness (frame : ChildFrame) (G : Field) (seed : Site → Site → Prop)
     extends OldPolicyData frame G seed where
   /-- Every forced non-seed white of the earlier field is forced by a derivation whose squares lie in the earlier strict interior. -/
   strictForced : ∀ c i, ForcedEdge G seed c i → ¬ seed c i →
     ForcedEdgeIn G (StrictInterior frame.child.num frame.child.den) seed c i
+  /-- PRIVATE witness squares (the parent's W1 data, inherited): the witness square of a forced non-seed white `c` contains `c`, and
+  its other three corners are reached from `c` by retained lattice edges, each step a retained input of the site before it. The
+  three edges go from the root along the policy, so the ranks of the policy decrease from the root to its corners (`W1Phase`). -/
+  privateSquare : ∀ c i, ForcedEdge G seed c i → ¬ seed c i → laplacian G c = 0 →
+    ∃ a b : ℤ, c ∈ squareCorners a b ∧
+      ∀ c' ∈ squareCorners a b, c' ≠ c → Relation.TransGen (fun x y => retained x y ∧ Edge y x) c c'
 
 /-- The first unit step of a derivation: a square containing `c` in `R`, its rejected input `o` outside it, and every other white
 corner forced into it (by a derivation at its own pointer inside the square). -/
