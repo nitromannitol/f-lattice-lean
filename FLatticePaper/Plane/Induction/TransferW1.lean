@@ -1,6 +1,7 @@
 import FLatticePaper.Plane.Induction.TransferSat
 import FLatticePaper.Plane.Induction.W1Bridge
 import FLatticePaper.Plane.Induction.W1Exit
+import FLatticePaper.Plane.Induction.NonfreeBridge
 
 /-! # (T) at the strict interior, from `W1Forced` of the word
 
@@ -33,6 +34,20 @@ theorem strictInterior_star (frame : ChildFrame) {z : Site}
   refine ⟨hcl, ?_, ?_⟩
   · exact FLatticePaper.W1Exit.rectInputs frame z hopen (incomingNeg z) (Or.inl rfl)
   · exact FLatticePaper.W1Exit.rectInputs frame z hopen (incomingPos z) (Or.inr rfl)
+
+/-- The zero vector lies in the deck span. -/
+theorem zero_deck_mem (frame : ChildFrame) : (0 : Site) ∈ frame.child.modifiedDeck.span :=
+  ⟨0, 0, by ext <;> simp [PeriodDeck.combine]⟩
+
+/-- A nonfree site of the closed polygon is in the strict interior: a point of `E` outside `StrictInterior` is free, or its translate by
+`−V` or `−K` is free (`outside_SI_free`), and `0`, `−V`, `−K` lie in the deck span, which `Nonfree` excludes. -/
+theorem nonfree_strictInterior (frame : ChildFrame) {z : Site} (hz : z ∈ frame.closedPolygon) (hnf : Nonfree frame z) :
+    FLatticePaper.W1.StrictInterior frame.child.num frame.child.den z := by
+  by_contra hns
+  rcases outside_SI_free frame z hz hns with h | h | h
+  · exact hnf 0 (zero_deck_mem frame) (by rw [add_zero]; exact h)
+  · exact hnf (-Vdeck frame) (span_neg_mem (Vdeck_mem_span frame)) h
+  · exact hnf (-Kdeck frame) (span_neg_mem (Kdeck_mem_span frame)) h
 
 /-- **(T) at strict-interior contacts** (task 104 closure): for a comparison field `m` of `standardField word`, a strict-interior white contact
 `c` with `F c = m c`, and an unrestricted unseeded forced derivation `ForcedEdge F ∅ c o`, the forced input satisfies `F o = m o`; so `m o < F o`
