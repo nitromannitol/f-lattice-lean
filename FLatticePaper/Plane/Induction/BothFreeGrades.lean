@@ -352,7 +352,7 @@ theorem vFirst_H_agree (frame : ChildFrame) (η : ℤ) (r : Site) (hη : η = -1
   rw [prescribedV_vFirst, prescribedH_even_east frame _ r hev]
 
 /-- The H class of `V_{L−1} + ησ` is even, so its prescribed direction is east. -/
-theorem vLast_H_agree (frame : ChildFrame) (r : Site) (hη : η = 1)
+theorem vLast_H_agree (frame : ChildFrame) (r : Site) (_hη : η = 1)
     (hr : r = (frame.vLast + shiftσ frame 1) - (1 * frame.child.modifiedDeck.transverse.1, 1 * frame.child.modifiedDeck.transverse.2)) :
     frame.prescribedV 1 frame.vLast = frame.prescribedH (-1) r := by
   have hev : EvenSite r := by
