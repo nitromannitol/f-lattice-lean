@@ -331,6 +331,7 @@ import FLatticePaper.Plane.Induction.TieReduce
 import FLatticePaper.Plane.Induction.ComparisonFields
 import FLatticePaper.Plane.Induction.ComparisonTransfer
 import FLatticePaper.Plane.Induction.ComparisonEmpty
+import FLatticePaper.Plane.Induction.CanonicalSigned
 import FLatticePaper.Plane.Induction.HWeb
 import FLatticePaper.Plane.Induction.W1Collar
 import FLatticePaper.Plane.Induction.W1CollarBox
