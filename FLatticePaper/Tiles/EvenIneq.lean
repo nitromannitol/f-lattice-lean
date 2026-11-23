@@ -129,4 +129,151 @@ theorem C2_ineq (d n e r : ℤ) (hd : 3 ≤ d) (hn : 1 ≤ n) (hr : 1 ≤ r) (hr
     have hdq2 : e - 3 ≤ d * q := by nlinarith
     nlinarith [mul_le_mul_of_nonneg_right hdq2 (show (0:ℤ) ≤ 2 * d + e by omega)]
 
+
+/-! Flag true (`d r − n e = −1`): the same facets for the odd child's `T1` piece. -/
+
+theorem eq_r_one_of_e_eq_three_r (d n r : ℤ) (hr : 1 ≤ r)
+    (hdet : d * r - n * (3 * r) = -1) : r = 1 := by
+  have h1 : r * (d - 3 * n) = -1 := by linear_combination hdet
+  rcases lt_trichotomy (d - 3 * n) 0 with h | h | h
+  · nlinarith
+  · nlinarith
+  · nlinarith
+
+theorem BT_ineq (d n e r : ℤ) (hd : 3 ≤ d) (hn : 1 ≤ n) (hr : 1 ≤ r) (hre : r < e)
+    (hdet : d * r - n * e = -1) : 4 * e < (r + 1) * (2 * d + e) := by
+  have hne : e ≤ n * e := by nlinarith
+  rcases (show r = 1 ∨ r = 2 ∨ 3 ≤ r by omega) with h | h | h
+  · subst h; nlinarith
+  · subst h; nlinarith
+  · nlinarith [mul_nonneg (show (0 : ℤ) ≤ e by omega) (show (0 : ℤ) ≤ r - 3 by omega)]
+
+theorem A1T_ineq (d n e r : ℤ) (hd : 3 ≤ d) (hr : 1 ≤ r) (hre : r < e)
+    (hdet : d * r - n * e = -1) (heven : (e + r) % 2 = 0) (hle : e ≤ 2 * r) :
+    4 * e < (2 * r + 1 - e) * (2 * d + e) := by
+  obtain ⟨m, hm⟩ : ∃ m, m = 2 * r - e := ⟨_, rfl⟩
+  have hm0 : 0 ≤ m := by omega
+  have he : e = 2 * r - m := by omega
+  subst he
+  have hrm : r * (2 * n - d) = n * m + 1 := by linear_combination -hdet
+  rcases (show m = 0 ∨ m = 1 ∨ m = 2 ∨ 3 ≤ m by omega) with h0 | h1 | h2 | h3
+  · subst h0
+    have hr1 : r = 1 := by
+      rcases lt_trichotomy (2 * n - d) 0 with h | h | h
+      · nlinarith
+      · nlinarith
+      · nlinarith
+    subst hr1
+    omega
+  · subst h1
+    have hk : 1 ≤ 2 * n - d := by
+      by_contra hc
+      push Not at hc
+      nlinarith
+    have hrd : r ≤ d := by
+      by_contra hc
+      push Not at hc
+      nlinarith
+    nlinarith
+  · subst h2
+    have hk : 1 ≤ 2 * n - d := by
+      by_contra hc
+      push Not at hc
+      nlinarith
+    have hr2 : r ≤ 2 * n + 1 := by nlinarith
+    nlinarith
+  · nlinarith [mul_nonneg (show (0 : ℤ) ≤ 2 * r - m by omega) (show (0 : ℤ) ≤ m - 3 by omega)]
+
+theorem A2T_ineq (d n e r : ℤ) (hd : 3 ≤ d) (hr : 1 ≤ r) (hre : r < e)
+    (hdet : d * r - n * e = -1) (heven : (e + r) % 2 = 0) (hge : 2 * r ≤ e) :
+    4 * e < (e + 1 - 2 * r) * (2 * d + e) := by
+  obtain ⟨p, hp⟩ : ∃ p, p = e - 2 * r := ⟨_, rfl⟩
+  have hp0 : 0 ≤ p := by omega
+  have he : e = 2 * r + p := by omega
+  subst he
+  rcases (show p = 0 ∨ p = 1 ∨ p = 2 ∨ 3 ≤ p by omega) with h0 | h1 | h2 | h3
+  · subst h0
+    have hr1 : r = 1 := by
+      have hk : r * (d - 2 * n) = -1 := by linear_combination hdet
+      rcases lt_trichotomy (d - 2 * n) 0 with h | h | h
+      · nlinarith
+      · nlinarith
+      · nlinarith
+    subst hr1
+    omega
+  · subst h1
+    have hk : r * (d - 2 * n) = n - 1 := by linear_combination hdet
+    have hk1 : 1 ≤ d - 2 * n := by
+      by_contra hc
+      push Not at hc
+      nlinarith
+    nlinarith
+  · subst h2
+    have hk : r * (d - 2 * n) = 2 * n - 1 := by linear_combination hdet
+    have hk1 : 1 ≤ d - 2 * n := by
+      by_contra hc
+      push Not at hc
+      nlinarith
+    nlinarith
+  · nlinarith [mul_nonneg (show (0 : ℤ) ≤ 2 * r + p by omega) (show (0 : ℤ) ≤ p - 3 by omega)]
+
+theorem PTlo1_ineq (d n e r : ℤ) (hd : 3 ≤ d) (hr : 1 ≤ r) (hre : r < e)
+    (hdet : d * r - n * e = -1) (heven : (e + r) % 2 = 0) (hge : 3 * r ≤ e) :
+    4 * (e - r) < (e - 3 * r + 2) * (2 * d + e) := by
+  obtain ⟨q, hq⟩ : ∃ q, q = e - 3 * r := ⟨_, rfl⟩
+  have hq0 : 0 ≤ q := by omega
+  have he : e = 3 * r + q := by omega
+  subst he
+  rcases (show q = 0 ∨ q = 2 ∨ 4 ≤ q ∨ q = 1 ∨ q = 3 by omega) with h0 | h2 | h4 | h1 | h3
+  · subst h0
+    have hr1 : r = 1 := eq_r_one_of_e_eq_three_r d n r hr (by linear_combination hdet)
+    subst hr1
+    omega
+  · subst h2
+    nlinarith
+  · nlinarith [mul_nonneg (show (0 : ℤ) ≤ q - 2 by omega) (show (0 : ℤ) ≤ r by omega)]
+  · omega
+  · omega
+
+theorem PTlo2_ineq (d n e r : ℤ) (hd : 3 ≤ d) (hr : 1 ≤ r) (hre : r < e)
+    (hdet : d * r - n * e = -1) (heven : (e + r) % 2 = 0) (hle : e ≤ 3 * r) :
+    4 * (e - r) < (3 * r - e + 2) * (2 * d + e) := by
+  obtain ⟨s, hs⟩ : ∃ s, s = 3 * r - e := ⟨_, rfl⟩
+  have hs0 : 0 ≤ s := by omega
+  have he : e = 3 * r - s := by omega
+  subst he
+  rcases (show s = 0 ∨ s = 1 ∨ s = 2 ∨ 3 ≤ s by omega) with h0 | h1 | h2 | h3
+  · subst h0
+    have hr1 : r = 1 := eq_r_one_of_e_eq_three_r d n r hr (by linear_combination hdet)
+    subst hr1
+    omega
+  · subst h1
+    nlinarith
+  · subst h2
+    nlinarith
+  · nlinarith [mul_nonneg (show (0 : ℤ) ≤ s - 3 by omega) (show (0 : ℤ) ≤ r by omega)]
+
+theorem PTslo1_ineq (d e r : ℤ) (hd : 3 ≤ d) (hr : 1 ≤ r) (hre : r < e) (hle : e ≤ 2 * r) :
+    2 * (e - r) < (2 * r + 1 - e) * (2 * d + e) := by
+  obtain ⟨m, hm⟩ : ∃ m, m = 2 * r - e := ⟨_, rfl⟩
+  have hm0 : 0 ≤ m := by omega
+  have he : e = 2 * r - m := by omega
+  subst he
+  nlinarith [mul_nonneg hm0 (show (0 : ℤ) ≤ 2 * r - m - 1 by omega), mul_nonneg hm0 (show (0 : ℤ) ≤ 2 * d by omega)]
+
+theorem PTslo2_ineq (d e r : ℤ) (hd : 3 ≤ d) (hr : 1 ≤ r) (hre : r < e) (hge : 2 * r ≤ e) :
+    2 * (e - r) < (e + 1 - 2 * r) * (2 * d + e) := by
+  obtain ⟨p, hp⟩ : ∃ p, p = e - 2 * r := ⟨_, rfl⟩
+  have hp0 : 0 ≤ p := by omega
+  have he : e = 2 * r + p := by omega
+  subst he
+  nlinarith [mul_nonneg hp0 (show (0 : ℤ) ≤ p + 2 * r - 1 by omega), mul_nonneg hp0 (show (0 : ℤ) ≤ 2 * d by omega)]
+
+theorem half_ineq (d n e r : ℤ) (hd : 3 ≤ d) (hr : 1 ≤ r)
+    (hdet : d * r - n * e = -1) (h3 : e = 3 * r) : e < 2 * d := by
+  subst h3
+  have hr1 : r = 1 := eq_r_one_of_e_eq_three_r d n r hr hdet
+  subst hr1
+  omega
+
 end FLatticePaper.Tiles.EvenIneq

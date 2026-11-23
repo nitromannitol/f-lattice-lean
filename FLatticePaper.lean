@@ -312,6 +312,8 @@ import FLatticePaper.Tiles.PairCoverW0
 import FLatticePaper.Tiles.EvenIneq
 import FLatticePaper.Tiles.PairEvenW0Q
 import FLatticePaper.Tiles.PairEvenW0P
+import FLatticePaper.Tiles.PairEvenW1P
+import FLatticePaper.Tiles.PairEvenW1Q
 import FLatticePaper.Plane.Induction.S3FreeBoundary
 import FLatticePaper.Plane.Induction.ParentCoordinates
 import FLatticePaper.Plane.Induction.Q3Arithmetic
