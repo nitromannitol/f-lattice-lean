@@ -307,3 +307,10 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - PROVED `nonfree_root_forced_nonfree`: a nonfree root of the old policy is black, or its retained edge is the unseeded forced edge. The bridge `nonfree_bridge` gives a strict-interior translate, `W1Forced` gives the forced edge there, translating back gives it at the root, and `forcedWhiteUnique` identifies the retained input.
 - CHANGED: the drop disjunct of SheetCover, SheetCharts and SheetCases now reads `Nonfree (frameAt (conjWord word)) (zTurn x)` (was the strict-interior root). The root condition uses `nonfree_root_forced_nonfree` with `hSE.packet`. The hypothesis `hW1` is unchanged.
 - Checks: `checks/DeckForced.lean` (four guards, standard axioms only). Root log has no warnings.
+
+### Task 72 (Q1 paragraph 6): the ordered free-site exclusions, the '+' row (checks/FREE_SITE_EXCLUSIONS.md)
+
+- Numeric (scripts/free_site_exclusions.py): for every odd coprime child with `d ≤ 31` (106 children) and every `r ∈ [0, L−1]` (3422 rows), the '+' row lists each free deck class once; its consecutive V-passages (N, N–W, W–N–E: 121418) and descending H-passages (E, E–N, N–E–S: 76398) have no free interior site (194394 interior sites); the curves are in the Lean free sets. Transitions (tip routes, 10160) are counted, not classified.
+- Reduction to `main`: none of the passage, tip or fan steps is a Lean lemma. The Lean facts used: `ChildFrame.freeH/freeV` (S3FreeBoundary), `Q3White.laplacian_eq_zero_of_freeV`, `Q3Para10.index_of_freeV`/`block_mem_freeV`/`VpI_not_freeV`, and `NonfreeBridge.outside_SI_free` (task 72).
+- Named steps: FIXED_FREE_GAME_AUDIT §3–§9 and TIP_THEOREM, ALL_SLOPE_STEP sections are listed with file paths in the report.
+- Scope: a numeric check, not the per-entry implications (E), (P), (F).
