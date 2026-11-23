@@ -254,6 +254,31 @@ theorem psi_line (F : Site → ℤ) (N D nq dq Nu Du epsU : ℤ) (H : ZoneHyp F 
     rw [e] at hs
     linear_combination (-1 : ℤ) * hs + ih
 
+/-- The `t_p`-window of the zone: with `d = 2D + d_q`, `n = 2N + n_q`, `ε = N d_q − n_q D = ±1`, the grade
+`p = N w₁ − D w₂` satisfies `−D ≤ p ≤ N + 2D − 1` when `t(w) = n w₁ − d w₂` is in `[1 − d, d + n − 1]` and `ε w₁ ∈ [−d, 0]`. -/
+theorem tp_window (N D nq dq w1 w2 : ℤ) (hD : 0 < D) (hd : 0 < 2 * D + dq)
+    (hε1 : -1 ≤ N * dq - nq * D)
+    (hlo : 1 - (2 * D + dq) ≤ (2 * N + nq) * w1 - (2 * D + dq) * w2)
+    (hhi : (2 * N + nq) * w1 - (2 * D + dq) * w2 ≤ (2 * D + dq) + (2 * N + nq) - 1)
+    (hεlo : -(2 * D + dq) ≤ (N * dq - nq * D) * w1) (hεhi : (N * dq - nq * D) * w1 ≤ 0) :
+    -D ≤ N * w1 - D * w2 ∧ N * w1 - D * w2 ≤ N + 2 * D - 1 := by
+  have hid : (2 * D + dq) * (N * w1 - D * w2)
+      = D * ((2 * N + nq) * w1 - (2 * D + dq) * w2) + (N * dq - nq * D) * w1 := by ring
+  constructor
+  · by_contra hc
+    have hc' : N * w1 - D * w2 ≤ -D - 1 := by omega
+    nlinarith
+  · by_contra hc
+    have hc' : N + 2 * D ≤ N * w1 - D * w2 := by omega
+    nlinarith
+
+/-- The quarter-turn field minus the harmonic grid is `F` at the quarter turn. -/
+theorem qtf_sub_h0 (F : Site → ℤ) (x : Site) :
+    quarterTurnField F x - harmonicGrid x = F (-x.2, x.1 - 1) := by
+  unfold quarterTurnField
+  rw [quarterTurn_site]
+  ring
+
 end ZoneCase
 
 end FLatticePaper.Induction
