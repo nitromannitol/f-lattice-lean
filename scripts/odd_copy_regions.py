@@ -8,7 +8,7 @@ frame of u:
   raw-type  (phase zero slots 2, 5): the minimum of A and C at z and z + sigma.
 Here z = Z(s - delta) for the plane and G-branch facts and z = Z(s) for the zero-shift copies, with Z(y) = (-y2, y1 - 1).
 Zones of frame u, with n = child.num, d = child.den: I1 is t(z) >= 1 - d (t = n z1 - d z2); the I2 band is sGrade(z) <= 2(d+n) - 1 (in the
-closed polygon, as StarZoneInputs); the upper region is sGrade(z) > 2(d+n) - 1 (UpperAttainment). For each named fact the script counts,
+closed polygon, as StarZoneInputs); the upper region is sGrade(z) > 2(d+n) - 1 (the restated premise UpperAttainmentOn of task 48). For each named fact the script counts,
 per copy tag and phase, the position of its points against the closed polygon, the comparison that holds, and the zone.
 Inputs: scripts/data/alt_copy_odd_dump.log (through odd_copy_check.copy), scripts/ordinary_copy_sheets.py (sheets of frames).
 """
