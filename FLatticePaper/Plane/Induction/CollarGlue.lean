@@ -18,10 +18,13 @@ open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.AndOrRank
 open FLatticePaper.W1 FLatticePaper.W1Phase FLatticePaper.W1MSheet FLatticePaper.W1Step FLatticePaper.W1CollarFrame
 open FLatticePaper.W1NonfreeHsqNonneg
 
-/-- The bottom arc of the collar: a free H point (or a V-translate of one) within one pixel. -/
+/-- The bottom arc of the collar: a free H point within one pixel. -/
 def BottomArc (frame : ChildFrame) (z : Site) : Prop :=
-  ∃ v : Site, |v.1 - z.1| ≤ 1 ∧ |v.2 - z.2| ≤ 1 ∧
-    (v ∈ frame.freeH ∨ (v - frame.child.modifiedDeck.transverse) ∈ frame.freeH)
+  ∃ v : Site, |v.1 - z.1| ≤ 1 ∧ |v.2 - z.2| ≤ 1 ∧ v ∈ frame.freeH
+
+/-- The top arc of the collar: a V-translate of a free H point within one pixel. -/
+def TopArc (frame : ChildFrame) (z : Site) : Prop :=
+  ∃ v : Site, |v.1 - z.1| ≤ 1 ∧ |v.2 - z.2| ≤ 1 ∧ (v - frame.child.modifiedDeck.transverse) ∈ frame.freeH
 
 /-- The left arc of the collar: a free V point within one pixel. -/
 def LeftArc (frame : ChildFrame) (z : Site) : Prop :=
@@ -32,9 +35,12 @@ def RightArc (frame : ChildFrame) (z : Site) : Prop :=
   ∃ v : Site, |v.1 - z.1| ≤ 1 ∧ |v.2 - z.2| ≤ 1 ∧ (v - frame.child.modifiedDeck.kernel) ∈ frame.freeV
 
 open Classical in
-/-- The base `(a, b)` of the collar square of `c`, by the arc of `c` (bottom, then left, then right). -/
+/-- The base `(a, b)` of the collar square of `c`, by the arc of `c`: bottom → upper-left `(c.1 − 1, c.2)`, top → lower-right
+`(c.1, c.2 − 1)`, left → upper-right `(c.1, c.2)`, right → lower-left `(c.1 − 1, c.2 − 1)`. The four black corners, where
+two arcs meet, are excluded by the laplacian-0 hypothesis. -/
 noncomputable def collarBase (frame : ChildFrame) (c : Site) : ℤ × ℤ :=
   if BottomArc frame c then (c.1 - 1, c.2)
+  else if TopArc frame c then (c.1, c.2 - 1)
   else if LeftArc frame c then (c.1, c.2)
   else (c.1 - 1, c.2 - 1)
 
@@ -47,6 +53,7 @@ theorem centre_mem_collarSquare (frame : ChildFrame) (c : Site) : c ∈ collarSq
   unfold collarSquare collarBase
   split_ifs
   · exact bottom_centre_mem c
+  · exact top_centre_mem c
   · exact vPlus_centre_mem c
   · exact vMinus_centre_mem c
 
