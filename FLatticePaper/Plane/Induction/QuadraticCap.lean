@@ -1,4 +1,9 @@
-import Mathlib
+import Mathlib.Algebra.Group.Int.Even
+import Mathlib.Tactic.Ring
+import Mathlib.Tactic.Linarith
+import Mathlib.Tactic.NormNum
+import Mathlib.Tactic.Push
+import Mathlib.Tactic.LinearCombination
 
 /-! # Task 97: the quadratic cap arithmetic (ALL_SLOPE_STEP, "The uniform quadratic cap")
 
