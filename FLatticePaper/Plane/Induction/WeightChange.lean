@@ -321,4 +321,94 @@ theorem quadrant_bound (U V : Site) (hD : U.1 * V.2 - U.2 * V.1 ≠ 0) (η : ℤ
     linear_combination (-(j * (lam * (c * η) - sV))) * hηη
   linarith [hge, hgx, hgr'.2]
 
+
+/-- Retained walks shorten `r0` by at least their length. -/
+theorem retWalk_length_le {ret : Site → Site → Prop} {r0 : Site → ℤ}
+    (hdec : ∀ x y, ret x y → r0 y < r0 x) {z e : Site} {n : ℕ} (h : RetWalk ret z e n) :
+    (n : ℤ) + r0 e ≤ r0 z := by
+  induction h with
+  | nil z => simp
+  | cons hr _ ih =>
+    have := hdec _ _ hr
+    push_cast
+    omega
+
+/-- Retained walks do not increase `P` and `J`. -/
+theorem retWalk_mono {ret : Site → Site → Prop} {P J : Site → ℤ}
+    (hmono : ∀ x y, ret x y → P y ≤ P x ∧ J y ≤ J x) {z e : Site} {n : ℕ} (h : RetWalk ret z e n) :
+    P e ≤ P z ∧ J e ≤ J z := by
+  induction h with
+  | nil z => exact ⟨le_rfl, le_rfl⟩
+  | cons hr _ ih =>
+    exact ⟨ih.1.trans (hmono _ _ hr).1, ih.2.trans (hmono _ _ hr).2⟩
+
+/-- **Boundedness of the walk values** for the weight `w = a P + b J`, with `lam` large as in `quadrant_bound`. -/
+theorem retVal_bddAbove {ret : Site → Site → Prop} (U V : Site) (hD : U.1 * V.2 - U.2 * V.1 ≠ 0)
+    (η : ℤ) (hη : η = 1 ∨ η = -1) (P J r0 : Site → ℤ) (a b lam sU sV : ℤ)
+    (hPU : ∀ z, P (z + U) = P z - 1) (hPV : ∀ z, P (z + V) = P z)
+    (hJU : ∀ z, J (z + U) = J z) (hJV : ∀ z, J (z + V) = J z + η)
+    (hr0U : ∀ z, r0 (z + U) = r0 z + sU) (hr0V : ∀ z, r0 (z + V) = r0 z + sV)
+    (hU : 0 ≤ lam * a + sU) (hV : η * sV ≤ lam * b)
+    (hmono : ∀ x y, ret x y → P y ≤ P x ∧ J y ≤ J x) (hdec : ∀ x y, ret x y → r0 y < r0 x) (z : Site) :
+    BddAbove (retVal ret (fun x => a * P x + b * J x) lam z) := by
+  obtain ⟨G, hG⟩ := quadrant_bound U V hD η hη P J r0 a b lam sU sV hPU hPV hJU hJV hr0U hr0V hU hV z
+  refine ⟨r0 z - lam * (a * P z + b * J z) + G, ?_⟩
+  rintro v ⟨e, n, hW, rfl⟩
+  have hn := retWalk_length_le hdec hW
+  have hm := retWalk_mono hmono hW
+  have hq := hG e hm.1 hm.2
+  show (n : ℤ) + lam * ((a * P e + b * J e) - (a * P z + b * J z)) ≤ r0 z - lam * (a * P z + b * J z) + G
+  linarith
+
+/-- **The rank with increments `lam (−a, b η)`.** For a retained relation invariant under the deck, with `P, J` deck-affine and
+nonincreasing along retained steps and one strict rank `r0`, there is a positive `lam` and a rank strictly decreasing along the
+retained steps whose increments along `U, V` are `lam (−a)` and `lam (b η)`. -/
+theorem exists_rank_increments {ret : Site → Site → Prop} (U V : Site) (hD : U.1 * V.2 - U.2 * V.1 ≠ 0)
+    (hiffU : ∀ c i, ret c i ↔ ret (c + U) (i + U)) (hiffV : ∀ c i, ret c i ↔ ret (c + V) (i + V))
+    (η : ℤ) (hη : η = 1 ∨ η = -1) (P J r0 : Site → ℤ) (sU sV : ℤ)
+    (hPU : ∀ z, P (z + U) = P z - 1) (hPV : ∀ z, P (z + V) = P z)
+    (hJU : ∀ z, J (z + U) = J z) (hJV : ∀ z, J (z + V) = J z + η)
+    (hr0U : ∀ z, r0 (z + U) = r0 z + sU) (hr0V : ∀ z, r0 (z + V) = r0 z + sV)
+    (hmono : ∀ x y, ret x y → P y ≤ P x ∧ J y ≤ J x) (hdec : ∀ x y, ret x y → r0 y < r0 x)
+    (a b : ℤ) (ha : 0 < a) (hb : 0 < b) :
+    ∃ lam : ℤ, 0 < lam ∧ ∃ rank : Site → ℤ, (∀ x y, ret x y → rank y < rank x) ∧
+      (∀ z, rank (z + U) = rank z + lam * (-a)) ∧ (∀ z, rank (z + V) = rank z + lam * (b * η)) := by
+  have ha1 : 1 ≤ a := by omega
+  have hb1 : 1 ≤ b := by omega
+  obtain ⟨lam, hlam⟩ : ∃ lam : ℤ, lam = |sU| + |sV| + 1 := ⟨_, rfl⟩
+  have hlam0 : 0 < lam := by
+    rw [hlam]
+    have := abs_nonneg sU
+    have := abs_nonneg sV
+    linarith
+  have hU : 0 ≤ lam * a + sU := by
+    have h1 : 0 ≤ lam * (a - 1) := mul_nonneg hlam0.le (by omega)
+    have h2 := neg_abs_le sU
+    rw [hlam] at h1 ⊢
+    nlinarith [abs_nonneg sV]
+  have hV : η * sV ≤ lam * b := by
+    have h1 : 0 ≤ lam * (b - 1) := mul_nonneg hlam0.le (by omega)
+    have h2 : η * sV ≤ |sV| := by
+      rcases hη with rfl | rfl
+      · simp [le_abs_self]
+      · simp [neg_le_abs]
+    rw [hlam] at h1 ⊢
+    nlinarith [abs_nonneg sU]
+  set w : Site → ℤ := fun x => a * P x + b * J x with hw
+  have hwU : ∀ x, w (x + U) = w x + (-a) := by
+    intro x
+    simp only [hw]
+    rw [hPU, hJU]
+    ring
+  have hwV : ∀ x, w (x + V) = w x + b * η := by
+    intro x
+    simp only [hw]
+    rw [hPV, hJV]
+    ring
+  have hbdd : ∀ z, BddAbove (retVal ret w lam z) := fun z =>
+    retVal_bddAbove U V hD η hη P J r0 a b lam sU sV hPU hPV hJU hJV hr0U hr0V hU hV hmono hdec z
+  refine ⟨lam, hlam0, bellmanRank ret w lam, fun x y hxy => bellmanRank_lt hbdd hxy, fun z => ?_, fun z => ?_⟩
+  · exact bellmanRank_add hiffU hwU z
+  · exact bellmanRank_add hiffV hwV z
+
 end FLatticePaper.WeightChange
