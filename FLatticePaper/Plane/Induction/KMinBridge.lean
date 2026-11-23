@@ -1,5 +1,6 @@
 import FLatticePaper.Plane.Induction.ComparisonTransfer
 import FLatticePaper.Plane.Induction.ComparisonEmpty
+import FLatticePaper.Plane.Induction.PassagePR
 
 /-! # Task 102 (1): the K-minimum bridge (fixes/Q1.md, the potentials `P`, `J_η`, `K = P + J_η`)
 
@@ -41,7 +42,7 @@ noncomputable def kMinusW (word : Word) (z : Site) : ℤ :=
 /-- **Black minimum propagates (sign `+`)**: at a black point of the polygon in the minimum of `K₊` over a fort `S` of `F`, an input in `S`
 has the same `K₊`. -/
 theorem minK_black_input_plus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hSE : StrongEstimates (conjWord word)) (hWord : StrongEstimates word)
+    (hSE : StrongEstimates (conjWord word)) (hPR : FLatticePaper.PassagePR.PriceRangeOn word)
     (hpk : (frameAt word).Packet (standardField word)) {S : Set Site}
     (hfort : IsIncomingFort (standardField word) S) {z : Site} (hzS : z ∈ S)
     (hzE : z ∈ (frameAt word).closedPolygon) (hb : laplacian (standardField word) z = -1)
@@ -57,7 +58,7 @@ theorem minK_black_input_plus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.thr
       ∃ j : Site, (j = FLatticePaper.incomingNeg z ∨ j = FLatticePaper.incomingPos z) ∧ j ∈ S ∧
         kPlusW word j = kPlusW word z := by
     intro i hi hiS
-    have hp := price_nonincrease_black h hSE hWord hpk hzE hb hi
+    have hp := FLatticePaper.PassagePR.price_nonincrease_black_PR h hSE hPR hpk hzE hb hi
     have hj := jplus_nonincrease_black h hSE hpk hzE hb hi
     have hmi := hmin i hiS
     refine ⟨i, hi, hiS, ?_⟩
@@ -71,7 +72,7 @@ theorem minK_black_input_plus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.thr
 
 /-- **Black minimum propagates (sign minus)**: the same for `K₋` and the rounded slip `J₋`. -/
 theorem minK_black_input_minus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hSE : StrongEstimates (conjWord word)) (hWord : StrongEstimates word)
+    (hSE : StrongEstimates (conjWord word)) (hPR : FLatticePaper.PassagePR.PriceRangeOn word)
     (hpk : (frameAt word).Packet (standardField word)) {S : Set Site}
     (hfort : IsIncomingFort (standardField word) S) {z : Site} (hzS : z ∈ S)
     (hzE : z ∈ (frameAt word).closedPolygon) (hb : laplacian (standardField word) z = -1)
@@ -87,7 +88,7 @@ theorem minK_black_input_minus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.th
       ∃ j : Site, (j = FLatticePaper.incomingNeg z ∨ j = FLatticePaper.incomingPos z) ∧ j ∈ S ∧
         kMinusW word j = kMinusW word z := by
     intro i hi hiS
-    have hp := price_nonincrease_black h hSE hWord hpk hzE hb hi
+    have hp := FLatticePaper.PassagePR.price_nonincrease_black_PR h hSE hPR hpk hzE hb hi
     have hj := jminus_nonincrease_black h hSE hpk hzE hb hi
     have hmi := hmin i hiS
     refine ⟨i, hi, hiS, ?_⟩
@@ -101,11 +102,11 @@ theorem minK_black_input_minus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.th
 
 /-- **The upper contact** (`D₊ = 0`): at a point of the polygon with `J₊ = 0`, `F` meets `cmpUpW`. -/
 theorem contact_cmpUp_of_J0 {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hSE : StrongEstimates (conjWord word)) (hWord : StrongEstimates word) {z : Site}
+    (hSE : StrongEstimates (conjWord word)) (hPR : FLatticePaper.PassagePR.PriceRangeOn word) {z : Site}
     (hz : z ∈ (frameAt word).closedPolygon) (hJ : jPlusW word z = 0) :
     standardField word z = cmpUpW word z := by
   have hle : cmpUpW word z ≤ standardField word z :=
-    isCmp_le_on_E h hSE hWord (Or.inr (Or.inl rfl)) z hz
+    FLatticePaper.PassagePR.isCmp_le_on_E_PR h hSE hPR (Or.inr (Or.inl rfl)) z hz
   have hle2 : standardField word (z + (frameAt word).shortShift) ≤ standardField word z := hle
   unfold jPlusW at hJ
   show standardField word z = standardField word (z + (frameAt word).shortShift)
@@ -113,11 +114,11 @@ theorem contact_cmpUp_of_J0 {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three
 
 /-- **The lower contact of `D₋`** (`D₋ = −2`): with `J₋ = −1` on the polygon, `F` meets `cmpDownW`. -/
 theorem contact_cmpDown_of_Jm1 {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hSE : StrongEstimates (conjWord word)) (hWord : StrongEstimates word) {z : Site}
+    (hSE : StrongEstimates (conjWord word)) (hPR : FLatticePaper.PassagePR.PriceRangeOn word) {z : Site}
     (hz : z ∈ (frameAt word).closedPolygon) (hJ : jMinusW word z = -1) :
     standardField word z = cmpDownW word z := by
   have hle : cmpDownW word z ≤ standardField word z :=
-    isCmp_le_on_E h hSE hWord (Or.inr (Or.inr rfl)) z hz
+    FLatticePaper.PassagePR.isCmp_le_on_E_PR h hSE hPR (Or.inr (Or.inr rfl)) z hz
   have hle2 : standardField word (z + -(frameAt word).shortShift) - 2 ≤ standardField word z := hle
   unfold jMinusW at hJ
   show standardField word z = standardField word (z + -(frameAt word).shortShift) - 2
