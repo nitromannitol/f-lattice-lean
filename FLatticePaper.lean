@@ -395,6 +395,7 @@ import FLatticePaper.Plane.Induction.CollarBottomCases
 import FLatticePaper.Plane.Induction.CollarBottomSquare
 import FLatticePaper.Plane.Induction.CollarTop
 import FLatticePaper.Plane.Induction.CollarStrict
+import FLatticePaper.Plane.Induction.CollarLeft
 import FLatticePaper.Plane.Induction.HWeb
 import FLatticePaper.Plane.Induction.W1Collar
 import FLatticePaper.Plane.Induction.W1CollarBox
