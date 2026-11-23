@@ -21,7 +21,19 @@ theorem paragraph5_field_identity_proved {frame conj : ChildFrame} {G : Field}
         quarterTurnField G x =
       conj.cutPrice - conj.price G (-x.2, x.1 - 1) := by
   obtain ⟨j, hj⟩ := ChildFrame.lattice_bridge_exists frame conj hconj
-  exact paragraph5_field_identity hconj hG j hj x
+  have h1 := quarterTurnField_sub_shift (conj := conj) (G := G) x
+  have e : x + (-frame.eps * frame.parents.even.den, -frame.eps * frame.parents.even.num) =
+      (x + (-conj.eps * (conj.parents.odd.num + conj.parents.odd.den),
+          conj.eps * (conj.parents.odd.num - conj.parents.odd.den))) +
+        (j * (2 * frame.parents.odd.den), j * (2 * frame.parents.odd.num)) := by
+    rw [hj]
+    abel
+  have h3 : quarterTurnField G (x + (-frame.eps * frame.parents.even.den, -frame.eps * frame.parents.even.num)) =
+      quarterTurnField G (x + (-conj.eps * (conj.parents.odd.num + conj.parents.odd.den),
+          conj.eps * (conj.parents.odd.num - conj.parents.odd.den))) := by
+    rw [e]
+    exact quarterTurnField_add_mul_up (frame := frame) (conj := conj) (G := G) hconj hG j _
+  linarith [h1, h3]
 
 namespace ChildFrame
 variable (frame : ChildFrame)

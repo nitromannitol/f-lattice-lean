@@ -32,10 +32,9 @@ Status: *discharged* = supplied by a wrapper from `StrongEstimates (conjWord wor
 | `hD` (price drift) | Q3Bound.lean:65–66 | (i) | discharged by `hSE.priceDrift` (Q3Strong.lean:32) |
 | `hN1 : 1 ≤ N`, `hND : N + 1 ≤ D` | Q3Bound.lean:67 | (v) parent bounds | discharged by `frameAt_odd_num_pos` + odd parity (Q3Strong.lean:17–46) |
 | `hB : 0 < B` (in `parentFloor_le_sub_sheetStep`) | Q3Bound.lean:52 | (v) | derived by `nlinarith` in `p_shift_bound` (Q3Bound.lean:70s) |
-| `hlat` (lattice bridge) | Q3Bridge.lean:22 | — | **obsolete**: `lattice_bridge_exists` (Q3Hlat.lean:36) proves it; the proved version is `paragraph5_field_identity_proved` (Q3Bound.lean:17), which has no `hlat`. Recommend deleting `paragraph5_field_identity` (Q3Bridge.lean:18–…). |
 | `hweb : HRootWeb N D (parentTGrade x)` | Q3Paragraph8.lean:72 | (iv) | **open**: the regular floor step of the H web (even `[1, N+D−1]`, odd `[N,D]`); the exceptional values are proved in ParentWeb.lean. This is the only open named hypothesis of paragraph 8 (H part). |
-| `hRectInputs` | Q3Exit.lean:44–45 | (iv) | **open**: points of the open parity rectangle have both inputs in the closed polygon (checked numerically, q3_rect_check.py). |
-| `hBoundary` | Q3Exit.lean:46 | (iv) | **open**: points of the closed polygon outside the open rectangle lie on a boundary spectrum mod T (checked numerically). |
+| `hRectInputs` | (was Q3Exit.lean:44–45) | (iv) | **discharged**: W1Exit.lean:303–307 (`exit_centre_on_boundary_spectrum`, unconditional). The Q3 wrapper `ChildFrame.exit_centre_on_boundary_spectrum` (Q3Exit.lean) keeps the hypotheses, as a generic lemma. |
+| `hBoundary` | (was Q3Exit.lean:46) | (iv) | **discharged**: W1Exit.lean:303–307 (`boundaryClosed`). |
 | `openRect` (definition) | Q3Exit.lean:25–34 | (iii) reading / (iv) W1 | PROVISIONAL: parity-resolved open rectangle, the W1 reading of task 45. |
 | `onBoundarySpectrum` (definition) | Q3Exit.lean:36–40 | (iii) reading | PROVISIONAL: t or s in the H/V spectrum up to ±T. |
 | `hn : 3 ≤ n`, `hnd : n + 2 ≤ d` | Q3Window.lean:21, 29, 37, 45 | (v) child structure | `n ≥ 3` is a paper hypothesis; `n + 2 ≤ d` follows from parity and `n < d` (instantiation needed). |
@@ -52,16 +51,17 @@ Status: *discharged* = supplied by a wrapper from `StrongEstimates (conjWord wor
 
 - **Category (ii) (the old canonical policy and forced-white classification):** no Lean hypothesis in the Q3 files. The paper's uses (the "matched old policy" in paragraph 4, the retention and the monotone policy in paragraphs 6 and 7, the forced-white edges in paragraph 2) are not formalized. The S3 `CanonicalPolicy` structure (S3Canonical.lean) is a different, earlier object.
 - **Category (iii) window mod 2C (chart, paragraph 4):** the common-shift check `q3_chart_mod_check.py` holds with the window `[λ, λ+2C)` taken mod `2C`, on all 417360 pairs (shift 0 or `−ηεU_q`). The Lean `chart_separation` (Q3Inputs.lean:14) covers only the separation step. The window itself is not formalized.
-- **Paragraph 8, V star:** `a ∈ {0,1}` and the `j = 0` translate are not formalized: they use the monotone V path and the translate index of `d_f`, which are not in the codebase's interface. Numerically `a ∈ {0,1}` holds on the child's native V sites (5700/5700, q3_child_native.py).
+- **Paragraph 8, V star (task 60, formalized):** `native_V_a_zero_or_one` (Q3VStar.lean) gives `a ∈ {0,1}` on the native box, from `price_floor_bound_of_strong` and `zeroStrip_of_strong` (category (i)); `aVal_translate_UV` gives `a(x + iU_p + jV_p) = a(x) + j`; `drop_forces_j_zero` gives `j = 0` for a drop 1 → 0. The reading of 'the pair' (which two values of `d_f` form the pair, PROVISIONAL, category (iii)) is not fixed by the text; the lemmas are stated for `a` and for `d_f` values through `a = −p`.
+- **V path (task 60):** the floor agreement `vBlock_floor_agree` (Q3VPath.lean), the box `vbox_tp_bounds` and the odd vertices `odd_vertex_tp_bounds` carry no named hypotheses beyond the child parameters (category (v)).
 - **Paragraph 2 (inputs of a black centre in E):** the exit lemma `exit_centre_on_boundary_spectrum` (Q3Exit.lean:43) reduces the claim to the two named hypotheses (iv). The strip facts of paragraph 2 are field data (i), not used in Lean.
 
 ## Summary of open items
 
-1. `hweb` (Q3Paragraph8.lean:72), category (iv): the H-web floor step.
-2. `hRectInputs`, `hBoundary` (Q3Exit.lean:44–46), category (iv): W1's rectangle theorem (task 45).
+1. `hweb` (Q3Paragraph8.lean:72), category (iv): the H-web floor step (the regular even and odd web values; the V-web floor step is in Q3VPath as an arithmetic box, not as a named hypothesis).
+2. (discharged in task 60: `hRectInputs`, `hBoundary`, by W1Exit.lean:303–307.)
 3. The rectangle and boundary readings `openRect`, `onBoundarySpectrum` (Q3Exit.lean:25, 36), category (iii)/(iv): PROVISIONAL.
 4. `hexit` (Q3Window.lean:23, 31, 39, 47), category (iii): the exit reading.
 5. `chart_separation` (Q3Inputs.lean:14): needs the parity tightening (`L + 2`), category (iii).
-6. `hlat` (Q3Bridge.lean:22): obsolete; delete with `paragraph5_field_identity`.
+6. (done in task 60: `paragraph5_field_identity` with `hlat` removed from Q3Bridge.lean; the proved identity is `paragraph5_field_identity_proved`, Q3Bound.lean.)
 
 All (i)-category hypotheses are supplied by `StrongEstimates (conjWord word)` through the `_of_strong` wrappers (Q3Strong, Q3Field, Q3Paragraph8).
