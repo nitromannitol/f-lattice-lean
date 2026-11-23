@@ -138,4 +138,48 @@ theorem retWalk_translate {ret : Site → Site → Prop} (d : Site)
   | nil z => exact RetWalk.nil (z + d)
   | cons hr _ ih => exact RetWalk.cons (hstep _ _ hr) ih
 
+
+/-- Deck translation cancels on the right, `c − d + d = c`. -/
+theorem site_sub_add' (c d : Site) : c + -d + d = c := by
+  ext <;> simp
+
+/-- Deck translation cancels on the left, `c + d − d = c`. -/
+theorem site_add_sub' (c d : Site) : c + d + -d = c := by
+  ext <;> simp
+
+/-- Deck invariance of the walk values: if the retained relation and `w` are invariant under the deck vector `d` (with
+`w` shifting by `kd`), the value set at `z + d` equals the one at `z`. -/
+theorem retVal_add_eq {ret : Site → Site → Prop} {w : Site → ℤ} {lam : ℤ} {d : Site} {kd : ℤ}
+    (hiff : ∀ c i, ret c i ↔ ret (c + d) (i + d)) (hw : ∀ x, w (x + d) = w x + kd) (z : Site) :
+    retVal ret w lam (z + d) = retVal ret w lam z := by
+  ext v
+  constructor
+  · rintro ⟨e, n, hW, rfl⟩
+    have hstep : ∀ c i, ret c i → ret (c + -d) (i + -d) := fun c i h =>
+      (hiff (c + -d) (i + -d)).mpr (by rw [site_sub_add', site_sub_add']; exact h)
+    have h2 := retWalk_translate (-d) hstep hW
+    have hz : z + d + -d = z := site_add_sub' z d
+    have he : e + -d + d = e := site_sub_add' e d
+    have hwe : w e = w (e + -d) + kd := by
+      have := hw (e + -d)
+      rw [he] at this
+      exact this
+    rw [hz] at h2
+    refine ⟨e + -d, n, h2, ?_⟩
+    rw [hwe, hw z]
+    ring
+  · rintro ⟨e, n, hW, rfl⟩
+    have hstep : ∀ c i, ret c i → ret (c + d) (i + d) := fun c i h => (hiff c i).mp h
+    refine ⟨e + d, n, retWalk_translate d hstep hW, ?_⟩
+    rw [hw e, hw z]
+    ring
+
+/-- The Bellman rank shifts by `lam kd` under the deck vector `d`. -/
+theorem bellmanRank_add {ret : Site → Site → Prop} {w : Site → ℤ} {lam : ℤ} {d : Site} {kd : ℤ}
+    (hiff : ∀ c i, ret c i ↔ ret (c + d) (i + d)) (hw : ∀ x, w (x + d) = w x + kd) (z : Site) :
+    bellmanRank ret w lam (z + d) = bellmanRank ret w lam z + lam * kd := by
+  unfold bellmanRank
+  rw [retVal_add_eq hiff hw z, hw z]
+  ring
+
 end FLatticePaper.WeightChange
