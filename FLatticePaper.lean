@@ -304,5 +304,6 @@ import FLatticePaper.Plane.Induction.OldPolicy
 import FLatticePaper.Plane.Induction.NoBlackPair
 import FLatticePaper.Plane.Induction.MatchedPolicy
 import FLatticePaper.Plane.Induction.SheetCases
+import FLatticePaper.Plane.Induction.W1Collar
 
 /-! Root import for the corrected F-lattice paper. -/
