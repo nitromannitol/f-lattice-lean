@@ -546,3 +546,10 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - PROVED `exists_translate_of_not_nonfree`: a root that is not nonfree has a child-deck translate `z + (i U + j V)` in `freeH ∪ freeV`, with `U = (d, n)` and `V = (n − d, n + d)` (the child kernel and transverse).
 - This is the first of the four lemmas for the band (a). The others are the parent identity `c − l_v = I − v + i V_p − j U_p` (with `v = zTurn w`), the sign of the translate index, and the bounds on `s(v)` from the V spectrum and `excVertex`.
 - Checks: `checks/CollarBand.lean`. Root build clean; sandbox logs clean.
+
+### Task 72 (hcollar, (a) lemma 2): CollarIdentity.lean
+
+- PROVED `zTurn_zTurn_add`: `zTurn (zTurn x + p) = (1,−1) − x + (−p.2, p.1)` (the half-turn of a conjugate translate).
+- PROVED `sW_centre_identity`: for the conjugate translate `p = i U_c + j V_c`, `s(c) = 2n + s(l_v) + 2 i (Nd − Dn) − j s(U_p) − s(v)` with `v = zTurn (zTurn (c − l_v) + p)` and `s` the word `s`-grade.
+- Checks: `checks/CollarIdentity.lean`. Root build clean; sandbox logs clean.
+- Open: the sign of `j` and the value `i = 1` (they come from the H spectrum of the translate, i.e. from the parent grades `s_p(c − l_v)`), and the bounds on `s(v)` (from `vSpectrum`, `s(v) ∈ [2 − d + n, L − 2]`).
