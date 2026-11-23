@@ -137,6 +137,7 @@ import FLatticePaper.Plane.Induction.TwosChain
 import FLatticePaper.Plane.Induction.TwosReciprocal
 import FLatticePaper.Plane.Induction.ThreesMidpoint
 import FLatticePaper.Plane.Induction.ThreesLeaves
+import FLatticePaper.Plane.Induction.TwosLeaves
 import FLatticePaper.Plane.Induction.TwosTiePiece
 import FLatticePaper.Plane.Induction.TwosPieces
 import FLatticePaper.Plane.Induction.TwosIdentification
