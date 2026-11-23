@@ -98,6 +98,75 @@ theorem key_le (F : Site → ℤ) (N D nq dq : ℤ) (hN : 0 < N) (hND : N < D) (
       have h2 := hzs (u.1 - dq, u.2 - nq) (by simp only; rw [ht_w]; linarith) (by simp only; rw [ht_w]; linarith)
       rw [h1, h2]
 
+/-- The values of `F ∘ Z` on the three ranges of `m = s_p(u)`: zero on the strip, `−1` at `m = 2r`, and at least `−1` at
+`m = 2r + 1` (binarity at an odd site whose inputs lie on the strips). -/
+theorem G_zero (F : Site → ℤ) (N D Nu Du epsU : ℤ) (H : ZoneCase.ZoneHyp F N D Nu Du epsU) (u : Site)
+    (hlo : 1 - (D + N) ≤ (D + N) * u.1 + (D - N) * u.2) (hhi : (D + N) * u.1 + (D - N) * u.2 ≤ 2 * (D + N) - 1) :
+    F (-u.2, u.1 - 1) = 0 := by
+  apply H.hstrip
+  · nlinarith [H.hN, H.hND]
+  · nlinarith [H.hN, H.hND]
+
+theorem G_minus_two (F : Site → ℤ) (N D Nu Du epsU : ℤ) (H : ZoneCase.ZoneHyp F N D Nu Du epsU)
+    (hsharm : ∀ y : Site, 1 - 2 * (D + N) ≤ 2 * D * y.1 + 2 * N * y.2 →
+      2 * D * y.1 + 2 * N * y.2 ≤ 2 * (2 * D) - 1 → F y = harmonicGrid y)
+    (u : Site) (hm : (D + N) * u.1 + (D - N) * u.2 = 2 * (D + N)) :
+    F (-u.2, u.1 - 1) = -1 := by
+  have hε2 : epsU ^ 2 = 1 := by rcases H.hepsU with rfl | rfl <;> norm_num
+  have hk : (D - N) * (-u.2) - (D + N) * (u.1 - 2) = 0 := by linear_combination (-1 : ℤ) * hm
+  obtain ⟨e1, e2⟩ := ZoneSlip.lattice_kappa N D Nu Du epsU (-u.2) (u.1 - 2) H.hdet hε2 hk
+  have hZ : (-u.2, u.1 - 1) = (0, 1) + ((epsU * (Nu * (-u.2) - Du * (u.1 - 2))) * (D + N),
+      (epsU * (Nu * (-u.2) - Du * (u.1 - 2))) * (D - N)) := by
+    ext
+    · simp only [Prod.fst_add]; linarith
+    · simp only [Prod.snd_add]; linarith
+  rw [hZ, ZoneCase.F_kappa_iter F N D H.hK]
+  rw [hsharm (0, 1) (by nlinarith [H.hN, H.hND]) (by nlinarith [H.hN, H.hND])]
+  exact ZoneCase.harmonic_zero_one
+
+theorem G_minus_three (F : Site → ℤ) (N D Nu Du epsU : ℤ) (H : ZoneCase.ZoneHyp F N D Nu Du epsU)
+    (hbin : ∀ c : Site, laplacian F c = -1 ∨ laplacian F c = 0)
+    (u : Site) (hm : (D + N) * u.1 + (D - N) * u.2 = 2 * (D + N) + 1) :
+    -1 ≤ F (-u.2, u.1 - 1) := by
+  -- σ = Z u − (0, 1) has transverse grade −1, so it is an odd site
+  have hr := H.hr
+  obtain ⟨β, hβ⟩ : ∃ β : ℤ, D - N = 2 * β + 1 := ⟨(D - N - 1) / 2, by omega⟩
+  obtain ⟨ρ, hρ⟩ : ∃ ρ : ℤ, D + N = 2 * ρ + 1 := ⟨(D + N - 1) / 2, by omega⟩
+  set σ : Site := (-u.2, u.1 - 2) with hσ
+  have htσ : (D - N) * σ.1 - (D + N) * σ.2 = -1 := by
+    rw [hσ]
+    linear_combination (-1 : ℤ) * hm
+  obtain ⟨Q, hQ⟩ : ∃ Q : ℤ, σ.1 + σ.2 = 2 * Q - 1 := by
+    refine ⟨-β * σ.1 + ρ * σ.2 + σ.2, ?_⟩
+    rw [hβ, hρ] at htσ
+    linear_combination htσ
+  have hodd : ¬ EvenSite σ := by
+    unfold EvenSite
+    rw [hQ]
+    omega
+  have hneg : incomingNeg σ = (σ.1, σ.2 - 1) := by
+    unfold incomingNeg
+    rw [if_neg hodd]
+  have hpos : incomingPos σ = (σ.1, σ.2 + 1) := by
+    unfold incomingPos
+    rw [if_neg hodd]
+  have hσ0 : F σ = 0 := by
+    apply H.hstrip
+    · nlinarith [H.hN, H.hND]
+    · nlinarith [H.hN, H.hND]
+  have hσ1 : F (σ.1, σ.2 - 1) = 0 := by
+    apply H.hstrip
+    · nlinarith [H.hN, H.hND]
+    · nlinarith [H.hN, H.hND]
+  have hZ : (σ.1, σ.2 + 1) = (-u.2, u.1 - 1) := by
+    ext
+    · simp only [hσ]
+    · simp only [hσ]; ring
+  have hlap := hbin σ
+  unfold laplacian at hlap
+  rw [hneg, hpos, hZ, hσ0, hσ1] at hlap
+  rcases hlap with h | h <;> linarith
+
 end HarmI2
 
 end FLatticePaper.Induction
