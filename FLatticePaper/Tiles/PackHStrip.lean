@@ -21,7 +21,7 @@ theorem ediv_emod_of_rep {b x q r : ℤ} (hb : 0 < b) (hr0 : 0 ≤ r) (hr : r < 
   (Int.ediv_emod_unique hb).2 ⟨h, hr0, hr⟩
 
 /-- The entry column of `(w1 N)^∞` into row `x + 1`, for `0 ≤ x ≤ B`. -/
-theorem Hent_succ (w1 : F2Word) (h1 : ∀ x ∈ w1, x = .one ∨ x = .i) (x : ℤ) (h0 : 0 ≤ x) (hx : x ≤ cntI w1) :
+theorem Hent_succ (w1 : F2Word) (_h1 : ∀ x ∈ w1, x = .one ∨ x = .i) (x : ℤ) (h0 : 0 ≤ x) (hx : x ≤ cntI w1) :
     Hent w1 (x + 1) = (if x < cntI w1 then colN w1 (0, 0) x else (F2Word.sum w1).1) := by
   have hq := cntI_nonneg w1
   unfold Hent
@@ -107,7 +107,7 @@ theorem Hent_mono_le (w1 : F2Word) (h1 : ∀ x ∈ w1, x = .one ∨ x = .i) {a b
   exact this
 
 /-- The period `B + 1`: the entry column rises by `A`. -/
-theorem Hent_add_period (w1 : F2Word) (h1 : ∀ x ∈ w1, x = .one ∨ x = .i) (s : ℤ) :
+theorem Hent_add_period (w1 : F2Word) (_h1 : ∀ x ∈ w1, x = .one ∨ x = .i) (s : ℤ) :
     Hent w1 (s + (cntI w1 + 1)) = Hent w1 s + (F2Word.sum w1).1 := by
   have hq := cntI_nonneg w1
   have hrep : (s - 1) % (cntI w1 + 1) + (cntI w1 + 1) * ((s - 1) / (cntI w1 + 1)) = s - 1 :=
@@ -176,7 +176,7 @@ theorem Nrow_le_H (c : GInt) (h1 : ∀ x ∈ w1, x = .one ∨ x = .i) (h2 : ∀ 
 /-- The south ends are above the H-entry shifted by `D` and the second coordinate sum minus one (the interface inequality
 `L_g2` of `w1`): `c.1 + Hent (t + 1 - D) + (sum w2 .1 - 1) ≤ Srow c t` for the rows `0 ≤ t < B + D`. -/
 theorem Srow_ge_H (c : GInt) (hA1 : Admissible w1) (h1 : ∀ x ∈ w1, x = .one ∨ x = .i)
-    (h2 : ∀ x ∈ w2, x = .i ∨ x = .negOne) (t : ℤ) (ht0 : 0 ≤ t) (ht1 : t < cntI w1 + cntI w2) :
+    (h2 : ∀ x ∈ w2, x = .i ∨ x = .negOne) (t : ℤ) (_ht0 : 0 ≤ t) (ht1 : t < cntI w1 + cntI w2) :
     c.1 + Hent w1 (t + 1 - cntI w2) + ((F2Word.sum w2).1 - 1) ≤ Srow c w1 w2 t := by
   have hq := cntI_nonneg w1
   have hr := cntI_nonneg w2
