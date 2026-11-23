@@ -244,4 +244,118 @@ theorem V_side_h0 (frame : ChildFrame) {F M : Field}
   · exact ChildFrame.harmonic_strip frame hstrip hagree hper z (by omega) h
   · exact hup z (by omega) hhi
 
+/-- The reflection `z ↦ I − z` about `I = (1, −1)`; the standard field and `harmonicGrid` are invariant under it. -/
+def iRefl (z : Site) : Site := (1 - z.1, -1 - z.2)
+
+theorem iRefl_iRefl (z : Site) : iRefl (iRefl z) = z := by
+  unfold iRefl
+  ext <;> simp
+
+theorem evenSite_iRefl (z : Site) : EvenSite (iRefl z) ↔ EvenSite z := by
+  unfold EvenSite iRefl
+  simp only
+  omega
+
+theorem tGrade_iRefl (frame : ChildFrame) (z : Site) :
+    frame.tGrade (iRefl z) = frame.child.num + frame.child.den - frame.tGrade z := by
+  unfold ChildFrame.tGrade iRefl
+  ring
+
+theorem sGrade_iRefl (frame : ChildFrame) (z : Site) :
+    frame.sGrade (iRefl z) = 2 * frame.child.num - frame.sGrade z := by
+  unfold ChildFrame.sGrade iRefl
+  ring
+
+theorem harmonicGrid_iRefl (z : Site) : harmonicGrid (iRefl z) = harmonicGrid z := by
+  obtain ⟨a, b⟩ := z
+  have hp : ((1 - a) + (-1 - b)) % 2 = (a + b) % 2 := by omega
+  show ((1 - a) ^ 2 + 2 * (1 - a) * (-1 - b) - (-1 - b) ^ 2 - 2 * (-1 - b) - ((1 - a) + (-1 - b)) % 2) / 4 =
+    (a ^ 2 + 2 * a * b - b ^ 2 - 2 * b - (a + b) % 2) / 4
+  rw [hp]
+  congr 1
+  ring
+
+/-- **The upper even zero interval `[n + 2d − 1, 2L − 2]`, from the lower one and the reflection `I − z`.** The named input is the
+global symmetry `F (I − z) = F z` (`hIsym`; source `escape/ALL_SLOPE_STEP.md` line 30, numerically global on the plane). -/
+theorem even_zero_upper (frame : ChildFrame) {F M : Field}
+    (hper : HasGeneratorPeriods frame.child F 0 frame.coherentConstantV)
+    (hstrip : frame.StripInputs M) (hagree : ∀ y ∈ frame.closedPolygon, F y = M y)
+    (hslip : ∀ z ∈ frame.closedPolygon, 0 ≤ frame.slip F 1 z)
+    (hseed : ∀ z : Site, EvenSite z → frame.tGrade z = 2 - (frame.child.den + frame.child.num) → F z = 0)
+    (hIsym : ∀ z : Site, F (iRefl z) = F z)
+    (w : Site) (hw : EvenSite w) (hlo : frame.child.num + 2 * frame.child.den - 1 ≤ frame.tGrade w)
+    (hhi : frame.tGrade w ≤ 2 * (frame.child.den + frame.child.num) - 2) : F w = 0 := by
+  obtain ⟨hpos, hnlt, hdn, hd3, -⟩ := frame.child_facts
+  have hz : EvenSite (iRefl w) := (evenSite_iRefl w).2 hw
+  have ht : frame.tGrade (iRefl w) = frame.child.num + frame.child.den - frame.tGrade w :=
+    tGrade_iRefl frame w
+  have h0 : F (iRefl w) = 0 :=
+    even_zero_lower frame hper hstrip hagree hslip hseed (iRefl w) hz (by omega) (by omega)
+  rw [← hIsym w]
+  exact h0
+
+/-- **The even zero interval `[2 − L, 2L − 2]`** (the lower part, the ordinary strip and the upper part by `I − z`). -/
+theorem even_zero_full (frame : ChildFrame) {F M : Field}
+    (hper : HasGeneratorPeriods frame.child F 0 frame.coherentConstantV)
+    (hstrip : frame.StripInputs M) (hagree : ∀ y ∈ frame.closedPolygon, F y = M y)
+    (hslip : ∀ z ∈ frame.closedPolygon, 0 ≤ frame.slip F 1 z)
+    (hseed : ∀ z : Site, EvenSite z → frame.tGrade z = 2 - (frame.child.den + frame.child.num) → F z = 0)
+    (hIsym : ∀ z : Site, F (iRefl z) = F z)
+    (z : Site) (hz : EvenSite z) (hlo : 2 - (frame.child.den + frame.child.num) ≤ frame.tGrade z)
+    (hhi : frame.tGrade z ≤ 2 * (frame.child.den + frame.child.num) - 2) : F z = 0 := by
+  obtain ⟨hpos, hnlt, hdn, hd3, -⟩ := frame.child_facts
+  by_cases h1 : frame.tGrade z ≤ 1 - frame.child.den
+  · exact even_zero_lower frame hper hstrip hagree hslip hseed z hz hlo h1
+  by_cases h2 : frame.tGrade z ≤ frame.child.num + 2 * frame.child.den - 1
+  · exact ChildFrame.zero_strip frame hstrip hagree hper z (by omega) h2
+  exact even_zero_upper frame hper hstrip hagree hslip hseed hIsym z hz (by omega) hhi
+
+/-- **Top collar (archive section 2, `F(y) = 0`), with the reflection as the only named input beyond the packet and the seed.** -/
+theorem top_collar_zero_full (frame : ChildFrame) {F M : Field}
+    (hper : HasGeneratorPeriods frame.child F 0 frame.coherentConstantV)
+    (hstrip : frame.StripInputs M) (hagree : ∀ y ∈ frame.closedPolygon, F y = M y)
+    (hslip : ∀ z ∈ frame.closedPolygon, 0 ≤ frame.slip F 1 z)
+    (hseed : ∀ z : Site, EvenSite z → frame.tGrade z = 2 - (frame.child.den + frame.child.num) → F z = 0)
+    (hIsym : ∀ z : Site, F (iRefl z) = F z)
+    (y : Site) (hy : (EvenSite y ∧ frame.child.den + frame.child.num - 2 < frame.tGrade y ∧
+        frame.tGrade y ≤ 2 * (frame.child.den + frame.child.num) - 2) ∨
+      (¬ EvenSite y ∧ frame.child.den < frame.tGrade y ∧
+        frame.tGrade y ≤ frame.child.num + 2 * frame.child.den - 2)) : F y = 0 := by
+  obtain ⟨hpos, hnlt, hdn, hd3, -⟩ := frame.child_facts
+  rcases hy with ⟨he, hlo, hhi⟩ | ⟨hn, hlo, hhi⟩
+  · exact even_zero_full frame hper hstrip hagree hslip hseed hIsym y he (by omega) hhi
+  · exact ChildFrame.zero_strip frame hstrip hagree hper y (by omega) (by omega)
+
+/-- **The upper odd h0 interval `[2L − 1, 3d + n − 2]`**, from the lower one `[2 − 3d + n, 1 − 2d]` and the reflection `I − z`
+(`harmonicGrid` is invariant under `I − z`). The lower interval is the named input `hlow`. -/
+theorem odd_h0_upper (frame : ChildFrame) {F : Field}
+    (hIsym : ∀ z : Site, F (iRefl z) = F z)
+    (hlow : ∀ z : Site, ¬ EvenSite z → 2 - 3 * frame.child.den + frame.child.num ≤ frame.sGrade z →
+      frame.sGrade z ≤ 1 - 2 * frame.child.den → F z = harmonicGrid z)
+    (w : Site) (hw : ¬ EvenSite w) (hlo : 2 * (frame.child.den + frame.child.num) - 1 ≤ frame.sGrade w)
+    (hhi : frame.sGrade w ≤ 3 * frame.child.den + frame.child.num - 2) : F w = harmonicGrid w := by
+  obtain ⟨hpos, hnlt, hdn, hd3, -⟩ := frame.child_facts
+  have hz : ¬ EvenSite (iRefl w) := fun h => hw ((evenSite_iRefl w).1 h)
+  have hs : frame.sGrade (iRefl w) = 2 * frame.child.num - frame.sGrade w := sGrade_iRefl frame w
+  have h1 : F w = F (iRefl w) := by
+    have h := hIsym (iRefl w)
+    rw [iRefl_iRefl] at h
+    exact h
+  rw [h1, hlow (iRefl w) hz (by omega) (by omega), harmonicGrid_iRefl]
+
+/-- **V side (archive section 2, `F = h0` on odd `s ∈ (L − 2, 3d + n − 2]`)**, with the lower odd h0 interval and the reflection
+as the named inputs. -/
+theorem V_side_full (frame : ChildFrame) {F M : Field}
+    (hper : HasGeneratorPeriods frame.child F 0 frame.coherentConstantV)
+    (hstrip : frame.StripInputs M) (hagree : ∀ y ∈ frame.closedPolygon, F y = M y)
+    (hIsym : ∀ z : Site, F (iRefl z) = F z)
+    (hlow : ∀ z : Site, ¬ EvenSite z → 2 - 3 * frame.child.den + frame.child.num ≤ frame.sGrade z →
+      frame.sGrade z ≤ 1 - 2 * frame.child.den → F z = harmonicGrid z)
+    (z : Site) (hz : ¬ EvenSite z) (hlo : frame.child.den + frame.child.num - 2 < frame.sGrade z)
+    (hhi : frame.sGrade z ≤ 3 * frame.child.den + frame.child.num - 2) : F z = harmonicGrid z := by
+  obtain ⟨hpos, hnlt, hdn, hd3, -⟩ := frame.child_facts
+  by_cases h : frame.sGrade z ≤ 2 * (frame.child.den + frame.child.num) - 1
+  · exact ChildFrame.harmonic_strip frame hstrip hagree hper z (by omega) h
+  · exact odd_h0_upper frame hIsym hlow z hz (by omega) hhi
+
 end FLatticePaper.W1Strips
