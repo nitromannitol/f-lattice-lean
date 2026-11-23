@@ -252,6 +252,29 @@ theorem harmR_nonneg (F : Site → ℤ) (N D Nu Du epsU nq dq : ℤ) (H : ZoneCa
       simp only at hA' hG'
       linarith
 
+/-- The window of the harmonic region, lower side: on the closed polygon `z₂ ≥ 0`. -/
+theorem geo_nonneg (n d z1 z2 : ℤ) (hn : 1 ≤ n) (hnd : n + 2 ≤ d)
+    (hA : 2 - d + n ≤ (d + n) * z1 + (d - n) * z2) (hB : n * z1 - d * z2 ≤ d + n - 1) : 0 ≤ z2 := by
+  by_contra h
+  have hz2 : z2 ≤ -1 := by omega
+  have h1 : 1 ≤ z1 := by
+    by_contra hc
+    have hc' : z1 ≤ 0 := by omega
+    nlinarith
+  nlinarith
+
+/-- The window of the harmonic region, upper side: on the closed polygon with `s ≤ 2L − 1`, `z₂ ≤ L = d + n`. -/
+theorem geo_le (n d z1 z2 : ℤ) (hn : 1 ≤ n) (hnd : n + 2 ≤ d)
+    (hC : 1 - (d * d + 2 * d * n - n * n) ≤ n * z1 - d * z2)
+    (hD : (d + n) * z1 + (d - n) * z2 ≤ 2 * (d + n) - 1) : z2 ≤ d + n := by
+  by_contra h
+  have hz : d + n + 1 ≤ z2 := by omega
+  have p2 : z1 ≤ n + 1 - d := by
+    by_contra hc
+    have hc' : n + 2 - d ≤ z1 := by omega
+    nlinarith
+  nlinarith
+
 end HarmI2
 
 end FLatticePaper.Induction
