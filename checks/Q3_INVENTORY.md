@@ -756,3 +756,11 @@ Scope to confirm with the lead: §1's star containment needs `c = d − n ≥ 3`
 - NOT yet: the acyclic minimum policy with its square
   clauses (the audit's lexicographic construction, `TWO_RANK_RAW_PHI_AUDIT.md` §2). The forced transfer needs that policy.
 - Checks: `checks/MinAdmission.lean`. Root build: 0 warnings, 0 linter notes.
+
+### Task 72 / Q20 (the shifted-V window, derived): BothFreeRise.lean
+
+- PROVED `window_centre_of_freeV`: a free V centre has `sGrade` in `[3 − 2d, 2L − 1]` (from `vSpectrum`, `c ≥ 1`).
+- PROVED `window_input_of_freeV` (with `3 ≤ c`): each input of a free V centre has `sGrade` in the same window (an even centre is in `E`,
+  so `sGrade ≥ 0`, and its horizontal inputs are `s ∓ L`; an odd centre has `s ≥ 2 − c`, and its vertical inputs are `s ∓ c`).
+- `both_free_rise_false` and `chain_nonincreasing_of_free_roots` no longer take `hwin`; they take `3 ≤ c` and derive the window.
+- Checks: `checks/BothFreeRise.lean`. Root build: 0 warnings, 0 linter notes.
