@@ -283,4 +283,159 @@ theorem odd_direct_even_arith (n d T p q l a b : ℤ) (hn : 0 < n) (hnd : n + 2 
   · exact le_of_mul_le_mul_left hup (by omega)
   · exact ht_c
 
+/-- Parity of the grade `t`: for odd `n`, `d`, `t(a, b) ≡ a + b (mod 2)`. -/
+theorem t_parity (n d a b : ℤ) (hn : n % 2 = 1) (hd : d % 2 = 1) :
+    (n * a - d * b) % 2 = (a + b) % 2 := by
+  obtain ⟨k, rfl⟩ : ∃ k, n = 2 * k + 1 := ⟨n / 2, by omega⟩
+  obtain ⟨m, rfl⟩ : ∃ m, d = 2 * m + 1 := ⟨d / 2, by omega⟩
+  have e : (2 * k + 1) * a - (2 * m + 1) * b = 2 * (k * a - m * b) + (a - b) := by ring
+  rw [e]
+  omega
+
+/-- The upper bound on `s` for an even centre from the diagonal index `k ≤ L − 2` and `t ≤ 0`. -/
+theorem s_le_even (n d T k t s : ℤ) (hn : 0 < n) (hnd : n + 2 ≤ d) (hT : T = d ^ 2 + 2 * d * n - n ^ 2)
+    (hid : (d + n) * s = k * T + 2 * n * t) (hk : k ≤ d + n - 2) (ht : t ≤ 0) :
+    s ≤ T - 2 * d + 2 * n + 1 := by
+  have hT0 : 0 ≤ T := by rw [hT]; nlinarith
+  have h1 : k * T ≤ (d + n - 2) * T := mul_le_mul_of_nonneg_right hk hT0
+  have h2 : 2 * n * t ≤ 0 := mul_nonpos_of_nonneg_of_nonpos (by omega) ht
+  have h3 : (d + n) * s ≤ (d + n) * (T - 2 * d + 2 * n + 1) := by
+    have h4 : (d + n - 2) * T ≤ (d + n) * (T - 2 * d + 2 * n + 1) := by
+      rw [hT]
+      nlinarith [mul_pos (show (0 : ℤ) < d by omega) (show (0 : ℤ) < n by omega)]
+    linarith
+  exact le_of_mul_le_mul_left h3 (by omega)
+
+/-- The upper bound on `s` for an odd centre from the diagonal index `k ≤ L − 1` and `t ≤ n − 2`. -/
+theorem s_le_odd (n d T k t s : ℤ) (hn : 0 < n) (hnd : n + 2 ≤ d) (hT : T = d ^ 2 + 2 * d * n - n ^ 2)
+    (hid : (d + n) * s = k * T + 2 * n * t) (hk : k ≤ d + n - 1) (ht : t ≤ n - 2) :
+    s ≤ T - d + n - 1 := by
+  have hT0 : 0 ≤ T := by rw [hT]; nlinarith
+  have h1 : k * T ≤ (d + n - 1) * T := mul_le_mul_of_nonneg_right hk hT0
+  have h2 : 2 * n * t ≤ 2 * n * (n - 2) := mul_le_mul_of_nonneg_left ht (by omega)
+  have h3 : (d + n) * s ≤ (d + n) * (T - d + n - 1) := by
+    have h4 : (d + n - 1) * T + 2 * n * (n - 2) ≤ (d + n) * (T - d + n - 1) := by
+      rw [hT]
+      nlinarith [mul_nonneg (show (0 : ℤ) ≤ d - n - 2 by omega) (show (0 : ℤ) ≤ 2 * n - 1 by omega)]
+    linarith
+  exact le_of_mul_le_mul_left h3 (by omega)
+
+/-- **The even direct bottom corners with an odd witness.** The even strict centre `c = (a, b)` (not `(1,1)`) with an odd
+H witness `v = (p, q)`, `|c − v|∞ ≤ 1`: `v = (1,0)` is impossible, and otherwise `s(v) ≥ 3L`. Conclusions: the even band. -/
+theorem even_direct_odd_arith (n d T p q a b : ℤ) (hn : 0 < n) (hnd : n + 2 ≤ d)
+    (hnodd : n % 2 = 1) (hdodd : d % 2 = 1) (hT : T = d ^ 2 + 2 * d * n - n ^ 2)
+    (hcE : (a + b) % 2 = 0) (hcs1 : 2 * n < (d + n) * a + (d - n) * b)
+    (hcu : n * a - d * b < 2) (hcs2 : (d + n) * a + (d - n) * b < T) (hne : ¬ (a = 1 ∧ b = 1))
+    (hvO : (p + q) % 2 = 1) (hvt : n ≤ n * p - d * q)
+    (hvk : p + q ≤ d + n - 1) (hvk2 : p + q = d + n - 1 → p = d ∧ q = n - 1)
+    (hvc : (p = 1 ∧ q = 0) ∨ 3 * (d + n) ≤ (d + n) * p + (d - n) * q)
+    (ha : -1 ≤ a - p ∧ a - p ≤ 1) (hb : -1 ≤ b - q ∧ b - q ≤ 1) :
+    2 * (d + n) - 2 < (d + n) * a + (d - n) * b ∧
+      (d + n) * a + (d - n) * b ≤ T - 2 * d + 2 * n + 1 ∧
+        2 - (d + n) ≤ n * a - d * b ∧ n * a - d * b ≤ 0 := by
+  obtain ⟨e1, rfl⟩ : ∃ e1, a = p + e1 := ⟨a - p, by ring⟩
+  obtain ⟨e2, rfl⟩ : ∃ e2, b = q + e2 := ⟨b - q, by ring⟩
+  have he1 : e1 = -1 ∨ e1 = 0 ∨ e1 = 1 := by omega
+  have he2 : e2 = -1 ∨ e2 = 0 ∨ e2 = 1 := by omega
+  have hid : (d + n) * ((d + n) * (p + e1) + (d - n) * (q + e2)) =
+      ((p + e1) + (q + e2)) * T + 2 * n * (n * (p + e1) - d * (q + e2)) := by
+    rw [hT]
+    ring
+  have ht0 : n * (p + e1) - d * (q + e2) ≤ 0 := by
+    have hp := t_parity n d (p + e1) (q + e2) hnodd hdodd
+    generalize hτ : n * (p + e1) - d * (q + e2) = τ at *
+    omega
+  -- the lower bound on `t`: from `t(v) ≥ n` and the four odd steps
+  have ht_lo : 2 - (d + n) ≤ n * (p + e1) - d * (q + e2) := by
+    rcases he1 with rfl | rfl | rfl <;> rcases he2 with rfl | rfl | rfl
+    all_goals first
+      | omega
+      | linarith
+  -- the lower bound on `s`
+  have hs_lo : 2 * (d + n) - 2 < (d + n) * (p + e1) + (d - n) * (q + e2) := by
+    rcases hvc with ⟨hp, hq⟩ | hbig
+    · subst hp
+      subst hq
+      rcases he1 with rfl | rfl | rfl <;> rcases he2 with rfl | rfl | rfl
+      all_goals omega
+    · rcases he1 with rfl | rfl | rfl <;> rcases he2 with rfl | rfl | rfl
+      all_goals first
+        | omega
+        | linarith
+  -- the diagonal index `k_c ≤ L − 2`
+  have hkc : (p + e1) + (q + e2) ≤ d + n - 2 := by
+    by_contra hc
+    have hkv : p + q = d + n - 1 := by omega
+    obtain ⟨hp, hq⟩ := hvk2 hkv
+    rw [hp, hq] at hcu hcs2
+    rcases he1 with rfl | rfl | rfl <;> rcases he2 with rfl | rfl | rfl
+    all_goals first
+      | omega
+      | linarith
+  refine ⟨hs_lo, ?_, ht_lo, ht0⟩
+  exact s_le_even n d T ((p + e1) + (q + e2)) (n * (p + e1) - d * (q + e2))
+    ((d + n) * (p + e1) + (d - n) * (q + e2)) hn hnd hT hid hkc ht0
+
+/-- **The odd direct bottom corners with an odd witness.** The odd strict centre `c = (a, b)` with an odd H witness
+`v = (p, q)`, `|c − v|∞ ≤ 1`, where `v = (1,0)`, `v = (3,0)`, or `s(v) > 3L`. Conclusions: the odd band. -/
+theorem odd_direct_odd_arith (n d T p q a b : ℤ) (hn : 0 < n) (hnd : n + 2 ≤ d)
+    (hnodd : n % 2 = 1) (hdodd : d % 2 = 1) (hT : T = d ^ 2 + 2 * d * n - n ^ 2)
+    (hcO : (a + b) % 2 = 1) (hcu : n * a - d * b < n)
+    (hcs1 : d + n - 2 < (d + n) * a + (d - n) * b)
+    (hcs2 : (d + n) * a + (d - n) * b < T + 2 - d + n)
+    (hvO : (p + q) % 2 = 1) (hvt : n ≤ n * p - d * q)
+    (hvk : p + q ≤ d + n - 1) (hvk2 : p + q = d + n - 1 → p = d ∧ q = n - 1)
+    (hvc : (p = 1 ∧ q = 0) ∨ (p = 3 ∧ q = 0) ∨ 3 * (d + n) < (d + n) * p + (d - n) * q)
+    (ha : -1 ≤ a - p ∧ a - p ≤ 1) (hb : -1 ≤ b - q ∧ b - q ≤ 1) :
+    (d + n) + 2 * n < (d + n) * a + (d - n) * b ∧
+      (d + n) * a + (d - n) * b ≤ T - d + n - 1 ∧
+        -d ≤ n * a - d * b ∧ n * a - d * b ≤ n - 2 := by
+  obtain ⟨e1, rfl⟩ : ∃ e1, a = p + e1 := ⟨a - p, by ring⟩
+  obtain ⟨e2, rfl⟩ : ∃ e2, b = q + e2 := ⟨b - q, by ring⟩
+  have he1 : e1 = -1 ∨ e1 = 0 ∨ e1 = 1 := by omega
+  have he2 : e2 = -1 ∨ e2 = 0 ∨ e2 = 1 := by omega
+  have hid : (d + n) * ((d + n) * (p + e1) + (d - n) * (q + e2)) =
+      ((p + e1) + (q + e2)) * T + 2 * n * (n * (p + e1) - d * (q + e2)) := by
+    rw [hT]
+    ring
+  have ht_hi : n * (p + e1) - d * (q + e2) ≤ n - 2 := by
+    have hp := t_parity n d (p + e1) (q + e2) hnodd hdodd
+    generalize hτ : n * (p + e1) - d * (q + e2) = τ at *
+    omega
+  have ht_lo : -d ≤ n * (p + e1) - d * (q + e2) := by
+    rcases he1 with rfl | rfl | rfl <;> rcases he2 with rfl | rfl | rfl
+    all_goals first
+      | omega
+      | linarith
+  -- the lower bound on `s`
+  have hs_lo : (d + n) + 2 * n < (d + n) * (p + e1) + (d - n) * (q + e2) := by
+    rcases hvc with ⟨hp, hq⟩ | ⟨hp, hq⟩ | hbig
+    · subst hp
+      subst hq
+      rcases he1 with rfl | rfl | rfl <;> rcases he2 with rfl | rfl | rfl
+      all_goals first
+        | omega
+    · subst hp
+      subst hq
+      rcases he1 with rfl | rfl | rfl <;> rcases he2 with rfl | rfl | rfl
+      all_goals first
+        | omega
+    · rcases he1 with rfl | rfl | rfl <;> rcases he2 with rfl | rfl | rfl
+      all_goals first
+        | omega
+        | linarith
+  -- the diagonal index `k_c ≤ L − 1`
+  have hkc : (p + e1) + (q + e2) ≤ d + n - 1 := by
+    by_contra hc
+    have hkv : p + q = d + n - 1 := by omega
+    obtain ⟨hp, hq⟩ := hvk2 hkv
+    rw [hp, hq] at hcu hcs2
+    rcases he1 with rfl | rfl | rfl <;> rcases he2 with rfl | rfl | rfl
+    all_goals first
+      | omega
+      | linarith
+  refine ⟨hs_lo, ?_, ht_lo, ht_hi⟩
+  exact s_le_odd n d T ((p + e1) + (q + e2)) (n * (p + e1) - d * (q + e2))
+    ((d + n) * (p + e1) + (d - n) * (q + e2)) hn hnd hT hid hkc ht_hi
+
 end FLatticePaper.CollarBottomCases

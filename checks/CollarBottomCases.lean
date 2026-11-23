@@ -36,3 +36,33 @@ info: 'FLatticePaper.CollarBottomCases.odd_direct_even_arith' depends on axioms:
 -/
 #guard_msgs in
 #print axioms FLatticePaper.CollarBottomCases.odd_direct_even_arith
+
+/--
+info: 'FLatticePaper.CollarBottomCases.t_parity' depends on axioms: [propext, Quot.sound]
+-/
+#guard_msgs in
+#print axioms FLatticePaper.CollarBottomCases.t_parity
+
+/--
+info: 'FLatticePaper.CollarBottomCases.s_le_even' depends on axioms: [propext, Classical.choice, Quot.sound]
+-/
+#guard_msgs in
+#print axioms FLatticePaper.CollarBottomCases.s_le_even
+
+/--
+info: 'FLatticePaper.CollarBottomCases.s_le_odd' depends on axioms: [propext, Classical.choice, Quot.sound]
+-/
+#guard_msgs in
+#print axioms FLatticePaper.CollarBottomCases.s_le_odd
+
+/--
+info: 'FLatticePaper.CollarBottomCases.even_direct_odd_arith' depends on axioms: [propext, Classical.choice, Quot.sound]
+-/
+#guard_msgs in
+#print axioms FLatticePaper.CollarBottomCases.even_direct_odd_arith
+
+/--
+info: 'FLatticePaper.CollarBottomCases.odd_direct_odd_arith' depends on axioms: [propext, Classical.choice, Quot.sound]
+-/
+#guard_msgs in
+#print axioms FLatticePaper.CollarBottomCases.odd_direct_odd_arith

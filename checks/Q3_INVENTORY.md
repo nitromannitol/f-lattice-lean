@@ -584,3 +584,8 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - Still open for the direct bottom band: the even-centre/odd-witness and odd-centre/odd-witness cores, the four-corner step (the collar square of a bottom centre is `squareCorners (c1−1) c2`, so all four corners need strictness; the corners follow from the centre band and `T > 3(d+n)`), and the glue to `collarBase`.
 - Checks: `checks/CollarBottomCases.lean`. Root build clean; sandbox logs clean.
 - Statement change (CollarGlue.lean): `hstrict` now assumes `StrictInterior c` for the centre. `hcollar_of_chains` already had a strict centre (its argument `_hcS` was unused), and the numerics show that laplacian-0 collar centres need not be strict (e.g. `(0,0)` for child `(1,3)` with the lattice-free collar predicate), so the strict premise is the honest hypothesis. The consumer's `hcollar` conclusion is unchanged.
+- PROVED `even_direct_odd_arith` (even strict centre, odd H witness): `v = (1,0)` is excluded by strictness and `c ≠ (1,1)`; otherwise `s(v) ≥ 3L`, and the even band follows.
+- PROVED `odd_direct_odd_arith` (odd strict centre, odd H witness with `v = (1,0)`, `(3,0)` or `s(v) > 3L`): the odd band `L + 2n < s(c) ≤ T − d + n − 1`, `−d ≤ t(c) ≤ n − 2`.
+- Helpers: `t_parity` (`t(a,b) ≡ a + b mod 2` for odd `n`, `d`), `s_le_even` (`L s = kT + 2nt`, `k ≤ L − 2`, `t ≤ 0` give `s ≤ T − 2d + 2n + 1`), `s_le_odd` (`k ≤ L − 1`, `t ≤ n − 2` give `s ≤ T − d + n − 1`).
+- Checks: `checks/CollarBottomCases.lean`. Root build clean; sandbox logs clean.
+- Next: the four-corner step (corners of `squareCorners (c1−1) c2` are strict given the centre band and `T > 3(d+n)`), then the glue to `collarBase` (class B) and the top, left and right classes.
