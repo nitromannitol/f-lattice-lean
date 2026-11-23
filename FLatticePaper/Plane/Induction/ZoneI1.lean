@@ -115,6 +115,48 @@ theorem periods_of_packet (U : ChildFrame) (F : Field) (hP : U.Packet F) (N D : 
     rw [e] at h
     linear_combination h
 
+/-- The polygon of the zone is inside the closed polygon of the earlier child. -/
+theorem polyU_closed (U : ChildFrame) (N D : ℤ) (hb : U.child.num = D - N) (hr : U.child.den = D + N) (y : Site)
+    (hP : ZoneSlip.PolyU N D y) : y ∈ U.closedPolygon := by
+  have hT : U.child.periodDenominator = 2 * (D ^ 2 + 2 * D * N - N ^ 2) := by
+    unfold Fraction.periodDenominator
+    rw [hb, hr]
+    ring
+  have hs : U.sGrade y = 2 * D * y.1 + 2 * N * y.2 := by
+    unfold ChildFrame.sGrade
+    rw [hb, hr]
+    ring
+  have ht : U.tGrade y = (D - N) * y.1 - (D + N) * y.2 := by
+    unfold ChildFrame.tGrade
+    rw [hb, hr]
+  simp only [ChildFrame.closedPolygon, Set.mem_setOf_eq]
+  rcases hP with ⟨he, h1, h2, h3, h4⟩ | ⟨hne, h1, h2, h3, h4⟩
+  · rw [if_pos he, hT, ht, hs, hb, hr]
+    refine ⟨by linarith, by linarith, by linarith, by linarith⟩
+  · rw [if_neg hne, hT, ht, hs, hb, hr]
+    refine ⟨by linarith, by linarith, by linarith, by linarith⟩
+
+/-- The slip of the standard field at the child's shortShift is `F y − F (y + (2ε_u D_u, 2ε_u N_u))`. -/
+theorem slip_eq_shortShift (U : ChildFrame) (F : Field) (y : Site) :
+    U.slip F 1 y = F y - F (y + (2 * U.eps * U.parents.odd.den, 2 * U.eps * U.parents.odd.num)) := by
+  unfold ChildFrame.slip ChildFrame.shortShift
+  rw [one_smul]
+
+/-- The determinant of the earlier parents: `N_u (D + N) − D_u (D − N) = ε_u`. -/
+theorem det_conj (U : ChildFrame) (N D : ℤ) (hb : U.child.num = D - N) (hr : U.child.den = D + N) :
+    U.parents.odd.num * (D + N) - U.parents.odd.den * (D - N) = U.eps := by
+  have hcn : U.child.num = 2 * U.parents.odd.num + U.parents.even.num := by
+    unfold ChildFrame.child Parents.current Parents.combine
+    ring
+  have hcd : U.child.den = 2 * U.parents.odd.den + U.parents.even.den := by
+    unfold ChildFrame.child Parents.current Parents.combine
+    ring
+  have he : U.eps = U.parents.odd.num * U.parents.even.den - U.parents.even.num * U.parents.odd.den := by
+    unfold ChildFrame.eps Fraction.det
+    ring
+  rw [he, ← hb, ← hr, hcn, hcd]
+  ring
+
 end ZoneI1
 
 end FLatticePaper.Induction
