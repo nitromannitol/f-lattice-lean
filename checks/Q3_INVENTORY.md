@@ -711,3 +711,18 @@ Scope to confirm with the lead: §1's star containment needs `c = d − n ≥ 3`
   the prescribed direction for the sign convention of the audit (`(−1,η)` original, `(−1,−η)` shifted); `CanonicalSignedPolicy.freePrescribed`
   gives only uniqueness of the selection. Hence `ChainPairData.chainNonincreasing` is still a named field.
 - Checks: `checks/TwoRank.lean` (five `#print axioms`). Root build: 0 warnings, 0 linter notes.
+
+### Task 72 / Q20 (both-free exclusion and the conditional chain reduction): BothFreeRise.lean
+
+- PROVED `both_free_rise_false`: at a rise `P(u+ησ) = P(z+ησ)+1` with `z`, `z+ησ` white, free roots, and the other input `v` selected by
+  the translated opposite policy `Q`, the two selections differ (`v ≠ u`) while the prescriptions agree. H/H (`prescribedH_shift_agree`),
+  V/H (`V_H_choices_agree_derived`, `k = 0`); the shifted-V root by price constancy `price_const_of_window` (the harmonic window
+  `[3−2d, 2L−1]` for the centre and the selected input). Prescription links per sign: `PrescribedAt frame F η P` (the policy of sign `η`
+  selects exactly `c + prescribedH η c` / `c + prescribedV η c` at free white centres), and `PrescribedAt frame F (−η) Q` for the
+  translated opposite policy.
+- PROVED `chain_nonincreasing_of_free_roots`: `Φ_η` does not increase along `C.policy`, given the forced transfer `hfree` (the rise's roots
+  are free, NOT yet formalized), the shifted-V window `hwin` (NOT yet discharged: fails at the left input of free V centres with grade
+  `s ∈ [2−c, 0)`, where the input has grade `2−2d`), the prescription links `hLinkP`, `hLinkQ`, the opposite policy's `oppRawSlip`,
+  `hoppQuota`, `hoppPrice` (to become `ChainPairData` fields), and `HasUnitPrice` (the unit increment, derived at the even-shifted edge
+  by `TwoRank.edge_add_of_even`).
+- Checks: `checks/BothFreeRise.lean`. Root build: 0 warnings, 0 linter notes.
