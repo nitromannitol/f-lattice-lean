@@ -83,16 +83,17 @@ structure CollarChains (word : Word) {seed : Site → Site → Prop}
 theorem hcollar_of_chains {word : Word} {seed : Site → Site → Prop}
     (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed)
     (chains : CollarChains word P)
-    (hstrict : ∀ c, CollarFrame (frameAt word) c → laplacian (MW word) c = 0 →
+    (hstrict : ∀ c, StrictInterior (frameAt word).child.num (frameAt word).child.den c →
+      CollarFrame (frameAt word) c → laplacian (MW word) c = 0 →
       ∀ c' ∈ collarSquare (frameAt word) c,
         StrictInterior (frameAt word).child.num (frameAt word).child.den c') :
     ∀ c : Site, StrictInterior (frameAt word).child.num (frameAt word).child.den c →
       laplacian (MW word) c = 0 → CollarFrame (frameAt word) c → HsqAt word P c := by
-  intro c _hcS hM hcol
+  intro c hcS hM hcol
   unfold HsqAt
   refine ⟨(collarBase (frameAt word) c).1, (collarBase (frameAt word) c).2, ?_, ?_, ?_, ?_, ?_⟩
   · exact centre_mem_collarSquare (frameAt word) c
-  · exact hstrict c hcol hM
+  · exact hstrict c hcS hcol hM
   · exact chains.out c hcol hM
   · intro c' hc' hne
     exact chains.corners c hcol hM c' hc' hne
