@@ -11,8 +11,8 @@ stars of the slip and of the primitive price. This file states these as one stru
 from `Potentials.lean` (`slip`, `price`, `cutPrice`, `shortShift`) and `AlternateMidpoint.lean` (`HasUnitSlip`, `NoEvenSlipSaddle`).
 
 The signed-policy notions (quotas, monotonicity along retained edges, reflected policies) are those of `SignedPolicy.lean`
-(task 38, w1). F2 and F3 are the policy of the standard field and its weighted ranks; F2 and F4 are the chain mate and its reflected
-policy and the drifts of the price and the slip on the generators. Not yet in this structure: the even-parity extension of the odd
+(task 38, w1). F2 and F3 are the policy of the standard field and its weighted ranks; F4 (the chain mate) follows from F2 and F3 in `ChainReflection.lean`, so it is not a field; the
+drifts of the price and the slip on the generators are fields. Not yet in this structure: the even-parity extension of the odd
 zero strip (NO_ODD_SLIP_AUDIT §§2–4), whose frame (the odd conjugate's own coordinates) is not yet identified with `frameAt u`.
 -/
 
@@ -102,21 +102,6 @@ structure StrongEstimates (u : Word) : Prop where
       ∀ a c : ℤ, 0 < a → 0 < c →
         RankWithIncrements policy (frameAt u).child.modifiedDeck.kernel (frameAt u).child.modifiedDeck.transverse
           (-a) (c * η)
-  /-- F2 and F4 for the chain mate `h′_η = chainSheet η`, for each phase `η = ±1` (the sign of the chain step; `η = ε` is one
-  of the two): a chain policy along which `h′_η` does not decrease; its reflection `ξ ↦ R′ − w′ − ξ` has a nondecreasing
-  `Φ_η = chainPotential η`, the black and white quotas for `h′_η`, and for every pair of positive weights a rank with the opposite
-  increments `λ(a, −cη)`. -/
-  F2F4_chain : ∀ η : ℤ, (η = 1 ∨ η = -1) → ∃ chainPolicy : Site → Site → Prop,
-    NondecreasingAlong (fun z => (frameAt u).chainSheet (standardField u) η z) chainPolicy ∧
-      ∃ R w : Site,
-        NondecreasingAlong (fun z => (frameAt u).chainPotential (standardField u) η z)
-            (ReflectedPolicy R w chainPolicy) ∧
-          RetainQuota (fun z => (frameAt u).chainSheet (standardField u) η z)
-            (ReflectedPolicy R w chainPolicy) ∧
-          ∀ a c : ℤ, 0 < a → 0 < c →
-            RankWithIncrements (ReflectedPolicy R w chainPolicy)
-              (frameAt u).child.modifiedDeck.kernel (frameAt u).child.modifiedDeck.transverse
-              a (-(c * η))
 
 namespace StrongEstimates
 
