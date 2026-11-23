@@ -447,5 +447,9 @@ import FLatticePaper.Plane.Induction.W1NonfreeHsqNonneg
 import FLatticePaper.Plane.Induction.W1NonfreeHsqC
 import FLatticePaper.Plane.Induction.W1FreeHfree
 import FLatticePaper.Plane.Induction.W1FreeBound
+import FLatticePaper.Plane.Induction.QuadraticCap
+import FLatticePaper.Plane.Induction.ContactCone
+import FLatticePaper.Plane.Induction.FanPropagation
+import FLatticePaper.Plane.Induction.FanTerminal
 
 /-! Root import for the corrected F-lattice paper. -/
