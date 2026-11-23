@@ -1,4 +1,4 @@
-import FLatticePaper.Plane.Induction.NonfreeRoot
+import FLatticePaper.Plane.Induction.DeckForced
 import FLatticePaper.Plane.Induction.SheetCases
 import FLatticePaper.Plane.Induction.I3CSheet
 import FLatticePaper.Plane.Induction.I3Application
@@ -217,8 +217,7 @@ theorem noBlackPairRise_of_charts {word : Word} (hw : ∃ x ∈ word, x ≠ Digi
       (∃ x x', parentPolicy P x x' ∧
         jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x = 1 ∧
         jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x' = 0 ∧
-        FLatticePaper.W1.StrictInterior (frameAt (conjWord word)).child.num
-          (frameAt (conjWord word)).child.den (zTurn x)) ∨
+        Nonfree (frameAt (conjWord word)) (zTurn x)) ∨
       (∃ x, HRootWeb (frameAt word).parents.odd.num (frameAt word).parents.odd.den
           ((frameAt word).parentTGrade x) ∧
         jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x = 1) ∨
@@ -229,12 +228,12 @@ theorem noBlackPairRise_of_charts {word : Word} (hw : ∃ x ∈ word, x ≠ Digi
     NoBlackPairRise (standardField word) (frameAt word).shortShift := by
   intro c hc hpar hbs i hi hone
   have hr : RisingBlackPair (standardField word) (frameAt word).shortShift c i := ⟨hi, hc, hpar, hbs, hone⟩
-  rcases hcover c i hr with h1 | h1 | h1 | ⟨x, x', hpol, j1, j0, hSI⟩ | ⟨x, hw', j1⟩ | hblk | j0
+  rcases hcover c i hr with h1 | h1 | h1 | ⟨x, x', hpol, j1, j0, hnf⟩ | ⟨x, hw', j1⟩ | hblk | j0
   · exact first_chart_excluded hw hSE P h1 hr
   · exact adjacent_chart_excluded hw hSE P h1 hr
   · exact hexit c i h1 hr
   · exact nonfree_drop_excluded hw hSE P hpol j1 j0
-      (nonfree_root_forced P hSE.packet.binary hW1 hSI hpol)
+      (nonfree_root_forced_nonfree P hSE.packet hW1 hnf hpol)
   · exact H_drop_excluded hw hSE x hw' j1
   · exact (frameAt word).not_rising_of_blockPair hpk hc hbs hblk
   · exact exceptional_drop_excluded hw hSE _ (exceptional_hT_proved hw hSE) j0

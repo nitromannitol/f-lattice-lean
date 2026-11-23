@@ -291,3 +291,26 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - PROVED `andOr_rank_of_restrictedNoFort`: the rank of `andOr_rank_of_escape` with that horizon, from the restricted no-fort condition alone.
 - The stopping bound `t + m K(z_t) ≤ m K(z_0) + m + m² d_0` of Q1 l.32 is the value bound `restrictedValue_le_of_uniform_escape` (`horizon · K + (horizon + horizon² · bound)`, `bound = d_0`), already formal in RestrictedBellmanRank. Not re-proved.
 - Checks: `checks/UniformEscape.lean` (two guards, standard axioms only). Root build clean (no warnings in the root log).
+
+### Task 72 (nonfree bridge): a nonfree site has a deck translate in StrictInterior (NonfreeBridge.lean)
+
+- DEFINED: `Nonfree frame z := ∀ v ∈ span, z + v ∉ freeH ∪ freeV` (not on the free H/V set modulo the deck, the lead's wording).
+- PROVED `outside_SI_free`: a point `w` of the closed polygon outside `W1.StrictInterior` lies in `freeH ∪ freeV`, or `w − V` or `w − K` does. Case analysis on the parity of `w` and on the failing strict inequality. Deck vectors: `K = (d, n)` (`s(K) = T`, `t(K) = 0`) and `V = (n − d, n + d)` (`t(V) = −T`, `s(V) = 0`). The upper t-strip is in `freeH` directly, the lower t-strip is in `freeH` after `−V`, the lower s-strip is in `freeV` directly, the upper s-strip is in `freeV` after `−K`.
+- PROVED `nonfree_bridge`: `Nonfree frame z → ∃ v ∈ span, StrictInterior (z + v)` (`exists_shift_mem` puts a translate into the closed polygon).
+- Numeric (scripts/nonfree_bridge_check.py): for 47 odd children `n/d` (`n + 2 ≤ d`, coprime, `d ≤ 21`) and sites in a box, both "no translate on E and boundary spectrum" and "no translate in freeH or freeV" give a strict-interior translate. A first run with a deck window `R = 4` gave failures only at the box corners, which vanished for `R ≥ 8`.
+- Checks: `checks/NonfreeBridge.lean` (two guards, standard axioms only). Module log has no warnings.
+
+### Task 72 (nonfree root, deck form): the cover condition is literally "nonfree" (DeckForced.lean)
+
+- PROVED `laplacian_span_inv`: the Laplacian of the standard packet is invariant under the child deck span. The kernel shifts the field by a constant and the transverse vector by an affine function, whose Laplacian is zero. The invariant set is a subgroup (`span_pred`), so it contains the span.
+- PROVED `forcedEdge_add`: unseeded forced edges are carried by even translations that preserve the Laplacian (squares and inputs translate).
+- PROVED `nonfree_root_forced_nonfree`: a nonfree root of the old policy is black, or its retained edge is the unseeded forced edge. The bridge `nonfree_bridge` gives a strict-interior translate, `W1Forced` gives the forced edge there, translating back gives it at the root, and `forcedWhiteUnique` identifies the retained input.
+- CHANGED: the drop disjunct of SheetCover, SheetCharts and SheetCases now reads `Nonfree (frameAt (conjWord word)) (zTurn x)` (was the strict-interior root). The root condition uses `nonfree_root_forced_nonfree` with `hSE.packet`. The hypothesis `hW1` is unchanged.
+- Checks: `checks/DeckForced.lean` (four guards, standard axioms only). Root log has no warnings.
+
+### Task 72 (Q1 paragraph 6): the ordered free-site exclusions, the '+' row (checks/FREE_SITE_EXCLUSIONS.md)
+
+- Numeric (scripts/free_site_exclusions.py): for every odd coprime child with `d ≤ 31` (106 children) and every `r ∈ [0, L−1]` (3422 rows), the '+' row lists each free deck class once; its consecutive V-passages (N, N–W, W–N–E: 121418) and descending H-passages (E, E–N, N–E–S: 76398) have no free interior site (194394 interior sites); the curves are in the Lean free sets. Transitions (tip routes, 10160) are counted, not classified.
+- Reduction to `main`: none of the passage, tip or fan steps is a Lean lemma. The Lean facts used: `ChildFrame.freeH/freeV` (S3FreeBoundary), `Q3White.laplacian_eq_zero_of_freeV`, `Q3Para10.index_of_freeV`/`block_mem_freeV`/`VpI_not_freeV`, and `NonfreeBridge.outside_SI_free` (task 72).
+- Named steps: FIXED_FREE_GAME_AUDIT §3–§9 and TIP_THEOREM, ALL_SLOPE_STEP sections are listed with file paths in the report.
+- Scope: a numeric check, not the per-entry implications (E), (P), (F).
