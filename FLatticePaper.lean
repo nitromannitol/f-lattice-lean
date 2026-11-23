@@ -389,5 +389,6 @@ import FLatticePaper.Plane.Induction.W1OddZero
 import FLatticePaper.Plane.Induction.W1OddSeedZero
 import FLatticePaper.Plane.Induction.W1OddSeedY
 import FLatticePaper.Plane.Induction.W1OfferOne
+import FLatticePaper.Plane.Induction.W1OfferTwo
 
 /-! Root import for the corrected F-lattice paper. -/
