@@ -175,6 +175,47 @@ def run(args):
         for (i, q, dP, dJ) in kept_edge[r]:
             if dP == 0 and dJ == 0:
                 graph[r].append(q)
+    # CanonicalPolicy checks (task 59 step 3): quota, permitted and weakly lower kept edges, free whites, Kahn levels.
+    for r in reps:
+        lapv = info[r][0]
+        for (i, q, dP, dJ) in kept_edge[r]:
+            stats["kept_total"] += 1
+            if not permitted(r, i):
+                stats["kept_not_permitted"] += 1
+            if not (dP <= 0 and dJ <= 0):
+                stats["kept_not_lower"] += 1
+        nk = len(kept_edge[r])
+        if lapv == -1:
+            stats["black_kept_two"] += (nk == 2)
+            stats["black_kept_not_two"] += (nk != 2)
+        else:
+            stats["white_kept_one"] += (nk == 1)
+            stats["white_kept_not_one"] += (nk != 1)
+        if r in free_idx:
+            stats["free_sites"] += 1
+            stats["free_black"] += (lapv == -1)
+            stats["free_kept_not_prescribed"] += (kept_edge[r][0][0] != presc[r] or nk != 1)
+    # Kahn levels on the equal-pair kept graph: level = 1 + max level of kept successors (sinks at 0)
+    outdeg = {r: len(graph[r]) for r in reps}
+    preds = defaultdict(list)
+    for r in reps:
+        for t in graph[r]:
+            preds[t].append(r)
+    level = {}
+    ready = [r for r in reps if outdeg[r] == 0]
+    for r in ready:
+        level[r] = 0
+    k = 0
+    while k < len(ready):
+        t = ready[k]
+        k += 1
+        for r in preds[t]:
+            outdeg[r] -= 1
+            if outdeg[r] == 0:
+                level[r] = 1 + max(level[x] for x in graph[r])
+                ready.append(r)
+    stats["levelled"] = len(level)
+    stats["level_violations"] = sum(1 for r in reps for t in graph[r] if not level[t] < level[r])
     # (b) acyclicity (Kahn) on equal-pair kept edges
     indeg = defaultdict(int)
     for r in reps:
