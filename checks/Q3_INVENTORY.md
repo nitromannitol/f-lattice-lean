@@ -518,3 +518,10 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - PROVED `not_rising_of_blockPairNeg`: a `BlockPairNeg` centre is not a black pair with black translate `c + (−σ)` (via `black_centres_contradiction`).
 - Open: the identification of the free root of a −σ tie with `BlockPairNeg c`. For ε = +1 the sheet shift vanishes (`phaseW = 1`), so the root is `c`, and the conjugate free H image of `zTurn c + v` is `I − c + R v` (`I = (1, −1)`), a point reflection of `c` and not a translate. The base of the −σ V block therefore needs the reflected point; this is queried with the lead.
 - Checks: `checks/NegBlock.lean`. Root build clean; sandbox logs clean.
+
+### Task 72 (hcollar, collar squares): CollarSquares.lean
+
+- PROVED the parent-root memberships `bottom_root_mem`, `vPlus_root_mem`, `vMinus_root_mem` and the child-base identities `bottom_child_base`, `vPlus_child_base`, `vMinus_child_base`, plus the centre memberships `bottom_centre_mem`, `vPlus_centre_mem`, `vMinus_centre_mem`. These fix the three collar squares of the root `r = zTurn (c − l_v)`: bottom (upper-left of `c`, child `squareCorners (c.1 − 1) c.2`), aligned V with `ε = +1` (upper-right, `squareCorners c.1 c.2`), aligned V with `ε = −1` (lower-left, `squareCorners (c.1 − 1) (c.2 − 1)`).
+- Numerics (`words ≤ 4`, scratchpad `arc_rule.py`, `nonaligned.py`): for every free collar centre the arc rule gives strict corners, including the non-aligned V side at the pricing point `c − W·U`. The exceptions are the bottom centres `(1,1)` with `ε = −1`; those are black and excluded by the laplacian-0 hypothesis, which is not yet proven from the strips.
+- Open (not in this file): the strictness of these squares needs the free-root band for even bottom centres (`s > 2L − 2`, numerically except at `(1,1)`) and its left/right analogues; the parent chains are the named core claims of `W1Phase`; the nonfree roots use `parentSquare_nonfree`.
+- Checks: `checks/CollarSquares.lean`. Root build clean; sandbox logs clean.
