@@ -1,5 +1,6 @@
 import FLatticePaper.Plane.Induction.S3Canonical
 import FLatticePaper.Plane.Induction.OldPolicy
+import FLatticePaper.Plane.Induction.ReflectionI
 
 /-! Task 71: the canonical signed policy at a word, and its producing direction to `OldPolicyData`.
 
@@ -23,6 +24,19 @@ namespace FLatticePaper.Induction
 
 open Farey FLatticePaper FLatticePaper.SquareClauses
 
+/-- The pair of policies of the chain-gap monotonicity (`.work/fields/canonical/strong_bulk/STRONG_PRICE_AND_ALTERNATE_STEP.md` §4).
+For the intermediate `g = F(· + ησ)`, the F-policy `P` has `D_η` nonincreasing, and a translated opposite-sign policy gives a
+g-policy along which `D_η` is nondecreasing (`translated_rawSlip`: `D_η(z) = −D_{−η}(z + ησ)`). The two-rank lemma of
+`TWO_RANK_RAW_PHI_AUDIT.md` then gives the chain-gap monotonicity: `Φ_η` does not increase along `P` (`chainNonincreasing`, the
+conclusion of §4, not derived here). The shift `ησ` is not a deck vector, so this is a statement about the pair, not a consequence
+of `P` and `D_η` alone. -/
+structure ChainPairData (frame : ChildFrame) (F : Field) (η : ℤ) (P : Site → Site → Prop) where
+  /-- The opposite-sign policy on `F`: its raw slip `D_{−η}` does not increase along it. The g-policy is `c ↦ opp (c + ησ)`. -/
+  opp : Site → Site → Prop
+  oppRawSlip : NonincreasingAlong (fun y => F y - F (y + (-η) • frame.shortShift)) opp
+  /-- The chain potential `Φ_η = D_η + P(· + ησ)` does not increase along the F-policy `P` (§4). -/
+  chainNonincreasing : NonincreasingAlong (frame.chainPotential F η) P
+
 /-- The canonical signed policy of a frame: the S3 canonical policy with the W1 selection, the raw-slip sign `−1`, the chain
 comparison, the reflection and the exceptional west input. -/
 structure CanonicalSignedPolicy (frame : ChildFrame) (F : Field) extends CanonicalPolicy frame F where
@@ -36,10 +50,10 @@ structure CanonicalSignedPolicy (frame : ChildFrame) (F : Field) extends Canonic
   squares : ∀ a b : ℤ, SquareClauseSat F sel a b
   /-- The raw slip `D₋(y) = F y − F (y − σ)` does not increase along the policy (Q1.md l.38). -/
   rawSlipMinus : NonincreasingAlong (fun y => F y - F (y + (-1 : ℤ) • frame.shortShift)) policy
-  /-- The chain potential `Φ_η` does not increase along the policy, for `η = ±1` (Q1.md l.40). -/
-  chainNonincreasing : ∀ η : ℤ, (η = 1 ∨ η = -1) → NonincreasingAlong (frame.chainPotential F η) policy
-  /-- Reflection about `I`: the policy is carried to itself. -/
-  reflection : ∀ c i, policy c i → policy (reflectionI - c) (reflectionI - i)
+  /-- The chain pair for each sign `η = ±1` (§4 of the strong-bulk note, task 72 (a)). -/
+  chainPairs : ∀ η : ℤ, (η = 1 ∨ η = -1) → ChainPairData frame F η policy
+  /-- A retained edge is an edge of the graph: the retained input is an input of its centre. -/
+  policyEdge : ∀ c i, policy c i → Edge i c
   /-- The prescribed west input at the exceptional vertex when `ε = 1`. -/
   westAtException : frame.eps = 1 →
     policy (frame.parents.odd.num - frame.parents.odd.den + 1, frame.parents.odd.den + frame.parents.odd.num - 1)
@@ -92,15 +106,50 @@ theorem rawSlip_of_canonical {frame : ChildFrame} {F : Field} (C : CanonicalSign
   · exact rawSlipPlus_of_canonical C
   · exact C.rawSlipMinus
 
-/-- **The producing direction (task 71).** The canonical signed policy at a frame gives an `OldPolicyData` with the empty seed. -/
-def oldPolicyData_of_canonical {frame : ChildFrame} {F : Field} (C : CanonicalSignedPolicy frame F) :
+/-- The translated g-policy `c ↦ opp (c + ησ)` has `D_η` nondecreasing along it: `D_η(c) = −D_{−η}(c + ησ)` (§4 of the note). -/
+theorem translated_rawSlip {frame : ChildFrame} {F : Field} {η : ℤ} {P : Site → Site → Prop}
+    (Q : ChainPairData frame F η P) :
+    ∀ c i, Q.opp (c + η • frame.shortShift) (i + η • frame.shortShift) →
+      F c - F (c + η • frame.shortShift) ≤ F i - F (i + η • frame.shortShift) := by
+  intro c i h
+  have h1 := Q.oppRawSlip _ _ h
+  have e : ∀ x : Site, x + η • frame.shortShift + (-η) • frame.shortShift = x := by
+    intro x
+    rw [neg_smul]
+    simp
+  simp only [e] at h1
+  linarith
+
+/-- The reflection about `I` at the roots of `OldPolicyData.reflection`: a black root (both inputs retained, and `I − c` is black
+by the symmetry `F (I − z) = F z`) or a forced-white edge (its reflection is forced, `forced_reflectI`). -/
+theorem reflection_of_canonical {frame : ChildFrame} {F : Field} (hF : ∀ z, F (reflectionI - z) = F z)
+    (C : CanonicalSignedPolicy frame F) :
+    ∀ c i, C.policy c i → (laplacian F c = -1 ∨ ForcedEdge F (fun _ _ => False) c i) →
+      C.policy (reflectionI - c) (reflectionI - i) := by
+  intro c i h hroot
+  rcases hroot with hb | hfe
+  · have hbI : laplacian F (reflectionI - c) = -1 := by
+      rw [laplacian_reflectI hF]
+      exact hb
+    have hE := edge_reflectI (C.policyEdge c i h)
+    rcases hE with e | e
+    · rw [e]
+      exact (C.quota.1 (reflectionI - c) hbI).1
+    · rw [e]
+      exact (C.quota.1 (reflectionI - c) hbI).2
+  · exact forcedRetained_of_canonical C _ _ (forced_reflectI hF hfe)
+
+/-- **The producing direction (task 71).** The canonical signed policy at a frame gives an `OldPolicyData` with the empty seed, given
+the `I`-symmetry of the field (task 72). -/
+def oldPolicyData_of_canonical {frame : ChildFrame} {F : Field} (hF : ∀ z, F (reflectionI - z) = F z)
+    (C : CanonicalSignedPolicy frame F) :
     OldPolicyData frame F (fun _ _ => False) where
   retained := C.policy
   quota := C.quota
   priceNonincreasing := price_nonincreasing_of_canonical C
   rawSlipNonincreasing := rawSlip_of_canonical C
-  chainNonincreasing := C.chainNonincreasing
-  reflection := C.reflection
+  chainNonincreasing := fun η hη => (C.chainPairs η hη).chainNonincreasing
+  reflection := reflection_of_canonical hF C
   forcedRetained := forcedRetained_of_canonical C
   westAtException := C.westAtException
 

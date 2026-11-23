@@ -251,3 +251,28 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - PROVED: `FLatticePaper.odometersTheorem_of_canonical` (CanonicalHeadline.lean): the headline of `odometersTheorem_of_policy` with `hpol` replaced by `hcan : ∀ word, … → Nonempty (CanonicalSignedPolicy (frameAt (conjWord word)) (standardField (conjWord word)))` at proper words; the old policy data is produced by `oldPolicyData_of_canonical` with the empty seed.
 - Fields of `OldPolicyData` needing more than the canonical fields: `chainNonincreasing`, `reflection`, `westAtException` are carried as canonical fields (no derivation from the rest); `priceNonincreasing`, `rawSlipNonincreasing` (both signs), `forcedRetained`, `quota` are derived.
 - Checks: `checks/CanonicalSigned.lean` (six `#guard_msgs`, standard axioms only). Root build clean (2595 jobs before this step, no change in the import graph beyond the headline line).
+
+### Task 72 (b): the reflection restricted to black and forced roots, derived
+
+- DEFINED: `OldPolicyData.reflection` now carries the hypothesis `laplacian G c = -1 ∨ ForcedEdge G seed c i` (black or forced root). This is what `nonfree_drop_excluded` uses: Q3.md l.30, a nonfree root keeps both inputs (black) or its unique forced edge. `parentPolicy_reflection` and `nonfree_drop_excluded` take the same root hypothesis (`hroot`); the three cover statements (`SheetCover`, `SheetCharts`, `SheetCases`) carry it in the drop disjunct; the two `NegChart` call sites supply it from the extracted black roots `blackRoot_of_black`, `blackRoot_of_nonneg`.
+- PROVED (`ReflectionI.lean`): `incomingNeg_reflectI`, `incomingPos_reflectI`, `edge_reflectI`, `laplacian_reflectI` (for `F (I − z) = F z`), `mem_corners_reflectI` (the square `squareCorners a b` goes to `squareCorners (−a) (−2 − b)`), `forced_reflectI` (unseeded forced edges are carried by `I`, by induction on `ForcedEdge`).
+- DERIVED (`CanonicalSigned.lean`): `reflection_of_canonical`: black roots from the quota (`I − c` is black by the symmetry, and `I − i` is an input of `I − c` by `edge_reflectI`, which uses the new field `policyEdge : retained c i → Edge i c`); forced roots from `forced_reflectI` and `forcedRetained`. The field `reflection` is removed from `CanonicalSignedPolicy`.
+- HEADLINE (`CanonicalHeadline.lean`): the symmetry `F (I − z) = F z` is taken from `standardField_iRefl` at the strong estimates of `conjWord word`.
+- Checks: `checks/ReflectionI.lean` (eight `#guard_msgs`, standard axioms only). Root build clean (2596 jobs).
+
+### Task 72 (a): the chain field as a statement about the pair of policies (CanonicalSigned.lean)
+
+- DEFINED: `ChainPairData frame F η P`: an opposite-sign policy `opp` on `F` with `oppRawSlip` (`D_{−η}` nonincreasing along `opp`), and `chainNonincreasing`: `Φ_η` nonincreasing along the F-policy `P`. `CanonicalSignedPolicy.chainPairs` replaces the former field `chainNonincreasing`.
+- PROVED: `translated_rawSlip`: the translated g-policy `c ↦ opp (c + ησ)` has `D_η` nondecreasing along it, from `D_η(z) = −D_{−η}(z + ησ)`.
+- NOT PROVED (the conclusion of STRONG_PRICE_AND_ALTERNATE_STEP §4): `chainNonincreasing`. TWO_RANK_RAW_PHI_AUDIT reduces it to one exclusion: a raw rise along a retained F-edge needs both parents free with opposite chosen directions at a shifted P edge (its "remaining geometric exclusion"). The audit does not certify that exclusion, so the field stays a named input.
+- Numeric (scripts/chain_shift_check.py): the identities `D_η(z) = −D_{−η}(z+ησ)` and `Φ_η(z) = F(z) − F(z+ησ−v) − ε a·(z+ησ)` hold on 2000 random integer fields. For all 628 proper Farey children (parent odd `N/D`, sibling even `n_q/d_q` with `|N d_q − D n_q| = 1`, child `(2N+n_q)/(2D+d_q)` in `(0,1)`), `σ` is NOT in the child deck span `{iK + jT}`: `det(K, σ) = 2ε² = 2`, while `det(K, T)` is the period denominator, at least 3 for proper children.
+
+### Task 72 (c): westAtException (not derived from the current frame; numeric check)
+
+- Numeric (scripts/exceptional_vertex_check.py): `V_p + I = (N − D + 1, N + D − 1)` is the `vLast` (`V + (1, −1)`) of the earlier frame whose child is the parent `N/D`. It lies in `freeV` of that frame for all 737 odd proper parents checked. Its prescribed direction is `(η, 0)`, with `η` the earlier vertical sign.
+- West (`incomingNeg`, direction `(−1, 0)`) needs `η = −1` when `ε = 1`, i.e. `η = −ε`. The reading "(−, ε)" would give east; the sign convention needs checking against the source.
+- Not derived: the prescription at `vLast` is a fact of the parent frame's canonical policy, not of the current frame's fields. `westAtException` stays a field.
+
+### Task 72 (d): rawSlipMinus stays a field
+
+- `rawSlipMinus` (sign `−1`, Q1.md l.38) remains a canonical field. Its prescribed directions are Q13, parked. The sign `+1` is derived from `permitted`.

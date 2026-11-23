@@ -33,11 +33,12 @@ def parentPolicy {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop
 
 /-- The transported policy is reflected about `I = (1, −1)`. -/
 theorem parentPolicy_reflection {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
-    (P : OldPolicyData frame G seed) {c i : Site} (h : parentPolicy P c i) :
+    (P : OldPolicyData frame G seed) {c i : Site} (h : parentPolicy P c i)
+    (hroot : laplacian G (zTurn c) = -1 ∨ SquareClauses.ForcedEdge G seed (zTurn c) (zTurn i)) :
     parentPolicy P ((1, -1) - c) ((1, -1) - i) := by
   unfold parentPolicy at h ⊢
   rw [zTurn_reflect, zTurn_reflect]
-  exact P.reflection _ _ h
+  exact P.reflection (zTurn c) (zTurn i) h hroot
 
 /-- The price step of the transported policy: `p(x) = c₀ − P'(Zx)` does not decrease along it. -/
 theorem parentPolicy_price {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
@@ -124,8 +125,10 @@ theorem nonfree_drop_excluded {word : Word} (h : ∃ x ∈ word, x ≠ Digit.thr
     {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
     {x x' : Site} (hpol : parentPolicy P x x')
     (h1 : jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x = 1)
-    (h0 : jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x' = 0) : False := by
-  have hrefl := parentPolicy_reflection P hpol
+    (h0 : jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x' = 0)
+    (hroot : laplacian (standardField (conjWord word)) (zTurn x) = -1 ∨
+      SquareClauses.ForcedEdge (standardField (conjWord word)) seed (zTurn x) (zTurn x')) : False := by
+  have hrefl := parentPolicy_reflection P hpol hroot
   have hmono : (frameAt (conjWord word)).cutPrice -
         (frameAt (conjWord word)).price (standardField (conjWord word)) (zTurn ((1, -1) - x)) ≤
       (frameAt (conjWord word)).cutPrice -

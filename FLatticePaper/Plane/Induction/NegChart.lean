@@ -137,6 +137,83 @@ theorem sheetC_sub_shortShift {word : Word} (h : ∃ x ∈ word, x ≠ Digit.thr
   rw [sub_add_cancel] at this
   omega
 
+/-- The black root of the parent policy: a black centre `c` with `Ψ c ≥ 1` has `G` black at its transported site
+`zTurn (c − l_v)` (the colour computation of `sheetPolicyA_of_black`, extracted for the root hypothesis of `nonfree_drop_excluded`). -/
+theorem blackRoot_of_black {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
+    (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
+    {c : Site} (hc : c ∈ (frameAt word).closedPolygon)
+    (hb : laplacian (standardField word) c = -1) (hΨc : 1 ≤ sheetDiffW word c) :
+    laplacian (standardField (conjWord word)) (zTurn (c - (frameAt word).sheetShift)) = -1 := by
+  have hlv : EvenSite (frameAt word).sheetShift := (frameAt word).evenSite_sheetShift
+  have hinN : Edge (FLatticePaper.incomingNeg c) c := Or.inl rfl
+  have hinP : Edge (FLatticePaper.incomingPos c) c := Or.inr rfl
+  have hEN := (frameAt word).black_input_mem hpk hc hb hinN
+  have hEP := (frameAt word).black_input_mem hpk hc hb hinP
+  have hΨc' : 1 ≤ (frameAt word).sheetC (quarterTurnField (standardField (conjWord word))) c -
+      (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) c := hΨc
+  have hMc := sheetMin_A_at_input (frameAt word) (quarterTurnField (standardField (conjWord word)))
+    (i := c) hΨc' (by omega)
+  have hMN := sheetMin_A_of_strict_root h hSE hinN hΨc
+  have hMP := sheetMin_A_of_strict_root h hSE hinP hΨc
+  have hFc := standardField_eq_sheetMin_of_strong h hSE hc
+  have hFN := standardField_eq_sheetMin_of_strong h hSE hEN
+  have hFP := standardField_eq_sheetMin_of_strong h hSE hEP
+  have hlapF : laplacian (standardField word) c =
+      laplacian ((frameAt word).sheetA (quarterTurnField (standardField (conjWord word)))) c := by
+    unfold laplacian
+    rw [hFc, hFN, hFP, hMc, hMN, hMP]
+  have hshiftLap : laplacian ((frameAt word).sheetA (quarterTurnField (standardField (conjWord word)))) c =
+      laplacian (quarterTurnField (standardField (conjWord word))) (c - (frameAt word).sheetShift) :=
+    laplacian_sub_even (quarterTurnField (standardField (conjWord word))) (frameAt word).sheetShift hlv c
+  have hq : laplacian (quarterTurnField (standardField (conjWord word))) (c - (frameAt word).sheetShift) =
+      laplacian (standardField (conjWord word)) (zTurn (c - (frameAt word).sheetShift)) :=
+    i3_laplacian_quarterTurn (standardField (conjWord word)) (c - (frameAt word).sheetShift)
+  rw [← hq, ← hshiftLap, ← hlapF]
+  exact hb
+
+/-- The black root of the parent policy, in the tied case (`Ψ c ≥ 0` with the star `Ψ ≥ 0`): `blackRoot_of_black` with `hstar`. -/
+theorem blackRoot_of_nonneg {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
+    (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
+    {c : Site} (hc : c ∈ (frameAt word).closedPolygon)
+    (hb : laplacian (standardField word) c = -1) (hΨc : 0 ≤ sheetDiffW word c)
+    (hstar : ∀ j, Edge j c → 0 ≤ sheetDiffW word j) :
+    laplacian (standardField (conjWord word)) (zTurn (c - (frameAt word).sheetShift)) = -1 := by
+  have hlv : EvenSite (frameAt word).sheetShift := (frameAt word).evenSite_sheetShift
+  have hinN : Edge (FLatticePaper.incomingNeg c) c := Or.inl rfl
+  have hinP : Edge (FLatticePaper.incomingPos c) c := Or.inr rfl
+  have hEN := (frameAt word).black_input_mem hpk hc hb hinN
+  have hEP := (frameAt word).black_input_mem hpk hc hb hinP
+  have hmin : ∀ j, Edge j c → (frameAt word).sheetMin (quarterTurnField (standardField (conjWord word))) j =
+      (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) j := by
+    intro j hj
+    have h0 : 0 ≤ (frameAt word).sheetC (quarterTurnField (standardField (conjWord word))) j -
+        (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) j := hstar j hj
+    unfold ChildFrame.sheetMin
+    exact min_eq_left (by omega)
+  have hMc : (frameAt word).sheetMin (quarterTurnField (standardField (conjWord word))) c =
+      (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) c := by
+    unfold ChildFrame.sheetMin
+    have h0 : 0 ≤ (frameAt word).sheetC (quarterTurnField (standardField (conjWord word))) c -
+        (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) c := hΨc
+    exact min_eq_left (by omega)
+  have hMN := hmin _ hinN
+  have hMP := hmin _ hinP
+  have hFc := standardField_eq_sheetMin_of_strong h hSE hc
+  have hFN := standardField_eq_sheetMin_of_strong h hSE hEN
+  have hFP := standardField_eq_sheetMin_of_strong h hSE hEP
+  have hlapF : laplacian (standardField word) c =
+      laplacian ((frameAt word).sheetA (quarterTurnField (standardField (conjWord word)))) c := by
+    unfold laplacian
+    rw [hFc, hFN, hFP, hMc, hMN, hMP]
+  have hshiftLap : laplacian ((frameAt word).sheetA (quarterTurnField (standardField (conjWord word)))) c =
+      laplacian (quarterTurnField (standardField (conjWord word))) (c - (frameAt word).sheetShift) :=
+    laplacian_sub_even (quarterTurnField (standardField (conjWord word))) (frameAt word).sheetShift hlv c
+  have hq : laplacian (quarterTurnField (standardField (conjWord word))) (c - (frameAt word).sheetShift) =
+      laplacian (standardField (conjWord word)) (zTurn (c - (frameAt word).sheetShift)) :=
+    i3_laplacian_quarterTurn (standardField (conjWord word)) (c - (frameAt word).sheetShift)
+  rw [← hq, ← hshiftLap, ← hlapF]
+  exact hb
+
 /-- The retention for a black centre with `Ψ ≥ 1` and an edge `i → c` (sign-independent: the colour argument of
 `sheetPolicyA_of_strict`). -/
 theorem sheetPolicyA_of_black {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
@@ -380,7 +457,7 @@ theorem neg_adjacent_excluded {word : Word} (h : ∃ x ∈ word, x ≠ Digit.thr
     rw [← sheetA_uq_eq_jumpA i]
     exact h0
   exact nonfree_drop_excluded (x := c - (frameAt word).sheetShift) (x' := i - (frameAt word).sheetShift)
-    h hSE P hret j1 j0
+    h hSE P hret j1 j0 (Or.inl (blackRoot_of_black h hSE hpk hcE hr.2.1 hΨc))
 
 /-- The negative chart for `−σ` with the centre star in `Ψ ≥ 0` (ties allowed): the same drop argument, with the retention
 `sheetPolicyA_of_nonneg` in place of `sheetPolicyA_of_black`. The rise forces the jump `a` from `1` to `0` on the retained
@@ -475,7 +552,7 @@ theorem neg_adjacent_nonneg {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three
     rw [← sheetA_uq_eq_jumpA i]
     exact h0
   exact nonfree_drop_excluded (x := c - (frameAt word).sheetShift) (x' := i - (frameAt word).sheetShift)
-    h hSE P hret j1 j0
+    h hSE P hret j1 j0 (Or.inl (blackRoot_of_nonneg h hSE hpk hcE hr.2.1 hΨc hstar))
 
 /-- **The A-case for `−σ` (task 69 (a)).** A rising `−σ` pair with centre in `E` and both `Ψ ≥ 1` is impossible, given the
 slip-range leaf `hslip`. -/

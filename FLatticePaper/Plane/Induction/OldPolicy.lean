@@ -43,8 +43,11 @@ structure OldPolicyData (frame : ChildFrame) (G : Field) (seed : Site → Site �
     NonincreasingAlong (fun y => G y - G (y + η • frame.shortShift)) retained
   /-- The chain potential `Φ_η` does not increase along the retained edges, for `η = ±1`. -/
   chainNonincreasing : ∀ η : ℤ, (η = 1 ∨ η = -1) → NonincreasingAlong (frame.chainPotential G η) retained
-  /-- Reflection about `I`: retained edges are carried to retained edges. -/
-  reflection : ∀ c i, retained c i → retained (reflectionI - c) (reflectionI - i)
+  /-- Reflection about `I` at the roots the Q3 argument uses (`nonfree_drop_excluded`): a retained edge from a black root (which keeps
+  both inputs) or a forced-white edge, is carried to a retained edge. The reflection of the clause system carries both kinds of
+  root to the same kind, so this is what the canonical construction provides from the quota, `forcedRetained` and the symmetry. -/
+  reflection : ∀ c i, retained c i → (laplacian G c = -1 ∨ FLatticePaper.SquareClauses.ForcedEdge G seed c i) →
+    retained (reflectionI - c) (reflectionI - i)
   /-- The forced-white edges are retained (they are unique at a forced white). -/
   forcedRetained : ∀ c i, FLatticePaper.SquareClauses.ForcedEdge G seed c i → retained c i
   /-- The prescribed west input at the exceptional vertex `V_p + I` when `W = 1` (`ε = +1`). -/
