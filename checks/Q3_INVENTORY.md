@@ -680,3 +680,12 @@ External facts cited by the note, and where they stand in main:
 
 Scope to confirm with the lead: §1's star containment needs `c = d − n ≥ 3` (the note's "proper nonbase c ≥ 4"; both `d, n` odd, so `c` is even and `c ≥ 4`). Base `c < 3` is the note's separate literal check and is not covered.
 - Checks: `checks/BothFreeGrades.lean`. Root build clean; sandbox logs clean.
+
+### Task 72 / Q20 (BOTH_FREE §§1–3): the V-arc ranges and the scope, derived (ArcRanges.lean, ChildGap.lean)
+
+- PROVED `arc_even_range` and `arc_odd_range` (ArcRanges.lean): the V-arc grade ranges that were the named input `hArc`. The lattice parametrization of a V point is `y − x = 2l` (even) or `2l − 1` (odd), with `A = dx + cl` (`s = 2A` or `2A − c`), `B = cx + 2dl` (`t = −B` or `d − B`), and the identity `T l = dB − cA`. The integer cores give `0 ≤ l ≤ d − 1` (even), `1 ≤ l ≤ d − 1` (odd); `l = 0` and `l = d − 1` (even) are `V_0` and `V_{L−1}`. Ranges: even non-endpoint `t ∈ [−T+2L, −L]`; odd `t ∈ [−T+L+d, −d]`. Needs only `n ≥ 1`, `n + 2 ≤ d`.
+- `V_H_choices_agree_derived` (BothFreeGrades.lean): the V/H choice agreement with no named arc hypothesis.
+- PROVED `child_gap_ge_four` (ChildGap.lean): for a proper word that is not a two-power (`IsTwoPow`), `d − n ≥ 4`. The child gap is `2δ_o + δ_e` of the parent pair; the root is `(1, 0)`; `δ_e` never decreases and is at least `2` after a digit other than `two`. `d − n = 2` holds exactly at the words `2^k` (census to length seven).
+- `price_const_on_star_of_word` (BothFreeGrades.lean): the §1 star price constancy from the word hypotheses and `HasStrips`.
+- Checks: `checks/ArcRanges.lean`, `checks/ChildGap.lean`, `checks/BothFreeGrades.lean`. Root build: see the commit.
+- Still named: which sites form the native V star (`StarS` is on the grade), the deck character of lifts, and the two-rank reduction (`ChainPairData.chainNonincreasing`).

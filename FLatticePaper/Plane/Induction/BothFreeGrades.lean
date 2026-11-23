@@ -1,5 +1,7 @@
 import FLatticePaper.Plane.Induction.Q3Shift
 import FLatticePaper.Plane.Induction.StrongPriceValues
+import FLatticePaper.Plane.Induction.ArcRanges
+import FLatticePaper.Plane.Induction.ChildGap
 
 /-! Task 72 / Q20 (chain monotonicity), the both-free exclusion, grade lemmas (BOTH_FREE_RAW_PHI_EXCLUSION.md §§1–3).
 
@@ -352,7 +354,7 @@ theorem vFirst_H_agree (frame : ChildFrame) (η : ℤ) (r : Site) (hη : η = -1
   rw [prescribedV_vFirst, prescribedH_even_east frame _ r hev]
 
 /-- The H class of `V_{L−1} + ησ` is even, so its prescribed direction is east. -/
-theorem vLast_H_agree (frame : ChildFrame) (r : Site) (hη : η = 1)
+theorem vLast_H_agree (frame : ChildFrame) (r : Site) (_hη : η = 1)
     (hr : r = (frame.vLast + shiftσ frame 1) - (1 * frame.child.modifiedDeck.transverse.1, 1 * frame.child.modifiedDeck.transverse.2)) :
     frame.prescribedV 1 frame.vLast = frame.prescribedH (-1) r := by
   have hev : EvenSite r := by
@@ -456,5 +458,28 @@ theorem price_const_on_star_of_strips (frame : ChildFrame) (F : Field) (hS : fra
     rw [sGrade_parentShift] at hsu
     exact hS.2 _ (by omega) (by omega)
   exact price_const_on_star frame F hz1 hz2 hu1 hu2
+
+/-- **§3, the V/H choices agree, with the V-arc grades derived.** The arc hypothesis of `V_H_choices_agree` is now a theorem
+(`ArcRanges.arc_even_range`, `ArcRanges.arc_odd_range`). -/
+theorem V_H_choices_agree_derived (frame : ChildFrame) {η : ℤ} (hη : η = 1 ∨ η = -1) {z : Site}
+    (hz : z ∈ frame.freeV) (k : ℤ) (r : Site)
+    (hr : r = (z + shiftσ frame η) - (k * frame.child.modifiedDeck.transverse.1, k * frame.child.modifiedDeck.transverse.2))
+    (hrH : r ∈ frame.freeH) :
+    frame.prescribedV η z = frame.prescribedH (-η) r :=
+  V_H_choices_agree frame
+    (fun z hz h1 h2 => by
+      by_cases he : EvenSite z
+      · exact Or.inl ⟨he, FLatticePaper.ArcRanges.arc_even_range frame hz he h1 h2⟩
+      · exact Or.inr ⟨he, FLatticePaper.ArcRanges.arc_odd_range frame hz he⟩)
+    hη hz k r hr hrH
+
+/-- **§1 from the word.** For a proper word that is not a two-power, the child gap is at least `4`, so the star price
+lemma applies: the price is constant on the star with no hypothesis beyond the word and `HasStrips`. -/
+theorem price_const_on_star_of_word (word : Word) (hprop : ∃ x ∈ word, x ≠ Digit.three) (hnot : ¬ IsTwoPow word)
+    (F : Field) (hS : (frameAt word).HasStrips F) {z u : Site}
+    (hzs : StarS (frameAt word) ((frameAt word).sGrade z)) (hus : StarS (frameAt word) ((frameAt word).sGrade u)) :
+    (frameAt word).price F u = (frameAt word).price F z :=
+  price_const_on_star_of_strips (frameAt word) F hS
+    (by have := FLatticePaper.ChildGap.child_gap_ge_four word hprop hnot; omega) hzs hus
 
 end FLatticePaper.BothFreeGrades
