@@ -305,4 +305,14 @@ theorem i3_noC_of_strong {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) 
   exact restrictedNoFort_of_constrained_rankGrade (Fraction.det_modifiedDeck_pos hint)
     (fun x => rk (i3Z (x + (frameAt word).sheetOffset))) lam hlam hcon hK hT'
 
+/-- **The sheet inputs of a word, from the strong estimates of the earlier word**: the unit increments of `Ξ` at the word's
+phase, the two permit quotas and the two restricted no-fort conditions (the sheets `A` and `C`). -/
+theorem i3_sheetLocalInputs_of_strong {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three)
+    (h : StrongEstimates (conjWord word)) : SheetLocalInputs word :=
+  { unit := i3_sheet_unit_of_strong h
+    permitA := i3_permitA_of_strong h
+    noA := i3_noA_of_strong hw h
+    permitC := i3_permitC_of_strong hw h
+    noC := i3_noC_of_strong hw h }
+
 end FLatticePaper.Induction
