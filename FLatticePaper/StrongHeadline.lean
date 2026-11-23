@@ -4,6 +4,7 @@ import FLatticePaper.Plane.Induction.StrongProducer
 import FLatticePaper.Plane.Induction.StrongInduction
 import FLatticePaper.Plane.Induction.BaseFields
 import FLatticePaper.Plane.Induction.StrongBridge
+import FLatticePaper.Plane.Induction.TieReduce
 
 /-! Task 39, step 1: the odometers theorem from the strong estimates of the conjugate words.
 
@@ -152,5 +153,92 @@ theorem circlePacking_of_strongResidual
     matrix ∈ integerSuperharmonicMatrices ↔ ∃ s t : ℤ, (harmonicPeak s t - matrix).PosSemidef :=
   circlePacking_of_odometersTheorem
     (odometersTheorem_of_strongResidual hpureSlip hpureRes htwoSlip htwoRes hres hodd hbulk) matrix
+
+/-- **The odometers theorem with the odd black no-rise discharged** (task 70): the odd black no-rise at each proper word is
+`oddBlackNoRise_of_narrow`, from the conjugate's policy and the two narrowed tie leaves; the rest as in
+`odometersTheorem_of_strongResidual`. -/
+theorem odometersTheorem_of_policy
+    (hpureSlip : ∀ k : ℕ, Induction.BaseSlip (List.replicate k Digit.three))
+    (hpureRes : ∀ k : ℕ, Induction.StrongResidual (List.replicate k Digit.three))
+    (htwoSlip : ∀ k : ℕ, Induction.BaseSlip (List.replicate (k + 1) Digit.two))
+    (htwoRes : ∀ k : ℕ, Induction.StrongResidual (List.replicate (k + 1) Digit.two))
+    (hres : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word → Induction.StrongResidual word)
+    (hpol : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      ∃ seed, Nonempty (Induction.OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed))
+    (hResP : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      ∀ c i, RisingBlackPair (standardField word) (frameAt word).shortShift c i →
+        c ∈ (frameAt word).closedPolygon →
+        (c - (frameAt word).uq ∈ (frameAt word).closedPolygon ∧ i - (frameAt word).uq ∈ (frameAt word).closedPolygon) →
+        sheetDiffW word c = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j = -1) → False)
+    (hResN : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      ∀ c i, RisingBlackPair (standardField word) (-(frameAt word).shortShift) c i →
+        c ∈ (frameAt word).closedPolygon →
+        (c + (frameAt word).uq ∈ (frameAt word).closedPolygon ∧ i + (frameAt word).uq ∈ (frameAt word).closedPolygon) →
+        sheetDiffW word c = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j = -1) → False)
+    (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      Induction.S3NoFortInputs (frameAt word) (standardField word)) :
+    OdometersTheorem := by
+  have hE : ∀ word : Word, Induction.StrongEstimates word :=
+    Induction.strongEstimates_of_residual_all
+      (fun k => Induction.StrongEstimates.of_base_pure k (hpureSlip k) (hpureRes k))
+      (fun k => Induction.StrongEstimates.of_base_two k (htwoSlip k) (htwoRes k)) hres
+  have hodd : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      OddBlackNoRise (standardField word) (frameAt word).shortShift := by
+    intro word hw hn
+    obtain ⟨seed, ⟨P⟩⟩ := hpol word hw hn
+    exact Induction.oddBlackNoRise_of_narrow hw (hE (conjWord word)) P (hResP word hw hn) (hResN word hw hn)
+  exact odometersTheorem_of_strongResidual hpureSlip hpureRes htwoSlip htwoRes hres hodd hbulk
+
+/-- **`theorem:hyperbola` from the policy headline** (task 70). -/
+theorem hyperbola_of_policy
+    (hpureSlip : ∀ k : ℕ, Induction.BaseSlip (List.replicate k Digit.three))
+    (hpureRes : ∀ k : ℕ, Induction.StrongResidual (List.replicate k Digit.three))
+    (htwoSlip : ∀ k : ℕ, Induction.BaseSlip (List.replicate (k + 1) Digit.two))
+    (htwoRes : ∀ k : ℕ, Induction.StrongResidual (List.replicate (k + 1) Digit.two))
+    (hres : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word → Induction.StrongResidual word)
+    (hpol : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      ∃ seed, Nonempty (Induction.OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed))
+    (hResP : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      ∀ c i, RisingBlackPair (standardField word) (frameAt word).shortShift c i →
+        c ∈ (frameAt word).closedPolygon →
+        (c - (frameAt word).uq ∈ (frameAt word).closedPolygon ∧ i - (frameAt word).uq ∈ (frameAt word).closedPolygon) →
+        sheetDiffW word c = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j = -1) → False)
+    (hResN : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      ∀ c i, RisingBlackPair (standardField word) (-(frameAt word).shortShift) c i →
+        c ∈ (frameAt word).closedPolygon →
+        (c + (frameAt word).uq ∈ (frameAt word).closedPolygon ∧ i + (frameAt word).uq ∈ (frameAt word).closedPolygon) →
+        sheetDiffW word c = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j = -1) → False)
+    (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      Induction.S3NoFortInputs (frameAt word) (standardField word))
+    (t : ℝ) (ht : 0 ≤ t) (hu : t ≤ 1) :
+    symmetricCircleMatrix t (1 - t) (-Real.sqrt (t ^ 2 + (1 - t) ^ 2)) ∈ frontier symmetricGrowthSet :=
+  hyperbola_of_odometersTheorem
+    (odometersTheorem_of_policy hpureSlip hpureRes htwoSlip htwoRes hres hpol hResP hResN hbulk) t ht hu
+
+/-- **`theorem:circle_packing` from the policy headline** (task 70). -/
+theorem circlePacking_of_policy
+    (hpureSlip : ∀ k : ℕ, Induction.BaseSlip (List.replicate k Digit.three))
+    (hpureRes : ∀ k : ℕ, Induction.StrongResidual (List.replicate k Digit.three))
+    (htwoSlip : ∀ k : ℕ, Induction.BaseSlip (List.replicate (k + 1) Digit.two))
+    (htwoRes : ∀ k : ℕ, Induction.StrongResidual (List.replicate (k + 1) Digit.two))
+    (hres : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word → Induction.StrongResidual word)
+    (hpol : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      ∃ seed, Nonempty (Induction.OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed))
+    (hResP : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      ∀ c i, RisingBlackPair (standardField word) (frameAt word).shortShift c i →
+        c ∈ (frameAt word).closedPolygon →
+        (c - (frameAt word).uq ∈ (frameAt word).closedPolygon ∧ i - (frameAt word).uq ∈ (frameAt word).closedPolygon) →
+        sheetDiffW word c = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j = -1) → False)
+    (hResN : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      ∀ c i, RisingBlackPair (standardField word) (-(frameAt word).shortShift) c i →
+        c ∈ (frameAt word).closedPolygon →
+        (c + (frameAt word).uq ∈ (frameAt word).closedPolygon ∧ i + (frameAt word).uq ∈ (frameAt word).closedPolygon) →
+        sheetDiffW word c = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j = -1) → False)
+    (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      Induction.S3NoFortInputs (frameAt word) (standardField word))
+    (matrix : Matrix (Fin 2) (Fin 2) ℝ) :
+    matrix ∈ integerSuperharmonicMatrices ↔ ∃ s t : ℤ, (harmonicPeak s t - matrix).PosSemidef :=
+  circlePacking_of_odometersTheorem
+    (odometersTheorem_of_policy hpureSlip hpureRes htwoSlip htwoRes hres hpol hResP hResN hbulk) matrix
 
 end FLatticePaper
