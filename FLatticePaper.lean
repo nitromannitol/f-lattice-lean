@@ -268,6 +268,7 @@ import FLatticePaper.Plane.Induction.AndOrRank
 import FLatticePaper.Plane.Induction.ComparisonContacts
 import FLatticePaper.Plane.Induction.SquareClauses
 import FLatticePaper.Tiles.PackAssembly
+import FLatticePaper.Tiles.StandardPacking
 import FLatticePaper.Plane.Induction.S3FreeBoundary
 
 /-! Root import for the corrected F-lattice paper. -/
