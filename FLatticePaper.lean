@@ -322,5 +322,6 @@ import FLatticePaper.Plane.Induction.W1CollarBox
 import FLatticePaper.Plane.Induction.W1ZeroStrip
 import FLatticePaper.Plane.Induction.W1Forcing
 import FLatticePaper.Plane.Induction.W1Ties
+import FLatticePaper.Plane.Induction.W1Return
 
 /-! Root import for the corrected F-lattice paper. -/
