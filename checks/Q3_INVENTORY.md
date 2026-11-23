@@ -386,3 +386,11 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - PROVED `FLatticePaper.other_input_of_tie`: at a black minimum `M = min(A, C)` with `M c = A c`, `M i = A i` and `A` white at `c`, the other input `j` has `C j = A j − 1` (`Ψ j = −1`). This is the algebraic identity `ΔA − ΔM = 1` on the star; no policy is used.
 - NOT PROVED: `hResP` and `hResN` (the leaves of `TieReduce.tie_excluded_of_narrow`). Still needed: the A-policy retention at the tied centre (from the `Ψ j = −1` input and `sheetDiff_mono_A`), the rising-pair slip increment and the old-root cases (`nonfree_drop_excluded`, Q3's H-star and V-star estimates), and the exceptional endpoint (Q19).
 - Checks: `checks/TieOneInput.lean`. Sandbox logs clean.
+
+### Task 72 (queue Q16, hResP, the tied centre): TieCentre.lean
+
+- PROVED `tie_sheetA_white`: at a black centre `c` of `M = standardField word` in `E` with `Ψ c = 0` and an input `j` with `Ψ j = −1`, the sheet `A` is white at `c` (`laplacian A c = 0`) and `A i ≤ C i` for the other input `i`. This is `ΔA − ΔM = Σ (A − M)`, `(A − M) j = 1`, `ΔA ∈ {−1, 0}` (the binary Laplacian of the conjugate's quarter-turn field); no policy is used.
+- PROVED `sheetPolicyA_of_tie`: the A-policy retains `c → i`. The quota at the white conjugate root retains one input, and `j` is not retained, since `sheetDiff_mono_A` would give `Ψ c ≤ Ψ j = −1`.
+- PROVED `retained_of_quota` (the quota pick).
+- NOT PROVED (still needed for `hResP`): the old-root argument. The retained edge must be `nonfree_drop_excluded`'s `parentPolicy` edge with `jumpA (c − lv) = 1` and `jumpA (i − lv) = 0`, which comes from the rising-pair slip structure (positive `σ`), and then either `nonfree_root_forced_nonfree` (nonfree old root) or the free-root exclusions (`H_drop_excluded`, the V-block) with the exceptional endpoint (Q19).
+- Checks: `checks/TieCentre.lean`. Root build clean; sandbox logs clean.
