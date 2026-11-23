@@ -41,7 +41,7 @@ theorem alpha_add_beta (d e : ℤ) (α β : ℚ) (hD : (0 : ℚ) < 2 * (d : ℚ)
   · linarith
 
 /-- **Flag false, `Q@(2P + 2V_P)` on `[α, 1]²`**, the reflection of `Q@0` on `[0, β]²`. -/
-theorem RF2 (d n e r : ℤ) (hd : 3 ≤ d) (hn : 1 ≤ n) (hnd : n < d) (hr : 1 ≤ r) (hre : r < e)
+theorem RF2 (d n e r : ℤ) (hd : 2 ≤ d) (hn : 1 ≤ n) (hnd : n < d) (hr : 1 ≤ r) (hre : r < e)
     (hdet : d * r - n * e = 1) (hodd : (d + n) % 2 = 1) (heven : (e + r) % 2 = 0)
     (z : ℤ × ℤ) (u v α β : ℚ)
     (hz1 : (z.1 : ℚ) - 1 / 2 = u * (2 * (d : ℚ) + e) + v * ((2 * (n : ℚ) + r) - (2 * (d : ℚ) + e)))
@@ -89,7 +89,7 @@ theorem RF4H (d n e r : ℤ) (hn : 1 ≤ n) (hnd : n < d) (hr : 1 ≤ r) (hre : 
   exact h
 
 /-- **Flag false, `P@V_Q` on `[0, α] × [β, 1 − α/2]`**, the reflection of `P@(Q + V_P)` on `[β, 1] × [α/2, α]`. -/
-theorem RF4L (d n e r : ℤ) (hd : 3 ≤ d) (hn : 1 ≤ n) (hnd : n < d) (hr : 1 ≤ r) (hre : r < e)
+theorem RF4L (d n e r : ℤ) (hdn : d ≠ 2 * n ∨ 2 * d < e) (hn : 1 ≤ n) (hnd : n < d) (hr : 1 ≤ r) (hre : r < e)
     (hdet : d * r - n * e = 1) (hodd : (d + n) % 2 = 1) (heven : (e + r) % 2 = 0)
     (z : ℤ × ℤ) (u v α β : ℚ)
     (hz1 : (z.1 : ℚ) - 1 / 2 = u * (2 * (d : ℚ) + e) + v * ((2 * (n : ℚ) + r) - (2 * (d : ℚ) + e)))
@@ -102,7 +102,7 @@ theorem RF4L (d n e r : ℤ) (hd : 3 ≤ d) (hn : 1 ≤ n) (hnd : n < d) (hr : 1
     exact_mod_cast this
   have hαβ := alpha_add_beta d e α β hD hα hβ
   obtain ⟨h1, h2⟩ := cellR0 d n e r z u v hz1 hz2
-  have key := F3H_box d n e r hn hnd hd hr hre hdet hodd heven
+  have key := F3H_box d n e r hn hnd hdn hr hre hdet hodd heven
     (2 * n + r + 1 - z.1, 2 * d + e + 4 * n + 2 * r - 1 - z.2) (1 - u) (1 - v) α β h1 h2 hα hβ
     (by linarith) (by linarith) (by linarith) (by linarith)
   have h := (refl_P d n hodd _).mp key
@@ -113,7 +113,7 @@ theorem RF4L (d n e r : ℤ) (hd : 3 ≤ d) (hn : 1 ≤ n) (hnd : n < d) (hr : 1
   exact h
 
 /-- **Flag true, `Q@2V_P` on `[0, β] × [α, 1]`**, the reflection of `Q@2P` on `[α, 1] × [0, β]`. -/
-theorem RT2 (d n e r : ℤ) (hd : 3 ≤ d) (hn : 1 ≤ n) (hnd : n < d) (hr : 1 ≤ r) (hre : r < e)
+theorem RT2 (d n e r : ℤ) (hd : 2 ≤ d) (hn : 1 ≤ n) (hnd : n < d) (hr : 1 ≤ r) (hre : r < e)
     (hdet : d * r - n * e = -1) (heven : (e + r) % 2 = 0)
     (z : ℤ × ℤ) (u v α β : ℚ)
     (hz1 : (z.1 : ℚ) - 1 / 2 = u * (2 * (d : ℚ) + e) + v * ((2 * (n : ℚ) + r) - (2 * (d : ℚ) + e)))
@@ -161,7 +161,7 @@ theorem RT4H (d n e r : ℤ) (hn : 1 ≤ n) (hnd : n < d) (hr : 1 ≤ r) (hre : 
   exact h
 
 /-- **Flag true, `P@(Q + V_Q)` on `[β, 1] × [β, 1 − α/2]`**, the reflection of `P@V_P` on `[0, α] × [α/2, α]`. -/
-theorem RT4L (d n e r : ℤ) (hd : 3 ≤ d) (hn : 1 ≤ n) (hnd : n < d) (hr : 1 ≤ r) (hre : r < e)
+theorem RT4L (d n e r : ℤ) (hdn : d ≠ 2 * n ∨ 2 * d < e ∨ (d = 2 ∧ n = 1 ∧ e = 3 ∧ r = 1)) (hn : 1 ≤ n) (hnd : n < d) (hr : 1 ≤ r) (hre : r < e)
     (hdet : d * r - n * e = -1) (hodd : (d + n) % 2 = 1) (heven : (e + r) % 2 = 0)
     (z : ℤ × ℤ) (u v α β : ℚ)
     (hz1 : (z.1 : ℚ) - 1 / 2 = u * (2 * (d : ℚ) + e) + v * ((2 * (n : ℚ) + r) - (2 * (d : ℚ) + e)))
@@ -174,7 +174,7 @@ theorem RT4L (d n e r : ℤ) (hd : 3 ≤ d) (hn : 1 ≤ n) (hnd : n < d) (hr : 1
     exact_mod_cast this
   have hαβ := alpha_add_beta d e α β hD hα hβ
   obtain ⟨h1, h2⟩ := cellR0 d n e r z u v hz1 hz2
-  have key := T3H_box d n e r hn hnd hd hr hre hdet hodd heven
+  have key := T3H_gen d n e r hn hnd hdn hr hre hdet hodd heven
     (2 * n + r + 1 - z.1, 2 * d + e + 4 * n + 2 * r - 1 - z.2) (1 - u) (1 - v) α h1 h2 hα
     (by linarith) (by linarith) (by linarith) (by linarith)
   have h := (refl_P d n hodd _).mp key

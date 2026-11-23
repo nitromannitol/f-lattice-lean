@@ -220,7 +220,7 @@ theorem d_ne_two_n (d n e r : ℤ) (hd : 3 ≤ d) (hdet : d * r - n * e = 1) : d
   omega
 
 /-- **The box `[β, 1] × [α/2, α]` of the flag-false even child is owned by `P` at `Q + V_P`.** -/
-theorem F3H_box (d n e r : ℤ) (hn : 1 ≤ n) (hnd : n < d) (hd : 3 ≤ d) (hr : 1 ≤ r) (hre : r < e)
+theorem F3H_box (d n e r : ℤ) (hn : 1 ≤ n) (hnd : n < d) (hdn : d ≠ 2 * n ∨ 2 * d < e) (hr : 1 ≤ r) (hre : r < e)
     (hdet : d * r - n * e = 1) (hodd : (d + n) % 2 = 1) (heven : (e + r) % 2 = 0)
     (z : ℤ × ℤ) (u v α β : ℚ)
     (hz1 : (z.1 : ℚ) - 1 / 2 = u * (2 * (d : ℚ) + e) + v * ((2 * (n : ℚ) + r) - (2 * (d : ℚ) + e)))
@@ -233,7 +233,6 @@ theorem F3H_box (d n e r : ℤ) (hn : 1 ≤ n) (hnd : n < d) (hd : 3 ≤ d) (hr 
   have hDi : (0 : ℤ) < 2 * d + e := by omega
   have hD : (0 : ℚ) < 2 * (d : ℚ) + e := by exact_mod_cast hDi
   have hmu : muOf ⟨n, d⟩ = 2 := muP_two d n hodd
-  have hd2 : d ≠ 2 * n := d_ne_two_n d n e r hd hdet
   have heQ : (0 : ℚ) < e := by exact_mod_cast (show (0 : ℤ) < e by omega)
   have hnQ : (0 : ℚ) < n := by exact_mod_cast (show (0 : ℤ) < n by omega)
   have hc : (0 : ℚ) < (d : ℚ) - n := by exact_mod_cast (show (0 : ℤ) < d - n by omega)
@@ -370,8 +369,8 @@ theorem F3H_box (d n e r : ℤ) (hn : 1 ≤ n) (hnd : n < d) (hd : 3 ≤ d) (hr 
     have hL1 : L ≤ d - n := by rw [hL]; exact min_le_left _ _
     have hL2 : L ≤ 3 * n - d := by rw [hL]; exact min_le_right _ _
     have hLcase : L = d - n ∨ L = 3 * n - d := by rw [hL]; exact min_choice _ _
-    have hLn : L ≤ n - 1 := by omega
-    have hX' : 0 < (n : ℚ) - K + G * β - ((L : ℚ) - 1) := hX L (by omega)
+    have hLn : L ≤ n := by omega
+    have hX' : 0 < (n : ℚ) - K + G * β - ((L : ℚ) - 1) := hX L hLn
     have hpar' : ¬ ((z.1 - (e + (n - d)) + (z.2 - (r + (n + d)))) % 2 = 0) := by omega
     have hev : decide ((((z.1 - (e + (n - d)), z.2 - (r + (n + d))) : ℤ × ℤ).1 +
         (z.1 - (e + (n - d)), z.2 - (r + (n + d))).2) % 2 = 0) = false := decide_eq_false hpar'
@@ -380,18 +379,18 @@ theorem F3H_box (d n e r : ℤ) (hn : 1 ≤ n) (hnd : n < d) (hd : 3 ≤ d) (hr 
     have hl : lOf ⟨n, d⟩ false = L := by rw [hL]; simp [lOf]
     rw [hA, hl]
     dsimp only
-    have hdn : (n : ℚ) < d := by exact_mod_cast hnd
+    have hndQ : (n : ℚ) < d := by exact_mod_cast hnd
     have hβ' : (0 : ℚ) < β := hβ0
     refine ⟨?_, ?_, ?_, ?_⟩
     · have h : ((n - (d ^ 2 + 2 * d * n - n ^ 2) - 1 : ℤ) : ℚ) < ((n * (z.1 - (e + (n - d))) - d * (z.2 - (r + (n + d))) : ℤ) : ℚ) := by
         push_cast
         rw [hTP] at hlo_real
-        linarith [hlo_real, hdn]
+        linarith [hlo_real, hndQ]
       have h' := Int.lt_iff_add_one_le.mp (Int.cast_lt.mp h)
       linarith
     · have h : ((n * (z.1 - (e + (n - d))) - d * (z.2 - (r + (n + d))) : ℤ) : ℚ) < ((d + 1 : ℤ) : ℚ) := by
         push_cast
-        linarith [hup_real, hdn, hβ']
+        linarith [hup_real, hndQ, hβ']
       have h' := Int.lt_add_one_iff.mp (Int.cast_lt.mp h)
       linarith
     · have h : (((L - 1) : ℤ) : ℚ) < (((d + n) * (z.1 - (e + (n - d))) + (d - n) * (z.2 - (r + (n + d))) : ℤ) : ℚ) := by
@@ -400,8 +399,17 @@ theorem F3H_box (d n e r : ℤ) (hn : 1 ≤ n) (hnd : n < d) (hd : 3 ≤ d) (hr 
       have h' := Int.lt_iff_add_one_le.mp (Int.cast_lt.mp h)
       linarith
     · have hαL : 2 * α < (n : ℚ) - L + 1 := by
-        have : (L : ℚ) + 1 ≤ n := by exact_mod_cast (show L + 1 ≤ n by omega)
-        linarith [hα2]
+        rcases (show L + 1 ≤ n ∨ L = n by omega) with h1 | h1
+        · have : (L : ℚ) + 1 ≤ n := by exact_mod_cast h1
+          linarith [hα2]
+        · have hdn2 : 2 * d < e := hdn.resolve_left (fun h => h (by omega))
+          have h2d : (2 : ℚ) * d < e := by exact_mod_cast hdn2
+          have e2 : 2 * α * (2 * (d : ℚ) + e) = 4 * d := by linear_combination 2 * hα
+          have hα1 : 2 * α < 1 := by
+            apply lt_of_mul_lt_mul_right _ hD.le
+            linarith [e2, h2d]
+          have : (L : ℚ) = n := by exact_mod_cast h1
+          linarith
       have h : (((d + n) * (z.1 - (e + (n - d))) + (d - n) * (z.2 - (r + (n + d))) : ℤ) : ℚ) <
           ((2 * (d ^ 2 + 2 * d * n - n ^ 2) + 2 * n - L + 1 : ℤ) : ℚ) := by
         push_cast
