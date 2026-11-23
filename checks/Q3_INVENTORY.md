@@ -332,3 +332,15 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - PROVED §5 (`CanonicalDirections.lean`): `prescribedH_internal_even/odd`, `prescribedV_internal_even/odd`, `prescribedH_H0`, `prescribedV_V0`, `prescribedH_hLast_sub_U` (north), `prescribedV_vLast_sub_V` (`η` east), `prescribedV_odd_minus_one` (north), `prescribedV_even_minus_one` (west). The tip-specific starts `Vp+ex` and `Vp` are not yet shown to be internal V sites.
 - PROVED §6: `tip_W0_middle_nonfree` (`v + (1,1)`, `ε = −1`, `t(v) = −B`, `s(v) = 2ε`, under `0 ≤ B`, `5L ≤ T − B`) and `tip_W1_middle_nonfree` (`v + (−1,0)`, `ε = +1`, same hypotheses). These take the tip values of `TIP_THEOREM.md` as hypotheses; the tip's own `t(v)`, `s(v)` are not derived here.
 - Checks: `checks/FreeTraceBox.lean`, `checks/CanonicalDirections.lean` (standard axioms or subsets). Root build clean; sandbox logs grep-clean for warning, error, sorry.
+
+### Task 72 (option b and TIP_THEOREM): RouteSteps.lean, CutTipEscape.lean
+
+- PROVED `RouteSteps.freeV_odd_box`: every odd `z ∈ freeV` has `1 − c ≤ x ≤ 0`, `1 ≤ y ≤ L − 2` (integer lemma `vbox_odd`; no numerics). Proof: `s ≤ L−2` forces `x ≤ 0`; `s ≥ 2−c` forces `y ≥ 1`; for `y ≥ L−1` the `s`-window gives `x = 1−c` (parity contradiction) or `x ≤ −c` (contradicting `t ≥ n−T`); `s ≥ 2−c` gives `x ≥ 1−c`.
+- PROVED `RouteSteps.freeH_even_s_lt`: every even `z ∈ freeH` has `s(z) < T + 2 − 2d`.
+- PROVED `RouteSteps.H_EN_of_step`: an even `z ∈ freeH` with `z + (1,0) ∉ freeH` has nonfree middle `z + (1,0)` (the window `c + 2 ≤ t(z)` is the contrapositive: `t ≤ c` makes the E-step a free site).
+- PROVED `RouteSteps.V_NW_of_step`: an odd `z ∈ freeV` with `z + (0,1) ∉ freeV` has nonfree middle `z + (0,1)`.
+- H_NES and V_WNE keep their windows (the source's "internal" midpoint conditions; endpoints H_0, H_last, V_0 are separate).
+- Numeric recheck with `n ≥ 3` (scripts/free_trace_window_check.py): window ⟺ step not free for H_EN and V_NW.
+- PROVED (abstract game, RestrictedBellmanRank) `CutTipEscape.two_edge_escape`: a white root `r` with a white permitted input `u` whose permitted input `y` has grade below the level escapes at depth 2. Instances `tip_W0_escape` (root `v+(1,0)`, `v` even) and `tip_W1_escape` (root `v`, even): the two incoming steps of the tip routes are `incomingPos`/`incomingNeg` as in TIP_THEOREM.
+- NOT PROVED: whiteness of the middles and the grade decrease at the port (field values from TIP_THEOREM); the forced-direction identification of the rejected input.
+- Checks: `checks/RouteSteps.lean`, `checks/CutTipEscape.lean`. Sandbox logs clean for warning, error, sorry (one lint warning fixed).
