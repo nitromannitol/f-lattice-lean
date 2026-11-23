@@ -3,3 +3,5 @@ import FLatticePaper.StrongHeadline
 #print axioms FLatticePaper.odometersTheorem_of_strong
 #print axioms FLatticePaper.odometersTheorem_of_producer
 #print axioms FLatticePaper.Induction.StrongEstimates.of_producer
+#print axioms FLatticePaper.odometersTheorem_of_residual
+#print axioms FLatticePaper.Induction.strongEstimates_of_all
