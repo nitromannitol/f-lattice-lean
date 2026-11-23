@@ -1,4 +1,6 @@
-import Mathlib.Tactic
+import Mathlib.Tactic.Linarith
+import Mathlib.Tactic.LinearCombination
+import Mathlib.Tactic.Ring
 
 /-! Task 53, item 2 (covering reduction), section 13: polynomial facet inequalities of the even child (`X = 2P + Q`, `μ_X = 1`).
 
