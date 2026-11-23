@@ -209,4 +209,166 @@ theorem sig_three (P Q : Fraction) (hQ : (Q.num + Q.den) % 2 = 0) :
   have hY : 2 * ((2 * P.den + Q.den + (2 * P.num + Q.num)) / 2) = 2 * P.den + Q.den + (2 * P.num + Q.num) := by omega
   linear_combination (-P.num) * hY
 
+/-! ### The quad invariant -/
+
+/-- A word has the ceiling slope `s`. -/
+def CeilOf (x : BinaryWord) (s : ℤ × ℤ) : Prop := CeilWord x s.1 s.2
+
+theorem lam_odd_pos (f : Fraction) (h1 : 0 < f.den) (h0 : 0 ≤ f.num) : 1 ≤ (sOdd f).2 := by
+  unfold sOdd
+  simp only
+  omega
+
+theorem lam_even_pos (f : Fraction) (h1 : 0 < f.den) (h0 : 0 ≤ f.num) (hp : (f.num + f.den) % 2 = 0) :
+    1 ≤ (sEven f).2 := by
+  unfold sEven
+  simp only
+  omega
+
+/-- The bounds of the odd current fraction `P + Q`. -/
+theorem cur_odd_bounds (P Q : Fraction) (hP1 : 0 < P.den) (hP0 : 0 ≤ P.num) (hQ1 : 0 < Q.den) (hQ0 : 0 ≤ Q.num) :
+    0 < ((Parents.mk P Q).current .odd).den ∧ 0 ≤ ((Parents.mk P Q).current .odd).num := by
+  simp only [Parents.current, Parents.combine, one_mul]
+  constructor <;> omega
+
+/-- The bounds and the parity of the even current fraction `2 P + Q`. -/
+theorem cur_even_bounds (P Q : Fraction) (hP1 : 0 < P.den) (hP0 : 0 ≤ P.num) (hQ1 : 0 < Q.den) (hQ0 : 0 ≤ Q.num)
+    (hQp : (Q.num + Q.den) % 2 = 0) :
+    0 < ((Parents.mk P Q).current .even).den ∧ 0 ≤ ((Parents.mk P Q).current .even).num ∧
+      (((Parents.mk P Q).current .even).num + ((Parents.mk P Q).current .even).den) % 2 = 0 := by
+  simp only [Parents.current, Parents.combine]
+  refine ⟨by omega, by omega, by omega⟩
+
+theorem quadAt_snoc_nil (v : Word) (d : Digit) : quadAt [] (v ++ [d]) = (quadAt [] v).step v d := by
+  rw [quadAt_append_singleton, List.nil_append]
+
+theorem parentsAt_snoc_one (v : Word) :
+    parentsAt (v ++ [Digit.one]) = Parents.mk ((parentsAt v).current .odd) ((parentsAt v).current .even) := by
+  rw [parentsAt_append_singleton]
+  rfl
+
+theorem parentsAt_snoc_two (v : Word) :
+    parentsAt (v ++ [Digit.two]) = Parents.mk ((parentsAt v).current .odd) (parentsAt v).even := by
+  rw [parentsAt_append_singleton]
+  rfl
+
+theorem parentsAt_snoc_three (v : Word) :
+    parentsAt (v ++ [Digit.three]) = Parents.mk (parentsAt v).odd ((parentsAt v).current .even) := by
+  rw [parentsAt_append_singleton]
+  rfl
+
+/-- The invariant: the four words of the quad are the ceiling words of the slopes of the current and parent fractions. -/
+def QuadInv (u : Word) : Prop :=
+  CeilOf (quadAt [] u).childP (sOdd ((parentsAt u).current .odd)) ∧
+    CeilOf (quadAt [] u).childQ (sEven ((parentsAt u).current .even)) ∧
+    CeilOf (quadAt [] u).parentP (sOdd (parentsAt u).odd) ∧
+    CeilOf (quadAt [] u).parentQ (sEven (parentsAt u).even)
+
+theorem ceilOf_initial_nil : CeilOf [Letter.q, Letter.q, Letter.p] (sOdd ⟨1, 2⟩) := by
+  show CeilWord [Letter.q, Letter.q, Letter.p] 2 3
+  refine ⟨by simp, fun j hj => ?_⟩
+  rcases (show j = 0 ∨ j = 1 ∨ j = 2 ∨ j = 3 by omega) with rfl | rfl | rfl | rfl <;> norm_num [qPrefix]
+
+theorem quadInv_nil : QuadInv [] := by
+  unfold QuadInv
+  have hq : quadAt [] ([] : Word) = initialQuad [] := rfl
+  have hO : (parentsAt ([] : Word)).current .odd = ⟨1, 2⟩ := SiteBase.curO_nil
+  have hE : (parentsAt ([] : Word)).current .even = ⟨1, 3⟩ := SiteBase.curE_nil
+  have hP : (parentsAt ([] : Word)).odd = ⟨0, 1⟩ := rfl
+  have hQ : (parentsAt ([] : Word)).even = ⟨1, 1⟩ := rfl
+  rw [hq, hO, hE, hP, hQ]
+  have e1 : (initialQuad ([] : Word)).childP = [Letter.q, Letter.q, Letter.p] := rfl
+  have e2 : (initialQuad ([] : Word)).childQ = [Letter.q, Letter.p] := rfl
+  have e3 : (initialQuad ([] : Word)).parentP = [Letter.p] := rfl
+  have e4 : (initialQuad ([] : Word)).parentQ = [Letter.q] := rfl
+  rw [e1, e2, e3, e4]
+  refine ⟨ceilOf_initial_nil, ?_, ?_, ?_⟩
+  · show CeilWord [Letter.q, Letter.p] 1 2
+    refine ⟨by simp, fun j hj => ?_⟩
+    rcases (show j = 0 ∨ j = 1 ∨ j = 2 by omega) with rfl | rfl | rfl <;> norm_num [qPrefix]
+  · show CeilWord [Letter.p] 0 1
+    refine ⟨by simp, fun j hj => ?_⟩
+    rcases (show j = 0 ∨ j = 1 by omega) with rfl | rfl <;> norm_num [qPrefix]
+  · show CeilWord [Letter.q] 1 1
+    refine ⟨by simp, fun j hj => ?_⟩
+    rcases (show j = 0 ∨ j = 1 by omega) with rfl | rfl <;> norm_num [qPrefix]
+
+theorem quadInv_all (u : Word) : QuadInv u := by
+  induction u using List.reverseRecOn with
+  | nil => exact quadInv_nil
+  | append_singleton v d ih =>
+    obtain ⟨i1, i2, i3, i4⟩ := ih
+    have hv := parentsAt_valid v
+    have hP1 : 0 < (parentsAt v).odd.den := hv.odd_bounds.1
+    have hP0 : 0 ≤ (parentsAt v).odd.num := hv.odd_bounds.2.1
+    have hQ1 : 0 < (parentsAt v).even.den := hv.even_bounds.1
+    have hQ0 : 0 ≤ (parentsAt v).even.num := hv.even_bounds.2.1
+    have hQp : ((parentsAt v).even.num + (parentsAt v).even.den) % 2 = 0 := hv.even_parity
+    have hdet : (parentsAt v).odd.det (parentsAt v).even = 2 * (phase v : ℤ) - 1 := det_parentsAt v
+    have hphase : phase v = v.count Digit.one % 2 := rfl
+    have hph : phase v < 2 := by rw [hphase]; omega
+    have hO : 0 < ((parentsAt v).current .odd).den ∧ 0 ≤ ((parentsAt v).current .odd).num :=
+      cur_odd_bounds _ _ hP1 hP0 hQ1 hQ0
+    have hE : 0 < ((parentsAt v).current .even).den ∧ 0 ≤ ((parentsAt v).current .even).num ∧
+        (((parentsAt v).current .even).num + ((parentsAt v).current .even).den) % 2 = 0 :=
+      cur_even_bounds _ _ hP1 hP0 hQ1 hQ0 hQp
+    have hlO : 1 ≤ (sOdd ((parentsAt v).current .odd)).2 := lam_odd_pos _ hO.1 hO.2
+    have hlE : 1 ≤ (sEven ((parentsAt v).current .even)).2 := lam_even_pos _ hE.1 hE.2.1 hE.2.2
+    have hlP : 1 ≤ (sOdd (parentsAt v).odd).2 := lam_odd_pos _ hP1 hP0
+    have hlQ : 1 ≤ (sEven (parentsAt v).even).2 := lam_even_pos _ hQ1 hQ0 hQp
+    have hEpar := hE.2.2
+    cases d with
+    | one =>
+      have hcount : (v ++ [Digit.one]).count Digit.one = v.count Digit.one + 1 := by simp [List.count_append]
+      have hσ : (sEven ((parentsAt v).current .even)).1 * (sOdd ((parentsAt v).current .odd)).2 -
+          (sOdd ((parentsAt v).current .odd)).1 * (sEven ((parentsAt v).current .even)).2 = 2 * (phase v : ℤ) - 1 :=
+        (sig_one _ _ hQp).trans hdet
+      have A := childWords_ceil (v ++ [Digit.one]) i1 i2 hlO hlE (by rw [hσ]; omega)
+        (by rw [hcount, hσ, hphase]; omega)
+      unfold QuadInv
+      rw [quadAt_snoc_nil, parentsAt_snoc_one]
+      refine ⟨?_, ?_, i1, i2⟩
+      · unfold CeilOf
+        rw [sOdd_cur_one _ _ hEpar]
+        exact A.1
+      · unfold CeilOf
+        rw [sEven_cur_two]
+        exact A.2
+    | two =>
+      have hcount : (v ++ [Digit.two]).count Digit.one = v.count Digit.one := by simp [List.count_append]
+      have hσ : (sEven (parentsAt v).even).1 * (sOdd ((parentsAt v).current .odd)).2 -
+          (sOdd ((parentsAt v).current .odd)).1 * (sEven (parentsAt v).even).2 = -(2 * (phase v : ℤ) - 1) := by
+        have := sig_two (parentsAt v).odd (parentsAt v).even hQp
+        rw [hdet] at this
+        exact this
+      have A := childWords_ceil (v ++ [Digit.two]) i1 i4 hlO hlQ (by rw [hσ]; omega)
+        (by rw [hcount, hσ, hphase]; omega)
+      unfold QuadInv
+      rw [quadAt_snoc_nil, parentsAt_snoc_two]
+      refine ⟨?_, ?_, i1, i4⟩
+      · unfold CeilOf
+        rw [sOdd_cur_one _ _ hQp]
+        exact A.1
+      · unfold CeilOf
+        rw [sEven_cur_two]
+        exact A.2
+    | three =>
+      have hcount : (v ++ [Digit.three]).count Digit.one = v.count Digit.one := by simp [List.count_append]
+      have hσ : (sEven ((parentsAt v).current .even)).1 * (sOdd (parentsAt v).odd).2 -
+          (sOdd (parentsAt v).odd).1 * (sEven ((parentsAt v).current .even)).2 = -(2 * (phase v : ℤ) - 1) := by
+        have := sig_three (parentsAt v).odd (parentsAt v).even hQp
+        rw [hdet] at this
+        exact this
+      have A := childWords_ceil (v ++ [Digit.three]) i3 i2 hlP hlE (by rw [hσ]; omega)
+        (by rw [hcount, hσ, hphase]; omega)
+      unfold QuadInv
+      rw [quadAt_snoc_nil, parentsAt_snoc_three]
+      refine ⟨?_, ?_, i3, i2⟩
+      · unfold CeilOf
+        rw [sOdd_cur_one _ _ hEpar]
+        exact A.1
+      · unfold CeilOf
+        rw [sEven_cur_two]
+        exact A.2
+
 end FLatticePaper.Tiles.CeilWords
