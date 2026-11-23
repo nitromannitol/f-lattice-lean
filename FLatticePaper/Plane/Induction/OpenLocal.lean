@@ -21,13 +21,15 @@ namespace FLatticePaper.Induction
 open Farey FLatticePaper
 
 /-- The star-zone inputs I1 and I2 at a proper word: witnesses `R` (roots, with `Ψ ≥ 1`) and `G` (calibrated sites, with
-`Ψ ≥ 0`) covering the two zones, and the mirror branch `ε = −1` of I2. -/
+`Ψ ≥ 0`) covering the zero zone, and the harmonic zone when `ε = 1`, and the mirror branch `ε = −1` of I2. The cover of the
+harmonic zone is required only at `ε = 1`: at `ε = −1` the comparison there is `Ψ ≤ 0`, and a positive cover fails
+(word `2`, site `(0, 1)`: `Ψ = −1`, with `Ψ = −2, 0` at the two possible centres). -/
 def StarZoneInputs (word : Word) : Prop :=
   ∃ R G : Site → Prop,
     (∀ c, R c → 1 ≤ sheetDiff word c) ∧ (∀ z, G z → 0 ≤ sheetDiff word z) ∧
     (∀ z ∈ (frameAt word).closedPolygon, 1 - (frameAt word).child.den ≤ (frameAt word).tGrade z →
       R z ∨ (∃ c, R c ∧ FLatticePaper.Edge z c) ∨ G z) ∧
-    (∀ z ∈ (frameAt word).closedPolygon,
+    ((frameAt word).eps = 1 → ∀ z ∈ (frameAt word).closedPolygon,
       (frameAt word).sGrade z ≤ 2 * ((frameAt word).child.den + (frameAt word).child.num) - 1 →
         R z ∨ (∃ c, R c ∧ FLatticePaper.Edge z c) ∨ G z) ∧
     ((frameAt word).eps = -1 → ∀ z ∈ (frameAt word).closedPolygon,
@@ -63,7 +65,7 @@ theorem openInputs_of_inputs {word : Word} (h : ∃ x ∈ word, x ≠ Digit.thre
   obtain ⟨K, hK⟩ := sheetDifference_identifies h hG
   obtain ⟨R, G, hR, hGd, cover1, cover2, mirror⟩ := hstar
   have hI1 := i1_of_root_stars h hG hsheet.unit hR hGd cover1
-  have hI2 := i2_pos_of_root_stars h hG hsheet.unit hR hGd cover2
+  have hI2 : (frameAt word).eps = 1 → _ := fun he => i2_pos_of_root_stars h hG hsheet.unit hR hGd (cover2 he) he
   have hI1' := openInput_one_of_chainBound h hG hK (fun z hz ht => by linarith [hK z, hI1 z hz ht])
   have hI2' := openInput_two_of_chainBound h hG hK (fun z hz hs =>
     ⟨fun he => by linarith [hK z, hI2 he z hz hs], fun he => by linarith [hK z, mirror he z hz hs]⟩)
