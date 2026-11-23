@@ -308,6 +308,14 @@ import FLatticePaper.Plane.Induction.SheetCharts
 import FLatticePaper.Plane.Induction.SheetPieces
 import FLatticePaper.Plane.Induction.ExitSlip
 import FLatticePaper.Plane.Induction.SheetCover
+import FLatticePaper.Plane.Induction.ChartPeriods
+import FLatticePaper.Plane.Induction.ChartShift
+import FLatticePaper.Plane.Induction.ChartSeparation
+import FLatticePaper.Plane.Induction.ChartGrades
+import FLatticePaper.Plane.Induction.ChartCommon
+import FLatticePaper.Plane.Induction.InputExit
+import FLatticePaper.Plane.Induction.ChartWitness
+import FLatticePaper.Plane.Induction.HWeb
 import FLatticePaper.Plane.Induction.W1Collar
 import FLatticePaper.Plane.Induction.W1CollarBox
 
