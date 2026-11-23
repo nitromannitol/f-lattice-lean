@@ -1,0 +1,4 @@
+import FLatticePaper.Plane.Induction.W1CollarFrame
+
+#print axioms FLatticePaper.W1CollarFrame.strict_corners_of_not_collar
+#print axioms FLatticePaper.W1CollarFrame.collarFrame_iff
