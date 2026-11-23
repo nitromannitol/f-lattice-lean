@@ -1,6 +1,7 @@
 import FLatticePaper.MainTheorems
 import FLatticePaper.Plane.Induction.I3CSheet
 import FLatticePaper.Plane.Induction.StrongProducer
+import FLatticePaper.Plane.Induction.StrongInduction
 
 /-! Task 39, step 1: the odometers theorem from the strong estimates of the conjugate words.
 
@@ -43,5 +44,23 @@ theorem odometersTheorem_of_producer
     OdometersTheorem :=
   odometersTheorem_of_strong
     (fun word hw hn => Induction.StrongEstimates.of_producer (hpk word hw hn) (hprod word hw hn)) hstar harc hodd hbulk
+
+/-- **The odometers theorem from the residual** (task 40): the strong estimates of every word follow from the pure words, the
+two-powers and the residual at every proper non-two-power word, by the word induction. -/
+theorem odometersTheorem_of_residual
+    (hpure : ∀ k : ℕ, Induction.StrongEstimates (List.replicate k Digit.three))
+    (htwo : ∀ k : ℕ, Induction.StrongEstimates (List.replicate (k + 1) Digit.two))
+    (hres : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word → Induction.StrongResidual word)
+    (hstar : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word → Induction.StarZoneInputs word)
+    (harc : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      Induction.VArcInputs (frameAt word) (standardField word))
+    (hodd : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      OddBlackNoRise (standardField word) (frameAt word).shortShift)
+    (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      Induction.S3NoFortInputs (frameAt word) (standardField word)) :
+    OdometersTheorem :=
+  odometersTheorem_of_strong
+    (fun word _ _ => Induction.strongEstimates_of_all hpure htwo hres hstar harc (Induction.conjWord word))
+    hstar harc hodd hbulk
 
 end FLatticePaper
