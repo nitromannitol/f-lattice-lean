@@ -290,6 +290,8 @@ import FLatticePaper.Plane.Induction.W1Lower
 import FLatticePaper.Plane.Induction.W1Seeds
 import FLatticePaper.Plane.Induction.W1Hc
 import FLatticePaper.Plane.Induction.W1Vside
+import FLatticePaper.Plane.Induction.W1Hexc
+import FLatticePaper.Plane.Induction.W1Hstrong
 import FLatticePaper.Plane.Induction.Q3Field
 import FLatticePaper.Plane.Induction.Q3Paragraph8
 import FLatticePaper.Plane.Induction.Q3VStar
