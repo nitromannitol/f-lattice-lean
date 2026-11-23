@@ -261,6 +261,7 @@ lake env lean checks/PackAssembly.lean
 lake env lean checks/PackGap.lean
 lake env lean checks/StandardPacking.lean
 lake env lean checks/IncrementCounts.lean
+lake env lean checks/SiteInductionAxioms.lean
 lake env lean checks/VArcLongitudinal.lean
 lake env lean checks/VArcOffers.lean
 lake env lean checks/ParentStepDischarge.lean
