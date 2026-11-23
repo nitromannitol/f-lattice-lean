@@ -369,5 +369,6 @@ import FLatticePaper.Plane.Induction.StrongSourceRep
 import FLatticePaper.Plane.Induction.StrongChartSlip
 import FLatticePaper.Plane.Induction.StrongVStar
 import FLatticePaper.Plane.Induction.W1ArcBottom
+import FLatticePaper.Plane.Induction.W1VShift
 
 /-! Root import for the corrected F-lattice paper. -/
