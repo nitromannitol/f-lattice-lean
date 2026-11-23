@@ -1,5 +1,5 @@
 import FLatticePaper.Construction.OddNominal
 
-#print axioms FLatticePaper.Construction.copy_of_zero_jet
-#print axioms FLatticePaper.Construction.odd_copy_zero_offset_agrees
+#print axioms FLatticePaper.Construction.standardJets_odd_slope_zero
+#print axioms FLatticePaper.Construction.copy_agrees_of_residual
 #print axioms FLatticePaper.Construction.ordinaryStandard_nominal_odd
