@@ -12,8 +12,8 @@ from `Potentials.lean` (`slip`, `price`, `cutPrice`, `shortShift`) and `Alternat
 
 The signed-policy notions (quotas, monotonicity along retained edges, reflected policies) are those of `SignedPolicy.lean`
 (task 38, w1). F2 and F3 are the policy of the standard field and its weighted ranks; F2 and F4 are the chain mate and its reflected
-policy. Not yet in this structure: the drifts of the price ranges and the even-parity extension of the odd zero strip
-(NO_ODD_SLIP_AUDIT §§2–4), which need their statements read from the audit.
+policy and the drifts of the price and the slip on the generators. Not yet in this structure: the even-parity extension of the odd
+zero strip (NO_ODD_SLIP_AUDIT §§2–4), whose frame (the odd conjugate's own coordinates) is not yet identified with `frameAt u`.
 -/
 
 namespace FLatticePaper.Induction
@@ -53,6 +53,20 @@ structure StrongEstimates (u : Word) : Prop where
   priceRange : ∀ z ∈ (frameAt u).closedPolygon,
     (frameAt u).cutPrice - 1 ≤ (frameAt u).price (standardField u) z ∧
       (frameAt u).price (standardField u) z ≤ (frameAt u).cutPrice
+  /-- The drifts of the primitive price on the generators `U` (kernel) and `V` (transverse) of the earlier child:
+  `P(z + U) − P(z) = −1` and `P(z + V) − P(z) = 0` (checked numerically on the standard fields of the proper words of length
+  at most three). -/
+  priceDrift : ∀ z,
+    (frameAt u).price (standardField u) (z + (frameAt u).child.modifiedDeck.kernel) -
+        (frameAt u).price (standardField u) z = -1 ∧
+      (frameAt u).price (standardField u) (z + (frameAt u).child.modifiedDeck.transverse) -
+        (frameAt u).price (standardField u) z = 0
+  /-- The drifts of the short slip `D_η` for `η = ±1`: `0` along `U` and `2η` along `V` (checked numerically as above). -/
+  slipDrift : ∀ η : ℤ, (η = 1 ∨ η = -1) → ∀ z,
+    (frameAt u).slip (standardField u) η (z + (frameAt u).child.modifiedDeck.kernel) -
+        (frameAt u).slip (standardField u) η z = 0 ∧
+      (frameAt u).slip (standardField u) η (z + (frameAt u).child.modifiedDeck.transverse) -
+        (frameAt u).slip (standardField u) η z = 2 * η
   /-- F1, the slip: unit increments of `F` against its σ-translate on every edge. -/
   F1_unitSlip : HasUnitSlip (standardField u) (fun z => standardField u (z + (frameAt u).shortShift))
   /-- F1, the slip: no-cross stars. -/
