@@ -322,6 +322,7 @@ import FLatticePaper.Plane.Induction.SlipReflect
 import FLatticePaper.Plane.Induction.RawB
 import FLatticePaper.Plane.Induction.NegChart
 import FLatticePaper.Plane.Induction.TieParity
+import FLatticePaper.Plane.Induction.TieOpt2
 import FLatticePaper.Plane.Induction.HWeb
 import FLatticePaper.Plane.Induction.W1Collar
 import FLatticePaper.Plane.Induction.W1CollarBox
