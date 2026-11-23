@@ -484,3 +484,13 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - (c) The 594 odd free H points map to even parent sites; 536 land in the word frame's free V, and the other 58 are exactly `V_p + I = (N−D+1, N+D−1)` (the exceptional endpoint of Q19, not free for ε = +1).
 - Consequence for the lead's step (2): the parent block vertex is `zTurn` of the even conjugate free H point, with `l < D`, so `parent_block_mem_freeV` applies.
 - Lean is not yet written for (a) or (b); the next step is the floor description of the even free H points of a general ChildFrame.
+
+### Task 72 (V-block converse, steps 1-3): VPathFloor.lean
+
+- PROVED `even_spectrum_floor` (step 1): an even site with `t` in the even H spectrum is `z₂ = ⌊2 n l / (d+n)⌋` for `l = (z₁+z₂)/2`. The identity is `2 n l = t + (d+n) z₂` with `0 ≤ t < d+n`.
+- PROVED `range_l`: with `r = (D−N) l − D b ∈ [1, D−1]` and `0 ≤ 2Dl − (D−N) b ≤ T_p + (D−N)`, `1 ≤ l ≤ D−1` (case analysis at `l ≤ 0`, `l = D`, `l ≥ D+1`).
+- PROVED `conj_freeH_even_block` (step 2): an even conjugate free H point `w` has `zTurn w = (−b', 2l−1−b')`, `b' = ⌊(D−N) l / D⌋`, `1 ≤ l ≤ D−1`. Uses the spectrum bounds on `t`, the polygon bounds on `s`, `conj_periodDenominator` and `conj_child_num_den`.
+- PROVED `conj_freeH_even_freeV` (step 3): `zTurn w` lies in the word frame's free V set (`parent_block_mem_freeV`, `l < D`).
+- Numerics (scripts/conj_freeH_vpath_check.py, words ≤ 4) agree with these statements.
+- Checks: `checks/VPathFloor.lean` (guards). Root build clean; sandbox logs clean.
+- Not yet: the odd conjugate free H points and `V_p + I` (the Q19 west edge).
