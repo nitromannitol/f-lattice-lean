@@ -208,4 +208,65 @@ theorem free_internal_gate (d : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (x y dx 
       rw [show 2 - d + 0 = 2 - d by ring, show d - 1 + 1 = d by ring] at hr'
       exact hr'
 
+/-- Lexicographic order is total on pairs: two points neither lex-larger than the other are equal. -/
+theorem eq_of_not_lexGt (a p : Pt) (h1 : ¬ LexGt a p) (h2 : ¬ LexGt p a) : a = p := by
+  obtain ⟨a1, a2⟩ := a
+  obtain ⟨p1, p2⟩ := p
+  simp only [LexGt, Prod.mk.injEq] at h1 h2 ⊢
+  omega
+
+/-- The alias translation is injective: a nonzero alias moves every point. -/
+theorem shiftP_ne_self (d : ℤ) (hd : 3 ≤ d) (p : Pt) (i j : ℤ) (hi : IsAlias i j) (hne : ¬ (i = 0 ∧ j = 0)) :
+    shiftP d p i j ≠ p := by
+  intro h
+  obtain ⟨hi1, hi2, hj1, hj2⟩ := hi
+  obtain ⟨x, y⟩ := p
+  simp only [shiftP, Prod.mk.injEq] at h hne
+  interval_cases i <;> interval_cases j <;> omega
+
+/-- **Bulk representatives are alias-isolated.** If `p` is a non-free representative, no nonzero alias translate is a representative. -/
+theorem not_rep_of_bulk_translate (d : ℤ) (hd : 3 ≤ d) (p : Pt) (hp : IsRepP d p) (hpf : ¬ IsFreeP d p)
+    (i j : ℤ) (hi : IsAlias i j) (hne : ¬ (i = 0 ∧ j = 0)) : ¬ IsRepP d (shiftP d p i j) := by
+  obtain ⟨hpn, hpfree, hplex⟩ : NativeP d p ∧ (∀ i j, IsAlias i j → ¬ IsFreeP d (shiftP d p i j)) ∧
+      (∀ i j, IsAlias i j → NativeP d (shiftP d p i j) → ¬ LexGt (shiftP d p i j) p) := by
+    rcases hp with hf | h
+    · exact absurd hf hpf
+    · exact h
+  intro hq
+  rcases hq with hqf | ⟨hqn, hqfree, hqlex⟩
+  · exact hpfree i j hi hqf
+  · -- the translate back to `p` is native and not lex-smaller than `shiftP p i j`
+    have hinv : shiftP d (shiftP d p i j) (-i) (-j) = p := by
+      obtain ⟨x, y⟩ := p
+      simp only [shiftP, Prod.mk.injEq]
+      constructor <;> ring
+    obtain ⟨hi1, hi2, hj1, hj2⟩ := hi
+    have hback : ¬ LexGt p (shiftP d p i j) := by
+      have := hqlex (-i) (-j) ⟨by omega, by omega, by omega, by omega⟩ (by rw [hinv]; exact hpn)
+      rw [hinv] at this
+      exact this
+    have hfwd : ¬ LexGt (shiftP d p i j) p := hplex i j ⟨hi1, hi2, hj1, hj2⟩ hqn
+    exact shiftP_ne_self d hd p i j ⟨hi1, hi2, hj1, hj2⟩ hne
+      (eq_of_not_lexGt _ _ hfwd hback)
+
+/-- A bulk representative has rank its own `valMinus`. -/
+theorem rankOf_bulk (d : ℤ) (hd : 3 ≤ d) (p : Pt) (hp : IsRepP d p) (hpf : ¬ IsFreeP d p) (r : ℤ)
+    (h : RankOf d p r) : r = valMinus d p := by
+  obtain ⟨i, j, hi, hrep, rfl⟩ := h
+  by_cases h0 : i = 0 ∧ j = 0
+  · obtain ⟨rfl, rfl⟩ := h0
+    simp [shiftP]
+  · exact absurd hrep (not_rep_of_bulk_translate d hd p hp hpf i j hi h0)
+
+/-- The existence half: a representative point has the rank of its own `valMinus`. -/
+theorem rankOf_self (d : ℤ) (p : Pt) (hp : IsRepP d p) : RankOf d p (valMinus d p) := by
+  refine ⟨0, 0, ⟨by norm_num, by norm_num, by norm_num, by norm_num⟩, ?_, ?_⟩
+  · simpa [shiftP] using hp
+  · simp [shiftP]
+
+/-- The rank of a translate of a representative, through the translating alias. -/
+theorem rankOf_translate (d : ℤ) (p : Pt) (i j : ℤ) (hi : IsAlias i j) (hrep : IsRepP d (shiftP d p i j)) :
+    RankOf d p (valMinus d (shiftP d p i j) - i * (2 * d) + j * (2 * (d + 1))) :=
+  ⟨i, j, hi, hrep, rfl⟩
+
 end FLatticePaper.PureRank
