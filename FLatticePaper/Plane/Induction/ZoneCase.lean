@@ -93,6 +93,57 @@ theorem value_plus (F : Site → ℤ) (N D nq dq Nu Du epsU : ℤ) (hdet : Nu * 
   unfold ZoneSlip.slipU
   ring
 
+/-- The hypotheses on the earlier word used by the zone argument: the earlier child `(D − N, D + N)`, its kernel and
+transverse periods, the slip range on the closed polygon, and the zero strip of the standard field in `t`. -/
+structure ZoneHyp (F : Site → ℤ) (N D Nu Du epsU : ℤ) : Prop where
+  hN : 0 < N
+  hND : N < D
+  hr : (D + N) % 2 = 1
+  hdet : Nu * (D + N) - Du * (D - N) = epsU
+  hepsU : epsU = 1 ∨ epsU = -1
+  hodd : (Nu + Du) % 2 = 1
+  hK : ∀ y : Site, F (y + (D + N, D - N)) = F y
+  hT : ∀ y : Site, F (y + (-2 * N, 2 * D)) =
+    F y + ((D - N) * y.1 - (D + N) * y.2) - (D ^ 2 + 2 * D * N - N ^ 2 + D)
+  hslip : ∀ y : Site, ZoneSlip.PolyU N D y →
+    0 ≤ ZoneSlip.slipU F (2 * epsU * Du, 2 * epsU * Nu) y ∧ ZoneSlip.slipU F (2 * epsU * Du, 2 * epsU * Nu) y ≤ 2
+  hstrip : ∀ y : Site, 1 - (D + N) ≤ (D - N) * y.1 - (D + N) * y.2 →
+    (D - N) * y.1 - (D + N) * y.2 ≤ (D - N) + 2 * (D + N) - 1 → F y = 0
+
+/-- The shortShift has transverse grade `−2`. -/
+theorem t_sigma (N D Nu Du epsU : ℤ) (hdet : Nu * (D + N) - Du * (D - N) = epsU) (hε2 : epsU ^ 2 = 1) :
+    (D - N) * (2 * epsU * Du) - (D + N) * (2 * epsU * Nu) = -2 := by
+  linear_combination (-2 * epsU) * hdet + (-2 : ℤ) * hε2
+
+/-- The sign of the `ε = −1` zone difference: nonnegative wherever the transverse coordinate of `Z w` is at most `r`. -/
+theorem zone_minus_nonneg (F : Site → ℤ) (N D nq dq Nu Du epsU : ℤ) (H : ZoneHyp F N D Nu Du epsU)
+    (hε : N * dq - nq * D = -1) (hD2 : 2 ≤ D) (w : Site)
+    (hj : (D - N) * (-w.2) - (D + N) * (w.1 - 1) ≤ D + N) :
+    0 ≤ F (-(w.2 - (nq + dq)), w.1 - (nq - dq) - 1) - F (-w.2, w.1 - 1) := by
+  have hε2 : epsU ^ 2 = 1 := by rcases H.hepsU with rfl | rfl <;> norm_num
+  rw [value_minus F N D nq dq Nu Du epsU H.hdet hε2 H.hK hε w]
+  have hσ := t_sigma N D Nu Du epsU H.hdet hε2
+  have ht : (D - N) * ((-w.2, w.1 - 1) - (2 * epsU * Du, 2 * epsU * Nu)).1
+      - (D + N) * ((-w.2, w.1 - 1) - (2 * epsU * Du, 2 * epsU * Nu)).2
+      = (D - N) * (-w.2) - (D + N) * (w.1 - 1) + 2 := by
+    simp only [Prod.fst_sub, Prod.snd_sub]
+    linear_combination (-1 : ℤ) * hσ
+  have hN := H.hN
+  have hND := H.hND
+  by_cases hc : (D - N) * ((-w.2, w.1 - 1) - (2 * epsU * Du, 2 * epsU * Nu)).1
+      - (D + N) * ((-w.2, w.1 - 1) - (2 * epsU * Du, 2 * epsU * Nu)).2 ≤ D + N
+  · exact (ZoneSlip.slip_sign F N D Nu Du epsU H.hN H.hND H.hr H.hdet H.hepsU H.hodd H.hK H.hT H.hslip _).1 hc
+  · have hc' : D + N < (D - N) * (-w.2) - (D + N) * (w.1 - 1) + 2 := by linarith
+    have hj' : D + N - 2 < (D - N) * (-w.2) - (D + N) * (w.1 - 1) := by linarith
+    have e : (-w.2, w.1 - 1) - (2 * epsU * Du, 2 * epsU * Nu) + (2 * epsU * Du, 2 * epsU * Nu)
+        = (-w.2, w.1 - 1) := by abel
+    unfold ZoneSlip.slipU
+    rw [e]
+    have h1 := H.hstrip ((-w.2, w.1 - 1) - (2 * epsU * Du, 2 * epsU * Nu))
+    have h2 := H.hstrip (-w.2, w.1 - 1)
+    rw [h1 (by rw [ht]; linarith) (by rw [ht]; linarith), h2 (by linarith) (by linarith)]
+    simp
+
 end ZoneCase
 
 end FLatticePaper.Induction
