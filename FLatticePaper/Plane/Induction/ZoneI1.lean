@@ -202,6 +202,23 @@ theorem box_of_closed (V : ChildFrame) (z : Site) (hz : z ∈ V.closedPolygon)
   unfold ChildFrame.tGrade at ht
   exact ZeroRegion.zeroRegion_box V.child.num V.child.den z.1 z.2 hn0 hnd ht b1 b2 b3
 
+/-- The sheet of the word in coordinates (the frame's `sheetC` with its shift, offset and constant unfolded). -/
+theorem sheetC_expr (V : ChildFrame) (Fp : Site → ℤ) (z : Site) :
+    V.sheetC Fp z = Fp (z.1 - (1 - V.phaseW) * V.parents.even.den
+        - (V.parents.even.num - V.parents.even.den + V.eps * V.parents.even.den),
+        z.2 - (1 - V.phaseW) * V.parents.even.num
+        - (V.parents.even.num + V.parents.even.den + V.eps * V.parents.even.num))
+      + (V.parents.even.num * (z.1 - (1 - V.phaseW) * V.parents.even.den)
+        - V.parents.even.den * (z.2 - (1 - V.phaseW) * V.parents.even.num))
+      + ((V.parents.even.den * V.parents.even.den + 2 * V.parents.even.den * V.parents.even.num
+          - V.parents.even.num * V.parents.even.num - V.parents.even.den - V.parents.even.num) / 2
+        + 2 * V.phaseW) := by
+  unfold ChildFrame.sheetC ChildFrame.sheetShift ChildFrame.sheetOffset ChildFrame.siblingSlope
+    ChildFrame.sheetConstant Fraction.periodDenominator Fraction.unmodifiedDeck
+  simp only [smul_eq_mul, Prod.smul_mk, Prod.fst_sub, Prod.snd_sub, Prod.mk_add_mk]
+  congr 1
+  ring_nf
+
 end ZoneI1
 
 end FLatticePaper.Induction
