@@ -29,11 +29,9 @@ theorem excess_sum {F m : Field} {c : Site} (hc : F c = m c) :
 /-- **The contact cone step.** A contact of a true fort `S` of `F` has an input which is a contact of `S`. -/
 theorem fort_contact_input {F m : Field} {S : Set Site} (hfort : IsIncomingFort F S) {c : Site} (hcS : c ∈ S)
     (hc : F c = m c) (hm : ∀ x, laplacian m x = -1 ∨ laplacian m x = 0)
-    (hle : ∀ x, m x ≤ F x) :
+    (h1 : m (incomingNeg c) ≤ F (incomingNeg c)) (h2 : m (incomingPos c) ≤ F (incomingPos c)) :
     ∃ i : Site, (i = incomingNeg c ∨ i = incomingPos c) ∧ i ∈ S ∧ F i = m i := by
   have hsum := excess_sum (F := F) (m := m) hc
-  have h1 := hle (incomingNeg c)
-  have h2 := hle (incomingPos c)
   rcases hfort c hcS with ⟨hl, hsome⟩ | ⟨hl, hn, hp⟩
   · -- black: both inputs are contacts (the excess sum is `−1 − lap m ≤ 0`)
     have hmc := hm c
