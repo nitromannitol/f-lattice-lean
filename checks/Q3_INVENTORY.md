@@ -476,3 +476,11 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - PROVED `conj_freeH_band`: a free conjugate H site `zTurn x + combine i j` forces the translated parent s-grade `σ = s_p x + j·2T_p` into one of two bands: `σ` odd in `[N−D+2, N+D−2]` (the conjugate's even-t branch), or `σ` even in `[0, 2N]` (the odd-t branch). Uses `L = D+N` odd.
 - Reading: the even-root part `[0, 2N]` is the earlier (parent-child) frame's V spectrum restricted to its lower band; the odd-root part is the odd H band, which the frame's free V (even sites only) does not contain. The V block (BlockPairAt, Q19 west edge) still needs the identification of the earlier frame's free V with the conjugate free H, which is not yet proved.
 - Checks: `checks/ConjFreeRoot.lean`. Root build clean; sandbox logs clean.
+
+### Task 72 (V-block converse, numerics): scripts/conj_freeH_vpath_check.py
+
+- (a) General children: every even free H point of an odd coprime child `(n, d)`, `d ≤ 25`, satisfies `z = (2l − b, b)` with `b = ⌊2nl/L⌋`, `L = n + d` (815 points).
+- (b) Words ≤ 4 (112 words, 1652 conjugate free H points): the forward transport `x = zTurn(w) = (−w2, w1 − 1)` takes the 1058 even free H points onto the parent V vertices `(−b', 2l − 1 − b')`, `b' = ⌊(D − N) l / D⌋`, with `1 ≤ l ≤ D − 1`, all in the word frame's free V. The lead's `zTurnInv` direction is the wrong one.
+- (c) The 594 odd free H points map to even parent sites; 536 land in the word frame's free V, and the other 58 are exactly `V_p + I = (N−D+1, N+D−1)` (the exceptional endpoint of Q19, not free for ε = +1).
+- Consequence for the lead's step (2): the parent block vertex is `zTurn` of the even conjugate free H point, with `l < D`, so `parent_block_mem_freeV` applies.
+- Lean is not yet written for (a) or (b); the next step is the floor description of the even free H points of a general ChildFrame.
