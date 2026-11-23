@@ -50,4 +50,21 @@ theorem price_eq_cutPrice_of_hWindow (frame : ChildFrame) (F : Field) (hS : fram
     hh (z - frame.parentShift) (by rw [hsub]; omega) (by rw [hsub]; omega)
   exact FLatticePaper.StrongPriceValues.price_eq_cutPrice_of_harmonic frame F z h1 h2
 
+
+/-- **The zero-source boundary identity.** If `F z = 0` (the zero strip at `z`) and `F (z − v) = h₀ (z − v)`, then `P z = c₀ − h₀ z`. -/
+theorem price_eq_cutPrice_sub_harmonic_of_zero (frame : ChildFrame) (F : Field) (z : Site) (h0z : F z = 0)
+    (h1 : F (z - frame.parentShift) = harmonicGrid (z - frame.parentShift)) :
+    frame.price F z = frame.cutPrice - harmonicGrid z := by
+  have hd := FLatticePaper.W1Lower.harmonicGrid_shift_price frame z
+  unfold ChildFrame.price ChildFrame.parentSlope
+  rw [h0z, h1]
+  linarith
+
+/-- On such a site, `P z ≤ c₀` exactly when `h₀ z ≥ 0`. -/
+theorem price_le_cutPrice_iff_harmonic_nonneg (frame : ChildFrame) (F : Field) (z : Site) (h0z : F z = 0)
+    (h1 : F (z - frame.parentShift) = harmonicGrid (z - frame.parentShift)) :
+    frame.price F z ≤ frame.cutPrice ↔ 0 ≤ harmonicGrid z := by
+  rw [price_eq_cutPrice_sub_harmonic_of_zero frame F z h0z h1]
+  constructor <;> intro h <;> linarith
+
 end FLatticePaper.StrongPriceInputs
