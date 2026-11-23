@@ -1,5 +1,7 @@
 import FLatticePaper.Tiles.SiteMaskStair
 import FLatticePaper.Construction.StaircaseCoverage
+import FLatticePaper.Construction.LadderCoverage
+import FLatticePaper.Tiles.SiteMaskLadder
 
 /-! Task 53, item 1: the covers of the base masks, transferred from the repository's deck covers to `QuotientCover`.
 
@@ -59,5 +61,24 @@ theorem cover_stair (k : ℕ) :
   have hraw := stairEven_raw_cover hden
   rw [stairEven_raw_sites_eq k] at hraw
   exact quotientCover_of_covers (Fraction.mk 1 (2 * (k : ℤ) + 3)) _ hraw
+
+/-- The raw odd ladder is the set `ladderF`. -/
+theorem ladderOdd_raw_sites_eq (k : ℕ) (hk : 1 ≤ k) :
+    (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 2)).sites = ladderF (2 * (k : ℤ) + 2) := by
+  ext z
+  obtain ⟨x, y⟩ := z
+  rw [BaseMask.mem_ladderOdd_raw_iff, mem_ladderF (by omega : (2 : ℤ) ≤ 2 * (k : ℤ) + 2)]
+  simp only [BaseMask.LadderOddCorner]
+  omega
+
+/-- `CV2`: the odd doubled ladder covers its `H` set, with the periods of `⟨1, 2k + 2⟩`. -/
+theorem cover_ladder (k : ℕ) (hk : 1 ≤ k) :
+    QuotientCover (HSet ⟨1, 2 * (k : ℤ) + 2⟩) (perU ⟨1, 2 * (k : ℤ) + 2⟩) (perV ⟨1, 2 * (k : ℤ) + 2⟩) := by
+  rw [← SiteMaskLadder.ladder_eq k hk]
+  have hden : BaseMask.ladderOdd.Valid (2 * (k : ℤ) + 2) :=
+    (show 4 ≤ 2 * (k : ℤ) + 2 ∧ (2 * (k : ℤ) + 2) % 2 = 0 from ⟨by omega, by omega⟩)
+  have hraw := ladderOdd_raw_cover hden
+  rw [ladderOdd_raw_sites_eq k hk] at hraw
+  exact quotientCover_of_covers (Fraction.mk 1 (2 * (k : ℤ) + 2)) _ hraw
 
 end FLatticePaper.Tiles.SiteCovers
