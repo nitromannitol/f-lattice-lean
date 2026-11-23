@@ -502,3 +502,11 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - For `r_l ≤ N − 1` the image is in the word frame's freeV (482 cases, words ≤ 4; the origin for `l = 0`); the word index `q = (d − n) l − d b` satisfies `q ≤ n` there (370 cases).
 - `excVertex` is free exactly when ε = −1 (54 of 112 `r = N` cases in words ≤ 4; the other 58 have ε = +1). Words ≤ 5 agree (3208 odd points, no failures).
 - Lean is not yet written for this; the algebra needed is the identity `D q = ε l + d r` (ε = N d − D n), giving `q ≤ n` from `r ≤ N − 1`.
+
+### Task 72 (V-block converse, odd points): OddFreeH.lean
+
+- PROVED `odd_block_arith`: with `r = (D − N) l − D b ∈ [0, N]` and the polygon band `1 − N ≤ σ + D ≤ T_p + D − 1` (`σ = 2Dl − (D − N) b`), `0 ≤ l ≤ D − 1` (from `D σ = T_p l + (D − N) r`).
+- PROVED `odd_freeH_image`: for an odd free H point `w` of the conjugate child, `zTurn w ∈ freeV` (word frame) or `zTurn w = excVertex` (`V_p + I`). The first case splits: `r = N` gives `l = D − 1`, `b = D − 1 − N` (via `ε(l+1) = D(d(l−b) − n(l+1))` and `ε = ±1`); `r ≤ N − 1` gives the block vertex `(−b, 2l − b)` (`even_block_mem_freeV`, with `q ≤ n` from `D q = ε l + d r`), and `l = 0` gives the origin (`origin_mem_freeV`).
+- PROVED `origin_mem_freeV`, `even_block_mem_freeV` (the child-frame block vertex `(−b, 2l − b)` with `q ≤ n`).
+- Checks: `checks/OddFreeH.lean`. Root build clean; sandbox logs clean (rc=1 on the warning/error/sorry greps).
+- Remaining for the V block: the excVertex case goes to the exceptional leaf (`exceptional_drop_excluded` with `exceptional_hT_proved`), and the −σ mirror of `BlockPairAt`.
