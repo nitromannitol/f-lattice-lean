@@ -145,30 +145,30 @@ theorem noBlackPairRise_of_chart_cover {word : Word} (h : ∃ x ∈ word, x ≠ 
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
     {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
     (hrep : ∀ c i, RisingBlackPair (standardField word) (frameAt word).shortShift c i →
-      c ∈ (frameAt word).closedPolygon ∧ i ∈ (frameAt word).closedPolygon)
+      c ∈ (frameAt word).closedPolygon → i ∈ (frameAt word).closedPolygon)
     (hstrict : ∀ c i, RisingBlackPair (standardField word) (frameAt word).shortShift c i →
-      1 ≤ sheetDiffW word c ∧ 1 ≤ sheetDiffW word i)
+      c ∈ (frameAt word).closedPolygon → 1 ≤ sheetDiffW word c ∧ 1 ≤ sheetDiffW word i)
     (hret : ∀ c i, RisingBlackPair (standardField word) (frameAt word).shortShift c i →
-      sheetPolicyA P (frameAt word).sheetShift c i) :
-    NoBlackPairRise (standardField word) (frameAt word).shortShift := by
+      c ∈ (frameAt word).closedPolygon → sheetPolicyA P (frameAt word).sheetShift c i) :
+    ∀ c i, RisingBlackPair (standardField word) (frameAt word).shortShift c i →
+      c ∈ (frameAt word).closedPolygon → False := by
   have hn3 : 3 ≤ (frameAt word).child.num := child_num_ge_three h
   have hnd : (frameAt word).child.num + 2 ≤ (frameAt word).child.den := by
     have := (frameAt word).child_facts.2.2.1
     omega
-  intro c hc hpar hbs i hi hone
-  have hr : RisingBlackPair (standardField word) (frameAt word).shortShift c i := ⟨hi, hc, hpar, hbs, hone⟩
-  obtain ⟨hcE, hiE⟩ := hrep c i hr
-  obtain ⟨hΨc, hΨi⟩ := hstrict c i hr
-  have hEdge : Edge i c := hi
+  intro c i hr hcE
+  have hiE : i ∈ (frameAt word).closedPolygon := hrep c i hr hcE
+  obtain ⟨hΨc, hΨi⟩ := hstrict c i hr hcE
+  have hEdge : Edge i c := hr.1
   by_cases hnc : (frameAt word).tGrade c - 2 ≥
       (if EvenSite c then 2 else (frameAt word).child.num) - (frameAt word).child.periodDenominator
   · by_cases hni : (frameAt word).tGrade i - 2 ≥
         (if EvenSite i then 2 else (frameAt word).child.num) - (frameAt word).child.periodDenominator
     · rcases common_chart_option (frameAt word) hn3 hnd hcE hiE hEdge hnc hni with ⟨hcs, his⟩ | ⟨hcq, hiq⟩
       · exact first_chart_excluded h hSE P
-          (firstChart_witness h hSE P hcE hiE hEdge hcs his hΨc (hret c i hr)) hr
+          (firstChart_witness h hSE P hcE hiE hEdge hcs his hΨc (hret c i hr hcE)) hr
       · exact adjacent_chart_excluded h hSE P
-          (adjacentChart_witness h hSE hpk P hcE hiE hcq hiq (by linarith) hΨi (hret c i hr)) hr
+          (adjacentChart_witness h hSE hpk P hcE hiE hcq hiq (by linarith) hΨi (hret c i hr hcE)) hr
     · exact (frameAt word).not_rising_of_input_exit hpk hn3 hnd
         ⟨hcE, hiE, hEdge, not_le.mp hni⟩ hr
   · exact (frameAt word).not_rising_of_centre_exit hpk hn3 hnd
