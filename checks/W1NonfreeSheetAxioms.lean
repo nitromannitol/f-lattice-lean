@@ -1,0 +1,3 @@
+import FLatticePaper.Plane.Induction.W1NonfreeSheet
+
+#print axioms FLatticePaper.W1NonfreeSheet.sheet_squareOut_of_parent
