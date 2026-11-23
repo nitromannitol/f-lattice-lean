@@ -281,6 +281,8 @@ import FLatticePaper.Plane.Induction.Q3Bridge
 import FLatticePaper.Plane.Induction.Q3Adjacent
 import FLatticePaper.Plane.Induction.Q3Bound
 import FLatticePaper.Plane.Induction.W1Constructor
+import FLatticePaper.Plane.Induction.W1Pick
+import FLatticePaper.Plane.Induction.W1Exit
 import FLatticePaper.Plane.Induction.Q3Field
 
 /-! Root import for the corrected F-lattice paper. -/
