@@ -245,4 +245,73 @@ theorem vband_stringSites_M (n d x y _t s a l : ℤ) (ℓ'' : BinaryWord) (hn : 
         (fun _ => ⟨by omega, by omega, by norm_num, by norm_num, by norm_num, by norm_num⟩)
 
 
+theorem vband_stringSites_ext (n d x y _t s a l : ℤ) (ℓ'' : BinaryWord) (hn : 0 < n) (hnd : n < d) (hM : 0 ≤ y - x ∧ y - x ≤ 2 * d - 2)
+    (hV : CursorV (Letter.q :: ℓ'') n d) (hlen : ((Letter.q :: ℓ'').length : ℤ) = d)
+    (hs : s = (d + n) * x + (d - n) * y)
+    (hsite : ((x + y) % 2 = 1 → a = n ∧ l = min (d - n) (3 * n - d)) ∧
+      ((x + y) % 2 = 0 → a = min (2 * n) (d - n) ∧ l = 0))
+    (hH3 : l ≤ s)
+    (hsodd : (x + y) % 2 = 1 → s < d + n) (heven : (x + y) % 2 = 0 → s < 2 * d) :
+    (x + 1, y + 1) ∈ stringSites true true (Letter.q :: ℓ'') := by
+  obtain ⟨hM0, hM1⟩ := hM
+  have hd : 0 < d := by omega
+  rcases (show (x + y) % 2 = 0 ∨ (x + y) % 2 = 1 by omega) with hz | hz
+  · -- even site: `l = 0`, the index is `k = (y − x)/2`, the cursor value `B = y − k`
+    obtain ⟨-, hl⟩ := hsite.2 hz
+    obtain ⟨k, hk⟩ : ∃ k : ℕ, (k : ℤ) = (y - x) / 2 := ⟨((y - x) / 2).toNat, Int.toNat_of_nonneg (by omega)⟩
+    have hk2 : (2 * k : ℤ) = y - x := by omega
+    have hx : x = y - 2 * k := by omega
+    have hEs : 2 * (d * (y - k) - n * k) = s := by
+      rw [hs, hx]; ring
+    have hkl : k < (Letter.q :: ℓ'').length := by omega
+    have hB : qPrefix (Letter.q :: ℓ'') k = y - k := by
+      apply qPrefix_eq_of_vErr (Letter.q :: ℓ'') n d hV hd k (by omega) (y - k)
+      · linarith [hEs, hH3, hl]
+      · linarith [hEs, heven hz, hl]
+    by_cases hEn : d * (y - k) - n * k < n
+    · exact mem_of_vcursor ℓ'' n d hV k hkl (y - k) x y 0 0 hB
+        (fun _ => ⟨by omega, by omega, by norm_num, by norm_num, by norm_num, by norm_num⟩)
+        (fun h => absurd hEn (not_lt.mpr h))
+    · exact mem_of_vcursor ℓ'' n d hV k hkl (y - k) x y 0 1 hB
+        (fun h => absurd h hEn)
+        (fun _ => ⟨by omega, by omega, by norm_num, by norm_num, by norm_num, by norm_num⟩)
+  · -- odd site: `a = n`, `l = min(d − n, 3n − d)`
+    obtain ⟨-, hl⟩ := hsite.1 hz
+    by_cases hsC : d - n ≤ s
+    · -- `C ≤ s`: the index `k = (y − x − 1)/2`, the cursor value `B = y − k − 1`, and a `q` with offset `(0,1)`
+      obtain ⟨k, hk⟩ : ∃ k : ℕ, (k : ℤ) = (y - x - 1) / 2 := ⟨((y - x - 1) / 2).toNat, Int.toNat_of_nonneg (by omega)⟩
+      have hk2 : (2 * k : ℤ) = y - x - 1 := by omega
+      have hx : x = y - 2 * k - 1 := by omega
+      have hEs : 2 * (d * (y - k - 1) - n * k) = s - (d - n) := by
+        rw [hs, hx]; ring
+      have hkl : k < (Letter.q :: ℓ'').length := by omega
+      have hsL : s < d + n := hsodd hz
+      have hsC2 : s - (d - n) < 2 * d := by omega
+      have hB : qPrefix (Letter.q :: ℓ'') k = y - k - 1 := by
+        apply qPrefix_eq_of_vErr (Letter.q :: ℓ'') n d hV hd k (by omega) (y - k - 1)
+        · linarith [hEs, hsC]
+        · linarith [hEs, hsC2]
+      have hElt : d * (y - k - 1) - n * k < n := by linarith [hEs, hsL]
+      exact mem_of_vcursor ℓ'' n d hV k hkl (y - k - 1) x y 0 1 hB
+        (fun _ => ⟨by omega, by omega, by norm_num, by norm_num, by norm_num, by norm_num⟩)
+        (fun h => absurd hElt (not_lt.mpr h))
+    · -- `s < C`: then `3n − d ≤ s`; the index `k = (y − x + 1)/2`, `B = y − k + 1`, and a `p` with offset `(0,0)`
+      have hsC' : s < d - n := by omega
+      have hs3 : 3 * n - d ≤ s := by omega
+      obtain ⟨k, hk⟩ : ∃ k : ℕ, (k : ℤ) = (y - x + 1) / 2 := ⟨((y - x + 1) / 2).toNat, Int.toNat_of_nonneg (by omega)⟩
+      have hk2 : (2 * k : ℤ) = y - x + 1 := by omega
+      have hx : x = y - 2 * k + 1 := by omega
+      have hEs : 2 * (d * (y - k + 1) - n * k) = s + (d - n) := by
+        rw [hs, hx]; ring
+      have hkl : k < (Letter.q :: ℓ'').length := by omega
+      have hB : qPrefix (Letter.q :: ℓ'') k = y - k + 1 := by
+        apply qPrefix_eq_of_vErr (Letter.q :: ℓ'') n d hV hd k (by omega) (y - k + 1)
+        · linarith [hEs, hs3]
+        · linarith [hEs, hsC']
+      exact mem_of_vcursor ℓ'' n d hV k hkl (y - k + 1) x y 0 0 hB
+        (fun h => absurd h (not_lt.mpr (by linarith [hEs, hs3] : n ≤ d * (y - k + 1) - n * k)))
+        (fun _ => ⟨by omega, by omega, by norm_num, by norm_num, by norm_num, by norm_num⟩)
+
+
+
 end FLatticePaper.Tiles.SiteVertCover

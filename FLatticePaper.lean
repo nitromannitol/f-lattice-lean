@@ -290,6 +290,8 @@ import FLatticePaper.Tiles.SiteVertCover
 import FLatticePaper.Tiles.SiteHull
 import FLatticePaper.Tiles.SiteHullOdd
 import FLatticePaper.Tiles.SiteHullEven
+import FLatticePaper.Tiles.SiteBoundary
+import FLatticePaper.Tiles.SiteBoundaryCover
 import FLatticePaper.Plane.Induction.S3FreeBoundary
 import FLatticePaper.Plane.Induction.ParentCoordinates
 import FLatticePaper.Plane.Induction.Q3Arithmetic
