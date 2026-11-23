@@ -1,4 +1,5 @@
 import FLatticePaper.Tiles.BinaryWords
+import FLatticePaper.Farey.Rotation
 
 /-! Task 51 (clause (b) from the fix of Q9): the letter counts of the zero-one words of a standard tile.
 
@@ -93,5 +94,90 @@ theorem quadCounts_all (u : Word) : QuadCounts u := by
     | one => exact quadCounts_snoc_one u ih
     | two => exact quadCounts_snoc_two u ih
     | three => exact quadCounts_snoc_three u ih
+
+
+/-! ### The vertical string and the forward increment sums -/
+
+/-- The letter exchange `p ↔ q` of the vertical string (the vertical zero-one string is the child word of the swapped word, with
+the letters exchanged). -/
+def swapLetter : Letter → Letter
+  | .p => .q
+  | .q => .p
+
+/-- The vertical zero-one word of the word `u`: the even child word of the two-three swapped word, with the letters exchanged. -/
+def vertWord (u : Word) : BinaryWord := (quadAt [] (u.map Digit.swapTwoThree)).childQ.map swapLetter
+
+theorem count_map_swapLetter_p (w : BinaryWord) : (w.map swapLetter).count Letter.p = w.count Letter.q := by
+  induction w with
+  | nil => rfl
+  | cons x w ih => cases x <;> simp [swapLetter, ih]
+
+theorem count_map_swapLetter_q (w : BinaryWord) : (w.map swapLetter).count Letter.q = w.count Letter.p := by
+  induction w with
+  | nil => rfl
+  | cons x w ih => cases x <;> simp [swapLetter, ih]
+
+/-- The parents of the two-three swapped word are the rotated parents (`Parents.ValidFrame.rotate_walk` at the root). -/
+theorem parentsAt_map_swap (u : Word) : parentsAt (u.map Digit.swapTwoThree) = (parentsAt u).rotate := by
+  have h := Parents.ValidFrame.rotate_walk root_valid u
+  have hr : root.rotate = root := rfl
+  rw [hr] at h
+  exact h.symm
+
+/-- The vertical counts: `#p(vertWord u) = d − n` and `#q(vertWord u) = n`, with `(n, d)` the current odd fraction at `u`. -/
+theorem vertWord_counts (u : Word) :
+    ((vertWord u).count Letter.p : ℤ) = ((parentsAt u).current .odd).den - ((parentsAt u).current .odd).num ∧
+      ((vertWord u).count Letter.q : ℤ) = ((parentsAt u).current .odd).num := by
+  have hE := (quadCounts_all (u.map Digit.swapTwoThree)).2.1
+  unfold EvnCount at hE
+  rw [parentsAt_map_swap] at hE
+  have hV := parentsAt_valid u
+  have hodd : ((parentsAt u).odd.num + (parentsAt u).odd.den) % 2 = 1 := hV.odd_parity
+  have heven : ((parentsAt u).even.num + (parentsAt u).even.den) % 2 = 0 := hV.even_parity
+  unfold vertWord
+  rw [count_map_swapLetter_p, count_map_swapLetter_q]
+  simp only [Parents.rotate, Parents.current, Parents.combine] at hE ⊢
+  rw [Fraction.rotate_of_even hV.even_parity, Fraction.rotate_of_odd hV.odd_parity] at hE
+  obtain ⟨hE1, hE2⟩ := hE
+  dsimp only at hE1 hE2 ⊢
+  constructor <;> omega
+
+
+/-- The increment sum of a zero-one word in the horizontal offsets `p ↦ (2, 0)`, `q ↦ (1, 1)`. -/
+def hIncSum (c : BinaryWord) : ℤ × ℤ := (2 * (c.count Letter.p : ℤ) + (c.count Letter.q : ℤ), (c.count Letter.q : ℤ))
+
+/-- **The forward horizontal sum of the odd child word is the doubled odd period** `2 (d, n)`, with `(n, d)` the current odd
+fraction at `u` (the sum of the increments equals `U = μ (d, n)` with `μ = 2`). -/
+theorem hIncSum_childP (u : Word) :
+    hIncSum (quadAt [] u).childP = (2 * ((parentsAt u).current .odd).den, 2 * ((parentsAt u).current .odd).num) := by
+  have h := (quadCounts_all u).1
+  unfold FwdCount at h
+  unfold hIncSum
+  obtain ⟨h1, h2⟩ := h
+  ext
+  · dsimp only; omega
+  · dsimp only; omega
+
+/-- **The forward horizontal sum of the even child word is the period** `(d, n)` of the even fraction (`μ = 1`). -/
+theorem hIncSum_childQ (u : Word) :
+    hIncSum (quadAt [] u).childQ = (((parentsAt u).current .even).den, ((parentsAt u).current .even).num) := by
+  have h := (quadCounts_all u).2.1
+  unfold EvnCount at h
+  unfold hIncSum
+  obtain ⟨h1, h2⟩ := h
+  ext
+  · dsimp only; omega
+  · dsimp only; omega
+
+/-- **The reversed vertical last corner**: the vertical increments `#p (−1, 1) + #q (0, 2)` of `vertWord u` sum to
+`V = (−C, L)` with `C = d − n` and `L = d + n`, for the odd fraction `(n, d)` at `u`. -/
+theorem vertWord_lastCorner (u : Word) :
+    (-(vertWord u).count Letter.p : ℤ) = -(((parentsAt u).current .odd).den - ((parentsAt u).current .odd).num) ∧
+      ((vertWord u).count Letter.p : ℤ) + 2 * ((vertWord u).count Letter.q : ℤ) =
+        ((parentsAt u).current .odd).den + ((parentsAt u).current .odd).num := by
+  obtain ⟨h1, h2⟩ := vertWord_counts u
+  constructor
+  · rw [h1]
+  · rw [h1, h2]; ring
 
 end FLatticePaper.Tiles
