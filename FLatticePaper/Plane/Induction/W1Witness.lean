@@ -19,12 +19,13 @@ structure OldPolicyWitness (frame : ChildFrame) (G : Field) (seed : Site → Sit
   /-- Every forced non-seed white of the earlier field is forced by a derivation whose squares lie in the earlier strict interior. -/
   strictForced : ∀ c i, ForcedEdge G seed c i → ¬ seed c i →
     ForcedEdgeIn G (StrictInterior frame.child.num frame.child.den) seed c i
-  /-- PRIVATE witness squares (the parent's W1 data, inherited): the witness square of a forced non-seed white `c` contains `c`, and
-  its other three corners are reached from `c` by retained lattice edges, each step a retained input of the site before it. The
-  three edges go from the root along the policy, so the ranks of the policy decrease from the root to its corners (`W1Phase`). -/
+  /-- PRIVATE witness squares (the parent's W1 data, inherited; archive ALL_WHITE_THREE_STEP_RETURNS §A and AUDIT §1): the witness square
+  of a forced non-seed white `c` contains `c`, and every other corner `c'` is joined to `c` by a chain of retained lattice edges, each
+  step a retained input of the site before it (`c'` keeps … keeps `c`). The rejected input of `c` is the square corner `u` with
+  `u → v → w → c`, so the ranks decrease from the corners to the root: `R c < R c'` (`W1Phase`). -/
   privateSquare : ∀ c i, ForcedEdge G seed c i → ¬ seed c i → laplacian G c = 0 →
     ∃ a b : ℤ, c ∈ squareCorners a b ∧
-      ∀ c' ∈ squareCorners a b, c' ≠ c → Relation.TransGen (fun x y => retained x y ∧ Edge y x) c c'
+      ∀ c' ∈ squareCorners a b, c' ≠ c → Relation.TransGen (fun x y => retained x y ∧ Edge y x) c' c
 
 /-- The first unit step of a derivation: a square containing `c` in `R`, its rejected input `o` outside it, and every other white
 corner forced into it (by a derivation at its own pointer inside the square). -/
