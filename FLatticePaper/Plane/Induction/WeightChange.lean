@@ -1,0 +1,414 @@
+import FLatticePaper.Graph
+import Mathlib.Tactic.Ring
+import Mathlib.Tactic.LinearCombination
+import Mathlib.Tactic.Linarith
+import Mathlib.Data.Int.ConditionallyCompleteOrder
+import Mathlib.Algebra.Order.Ring.Abs
+import Mathlib.Algebra.Order.Group.Abs
+import Mathlib.Data.Int.Interval
+import Mathlib.Data.Finset.Prod
+import Mathlib.Algebra.Order.BigOperators.Group.Finset
+
+/-! Task 42: the weight change on a fixed graph (fix Q4-I3, "External facts").
+
+A deck basis `U, V` with determinant `D ≠ 0` generates the lattice `L = {i U + j V}` (the deck). A relation `retained c i` lists
+the retained inputs of a site. Suppose two deck-affine functions `P, J` (increments `(−1, 0)` and `(0, η)`) do not increase along
+retained edges, and one old strict rank `r0` (increments `lam0 (−a0)`, `lam0 (c0 η)`) strictly decreases along them. Then for all
+integers `a, c > 0` there is a rank with increments `lam (−a, c η)`, `lam > 0`, strictly decreasing along the retained edges.
+
+Construction. The lift `w` (integer, with increments `(−a, c η)`) is `w z = ⌊(A z₁ + B z₂)/D⌋`. The walk value `M (w e − w z) + n` of a
+retained walk of length `n` from `z` to `e`, with `M = lam0 (a0 + c0)`, is bounded: `n ≤ r0 z − r0 e` along a walk, so the value is at most
+`g e − g z` with `g = M w − r0`; and `g` is bounded above on the sites `e` with `P e ≤ P z`, `J e ≤ J z`, by the monotonicity of `g`
+along `U` and `V` (its increments have the right signs). The rank is `M w + R`, where `R z` is the supremum of the walk values from `z`. -/
+
+namespace FLatticePaper.WeightChange
+
+open FLatticePaper
+
+/-- The deck point `i U + j V`. -/
+def latPt (U V : Site) (i j : ℤ) : Site := (i * U.1 + j * V.1, i * U.2 + j * V.2)
+
+/-- The determinant of the deck basis. -/
+def detUV (U V : Site) : ℤ := U.1 * V.2 - U.2 * V.1
+
+theorem latPt_zero (U V : Site) : latPt U V 0 0 = (0, 0) := by
+  unfold latPt
+  simp
+
+theorem latPt_succ_fst (U V : Site) (n : ℤ) : latPt U V (n + 1) 0 = latPt U V n 0 + U := by
+  unfold latPt
+  ext <;> simp <;> ring
+
+theorem latPt_succ_snd (U V : Site) (n : ℤ) : latPt U V 0 (n + 1) = latPt U V 0 n + V := by
+  unfold latPt
+  ext <;> simp <;> ring
+
+theorem latPt_split (U V : Site) (i j : ℤ) : latPt U V i j = latPt U V i 0 + latPt U V 0 j := by
+  unfold latPt
+  ext <;> simp
+
+/-- Adding the zero site does nothing. -/
+theorem site_add_zero' (z : Site) : z + (0 : Site) = z := by
+  ext <;> simp
+
+/-- An affine sequence: `F (z + T n) = F z + n c` when `T` steps by `step` and `F` increases by `c` along `step`. -/
+theorem affine_seq {F : Site → ℤ} {step : Site} {c : ℤ} (hstep : ∀ z, F (z + step) = F z + c)
+    (T : ℤ → Site) (hT0 : T 0 = 0) (hTs : ∀ n, T (n + 1) = T n + step) (z : Site) (n : ℤ) :
+    F (z + T n) = F z + n * c := by
+  refine Int.induction_on n ?_ ?_ ?_
+  · rw [hT0, site_add_zero', zero_mul, add_zero]
+  · intro k ih
+    have key : z + T ((k : ℤ) + 1) = (z + T k) + step := by
+      rw [hTs]
+      ext <;> simp <;> ring
+    rw [key, hstep, ih]
+    ring
+  · intro k ih
+    have h1 := hstep (z + T (-(k : ℤ) - 1))
+    have h2 := hTs (-(k : ℤ) - 1)
+    have e : -(k : ℤ) - 1 + 1 = -(k : ℤ) := by ring
+    rw [e] at h2
+    have h3 : z + T (-(k : ℤ)) = (z + T (-(k : ℤ) - 1)) + step := by
+      rw [h2]
+      ext <;> simp <;> ring
+    have ih' : F (z + T (-(k : ℤ) - 1) + step) = F z + (-(k : ℤ)) * c := by
+      rw [← h3]
+      exact ih
+    linear_combination ih' - h1
+
+/-- A function with increments `p` along `U` and `q` along `V` has increment `i p + j q` along the deck point `i U + j V`. -/
+theorem affine_lattice {F : Site → ℤ} {U V : Site} {p q : ℤ} (hU : ∀ z, F (z + U) = F z + p)
+    (hV : ∀ z, F (z + V) = F z + q) (z : Site) (i j : ℤ) :
+    F (z + latPt U V i j) = F z + i * p + j * q := by
+  have hsplit' : z + latPt U V i j = (z + latPt U V i 0) + latPt U V 0 j := by
+    rw [latPt_split]
+    ext <;> simp <;> ring
+  rw [hsplit']
+  have hA : F (z + latPt U V i 0) = F z + i * p :=
+    affine_seq hU (fun n => latPt U V n 0) (latPt_zero U V) (latPt_succ_fst U V) z i
+  have hB : F (z + latPt U V i 0 + latPt U V 0 j) = F (z + latPt U V i 0) + j * q :=
+    affine_seq hV (fun n => latPt U V 0 n) (latPt_zero U V) (latPt_succ_snd U V) (z + latPt U V i 0) j
+  rw [hB, hA]
+
+/-- The deck point of the determinant: `D x = i U + j V` with explicit integers. -/
+theorem detUV_mul_lat (U V : Site) (x1 x2 : ℤ) :
+    latPt U V (x1 * V.2 - x2 * V.1) (U.1 * x2 - U.2 * x1) = (detUV U V * x1, detUV U V * x2) := by
+  unfold latPt detUV
+  ext <;> simp <;> ring
+
+
+/-! Walks and the Bellman rank. `RetWalk ret z e n`: a chain of `n` retained steps from `z` to `e`. -/
+
+inductive RetWalk (ret : Site → Site → Prop) : Site → Site → ℕ → Prop
+  | nil (z : Site) : RetWalk ret z z 0
+  | cons {z i e : Site} {n : ℕ} : ret z i → RetWalk ret i e n → RetWalk ret z e (n + 1)
+
+/-- The values `n + lam (w e − w z)` of the retained walks from `z`. -/
+def retVal (ret : Site → Site → Prop) (w : Site → ℤ) (lam : ℤ) (z : Site) : Set ℤ :=
+  {v | ∃ e : Site, ∃ n : ℕ, RetWalk ret z e n ∧ v = (n : ℤ) + lam * (w e - w z)}
+
+/-- The Bellman rank `lam · w z + sup of the walk values from z`. -/
+noncomputable def bellmanRank (ret : Site → Site → Prop) (w : Site → ℤ) (lam : ℤ) (z : Site) : ℤ :=
+  lam * w z + sSup (retVal ret w lam z)
+
+theorem retVal_nonempty (ret : Site → Site → Prop) (w : Site → ℤ) (lam : ℤ) (z : Site) :
+    (retVal ret w lam z).Nonempty :=
+  ⟨((0 : ℕ) : ℤ) + lam * (w z - w z), z, 0, RetWalk.nil z, rfl⟩
+
+theorem retVal_cons {ret : Site → Site → Prop} {w : Site → ℤ} {lam : ℤ} {c i : Site} (hc : ret c i)
+    {v : ℤ} (hv : v ∈ retVal ret w lam i) :
+    1 + lam * (w i - w c) + v ∈ retVal ret w lam c := by
+  obtain ⟨e, n, hW, rfl⟩ := hv
+  refine ⟨e, n + 1, RetWalk.cons hc hW, ?_⟩
+  push_cast
+  ring
+
+/-- Along a retained step the Bellman rank strictly drops, provided the walk values are bounded above. -/
+theorem bellmanRank_lt {ret : Site → Site → Prop} {w : Site → ℤ} {lam : ℤ}
+    (hb : ∀ z, BddAbove (retVal ret w lam z)) {c i : Site} (hc : ret c i) :
+    bellmanRank ret w lam i < bellmanRank ret w lam c := by
+  have e : lam * (w i - w c) = lam * w i - lam * w c := by ring
+  have key : sSup (retVal ret w lam i) ≤ sSup (retVal ret w lam c) - (1 + lam * (w i - w c)) :=
+    csSup_le (retVal_nonempty ret w lam i) (fun v hv => by
+      have h := le_csSup (hb c) (retVal_cons hc hv)
+      linarith)
+  unfold bellmanRank
+  linarith
+
+/-- Retained walks are carried by a step-preserving translation. -/
+theorem retWalk_translate {ret : Site → Site → Prop} (d : Site)
+    (hstep : ∀ c i, ret c i → ret (c + d) (i + d)) {z e : Site} {n : ℕ} (h : RetWalk ret z e n) :
+    RetWalk ret (z + d) (e + d) n := by
+  induction h with
+  | nil z => exact RetWalk.nil (z + d)
+  | cons hr _ ih => exact RetWalk.cons (hstep _ _ hr) ih
+
+
+/-- Deck translation cancels on the right, `c − d + d = c`. -/
+theorem site_sub_add' (c d : Site) : c + -d + d = c := by
+  ext <;> simp
+
+/-- Deck translation cancels on the left, `c + d − d = c`. -/
+theorem site_add_sub' (c d : Site) : c + d + -d = c := by
+  ext <;> simp
+
+/-- Deck invariance of the walk values: if the retained relation and `w` are invariant under the deck vector `d` (with
+`w` shifting by `kd`), the value set at `z + d` equals the one at `z`. -/
+theorem retVal_add_eq {ret : Site → Site → Prop} {w : Site → ℤ} {lam : ℤ} {d : Site} {kd : ℤ}
+    (hiff : ∀ c i, ret c i ↔ ret (c + d) (i + d)) (hw : ∀ x, w (x + d) = w x + kd) (z : Site) :
+    retVal ret w lam (z + d) = retVal ret w lam z := by
+  ext v
+  constructor
+  · rintro ⟨e, n, hW, rfl⟩
+    have hstep : ∀ c i, ret c i → ret (c + -d) (i + -d) := fun c i h =>
+      (hiff (c + -d) (i + -d)).mpr (by rw [site_sub_add', site_sub_add']; exact h)
+    have h2 := retWalk_translate (-d) hstep hW
+    have hz : z + d + -d = z := site_add_sub' z d
+    have he : e + -d + d = e := site_sub_add' e d
+    have hwe : w e = w (e + -d) + kd := by
+      have := hw (e + -d)
+      rw [he] at this
+      exact this
+    rw [hz] at h2
+    refine ⟨e + -d, n, h2, ?_⟩
+    rw [hwe, hw z]
+    ring
+  · rintro ⟨e, n, hW, rfl⟩
+    have hstep : ∀ c i, ret c i → ret (c + d) (i + d) := fun c i h => (hiff c i).mp h
+    refine ⟨e + d, n, retWalk_translate d hstep hW, ?_⟩
+    rw [hw e, hw z]
+    ring
+
+/-- The Bellman rank shifts by `lam kd` under the deck vector `d`. -/
+theorem bellmanRank_add {ret : Site → Site → Prop} {w : Site → ℤ} {lam : ℤ} {d : Site} {kd : ℤ}
+    (hiff : ∀ c i, ret c i ↔ ret (c + d) (i + d)) (hw : ∀ x, w (x + d) = w x + kd) (z : Site) :
+    bellmanRank ret w lam (z + d) = bellmanRank ret w lam z + lam * kd := by
+  unfold bellmanRank
+  rw [retVal_add_eq hiff hw z, hw z]
+  ring
+
+
+/-! Finite representatives of the deck: every site is a deck translate of a site in a fixed finite box. -/
+
+/-- The integer identity behind the decomposition: `D (e − (i U + j V)) = p U + q V` for the remainders `p, q`. -/
+theorem deck_rep_identity (U V e : Site) (i j x y p q : ℤ)
+    (hx : (U.1 * V.2 - U.2 * V.1) * i + p = x) (hy : (U.1 * V.2 - U.2 * V.1) * j + q = y)
+    (hxd : x = e.1 * V.2 - e.2 * V.1) (hyd : y = U.1 * e.2 - U.2 * e.1) :
+    (U.1 * V.2 - U.2 * V.1) * (e.1 - (i * U.1 + j * V.1)) = p * U.1 + q * V.1 ∧
+      (U.1 * V.2 - U.2 * V.1) * (e.2 - (i * U.2 + j * V.2)) = p * U.2 + q * V.2 := by
+  constructor
+  · linear_combination (-U.1) * hx + (-V.1) * hy - U.1 * hxd - V.1 * hyd
+  · linear_combination (-U.2) * hx + (-V.2) * hy - U.2 * hxd - V.2 * hyd
+
+/-- A bound on a coordinate: if `D r = p a + q b` with remainders `0 ≤ p, q < |D|`, then `|r| ≤ |a| + |b|`. -/
+theorem abs_le_of_det_eq {D r p q a b : ℤ} (hD : D ≠ 0) (hp0 : 0 ≤ p) (hpD : p < |D|) (hq0 : 0 ≤ q)
+    (hqD : q < |D|) (h : D * r = p * a + q * b) : |r| ≤ |a| + |b| := by
+  have hpos : 0 < |D| := abs_pos.mpr hD
+  have e1 : |D * r| = |D| * |r| := abs_mul D r
+  have e2 : |p * a + q * b| ≤ |p * a| + |q * b| := abs_add_le _ _
+  have e3 : |p * a| = p * |a| := by rw [abs_mul, abs_of_nonneg hp0]
+  have e4 : |q * b| = q * |b| := by rw [abs_mul, abs_of_nonneg hq0]
+  rw [h] at e1
+  have key : |D| * |r| ≤ |D| * (|a| + |b|) := by
+    nlinarith [mul_nonneg (sub_nonneg.2 hpD.le) (abs_nonneg a),
+      mul_nonneg (sub_nonneg.2 hqD.le) (abs_nonneg b)]
+  exact le_of_mul_le_mul_left key hpos
+
+/-- **Finite deck representatives.** For a nondegenerate deck basis `U, V`, the sites are covered by finitely many deck
+translates: every `e` equals `r + i U + j V` with `r` in a fixed finite box. -/
+theorem exists_deck_box (U V : Site) (hD : U.1 * V.2 - U.2 * V.1 ≠ 0) :
+    ∃ S : Finset Site, ∀ e : Site, ∃ r ∈ S, ∃ i j : ℤ, e = r + latPt U V i j := by
+  obtain ⟨B, hB⟩ : ∃ B : ℤ, B = |U.1| + |V.1| + |U.2| + |V.2| := ⟨_, rfl⟩
+  refine ⟨Finset.Icc (-B) B ×ˢ Finset.Icc (-B) B, fun e => ?_⟩
+  obtain ⟨x, hxd⟩ : ∃ x : ℤ, x = e.1 * V.2 - e.2 * V.1 := ⟨_, rfl⟩
+  obtain ⟨y, hyd⟩ : ∃ y : ℤ, y = U.1 * e.2 - U.2 * e.1 := ⟨_, rfl⟩
+  obtain ⟨i, hi⟩ : ∃ i : ℤ, i = x / (U.1 * V.2 - U.2 * V.1) := ⟨_, rfl⟩
+  obtain ⟨j, hj⟩ : ∃ j : ℤ, j = y / (U.1 * V.2 - U.2 * V.1) := ⟨_, rfl⟩
+  obtain ⟨p, hp⟩ : ∃ p : ℤ, p = x % (U.1 * V.2 - U.2 * V.1) := ⟨_, rfl⟩
+  obtain ⟨q, hq⟩ : ∃ q : ℤ, q = y % (U.1 * V.2 - U.2 * V.1) := ⟨_, rfl⟩
+  have hx : (U.1 * V.2 - U.2 * V.1) * i + p = x := by
+    rw [hi, hp]
+    linarith [Int.emod_def x (U.1 * V.2 - U.2 * V.1)]
+  have hy : (U.1 * V.2 - U.2 * V.1) * j + q = y := by
+    rw [hj, hq]
+    linarith [Int.emod_def y (U.1 * V.2 - U.2 * V.1)]
+  have hp0 : 0 ≤ p := by
+    rw [hp]
+    exact Int.emod_nonneg _ hD
+  have hpD : p < |U.1 * V.2 - U.2 * V.1| := by
+    rw [hp, Int.abs_eq_natAbs]
+    exact_mod_cast Int.emod_lt x hD
+  have hq0 : 0 ≤ q := by
+    rw [hq]
+    exact Int.emod_nonneg _ hD
+  have hqD : q < |U.1 * V.2 - U.2 * V.1| := by
+    rw [hq, Int.abs_eq_natAbs]
+    exact_mod_cast Int.emod_lt y hD
+  obtain ⟨h1, h2⟩ := deck_rep_identity U V e i j x y p q hx hy hxd hyd
+  have hb1 := abs_le_of_det_eq hD hp0 hpD hq0 hqD h1
+  have hb2 := abs_le_of_det_eq hD hp0 hpD hq0 hqD h2
+  have hB1 : |e.1 - (i * U.1 + j * V.1)| ≤ B := by
+    rw [hB]
+    linarith [abs_nonneg U.2, abs_nonneg V.2]
+  have hB2 : |e.2 - (i * U.2 + j * V.2)| ≤ B := by
+    rw [hB]
+    linarith [abs_nonneg U.1, abs_nonneg V.1]
+  refine ⟨(e.1 - (i * U.1 + j * V.1), e.2 - (i * U.2 + j * V.2)), ?_, i, j, ?_⟩
+  · rw [Finset.mem_product, Finset.mem_Icc, Finset.mem_Icc]
+    exact ⟨abs_le.mp hB1, abs_le.mp hB2⟩
+  · ext <;> simp [latPt]
+
+
+/-- **Quadrant bound.** Let `g = lam (a P + c J) − r0` with `P, J` deck-affine (increments `(−1, 0)` and `(0, η)`) and `r0`
+deck-affine with increments `sU, sV`. If `lam a + sU ≥ 0` and `η sV ≤ lam c`, then `g` is bounded above on the sites `e`
+with `P e ≤ P z` and `J e ≤ J z`, by a constant depending on `z`. -/
+theorem quadrant_bound (U V : Site) (hD : U.1 * V.2 - U.2 * V.1 ≠ 0) (η : ℤ) (hη : η = 1 ∨ η = -1)
+    (P J r0 : Site → ℤ) (a c lam sU sV : ℤ)
+    (hPU : ∀ z, P (z + U) = P z - 1) (hPV : ∀ z, P (z + V) = P z)
+    (hJU : ∀ z, J (z + U) = J z) (hJV : ∀ z, J (z + V) = J z + η)
+    (hr0U : ∀ z, r0 (z + U) = r0 z + sU) (hr0V : ∀ z, r0 (z + V) = r0 z + sV)
+    (hU : 0 ≤ lam * a + sU) (hV : η * sV ≤ lam * c) (z : Site) :
+    ∃ G : ℤ, ∀ e : Site, P e ≤ P z → J e ≤ J z → lam * (a * P e + c * J e) - r0 e ≤ G := by
+  have hηη : η * η = 1 := by
+    rcases hη with rfl | rfl <;> norm_num
+  obtain ⟨g, hg⟩ : ∃ g : Site → ℤ, ∀ x, g x = lam * (a * P x + c * J x) - r0 x := ⟨_, fun x => rfl⟩
+  obtain ⟨S, hS⟩ := exists_deck_box U V hD
+  obtain ⟨K, hK⟩ : ∃ K : ℤ, K = Finset.sum S (fun r => |P r| + |J r| + |g r|) := ⟨_, rfl⟩
+  have hbound : ∀ r ∈ S, |P r| ≤ K ∧ |J r| ≤ K ∧ |g r| ≤ K := by
+    intro r hr
+    have h : |P r| + |J r| + |g r| ≤ Finset.sum S (fun x => |P x| + |J x| + |g x|) :=
+      Finset.single_le_sum (f := fun x => |P x| + |J x| + |g x|) (fun x _ => by positivity) hr
+    rw [← hK] at h
+    refine ⟨?_, ?_, ?_⟩ <;> linarith [abs_nonneg (P r), abs_nonneg (J r), abs_nonneg (g r)]
+  have hgU : ∀ x, g (x + U) = g x + (-lam * a - sU) := by
+    intro x
+    simp only [hg]
+    rw [hPU, hJU, hr0U]
+    ring
+  have hgV : ∀ x, g (x + V) = g x + (lam * (c * η) - sV) := by
+    intro x
+    simp only [hg]
+    rw [hPV, hJV, hr0V]
+    ring
+  have hPU' : ∀ x, P (x + U) = P x + (-1) := fun x => by rw [hPU]; ring
+  have hPV' : ∀ x, P (x + V) = P x + 0 := fun x => by rw [hPV]; ring
+  have hJU' : ∀ x, J (x + U) = J x + 0 := fun x => by rw [hJU]; ring
+  have hJV' : ∀ x, J (x + V) = J x + η := hJV
+  have hgUnp : -lam * a - sU ≤ 0 := by linarith
+  have hsign : 0 ≤ η * (lam * (c * η) - sV) := by
+    have e1 : η * (lam * (c * η) - sV) = lam * c - η * sV := by
+      linear_combination (lam * c) * hηη
+    linarith
+  refine ⟨K + (-K - P z) * (-lam * a - sU) + (K + J z) * (η * (lam * (c * η) - sV)), fun e hPle hJle => ?_⟩
+  obtain ⟨r, hrS, i, j, rfl⟩ := hS e
+  have hPe := affine_lattice hPU' hPV' r i j
+  have hJe := affine_lattice hJU' hJV' r i j
+  have hge := affine_lattice hgU hgV r i j
+  have hgx := hg (r + latPt U V i j)
+  obtain ⟨hPr, hJr, hgr⟩ := hbound r hrS
+  have hPr' := abs_le.mp hPr
+  have hJr' := abs_le.mp hJr
+  have hgr' := abs_le.mp hgr
+  rw [hPe] at hPle
+  rw [hJe] at hJle
+  have hi : -K - P z ≤ i := by linarith
+  have hj : η * j ≤ K + J z := by linarith
+  have hA : i * (-lam * a - sU) ≤ (-K - P z) * (-lam * a - sU) :=
+    mul_le_mul_of_nonpos_right hi hgUnp
+  have hB : (η * j) * (η * (lam * (c * η) - sV)) ≤ (K + J z) * (η * (lam * (c * η) - sV)) :=
+    mul_le_mul_of_nonneg_right hj hsign
+  have hI : j * (lam * (c * η) - sV) = (η * j) * (η * (lam * (c * η) - sV)) := by
+    linear_combination (-(j * (lam * (c * η) - sV))) * hηη
+  linarith [hge, hgx, hgr'.2]
+
+
+/-- Retained walks shorten `r0` by at least their length. -/
+theorem retWalk_length_le {ret : Site → Site → Prop} {r0 : Site → ℤ}
+    (hdec : ∀ x y, ret x y → r0 y < r0 x) {z e : Site} {n : ℕ} (h : RetWalk ret z e n) :
+    (n : ℤ) + r0 e ≤ r0 z := by
+  induction h with
+  | nil z => simp
+  | cons hr _ ih =>
+    have := hdec _ _ hr
+    push_cast
+    omega
+
+/-- Retained walks do not increase `P` and `J`. -/
+theorem retWalk_mono {ret : Site → Site → Prop} {P J : Site → ℤ}
+    (hmono : ∀ x y, ret x y → P y ≤ P x ∧ J y ≤ J x) {z e : Site} {n : ℕ} (h : RetWalk ret z e n) :
+    P e ≤ P z ∧ J e ≤ J z := by
+  induction h with
+  | nil z => exact ⟨le_rfl, le_rfl⟩
+  | cons hr _ ih =>
+    exact ⟨ih.1.trans (hmono _ _ hr).1, ih.2.trans (hmono _ _ hr).2⟩
+
+/-- **Boundedness of the walk values** for the weight `w = a P + b J`, with `lam` large as in `quadrant_bound`. -/
+theorem retVal_bddAbove {ret : Site → Site → Prop} (U V : Site) (hD : U.1 * V.2 - U.2 * V.1 ≠ 0)
+    (η : ℤ) (hη : η = 1 ∨ η = -1) (P J r0 : Site → ℤ) (a b lam sU sV : ℤ)
+    (hPU : ∀ z, P (z + U) = P z - 1) (hPV : ∀ z, P (z + V) = P z)
+    (hJU : ∀ z, J (z + U) = J z) (hJV : ∀ z, J (z + V) = J z + η)
+    (hr0U : ∀ z, r0 (z + U) = r0 z + sU) (hr0V : ∀ z, r0 (z + V) = r0 z + sV)
+    (hU : 0 ≤ lam * a + sU) (hV : η * sV ≤ lam * b)
+    (hmono : ∀ x y, ret x y → P y ≤ P x ∧ J y ≤ J x) (hdec : ∀ x y, ret x y → r0 y < r0 x) (z : Site) :
+    BddAbove (retVal ret (fun x => a * P x + b * J x) lam z) := by
+  obtain ⟨G, hG⟩ := quadrant_bound U V hD η hη P J r0 a b lam sU sV hPU hPV hJU hJV hr0U hr0V hU hV z
+  refine ⟨r0 z - lam * (a * P z + b * J z) + G, ?_⟩
+  rintro v ⟨e, n, hW, rfl⟩
+  have hn := retWalk_length_le hdec hW
+  have hm := retWalk_mono hmono hW
+  have hq := hG e hm.1 hm.2
+  show (n : ℤ) + lam * ((a * P e + b * J e) - (a * P z + b * J z)) ≤ r0 z - lam * (a * P z + b * J z) + G
+  linarith
+
+/-- **The rank with increments `lam (−a, b η)`.** For a retained relation invariant under the deck, with `P, J` deck-affine and
+nonincreasing along retained steps and one strict rank `r0`, there is a positive `lam` and a rank strictly decreasing along the
+retained steps whose increments along `U, V` are `lam (−a)` and `lam (b η)`. -/
+theorem exists_rank_increments {ret : Site → Site → Prop} (U V : Site) (hD : U.1 * V.2 - U.2 * V.1 ≠ 0)
+    (hiffU : ∀ c i, ret c i ↔ ret (c + U) (i + U)) (hiffV : ∀ c i, ret c i ↔ ret (c + V) (i + V))
+    (η : ℤ) (hη : η = 1 ∨ η = -1) (P J r0 : Site → ℤ) (sU sV : ℤ)
+    (hPU : ∀ z, P (z + U) = P z - 1) (hPV : ∀ z, P (z + V) = P z)
+    (hJU : ∀ z, J (z + U) = J z) (hJV : ∀ z, J (z + V) = J z + η)
+    (hr0U : ∀ z, r0 (z + U) = r0 z + sU) (hr0V : ∀ z, r0 (z + V) = r0 z + sV)
+    (hmono : ∀ x y, ret x y → P y ≤ P x ∧ J y ≤ J x) (hdec : ∀ x y, ret x y → r0 y < r0 x)
+    (a b : ℤ) (ha : 0 < a) (hb : 0 < b) :
+    ∃ lam : ℤ, 0 < lam ∧ ∃ rank : Site → ℤ, (∀ x y, ret x y → rank y < rank x) ∧
+      (∀ z, rank (z + U) = rank z + lam * (-a)) ∧ (∀ z, rank (z + V) = rank z + lam * (b * η)) := by
+  have ha1 : 1 ≤ a := by omega
+  have hb1 : 1 ≤ b := by omega
+  obtain ⟨lam, hlam⟩ : ∃ lam : ℤ, lam = |sU| + |sV| + 1 := ⟨_, rfl⟩
+  have hlam0 : 0 < lam := by
+    rw [hlam]
+    have := abs_nonneg sU
+    have := abs_nonneg sV
+    linarith
+  have hU : 0 ≤ lam * a + sU := by
+    have h1 : 0 ≤ lam * (a - 1) := mul_nonneg hlam0.le (by omega)
+    have h2 := neg_abs_le sU
+    rw [hlam] at h1 ⊢
+    nlinarith [abs_nonneg sV]
+  have hV : η * sV ≤ lam * b := by
+    have h1 : 0 ≤ lam * (b - 1) := mul_nonneg hlam0.le (by omega)
+    have h2 : η * sV ≤ |sV| := by
+      rcases hη with rfl | rfl
+      · simp [le_abs_self]
+      · simp [neg_le_abs]
+    rw [hlam] at h1 ⊢
+    nlinarith [abs_nonneg sU]
+  set w : Site → ℤ := fun x => a * P x + b * J x with hw
+  have hwU : ∀ x, w (x + U) = w x + (-a) := by
+    intro x
+    simp only [hw]
+    rw [hPU, hJU]
+    ring
+  have hwV : ∀ x, w (x + V) = w x + b * η := by
+    intro x
+    simp only [hw]
+    rw [hPV, hJV]
+    ring
+  have hbdd : ∀ z, BddAbove (retVal ret w lam z) := fun z =>
+    retVal_bddAbove U V hD η hη P J r0 a b lam sU sV hPU hPV hJU hJV hr0U hr0V hU hV hmono hdec z
+  refine ⟨lam, hlam0, bellmanRank ret w lam, fun x y hxy => bellmanRank_lt hbdd hxy, fun z => ?_, fun z => ?_⟩
+  · exact bellmanRank_add hiffU hwU z
+  · exact bellmanRank_add hiffV hwV z
+
+end FLatticePaper.WeightChange

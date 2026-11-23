@@ -1,0 +1,3 @@
+import FLatticePaper.Plane.Induction.WeightPolicy
+
+#print axioms FLatticePaper.Induction.rankWithIncrements_of_monotone
