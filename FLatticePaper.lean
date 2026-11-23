@@ -189,6 +189,7 @@ import FLatticePaper.Plane.Induction.ParentStep
 import FLatticePaper.Plane.Induction.I3Application
 import FLatticePaper.Plane.Induction.I3Permits
 import FLatticePaper.Plane.Induction.VArcLongitudinal
+import FLatticePaper.Plane.Induction.VArcOffers
 import FLatticePaper.Plane.Induction.ZoneSheet
 import FLatticePaper.Plane.Induction.I3NoA
 import FLatticePaper.Plane.Induction.I3CSheet
