@@ -26,3 +26,14 @@ import FLatticePaper.Construction.PureRank
 #print axioms FLatticePaper.PureRank.rankOf_fifth
 #print axioms FLatticePaper.PureRank.rankOf_qRank
 #print axioms FLatticePaper.PureRank.rankOf_eq_qRank
+#print axioms FLatticePaper.PureRank.rep_cases
+#print axioms FLatticePaper.PureRank.gate_H_even_all
+#print axioms FLatticePaper.PureRank.gate_H_odd_all
+#print axioms FLatticePaper.PureRank.gate_H_d_all
+#print axioms FLatticePaper.PureRank.gate_origin_all
+#print axioms FLatticePaper.PureRank.gate_Vlast_all
+#print axioms FLatticePaper.PureRank.gate_V_odd_all
+#print axioms FLatticePaper.PureRank.valMinus_V_odd
+#print axioms FLatticePaper.PureRank.valMinus_origin
+#print axioms FLatticePaper.PureRank.valMinus_Vlast
+#print axioms FLatticePaper.PureRank.free_root_gate

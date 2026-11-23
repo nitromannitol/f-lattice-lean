@@ -503,4 +503,166 @@ theorem rankOf_eq_qRank (d : ℤ) (hd : 3 ≤ d) (x y : ℤ) (hn : NativeP d (x,
     (h : RankOf d (x, y) r) : r = qRank d (x, y) :=
   rankOf_unique d hd (x, y) r _ h (rankOf_qRank d hd x y hn)
 
+/-! ## The free-root gate (step (ii), free sources)
+
+For every free native point with prescribed direction, every rank of its target is below its rank.
+The targets may lie outside the native domain; their ranks are read through their representative translates. -/
+
+/-- A representative is free, or non-free and native with the interior shape. -/
+theorem rep_cases (d : ℤ) (q : Pt) (hq : IsRepP d q) :
+    IsFreeP d q ∨ (NativeP d q ∧ q.2 ≤ d ∧ q.1 + q.2 ≠ d + 2 ∧ ¬ (q.1 = d ∧ q.2 = 1)) := by
+  obtain ⟨x, y⟩ := q
+  by_cases hf : IsFreeP d (x, y)
+  · exact Or.inl hf
+  right
+  unfold IsRepP at hq
+  rcases hq with hf' | ⟨hn, hfree, -⟩
+  · exact absurd hf' hf
+  have H1 := hfree 0 (-1) ⟨by norm_num, by norm_num, by norm_num, by norm_num⟩
+  have H2 := hfree (-1) 0 ⟨by norm_num, by norm_num, by norm_num, by norm_num⟩
+  refine ⟨hn, ?_⟩
+  unfold IsFreeP IsHc IsVc at H1 H2 hf
+  unfold NativeP at hn
+  simp only [shiftP, Prod.mk.injEq] at H1 H2 hf hn
+  omega
+
+set_option maxHeartbeats 1000000 in
+/-- The H point with even `x` (root value `2x`): every rank of its prescribed target `(x−1, 0)` is below `2x`. -/
+theorem gate_H_even_all (d x : ℤ) (hd : 3 ≤ d) (hx2 : 2 ≤ x) (hxd : x ≤ d) (hev : x % 2 = 0)
+    (r : ℤ) (hr : RankOf d (x - 1, 0) r) : r < 2 * x := by
+  obtain ⟨i, j, hi, hrep, rfl⟩ := hr
+  obtain ⟨hi1, hi2, hj1, hj2⟩ := hi
+  rcases rep_cases d _ hrep with hF | hR
+  all_goals
+    interval_cases i <;> interval_cases j <;>
+    (unfold valMinus; simp only [shiftP, IsHc, IsVc, IsFreeP, NativeP, Prod.mk.injEq] at *; split_ifs <;> omega)
+
+set_option maxHeartbeats 1000000 in
+/-- The H point with odd `x ≠ d` (root value `2x+1`): its target is `(x, −1)`. -/
+theorem gate_H_odd_all (d x : ℤ) (hd : 3 ≤ d) (hx1 : 1 ≤ x) (hxd : x < d) (hod : x % 2 = 1)
+    (r : ℤ) (hr : RankOf d (x, -1) r) : r < 2 * x + 1 := by
+  obtain ⟨i, j, hi, hrep, rfl⟩ := hr
+  obtain ⟨hi1, hi2, hj1, hj2⟩ := hi
+  rcases rep_cases d _ hrep with hF | hR
+  all_goals
+    interval_cases i <;> interval_cases j <;>
+    (unfold valMinus; simp only [shiftP, IsHc, IsVc, IsFreeP, NativeP, Prod.mk.injEq] at *; split_ifs <;> omega)
+
+set_option maxHeartbeats 1000000 in
+/-- The H point `(d, 0)` (root value `2d+1`): its target is `(d, 1)`. -/
+theorem gate_H_d_all (d : ℤ) (hd : 3 ≤ d)
+    (r : ℤ) (hr : RankOf d (d, 1) r) : r < 2 * d + 1 := by
+  obtain ⟨i, j, hi, hrep, rfl⟩ := hr
+  obtain ⟨hi1, hi2, hj1, hj2⟩ := hi
+  rcases rep_cases d _ hrep with hF | hR
+  all_goals
+    interval_cases i <;> interval_cases j <;>
+    (unfold valMinus; simp only [shiftP, IsHc, IsVc, IsFreeP, NativeP, Prod.mk.injEq] at *; split_ifs <;> omega)
+
+set_option maxHeartbeats 1000000 in
+/-- The origin (root value `0`): its target is `(−1, 0)`. -/
+theorem gate_origin_all (d : ℤ) (hd : 3 ≤ d)
+    (r : ℤ) (hr : RankOf d (-1, 0) r) : r < 0 := by
+  obtain ⟨i, j, hi, hrep, rfl⟩ := hr
+  obtain ⟨hi1, hi2, hj1, hj2⟩ := hi
+  rcases rep_cases d _ hrep with hF | hR
+  all_goals
+    interval_cases i <;> interval_cases j <;>
+    (unfold valMinus; simp only [shiftP, IsHc, IsVc, IsFreeP, NativeP, Prod.mk.injEq] at *; split_ifs <;> omega)
+
+set_option maxHeartbeats 1000000 in
+/-- The V point `(2−d, d)` (root value `−2d`): its target is `(1−d, d)`. -/
+theorem gate_Vlast_all (d : ℤ) (hd : 3 ≤ d)
+    (r : ℤ) (hr : RankOf d (1 - d, d) r) : r < -2 * d := by
+  obtain ⟨i, j, hi, hrep, rfl⟩ := hr
+  obtain ⟨hi1, hi2, hj1, hj2⟩ := hi
+  rcases rep_cases d _ hrep with hF | hR
+  all_goals
+    interval_cases i <;> interval_cases j <;>
+    (unfold valMinus; simp only [shiftP, IsHc, IsVc, IsFreeP, NativeP, Prod.mk.injEq] at *; split_ifs <;> omega)
+
+set_option maxHeartbeats 1000000 in
+/-- The V point `(x, 1−x)` with `1 ≤ 1−x ≤ d−1` odd sum (root value `2x−3`): its target is `(x, 2−x)`. -/
+theorem gate_V_odd_all (d x : ℤ) (hd : 3 ≤ d) (hx1 : 2 - d ≤ x) (hx0 : x ≤ 0)
+    (r : ℤ) (hr : RankOf d (x, 2 - x) r) : r < 2 * x - 3 := by
+  obtain ⟨i, j, hi, hrep, rfl⟩ := hr
+  obtain ⟨hi1, hi2, hj1, hj2⟩ := hi
+  rcases rep_cases d _ hrep with hF | hR
+  all_goals
+    interval_cases i <;> interval_cases j <;>
+    (unfold valMinus; simp only [shiftP, IsHc, IsVc, IsFreeP, NativeP, Prod.mk.injEq] at *; split_ifs <;> omega)
+
+theorem valMinus_V_odd (d x : ℤ) (hx1 : 2 - d ≤ x) (hx0 : x ≤ 0) :
+    valMinus d (x, 1 - x) = 2 * x - 3 := by
+  have h1 := hx1
+  unfold valMinus
+  simp only [IsHc, IsVc, Prod.mk.injEq]
+  split_ifs <;> omega
+
+theorem valMinus_origin (d : ℤ) : valMinus d (0, 0) = 0 := by
+  simp [valMinus, IsHc, IsVc]
+
+theorem valMinus_Vlast (d : ℤ) (hd : 3 ≤ d) : valMinus d (2 - d, d) = -2 * d := by
+  simp [valMinus, IsHc, IsVc]
+  omega
+
+set_option maxHeartbeats 1000000 in
+/-- The free-root gate: for a free native point with prescribed direction `(dx,dy)`, every rank of the target `p + (dx,dy)`
+is below the rank of the point. -/
+theorem free_root_gate (d : ℤ) (hd : 3 ≤ d) (x y dx dy : ℤ) (hf : IsFreeP d (x, y))
+    (hdir : prescribedFree d (x, y) = (dx, dy)) (r : ℤ) (hr : RankOf d (x + dx, y + dy) r) :
+    r < valMinus d (x, y) := by
+  simp only [prescribedFree] at hdir
+  unfold IsFreeP at hf
+  split_ifs at hdir with h1 h2 h3
+  · simp only [Prod.mk.injEq] at hdir
+    obtain ⟨rfl, rfl⟩ := hdir
+    unfold IsHc IsVc at hf
+    simp only [Prod.mk.injEq] at hf
+    rcases hf with ⟨hy, hx1, hxd⟩ | ⟨hx0, hy0⟩ | ⟨hs, hy1, hy2⟩ | ⟨hx2, hyd⟩
+    · subst hy
+      rw [valMinus_H_even d x (by omega) hxd (by omega)]
+      exact gate_H_even_all d x hd (by omega) hxd (by omega) r
+        (by rwa [show x + -1 = x - 1 by ring, show (0:ℤ) + 0 = 0 by ring] at hr)
+    · subst hx0; subst hy0
+      rw [valMinus_origin d]
+      exact gate_origin_all d hd r (by rwa [show (0:ℤ) + -1 = -1 by ring, show (0:ℤ) + 0 = 0 by ring] at hr)
+    · exfalso; omega
+    · subst hx2; subst y
+      rw [valMinus_Vlast d hd]
+      exact gate_Vlast_all d hd r
+        (by rwa [show 2 - d + -1 = 1 - d by ring, show d + 0 = d by ring] at hr)
+  · simp only [Prod.mk.injEq] at hdir
+    obtain ⟨rfl, rfl⟩ := hdir
+    have hy : y = 0 := h2.1
+    have hx1 : 1 ≤ x := h2.2.1
+    have hxd : x ≤ d := h2.2.2
+    have hxd' : x = d := h3
+    subst hy
+    rw [hxd'] at hr ⊢
+    rw [valMinus_H_odd d d (by omega) le_rfl (by omega)]
+    exact gate_H_d_all d hd r (by rwa [show d + 0 = d by ring, show (0:ℤ) + 1 = 1 by ring] at hr)
+  · simp only [Prod.mk.injEq] at hdir
+    obtain ⟨rfl, rfl⟩ := hdir
+    have hy : y = 0 := h2.1
+    have hx1 : 1 ≤ x := h2.2.1
+    have hxd : x ≤ d := h2.2.2
+    have hxlt : x < d := lt_of_le_of_ne hxd h3
+    subst hy
+    rw [valMinus_H_odd d x hx1 hxd (by omega)]
+    exact gate_H_odd_all d x hd hx1 hxlt (by omega) r
+      (by rwa [show x + 0 = x by ring, show (0:ℤ) + -1 = -1 by ring] at hr)
+  · simp only [Prod.mk.injEq] at hdir
+    obtain ⟨rfl, rfl⟩ := hdir
+    have hnH : ¬ (y = 0 ∧ 1 ≤ x ∧ x ≤ d) := fun h => h2 (show IsHc d (x, y) from ⟨h.1, h.2.1, h.2.2⟩)
+    rcases hf with ⟨hy, hx1, hxd⟩ | ⟨hx0, hy0⟩ | ⟨hs, hy1, hy2⟩ | ⟨hx2, hyd⟩
+    · exact absurd ⟨hy, hx1, hxd⟩ hnH
+    · exfalso; omega
+    · have hyx : y = 1 - x := by omega
+      subst hyx
+      rw [valMinus_V_odd d x (by omega) (by omega)]
+      exact gate_V_odd_all d x hd (by omega) (by omega) r
+        (by rwa [show x + 0 = x by ring, show 1 - x + 1 = 2 - x by ring] at hr)
+    · exfalso; omega
+
 end FLatticePaper.PureRank
