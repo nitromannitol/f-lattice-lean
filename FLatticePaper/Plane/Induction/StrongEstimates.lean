@@ -1,6 +1,7 @@
 import FLatticePaper.Plane.Induction.Potentials
 import FLatticePaper.Plane.Induction.Packet
 import FLatticePaper.Plane.AlternateMidpoint
+import FLatticePaper.Plane.Induction.SignedPolicy
 
 /-! # The strong estimates of a standard field (task 49, step 0)
 
@@ -9,10 +10,10 @@ the packet of its standard field together with the two price ranges, the short-s
 stars of the slip and of the primitive price. This file states these as one structure `StrongEstimates u`, with the notions taken
 from `Potentials.lean` (`slip`, `price`, `cutPrice`, `shortShift`) and `AlternateMidpoint.lean` (`HasUnitSlip`, `NoEvenSlipSaddle`).
 
-Not yet in this structure (their notions are not defined in Lean yet): F2 (the signed policies of the field and of its chain mate,
-monotone on their retained edges), F3 (the signed retained graph with an integer rank for every pair of positive weights), F4
-(the reflected graph of the chain mate, its black and white quotas and opposite rank increments), and the even-parity extension of
-the odd zero strip (NO_ODD_SLIP_AUDIT §§2–4). They are added when their definitions exist.
+The signed-policy notions (quotas, monotonicity along retained edges, reflected policies) are those of `SignedPolicy.lean`
+(task 38, w1). F2 and F3 are the policy of the standard field and its weighted ranks; F2 and F4 are the chain mate and its reflected
+policy. Not yet in this structure: the drifts of the price ranges and the even-parity extension of the odd zero strip
+(NO_ODD_SLIP_AUDIT §§2–4), which need their statements read from the audit.
 -/
 
 namespace FLatticePaper.Induction
@@ -35,6 +36,12 @@ def NoPriceSaddle (frame : ChildFrame) (F : Field) : Prop :=
     let pos := priceIncrement frame F site (incomingPos site)
     ¬ ((neg = -1 ∧ pos = 1) ∨ (neg = 1 ∧ pos = -1))
 
+/-- A rank that strictly decreases along the retained edges, and whose increments on the generators `U`, `V` are a positive
+integer multiple `λ` of `(p, q)`. -/
+def RankWithIncrements (retained : Site → Site → Prop) (U V : Site) (p q : ℤ) : Prop :=
+  ∃ rank : Site → ℤ, ∃ lam : ℤ, 0 < lam ∧ (∀ x i, retained x i → rank i < rank x) ∧
+    (∀ z, rank (z + U) - rank z = p * lam) ∧ (∀ z, rank (z + V) - rank z = q * lam)
+
 /-- The strong estimates of the standard field of a word `u`, the earlier word of an induction step. -/
 structure StrongEstimates (u : Word) : Prop where
   /-- The packet of the standard field: periods, strips, reflection, binarity. -/
@@ -54,6 +61,28 @@ structure StrongEstimates (u : Word) : Prop where
   F1_unitPrice : HasUnitPrice (frameAt u) (standardField u)
   /-- F1, the primitive price: no opposite nonzero increments at a star (no-cross primitive stars). -/
   F1_noPriceSaddle : NoPriceSaddle (frameAt u) (standardField u)
+  /-- F2 and F3 for the standard field: a signed policy that is a quota policy, along whose retained edges the field does not
+  increase, and for every pair of positive weights `(a, c)` a rank with increments `λ(−a, cη)` on the generators `U′`, `V′`
+  (`U′`, `V′` the kernel and the transverse period of the earlier child, `η = ε`). -/
+  F2F3_policy : ∃ policy : Site → Site → Prop,
+    RetainQuota (standardField u) policy ∧ NonincreasingAlong (standardField u) policy ∧
+      ∀ a c : ℤ, 0 < a → 0 < c →
+        RankWithIncrements policy (frameAt u).child.modifiedDeck.kernel (frameAt u).child.modifiedDeck.transverse
+          (-a) (c * (frameAt u).eps)
+  /-- F2 and F4 for the chain mate `h′ = chainSheet ε`: a chain policy along which `h′` does not decrease; its reflection
+  `ξ ↦ R′ − w′ − ξ` has a nondecreasing `Φ = F′ − h′`, the black and white quotas for `h′`, and for every pair of positive weights
+  a rank with the opposite increments `λ(a, −cη)`. -/
+  F2F4_chain : ∃ chainPolicy : Site → Site → Prop,
+    NondecreasingAlong (fun z => (frameAt u).chainSheet (standardField u) (frameAt u).eps z) chainPolicy ∧
+      ∃ R w : Site,
+        NondecreasingAlong (fun z => (frameAt u).chainPotential (standardField u) (frameAt u).eps z)
+            (ReflectedPolicy R w chainPolicy) ∧
+          RetainQuota (fun z => (frameAt u).chainSheet (standardField u) (frameAt u).eps z)
+            (ReflectedPolicy R w chainPolicy) ∧
+          ∀ a c : ℤ, 0 < a → 0 < c →
+            RankWithIncrements (ReflectedPolicy R w chainPolicy)
+              (frameAt u).child.modifiedDeck.kernel (frameAt u).child.modifiedDeck.transverse
+              a (-(c * (frameAt u).eps))
 
 namespace StrongEstimates
 
