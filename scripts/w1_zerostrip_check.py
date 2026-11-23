@@ -1,60 +1,56 @@
-"""Task 59 numerics: zeroStripInterval and zeroEvenLine at u, against the packet strips.
+"""Task 59 numerics: the zero-strip, even-line and odd-seed fields at a general proper word u (Lean convention).
 
-u a proper even word, F = standard(u), h = F - h0. Child (n,d), parent N/D, L = d+n, T as usual.
-zeroStripInterval: quarterTurn F (x) = F(Zx) + h0(x) = 0 on 1-D <= t_p(x) <= N+2D-1, with Zx = (-x2, x1-1).
-With y = Zx: t_p(x) = D y1 + N y2 + N, and h0(x) = -h0(y), so the claim is h(y) = 0 on the band
-  1-D-N <= D y1 + N y2 <= 2D-1.
-zeroEvenLine: h(y) = 0 for y odd (x even) with D y1 + N y2 = -D-N.
-Packet strips (HasStrips): h = 0 on the t-band of F? no: F = 0 on t in [1-d, n+2d-1]; F = h0 (i.e. h = 0) on s in [1-2d, 2L-1].
-Question: is h a function of (s, parity) (V invariance), and where do the band's s-values lie relative to the strips?
+For u with child n/d (odd), the Lean values are parentN u = (d - n)/2 and parentD u = (d + n)/2 (the odd parent of the word
+whose conjugate is u). The fields, with F = standard(u) and quarterTurn F (x) = F(Zx) + h0(x), Zx = (-x2, x1 - 1):
+  zeroStripInterval: quarterTurn F (x) = 0 for 1 - Du <= Nu x1 - Du x2 <= Nu + 2Du - 1;
+  zeroEvenLine:      quarterTurn F (x) = 0 for x even with Nu x1 - Du x2 = -Du;
+  odd seed (SeedFields.odd_zero): quarterTurn F (x) = 0 for x even with Nu x1 - Du x2 = 1 - (Du + Nu).
+Odd lower extension (hlow): F = h0 on odd sites with s in [2 - 3d + n, 1 - 2d].
+Use with: python3 scripts/w1_zerostrip_check.py   (all counts should be zero failures).
 """
 import itertools, sys
 sys.path.insert(0, '/Users/ahmedbou-rabee/lean-work/flattice-wt/w1/scripts')
-from permit_local import standard, Frame, h0, parents
+from permit_local import standard, Frame, h0
 
-def run(w, B=40):
-    (N, D), (nq, dq) = parents(w)
-    fr = Frame(w)
+Z = lambda x: (-x[1], x[0] - 1)
+
+def run(u, R_extra=6):
+    fr = Frame(u)
     n, d = fr.n, fr.d
-    L = d + n
-    G, _ = standard(tuple(w))
-    h = lambda y: G(y) - h0(*y)
-    band = []
-    zeroEven = []
-    for y1 in range(-B, B + 1):
-        for y2 in range(-B, B + 1):
-            f = D * y1 + N * y2
-            if 1 - D - N <= f <= 2 * D - 1:
-                band.append((y1, y2))
-            if f == -D - N and (y1 + y2) % 2 == 1:
-                zeroEven.append((y1, y2))
-    bad_band = [y for y in band if h(y) != 0]
-    bad_even = [y for y in zeroEven if h(y) != 0]
-    s_by_par = {0: set(), 1: set()}
-    for y in band:
-        s_by_par[(y[0] + y[1]) % 2].add(L * y[0] + (d - n) * y[1])
-    # is h a function of (s, parity)?
-    seen = {}
-    conflict = 0
-    for y1 in range(-12, 13):
-        for y2 in range(-12, 13):
-            key = (L * y1 + (d - n) * y2, (y1 + y2) % 2)
-            v = h((y1, y2))
-            if key in seen and seen[key] != v:
-                conflict += 1
-            seen.setdefault(key, v)
-    return dict(n=n, d=d, N=N, D=D, band=len(band), bad_band=len(bad_band), zeroEven=len(zeroEven),
-                bad_even=len(bad_even), conflict=conflict,
-                s_even=(min(s_by_par[0]), max(s_by_par[0])) if s_by_par[0] else None,
-                s_odd=(min(s_by_par[1]), max(s_by_par[1])) if s_by_par[1] else None,
-                ordinary=(1 - 2 * d, 2 * L - 1), oddext=(2 - 3 * d + n, 3 * d + n - 2))
+    Nu, Du = (d - n) // 2, (d + n) // 2
+    G, _ = standard(tuple(u))
+    f = lambda x: G(Z(x)) + h0(*x)
+    R = 2 * d + R_extra
+    counts = {'band': [0, 0], 'even': [0, 0], 'seed': [0, 0], 'lower': [0, 0]}
+    for x1 in range(-R, R + 1):
+        for x2 in range(-R, R + 1):
+            x = (x1, x2)
+            tp = Nu * x1 - Du * x2
+            par = (x1 + x2) % 2
+            if 1 - Du <= tp <= Nu + 2 * Du - 1:
+                counts['band'][0] += 1
+                counts['band'][1] += f(x) != 0
+            if par == 0 and tp == -Du:
+                counts['even'][0] += 1
+                counts['even'][1] += f(x) != 0
+            if par == 0 and tp == 1 - (Du + Nu):
+                counts['seed'][0] += 1
+                counts['seed'][1] += f(x) != 0
+            y = (x1, x2)
+            s = (d + n) * y[0] + (d - n) * y[1]
+            if (y[0] + y[1]) % 2 == 1 and 2 - 3 * d + n <= s <= 1 - 2 * d:
+                counts['lower'][0] += 1
+                counts['lower'][1] += G(y) != h0(*y)
+    return counts
 
 if __name__ == '__main__':
-    for L_ in (1, 2):
-        for w in itertools.product((1, 2, 3), repeat=L_):
-            if all(x == 3 for x in w) or all(x == 2 for x in w):
+    totals = {'band': [0, 0], 'even': [0, 0], 'seed': [0, 0], 'lower': [0, 0]}
+    for L_ in (1, 2, 3):
+        for u in itertools.product((1, 2, 3), repeat=L_):
+            if all(x == 3 for x in u) or all(x == 2 for x in u):
                 continue
-            if Frame(w).d > 30:
-                continue
-            r = run(w)
-            print(''.join(map(str, w)), r, flush=True)
+            c = run(u)
+            for k in totals:
+                totals[k][0] += c[k][0]
+                totals[k][1] += c[k][1]
+    print('(points checked, failures):', totals)
