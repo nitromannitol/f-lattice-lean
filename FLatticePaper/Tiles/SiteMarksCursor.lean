@@ -91,4 +91,54 @@ theorem s_identity (n d x y : ℤ) :
     (d + n) * ((d + n) * x + (d - n) * y) =
       (d ^ 2 + 2 * d * n - n ^ 2) * (x + y) + (2 * n) * (n * x - d * y) := by ring
 
+/-- The default of `getD` is irrelevant inside the range. -/
+theorem getD_irrel (xs : BinaryWord) (k : ℕ) (hk : k < xs.length) (d d' : Letter) : xs.getD k d = xs.getD k d' := by
+  simp [List.getD_eq_getElem?_getD, List.getElem?_eq_getElem hk]
+
+/-- The letter before the `k`-th letter of a forward string read after `pr`. -/
+def prevLetter (pr : Letter) (ls : BinaryWord) (k : ℕ) : Letter := if k = 0 then pr else ls.getD (k - 1) pr
+
+theorem prevLetter_cons (pr l : Letter) (ls : BinaryWord) (k : ℕ) (hk : k < ls.length) :
+    prevLetter pr (l :: ls) (k + 1) = prevLetter l ls k := by
+  cases k with
+  | zero => simp [prevLetter]
+  | succ j =>
+    have hj : j < ls.length := by omega
+    simpa [prevLetter, List.getD_cons_succ] using getD_irrel ls j hj pr l
+
+/-- **The origins by index.** Every origin of a forward string read after `pr` is the `k`-th tile: its position is the cursor
+`(2(k+1) − #q(ls.take(k+1)), #q(ls.take(k+1)))` from the start, its letter is `ls[k]`, and its enlargement flag is the pair
+`prev = q, ls[k] = q`. -/
+theorem origins_fwd_spec (ls : BinaryWord) : ∀ (pr : Letter) (pos : ℤ × ℤ) (o : (ℤ × ℤ) × Letter × Bool),
+    o ∈ origins false false (some pr) pos ls →
+    ∃ k : ℕ, k < ls.length ∧
+      o.1 = (pos.1 + 2 * ((k : ℤ) + 1) - qPrefix ls (k + 1), pos.2 + qPrefix ls (k + 1)) ∧
+      o.2.1 = ls.getD k pr ∧
+      o.2.2 = (prevLetter pr ls k == Letter.q && ls.getD k pr == Letter.q) := by
+  induction ls with
+  | nil => intro pr pos o ho; simp [origins] at ho
+  | cons l ls ih =>
+    intro pr pos o ho
+    have hstep : origins false false (some pr) pos (l :: ls) =
+        ((pos.1 + (if l = Letter.p then 2 else 1), pos.2 + (if l = Letter.q then 1 else 0)), l,
+          (!false && pr == Letter.q && l == Letter.q)) ::
+          origins false false (some l)
+            (pos.1 + (if l = Letter.p then 2 else 1), pos.2 + (if l = Letter.q then 1 else 0)) ls := by
+      simp only [origins, dxdy_fwd]
+    rw [hstep, List.mem_cons] at ho
+    rcases ho with rfl | ho
+    · refine ⟨0, by simp, ?_, ?_, ?_⟩
+      · cases l
+        · simp [qPrefix, List.take_succ_cons]
+        · simp [qPrefix, List.take_succ_cons]
+          omega
+      · simp
+      · simp [prevLetter]
+    · obtain ⟨k, hk, h1, h2, h3⟩ := ih l _ o ho
+      refine ⟨k + 1, by simp; omega, ?_, ?_, ?_⟩
+      · rw [h1, qPrefix_cons_succ]
+        cases l <;> refine Prod.ext ?_ ?_ <;> simp <;> omega
+      · rw [h2, List.getD_cons_succ, getD_irrel ls k hk l pr]
+      · rw [h3, prevLetter_cons pr l ls k hk, List.getD_cons_succ, getD_irrel ls k hk l pr]
+
 end FLatticePaper.Tiles.SiteMarksCursor
