@@ -278,6 +278,7 @@ import FLatticePaper.Tiles.SiteCell
 import FLatticePaper.Tiles.CeilWords
 import FLatticePaper.Tiles.SiteMarksCursor
 import FLatticePaper.Tiles.SiteLowLeft
+import FLatticePaper.Tiles.SiteUnique
 import FLatticePaper.Plane.Induction.S3FreeBoundary
 import FLatticePaper.Plane.Induction.ParentCoordinates
 import FLatticePaper.Plane.Induction.Q3Arithmetic
