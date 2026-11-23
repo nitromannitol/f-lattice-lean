@@ -50,34 +50,38 @@ comparison field `m` has every forced input `o` a contact: otherwise (T) produce
 theorem forced_contact_transfer_PR {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hPR : PriceRangeOn word) {seed : Site → Site → Prop}
     (EC : Field → Prop)
-    (hT : ∀ m, IsCmpField word m → ∀ c o, laplacian (standardField word) c = 0 →
+    (hT : ∀ m, IsCmpField word m → ∀ c o, FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c →
+      laplacian (standardField word) c = 0 →
       standardField word c = m c → SquareClauses.ForcedEdge (standardField word) seed c o →
       o ∈ (frameAt word).closedPolygon → m o < standardField word o → EC m)
     (hW : ∀ m, IsCmpField word m → ¬ EC m)
-    {m : Field} (hm : IsCmpField word m) {c o : Site} (hw : laplacian (standardField word) c = 0)
+    {m : Field} (hm : IsCmpField word m) {c o : Site} (hSIc : FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c)
+    (hw : laplacian (standardField word) c = 0)
     (hc : standardField word c = m c) (hf : SquareClauses.ForcedEdge (standardField word) seed c o)
     (hoE : o ∈ (frameAt word).closedPolygon) : standardField word o = m o := by
   by_contra hne
   have hle := isCmp_le_on_E_PR h hSE hPR hm o hoE
-  exact hW m hm (hT m hm c o hw hc hf hoE (lt_of_le_of_ne hle (fun e => hne e.symm)))
+  exact hW m hm (hT m hm c o hSIc hw hc hf hoE (lt_of_le_of_ne hle (fun e => hne e.symm)))
 
 /-- `P` does not increase along a forced white edge (task 70 (c)): a lower contact root forces a lower contact input (T, W);
 a non-lower root has `P = c₀` on the whole range. -/
 theorem price_nonincrease_forced_PR {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hPR : PriceRangeOn word) {seed : Site → Site → Prop}
     (EC : Field → Prop)
-    (hT : ∀ m, IsCmpField word m → ∀ c o, laplacian (standardField word) c = 0 →
+    (hT : ∀ m, IsCmpField word m → ∀ c o, FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c →
+      laplacian (standardField word) c = 0 →
       standardField word c = m c → SquareClauses.ForcedEdge (standardField word) seed c o →
       o ∈ (frameAt word).closedPolygon → m o < standardField word o → EC m)
     (hW : ∀ m, IsCmpField word m → ¬ EC m)
-    {c o : Site} (hw : laplacian (standardField word) c = 0) (hcE : c ∈ (frameAt word).closedPolygon)
+    {c o : Site} (hSIc : FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c)
+    (hw : laplacian (standardField word) c = 0) (hcE : c ∈ (frameAt word).closedPolygon)
     (hf : SquareClauses.ForcedEdge (standardField word) seed c o) (hoE : o ∈ (frameAt word).closedPolygon) :
     (frameAt word).price (standardField word) o ≤ (frameAt word).price (standardField word) c := by
   have hpc := hPR c hcE
   have hpo := hPR o hoE
   by_cases hlow : (frameAt word).price (standardField word) c = (frameAt word).cutPrice - 1
   · have hc' := (price_eq_low_iff c).mp hlow
-    have ho' := forced_contact_transfer_PR h hSE hPR EC hT hW (Or.inl rfl) hw hc' hf hoE
+    have ho' := forced_contact_transfer_PR h hSE hPR EC hT hW (Or.inl rfl) hSIc hw hc' hf hoE
     have := (price_eq_low_iff o).mpr ho'
     omega
   · omega
@@ -87,11 +91,13 @@ contact of `cmpUp`, whose forced input is a contact (T, W). -/
 theorem jplus_nonincrease_forced_PR {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hPR : PriceRangeOn word) {seed : Site → Site → Prop}
     (EC : Field → Prop)
-    (hT : ∀ m, IsCmpField word m → ∀ c o, laplacian (standardField word) c = 0 →
+    (hT : ∀ m, IsCmpField word m → ∀ c o, FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c →
+      laplacian (standardField word) c = 0 →
       standardField word c = m c → SquareClauses.ForcedEdge (standardField word) seed c o →
       o ∈ (frameAt word).closedPolygon → m o < standardField word o → EC m)
     (hW : ∀ m, IsCmpField word m → ¬ EC m)
-    {c o : Site} (hw : laplacian (standardField word) c = 0) (hcE : c ∈ (frameAt word).closedPolygon)
+    {c o : Site} (hSIc : FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c)
+    (hw : laplacian (standardField word) c = 0) (hcE : c ∈ (frameAt word).closedPolygon)
     (hf : SquareClauses.ForcedEdge (standardField word) seed c o) (hoE : o ∈ (frameAt word).closedPolygon) :
     (standardField word o - standardField word (o + (frameAt word).shortShift) + 1) / 2 ≤
       (standardField word c - standardField word (c + (frameAt word).shortShift) + 1) / 2 := by
@@ -101,7 +107,7 @@ theorem jplus_nonincrease_forced_PR {word : Word} (h : ∃ x ∈ word, x ≠ Dig
   · have hc' : standardField word c = cmpUpW word c := by
       unfold cmpUpW FLatticePaper.Contacts.cmpUp
       linarith
-    have ho' := forced_contact_transfer_PR h hSE hPR EC hT hW (Or.inr (Or.inl rfl)) hw hc' hf hoE
+    have ho' := forced_contact_transfer_PR h hSE hPR EC hT hW (Or.inr (Or.inl rfl)) hSIc hw hc' hf hoE
     unfold cmpUpW FLatticePaper.Contacts.cmpUp at ho'
     omega
   · omega
@@ -112,11 +118,13 @@ theorem jminus_nonincrease_forced_PR {word : Word} (h : ∃ x ∈ word, x ≠ Di
     (hSE : StrongEstimates (conjWord word)) (hPR : PriceRangeOn word)
     (hpk : (frameAt word).Packet (standardField word)) {seed : Site → Site → Prop}
     (EC : Field → Prop)
-    (hT : ∀ m, IsCmpField word m → ∀ c o, laplacian (standardField word) c = 0 →
+    (hT : ∀ m, IsCmpField word m → ∀ c o, FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c →
+      laplacian (standardField word) c = 0 →
       standardField word c = m c → SquareClauses.ForcedEdge (standardField word) seed c o →
       o ∈ (frameAt word).closedPolygon → m o < standardField word o → EC m)
     (hW : ∀ m, IsCmpField word m → ¬ EC m)
-    {c o : Site} (hw : laplacian (standardField word) c = 0) (hcE : c ∈ (frameAt word).closedPolygon)
+    {c o : Site} (hSIc : FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c)
+    (hw : laplacian (standardField word) c = 0) (hcE : c ∈ (frameAt word).closedPolygon)
     (hf : SquareClauses.ForcedEdge (standardField word) seed c o) (hoE : o ∈ (frameAt word).closedPolygon) :
     (standardField word o - standardField word (o + -(frameAt word).shortShift) + 1) / 2 ≤
       (standardField word c - standardField word (c + -(frameAt word).shortShift) + 1) / 2 := by
@@ -126,7 +134,7 @@ theorem jminus_nonincrease_forced_PR {word : Word} (h : ∃ x ∈ word, x ≠ Di
   · have hc' : standardField word c = cmpDownW word c := by
       unfold cmpDownW FLatticePaper.Contacts.cmpDown
       linarith
-    have ho' := forced_contact_transfer_PR h hSE hPR EC hT hW (Or.inr (Or.inr rfl)) hw hc' hf hoE
+    have ho' := forced_contact_transfer_PR h hSE hPR EC hT hW (Or.inr (Or.inr rfl)) hSIc hw hc' hf hoE
     unfold cmpDownW FLatticePaper.Contacts.cmpDown at ho'
     omega
   · omega
@@ -154,51 +162,59 @@ where (T) is the hypothesis `hT` with the concrete empty clause and (W) is `hW`.
 theorem forced_contact_of_sat_PR {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hPR : PriceRangeOn word)
     (hW : HasSatSelection (standardField word))
-    (hT : ∀ m, IsCmpField word m → ∀ c o, laplacian (standardField word) c = 0 →
+    (hT : ∀ m, IsCmpField word m → ∀ c o, FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c →
+      laplacian (standardField word) c = 0 →
       standardField word c = m c → ForcedEdge (standardField word) (fun _ _ => False) c o →
       o ∈ (frameAt word).closedPolygon → m o < standardField word o → EmptyClause m)
-    {m : Field} (hm : IsCmpField word m) {c o : Site} (hw : laplacian (standardField word) c = 0)
+    {m : Field} (hm : IsCmpField word m) {c o : Site} (hSIc : FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c)
+    (hw : laplacian (standardField word) c = 0)
     (hc : standardField word c = m c) (hf : ForcedEdge (standardField word) (fun _ _ => False) c o)
     (hoE : o ∈ (frameAt word).closedPolygon) : standardField word o = m o :=
-  forced_contact_transfer_PR h hSE hPR EmptyClause hT (fun _ hm' => not_emptyClause_of_cmp hW hm') hm hw hc hf hoE
+  forced_contact_transfer_PR h hSE hPR EmptyClause hT (fun _ hm' => not_emptyClause_of_cmp hW hm') hm hSIc hw hc hf hoE
 
 /-- `P` does not increase along unseeded forced white edges, from (T) with the concrete empty clause and (W). -/
 theorem price_nonincrease_forced_of_sat_PR {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hPR : PriceRangeOn word)
     (hW : HasSatSelection (standardField word))
-    (hT : ∀ m, IsCmpField word m → ∀ c o, laplacian (standardField word) c = 0 →
+    (hT : ∀ m, IsCmpField word m → ∀ c o, FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c →
+      laplacian (standardField word) c = 0 →
       standardField word c = m c → ForcedEdge (standardField word) (fun _ _ => False) c o →
       o ∈ (frameAt word).closedPolygon → m o < standardField word o → EmptyClause m)
-    {c o : Site} (hw : laplacian (standardField word) c = 0) (hcE : c ∈ (frameAt word).closedPolygon)
+    {c o : Site} (hSIc : FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c)
+    (hw : laplacian (standardField word) c = 0) (hcE : c ∈ (frameAt word).closedPolygon)
     (hf : ForcedEdge (standardField word) (fun _ _ => False) c o) (hoE : o ∈ (frameAt word).closedPolygon) :
     (frameAt word).price (standardField word) o ≤ (frameAt word).price (standardField word) c :=
-  price_nonincrease_forced_PR h hSE hPR EmptyClause hT (fun _ hm' => not_emptyClause_of_cmp hW hm') hw hcE hf hoE
+  price_nonincrease_forced_PR h hSE hPR EmptyClause hT (fun _ hm' => not_emptyClause_of_cmp hW hm') hSIc hw hcE hf hoE
 
 /-- `J₊` does not increase along unseeded forced white edges, from (T) with the concrete empty clause and (W). -/
 theorem jplus_nonincrease_forced_of_sat_PR {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hPR : PriceRangeOn word)
     (hW : HasSatSelection (standardField word))
-    (hT : ∀ m, IsCmpField word m → ∀ c o, laplacian (standardField word) c = 0 →
+    (hT : ∀ m, IsCmpField word m → ∀ c o, FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c →
+      laplacian (standardField word) c = 0 →
       standardField word c = m c → ForcedEdge (standardField word) (fun _ _ => False) c o →
       o ∈ (frameAt word).closedPolygon → m o < standardField word o → EmptyClause m)
-    {c o : Site} (hw : laplacian (standardField word) c = 0) (hcE : c ∈ (frameAt word).closedPolygon)
+    {c o : Site} (hSIc : FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c)
+    (hw : laplacian (standardField word) c = 0) (hcE : c ∈ (frameAt word).closedPolygon)
     (hf : ForcedEdge (standardField word) (fun _ _ => False) c o) (hoE : o ∈ (frameAt word).closedPolygon) :
     (standardField word o - standardField word (o + (frameAt word).shortShift) + 1) / 2 ≤
       (standardField word c - standardField word (c + (frameAt word).shortShift) + 1) / 2 :=
-  jplus_nonincrease_forced_PR h hSE hPR EmptyClause hT (fun _ hm' => not_emptyClause_of_cmp hW hm') hw hcE hf hoE
+  jplus_nonincrease_forced_PR h hSE hPR EmptyClause hT (fun _ hm' => not_emptyClause_of_cmp hW hm') hSIc hw hcE hf hoE
 
 /-- `J₋` does not increase along unseeded forced white edges, from (T) with the concrete empty clause and (W). -/
 theorem jminus_nonincrease_forced_of_sat_PR {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hPR : PriceRangeOn word)
     (hW : HasSatSelection (standardField word))
-    (hT : ∀ m, IsCmpField word m → ∀ c o, laplacian (standardField word) c = 0 →
+    (hT : ∀ m, IsCmpField word m → ∀ c o, FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c →
+      laplacian (standardField word) c = 0 →
       standardField word c = m c → ForcedEdge (standardField word) (fun _ _ => False) c o →
       o ∈ (frameAt word).closedPolygon → m o < standardField word o → EmptyClause m)
-    {c o : Site} (hw : laplacian (standardField word) c = 0) (hcE : c ∈ (frameAt word).closedPolygon)
+    {c o : Site} (hSIc : FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c)
+    (hw : laplacian (standardField word) c = 0) (hcE : c ∈ (frameAt word).closedPolygon)
     (hf : ForcedEdge (standardField word) (fun _ _ => False) c o) (hoE : o ∈ (frameAt word).closedPolygon) :
     (standardField word o - standardField word (o + -(frameAt word).shortShift) + 1) / 2 ≤
       (standardField word c - standardField word (c + -(frameAt word).shortShift) + 1) / 2 :=
   jminus_nonincrease_forced_PR h hSE hPR (packet_of_strong h hSE) EmptyClause hT
-    (fun _ hm' => not_emptyClause_of_cmp hW hm') hw hcE hf hoE
+    (fun _ hm' => not_emptyClause_of_cmp hW hm') hSIc hw hcE hf hoE
 
 end FLatticePaper.PassagePR
