@@ -494,3 +494,11 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - Numerics (scripts/conj_freeH_vpath_check.py, words ≤ 4) agree with these statements.
 - Checks: `checks/VPathFloor.lean` (guards). Root build clean; sandbox logs clean.
 - Not yet: the odd conjugate free H points and `V_p + I` (the Q19 west edge).
+
+### Task 72 (V-block converse, odd points, numerics): scripts/conj_freeH_odd_check.py
+
+- Odd conjugate free H points, written as `w = (2l − b + 1, b)` with `l = (w1 + w2 − 1)/2`, `b = w2`: the spectrum `t_c(w) = 2r + (D − N)` with `r = (D − N) l − D b` gives `0 ≤ r ≤ N` (exactly), and `b = ⌊(D − N) l / D⌋`, `0 ≤ l ≤ D − 1`. The image is `zTurn w = (−b, 2l − b)`.
+- Each `l ∈ [0, D − 1]` with `0 ≤ r_l ≤ N` is hit by exactly one odd conjugate free H point; `r_l = N` holds exactly for `l = D − 1`, where the image is `excVertex = V_p + I`.
+- For `r_l ≤ N − 1` the image is in the word frame's freeV (482 cases, words ≤ 4; the origin for `l = 0`); the word index `q = (d − n) l − d b` satisfies `q ≤ n` there (370 cases).
+- `excVertex` is free exactly when ε = −1 (54 of 112 `r = N` cases in words ≤ 4; the other 58 have ε = +1). Words ≤ 5 agree (3208 odd points, no failures).
+- Lean is not yet written for this; the algebra needed is the identity `D q = ε l + d r` (ε = N d − D n), giving `q ≤ n` from `r ≤ N − 1`.
