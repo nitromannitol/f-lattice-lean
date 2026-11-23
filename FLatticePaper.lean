@@ -276,6 +276,7 @@ import FLatticePaper.Tiles.SiteBaseDischarge
 import FLatticePaper.Tiles.SitePairScope
 import FLatticePaper.Tiles.SiteCell
 import FLatticePaper.Tiles.CeilWords
+import FLatticePaper.Tiles.SiteHull
 import FLatticePaper.Tiles.SiteMarksCursor
 import FLatticePaper.Tiles.SiteLowLeft
 import FLatticePaper.Tiles.SiteUnique
