@@ -61,7 +61,7 @@ theorem price_arc_W0 (P EHv Ψ : Site → ℤ) (c0 : ℤ) (arc : Set Site) (h0 :
 /-- **Phase W1 on the native H arc.** With `P(z) = c₀ − 1 − E_H(w)` at the reflection `w = refl z`, and the arc identity `E_H = min(0, Ψ − 1)`
 at the reflected points (the phase bit `W = 1`), where `Ψ = 0` at `refl h₀` and `Ψ ≥ 1` at the other reflected arc vertices: the same three
 conclusions as phase W0. -/
-theorem price_arc_W1 (P EHv Ψ refl : Site → ℤ) (c0 : ℤ) (arc : Set Site) (h0 : Site) (hh0 : h0 ∈ arc)
+theorem price_arc_W1 (P EHv Ψ : Site → ℤ) (refl : Site → Site) (c0 : ℤ) (arc : Set Site) (h0 : Site) (hh0 : h0 ∈ arc)
     (hP : ∀ z ∈ arc, P z = c0 - 1 - EHv (refl z))
     (hEH : ∀ z ∈ arc, EHv (refl z) = min 0 (Ψ (refl z) - 1))
     (hΨ0 : Ψ (refl h0) = 0) (hΨ : ∀ z ∈ arc, z ≠ h0 → 1 ≤ Ψ (refl z)) (hΨnn : ∀ z ∈ arc, 0 ≤ Ψ (refl z)) :

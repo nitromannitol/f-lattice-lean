@@ -491,5 +491,6 @@ import FLatticePaper.Plane.Induction.PriceDeck
 import FLatticePaper.Plane.Induction.FreeEnum
 import FLatticePaper.Plane.Induction.FreeCover
 import FLatticePaper.Plane.Induction.PsiCalibration
+import FLatticePaper.Plane.Induction.ArcPsi
 
 /-! Root import for the corrected F-lattice paper. -/
