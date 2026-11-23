@@ -105,3 +105,22 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - `OldPolicyData.pFun` is the paper's `p(x) = f(x − εU_q) − f(x)`, but the Lean `price` uses `parentShift = ε(N−D, N+D)` (the odd parent's transverse, `ChildFrame.lean:23`), so `price` is not `p` and `pNondecreasing` does not give `hfirst`'s price step.
 - With quota (a black centre retains both inputs) and `chainNonincreasing` on all retained edges, `hfirst` applied to every black pair would exclude every rise. The paper's chart analysis is needed exactly because the monotone quantities hold on different charts, so `hfirst` must be stated per chart (as done), not globally.
 - `noBlackPairRise_of_oldPolicy` takes `firstCommon ⇒ P.retained` and the price step as named inputs; `chainNonincreasing 1` is used as the chain-gap monotonicity.
+
+### Task 63 status (supersedes the status column above; SheetCases.lean, MatchedPolicy.lean)
+
+- Mismatch 1 (chart-monotone quantity), restated: `OldPolicyData.priceNonincreasing : NonincreasingAlong (frame.price G) retained` on the conjugate frame's own price. By paragraph 5, `p(x) = c₀ − P'(Zx)` (`paragraph5_field_identity_of_strong`), so this is `p` nondecreasing along the transported policy `parentPolicy P c i := P.retained (Z c) (Z i)` (`parentPolicy_price`). `pFun` is removed.
+- Matched policies as Lean objects: `parentPolicy P` (parent sheet), `sheetPolicyA P lv` (`c, i ↦ parentPolicy (c − lv) (i − lv)`), `sheetPolicyC P lv centre` (pulled back by the exchange `z ↦ centre − z`, `SheetExchange`). Price steps in their own coordinates: `sheetPolicyA_price`, `sheetPolicyC_price`. Reflection: `parentPolicy_reflection` (from `P.reflection`, with `Z(I − w) = I' − Zw`, `zTurn_reflect`).
+- Sheet selection (paragraph 3), as far as the unit bound allows: `sheetMin_A_at_input` (`Ψ(c) ≥ 1`, unit bound on `Ψ = C − A` gives `M = A` at the input), `sheetMin_C_at_input`, `sheetMin_A_at_tie`. The unit bound on `Ψ` is a named input: `SheetLocalInputs.unit` is stated for `sheetChainPotential` (`Ξ`), and `Ψ = C − A` is not yet identified with `Ξ` (`sheetC_sub_sheetA_eq` gives `C − A` as a two-point `G` difference plus an affine term).
+
+| case | status (task 63) | leaf |
+|---|---|---|
+| nonfree root (`a: 1 → 0`) | **proved**: `nonfree_drop_excluded` (`paragraph7_of_strong`, `paragraph5_field_identity_of_strong`, `parentPolicy_reflection`, `parentPolicy_price`) | no hypothesis beyond `P` and `hSE` |
+| free H roots (`a = 0`) | **proved given `hweb`**: `H_drop_excluded` (`H_root_a_eq_zero`). `hweb : HRootWeb N D (parentTGrade x)` is **not** supplied by ParentWeb (ParentWeb has only the endpoint values); it stays the named paragraph-8 input in the cover | `hweb` |
+| free V roots (`j = 0`, `i ∈ {0,1}`) | **proved** given the block output: `ChildFrame.not_rising_of_blockPair` | the cover output `BlockPairAt` |
+| exceptional `V_p + I` (W = 1) | **proved given `hT`**: `exceptional_drop_excluded`, with `p(0) = 0` (`pJump_origin_zero`) and `p(1,0) = 0` (`pJump_corner_zero`) from `zeroStrip_of_strong` | `hT : a(v − (1,0)) = p(1,0) + 1` (the paper's `V_p`-step; `HarmI2.harmR_shift_Vp` needs a periodicity hypothesis not yet wired) |
+| adjacent positive chart (first offer) | **partial**: `first_offer_of_strict` (`min(p x, Ψ + p(x − e)) = p x` for `Ψ ≥ 1`, from `p_shift_bound_of_strong`); the contradiction is not closed | `hadj` |
+| first common chart | named (`hfirst`); the chain monotonicity in `noBlackPairRise_of_cases` is stated for the conjugate chain with `η = 1`, not for the word's `η = eps(word)` in the sheet coordinates (`i3_sheet_eq_chainPotential`) | `hfirst` |
+| exit with the same slip | named (`hexit`) | `hexit` |
+| cover of a rising black pair by the cases | named (`hcover`); the sheet choice is the selection lemmas above | `hcover` |
+
+`noBlackPairRise_of_sheet_cases` (SheetCases.lean) states `NoBlackPairRise (standardField word) (frameAt word).shortShift` from `hcover`, `hfirst`, `hadj`, `hexit`, `hT` (all named) and the closed leaves above; checks in `checks/SheetCases.lean` (standard axioms only).
