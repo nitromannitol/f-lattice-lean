@@ -1,0 +1,5 @@
+import FLatticePaper.Plane.Induction.I3Restricted
+
+#print axioms FLatticePaper.Induction.isConstrainedBurningRank_of_strict_quota
+#print axioms FLatticePaper.Induction.restrictedNoFort_of_constrainedRank
+#print axioms FLatticePaper.Induction.restrictedNoFort_of_constrained_rankGrade
