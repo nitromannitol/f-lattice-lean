@@ -1,0 +1,3 @@
+import FLatticePaper.Tiles.SiteSourcesAll
+#print axioms FLatticePaper.Tiles.SiteSourcesAll.standard_fourStrings_all
+#print axioms FLatticePaper.Tiles.SiteSourcesAll.sourceHyps_of_marks
