@@ -1,0 +1,5 @@
+import FLatticePaper.Plane.Induction.W1NonfreeHsqNonneg
+
+#print axioms FLatticePaper.W1NonfreeHsqNonneg.square_nonneg
+#print axioms FLatticePaper.W1NonfreeHsqNonneg.hsq_offcollar
+#print axioms FLatticePaper.W1NonfreeHsqNonneg.hsq_nonneg_of_inputs
