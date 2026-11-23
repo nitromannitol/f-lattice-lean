@@ -223,6 +223,8 @@ lake env lean checks/NearQPrices.lean
 lake env lean checks/RawOrigin.lean
 lake env lean checks/NominalAgreement.lean
 lake env lean checks/ConjugatePeriods.lean
+lake env lean checks/OddCovering.lean
+lake env lean checks/OddNominal.lean
 lake env lean checks/PropBaseCases.lean
 lake env lean checks/BinaryWords.lean
 lake env lean checks/BoundaryStrings.lean
