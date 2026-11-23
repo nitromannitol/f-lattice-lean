@@ -1,0 +1,4 @@
+import FLatticePaper.Plane.Induction.W1OddSeedZero
+
+#print axioms FLatticePaper.W1OddSeedZero.harmonicGrid_quarter_neg
+#print axioms FLatticePaper.W1OddSeedZero.seed_zero_of_offers
