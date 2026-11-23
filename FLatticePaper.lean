@@ -187,6 +187,7 @@ import FLatticePaper.Plane.Induction.OddRise
 import FLatticePaper.Plane.Induction.ZeroRegion
 import FLatticePaper.Plane.Induction.ParentStep
 import FLatticePaper.Plane.Induction.I3Application
+import FLatticePaper.Plane.Induction.I3Permits
 import FLatticePaper.Plane.HarmonicConstant
 import FLatticePaper.Plane.Induction.AlternateFacts
 import FLatticePaper.Plane.GlobalOdometers
