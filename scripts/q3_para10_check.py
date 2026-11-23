@@ -27,13 +27,14 @@ def run(w):
     Up = (2 * D, 2 * N)
     Uq = (dq, nq)
     def lh(z):
-        return (0, 2 * n) if oc.even_site(z) else (2 - d + n, L - 2)
-    # the block: odd vertices v_l, l < D, plus V_p + I (exceptional when W = 1, child left when W = 0)
+        return (2 - d + n, L - 2)   # union V cut window (index_of_freeV)
+    # the block: odd vertices v_l, 1 <= l <= D (child floor), plus the exceptional V_p + I when W = 1 only
     verts = []
     for l in range(1, D + 1):
         bp = (d - n) * l // d            # child floor (equals the parent floor for l < D)
         verts.append(("odd", (-bp, 2 * l - 1 - bp)))
-    verts.append(("exc", (N - D + 1, D + N - 1)))
+    if W == 1:
+        verts.append(("exc", (N - D + 1, D + N - 1)))
     for kind, v in verts:
         # child left vertex test
         left = inE(v) and not inE((v[0] - 1, v[1]))

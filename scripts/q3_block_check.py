@@ -21,9 +21,9 @@ def run(w):
     def left_bdry(z):
         return inE(z) and not inE((z[0] - 1, z[1]))
     def spec(z):
-        if oc.even_site(z):
-            return 0 <= sg(z) <= 2 * n
-        return 2 - d + n <= sg(z) <= L - 2
+        # union V cut (S3 vSpectrum): s even, s in [0, 2n] or s in [2-d+n, L-2]
+        s = sg(z)
+        return s % 2 == 0 and ((0 <= s <= 2 * n) or (2 - d + n <= s <= L - 2))
     out = defaultdict(int)
     key = "W=%d" % W
     for l in range(1, D + 1):
