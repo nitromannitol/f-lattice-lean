@@ -262,5 +262,6 @@ import FLatticePaper.Plane.Induction.BaseStrip
 import FLatticePaper.Plane.Induction.ZoneI1
 import FLatticePaper.Plane.Induction.HarmWrap
 import FLatticePaper.Plane.Induction.ParentStepDischarge
+import FLatticePaper.Plane.Induction.WeightPolicy
 
 /-! Root import for the corrected F-lattice paper. -/
