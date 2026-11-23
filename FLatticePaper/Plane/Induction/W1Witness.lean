@@ -1,0 +1,38 @@
+import FLatticePaper.Plane.Induction.OldPolicy
+import FLatticePaper.Plane.Induction.W1Constructor
+
+/-! Task 62 (2): the witness data of the earlier canonical policy, as a structure extending `OldPolicyData` (w3's file is not edited).
+
+`OldPolicyWitness frame G seed` adds to the policy the strict-interior witnesses of its forced whites: for every forced white `c`
+with its forced input `i` (not a seed), the forcing of `(c, i)` is a derivation `ForcedEdgeIn` whose squares lie in the strict interior
+of the earlier child (`StrictInterior`). This is the earlier W1 forcing (the induction hypothesis of §4: "the actual earlier unit
+witness"), in the form that the child's aligned-collar squares use. `witnessSquare` extracts from such a derivation the unit square of
+its first step, with its rejected input outside it and its other white corners forced into it. -/
+
+namespace FLatticePaper.W1Witness
+
+open Farey FLatticePaper FLatticePaper.SquareClauses FLatticePaper.AndOrRank FLatticePaper.Induction FLatticePaper.W1
+
+/-- The earlier canonical policy with its strict-interior witnesses at the forced whites. -/
+structure OldPolicyWitness (frame : ChildFrame) (G : Field) (seed : Site → Site → Prop)
+    extends OldPolicyData frame G seed where
+  /-- Every forced non-seed white of the earlier field is forced by a derivation whose squares lie in the earlier strict interior. -/
+  strictForced : ∀ c i, ForcedEdge G seed c i → ¬ seed c i →
+    ForcedEdgeIn G (StrictInterior frame.child.num frame.child.den) seed c i
+
+/-- The first unit step of a derivation: a square containing `c` in `R`, its rejected input `o` outside it, and every other white
+corner forced into it (by a derivation at its own pointer inside the square). -/
+theorem witnessSquare {F : Field} {R : Site → Prop} {seed : Site → Site → Prop} {c o : Site}
+    (h : ForcedEdgeIn F R seed c o) (hns : ¬ seed c o) :
+    ∃ a b : ℤ, c ∈ squareCorners a b ∧ o ∉ squareCorners a b ∧ (∀ c' ∈ squareCorners a b, R c') ∧
+      (∀ c' ∈ squareCorners a b, c' ≠ c → laplacian F c' = -1 ∨
+        (laplacian F c' = 0 ∧ ∃ i', ForcedEdgeIn F R seed c' i' ∧ i' ∈ squareCorners a b)) := by
+  cases h with
+  | seed hs => exact absurd hs hns
+  | @unit a b _ _ inside hR hc hw ho hout hin hforced =>
+    refine ⟨a, b, hc, hout, hR, fun c' hc' hne => ?_⟩
+    rcases hin c' hc' hne with h1 | ⟨h1, h2, _⟩
+    · exact Or.inl h1
+    · exact Or.inr ⟨h1, inside c', hforced c' hc' hne h1, h2⟩
+
+end FLatticePaper.W1Witness
