@@ -279,6 +279,73 @@ theorem qtf_sub_h0 (F : Site → ℤ) (x : Site) :
   rw [quarterTurn_site]
   ring
 
+/-- Step (d), the case `ε = −1` (`W = 0`): the sheet is nonnegative on the zone. -/
+theorem I1_core_minus (F : Site → ℤ) (N D nq dq Nu Du epsU cq : ℤ) (H : ZoneHyp F N D Nu Du epsU)
+    (hε : N * dq - nq * D = -1) (hdq : 0 < 2 * D + dq)
+    (hcq : 2 * cq = dq * dq + 2 * dq * nq - nq * nq - dq - nq)
+    (hzs : ∀ x : Site, 1 - D ≤ N * x.1 - D * x.2 → N * x.1 - D * x.2 ≤ N + 2 * D - 1 → quarterTurnField F x = 0)
+    (hzev : ∀ x : Site, (x.1 + x.2) % 2 = 0 → N * x.1 - D * x.2 = -D → quarterTurnField F x = 0)
+    (z1 z2 : ℤ) (hz1 : 0 ≤ z1) (hz1' : z1 ≤ 2 * D + dq) (hz2 : 0 ≤ z2) (hz2' : z2 ≤ 2 * N + nq)
+    (ht1 : 1 - (2 * D + dq) ≤ (2 * N + nq) * z1 - (2 * D + dq) * z2)
+    (ht2 : (2 * N + nq) * z1 - (2 * D + dq) * z2 ≤ (2 * D + dq) + (2 * N + nq) - 1) :
+    0 ≤ quarterTurnField F (z1 - (1 - 0) * dq - (nq - dq + (N * dq - nq * D) * dq),
+          z2 - (1 - 0) * nq - (nq + dq + (N * dq - nq * D) * nq))
+      + (nq * (z1 - (1 - 0) * dq) - dq * (z2 - (1 - 0) * nq)) + (cq + 2 * 0) := by
+  have hN := H.hN
+  have hND := H.hND
+  have hr := H.hr
+  have hD2 : 2 ≤ D := by omega
+  have hsheet := ZoneSheet.sheet_eq_harmonic F N D nq dq cq 0 z1 z2 (Or.inl ⟨rfl, hε⟩) hcq
+    (fun x => ZoneHarmonic.quarterTurnField_add_Up F N D H.hT x)
+  rw [hsheet]
+  simp only [zero_mul, sub_zero]
+  rw [qtf_sub_h0]
+  have hj : (D - N) * (-(z1, z2).2) - (D + N) * ((z1, z2).1 - 1) ≤ D + N :=
+    tG_le_of_box N D z1 z2 hN hND hz1 hz2
+  have hmin := zone_minus_nonneg F N D nq dq Nu Du epsU H hε hD2 (z1, z2) hj
+  simp only at hmin
+  by_cases hs : N * z1 - D * z2 = -D
+  · obtain ⟨k, hk1, hk2⟩ := exc_form N D nq dq z1 z2 (by omega) (by rw [hε]; norm_num) hs
+    rcases Int.even_or_odd k with ⟨l, hl⟩ | ⟨l, hl⟩
+    · have e1 : z1 = 2 * l * D := by rw [hk1, hl]; ring
+      have e2 : z2 = 2 * l * N + 1 := by rw [hk2, hl]; ring
+      subst e1 e2
+      have hpsi := psi_line F N D nq dq Nu Du epsU H (Or.inr hε) l
+      have hl0 : 0 ≤ l := by nlinarith
+      have hl1 : 1 ≤ l := by
+        by_contra hc
+        have h0 : l = 0 := by omega
+        subst h0
+        have e0 : (2 * N + nq) * (2 * (0 : ℤ) * D) - (2 * D + dq) * (2 * (0 : ℤ) * N + 1)
+            = -(2 * D + dq) := by ring
+        linarith
+      rw [hpsi, hε]
+      linarith
+    · have e1 : z1 = (2 * l + 1) * D := by rw [hk1, hl]
+      have e2 : z2 = (2 * l + 1) * N + 1 := by rw [hk2, hl]
+      obtain ⟨c, hc⟩ : ∃ c : ℤ, D + N = 2 * c + 1 := ⟨(D + N - 1) / 2, by omega⟩
+      have hsum : z1 + z2 = 2 * (2 * l * c + l + c + 1) := by
+        rw [e1, e2]
+        linear_combination (2 * l + 1) * hc
+      have hpar : (z1 + z2) % 2 = 0 := by
+        rw [hsum]
+        simp
+      have hf : quarterTurnField F (z1, z2) = 0 := hzev (z1, z2) hpar hs
+      unfold quarterTurnField at hf
+      rw [quarterTurn_site] at hf
+      simp only at hf
+      linarith
+  · have hb := tp_window N D nq dq z1 z2 (by omega) hdq (by linarith) ht1 ht2
+      (by rw [hε]; linarith) (by rw [hε]; linarith)
+    obtain ⟨hlo', hhi'⟩ := hb
+    have key : ∀ p : ℤ, -D ≤ p → p ≠ -D → 1 - D ≤ p := fun p h1 h2 => by omega
+    have hs1 : 1 - D ≤ N * z1 - D * z2 := key _ hlo' hs
+    have hf0 : quarterTurnField F (z1, z2) = 0 := hzs (z1, z2) hs1 hhi'
+    unfold quarterTurnField at hf0
+    rw [quarterTurn_site] at hf0
+    simp only at hf0
+    linarith
+
 end ZoneCase
 
 end FLatticePaper.Induction
