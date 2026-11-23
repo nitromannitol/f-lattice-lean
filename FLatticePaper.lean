@@ -31,6 +31,7 @@ import FLatticePaper.Construction.NearQPrices
 import FLatticePaper.Construction.PlaneIdentification
 import FLatticePaper.Construction.RawOrigin
 import FLatticePaper.Construction.NominalAgreement
+import FLatticePaper.Construction.OddCovering
 import FLatticePaper.Construction.ConjugatePeriods
 import FLatticePaper.Construction.StructuralSuccess
 import FLatticePaper.Construction.OverlapSites
