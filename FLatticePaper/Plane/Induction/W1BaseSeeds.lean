@@ -1,5 +1,6 @@
 import FLatticePaper.Plane.Induction.TwosStrips
 import FLatticePaper.Plane.Induction.TwosReciprocal
+import FLatticePaper.Plane.Induction.TwosField
 import FLatticePaper.Plane.Induction.Packet
 import FLatticePaper.Plane.Induction.W1OddZero
 import FLatticePaper.Plane.Induction.W1SeedFields
@@ -114,6 +115,25 @@ theorem seedFields_base {w : Word} (h : ∃ x ∈ w, x ≠ Digit.three) (k : ℕ
   have hpar : SeedFields (conjWord w) := by
     rw [hconj]
     exact seedFields_threes k
+  exact FLatticePaper.W1SeedFields.seedFields_of_conj h hS hpar
+
+/-- **`SeedFields` of the twos word `2^(k+1)`** (task 78): its conjugate is the threes word `3^k`, so `seedFields_of_conj` gives both
+seeds from `SeedFields (3^k)` (proved for every `k`), given the strong estimates of `3^k`. -/
+theorem seedFields_two_succ (k : ℕ) (hS : StrongEstimates (List.replicate k Digit.three)) :
+    SeedFields (List.replicate (k + 1) Digit.two) := by
+  have hc : conjWord (List.replicate (k + 1) Digit.two) = List.replicate k Digit.three := conjWord_replicate_two k
+  exact FLatticePaper.W1SeedFields.seedFields_of_conj
+    ⟨Digit.two, List.mem_replicate.mpr ⟨by omega, rfl⟩, by decide⟩
+    (by rw [hc]; exact hS) (by rw [hc]; exact seedFields_threes k)
+
+/-- **`SeedFields` at a word whose conjugate is the twos word `2^(k+1)`** (task 78): the seeds of the conjugate are those of
+`2^(k+1)`, from `seedFields_two_succ`, and `seedFields_of_conj` transfers them to `w`. -/
+theorem seedFields_twos_conj {w : Word} (h : ∃ x ∈ w, x ≠ Digit.three) (k : ℕ)
+    (hconj : conjWord w = List.replicate (k + 1) Digit.two) (hS : StrongEstimates (conjWord w))
+    (hS3 : StrongEstimates (List.replicate k Digit.three)) : SeedFields w := by
+  have hpar : SeedFields (conjWord w) := by
+    rw [hconj]
+    exact seedFields_two_succ k hS3
   exact FLatticePaper.W1SeedFields.seedFields_of_conj h hS hpar
 
 end FLatticePaper.W1BaseSeeds
