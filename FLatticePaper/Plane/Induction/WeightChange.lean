@@ -7,6 +7,7 @@ import Mathlib.Algebra.Order.Ring.Abs
 import Mathlib.Algebra.Order.Group.Abs
 import Mathlib.Data.Int.Interval
 import Mathlib.Data.Finset.Prod
+import Mathlib.Algebra.Order.BigOperators.Group.Finset
 
 /-! Task 42: the weight change on a fixed graph (fix Q4-I3, "External facts").
 
@@ -256,5 +257,68 @@ theorem exists_deck_box (U V : Site) (hD : U.1 * V.2 - U.2 * V.1 ≠ 0) :
   · rw [Finset.mem_product, Finset.mem_Icc, Finset.mem_Icc]
     exact ⟨abs_le.mp hB1, abs_le.mp hB2⟩
   · ext <;> simp [latPt]
+
+
+/-- **Quadrant bound.** Let `g = lam (a P + c J) − r0` with `P, J` deck-affine (increments `(−1, 0)` and `(0, η)`) and `r0`
+deck-affine with increments `sU, sV`. If `lam a + sU ≥ 0` and `η sV ≤ lam c`, then `g` is bounded above on the sites `e`
+with `P e ≤ P z` and `J e ≤ J z`, by a constant depending on `z`. -/
+theorem quadrant_bound (U V : Site) (hD : U.1 * V.2 - U.2 * V.1 ≠ 0) (η : ℤ) (hη : η = 1 ∨ η = -1)
+    (P J r0 : Site → ℤ) (a c lam sU sV : ℤ)
+    (hPU : ∀ z, P (z + U) = P z - 1) (hPV : ∀ z, P (z + V) = P z)
+    (hJU : ∀ z, J (z + U) = J z) (hJV : ∀ z, J (z + V) = J z + η)
+    (hr0U : ∀ z, r0 (z + U) = r0 z + sU) (hr0V : ∀ z, r0 (z + V) = r0 z + sV)
+    (hU : 0 ≤ lam * a + sU) (hV : η * sV ≤ lam * c) (z : Site) :
+    ∃ G : ℤ, ∀ e : Site, P e ≤ P z → J e ≤ J z → lam * (a * P e + c * J e) - r0 e ≤ G := by
+  have hηη : η * η = 1 := by
+    rcases hη with rfl | rfl <;> norm_num
+  obtain ⟨g, hg⟩ : ∃ g : Site → ℤ, ∀ x, g x = lam * (a * P x + c * J x) - r0 x := ⟨_, fun x => rfl⟩
+  obtain ⟨S, hS⟩ := exists_deck_box U V hD
+  obtain ⟨K, hK⟩ : ∃ K : ℤ, K = Finset.sum S (fun r => |P r| + |J r| + |g r|) := ⟨_, rfl⟩
+  have hbound : ∀ r ∈ S, |P r| ≤ K ∧ |J r| ≤ K ∧ |g r| ≤ K := by
+    intro r hr
+    have h : |P r| + |J r| + |g r| ≤ Finset.sum S (fun x => |P x| + |J x| + |g x|) :=
+      Finset.single_le_sum (f := fun x => |P x| + |J x| + |g x|) (fun x _ => by positivity) hr
+    rw [← hK] at h
+    refine ⟨?_, ?_, ?_⟩ <;> linarith [abs_nonneg (P r), abs_nonneg (J r), abs_nonneg (g r)]
+  have hgU : ∀ x, g (x + U) = g x + (-lam * a - sU) := by
+    intro x
+    simp only [hg]
+    rw [hPU, hJU, hr0U]
+    ring
+  have hgV : ∀ x, g (x + V) = g x + (lam * (c * η) - sV) := by
+    intro x
+    simp only [hg]
+    rw [hPV, hJV, hr0V]
+    ring
+  have hPU' : ∀ x, P (x + U) = P x + (-1) := fun x => by rw [hPU]; ring
+  have hPV' : ∀ x, P (x + V) = P x + 0 := fun x => by rw [hPV]; ring
+  have hJU' : ∀ x, J (x + U) = J x + 0 := fun x => by rw [hJU]; ring
+  have hJV' : ∀ x, J (x + V) = J x + η := hJV
+  have hgUnp : -lam * a - sU ≤ 0 := by linarith
+  have hsign : 0 ≤ η * (lam * (c * η) - sV) := by
+    have e1 : η * (lam * (c * η) - sV) = lam * c - η * sV := by
+      linear_combination (lam * c) * hηη
+    linarith
+  refine ⟨K + (-K - P z) * (-lam * a - sU) + (K + J z) * (η * (lam * (c * η) - sV)), fun e hPle hJle => ?_⟩
+  obtain ⟨r, hrS, i, j, rfl⟩ := hS e
+  have hPe := affine_lattice hPU' hPV' r i j
+  have hJe := affine_lattice hJU' hJV' r i j
+  have hge := affine_lattice hgU hgV r i j
+  have hgx := hg (r + latPt U V i j)
+  obtain ⟨hPr, hJr, hgr⟩ := hbound r hrS
+  have hPr' := abs_le.mp hPr
+  have hJr' := abs_le.mp hJr
+  have hgr' := abs_le.mp hgr
+  rw [hPe] at hPle
+  rw [hJe] at hJle
+  have hi : -K - P z ≤ i := by linarith
+  have hj : η * j ≤ K + J z := by linarith
+  have hA : i * (-lam * a - sU) ≤ (-K - P z) * (-lam * a - sU) :=
+    mul_le_mul_of_nonpos_right hi hgUnp
+  have hB : (η * j) * (η * (lam * (c * η) - sV)) ≤ (K + J z) * (η * (lam * (c * η) - sV)) :=
+    mul_le_mul_of_nonneg_right hj hsign
+  have hI : j * (lam * (c * η) - sV) = (η * j) * (η * (lam * (c * η) - sV)) := by
+    linear_combination (-(j * (lam * (c * η) - sV))) * hηη
+  linarith [hge, hgx, hgr'.2]
 
 end FLatticePaper.WeightChange
