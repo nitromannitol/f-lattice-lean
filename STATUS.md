@@ -377,6 +377,8 @@ lake env lean checks/PairCellWindowsAxioms.lean
 lake env lean checks/PairBoxesAxioms.lean
 lake env lean checks/PairBoxesP0Axioms.lean
 lake env lean checks/PairBoxesP0EvenAxioms.lean
+lake env lean checks/PairOwnerP0Axioms.lean
+lake env lean checks/PairQAboxAxioms.lean
 lake env lean checks/VArcLongitudinal.lean
 lake env lean checks/VArcOffers.lean
 lake env lean checks/ParentStepDischarge.lean
