@@ -196,3 +196,8 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - PROVED: `plus_adjacent_nonpos_excluded`: a rising `σ` pair in option 2 whose centre star has `Ψ ≤ 0` is excluded by reflection to `neg_adjacent_nonneg`. `plus_adjacent_target_excluded`: a strict target `Ψ i ≥ 1` with a centre star `Ψ ≥ 0` is excluded by the positive adjacent chart and `sheetPolicyA_of_nonneg`.
 - NOT COVERED (the residual of `hTie` in option 2): a tied centre whose star contains a `Ψ = −1` input (mixed star), and a tied target under a strict centre (`Ψ c = 1, Ψ i = 0`, which the fix's l.21 says cannot occur: a tied target forces a tied centre). Both need the winner-retention argument of l.13 (the white parent at a black minimum) and the tied-target claim of l.21, not yet formalized.
 - Checks: `checks/NegChart.lean` (14 `#print axioms`), `checks/TieOpt2.lean` (4); standard axioms only. Zero warnings and errors in the sandbox logs; root build `FLatticePaper` clean (2583 jobs).
+
+### Task 69 (c) status (OddAssembly.lean; OddBlackNoRise)
+
+- `oddBlackNoRise_of_leaves`: `OddBlackNoRise (standardField word) σ` from `oddBlackNoRise_standard` (OddRise.lean), with `NoBlackPairRise` from `noBlackPairRise_of_leaves` (the conjugate's strong estimates and the old policy). The named leaves are `hslip` (the word's slip range on E), `hU` (the word's unit slip, the `F1_unitSlip` field of the word's slip fields, which also needs `StarZoneInputs` and `VArcInputs`), and `hTie` (the option-2 ties with a mixed star, and a tied target under a strict centre).
+- Checks: `checks/OddAssembly.lean` (1 `#print axioms`, standard). Root build `FLatticePaper` clean (2584 jobs), zero warnings and errors.
