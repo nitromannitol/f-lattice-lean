@@ -96,26 +96,27 @@ structure StrongEstimates (u : Word) : Prop where
   /-- F2 and F3 for the standard field: a signed policy that is a quota policy, along whose retained edges the field does not
   increase, and for every pair of positive weights `(a, c)` a rank with increments `λ(−a, cη)` on the generators `U′`, `V′`
   (`U′`, `V′` the kernel and the transverse period of the earlier child, `η = ε`). -/
-  F2F3_policy : ∃ policy : Site → Site → Prop,
+  F2F3_policy : ∀ η : ℤ, (η = 1 ∨ η = -1) → ∃ policy : Site → Site → Prop,
     RetainQuota (standardField u) policy ∧
-      NonincreasingAlong ((frameAt u).chainPotential (standardField u) (frameAt u).eps) policy ∧
+      NonincreasingAlong ((frameAt u).chainPotential (standardField u) η) policy ∧
       ∀ a c : ℤ, 0 < a → 0 < c →
         RankWithIncrements policy (frameAt u).child.modifiedDeck.kernel (frameAt u).child.modifiedDeck.transverse
-          (-a) (c * (frameAt u).eps)
-  /-- F2 and F4 for the chain mate `h′ = chainSheet ε`: a chain policy along which `h′` does not decrease; its reflection
-  `ξ ↦ R′ − w′ − ξ` has a nondecreasing `Φ = F′ − h′`, the black and white quotas for `h′`, and for every pair of positive weights
-  a rank with the opposite increments `λ(a, −cη)`. -/
-  F2F4_chain : ∃ chainPolicy : Site → Site → Prop,
-    NondecreasingAlong (fun z => (frameAt u).chainSheet (standardField u) (frameAt u).eps z) chainPolicy ∧
+          (-a) (c * η)
+  /-- F2 and F4 for the chain mate `h′_η = chainSheet η`, for each phase `η = ±1` (the sign of the chain step; `η = ε` is one
+  of the two): a chain policy along which `h′_η` does not decrease; its reflection `ξ ↦ R′ − w′ − ξ` has a nondecreasing
+  `Φ_η = chainPotential η`, the black and white quotas for `h′_η`, and for every pair of positive weights a rank with the opposite
+  increments `λ(a, −cη)`. -/
+  F2F4_chain : ∀ η : ℤ, (η = 1 ∨ η = -1) → ∃ chainPolicy : Site → Site → Prop,
+    NondecreasingAlong (fun z => (frameAt u).chainSheet (standardField u) η z) chainPolicy ∧
       ∃ R w : Site,
-        NondecreasingAlong (fun z => (frameAt u).chainPotential (standardField u) (frameAt u).eps z)
+        NondecreasingAlong (fun z => (frameAt u).chainPotential (standardField u) η z)
             (ReflectedPolicy R w chainPolicy) ∧
-          RetainQuota (fun z => (frameAt u).chainSheet (standardField u) (frameAt u).eps z)
+          RetainQuota (fun z => (frameAt u).chainSheet (standardField u) η z)
             (ReflectedPolicy R w chainPolicy) ∧
           ∀ a c : ℤ, 0 < a → 0 < c →
             RankWithIncrements (ReflectedPolicy R w chainPolicy)
               (frameAt u).child.modifiedDeck.kernel (frameAt u).child.modifiedDeck.transverse
-              a (-(c * (frameAt u).eps))
+              a (-(c * η))
 
 namespace StrongEstimates
 
