@@ -15,3 +15,5 @@ derived (`hbmono_of_raw`, `a_unit_bound`). -/
 #print axioms FLatticePaper.Induction.neg_adjacent_excluded
 #print axioms FLatticePaper.Induction.neg_sign_excluded
 #print axioms FLatticePaper.Induction.noBlackPairRise_of_leaves
+#print axioms FLatticePaper.Induction.sheetPolicyA_of_nonneg
+#print axioms FLatticePaper.Induction.neg_adjacent_nonneg
