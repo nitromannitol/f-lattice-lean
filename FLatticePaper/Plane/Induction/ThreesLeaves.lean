@@ -352,4 +352,42 @@ theorem threes_step (d c : ℤ) (hd : 3 ≤ d) (hodd : d % 2 = 1) (hc : 2 * c = 
             · exact h
           exact leaf_K2L2 d c hd hc RF hred y hy a b hK2 hL2
 
+theorem threes_shortShift (k : ℕ) : (frameAt (List.replicate k Digit.three)).shortShift = (-2, 0) := by
+  have hp : (frameAt (List.replicate k Digit.three)).parents = ⟨⟨0, 1⟩, ⟨1, 2 * (k : ℤ) + 1⟩⟩ :=
+    parentsAt_replicate_three k
+  unfold ChildFrame.shortShift ChildFrame.eps
+  rw [hp]
+  simp [Fraction.det]
+
+/-- The base identity at the even child `1/(2k+3)` of `3^k`: the midpoint is the explicit base alternate, with constant
+zero. The second difference lemma `threes_step` gives the value of the rounded midpoint. -/
+theorem threes_alternate (k : ℕ) (x : Site) :
+    (frameAt (List.replicate k Digit.three)).alternate (standardField (List.replicate k Digit.three)) x =
+      stairEvenAltField (2 * (k : ℤ) + 3) (standardField (List.replicate k Digit.three)) x := by
+  rw [standardField_threes]
+  have hd : (3 : ℤ) ≤ 2 * (k : ℤ) + 3 := by omega
+  have hodd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  obtain ⟨z, rfl⟩ : ∃ z : Site, x = z + (1, 0) := ⟨x - (1, 0), by simp⟩
+  obtain ⟨h1, h2, h3⟩ := threes_step (2 * (k : ℤ) + 3) (stairEvenConstantV (2 * (k : ℤ) + 3)) hd hodd
+    (stairEvenConstantV_twice _ hodd) (reciprocalField k) (fun y i j hy => reciprocal_hred k y hy i j) z
+  have hsh := threes_shortShift k
+  have e2 : z + (1, 0) + (-2, 0) = z - (1, 0) := Prod.ext (by simp; ring) (by simp)
+  have e1 : z + (1, 0) - (1, 0) = z := by simp
+  simp only [ChildFrame.alternate, roundedMidpoint, hsh, e2, stairEvenAltField, e1]
+  have hm : stairEvenAltMarker (2 * (k : ℤ) + 3) (z + (1, 0)) = 0 ∨
+      stairEvenAltMarker (2 * (k : ℤ) + 3) (z + (1, 0)) = 1 := by
+    unfold stairEvenAltMarker
+    dsimp only
+    split_ifs <;> simp
+  rcases hm with hm | hm
+  · have hne : reciprocalField k (z + (1, 0)) + reciprocalField k (z - (1, 0)) - 2 * reciprocalField k z ≠ 1 :=
+      fun h => by
+        have h' := h3.mp h
+        omega
+    rw [hm]
+    omega
+  · have heq := h3.mpr hm
+    rw [hm]
+    omega
+
 end FLatticePaper.Induction.ThreesMidpoint
