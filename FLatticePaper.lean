@@ -341,6 +341,7 @@ import FLatticePaper.Plane.Induction.StrongPriceValues
 import FLatticePaper.Plane.Induction.StrongHSpan
 import FLatticePaper.Plane.Induction.StrongHStrip
 import FLatticePaper.Plane.Induction.StrongPriceRange
+import FLatticePaper.Plane.Induction.StrongUnitPrice
 import FLatticePaper.Plane.Induction.StrongVStar
 
 /-! Root import for the corrected F-lattice paper. -/
