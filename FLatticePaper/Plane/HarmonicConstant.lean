@@ -1,4 +1,8 @@
-import Mathlib
+import Mathlib.Data.Real.Basic
+import Mathlib.Data.Finset.Max
+import Mathlib.Data.Int.Interval
+import Mathlib.Tactic.Ring
+import Mathlib.Tactic.Linarith
 import FLatticePaper.Graph
 
 /-! The maximum principle on the incoming graph of the plane (global_recurrence.tex, the periodic harmonic difference).

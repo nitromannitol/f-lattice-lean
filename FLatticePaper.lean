@@ -31,6 +31,8 @@ import FLatticePaper.Construction.NearQPrices
 import FLatticePaper.Construction.PlaneIdentification
 import FLatticePaper.Construction.RawOrigin
 import FLatticePaper.Construction.NominalAgreement
+import FLatticePaper.Construction.OddCovering
+import FLatticePaper.Construction.OddNominal
 import FLatticePaper.Construction.ConjugatePeriods
 import FLatticePaper.Construction.StructuralSuccess
 import FLatticePaper.Construction.OverlapSites
@@ -135,6 +137,9 @@ import FLatticePaper.Plane.Induction.TwosField
 import FLatticePaper.Plane.Induction.TwosSheets
 import FLatticePaper.Plane.Induction.TwosChain
 import FLatticePaper.Plane.Induction.TwosReciprocal
+import FLatticePaper.Plane.Induction.ThreesMidpoint
+import FLatticePaper.Plane.Induction.ThreesLeaves
+import FLatticePaper.Plane.Induction.TwosLeaves
 import FLatticePaper.Plane.Induction.TwosTiePiece
 import FLatticePaper.Plane.Induction.TwosPieces
 import FLatticePaper.Plane.Induction.TwosIdentification
@@ -169,9 +174,15 @@ import FLatticePaper.Tiles.WordFacts3
 import FLatticePaper.Tiles.SuccessorProof
 import FLatticePaper.Tiles.RowConvexCrossing
 import FLatticePaper.MainTheorems
+import FLatticePaper.Plane.Induction.SignedPolicy
+import FLatticePaper.Plane.Induction.I3Local
+import FLatticePaper.Tiles.RegisterInduction
+import FLatticePaper.Tiles.RowsOfBoundary
+import FLatticePaper.Plane.Induction.StrongEstimates
 import FLatticePaper.Plane.HarmonicConstant
 import FLatticePaper.Plane.Induction.AlternateFacts
 import FLatticePaper.Plane.GlobalOdometers
+import FLatticePaper.Plane.OddPhaseAlternate
 import FLatticePaper.Construction.BaseCaseRecurrence
 import FLatticePaper.Construction.PropBaseCases
 import FLatticePaper.Tiles.StackedStringConnected
@@ -207,6 +218,11 @@ import FLatticePaper.Tiles.BaseFamilies
 import FLatticePaper.Tiles.RowChain
 import FLatticePaper.Tiles.ArcRows
 import FLatticePaper.Tiles.StandardDischarge
+import FLatticePaper.Tiles.RegionBoundary
+import FLatticePaper.Tiles.CellRowBridge
+import FLatticePaper.Tiles.ChildCoverRows
+import FLatticePaper.Tiles.RegionRuns
+import FLatticePaper.Tiles.RegionArith
 import FLatticePaper.Tiles.StandardSimple
 import FLatticePaper.Tiles.ArcInequality
 import FLatticePaper.Tiles.CheckerFree
@@ -224,5 +240,8 @@ import FLatticePaper.Tiles.RestoredAlternate
 import FLatticePaper.Tiles.AlternateInheritance
 import FLatticePaper.Tiles.AlternateAgreement
 import FLatticePaper.Construction.AlternateIdentification
+import FLatticePaper.Construction.OddChartParity
+import FLatticePaper.Construction.OddAlternateCopies
+import FLatticePaper.Construction.OddShear
 
 /-! Root import for the corrected F-lattice paper. -/

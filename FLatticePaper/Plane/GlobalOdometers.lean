@@ -14,6 +14,7 @@ import FLatticePaper.Tiles.DeckCoverage
 import FLatticePaper.Tiles.SeamSymm
 import FLatticePaper.Plane.HarmonicConstant
 import FLatticePaper.Plane.Induction.AlternateFacts
+import FLatticePaper.Plane.BaseAlternate
 
 /-! `lemma:global_odometers` for the standard odometers (global_recurrence.tex 56-101), for every birth parity.
 
@@ -31,7 +32,7 @@ proper words the star estimates come from the open local inputs of the headline.
 
 namespace FLatticePaper.GlobalOdometers
 
-open FLatticePaper FLatticePaper.Farey FLatticePaper.Construction FLatticePaper.Induction FLatticePaper.Tiles
+open FLatticePaper FLatticePaper.Farey FLatticePaper.Construction FLatticePaper.Induction FLatticePaper.Tiles FLatticePaper.BaseAlternate
 open FLatticePaper.Tiles.Standard FLatticePaper.Tiles.StandardBoundary FLatticePaper.Tiles.StandardClause
 open FLatticePaper.Tiles.DeckCoverage FLatticePaper.Tiles.SeamSymm
 
@@ -390,43 +391,6 @@ theorem planeAlternate_even (w : Word) : planeAlternate w .even = (frameAt w).al
 theorem planeAlternate_odd (w : Word) :
     planeAlternate w .odd = quarterTurnField ((frameAt (swapW w)).alternate (standardField (swapW w))) := rfl
 
-/-- The star estimates of every word: the base words (pure words and powers of two) are named, the proper words come from
-the open local inputs. -/
-theorem starEstimates_all (hpk : ∀ u : Word, (frameAt u).Packet (standardField u))
-    (hstar : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word → StarZoneInputs word)
-    (hsheet : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word → SheetLocalInputs word)
-    (harc : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word →
-      VArcInputs (frameAt word) (standardField word))
-    (hodd : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word →
-      OddBlackNoRise (standardField word) (frameAt word).shortShift)
-    (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word →
-      S3NoFortInputs (frameAt word) (standardField word))
-    (hbase : ∀ u : Word, ((∀ x ∈ u, x = Digit.three) ∨ IsTwoPow u) → StarEstimates u) (u : Word) :
-    StarEstimates u := by
-  by_cases hall : ∀ x ∈ u, x = Digit.three
-  · exact hbase u (Or.inl hall)
-  · have hproper : ∃ x ∈ u, x ≠ Digit.three := by
-      by_contra h
-      push Not at h
-      exact hall h
-    by_cases htw : IsTwoPow u
-    · exact hbase u (Or.inr htw)
-    · exact starEstimates_of_inputs u hproper (hpk (conjWord u)) (hpk u) (hstar u hproper htw)
-        (hsheet u hproper htw) (harc u hproper htw) (hodd u hproper htw) (hbulk u hproper htw)
-
-/-- The even alternate of a word with its star estimates: the periods, growth, binary Laplacian, recurrence and the
-non-integer-affine difference from the standard field. -/
-theorem alternate_facts_word (u : Word) (hpk : (frameAt u).Packet (standardField u)) (hS : StarEstimates u) :
-    SatisfiesPeriodicity (frameAt u).child ((frameAt u).alternate (standardField u)) ∧
-      HasQuadraticGrowth ((frameAt u).alternate (standardField u)) (frameAt u).child.matrix ∧
-      (∀ x, laplacian ((frameAt u).alternate (standardField u)) x = -1 ∨
-        laplacian ((frameAt u).alternate (standardField u)) x = 0) ∧
-      Superharmonic ((frameAt u).alternate (standardField u)) ∧
-      Recurrent ((frameAt u).alternate (standardField u)) ∧
-      ¬ IntegerAffine (fun x => (frameAt u).alternate (standardField u) x - standardField u x) := by
-  obtain ⟨hU, hNS, rank, hrank⟩ := hS
-  exact (frameAt u).alternate_facts hpk.periods hU hNS hrank
-
 /-- The quarter turn of an even alternate: the same facts at the odd type (the transfer of `odometersTheoremAt_of_rotate`). -/
 theorem alternate_quarterTurn_facts {fr : Fraction} {A G : Field} (hodd : fr.Odd)
     (hinterval : fr.InUnitInterval) (hA : SatisfiesPeriodicity fr.rotate A)
@@ -458,8 +422,7 @@ theorem alternate_quarterTurn_facts {fr : Fraction} {A G : Field} (hodd : fr.Odd
 
 /-- The alternate facts of a birth `(w, p)` of `fr`, at both parities: the quarter turn at the odd birth. -/
 theorem alternate_facts_birth (w : Word) (p : Parity) {fr : Fraction} (hfr : (parentsAt w).current p = fr)
-    (hint : fr.Interior) (hpk : ∀ u : Word, (frameAt u).Packet (standardField u))
-    (hS : ∀ u : Word, StarEstimates u) :
+    (hint : fr.Interior) (hA : ∀ u : Word, AlternateFactsWord u) :
     SatisfiesPeriodicity fr (planeAlternate w p) ∧ HasQuadraticGrowth (planeAlternate w p) fr.matrix ∧
       (∀ x, laplacian (planeAlternate w p) x = -1 ∨ laplacian (planeAlternate w p) x = 0) ∧
       Superharmonic (planeAlternate w p) ∧ Recurrent (planeAlternate w p) ∧
@@ -468,11 +431,12 @@ theorem alternate_facts_birth (w : Word) (p : Parity) {fr : Fraction} (hfr : (pa
   cases p with
   | even =>
     rw [planeAlternate_even, planeTarget_even]
-    exact alternate_facts_word w (hpk w) (hS w)
+    obtain ⟨-, h1, h2, h3, h4, h5, h6⟩ := hA w
+    exact ⟨h1, h2, h3, h4, h5, h6⟩
   | odd =>
     have hodd : ((parentsAt w).current .odd).Odd := (parentsAt_valid w).current_odd_parity
     have hch : (frameAt (swapW w)).child = ((parentsAt w).current .odd).rotate := (current_swap w).1
-    obtain ⟨hA1, hA2, hA3, hA4, hA5, hA6⟩ := alternate_facts_word (swapW w) (hpk (swapW w)) (hS (swapW w))
+    obtain ⟨-, hA1, hA2, hA3, hA4, hA5, hA6⟩ := hA (swapW w)
     rw [hch] at hA1 hA2
     rw [planeAlternate_odd, planeTarget_odd]
     exact alternate_quarterTurn_facts hodd hint.inUnitInterval hA1 hA2 hA3 hA4 hA5 hA6
@@ -594,68 +558,70 @@ theorem packet_all (hstar : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three)
       (fun _ hz hs => twos_harm_strip k hz hs))
     hstar hsheet
 
-/-- `lemma:global_odometers` for both odometers at a birth `(w, p)` of `fraction = n/d`: the standard one (`global_odometers`),
-and the alternate `ĝ = planeAlternate w p`, with its identification of the constructor's alternate tile (`htileAlt`) and the
-coverage of that tile (`hcovAlt`), and the distinctness of the two: the difference is not integer affine (in the fixed
-coordinates of `eq:periodicity`), and the Laplacians differ somewhere.
+/-- The explicit increments of the even alternate against the standard field: the transverse period lowers the difference by
+`1` (the alternate's transverse constant is `cV - 1`), and the kernel period leaves it unchanged. -/
+theorem even_increments {fr : Fraction} {F H : Field} {cU cV : ℤ}
+    (hF : HasGeneratorPeriods fr F cU cV) (hH : HasGeneratorPeriods fr H cU (cV - 1)) :
+    (∀ x : Site, H (x + fr.modifiedDeck.kernel) - F (x + fr.modifiedDeck.kernel) = H x - F x) ∧
+      (∀ x : Site, H (x + fr.modifiedDeck.transverse) - F (x + fr.modifiedDeck.transverse) = H x - F x - 1) := by
+  refine ⟨fun x => ?_, fun x => ?_⟩
+  · rw [hH.1 x, hF.1 x]
+    ring
+  · rw [hH.2 x, hF.2 x]
+    ring
 
-The inputs are those of `global_odometers` together with `hbase`: the star estimates of the base words (pure words and
-powers of two), which the library does not yet derive for the standard fields at those words. -/
-theorem global_odometers_pair {fraction : Fraction} (hint : fraction.Interior) {w : Word} {p : Parity}
-    (hbirth : (parentsAt w).current p = fraction)
-    (hstar : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word → StarZoneInputs word)
-    (hsheet : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word → SheetLocalInputs word)
-    (harc : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word →
-      VArcInputs (frameAt word) (standardField word))
-    (hodd : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word →
-      OddBlackNoRise (standardField word) (frameAt word).shortShift)
-    (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word →
-      S3NoFortInputs (frameAt word) (standardField word))
-    (hbase : ∀ u : Word, ((∀ x ∈ u, x = Digit.three) ∨ IsTwoPow u) → StarEstimates u)
-    (bdOdd : ∀ v : Word, StandardBoundaryOdd v) (bdEven : ∀ v : Word, StandardBoundaryEven v)
-    (simpleOdd : ∀ v : Word, IsSimpleTile (cellTileOf (oddTile v)))
-    (simpleEven : ∀ v : Word, IsSimpleTile (cellTileOf (evenTile v)))
-    (tile : HeightTile Site)
-    (htile : ∃ gauge : ℤ, tile.Agrees (planeTarget w p) gauge)
-    (hsites : (p = .even ∧ tile.sites = evenTile w) ∨ (p = .odd ∧ tile.sites = oddTile w) ∨
-      fraction.modifiedDeck.Covers tile.sites)
-    (altTile : HeightTile Site) (htileAlt : ∃ gauge : ℤ, altTile.Agrees (planeAlternate w p) gauge)
-    (hcovAlt : fraction.modifiedDeck.Covers altTile.sites) :
-    ((∃ c : ℤ, ∀ (x : Site) (hx : x ∈ tile.sites), planeTarget w p x = tile.height ⟨x, hx⟩ + c) ∧
-      SatisfiesPeriodicity fraction (planeTarget w p) ∧
-      HasQuadraticGrowth (planeTarget w p) fraction.matrix ∧
-      (∃ b : Fin 2 → ℝ, ∀ v ∈ fraction.modifiedDeck.span,
-        Function.Periodic (fun x : Site => ((planeTarget w p x : ℤ) : ℝ) - matrixQuadratic fraction.matrix x -
-          dotProduct b (siteVector x)) v) ∧
-      (∀ x, laplacian (planeTarget w p) x = -1 ∨ laplacian (planeTarget w p) x = 0) ∧
-      Superharmonic (planeTarget w p) ∧ Recurrent (planeTarget w p) ∧
-      (∀ H : Field, SatisfiesPeriodicity fraction H →
-        (∀ v ∈ fraction.modifiedDeck.span, H v - H 0 = planeTarget w p v - planeTarget w p 0) →
-        ∀ gH : ℤ, tile.Agrees H gH → ∃ c : ℤ, ∀ x, H x = planeTarget w p x + c)) ∧
-    (∃ c : ℤ, ∀ (x : Site) (hx : x ∈ altTile.sites), planeAlternate w p x = altTile.height ⟨x, hx⟩ + c) ∧
-    SatisfiesPeriodicity fraction (planeAlternate w p) ∧
-    HasQuadraticGrowth (planeAlternate w p) fraction.matrix ∧
-    (∃ b : Fin 2 → ℝ, ∀ v ∈ fraction.modifiedDeck.span,
-      Function.Periodic (fun x : Site => ((planeAlternate w p x : ℤ) : ℝ) - matrixQuadratic fraction.matrix x -
-        dotProduct b (siteVector x)) v) ∧
-    (∀ x, laplacian (planeAlternate w p) x = -1 ∨ laplacian (planeAlternate w p) x = 0) ∧
-    Superharmonic (planeAlternate w p) ∧ Recurrent (planeAlternate w p) ∧
-    (∀ H : Field, SatisfiesPeriodicity fraction H →
-      (∀ v ∈ fraction.modifiedDeck.span, H v - H 0 = planeAlternate w p v - planeAlternate w p 0) →
-      ∀ gH : ℤ, altTile.Agrees H gH → ∃ c : ℤ, ∀ x, H x = planeAlternate w p x + c) ∧
-    ¬ IntegerAffine (fun x => planeAlternate w p x - planeTarget w p x) ∧
-    (∃ x, laplacian (planeAlternate w p) x ≠ laplacian (planeTarget w p) x) := by
-  have hpk : ∀ u : Word, (frameAt u).Packet (standardField u) := packet_all hstar hsheet
-  have hS : ∀ u : Word, StarEstimates u := starEstimates_all hpk hstar hsheet harc hodd hbulk hbase
-  have hstd := global_odometers hint hbirth hstar hsheet harc hodd hbulk bdOdd bdEven simpleOdd simpleEven
-    tile htile hsites
-  have hstdSP : SatisfiesPeriodicity fraction (planeTarget w p) := hstd.2.1
-  obtain ⟨hAS, hAGr, hAB, hAS2, hAR, hAN⟩ := alternate_facts_birth w p hbirth hint hpk hS
-  obtain ⟨gauge, hag⟩ := htileAlt
-  refine ⟨hstd, ⟨-gauge, fun x hx => ?_⟩, hAS, hAGr, exists_tilt hint.inUnitInterval hAS, hAB, hAS2, hAR,
-    fun H hH hcc gH hHt => ⟨gauge - gH, fun x => unique_of_covers altTile hcovAlt hAS hH hcc hag hHt x⟩,
-    hAN, laplacian_differs hint.inUnitInterval hAS hstdSP hAN⟩
-  have := hag ⟨x, hx⟩
-  linarith
+/-- The explicit increment of the odd alternate against the standard field: the kernel period of an odd fraction is the
+transverse period of its rotation, and the quarter-turned difference drops by `1` there. -/
+theorem odd_increments {fr : Fraction} (hodd : fr.Odd) {A G : Field} {cU cV : ℤ}
+    (hA : HasGeneratorPeriods fr.rotate A cU (cV - 1)) (hG : HasGeneratorPeriods fr.rotate G cU cV) (x : Site) :
+    quarterTurnField A (x + fr.modifiedDeck.kernel) - quarterTurnField G (x + fr.modifiedDeck.kernel) =
+      quarterTurnField A x - quarterTurnField G x - 1 := by
+  have hk : fr.modifiedDeck.kernel = (2 * fr.den, 2 * fr.num) := by
+    rw [modifiedDeck_kernel_of_odd hodd]
+    rfl
+  have ht : fr.rotate.modifiedDeck.transverse = (-(2 * fr.num), 2 * fr.den) := by
+    rw [modifiedDeck_transverse, Fraction.rotate_of_odd hodd]
+    simp only [texV2, Prod.mk.injEq]
+    constructor <;> ring
+  have hshift : (-((x + fr.modifiedDeck.kernel).2), (x + fr.modifiedDeck.kernel).1 - 1) =
+      (-x.2, x.1 - 1) + fr.rotate.modifiedDeck.transverse := by
+    rw [hk, ht]
+    refine Prod.ext ?_ ?_
+    · simp only [Prod.fst_add, Prod.snd_add]
+      ring
+    · simp only [Prod.fst_add, Prod.snd_add]
+      ring
+  simp only [quarterTurnField_eq]
+  rw [hshift, hA.2, hG.2]
+  ring
+
+/-- The explicit increments of the even alternate at an even birth `(w, 0)`-type. -/
+theorem even_alt_increments (w : Word) {fr : Fraction} (hfr : (frameAt w).child = fr)
+    (hpk : (frameAt w).Packet (standardField w)) (hA : AlternateFactsWord w) :
+    (∀ x : Site, planeAlternate w .even (x + fr.modifiedDeck.transverse) -
+        planeTarget w .even (x + fr.modifiedDeck.transverse) =
+        planeAlternate w .even x - planeTarget w .even x - 1) ∧
+      (∀ x : Site, planeAlternate w .even (x + fr.modifiedDeck.kernel) -
+        planeTarget w .even (x + fr.modifiedDeck.kernel) = planeAlternate w .even x - planeTarget w .even x) := by
+  obtain ⟨hAgen, -, -, -, -, -, -⟩ := hA
+  rw [← hfr, planeAlternate_even, planeTarget_even]
+  exact ⟨(even_increments hpk.periods hAgen).2, (even_increments hpk.periods hAgen).1⟩
+
+/-- The explicit increment of the odd alternate at an odd birth `(w, 1)`-type: the kernel period lowers the difference by `1`. -/
+theorem odd_alt_increments (w : Word) {fr : Fraction} (hfr : (parentsAt w).current .odd = fr)
+    (hpk : (frameAt (swapW w)).Packet (standardField (swapW w))) (hA : AlternateFactsWord (swapW w)) (x : Site) :
+    planeAlternate w .odd (x + fr.modifiedDeck.kernel) - planeTarget w .odd (x + fr.modifiedDeck.kernel) =
+      planeAlternate w .odd x - planeTarget w .odd x - 1 := by
+  have hodd : fr.Odd := by
+    rw [← hfr]
+    exact (parentsAt_valid w).current_odd_parity
+  have hch : (frameAt (swapW w)).child = fr.rotate := by
+    rw [← hfr]
+    exact (current_swap w).1
+  obtain ⟨hAgen, -, -, -, -, -, -⟩ := hA
+  have hGgen := hpk.periods
+  rw [hch] at hAgen hGgen
+  rw [planeAlternate_odd, planeTarget_odd]
+  exact odd_increments hodd hAgen hGgen x
 
 end FLatticePaper.GlobalOdometers

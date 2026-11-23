@@ -1,4 +1,4 @@
-import FLatticePaper.Plane.GlobalOdometers
+import FLatticePaper.Plane.OddPhaseAlternate
 
 #print axioms FLatticePaper.GlobalOdometers.global_odometers
-#print axioms FLatticePaper.GlobalOdometers.global_odometers_pair
+#print axioms FLatticePaper.OddPhaseAlternate.global_odometers_pair

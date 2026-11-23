@@ -1,0 +1,9 @@
+import FLatticePaper.Plane.Induction.I3Local
+
+#print axioms FLatticePaper.Induction.invariant_of_combine
+#print axioms FLatticePaper.Induction.exists_lower_bound_of_periodic
+#print axioms FLatticePaper.Induction.restrictedNoFort_of_strictRank
+#print axioms FLatticePaper.Induction.restrictedNoFort_of_rankGrade
+#print axioms FLatticePaper.Induction.noA_of_fields
+#print axioms FLatticePaper.Induction.noC_of_fields
+#print axioms FLatticePaper.Induction.sheetLocalInputs_of_fields

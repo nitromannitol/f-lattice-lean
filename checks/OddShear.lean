@@ -1,0 +1,26 @@
+import FLatticePaper.Construction.OddShear
+
+/-! Axioms of the shear identity of the odd alternate copies (task 46). -/
+
+#print axioms FLatticePaper.Construction.count_one_map_swap
+#print axioms FLatticePaper.Construction.phase_map_swap
+#print axioms FLatticePaper.Construction.parentsAt_swap_spec
+#print axioms FLatticePaper.Construction.child_modifiedDeck_kernel_eq
+#print axioms FLatticePaper.Construction.standardField_child_kernel_period
+#print axioms FLatticePaper.Construction.harmonicGrid_shift
+#print axioms FLatticePaper.Construction.planeTarget_odd_eq
+#print axioms FLatticePaper.Construction.alternateSigma_eq_rot_add_period
+#print axioms FLatticePaper.Construction.min_shear_aux
+#print axioms FLatticePaper.Construction.alternateOddRawTarget_eq_planeTarget_add_one
+#print axioms FLatticePaper.Construction.ordinaryAlternate_odd_first_agrees_of_gap
+#print axioms FLatticePaper.Construction.oddStdChart_phase_zero
+#print axioms FLatticePaper.Construction.alternateOddRawTarget_eq_planeTarget_phase_zero
+#print axioms FLatticePaper.Construction.ordinaryAlternate_odd_first_agrees_phase_zero
+#print axioms FLatticePaper.Construction.ordinaryAlternate_odd_copy_four_agrees_phase_zero
+#print axioms FLatticePaper.Construction.min_shift_aux
+#print axioms FLatticePaper.Construction.alternateOddRawTarget_eq_gPlane_add_min
+#print axioms FLatticePaper.Construction.HeightTile.Agrees.alternateOddRawTarget_of_gPlane
+#print axioms FLatticePaper.Construction.alternateOddRawTarget_eq_planeTarget_chart_min
+#print axioms FLatticePaper.Construction.HeightTile.Agrees.alternateOddRawTarget_of_coincident
+#print axioms FLatticePaper.Construction.ordinaryAlternate_odd_hslot_of_facts
+#print axioms FLatticePaper.Construction.ordinaryAlternate_odd_identifies_copies_of_facts
