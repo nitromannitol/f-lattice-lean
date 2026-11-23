@@ -97,4 +97,184 @@ theorem first_offer_of_phase_zero {frame conj : ChildFrame} {G : Field}
   rw [e, quarterTurnField_add_two hG hnum hden]
   exact hA
 
+
+/-- The sharp inequality of the parent: `(K + 2)(d + n − 2) < (D + N) T` for `N d = D n + 1` (checked on the lattice and
+proved for all parameters of the Farey relations). -/
+theorem splus_ineq (N D n d : ℤ) (hN1 : 1 ≤ N) (hND : N + 1 ≤ D) (h2N : 2 * N ≤ n) (h2D : 2 * D ≤ d)
+    (hn : 3 ≤ n) (hnd : n + 2 ≤ d) (hrel : N * d = D * n + 1) :
+    ((D * (d + n) + N * (d - n)) + 2) * (d + n - 2) < (D + N) * (d ^ 2 + 2 * d * n - n ^ 2) := by
+  nlinarith [mul_nonneg (sub_nonneg.2 h2N) (sub_nonneg.2 h2D), mul_nonneg (sub_nonneg.2 hN1) (sub_nonneg.2 hND),
+    mul_nonneg (sub_nonneg.2 h2N) (sub_nonneg.2 hnd), mul_nonneg (sub_nonneg.2 h2D) (sub_nonneg.2 hnd),
+    mul_nonneg (sub_nonneg.2 h2N) (sub_nonneg.2 hn), mul_nonneg (sub_nonneg.2 hN1) (sub_nonneg.2 h2N)]
+
+/-- The sheet shift `(1 − W)·U_q` vanishes for `W = 1`: the sheet `A` is `Fp` itself. -/
+theorem sheetShift_of_phase_one {frame : ChildFrame} (hW : frame.phaseW = 1) : frame.sheetShift = 0 := by
+  ext <;> simp [ChildFrame.sheetShift, Fraction.unmodifiedDeck, hW]
+
+/-- The parent zero strip, in the parent transverse grade `t_p(x) = N x₁ − D x₂`: `Fp x = 0` for `1 − D ≤ t_p(x) ≤ N + 2D − 1`
+(the strip of the earlier child, transported by the quarter turn: `s_e(Zx) = 2 t_p(x) − 2N`). -/
+theorem quarterTurnField_zero_of_tp {conj : ChildFrame} {G : Field} (hStrips : conj.HasStrips G)
+    {N D : ℤ} (hnum : conj.child.num = D - N) (hden : conj.child.den = D + N) {x : Site}
+    (hlo : 1 - D ≤ N * x.1 - D * x.2) (hhi : N * x.1 - D * x.2 ≤ N + 2 * D - 1) :
+    quarterTurnField G x = 0 := by
+  have e : conj.sGrade (QuarterTurn.counterclockwise.mapSite (0, -1) x) = 2 * (N * x.1 - D * x.2) - 2 * N := by
+    rw [mapSite_quarterTurn_eq]
+    unfold ChildFrame.sGrade
+    dsimp only
+    rw [hnum, hden]
+    ring
+  apply quarterTurnField_eq_zero hStrips
+  · rw [e, hden]
+    linarith
+  · rw [e, hden, hnum]
+    linarith
+
+/-- `s ≤ d + n − 2` on the longitudinal range: the grade `s` is even, and `d + n` is even. -/
+theorem sGrade_le_pred (frame : ChildFrame) {z : Site} (hs : frame.sGrade z ≤ frame.child.den + frame.child.num - 1) :
+    frame.sGrade z ≤ frame.child.den + frame.child.num - 2 := by
+  have h2 : frame.sGrade z % 2 = 0 := frame.sGrade_mod_two z
+  have hev : (frame.child.num + frame.child.den) % 2 = 0 := frame.child_even
+  omega
+
+/-- `t ≤ d + n − 2` on the closed polygon, for `n ≥ 2` (the even bound is `d + n − 2`, the odd bound `d`). -/
+theorem tGrade_le_pred (frame : ChildFrame) {z : Site} (hz : z ∈ frame.closedPolygon) (hn : 2 ≤ frame.child.num) :
+    frame.tGrade z ≤ frame.child.den + frame.child.num - 2 := by
+  have h := hz
+  unfold ChildFrame.closedPolygon at h
+  simp only [Set.mem_setOf_eq] at h
+  split_ifs at h
+  · omega
+  · omega
+
+/-- The parent identity `T · t_p(z) = ε s(z) + K t(z)` with `K = D(d + n) + N(d − n)` (`ε = N d − D n`). -/
+theorem tp_identity (frame : ChildFrame) (z : Site) :
+    frame.child.periodDenominator * (frame.parents.odd.num * z.1 - frame.parents.odd.den * z.2) =
+      frame.eps * frame.sGrade z +
+        (frame.parents.odd.den * (frame.child.den + frame.child.num)
+          + frame.parents.odd.num * (frame.child.den - frame.child.num)) * frame.tGrade z := by
+  have hPD : frame.child.periodDenominator = frame.child.den ^ 2 + 2 * frame.child.den * frame.child.num - frame.child.num ^ 2 := by
+    unfold Fraction.periodDenominator
+    ring
+  have hε : frame.eps = frame.parents.odd.num * frame.child.den - frame.parents.odd.den * frame.child.num := frame.eps_eq
+  rw [hPD]
+  unfold ChildFrame.sGrade ChildFrame.tGrade
+  linear_combination (-((frame.child.den + frame.child.num) * z.1 + (frame.child.den - frame.child.num) * z.2)) * hε
+
+/-- The longitudinal bound on the parent transverse grade: with `ε = 1`, `t_p(z) < D + N` on the closed polygon where
+`s(z) ≤ d + n − 1`. -/
+theorem tp_lt_of_mem (frame : ChildFrame) (hε : frame.eps = 1) {z : Site} (hz : z ∈ frame.closedPolygon)
+    (hN : 0 < frame.parents.odd.num) (hn : 3 ≤ frame.child.num)
+    (hs : frame.sGrade z ≤ frame.child.den + frame.child.num - 1) :
+    frame.parents.odd.num * z.1 - frame.parents.odd.den * z.2 < frame.parents.odd.den + frame.parents.odd.num := by
+  obtain ⟨hnpos, hnd, hdiff, hd3, hTdef⟩ := frame.child_facts
+  obtain ⟨hDpos, hN0, hNle⟩ := frame.valid.odd_bounds
+  obtain ⟨hdq0, hnq0, hnqle⟩ := frame.valid.even_bounds
+  have hoddpar : (frame.parents.odd.num + frame.parents.odd.den) % 2 = 1 := frame.valid.odd_parity
+  have hN1 : 1 ≤ frame.parents.odd.num := by omega
+  have hND : frame.parents.odd.num + 1 ≤ frame.parents.odd.den := by omega
+  have hn2 : 2 * frame.parents.odd.num ≤ frame.child.num := by
+    have := frame.child_num_eq
+    omega
+  have hd2 : 2 * frame.parents.odd.den ≤ frame.child.den := by
+    have := frame.child_den_eq
+    omega
+  have hrel : frame.parents.odd.num * frame.child.den = frame.parents.odd.den * frame.child.num + 1 := by
+    have h := frame.eps_eq
+    rw [hε] at h
+    linarith
+  have hT : 0 < frame.child.periodDenominator := by
+    have hPD : frame.child.periodDenominator = frame.child.den ^ 2 + 2 * frame.child.den * frame.child.num - frame.child.num ^ 2 := by
+      unfold Fraction.periodDenominator
+      ring
+    rw [hPD]
+    nlinarith
+  have hid := tp_identity frame z
+  rw [hε, one_mul] at hid
+  have hsle := sGrade_le_pred frame hs
+  have htle := tGrade_le_pred frame hz (by omega)
+  have hK : 0 ≤ frame.parents.odd.den * (frame.child.den + frame.child.num)
+      + frame.parents.odd.num * (frame.child.den - frame.child.num) := by
+    nlinarith
+  have hsp := splus_ineq frame.parents.odd.num frame.parents.odd.den frame.child.num frame.child.den
+    hN1 hND hn2 hd2 (by omega) (by omega) hrel
+  have hKt := mul_le_mul_of_nonneg_left htle hK
+  have hstep : frame.child.periodDenominator * (frame.parents.odd.num * z.1 - frame.parents.odd.den * z.2) <
+      frame.child.periodDenominator * (frame.parents.odd.den + frame.parents.odd.num) := by
+    rw [hid]
+    have hd0 : 0 ≤ frame.child.den + frame.child.num - 2 := by omega
+    nlinarith
+  exact lt_of_mul_lt_mul_left hstep hT.le
+
+
+/-- The first offer for `W = 1`: `h(v) ≤ A(v + U_q) = Fp(v + U_q)`. The sheet minimum gives `h(v) ≤ Fp(v)`; the step
+`Fp(v + U_q) ≥ Fp(v)` is `ParentStepSign` (named) when `t_p(v) + 1 < N`, and otherwise both values lie in the parent zero
+strip, where `Fp = 0`. -/
+theorem first_offer_of_phase_one {frame conj : ChildFrame} {G : Field}
+    (hconj : conj.child = frame.parents.odd.rotate)
+    (hStrips : conj.HasStrips G)
+    (hS : frame.StripInputs (frame.sheetMin (quarterTurnField G)))
+    (hPSS : ParentStepSign frame (quarterTurnField G))
+    (hW : frame.phaseW = 1) (hN : 0 < frame.parents.odd.num) (hn : 3 ≤ frame.child.num)
+    {v : Site} (hv : v ∈ frame.closedPolygon)
+    (hs : frame.sGrade v ≤ frame.child.den + frame.child.num - 1) :
+    harmonicGrid v ≤ frame.sheetA (quarterTurnField G) (v + frame.offsetX) := by
+  obtain ⟨hnum, hden⟩ := conj_child_num_den hconj
+  have hε : frame.eps = 1 := by
+    rcases frame.eps_unit with h | h
+    · exact h
+    · unfold ChildFrame.phaseW at hW
+      rw [h] at hW
+      norm_num at hW
+  obtain ⟨hnpos, hnd, -, -, -⟩ := frame.child_facts
+  have hdn : 0 ≤ frame.child.den + frame.child.num := by omega
+  have hN1 : 1 ≤ frame.parents.odd.num := by omega
+  have hoddpar : (frame.parents.odd.num + frame.parents.odd.den) % 2 = 1 := frame.valid.odd_parity
+  have hND : frame.parents.odd.num + 1 ≤ frame.parents.odd.den := by
+    obtain ⟨-, -, hNle⟩ := frame.valid.odd_bounds
+    omega
+  have hDpos : 2 ≤ frame.parents.odd.den := by omega
+  have hX : frame.offsetX = (frame.parents.even.den, frame.parents.even.num) := frame.offsetX_of_W1 hW
+  have hA : frame.sheetMin (quarterTurnField G) v ≤ frame.sheetA (quarterTurnField G) v := by
+    unfold ChildFrame.sheetMin
+    exact min_le_left _ _
+  rw [← hS.harmonic v hv (by omega), hX]
+  unfold ChildFrame.sheetA at hA ⊢
+  rw [sheetShift_of_phase_one hW, sub_zero] at hA ⊢
+  set x : Site := v + (frame.parents.even.den, frame.parents.even.num) with hx
+  have hEv : (frame.parents.even.num + frame.parents.even.den) % 2 = 0 := frame.valid.even_parity
+  have hpar : (x.1 + x.2) % 2 = (v.1 + v.2) % 2 := by
+    rw [hx]
+    simp only [Prod.fst_add, Prod.snd_add]
+    omega
+  have hE : frame.eps = frame.parents.odd.num * frame.parents.even.den - frame.parents.even.num * frame.parents.odd.den :=
+    rfl
+  have h1 : frame.parents.odd.num * frame.parents.even.den - frame.parents.even.num * frame.parents.odd.den = 1 := by
+    rw [← hE, hε]
+  have hshift : frame.parents.odd.num * x.1 - frame.parents.odd.den * x.2 =
+      (frame.parents.odd.num * v.1 - frame.parents.odd.den * v.2) + 1 := by
+    rw [hx]
+    simp only [Prod.fst_add, Prod.snd_add]
+    linear_combination h1
+  have hzv := tp_lt_of_mem frame hε hv hN hn hs
+  by_cases hk : frame.parents.odd.num * x.1 - frame.parents.odd.den * x.2 < frame.parents.odd.num
+  · exact le_trans hA ((hPSS x v hpar hshift).1 hk)
+  · replace hk := not_lt.mp hk
+    have hzv' : frame.parents.odd.num * v.1 - frame.parents.odd.den * v.2 + 1 ≤
+        frame.parents.odd.den + frame.parents.odd.num := Int.add_one_le_iff.mpr hzv
+    have hvlo : 1 - frame.parents.odd.den ≤ frame.parents.odd.num * v.1 - frame.parents.odd.den * v.2 := by
+      linarith
+    have hvhi : frame.parents.odd.num * v.1 - frame.parents.odd.den * v.2 ≤
+        frame.parents.odd.num + 2 * frame.parents.odd.den - 1 := by
+      linarith
+    have hxlo : 1 - frame.parents.odd.den ≤ frame.parents.odd.num * x.1 - frame.parents.odd.den * x.2 := by
+      linarith
+    have hxhi : frame.parents.odd.num * x.1 - frame.parents.odd.den * x.2 ≤
+        frame.parents.odd.num + 2 * frame.parents.odd.den - 1 := by
+      linarith
+    have hx0 := quarterTurnField_zero_of_tp hStrips hnum hden hvlo hvhi
+    have hx1 := quarterTurnField_zero_of_tp hStrips hnum hden hxlo hxhi
+    rw [hx0] at hA
+    rw [hx1]
+    exact hA
+
 end FLatticePaper.Induction
