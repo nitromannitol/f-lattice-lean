@@ -1,0 +1,5 @@
+import FLatticePaper.Plane.Induction.StrongPriceValues
+
+#print axioms FLatticePaper.StrongPriceValues.price_eq_cutPrice_of_harmonic
+#print axioms FLatticePaper.StrongPriceValues.roundedSlip_mono
+#print axioms FLatticePaper.StrongPriceValues.sheetMin_recurrent_of_strong
