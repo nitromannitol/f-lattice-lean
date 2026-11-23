@@ -38,6 +38,30 @@ theorem fZ_add_Vp (F : Site → ℤ) (N D : ℤ) (hK : ∀ y : Site, F (y + (D +
   congr 1
   ext <;> simp
 
+/-- Step (b): `U_p = (2D, 2N)` is a zero period of the quarter-turn field `f = F ∘ Z + h₀`. The transverse period of `F`
+(`F(y + τ) = F y + t(y) − (B + D)` for `τ = (−2N, 2D)`, `t(y) = (D − N) y₁ − (D + N) y₂`, `B = D² + 2DN − N²`) and the harmonic
+shift along `(D + N, D − N)` (constant `−B − N`) cancel exactly. -/
+theorem quarterTurnField_add_Up (F : Field) (N D : ℤ)
+    (hT : ∀ y : Site, F (y + (-2 * N, 2 * D)) =
+      F y + ((D - N) * y.1 - (D + N) * y.2) - (D ^ 2 + 2 * D * N - N ^ 2 + D))
+    (x : Site) :
+    quarterTurnField F (x + (2 * D, 2 * N)) = quarterTurnField F x := by
+  unfold quarterTurnField
+  rw [quarterTurn_site, quarterTurn_site]
+  have hZ : (-(x + (2 * D, 2 * N)).2, (x + (2 * D, 2 * N)).1 - 1) = (-x.2, x.1 - 1) + (-2 * N, 2 * D) := by
+    ext <;> simp <;> ring
+  have hc : 2 * (-(D ^ 2 + 2 * D * N - N ^ 2) - N) =
+      -2 * (D + N) * (D - N) - (D + N) ^ 2 + (D - N) ^ 2 - (D + N) + (D - N) := by ring
+  have hh := harmonicGrid_sub_shift (x + (2 * D, 2 * N)) (D + N) (D - N)
+    (-(D ^ 2 + 2 * D * N - N ^ 2) - N) hc
+  have e : x + (2 * D, 2 * N) - ((D + N) + (D - N), (D + N) - (D - N)) = x := by
+    ext <;> simp <;> ring
+  rw [e] at hh
+  simp only [Prod.fst_add, Prod.snd_add] at hh
+  rw [hZ, hT]
+  dsimp only
+  linear_combination hh
+
 end ZoneHarmonic
 
 end FLatticePaper.Induction
