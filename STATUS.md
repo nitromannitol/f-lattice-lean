@@ -401,6 +401,9 @@ lake env lean checks/PairCoverW1Axioms.lean
 lake env lean checks/PairW0PAxioms.lean
 lake env lean checks/PairW0QAxioms.lean
 lake env lean checks/PairCoverW0Axioms.lean
+lake env lean checks/EvenIneqAxioms.lean
+lake env lean checks/PairEvenW0QAxioms.lean
+lake env lean checks/PairEvenW0PAxioms.lean
 lake env lean checks/VArcLongitudinal.lean
 lake env lean checks/VArcOffers.lean
 lake env lean checks/ParentStepDischarge.lean
