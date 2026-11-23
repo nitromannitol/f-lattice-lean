@@ -450,5 +450,6 @@ import FLatticePaper.Plane.Induction.FanPropagation
 import FLatticePaper.Plane.Induction.FanTerminal
 import FLatticePaper.Plane.Induction.SheetFort
 import FLatticePaper.Plane.Induction.ScheduleClosure
+import FLatticePaper.Plane.Induction.StripsM
 
 /-! Root import for the corrected F-lattice paper. -/
