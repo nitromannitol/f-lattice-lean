@@ -1,0 +1,4 @@
+import FLatticePaper.Plane.Induction.StrongPriceInputs
+
+#print axioms FLatticePaper.StrongPriceInputs.priceRange_of_conjugate
+#print axioms FLatticePaper.StrongPriceInputs.price_eq_cutPrice_of_hWindow
