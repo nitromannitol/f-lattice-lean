@@ -426,5 +426,7 @@ import FLatticePaper.Plane.Induction.W1MDescent
 import FLatticePaper.Plane.Induction.W1MReflect
 import FLatticePaper.Plane.Induction.W1MSheet
 import FLatticePaper.Plane.Induction.W1MFinal
+import FLatticePaper.Plane.Induction.W1Inherited
+import FLatticePaper.Plane.Induction.W1SheetSquare
 
 /-! Root import for the corrected F-lattice paper. -/
