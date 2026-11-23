@@ -337,6 +337,8 @@ import FLatticePaper.Plane.Induction.ComparisonTransfer
 import FLatticePaper.Plane.Induction.ComparisonEmpty
 import FLatticePaper.Plane.Induction.CanonicalSigned
 import FLatticePaper.CanonicalHeadline
+import FLatticePaper.Plane.Induction.UniformEscape
+import FLatticePaper.Plane.Induction.NonfreeRoot
 import FLatticePaper.Plane.Induction.HWeb
 import FLatticePaper.Plane.Induction.W1Collar
 import FLatticePaper.Plane.Induction.W1CollarBox

@@ -1,3 +1,4 @@
+import FLatticePaper.Plane.Induction.NonfreeRoot
 import FLatticePaper.Plane.Induction.SheetCases
 import FLatticePaper.Plane.Induction.I3CSheet
 import FLatticePaper.Plane.Induction.I3Application
@@ -209,13 +210,15 @@ theorem noBlackPairRise_of_charts {word : Word} (hw : ∃ x ∈ word, x ≠ Digi
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
     {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
     (exitSameSlip : Site → Site → Prop)
+    (hW1 : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num
+      (frameAt (conjWord word)).child.den (standardField (conjWord word)))
     (hcover : ∀ c i, RisingBlackPair (standardField word) (frameAt word).shortShift c i →
       FirstChartEdge P c i ∨ AdjacentChartEdge P c i ∨ exitSameSlip c i ∨
       (∃ x x', parentPolicy P x x' ∧
         jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x = 1 ∧
         jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x' = 0 ∧
-        (laplacian (standardField (conjWord word)) (zTurn x) = -1 ∨
-          SquareClauses.ForcedEdge (standardField (conjWord word)) seed (zTurn x) (zTurn x'))) ∨
+        FLatticePaper.W1.StrictInterior (frameAt (conjWord word)).child.num
+          (frameAt (conjWord word)).child.den (zTurn x)) ∨
       (∃ x, HRootWeb (frameAt word).parents.odd.num (frameAt word).parents.odd.den
           ((frameAt word).parentTGrade x) ∧
         jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x = 1) ∨
@@ -226,11 +229,12 @@ theorem noBlackPairRise_of_charts {word : Word} (hw : ∃ x ∈ word, x ≠ Digi
     NoBlackPairRise (standardField word) (frameAt word).shortShift := by
   intro c hc hpar hbs i hi hone
   have hr : RisingBlackPair (standardField word) (frameAt word).shortShift c i := ⟨hi, hc, hpar, hbs, hone⟩
-  rcases hcover c i hr with h1 | h1 | h1 | ⟨x, x', hpol, j1, j0, hroot⟩ | ⟨x, hw', j1⟩ | hblk | j0
+  rcases hcover c i hr with h1 | h1 | h1 | ⟨x, x', hpol, j1, j0, hSI⟩ | ⟨x, hw', j1⟩ | hblk | j0
   · exact first_chart_excluded hw hSE P h1 hr
   · exact adjacent_chart_excluded hw hSE P h1 hr
   · exact hexit c i h1 hr
-  · exact nonfree_drop_excluded hw hSE P hpol j1 j0 hroot
+  · exact nonfree_drop_excluded hw hSE P hpol j1 j0
+      (nonfree_root_forced P hSE.packet.binary hW1 hSI hpol)
   · exact H_drop_excluded hw hSE x hw' j1
   · exact (frameAt word).not_rising_of_blockPair hpk hc hbs hblk
   · exact exceptional_drop_excluded hw hSE _ (exceptional_hT_proved hw hSE) j0

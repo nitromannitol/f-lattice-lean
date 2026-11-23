@@ -120,6 +120,17 @@ theorem translated_rawSlip {frame : ChildFrame} {F : Field} {η : ℤ} {P : Site
   simp only [e] at h1
   linarith
 
+/-- At a white with an unseeded forced edge `z → o`, the retained input is `o`: the policy keeps the selected input, and the selection
+agrees with the forced edge (`forced_sound`). -/
+theorem forcedWhiteUnique_of_canonical {frame : ChildFrame} {F : Field} (C : CanonicalSignedPolicy frame F) :
+    ∀ z i, C.policy z i → laplacian F z = 0 →
+      ∀ o, ForcedEdge F (fun _ _ => False) z o → o = i := by
+  intro z i h hw o ho
+  have hi := (C.white_policy z hw i).mp h
+  have hsel : C.sel z = o :=
+    forced_sound F (fun _ _ => False) C.sel C.sel_input (fun _ _ h' => False.elim h') C.squares z o ho
+  exact (hi.trans hsel).symm
+
 /-- The reflection about `I` at the roots of `OldPolicyData.reflection`: a black root (both inputs retained, and `I − c` is black
 by the symmetry `F (I − z) = F z`) or a forced-white edge (its reflection is forced, `forced_reflectI`). -/
 theorem reflection_of_canonical {frame : ChildFrame} {F : Field} (hF : ∀ z, F (reflectionI - z) = F z)
@@ -151,6 +162,7 @@ def oldPolicyData_of_canonical {frame : ChildFrame} {F : Field} (hF : ∀ z, F (
   chainNonincreasing := fun η hη => (C.chainPairs η hη).chainNonincreasing
   reflection := reflection_of_canonical hF C
   forcedRetained := forcedRetained_of_canonical C
+  forcedWhiteUnique := forcedWhiteUnique_of_canonical C
   westAtException := C.westAtException
 
 end FLatticePaper.Induction
