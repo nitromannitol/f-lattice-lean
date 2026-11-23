@@ -305,5 +305,8 @@ import FLatticePaper.Plane.Induction.NoBlackPair
 import FLatticePaper.Plane.Induction.MatchedPolicy
 import FLatticePaper.Plane.Induction.SheetCases
 import FLatticePaper.Plane.Induction.SheetCharts
+import FLatticePaper.Plane.Induction.SheetPieces
+import FLatticePaper.Plane.Induction.ExitSlip
+import FLatticePaper.Plane.Induction.SheetCover
 
 /-! Root import for the corrected F-lattice paper. -/
