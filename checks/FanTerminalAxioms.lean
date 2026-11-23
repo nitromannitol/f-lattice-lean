@@ -1,0 +1,4 @@
+import FLatticePaper.Plane.Induction.FanTerminal
+
+#print axioms FLatticePaper.FanTerminal.fan_terminal_closed
+#print axioms FLatticePaper.FanTerminal.fan_terminal_contradiction
