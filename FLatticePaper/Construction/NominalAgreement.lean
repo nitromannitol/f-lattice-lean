@@ -332,32 +332,41 @@ theorem nominal_even_five_of_mirror (parents : TileParents) (word : Word) (hprop
     (fun s hs => sheetC_le_sheetA_of_mirror hstar heps (hE s hs) (hsG s hs))
 
 
-/-- The missing written premise for `ε = +1` (task 46): `C ≤ A` on the upper part `sGrade > 2(d+n) - 1` of the closed
-polygon. The mirror branch `ε = -1` gives `C ≤ A` on the lower part (`sheetC_le_sheetA_of_mirror`); the reflected
-positivity `Ψ ≥ 0` on the reflected band is the open premise `hpos` of `i2_neg_of_reflection` (SheetReflection.lean),
-which the archive does not write. Numerically it holds on every copy site of slots four and five for `ε = +1`
-(2802 of 2802 sites, all with `t < 1 - d`, outside the I1 zone). -/
-def UpperAttainment (word : Word) : Prop :=
-  ∀ z ∈ (frameAt word).closedPolygon,
-    2 * ((frameAt word).child.den + (frameAt word).child.num) - 1 < (frameAt word).sGrade z →
-      (frameAt word).sheetC (quarterTurnField (standardField (conjWord word))) z ≤
-        (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) z
+/-- **The upper attainment premise, on the copy sites it is used on (task 48).** For the ordinary even standard output of `word`, on the
+sites of its slot-`slot` copy that lie in the upper part `2(d+n) − 1 < sGrade` of the child frame of `word`, `C ≤ A` for the sheets of
+`quarterTurnField (standardField (conjWord word))`. Checked on the words of length at most three that have an ordinary even copy
+(`scripts/upper_attainment_on_copies.py`, data `ordinary_copy_dump.log` and `ordinary_copy_dump_two.log`): slot five holds on all 36
+such words, both phases; slot four holds on the 23 words ending in one or three and fails on the 13 words ending in two, whose even
+standard tile is the corrected one (`tableKind .two .standardEven = .shortL`), so the premise does not apply to them. -/
+def UpperAttainmentOn (parents : TileParents) (word : Word) (slot : Fin 6) : Prop :=
+  ∀ s ∈ (ordinaryStandardCopy parents word .even slot).val.sites,
+    2 * ((frameAt word).child.den + (frameAt word).child.num) - 1 < (frameAt word).sGrade s →
+      (frameAt word).sheetC (quarterTurnField (standardField (conjWord word))) s ≤
+        (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) s
 
-/-- Slot four for `ε = +1`, with the named premise `UpperAttainment` and the copy sites in the upper part. -/
+/-- The words whose even standard output is the ordinary tile: the last digit is one or three. The table of kinds gives
+`tableKind .one _ = .ordinary` and `tableKind .three .standardEven = .ordinary`, while `tableKind .two .standardEven = .shortL`
+(the corrected tile), so the ordinary even copies of a word ending in two are not its output. -/
+def OrdinaryEvenWord (word : Word) : Prop :=
+  word.getLast? = some Digit.one ∨ word.getLast? = some Digit.three
+
+/-- Slot four for `ε = +1` on a word ending in one or three, with the named premise `UpperAttainmentOn` on the copy sites in the
+upper part. -/
 theorem nominal_even_four_of_upper (parents : TileParents) (word : Word) (hproper : ∃ x ∈ word, x ≠ Digit.three)
     (hodd : ∃ g : ℤ, parents.odd.val.Agrees (quarterTurnField (standardField (conjWord word))) g)
     (hper : RespectsPeriodsOn (frameAt word).child (frameAt word).coherentConstantU
       (frameAt word).coherentConstantV (frameAt word).closedPolygon
       ((frameAt word).sheetMin (quarterTurnField (standardField (conjWord word)))))
     (hE : ∀ s ∈ (ordinaryStandardCopy parents word .even 4).val.sites, s ∈ (frameAt word).closedPolygon)
-    (hU : UpperAttainment word)
+    (hU : OrdinaryEvenWord word ∧ UpperAttainmentOn parents word 4)
     (hsU : ∀ s ∈ (ordinaryStandardCopy parents word .even 4).val.sites,
       2 * ((frameAt word).child.den + (frameAt word).child.num) - 1 < (frameAt word).sGrade s) :
     ∃ g : ℤ, (ordinaryStandardCopy parents word .even 4).val.Agrees (standardField word) g :=
   nominal_even_four parents word hproper hodd hper hE
-    (fun s hs => hU s (hE s hs) (hsU s hs))
+    (fun s hs => hU.2 s hs (hsU s hs))
 
-/-- Slot five for `ε = +1`, with the named premise `UpperAttainment`. -/
+/-- Slot five for `ε = +1` on a word ending in one or three, with the named premise `UpperAttainmentOn` on the copy sites in the
+upper part. -/
 theorem nominal_even_five_of_upper (parents : TileParents) (word : Word) (hproper : ∃ x ∈ word, x ≠ Digit.three)
     (hodd : ∃ g : ℤ, parents.odd.val.Agrees (quarterTurnField (standardField (conjWord word))) g)
     {cU cV : ℤ} (hperO : HasGeneratorPeriods (parentsAt word).odd
@@ -366,12 +375,12 @@ theorem nominal_even_five_of_upper (parents : TileParents) (word : Word) (hprope
       (frameAt word).coherentConstantV (frameAt word).closedPolygon
       ((frameAt word).sheetMin (quarterTurnField (standardField (conjWord word)))))
     (hE : ∀ s ∈ (ordinaryStandardCopy parents word .even 5).val.sites, s ∈ (frameAt word).closedPolygon)
-    (hU : UpperAttainment word)
+    (hU : OrdinaryEvenWord word ∧ UpperAttainmentOn parents word 5)
     (hsU : ∀ s ∈ (ordinaryStandardCopy parents word .even 5).val.sites,
       2 * ((frameAt word).child.den + (frameAt word).child.num) - 1 < (frameAt word).sGrade s) :
     ∃ g : ℤ, (ordinaryStandardCopy parents word .even 5).val.Agrees (standardField word) g :=
   nominal_even_five parents word hproper hodd hperO hper hE
-    (fun s hs => hU s (hE s hs) (hsU s hs))
+    (fun s hs => hU.2 s hs (hsU s hs))
 
 
 end FLatticePaper.Construction
