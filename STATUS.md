@@ -208,6 +208,8 @@ lake env lean checks/I3CSheet.lean
 lake env lean checks/StrongHeadline.lean
 lake env lean checks/BaseFields.lean
 lake env lean checks/BaseStrip.lean
+lake env lean checks/ZoneSlip.lean
+lake env lean checks/ZoneI1.lean
 lake env lean checks/VArcLongitudinal.lean
 lake env lean checks/VArcOffers.lean
 lake env lean checks/ChainReflection.lean
