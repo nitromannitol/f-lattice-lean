@@ -198,6 +198,13 @@ lake env lean checks/ChildNumerator.lean
 lake env lean checks/OpenLocal.lean
 lake env lean checks/I3Local.lean
 lake env lean checks/I3Unit.lean
+lake env lean checks/I3Application.lean
+lake env lean checks/I3Permits.lean
+lake env lean checks/ChainReflection.lean
+lake env lean checks/ParentStep.lean
+lake env lean checks/ZeroRegion.lean
+lake env lean checks/VArcTransverse.lean
+lake env lean checks/OddRise.lean
 lake env lean checks/GlobalOdometers.lean
 lake env lean checks/ThreesMidpoint.lean
 lake env lean checks/SlipPermits.lean
