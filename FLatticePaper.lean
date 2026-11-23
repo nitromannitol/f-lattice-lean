@@ -350,6 +350,7 @@ import FLatticePaper.Plane.Induction.TipWhiteness
 import FLatticePaper.Plane.Induction.TipVertex
 import FLatticePaper.Plane.Induction.TipEscape
 import FLatticePaper.Plane.Induction.W0Sheets
+import FLatticePaper.Plane.Induction.TieOneInput
 import FLatticePaper.Plane.Induction.HWeb
 import FLatticePaper.Plane.Induction.W1Collar
 import FLatticePaper.Plane.Induction.W1CollarBox

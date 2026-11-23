@@ -380,3 +380,9 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - Hypotheses: `h`, `StrongEstimates (conjWord word)`, `SeedFields (conjWord word)`, `(frameAt word).Packet (standardField word)`, `eps = −1`, and the nonbase bounds `0 ≤ tipB`, `5L ≤ T − tipB`.
 - Checks: `checks/W0Sheets.lean`. Root build clean; sandbox logs clean.
 - Also fixed: `FLatticePaper.lean` was missing the `TipEscape` import; added with `W0Sheets`.
+
+### Task 72 (queue Q16, the one-input tie): TieOneInput.lean
+
+- PROVED `FLatticePaper.other_input_of_tie`: at a black minimum `M = min(A, C)` with `M c = A c`, `M i = A i` and `A` white at `c`, the other input `j` has `C j = A j − 1` (`Ψ j = −1`). This is the algebraic identity `ΔA − ΔM = 1` on the star; no policy is used.
+- NOT PROVED: `hResP` and `hResN` (the leaves of `TieReduce.tie_excluded_of_narrow`). Still needed: the A-policy retention at the tied centre (from the `Ψ j = −1` input and `sheetDiff_mono_A`), the rising-pair slip increment and the old-root cases (`nonfree_drop_excluded`, Q3's H-star and V-star estimates), and the exceptional endpoint (Q19).
+- Checks: `checks/TieOneInput.lean`. Sandbox logs clean.
