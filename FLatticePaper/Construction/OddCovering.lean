@@ -20,7 +20,7 @@ theorem conjWord_append_one_eq (word : Word) :
   rw [oddBirthPrefix_append_one]
 
 /-- The odd output target is the quarter turn of the standard field of the conjugate word of `word ++ [one]`. -/
-theorem planeTarget_odd_eq (word : Word) :
+theorem planeTarget_odd_eq_conj (word : Word) :
     planeTarget word .odd = quarterTurnField (standardField (conjWord (word ++ [Digit.one]))) := rfl
 
 /-- Step 1 (covering): for every site `z` (in particular every site of an odd copy), its quarter turn `Z z` is a

@@ -1,6 +1,6 @@
 import FLatticePaper.Construction.OddCovering
 
 #print axioms FLatticePaper.Construction.conjWord_append_one_eq
-#print axioms FLatticePaper.Construction.planeTarget_odd_eq
+#print axioms FLatticePaper.Construction.planeTarget_odd_eq_conj
 #print axioms FLatticePaper.Construction.odd_copy_site_covered
 #print axioms FLatticePaper.Construction.odd_copy_sites_covered
