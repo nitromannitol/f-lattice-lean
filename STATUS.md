@@ -200,6 +200,9 @@ lake env lean checks/I3Local.lean
 lake env lean checks/I3Unit.lean
 lake env lean checks/I3Application.lean
 lake env lean checks/I3Permits.lean
+lake env lean checks/I3Restricted.lean
+lake env lean checks/I3NoA.lean
+lake env lean checks/VArcLongitudinal.lean
 lake env lean checks/ChainReflection.lean
 lake env lean checks/ParentStep.lean
 lake env lean checks/ZeroRegion.lean
