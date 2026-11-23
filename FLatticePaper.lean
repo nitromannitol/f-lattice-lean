@@ -390,6 +390,7 @@ import FLatticePaper.Plane.Induction.CollarGlue
 import FLatticePaper.Plane.Induction.CollarBand
 import FLatticePaper.Plane.Induction.CollarIdentity
 import FLatticePaper.Plane.Induction.CollarBottomBand
+import FLatticePaper.Plane.Induction.CollarUpper
 import FLatticePaper.Plane.Induction.HWeb
 import FLatticePaper.Plane.Induction.W1Collar
 import FLatticePaper.Plane.Induction.W1CollarBox

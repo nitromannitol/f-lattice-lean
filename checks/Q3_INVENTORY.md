@@ -566,3 +566,10 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - Corrected the arc rule. `BottomArc` is now the direct free-H witness only; the V-translate witness is `TopArc` with the lower-right square `squareCorners c.1 (c.2 − 1)` (`top_centre_mem`). The earlier merged definition put the top arc into the bottom square, which fails for odd top centres (numerics with the corrected box: 33 failures at word length 3).
 - Numerics with the corrected box (words ≤ 3): pure classes B → upper-left, T → lower-right, L → upper-right, R → lower-left, with every strict corner strict. The mixed classes BL, BR, TL, TR (33 each) are the four black corners and are excluded by laplacian 0.
 - Checks: `checks/CollarGlue.lean` (unchanged). Root build clean; sandbox logs clean.
+
+### Task 72 (hcollar, band (a), H-arc upper bounds): CollarUpper.lean
+
+- PROVED `L_mul_sGrade`: `L · s(x) = (x₁ + x₂) · T + 2 n · t(x)` for every site.
+- PROVED `even_H_k_bounds`: an even H point of the closed polygon has `x₁ + x₂ ≤ L − 2`, and `x₁ + x₂ = L − 2` forces `(d − 1, n − 1)`.
+- PROVED `odd_H_k_bounds`: an odd H point has `x₁ + x₂ ≤ L − 1`, and `x₁ + x₂ = L − 1` forces `(d, n − 1)`.
+- Checks: `checks/CollarUpper.lean`. Root build clean; sandbox logs clean.
