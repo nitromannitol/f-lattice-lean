@@ -439,5 +439,6 @@ import FLatticePaper.Plane.Induction.W1OffCollarCases
 import FLatticePaper.Plane.Induction.W1CollarFrame
 import FLatticePaper.Plane.Induction.W1NonfreeOut
 import FLatticePaper.Plane.Induction.W1NonfreeSheet
+import FLatticePaper.Plane.Induction.W1NonfreeHsq
 
 /-! Root import for the corrected F-lattice paper. -/
