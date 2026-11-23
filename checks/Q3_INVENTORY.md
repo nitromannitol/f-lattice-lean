@@ -360,3 +360,11 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - PROVED `TipVertex.tGrade_tipVertex`, `sGrade_tipVertex`, `evenSite_tipVertex`: the tip vertex is the parent's V vertex `V_p = (n_p − d_p, n_p + d_p)` in child coordinates, with `t(V_p) = −B`, `B = L d_p + c n_p`, and `s(V_p) = 2 eps` (identities using `eps_eq`). This derives the tip values that TIP_THEOREM states, so they are no longer hypotheses. The phase is `eps`: W1 is `eps = 1`, W0 is `eps = −1`.
 - PROVED `TipVertex.W1_tip_white_of_eps`, `W0_root_white_of_eps`: the W1 root and middle, and the W0 root, are white for `HasStrips F`, given `eps` and the nonbase bounds `0 ≤ B`, `5L ≤ T − B` (kept as hypotheses).
 - Checks: `checks/TipVertex.lean`. Root build clean; sandbox logs clean.
+
+### Task 72 (TIP_THEOREM, the W1 escape with grade wired): TipEscape.lean
+
+- PROVED `FLatticePaper.tipJ_port_lt_root`: with `J = ceil(D/2)` (`tipJ D = (D+1)/2`), `J(−2) < J(−1)`: the boundary profiles `D = −1` (root, `J = 0`) and `D = −2` (port, `J = −1`) give the drop.
+- PROVED `FLatticePaper.tip_W1_escape_profiles`: the W1 cut tip (`eps = 1`) escapes at depth two in the restricted game with grade `J_η = tipJ (slip F η)`, given `HasStrips`, the nonbase bounds, the boundary profiles (named hypotheses `hD0`, `hD1`, sourced from ANCESTRAL_PSI_V_CUT_PROOF §§1–3 and VArcOffers), and the permits of the two route edges (`hru`, `hpu`, kept general; the source's permits are `slipPermits`, i.e. the sheet gap condition, not yet derived).
+- Whiteness of the root and middle comes from `TipVertex.W1_tip_white_of_eps` (no hypothesis).
+- NOT PROVED: the W0 middle (sheet evaluation), the permits from the sheet gap, and the boundary profiles themselves.
+- Checks: `checks/TipEscape.lean`. Root build clean; sandbox logs clean.
