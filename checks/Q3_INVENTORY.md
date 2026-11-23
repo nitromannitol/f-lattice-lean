@@ -532,3 +532,11 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - Correction to the lead's note: `(2,1)` is odd (the inputs of an even site are odd); the argument uses only the zero strip there, so it is unaffected.
 - The corner is black for every word, not only at `ε = −1`; the bottom collar excludes it by the laplacian-0 hypothesis in all cases.
 - Checks: `checks/CollarOneOne.lean`. Root build clean; sandbox logs clean.
+
+### Task 72 (hcollar, the glue to HsqAt): CollarGlue.lean
+
+- DEFINED the arc predicates `BottomArc`, `LeftArc`, `RightArc` (the collar's H arc, left V arc and right V arc) and the base `collarBase`: bottom → `squareCorners (c.1 − 1) c.2`; otherwise left → `squareCorners c.1 c.2`; otherwise right → `squareCorners (c.1 − 1) (c.2 − 1)`. The arc rule has no sign dependence and matches the numerics (the left and right arcs never overlap without the bottom arc).
+- PROVED `centre_mem_collarSquare`: the centre lies in its collar square.
+- DEFINED the inherited structure `CollarChains` (fields `out`, `corners`, `phase`): the rejected pointer is outside the square; the other corners are black or forced white with the output in the square; the phase chains reach the centre. These are the parent's collar return chains, to be supplied as data like `OldPolicyWitness`.
+- PROVED `hcollar_of_chains`: from `CollarChains` and the strictness of the collar square (`hstrict`, named), `HsqAt word P c` holds at every strict collar centre with laplacian 0.
+- Checks: `checks/CollarGlue.lean`. Root build clean; sandbox logs clean.
