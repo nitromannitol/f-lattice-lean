@@ -84,3 +84,24 @@ Status: *discharged* = supplied by a wrapper from `StrongEstimates (conjWord wor
 10. (task 61) `OldPolicyData` fields `bNondecreasing`, `reflection`, `forcedRetained`, `westAtException` are not in the strong estimates, and `pNondecreasing` is only partly there (see the task-61 section).
 
 All (i)-category hypotheses are supplied by `StrongEstimates (conjWord word)` through the `_of_strong` wrappers (Q3Strong, Q3Field, Q3Paragraph8).
+
+## NoBlackPairRise: the case split (task 62, NoBlackPair.lean)
+
+Target: `NoBlackPairRise F shortShift` (OddRise.lean), i.e. no rise at a black odd centre with black translate. The
+paper's cases (fixes/Q3.md, paragraphs 3–10) are the named inputs of `noBlackPairRise_of_cases`:
+
+| case (Q3.md) | Lean leaf | status | reason |
+|---|---|---|---|
+| sheet choice: strict root / tie, retention | `hcover` (cover of a rising black pair by the cases) | named | the active sheet and its matched policy are not Lean objects |
+| first common chart, `F(·+ησ) − A = min(0, Ψ − 2η)` | `firstCommon`, `hfirst` | proved from `hfirst` | `rise_excluded_at_edge`: `Φ₁(i) ≤ Φ₁(c)` and `P(c+σ) ≤ P(i+σ)` give slip increment `≠ 1` (`slipIncrement_eq_chain_gap`); `hfirst` is the chain-gap and price monotonicity on first-chart edges, named |
+| exit with the same slip | `exitSameSlip`, `hexit` | named | needs the exit geometry (Q3Exit `openRect` / `onBoundarySpectrum`, PROVISIONAL) |
+| adjacent positive chart (first offer) | `adjacentPositive`, `hadj` | named | needs the primitive span bound `p(x−e) ≥ p(x) − 1` on the period index; `t_p(−e) ≥ 0` is in Q3Para10 but not wired to `p` |
+| negative chart, `a: 1 → 0`, nonfree root | `negativeNonfree`, `hnonfree` | named | needs `a(x) = p(I − x)` from `f(I−x) = f(x)`; `Packet.reflection` is about `frame.centre` with a `tGrade` term, not literal `F(I−y) = F(y)` |
+| negative chart, free H roots `a = 0` | `negativeFreeH`, `hfreeH` | named | needs the native H star classification (`t_p` ranges) |
+| negative chart, free V roots `j = 0`, `i ∈ {0,1}` | `negativeFreeV` → `BlockPairAt`, `hfreeV` | output named; contradiction proved | `not_rising_of_blockPair` (`ε = ±1`): the black partner has the Laplacian of `c − U_q` or `c + U_q` by the period `U = U_p + U_q`; `black_centres_contradiction` (Q3White) excludes the pair |
+| exceptional `V_p + I` (W = 1) | `exceptionalVertex`, `hexc` | named | paragraph 10: `a(v) = p(0) + 1` and `a(v − (1,0)) = p(1,0) + 1` need `westAtException` and the zero-strip values of `p` at `t_p ∈ {0,−1,N,N−1}` |
+
+Shift and sign mismatches found in this step (not chosen; for the lead):
+- `OldPolicyData.pFun` is the paper's `p(x) = f(x − εU_q) − f(x)`, but the Lean `price` uses `parentShift = ε(N−D, N+D)` (the odd parent's transverse, `ChildFrame.lean:23`), so `price` is not `p` and `pNondecreasing` does not give `hfirst`'s price step.
+- With quota (a black centre retains both inputs) and `chainNonincreasing` on all retained edges, `hfirst` applied to every black pair would exclude every rise. The paper's chart analysis is needed exactly because the monotone quantities hold on different charts, so `hfirst` must be stated per chart (as done), not globally.
+- `noBlackPairRise_of_oldPolicy` takes `firstCommon ⇒ P.retained` and the price step as named inputs; `chainNonincreasing 1` is used as the chain-gap monotonicity.
