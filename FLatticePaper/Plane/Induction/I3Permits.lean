@@ -58,7 +58,7 @@ theorem i3_permitA_of_strong {word : Word} (h : StrongEstimates (conjWord word))
     PermitLocal (quarterTurnField (standardField (conjWord word)))
       (fun c i => sheetChainPotential word (standardField (conjWord word)) i ≤
         sheetChainPotential word (standardField (conjWord word)) c) := by
-  obtain ⟨policy, hq, hmono, -⟩ := h.F2F3_policy
+  obtain ⟨policy, hq, hmono, -⟩ := h.F2F3_policy (frameAt (conjWord word)).eps (frameAt (conjWord word)).eps_unit
   have hT := i3_retainQuota_quarterTurn _ policy hq
   have hsub : ∀ c i, policy (i3Z c) (i3Z i) →
       sheetChainPotential word (standardField (conjWord word)) i ≤
