@@ -18,7 +18,7 @@ open FLatticePaper.W1Forcing FLatticePaper.W1Witness FLatticePaper.W1Phase
 
 /-- **The collar square of `H_last`** (task 74 (1)): the core square `squareCorners (−1) (−2)` of the root `(0, −1)`, transported to
 the child square `squareCorners (lv.1 − 1) lv.2` through the child root `c` over `(0, −1)`. -/
-theorem collar_Hlast {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed)
+theorem collar_Hlast {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed η)
     (lv : Site) {c : Site} (hc : zTurn (c - lv) = (0, -1))
     (hchain : ∀ q ∈ squareCorners (-1) (-2), q ≠ (0, -1) →
       Relation.TransGen (fun x y => P.retained x y ∧ Edge y x) q (0, -1)) :

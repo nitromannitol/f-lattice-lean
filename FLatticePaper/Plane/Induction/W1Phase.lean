@@ -25,8 +25,8 @@ open FLatticePaper.W1Witness
 
 /-- The earlier canonical policy with its rank and its private squares: the archive's F2F3 rank, an integer function strictly decreasing
 along the retained edges. -/
-structure OldPolicyRanked (frame : ChildFrame) (G : Field) (seed : Site → Site → Prop)
-    extends OldPolicyWitness frame G seed where
+structure OldPolicyRanked (frame : ChildFrame) (G : Field) (seed : Site → Site → Prop) (η : ℤ)
+    extends OldPolicyWitness frame G seed η where
   /-- The rank of the policy. -/
   rank : Site → ℤ
   /-- The rank strictly decreases along every retained edge. -/
@@ -37,24 +37,24 @@ structure OldPolicyRanked (frame : ChildFrame) (G : Field) (seed : Site → Site
     RankWithIncrements retained frame.child.modifiedDeck.kernel frame.child.modifiedDeck.transverse (-1) η
 
 /-- The A-sheet rank: the rank of the policy at the parent point `zTurn (c − lv)`. -/
-def sheetRankA {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed)
+def sheetRankA {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed η)
     (lv c : Site) : ℤ :=
   P.rank (zTurn (c - lv))
 
 /-- The C-sheet rank: the A-sheet rank of the reflected point `centre − c`. -/
-def sheetRankC {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed)
+def sheetRankC {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed η)
     (lv centre c : Site) : ℤ :=
   sheetRankA P lv (centre - c)
 
 /-- The A-sheet rank decreases along the transported A policy. -/
-theorem sheetRankA_decr {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
-    (P : OldPolicyRanked frame G seed) (lv : Site) {c i : Site}
+theorem sheetRankA_decr {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
+    (P : OldPolicyRanked frame G seed η) (lv : Site) {c i : Site}
     (h : sheetPolicyA P.toOldPolicyWitness.toOldPolicyData lv c i) : sheetRankA P lv i < sheetRankA P lv c :=
   P.rank_decr (zTurn (c - lv)) (zTurn (i - lv)) h
 
 /-- The C-sheet rank decreases along the transported C policy (the reflection of the A policy). -/
-theorem sheetRankC_decr {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
-    (P : OldPolicyRanked frame G seed) (lv centre : Site) {c i : Site}
+theorem sheetRankC_decr {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
+    (P : OldPolicyRanked frame G seed η) (lv centre : Site) {c i : Site}
     (h : sheetPolicyC P.toOldPolicyWitness.toOldPolicyData lv centre c i) :
     sheetRankC P lv centre i < sheetRankC P lv centre c :=
   sheetRankA_decr P lv (c := centre - c) (i := centre - i) h
@@ -220,8 +220,8 @@ theorem forcing_of_phase_policy (n d : ℤ) (F : Field) (out : Site → Site) (p
 
 /-- **The forcing with the transported sheet ranks.** The A and C phase policies are the sheet policies of the earlier policy, and their
 ranks are `sheetRankA` and `sheetRankC`, which decrease along them. -/
-theorem forcing_of_sheet {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
-    (P : OldPolicyRanked frame G seed) (lv centre : Site) (n d : ℤ) (F : Field) (out : Site → Site) (psi : Site → ℤ)
+theorem forcing_of_sheet {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
+    (P : OldPolicyRanked frame G seed η) (lv centre : Site) (n d : ℤ) (F : Field) (out : Site → Site) (psi : Site → ℤ)
     (hfin : {c : Site | StrictInterior n d c}.Finite)
     (hout : ∀ c, StrictInterior n d c → laplacian F c = 0 → (out c = incomingNeg c ∨ out c = incomingPos c))
     (hsq : ∀ c, StrictInterior n d c → laplacian F c = 0 → ∃ a b : ℤ,
@@ -263,7 +263,7 @@ theorem sheetImg_zTurn (lv c : Site) : sheetImg lv (zTurn (c - lv)) = c := by
 
 /-- A chain of retained lattice edges of the parent from the corner `q` to the root `p` transports to an A sheet chain from the child
 site over `q` to the child site over `p`. -/
-theorem transGen_sheet_img {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed)
+theorem transGen_sheet_img {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed η)
     (lv : Site) {p q : Site} (h : Relation.TransGen (fun x y => P.retained x y ∧ Edge y x) q p) :
     Relation.TransGen (sheetPolicyA P.toOldPolicyWitness.toOldPolicyData lv) (sheetImg lv q) (sheetImg lv p) := by
   induction h with
@@ -309,7 +309,7 @@ theorem sheet_corner_of_mem (lv : Site) (a b : ℤ) {c' : Site}
 /-- **The private square transported.** A parent square `squareCorners a b` through its root `p`, whose other corners reach `p` by retained
 edges, transports to the child square `squareCorners (b+1+lv₁) (−a−1+lv₂)` through the child root `c` over `p`: the child root lies in it,
 and every other corner reaches `c` along the A sheet policy. -/
-theorem sheet_private_square {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed)
+theorem sheet_private_square {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed η)
     (lv : Site) (a b : ℤ) {p c : Site} (hp : p ∈ squareCorners a b) (hc : zTurn (c - lv) = p)
     (hchain : ∀ q ∈ squareCorners a b, q ≠ p → Relation.TransGen (fun x y => P.retained x y ∧ Edge y x) q p) :
     c ∈ squareCorners (b + 1 + lv.1) (-a - 1 + lv.2) ∧
@@ -326,7 +326,7 @@ theorem sheet_private_square {frame : ChildFrame} {G : Field} {seed : Site → S
 /-- **The private witness transported.** At a child white `c` over a forced parent white `p` (the parent's witness square is private,
 `OldPolicyWitness.privateSquare`), the transported child square contains `c`, and every other corner reaches `c` along the A sheet
 policy: the chain required by the phase return on the transported square. -/
-theorem sheet_private_of_forced {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed)
+theorem sheet_private_of_forced {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed η)
     (lv : Site) {p c i : Site} (hc : zTurn (c - lv) = p) (hF : ForcedEdge G seed p i) (hns : ¬ seed p i)
     (hw : laplacian G p = 0) :
     ∃ a b : ℤ, p ∈ squareCorners a b ∧ c ∈ squareCorners (b + 1 + lv.1) (-a - 1 + lv.2) ∧
@@ -343,7 +343,7 @@ archive's claim, not a field. `Hlast` is not identified in Lean. Note: the archi
 η+: `squareCorners 0 0`; AUDIT §3 both signs: `squareCorners 1 0`), and V0's η+ square as `squareCorners 0 (−1)`, not `squareCorners (−1) (−1)`. -/
 
 /-- The bottom H0 core square (archive AUDIT §3, both signs): the parent square `squareCorners 1 0` of the rejected input `(1,1)`. -/
-theorem collar_H0_upperRight {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed)
+theorem collar_H0_upperRight {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed η)
     (lv : Site) {c : Site} (hc : zTurn (c - lv) = (1, 0))
     (hchain : ∀ q ∈ squareCorners 1 0, q ≠ (1, 0) →
       Relation.TransGen (fun x y => P.retained x y ∧ Edge y x) q (1, 0)) :
@@ -354,7 +354,7 @@ theorem collar_H0_upperRight {frame : ChildFrame} {G : Field} {seed : Site → S
 
 /-- The H0 η+ core square of ALL_WHITE §D: the parent square `squareCorners 0 0`, whose rejected input `(1,1)` returns through `(0,1)`,
 `(0,0)`. -/
-theorem collar_H0_upperLeft {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed)
+theorem collar_H0_upperLeft {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed η)
     (lv : Site) {c : Site} (hc : zTurn (c - lv) = (1, 0))
     (hchain : ∀ q ∈ squareCorners 0 0, q ≠ (1, 0) →
       Relation.TransGen (fun x y => P.retained x y ∧ Edge y x) q (1, 0)) :
@@ -364,7 +364,7 @@ theorem collar_H0_upperLeft {frame : ChildFrame} {G : Field} {seed : Site → Si
   sheet_private_square P lv 0 0 (by simp [squareCorners]) hc hchain
 
 /-- The bottom V0 η− core square (AUDIT §3): the parent square `squareCorners (−1) 0`, rejected input `(−1,0)`. -/
-theorem collar_V0_upperLeft {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed)
+theorem collar_V0_upperLeft {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed η)
     (lv : Site) {c : Site} (hc : zTurn (c - lv) = (0, 0))
     (hchain : ∀ q ∈ squareCorners (-1) 0, q ≠ (0, 0) →
       Relation.TransGen (fun x y => P.retained x y ∧ Edge y x) q (0, 0)) :
@@ -374,7 +374,7 @@ theorem collar_V0_upperLeft {frame : ChildFrame} {G : Field} {seed : Site → Si
   sheet_private_square P lv (-1) 0 (by simp [squareCorners]) hc hchain
 
 /-- The bottom V0 η+ core square (AUDIT §3, ALL_WHITE §D): the parent square `squareCorners 0 (−1)`, rejected input `(1,0)`. -/
-theorem collar_V0_etaPlus {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed)
+theorem collar_V0_etaPlus {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed η)
     (lv : Site) {c : Site} (hc : zTurn (c - lv) = (0, 0))
     (hchain : ∀ q ∈ squareCorners 0 (-1), q ≠ (0, 0) →
       Relation.TransGen (fun x y => P.retained x y ∧ Edge y x) q (0, 0)) :
@@ -385,7 +385,7 @@ theorem collar_V0_etaPlus {frame : ChildFrame} {G : Field} {seed : Site → Site
 
 /-- The W1 left Vlast core square (AUDIT §3, both signs): the parent square `squareCorners 1 (−1)`, rejected input `(2,−1)` relative to the
 root `(1,−1)` of the child square. -/
-theorem collar_Vlast_upperRight {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed)
+theorem collar_Vlast_upperRight {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed η)
     (lv : Site) {c : Site} (hc : zTurn (c - lv) = (1, -1))
     (hchain : ∀ q ∈ squareCorners 1 (-1), q ≠ (1, -1) →
       Relation.TransGen (fun x y => P.retained x y ∧ Edge y x) q (1, -1)) :

@@ -22,7 +22,7 @@ namespace FLatticePaper.Induction
 open Farey FLatticePaper
 
 /-- The canonical signed policy of the raw-slip game of S3 (Q1): the selected inputs, the free set, and the strict rank. -/
-structure CanonicalPolicy (frame : ChildFrame) (F : Field) where
+structure CanonicalPolicy (frame : ChildFrame) (F : Field) (η : ℤ) where
   /-- `policy c i`: the input `i` of the centre `c` is selected. -/
   policy : Site → Site → Prop
   /-- The deck-invariant free set (the H/V boundary). -/
@@ -31,7 +31,7 @@ structure CanonicalPolicy (frame : ChildFrame) (F : Field) where
   /-- Quota: black keeps both inputs, white keeps at least one. -/
   quota : RetainQuota F policy
   /-- Selected inputs are permitted in the raw-slip game. -/
-  permitted : ∀ c i, policy c i → slipPermits F (fun z => F (z + frame.shortShift)) c i
+  permitted : ∀ c i, policy c i → slipPermits F (fun z => F (z + η • frame.shortShift)) c i
   /-- The primitive price `P` does not increase along selected inputs. -/
   nonincreasingP : ∀ c i, policy c i → frame.cutGrade F 1 0 1 i ≤ frame.cutGrade F 1 0 1 c
   /-- The rounded slip `J` does not increase along selected inputs. -/
@@ -259,9 +259,22 @@ theorem bulkCount_lt {cU cV : ℤ} (hper : HasGeneratorPeriods frame.child F cU 
     exact lt_irrefl _ hi.2
   · exact (pairClass_finite hper _ _).subset (fun u hu => hu.1)
 
+/-- The unit sign: `1 • σ = σ` in the permit of the S3 game. -/
+theorem one_shift_fun (frame : ChildFrame) (F : Field) :
+    (fun z => F (z + (1 : ℤ) • frame.shortShift)) = (fun z => F (z + frame.shortShift)) := by
+  funext z
+  rw [one_smul]
+
+/-- The permitted inputs of the unit game are the S3 permits of the plus sign. -/
+theorem permitted_one {frame : ChildFrame} {F : Field} (C : CanonicalPolicy frame F 1) (c i : Site) (h : C.policy c i) :
+    slipPermits F (fun z => F (z + frame.shortShift)) c i := by
+  have := C.permitted c i h
+  rw [one_shift_fun] at this
+  exact this
+
 /-- A restricted fort has, at each of its sites, a selected input in the fort. -/
-theorem exists_input_in_fort (C : CanonicalPolicy frame F) {fort : Set Site}
-    (hfort : IsRestrictedFort F (slipPermits F (fun z => F (z + frame.shortShift))) fort) {z : Site} (hz : z ∈ fort) :
+theorem exists_input_in_fort {η : ℤ} (C : CanonicalPolicy frame F η) {fort : Set Site}
+    (hfort : IsRestrictedFort F (slipPermits F (fun z => F (z + η • frame.shortShift))) fort) {z : Site} (hz : z ∈ fort) :
     ∃ i, (i = incomingNeg z ∨ i = incomingPos z) ∧ C.policy z i ∧ i ∈ fort := by
   rcases hfort z hz with ⟨hB, hcase⟩ | ⟨hW, hcaseN, hcaseP⟩
   · obtain ⟨hpn, hpp⟩ := C.quota.1 z hB
@@ -278,8 +291,8 @@ theorem exists_input_in_fort (C : CanonicalPolicy frame F) {fort : Set Site}
 
 /-- The chain of the gate: from a fort site at the level `(c0, j0)`, follow selected inputs in the fort; a strict componentwise
 drop ends the chain, a constant pair strictly lowers the count, and a free site ends the chain. -/
-theorem gate_chain (C : CanonicalPolicy frame F) {cU cV : ℤ} (hper : HasGeneratorPeriods frame.child F cU cV)
-    {fort : Set Site} (hfort : IsRestrictedFort F (slipPermits F (fun z => F (z + frame.shortShift))) fort)
+theorem gate_chain {η : ℤ} (C : CanonicalPolicy frame F η) {cU cV : ℤ} (hper : HasGeneratorPeriods frame.child F cU cV)
+    {fort : Set Site} (hfort : IsRestrictedFort F (slipPermits F (fun z => F (z + η • frame.shortShift))) fort)
     (c0 j0 : ℤ) : ∀ n : ℕ, ∀ z : Site, bulkCount frame F C.rank z = n → z ∈ fort →
       frame.cutGrade F 1 0 1 z = c0 → frame.cutGrade F 0 1 1 z = j0 →
       (∃ t ∈ fort, frame.cutGrade F 1 0 1 t ≤ c0 ∧ frame.cutGrade F 0 1 1 t ≤ j0 ∧
@@ -316,8 +329,8 @@ theorem gate_chain (C : CanonicalPolicy frame F) {cU cV : ℤ} (hper : HasGenera
 
 /-- The gate of `S3NoFortInputs` at a free site of a fort at the levels `(c0, j0)`: the start has a selected input in the fort,
 and either it is a strict drop or the chain reaches a free site of strictly smaller count. -/
-theorem gate_from_free (C : CanonicalPolicy frame F) {cU cV : ℤ} (hper : HasGeneratorPeriods frame.child F cU cV)
-    {fort : Set Site} (hfort : IsRestrictedFort F (slipPermits F (fun z => F (z + frame.shortShift))) fort)
+theorem gate_from_free {η : ℤ} (C : CanonicalPolicy frame F η) {cU cV : ℤ} (hper : HasGeneratorPeriods frame.child F cU cV)
+    {fort : Set Site} (hfort : IsRestrictedFort F (slipPermits F (fun z => F (z + η • frame.shortShift))) fort)
     {site : Site} (hsite : site ∈ fort) (c0 j0 : ℤ)
     (hP : frame.cutGrade F 1 0 1 site = c0) (hJ : frame.cutGrade F 0 1 1 site = j0) :
     ∃ target ∈ fort, (frame.cutGrade F 1 0 1 target ≤ c0 ∧ frame.cutGrade F 0 1 1 target ≤ j0 ∧
@@ -348,7 +361,7 @@ theorem gate_from_free (C : CanonicalPolicy frame F) {cU cV : ℤ} (hper : HasGe
 
 /-- **The S3 orders and the gate from the canonical signed policy.** The natural orders are the same-pair counts; the free set is
 the policy's; the levels are `(c_0, 0)` with `c_0 = cutPrice`. -/
-noncomputable def S3NoFortInputs_of_canonical (C : CanonicalPolicy frame F) {cU cV : ℤ}
+noncomputable def S3NoFortInputs_of_canonical (C : CanonicalPolicy frame F 1) {cU cV : ℤ}
     (hper : HasGeneratorPeriods frame.child F cU cV) : S3NoFortInputs frame F where
   free := C.free
   bulkOrder := bulkCount frame F C.rank
@@ -367,29 +380,35 @@ noncomputable def S3NoFortInputs_of_canonical (C : CanonicalPolicy frame F) {cU 
   bulkWhite := by
     intro c _ hlap
     rcases C.quota.2 c hlap with hpn | hpp
-    · exact ⟨incomingNeg c, Or.inl rfl, C.permitted c _ hpn, C.nonincreasingP c _ hpn, C.nonincreasingJ c _ hpn,
+    · exact ⟨incomingNeg c, Or.inl rfl, permitted_one C c _ hpn, C.nonincreasingP c _ hpn, C.nonincreasingJ c _ hpn,
         fun hP hJ => bulkCount_lt hper C.rank hP hJ (C.strictRank c _ hpn hP hJ)⟩
-    · exact ⟨incomingPos c, Or.inr rfl, C.permitted c _ hpp, C.nonincreasingP c _ hpp, C.nonincreasingJ c _ hpp,
+    · exact ⟨incomingPos c, Or.inr rfl, permitted_one C c _ hpp, C.nonincreasingP c _ hpp, C.nonincreasingJ c _ hpp,
         fun hP hJ => bulkCount_lt hper C.rank hP hJ (C.strictRank c _ hpp hP hJ)⟩
   gate := by
     intro fort hfort site hsite _ hP hJ
-    exact gate_from_free C hper hfort hsite _ _ hP hJ
+    have hfort' : IsRestrictedFort F (slipPermits F (fun z => F (z + (1 : ℤ) • frame.shortShift))) fort := by
+      rw [one_shift_fun]
+      exact hfort
+    exact gate_from_free C hper hfort' hsite _ _ hP hJ
 
 end Gate
 
 /-- Permitted black and white centres: the canonical policy is local in the sense of `PermitLocal`. -/
-theorem permitLocal_of_canonical (C : CanonicalPolicy frame F) :
-    PermitLocal F (slipPermits F (fun z => F (z + frame.shortShift))) := by
+theorem permitLocal_of_canonical {η : ℤ} (C : CanonicalPolicy frame F η) :
+    PermitLocal F (slipPermits F (fun z => F (z + η • frame.shortShift))) := by
   refine ⟨fun c hc => ⟨C.permitted c _ (C.quota.1 c hc).1, C.permitted c _ (C.quota.1 c hc).2⟩, fun c hc => ?_⟩
   rcases C.quota.2 c hc with h | h
   · exact Or.inl (C.permitted c _ h)
   · exact Or.inr (C.permitted c _ h)
 
 /-- **The restricted no-fort premise of S3 from the canonical signed policy** (the S3 orders and gate of fix Q1). -/
-theorem restrictedNoFort_of_canonical (C : CanonicalPolicy frame F) {cU cV : ℤ}
+theorem restrictedNoFort_of_canonical (C : CanonicalPolicy frame F 1) {cU cV : ℤ}
     (hper : HasGeneratorPeriods frame.child F cU cV)
     (hbinary : ∀ site, laplacian F site = -1 ∨ laplacian F site = 0) :
     RestrictedNoFort F (frame.cutGrade F 1 1 1) (slipPermits F (fun z => F (z + frame.shortShift))) :=
-  restrictedNoFort_S3_of_inputs frame hper hbinary (permitLocal_of_canonical C) (S3NoFortInputs_of_canonical C hper)
+  restrictedNoFort_S3_of_inputs frame hper hbinary (by
+    have := permitLocal_of_canonical C
+    rw [one_shift_fun] at this
+    exact this) (S3NoFortInputs_of_canonical C hper)
 
 end FLatticePaper.Induction

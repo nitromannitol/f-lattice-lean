@@ -61,7 +61,7 @@ theorem centre_mem_collarSquare (frame : ChildFrame) (c : Site) : c ∈ collarSq
 `OldPolicyWitness`): at a collar centre with laplacian `0`, the rejected pointer is outside the collar square, the other corners
 are black or forced white with the output inside the square, and the phase chains reach the centre. -/
 structure CollarChains (word : Word) {seed : Site → Site → Prop}
-    (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed) : Prop where
+    (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps) : Prop where
   out : ∀ c, CollarFrame (frameAt word) c → laplacian (MW word) c = 0 →
     sheetOut P (frameAt word).sheetShift (frameAt word).centre (sheetPsi word) c ∉ collarSquare (frameAt word) c
   corners : ∀ c, CollarFrame (frameAt word) c → laplacian (MW word) c = 0 →
@@ -81,7 +81,7 @@ structure CollarChains (word : Word) {seed : Site → Site → Prop}
 
 /-- **The glue: `hcollar` from the inherited chains and the strictness of the collar square.** -/
 theorem hcollar_of_chains {word : Word} {seed : Site → Site → Prop}
-    (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (chains : CollarChains word P)
     (hstrict : ∀ c, StrictInterior (frameAt word).child.num (frameAt word).child.den c →
       CollarFrame (frameAt word) c → laplacian (MW word) c = 0 →

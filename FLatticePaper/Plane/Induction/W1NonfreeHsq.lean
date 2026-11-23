@@ -46,7 +46,7 @@ theorem psi_input_nonneg {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) 
 
 /-- `Ψ` does not decrease along the `A`-retained edges. -/
 theorem psi_mono {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     {p q : Site} (h : sheetPolicyA P (frameAt word).sheetShift p q) : sheetPsi word p ≤ sheetPsi word q :=
   sheetDiff_mono_A hw hSE P h
 
@@ -84,7 +84,7 @@ theorem pointer_of_unique (Q : Site → Site → Prop) (c o : Site)
 
 /-- A strict corner (`Ψ ≥ 1`) of the sheet square: its `M`-laplacian is that of the parent, with the `A`-pointer. -/
 theorem corner_facts {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     {p nx : Site} (hnx : Edge nx p) (hQ : sheetPolicyA P (frameAt word).sheetShift p nx)
     (hL : laplacian (standardField (conjWord word)) (zTurn (p - (frameAt word).sheetShift)) = -1 ∨
       (laplacian (standardField (conjWord word)) (zTurn (p - (frameAt word).sheetShift)) = 0 ∧
@@ -101,7 +101,7 @@ theorem corner_facts {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE
 three corners have `Ψ ≥ 0`; each strict corner has the `M`-laplacian of its parent with the `A`-pointer to its successor; the rejected
 input of `c` is its `A`-pointer. -/
 theorem square_facts {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     {c : Site} (hc : 1 ≤ sheetPsi word c)
     (h : ParentSquareOut (standardField (conjWord word)) P.retained (zTurn (c - (frameAt word).sheetShift))) :
     ∃ p0 p1 p2 : Site, ∃ a b : ℤ,

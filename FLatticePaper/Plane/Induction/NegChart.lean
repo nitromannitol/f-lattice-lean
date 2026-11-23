@@ -218,7 +218,7 @@ theorem blackRoot_of_nonneg {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three
 `sheetPolicyA_of_strict`). -/
 theorem sheetPolicyA_of_black {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     {c i : Site} (hc : c ∈ (frameAt word).closedPolygon) (hEdge : Edge i c)
     (hb : laplacian (standardField word) c = -1) (hΨc : 1 ≤ sheetDiffW word c) :
     sheetPolicyA P (frameAt word).sheetShift c i := by
@@ -271,7 +271,7 @@ theorem sheetPolicyA_of_black {word : Word} (h : ∃ x ∈ word, x ≠ Digit.thr
 `sheetPolicyA_of_black` applies (task 69 (b): the tied centre). -/
 theorem sheetPolicyA_of_nonneg {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     {c i : Site} (hc : c ∈ (frameAt word).closedPolygon) (hEdge : Edge i c)
     (hb : laplacian (standardField word) c = -1) (hΨc : 0 ≤ sheetDiffW word c)
     (hstar : ∀ j, Edge j c → 0 ≤ sheetDiffW word j) :
@@ -370,7 +370,7 @@ edge `(c − l_v, i − l_v)`, which `nonfree_drop_excluded` excludes. The slip 
 (`D_+ ∈ [0, 2]` on `E`, transported to `D_−` by the reflection), the odd parity of `D_−(c)`, and the rise. -/
 theorem neg_adjacent_excluded {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hslip : ∀ z ∈ (frameAt word).closedPolygon,
       0 ≤ standardField word z - standardField word (z + (frameAt word).shortShift) ∧
         standardField word z - standardField word (z + (frameAt word).shortShift) ≤ 2)
@@ -465,7 +465,7 @@ edge `(c − l_v, i − l_v)`, which `nonfree_drop_excluded` excludes. The slip 
 (`D_+ ∈ [0, 2]` on `E`, transported to `D_−` by the reflection), the odd parity of `D_−(c)`, and the rise. -/
 theorem neg_adjacent_nonneg {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hslip : ∀ z ∈ (frameAt word).closedPolygon,
       0 ≤ standardField word z - standardField word (z + (frameAt word).shortShift) ∧
         standardField word z - standardField word (z + (frameAt word).shortShift) ≤ 2)
@@ -558,7 +558,7 @@ theorem neg_adjacent_nonneg {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three
 slip-range leaf `hslip`. -/
 theorem neg_sign_excluded {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hslip : ∀ z ∈ (frameAt word).closedPolygon,
       0 ≤ standardField word z - standardField word (z + (frameAt word).shortShift) ∧
         standardField word z - standardField word (z + (frameAt word).shortShift) ≤ 2)
@@ -606,7 +606,7 @@ theorem neg_sign_excluded {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
 tie leaf `hTie` (task 69 (b)). -/
 theorem noBlackPairRise_of_leaves {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hslip : ∀ z ∈ (frameAt word).closedPolygon,
       0 ≤ standardField word z - standardField word (z + (frameAt word).shortShift) ∧
         standardField word z - standardField word (z + (frameAt word).shortShift) ≤ 2)

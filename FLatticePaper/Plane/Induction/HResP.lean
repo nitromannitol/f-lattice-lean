@@ -44,7 +44,7 @@ theorem exists_other_input {c i : Site} (hi : FLatticePaper.Edge i c) :
 /-- **The tied rising pair (hResP), reduced to the negative tied-target exclusion.** -/
 theorem hResP_of_negTie {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hNegTie : ∀ c i, RisingBlackPair (standardField word) (-(frameAt word).shortShift) c i →
       c ∈ (frameAt word).closedPolygon → i ∈ (frameAt word).closedPolygon →
       c + (frameAt word).uq ∈ (frameAt word).closedPolygon → i + (frameAt word).uq ∈ (frameAt word).closedPolygon →

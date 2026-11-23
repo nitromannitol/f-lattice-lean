@@ -27,13 +27,13 @@ theorem zTurn_reflect (w : Site) : zTurn ((1, -1) - w) = reflectionI - zTurn w :
   ext <;> simp only [Prod.fst_sub, Prod.snd_sub] <;> ring
 
 /-- The conjugate's policy transported to the parent sheet by `Z`. -/
-def parentPolicy {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyData frame G seed) :
+def parentPolicy {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyData frame G seed η) :
     Site → Site → Prop :=
   fun c i => P.retained (zTurn c) (zTurn i)
 
 /-- The transported policy is reflected about `I = (1, −1)`. -/
-theorem parentPolicy_reflection {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
-    (P : OldPolicyData frame G seed) {c i : Site} (h : parentPolicy P c i)
+theorem parentPolicy_reflection {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
+    (P : OldPolicyData frame G seed η) {c i : Site} (h : parentPolicy P c i)
     (hroot : laplacian G (zTurn c) = -1 ∨ SquareClauses.ForcedEdge G (fun _ _ => False) (zTurn c) (zTurn i)) :
     parentPolicy P ((1, -1) - c) ((1, -1) - i) := by
   unfold parentPolicy at h ⊢
@@ -41,8 +41,8 @@ theorem parentPolicy_reflection {frame : ChildFrame} {G : Field} {seed : Site �
   exact P.reflection (zTurn c) (zTurn i) h hroot
 
 /-- The price step of the transported policy: `p(x) = c₀ − P'(Zx)` does not decrease along it. -/
-theorem parentPolicy_price {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
-    (P : OldPolicyData frame G seed) :
+theorem parentPolicy_price {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
+    (P : OldPolicyData frame G seed η) :
     NondecreasingAlong (fun y => frame.cutPrice - frame.price G (zTurn y)) (parentPolicy P) := by
   intro c i h
   unfold parentPolicy at h
@@ -51,12 +51,12 @@ theorem parentPolicy_price {frame : ChildFrame} {G : Field} {seed : Site → Sit
   omega
 
 /-- The A-sheet policy: the transported policy at the sheet coordinates `c − lv`, `i − lv`. -/
-def sheetPolicyA {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyData frame G seed)
+def sheetPolicyA {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyData frame G seed η)
     (lv : Site) : Site → Site → Prop :=
   fun c i => parentPolicy P (c - lv) (i - lv)
 
 /-- The C-sheet policy: the A-sheet policy pulled back by the sheet exchange `R z = centre − z` (`SheetExchange`). -/
-def sheetPolicyC {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyData frame G seed)
+def sheetPolicyC {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyData frame G seed η)
     (lv : Site) (centre : Site) : Site → Site → Prop :=
   fun c i => sheetPolicyA P lv (centre - c) (centre - i)
 
@@ -82,14 +82,14 @@ theorem jumpA_eq_cutPrice {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
   rfl
 
 /-- The A-sheet policy carries the price step in its own coordinates: `p` at `c − lv` does not decrease along it. -/
-theorem sheetPolicyA_price {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
-    (P : OldPolicyData frame G seed) (lv : Site) :
+theorem sheetPolicyA_price {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
+    (P : OldPolicyData frame G seed η) (lv : Site) :
     NondecreasingAlong (fun c => frame.cutPrice - frame.price G (zTurn (c - lv))) (sheetPolicyA P lv) :=
   fun c i h => parentPolicy_price P (c - lv) (i - lv) h
 
 /-- The C-sheet policy carries the price step in its own coordinates, through the exchange `z ↦ centre − z`. -/
-theorem sheetPolicyC_price {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
-    (P : OldPolicyData frame G seed) (lv centre : Site) :
+theorem sheetPolicyC_price {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
+    (P : OldPolicyData frame G seed η) (lv centre : Site) :
     NondecreasingAlong (fun c => frame.cutPrice - frame.price G (zTurn (centre - c - lv)))
       (sheetPolicyC P lv centre) :=
   fun c i h => parentPolicy_price P (centre - c - lv) (centre - i - lv) h
@@ -122,7 +122,7 @@ theorem sheetMin_A_at_tie (frame : ChildFrame) (Fp : Field) {c : Site}
 reflected edge is retained, and `p = c₀ − P'(Z·)` does not decrease along it. -/
 theorem nonfree_drop_excluded {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     {x x' : Site} (hpol : parentPolicy P x x')
     (h1 : jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x = 1)
     (h0 : jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x' = 0)

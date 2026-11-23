@@ -89,13 +89,13 @@ theorem sheetB_eq {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
 /-- `hbmono` from the policy's raw-slip field: `B` is nondecreasing along the matched edges. -/
 theorem hbmono_of_raw {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (c i : Site) (hret : sheetPolicyA P (frameAt word).sheetShift c i) :
     (frameAt word).sheetC (quarterTurnField (standardField (conjWord word))) (c + (frameAt word).uq) -
         (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) c ≤
       (frameAt word).sheetC (quarterTurnField (standardField (conjWord word))) (i + (frameAt word).uq) -
         (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) i := by
-  have hmono := P.rawSlipNonincreasing (frameAt word).eps (frameAt word).eps_unit
+  have hmono := P.rawSlipNonincreasing
     (zTurn (c - (frameAt word).sheetShift)) (zTurn (i - (frameAt word).sheetShift)) hret
   dsimp only at hmono
   rw [sheetB_eq h hSE c, sheetB_eq h hSE i]

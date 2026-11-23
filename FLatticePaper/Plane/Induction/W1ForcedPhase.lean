@@ -55,8 +55,8 @@ theorem w1Forced_of_strict_squares (n d : ℤ) (F : Field) (R : Site → Site �
 
 /-- **W1Forced for a ranked policy** (task 88): the policy `P` (its retained relation with its strictly decreasing rank) gives `W1Forced`,
 given the finiteness and the strict-interior square data of `P.retained`. -/
-theorem w1Forced_of_ranked {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
-    (P : OldPolicyRanked frame G seed)
+theorem w1Forced_of_ranked {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
+    (P : OldPolicyRanked frame G seed η)
     (hfin : {c : Site | StrictInterior frame.child.num frame.child.den c}.Finite)
     (hsq : ∀ c, StrictInterior frame.child.num frame.child.den c → laplacian G c = 0 → ∃ a b : ℤ,
       c ∈ squareCorners a b ∧ (∀ c' ∈ squareCorners a b, StrictInterior frame.child.num frame.child.den c') ∧

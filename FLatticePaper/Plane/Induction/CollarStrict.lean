@@ -48,7 +48,7 @@ theorem hstrict_of_strong {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three)
 
 /-- `hcollar` for a word, from the inherited chains (the strict-centre premise is the collar's own). -/
 theorem hcollar_discharged {word : Word} {seed : Site → Site → Prop}
-    (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (chains : CollarChains word P)
     (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word)) :
     ∀ c : Site, StrictInterior (frameAt word).child.num (frameAt word).child.den c →

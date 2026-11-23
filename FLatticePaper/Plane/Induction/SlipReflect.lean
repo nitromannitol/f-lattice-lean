@@ -141,7 +141,7 @@ theorem sheetDiffW_reflect {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
 the retention `hret` derived from the centre bound). -/
 theorem chart_excluded_of_bounds {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     {c i : Site} (hr : RisingBlackPair (standardField word) (frameAt word).shortShift c i)
     (hcE : c ∈ (frameAt word).closedPolygon) (hΨc : 1 ≤ sheetDiffW word c) (hΨi : 1 ≤ sheetDiffW word i) :
     False := by
@@ -172,7 +172,7 @@ positive is the chart exclusion (proved). Both negative reflects (`rising_reflec
 `hTie`. -/
 theorem noBlackPairRise_of_signs {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hNeg : ∀ c i, RisingBlackPair (standardField word) (-(frameAt word).shortShift) c i →
       c ∈ (frameAt word).closedPolygon → 1 ≤ sheetDiffW word c → 1 ≤ sheetDiffW word i → False)
     (hTie : ∀ c i, RisingBlackPair (standardField word) (frameAt word).shortShift c i →

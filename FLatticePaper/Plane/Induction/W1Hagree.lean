@@ -68,8 +68,8 @@ theorem sheetRankC_W_periodic (r : Site → ℤ) (W : Site) (hW : ∀ z, r (z + 
 
 /-- **The reflection of the matched policy** (task 79): with the exchange centre `I + 2 lv`, the C-sheet policy at `(c, i)` holds
 whenever the A-sheet policy holds at `(c, i)` and the parent edge of `(c, i)` is black or forced (`OldPolicyData.reflection`). -/
-theorem sheetPolicyC_of_sheetPolicyA {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
-    (P : OldPolicyData frame G seed) (lv c i : Site)
+theorem sheetPolicyC_of_sheetPolicyA {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
+    (P : OldPolicyData frame G seed η) (lv c i : Site)
     (hroot : laplacian G (zTurn (c - lv)) = -1 ∨
       SquareClauses.ForcedEdge G (fun _ _ => False) (zTurn (c - lv)) (zTurn (i - lv)))
     (h : sheetPolicyA P lv c i) :
@@ -87,8 +87,8 @@ theorem sheetPolicyC_of_sheetPolicyA {frame : ChildFrame} {G : Field} {seed : Si
 /-- **The common arrow at a reflected tie** (task 79, partial hagree): at a tie with binary laplacian, the pointer `pointerOf QA c` of the
 A policy is retained by the C policy, provided the parent edge of the pointer is black or forced. The white parent with a non-forced pointer
 is the residual of `hagree`. -/
-theorem hagree_at_reflected_tie {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
-    (P : OldPolicyData frame G seed) (F : Field) (lv c : Site)
+theorem hagree_at_reflected_tie {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
+    (P : OldPolicyData frame G seed η) (F : Field) (lv c : Site)
     (hq : RetainQuota F (sheetPolicyA P lv))
     (hbin : laplacian F c = -1 ∨ laplacian F c = 0)
     (hroot : laplacian G (zTurn (c - lv)) = -1 ∨

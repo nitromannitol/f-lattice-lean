@@ -17,7 +17,7 @@ open Farey FLatticePaper
 /-- A rising `σ` pair in option 2 whose centre star has `Ψ ≤ 0` is excluded (reflect to the negative lemma). -/
 theorem plus_adjacent_nonpos_excluded {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hslip : ∀ z ∈ (frameAt word).closedPolygon,
       0 ≤ standardField word z - standardField word (z + (frameAt word).shortShift) ∧
         standardField word z - standardField word (z + (frameAt word).shortShift) ≤ 2)
@@ -77,7 +77,7 @@ theorem plus_adjacent_nonpos_excluded {word : Word} (h : ∃ x ∈ word, x ≠ D
 (the positive adjacent chart, with the centre's retention `sheetPolicyA_of_nonneg`). -/
 theorem plus_adjacent_target_excluded {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     {c i : Site} (hr : RisingBlackPair (standardField word) (frameAt word).shortShift c i)
     (hcE : c ∈ (frameAt word).closedPolygon) (hiE : i ∈ (frameAt word).closedPolygon)
     (hcq : c - ((frameAt word).eps * (frameAt word).parents.even.den,

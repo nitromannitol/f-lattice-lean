@@ -163,8 +163,8 @@ theorem forcedEdge_add (G : Field) {v : Site} (hv : EvenSite v) (hL : ∀ z, lap
 
 /-- **The nonfree root condition in deck form.** A nonfree root of the old policy is black, or its retained edge is the unseeded forced
 edge: the strict-interior translate carries `W1Forced` to the root, and the retained input is the forced target. -/
-theorem nonfree_root_forced_nonfree {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
-    (P : OldPolicyData frame G seed) (hP : frame.Packet G)
+theorem nonfree_root_forced_nonfree {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
+    (P : OldPolicyData frame G seed η) (hP : frame.Packet G)
     (hW1 : FLatticePaper.W1.W1Forced frame.child.num frame.child.den G) {z z' : Site}
     (hnf : Nonfree frame z) (hr : P.retained z z') :
     laplacian G z = -1 ∨ ForcedEdge G (fun _ _ => False) z z' := by

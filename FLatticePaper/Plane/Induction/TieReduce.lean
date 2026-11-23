@@ -43,7 +43,7 @@ theorem packet_of_strong {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
 `Ψ` along the retained edges (`sheetDiff_mono_A`). -/
 theorem strict_centre_target {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     {τ c i : Site} (hr : RisingBlackPair (standardField word) τ c i)
     (hcE : c ∈ (frameAt word).closedPolygon) (hΨc : 1 ≤ sheetDiffW word c) : 1 ≤ sheetDiffW word i := by
   have hret := sheetPolicyA_of_black hw hSE hpk P hcE hr.1 hr.2.1 hΨc
@@ -63,7 +63,7 @@ theorem ChildFrame.reflect_sub_eq_add (frame : ChildFrame) (c τ : Site) :
 the two narrowed leaves: option-2 ties whose centre has an input with `Ψ = −1`, for σ (`hResP`) and for −σ (`hResN`). -/
 theorem tie_excluded_of_narrow {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hResP : ∀ c i, RisingBlackPair (standardField word) (frameAt word).shortShift c i →
       c ∈ (frameAt word).closedPolygon →
       (c - (frameAt word).uq ∈ (frameAt word).closedPolygon ∧ i - (frameAt word).uq ∈ (frameAt word).closedPolygon) →
@@ -135,7 +135,7 @@ theorem tie_excluded_of_narrow {word : Word} (h : ∃ x ∈ word, x ≠ Digit.th
 leaves `hResP`, `hResN` as the only remaining inputs.** -/
 theorem oddBlackNoRise_of_narrow {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hResP : ∀ c i, RisingBlackPair (standardField word) (frameAt word).shortShift c i →
       c ∈ (frameAt word).closedPolygon →
       (c - (frameAt word).uq ∈ (frameAt word).closedPolygon ∧ i - (frameAt word).uq ∈ (frameAt word).closedPolygon) →

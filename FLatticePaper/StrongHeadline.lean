@@ -164,7 +164,8 @@ theorem odometersTheorem_of_policy
     (htwoRes : ∀ k : ℕ, Induction.StrongResidual (List.replicate (k + 1) Digit.two))
     (hres : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word → Induction.StrongResidual word)
     (hpol : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
-      ∃ seed, Nonempty (Induction.OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed))
+      ∃ seed, Nonempty (Induction.OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed
+        (frameAt word).eps))
     (hResP : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       ∀ c i, RisingBlackPair (standardField word) (frameAt word).shortShift c i →
         c ∈ (frameAt word).closedPolygon →
@@ -197,7 +198,8 @@ theorem hyperbola_of_policy
     (htwoRes : ∀ k : ℕ, Induction.StrongResidual (List.replicate (k + 1) Digit.two))
     (hres : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word → Induction.StrongResidual word)
     (hpol : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
-      ∃ seed, Nonempty (Induction.OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed))
+      ∃ seed, Nonempty (Induction.OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed
+        (frameAt word).eps))
     (hResP : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       ∀ c i, RisingBlackPair (standardField word) (frameAt word).shortShift c i →
         c ∈ (frameAt word).closedPolygon →
@@ -223,7 +225,8 @@ theorem circlePacking_of_policy
     (htwoRes : ∀ k : ℕ, Induction.StrongResidual (List.replicate (k + 1) Digit.two))
     (hres : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word → Induction.StrongResidual word)
     (hpol : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
-      ∃ seed, Nonempty (Induction.OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed))
+      ∃ seed, Nonempty (Induction.OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed
+        (frameAt word).eps))
     (hResP : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       ∀ c i, RisingBlackPair (standardField word) (frameAt word).shortShift c i →
         c ∈ (frameAt word).closedPolygon →

@@ -318,7 +318,7 @@ the parent point `zTurn (c − lv)` has the colour of `c` (black), the quota ret
 `zTurn (i − lv)` is one of them. -/
 theorem sheetPolicyA_of_strict {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     {c i : Site} (hc : c ∈ (frameAt word).closedPolygon)
     (hr : RisingBlackPair (standardField word) (frameAt word).shortShift c i)
     (hΨc : 1 ≤ sheetDiffW word c) :
@@ -375,7 +375,7 @@ theorem sheetPolicyA_of_strict {word : Word} (h : ∃ x ∈ word, x ≠ Digit.th
 `OldPolicyData`. -/
 theorem noBlackPairRise_of_chart_cover_strict {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hstrict : ∀ c i, RisingBlackPair (standardField word) (frameAt word).shortShift c i →
       c ∈ (frameAt word).closedPolygon → 1 ≤ sheetDiffW word c ∧ 1 ≤ sheetDiffW word i) :
     NoBlackPairRise (standardField word) (frameAt word).shortShift :=
