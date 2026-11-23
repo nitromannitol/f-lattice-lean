@@ -1,5 +1,6 @@
 import FLatticePaper.Plane.Induction.HarmI2
 import FLatticePaper.Plane.Induction.ZoneI1
+import FLatticePaper.Plane.Induction.ParentStepDischarge
 
 /-! # The frame-level harmonic region of I2 (task 49, the wrapper of the harmonic step)
 
@@ -36,18 +37,9 @@ theorem closed_lower (V : ChildFrame) (z : Site) (hz : z ∈ V.closedPolygon) :
 
 /-- The other sheet is at least `h₀` on the harmonic band of the word, for both signs of `ε` (the fix's harmonic region):
 for `ε = +1` the sheet `C`, for `ε = −1` the sheet `A`. The parent step is the named input `hps` (`ParentStepSign` with the
-word's odd parent). -/
+word's odd parent, discharged from the strong estimates of the conjugate). -/
 theorem I2_of_strong {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hS : StrongEstimates (conjWord word))
-    (hps : ∀ x x' : Site,
-      (x.1 + x.2) % 2 = (x'.1 + x'.2) % 2 →
-      (frameAt word).parents.odd.num * x.1 - (frameAt word).parents.odd.den * x.2
-        = (frameAt word).parents.odd.num * x'.1 - (frameAt word).parents.odd.den * x'.2 + 1 →
-      ((frameAt word).parents.odd.num * x.1 - (frameAt word).parents.odd.den * x.2
-          < (frameAt word).parents.odd.num →
-        quarterTurnField (standardField (conjWord word)) x' ≤ quarterTurnField (standardField (conjWord word)) x) ∧
-      ((frameAt word).parents.odd.num ≤ (frameAt word).parents.odd.num * x.1 - (frameAt word).parents.odd.den * x.2 →
-        quarterTurnField (standardField (conjWord word)) x ≤ quarterTurnField (standardField (conjWord word)) x'))
     (z : Site) (hz : z ∈ (frameAt word).closedPolygon)
     (hs : (frameAt word).sGrade z ≤ 2 * ((frameAt word).child.den + (frameAt word).child.num) - 1) :
     ((frameAt word).eps = 1 →
@@ -148,6 +140,8 @@ theorem I2_of_strong {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
   have hdiv : (dq * dq + 2 * dq * nq - nq * nq - dq - nq) / 2 = k1 - k2 + dq * nq := by
     rw [← hcq]
     exact Int.mul_ediv_cancel_left _ (by norm_num)
+  have hps := parentStepSign_of_strong h hS
+  unfold ParentStepSign at hps
   have hevQ : (nq + dq) % 2 = 0 := (frameAt word).valid.even_parity
   have hsharm : ∀ y : Site, 1 - 2 * (D + N) ≤ 2 * D * y.1 + 2 * N * y.2 →
       2 * D * y.1 + 2 * N * y.2 ≤ 2 * (2 * D) - 1 → standardField (conjWord word) y = harmonicGrid y := by
