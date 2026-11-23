@@ -344,3 +344,13 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - PROVED (abstract game, RestrictedBellmanRank) `CutTipEscape.two_edge_escape`: a white root `r` with a white permitted input `u` whose permitted input `y` has grade below the level escapes at depth 2. Instances `tip_W0_escape` (root `v+(1,0)`, `v` even) and `tip_W1_escape` (root `v`, even): the two incoming steps of the tip routes are `incomingPos`/`incomingNeg` as in TIP_THEOREM.
 - NOT PROVED: whiteness of the middles and the grade decrease at the port (field values from TIP_THEOREM); the forced-direction identification of the rejected input.
 - Checks: `checks/RouteSteps.lean`, `checks/CutTipEscape.lean`. Sandbox logs clean for warning, error, sorry (one lint warning fixed).
+
+### Task 72 (TIP_THEOREM hypotheses, whiteness): TipWhiteness.lean
+
+- PROVED `TipWhiteness.laplacian_eq_zero_of_odd_strip`: an odd site whose vertical star has `s ∈ [1 − 2d + c, 2L − 1 − c]` is white for any field with `HasStrips` (the harmonic s-strip), by `harmonicGrid_harmonic`.
+- PROVED `W1_middle_white`: the W1 middle `v + (−1,0)` is white from `s(v) = 2` alone (its star has `s = 2 − L ± c`, inside the strip).
+- PROVED `W1_root_freeV`, `W0_root_freeV`: the tip roots `v` (W1) and `v + (1,0)` (W0) are free V sites, from the tip values `t(v) = −B`, `s(v) = 2` (W1) or `s(v) = −2` (W0) and `0 ≤ B`, `5L ≤ T − B`. Hence white by `ChildFrame.laplacian_eq_zero_of_freeV`.
+- PROVED `W1_tip_white` (root and middle) and `W0_tip_root_white`.
+- NOT PROVED: the whiteness of the W0 middle `v + (1,1)`. Its east input has `s = 3d + n − 2`, outside the harmonic s-strip `[1 − 2d, 2L − 1]`, so it needs the two-sheet evaluation of TIP_THEOREM (`fA`, `fC`).
+- NOT PROVED: the existence of the tip vertex `v` with `t(v) = −B`, `s(v) = 2ε` from the parent data (the tip values stay hypotheses); the permits and the grade drop `0 → −1` at the port.
+- Checks: `checks/TipWhiteness.lean`. Root build clean; sandbox logs clean for warning, error, sorry.
