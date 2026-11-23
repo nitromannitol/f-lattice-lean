@@ -229,3 +229,12 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - HYPOTHESIS (T), the contained unit-proof transfer (`hT`): a contact forced-white root whose forced input is not a contact produces a finite empty clause `EC m` for its comparison field `m` (source: B2_INDEPENDENT_PRERANK_AUDIT §3). The Lean form is the one-step statement for `SquareClauses.ForcedEdge`; the source gives it as an induction on the contained unit proof, which is not formalized.
 - HYPOTHESIS (W), the W1 no-refutation transferred to `m` (`hW : ¬ EC m`): the unseeded closure of each comparison field has no empty clause (source: §3, "the current W1 global no-refutation statement transfers to it"). `EC` is an abstract predicate here; no Lean statement of the global W1 no-refutation exists in the repo (`SquareClauses.unseeded_forces_standard_window` is one concrete window).
 - Checks: `checks/ComparisonTransfer.lean` (six `#guard_msgs` on `#print axioms`, each exactly the standard three). Zero warnings in the build.
+
+### Task 70 part 2 (c) status, second pass (ComparisonEmpty.lean: the concrete empty clause and (W))
+
+- DEFINED: `EmptyClause G` (unseeded unit closure of `G` derives a conflict): (i) a white site with two distinct forced inputs; (ii) a unit square with every corner black or forced into the square.
+- DEFINED (W): `HasSatSelection F`, a white input selection satisfying every square clause. `hasSat_of_strict` derives it from a strictly decreasing rank (`squareClauses_of_strict`).
+- PROVED: `not_emptyClause_of_sat` (a satisfying selection excludes `EmptyClause`); `not_emptyClause_of_cmp` (for each comparison field `m`, from (W) for `F = standardField word`, via the even translate `z ↦ sel (z + t) − t`, since `laplacian m c = laplacian F (c + t)` for `t = −v`, `σ`, `−σ`).
+- PROVED from (T) with the concrete `EmptyClause` and (W): `forced_contact_of_sat`, `price_nonincrease_forced_of_sat`, `jplus_nonincrease_forced_of_sat`, `jminus_nonincrease_forced_of_sat`. (T) is the hypothesis `hT`, for unseeded `ForcedEdge` only.
+- NOT PROVED: (T). The induction base holds: when every other corner of the proof square is black, the gap identities force all four corners black for `m`, which is an all-black square, hence `EmptyClause m`. The step fails: a white corner `x` of the square has `laplacian m x = −(gap of its outside input)`, which the gap identities do not determine, so the all-black conclusion is unavailable.
+- Checks: `checks/ComparisonEmpty.lean` (eight `#guard_msgs` on `#print axioms`, each the standard three).
