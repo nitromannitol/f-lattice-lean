@@ -286,5 +286,6 @@ import FLatticePaper.Plane.Induction.W1Exit
 import FLatticePaper.Plane.Induction.W1Strips
 import FLatticePaper.Plane.Induction.Q3Field
 import FLatticePaper.Plane.Induction.Q3Paragraph8
+import FLatticePaper.Plane.Induction.Q3VStar
 
 /-! Root import for the corrected F-lattice paper. -/
