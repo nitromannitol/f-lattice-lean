@@ -176,6 +176,7 @@ import FLatticePaper.Tiles.RowConvexCrossing
 import FLatticePaper.MainTheorems
 import FLatticePaper.Plane.Induction.SignedPolicy
 import FLatticePaper.Plane.Induction.I3Local
+import FLatticePaper.Plane.Induction.I3Unit
 import FLatticePaper.Tiles.RegisterInduction
 import FLatticePaper.Tiles.RowsOfBoundary
 import FLatticePaper.Plane.Induction.StrongEstimates
