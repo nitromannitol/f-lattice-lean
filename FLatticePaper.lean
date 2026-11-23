@@ -466,5 +466,6 @@ import FLatticePaper.Plane.Induction.StripsM
 import FLatticePaper.Plane.Induction.KMinBridge
 import FLatticePaper.Plane.Induction.PassagePR
 import FLatticePaper.Plane.Induction.MinPassage
+import FLatticePaper.Plane.Induction.TransferSat
 
 /-! Root import for the corrected F-lattice paper. -/
