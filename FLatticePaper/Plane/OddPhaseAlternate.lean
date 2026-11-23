@@ -3,6 +3,7 @@ import FLatticePaper.Construction.AlternateIdentification
 import FLatticePaper.Construction.NearOneBaseCases
 import FLatticePaper.Tiles.StandardSimple
 import FLatticePaper.Construction.OddChartParity
+import FLatticePaper.Plane.Induction.ThreesLeaves
 
 /-! The alternate identification at every birth, with the odd alternate's target of w2 (`alternateOddTarget`).
 
@@ -424,7 +425,14 @@ theorem odd_altTarget_facts (w : Word) {fr : Fraction} (hfr : (parentsAt w).curr
     rw [hfun]
     exact hinc x
 
-/-- The alternate facts of every word: the base words `3^k` from the explicit base alternate (`hbaseThree`), the powers of two
+/-- The base identity at `3^k` with constant zero: the rounded midpoint of the standard field is the explicit base
+alternate (`threes_alternate`, proved in `Plane/Induction/ThreesLeaves.lean`). -/
+theorem threes_base_identity (k : ℕ) : ∃ c : ℤ, ∀ x, (frameAt (List.replicate k Digit.three)).alternate
+    (standardField (List.replicate k Digit.three)) x =
+      stairEvenAltField (2 * (k : ℤ) + 3) (standardField (List.replicate k Digit.three)) x + c :=
+  ⟨0, fun x => by rw [FLatticePaper.Induction.ThreesMidpoint.threes_alternate k x, add_zero]⟩
+
+/-- The alternate facts of every word: the base words `3^k` from the explicit base alternate (`threes_base_identity`), the powers of two
 and the proper words from their star estimates. -/
 theorem altFactsWord_all
     (hstar : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word → StarZoneInputs word)
@@ -438,17 +446,14 @@ theorem altFactsWord_all
     (hbaseTwoId : ∀ k : ℕ, ∃ S : Field, (BaseMask.ladderOddAlt.raw (2 * (k : ℤ) + 4)).Agrees S 0 ∧
       HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4)) S (-1) (ladderOddAltConstantV (2 * (k : ℤ) + 4)) ∧
       ∃ c : ℤ, ∀ x, (frameAt (List.replicate (k + 1) Digit.two)).alternate
-        (standardField (List.replicate (k + 1) Digit.two)) x = rotateLadderAltField (2 * (k : ℤ) + 4) S x + c)
-    (hbaseThree : ∀ k : ℕ, ∃ c : ℤ, ∀ x, (frameAt (List.replicate k Digit.three)).alternate
-        (standardField (List.replicate k Digit.three)) x =
-      stairEvenAltField (2 * (k : ℤ) + 3) (standardField (List.replicate k Digit.three)) x + c) :
+        (standardField (List.replicate (k + 1) Digit.two)) x = rotateLadderAltField (2 * (k : ℤ) + 4) S x + c) :
     ∀ u : Word, AlternateFactsWord u := by
   have hpk : ∀ u : Word, (frameAt u).Packet (standardField u) := packet_all hstar hsheet
   intro u
   by_cases hall : ∀ x ∈ u, x = Digit.three
   · obtain ⟨k, rfl⟩ : ∃ k : ℕ, u = List.replicate k Digit.three :=
       ⟨u.length, List.eq_replicate_iff.mpr ⟨rfl, hall⟩⟩
-    exact reciprocal_alternateFactsWord k (hbaseThree k)
+    exact reciprocal_alternateFactsWord k (threes_base_identity k)
   · have hproper : ∃ x ∈ u, x ≠ Digit.three := by
       by_contra h
       push Not at h
@@ -470,7 +475,7 @@ Laplacians differ somewhere, and the explicit increments hold (the transverse in
 kernel increment `-1 + slope·kernel`, whose affine term is the transverse slope of the odd parent).
 
 The base words need no star estimates: at `3^k` the alternate is the explicit base alternate `stairEvenAltField` up to a
-constant (`hbaseThree`), and at `2^k` the rotated explicit alternate `rotateLadderAltField` up to a constant (`hbaseTwoId`,
+constant (`threes_base_identity`, proved), and at `2^k` the rotated explicit alternate `rotateLadderAltField` up to a constant (`hbaseTwoId`,
 with its base field `S`). Both are plane identities between the midpoint and the explicit base fields, which the base-case
 proposition of the paper states (the unique recurrent extension of the base alternate tile).
 -/
@@ -488,9 +493,6 @@ theorem global_odometers_pair {fraction : Fraction} (hint : fraction.Interior) {
       HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4)) S (-1) (ladderOddAltConstantV (2 * (k : ℤ) + 4)) ∧
       ∃ c : ℤ, ∀ x, (frameAt (List.replicate (k + 1) Digit.two)).alternate
         (standardField (List.replicate (k + 1) Digit.two)) x = rotateLadderAltField (2 * (k : ℤ) + 4) S x + c)
-    (hbaseThree : ∀ k : ℕ, ∃ c : ℤ, ∀ x, (frameAt (List.replicate k Digit.three)).alternate
-        (standardField (List.replicate k Digit.three)) x =
-      stairEvenAltField (2 * (k : ℤ) + 3) (standardField (List.replicate k Digit.three)) x + c)
     (bdOdd : ∀ v : Word, StandardBoundaryOdd v) (bdEven : ∀ v : Word, StandardBoundaryEven v)
     (tile : HeightTile Site)
     (htile : ∃ gauge : ℤ, tile.Agrees (planeTarget w p) gauge)
@@ -535,7 +537,7 @@ theorem global_odometers_pair {fraction : Fraction} (hint : fraction.Interior) {
             (alternateOddSlope w).2 * (fraction.modifiedDeck.kernel).2))) := by
   have hpk : ∀ u : Word, (frameAt u).Packet (standardField u) := packet_all hstar hsheet
   have hAll : ∀ u : Word, AlternateFactsWord u :=
-    altFactsWord_all hstar hsheet harc hodd hbulk hbaseTwoId hbaseThree
+    altFactsWord_all hstar hsheet harc hodd hbulk hbaseTwoId
   have hstd := global_odometers hint hbirth hstar hsheet harc hodd hbulk bdOdd bdEven
     (fun v => FLatticePaper.Tiles.StandardSimple.simpleOdd_of_standardBoundaryWord (fun u => ⟨bdOdd u, bdEven u⟩) v)
     (fun v => FLatticePaper.Tiles.StandardSimple.simpleEven_of_standardBoundaryWord (fun u => ⟨bdOdd u, bdEven u⟩) v)
