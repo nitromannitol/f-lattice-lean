@@ -392,6 +392,9 @@ lake env lean checks/PairOwnerP0Axioms.lean
 lake env lean checks/PairQAboxAxioms.lean
 lake env lean checks/PairQBBoxAxioms.lean
 lake env lean checks/PairCoverW1Axioms.lean
+lake env lean checks/PairW0PAxioms.lean
+lake env lean checks/PairW0QAxioms.lean
+lake env lean checks/PairCoverW0Axioms.lean
 lake env lean checks/VArcLongitudinal.lean
 lake env lean checks/VArcOffers.lean
 lake env lean checks/ParentStepDischarge.lean
