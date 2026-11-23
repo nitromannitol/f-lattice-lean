@@ -48,3 +48,9 @@ info: 'FLatticePaper.Induction.conj_freeV_band' depends on axioms: [propext, Cla
 #guard_msgs in
 #print axioms FLatticePaper.Induction.conj_freeV_band
 
+/--
+info: 'FLatticePaper.Induction.conj_freeH_band' depends on axioms: [propext, Classical.choice, Quot.sound]
+-/
+#guard_msgs in
+#print axioms FLatticePaper.Induction.conj_freeH_band
+

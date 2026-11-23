@@ -470,3 +470,9 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - Consequence: the H-drop branch of hNegTie case (b) is closed by arithmetic, with no residual and no numerics.
 - Checks: `checks/EdgeDrop.lean`, `checks/ConjFreeRoot.lean` (guards). Root build clean; sandbox logs clean.
 - Next: the V block (conjugate freeH branch), with Q19.
+
+### Task 72 (case (b), conjugate freeH branch, arithmetic): ConjFreeRoot.lean (`conj_freeH_band`)
+
+- PROVED `conj_freeH_band`: a free conjugate H site `zTurn x + combine i j` forces the translated parent s-grade `σ = s_p x + j·2T_p` into one of two bands: `σ` odd in `[N−D+2, N+D−2]` (the conjugate's even-t branch), or `σ` even in `[0, 2N]` (the odd-t branch). Uses `L = D+N` odd.
+- Reading: the even-root part `[0, 2N]` is the earlier (parent-child) frame's V spectrum restricted to its lower band; the odd-root part is the odd H band, which the frame's free V (even sites only) does not contain. The V block (BlockPairAt, Q19 west edge) still needs the identification of the earlier frame's free V with the conjugate free H, which is not yet proved.
+- Checks: `checks/ConjFreeRoot.lean`. Root build clean; sandbox logs clean.
