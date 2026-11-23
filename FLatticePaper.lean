@@ -473,5 +473,7 @@ import FLatticePaper.Plane.Induction.MinPassage
 import FLatticePaper.Plane.Induction.TransferSat
 import FLatticePaper.Plane.Induction.TransferW1
 import FLatticePaper.Plane.Induction.FreeSchedule
+import FLatticePaper.Plane.Induction.FreeRows
+import FLatticePaper.Plane.Induction.PriceH
 
 /-! Root import for the corrected F-lattice paper. -/
