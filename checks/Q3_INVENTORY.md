@@ -525,3 +525,10 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - Numerics (`words ≤ 4`, scratchpad `arc_rule.py`, `nonaligned.py`): for every free collar centre the arc rule gives strict corners, including the non-aligned V side at the pricing point `c − W·U`. The exceptions are the bottom centres `(1,1)` with `ε = −1`; those are black and excluded by the laplacian-0 hypothesis, which is not yet proven from the strips.
 - Open (not in this file): the strictness of these squares needs the free-root band for even bottom centres (`s > 2L − 2`, numerically except at `(1,1)`) and its left/right analogues; the parent chains are the named core claims of `W1Phase`; the nonfree roots use `parentSquare_nonfree`.
 - Checks: `checks/CollarSquares.lean`. Root build clean; sandbox logs clean.
+
+### Task 72 (hcollar, the black corner (1,1)): CollarOneOne.lean
+
+- PROVED `laplacian_MW_one_one`: for every word with a proper letter, `laplacian (MW word) (1, 1) = −1`. The inputs of `(1,1)` are `(0,1)` and `(2,1)`, both odd; `(0,1)` has `s = d − n` in the harmonic strip (`F(0,1) = h₀(0,1) = −1`), and `(1,1)`, `(2,1)` have `t` in the zero strip (`F = 0`). The three sites lie in the closed polygon (`one_one_neighbourhood_mem`), where `MW` agrees with the standard field.
+- Correction to the lead's note: `(2,1)` is odd (the inputs of an even site are odd); the argument uses only the zero strip there, so it is unaffected.
+- The corner is black for every word, not only at `ε = −1`; the bottom collar excludes it by the laplacian-0 hypothesis in all cases.
+- Checks: `checks/CollarOneOne.lean`. Root build clean; sandbox logs clean.
