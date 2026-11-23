@@ -14,5 +14,7 @@ Standard axioms only. -/
 #print axioms FLatticePaper.Induction.ChildFrame.rising_centre_input_mem
 #print axioms FLatticePaper.Induction.ChildFrame.rising_translate
 #print axioms FLatticePaper.Induction.ChildFrame.noBlackPairRise_of_E
-#print axioms FLatticePaper.Induction.noBlackPairRise_of_chart_cover_E
 #print axioms FLatticePaper.Induction.noBlackPairRise_of_chart_cover
+#print axioms FLatticePaper.Induction.ChildFrame.black_input_mem
+#print axioms FLatticePaper.Induction.sheetPolicyA_of_strict
+#print axioms FLatticePaper.Induction.noBlackPairRise_of_chart_cover_strict

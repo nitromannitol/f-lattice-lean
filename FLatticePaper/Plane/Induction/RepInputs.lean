@@ -303,18 +303,85 @@ theorem ChildFrame.noBlackPairRise_of_E {G : Field} (frame : ChildFrame) (hP : f
   rw [sub_add_cancel]
   exact ⟨hi, h1, h2, h3, hs⟩
 
-/-- The chart cover with the `E`-restricted hypotheses: `hrep` is discharged by the exit-and-white argument, and
-`NoBlackPairRise` follows by translation. Only `hstrict` and `hret` remain as named leaves. -/
-theorem noBlackPairRise_of_chart_cover_E {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
+/-- The inputs of a black centre in `E` lie in `E` (any input, not only the one of a rising pair). -/
+theorem ChildFrame.black_input_mem {F : Field} (frame : ChildFrame) (hP : frame.Packet F) {c j : Site}
+    (hc : c ∈ frame.closedPolygon) (hb : laplacian F c = -1) (hj : Edge j c) : j ∈ frame.closedPolygon := by
+  by_contra hout
+  have hbs := FLatticePaper.W1Exit.exit_centre_on_boundary_spectrum frame c j hc hj hout
+  have hw := frame.laplacian_eq_zero_of_boundary hP hbs
+  rw [hb] at hw
+  norm_num at hw
+
+/-- **The retention `hret` from the strict centre bound.** A rising pair with centre in `E` and `Ψ(c) ≥ 1` (the sheet
+`A` is the minimum at `c` and both its inputs) is retained by the matched policy: `F = sheetA` at `c` and its inputs, so
+the parent point `zTurn (c − lv)` has the colour of `c` (black), the quota retains both its inputs, and the input
+`zTurn (i − lv)` is one of them. -/
+theorem sheetPolicyA_of_strict {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
+    (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {c i : Site} (hc : c ∈ (frameAt word).closedPolygon)
+    (hr : RisingBlackPair (standardField word) (frameAt word).shortShift c i)
+    (hΨc : 1 ≤ sheetDiffW word c) :
+    sheetPolicyA P (frameAt word).sheetShift c i := by
+  have hEdge : Edge i c := hr.1
+  have hb : laplacian (standardField word) c = -1 := hr.2.1
+  have hlv : EvenSite (frameAt word).sheetShift := (frameAt word).evenSite_sheetShift
+  have hinN : Edge (FLatticePaper.incomingNeg c) c := Or.inl rfl
+  have hinP : Edge (FLatticePaper.incomingPos c) c := Or.inr rfl
+  have hEN := (frameAt word).black_input_mem hpk hc hb hinN
+  have hEP := (frameAt word).black_input_mem hpk hc hb hinP
+  have hΨc' : 1 ≤ (frameAt word).sheetC (quarterTurnField (standardField (conjWord word))) c -
+      (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) c := hΨc
+  have hMc := sheetMin_A_at_input (frameAt word) (quarterTurnField (standardField (conjWord word)))
+    (i := c) hΨc' (by omega)
+  have hMN := sheetMin_A_of_strict_root h hSE hinN hΨc
+  have hMP := sheetMin_A_of_strict_root h hSE hinP hΨc
+  have hFc := standardField_eq_sheetMin_of_strong h hSE hc
+  have hFN := standardField_eq_sheetMin_of_strong h hSE hEN
+  have hFP := standardField_eq_sheetMin_of_strong h hSE hEP
+  have hlapF : laplacian (standardField word) c =
+      laplacian ((frameAt word).sheetA (quarterTurnField (standardField (conjWord word)))) c := by
+    unfold laplacian
+    rw [hFc, hFN, hFP, hMc, hMN, hMP]
+  have hshiftLap : laplacian ((frameAt word).sheetA (quarterTurnField (standardField (conjWord word)))) c =
+      laplacian (quarterTurnField (standardField (conjWord word))) (c - (frameAt word).sheetShift) :=
+    laplacian_sub_even (quarterTurnField (standardField (conjWord word))) (frameAt word).sheetShift hlv c
+  have hq : laplacian (quarterTurnField (standardField (conjWord word))) (c - (frameAt word).sheetShift) =
+      laplacian (standardField (conjWord word)) (zTurn (c - (frameAt word).sheetShift)) :=
+    i3_laplacian_quarterTurn (standardField (conjWord word)) (c - (frameAt word).sheetShift)
+  have hblack : laplacian (standardField (conjWord word)) (zTurn (c - (frameAt word).sheetShift)) = -1 := by
+    rw [← hq, ← hshiftLap, ← hlapF]
+    exact hb
+  have hEi : Edge (i - (frameAt word).sheetShift) (c - (frameAt word).sheetShift) := by
+    unfold Edge at hEdge ⊢
+    rcases hEdge with h1 | h1
+    · left
+      rw [h1, incomingNeg_sub_even' c _ hlv]
+    · right
+      rw [h1, incomingPos_sub_even' c _ hlv]
+  have hzE : Edge (zTurn (i - (frameAt word).sheetShift)) (zTurn (c - (frameAt word).sheetShift)) :=
+    i3_edge_Z hEi
+  have hret := P.quota.1 (zTurn (c - (frameAt word).sheetShift)) hblack
+  dsimp only [sheetPolicyA, parentPolicy]
+  unfold Edge at hzE
+  rcases hzE with h2 | h2
+  · rw [h2]
+    exact hret.1
+  · rw [h2]
+    exact hret.2
+
+/-- The chart cover with the centre bound only: `hret` is derived (`sheetPolicyA_of_strict`), so `NoBlackPairRise` needs
+`hstrict` (the strict centre and input bounds `Ψ ≥ 1`, the tie and `C` cases) and the conjugate's `StrongEstimates` and
+`OldPolicyData`. -/
+theorem noBlackPairRise_of_chart_cover_strict {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
     {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
     (hstrict : ∀ c i, RisingBlackPair (standardField word) (frameAt word).shortShift c i →
-      c ∈ (frameAt word).closedPolygon → 1 ≤ sheetDiffW word c ∧ 1 ≤ sheetDiffW word i)
-    (hret : ∀ c i, RisingBlackPair (standardField word) (frameAt word).shortShift c i →
-      c ∈ (frameAt word).closedPolygon → sheetPolicyA P (frameAt word).sheetShift c i) :
+      c ∈ (frameAt word).closedPolygon → 1 ≤ sheetDiffW word c ∧ 1 ≤ sheetDiffW word i) :
     NoBlackPairRise (standardField word) (frameAt word).shortShift :=
   (frameAt word).noBlackPairRise_of_E hpk
     (noBlackPairRise_of_chart_cover h hSE hpk P
-      (fun _ _ hr hc => (frameAt word).rising_centre_input_mem hpk hc hr) hstrict hret)
+      (fun _ _ hr hc => (frameAt word).rising_centre_input_mem hpk hc hr) hstrict
+      (fun _ _ hr hc => sheetPolicyA_of_strict h hSE hpk P hc hr (hstrict _ _ hr hc).1))
 
 end FLatticePaper.Induction
