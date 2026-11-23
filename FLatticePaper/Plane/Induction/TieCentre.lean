@@ -32,7 +32,7 @@ the sheet `A` is white at `c` and `A i = M i` for the other input `i`. -/
 theorem tie_sheetA_white {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
     {c i j : Site} (hc : c ∈ (frameAt word).closedPolygon) (hi : Edge i c) (hj : Edge j c) (hij : i ≠ j)
-    (hb : laplacian (standardField word) c = -1) (hΨc : sheetDiffW word c = 0) (hΨj : sheetDiffW word j = -1) :
+    (hb : laplacian (standardField word) c = -1) (hΨc : sheetDiffW word c = 0) (hΨj : sheetDiffW word j ≤ -1) :
     laplacian ((frameAt word).sheetA (quarterTurnField (standardField (conjWord word)))) c = 0 ∧
       (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) i ≤
         (frameAt word).sheetC (quarterTurnField (standardField (conjWord word))) i := by
@@ -41,7 +41,7 @@ theorem tie_sheetA_white {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
   set A := (frameAt word).sheetA Fp with hA
   set C := (frameAt word).sheetC Fp with hC
   have hΨc' : C c - A c = 0 := hΨc
-  have hΨj' : C j - A j = -1 := hΨj
+  have hΨj' : C j - A j ≤ -1 := hΨj
   have hG : ∀ z ∈ (frameAt word).closedPolygon, standardField word z = min (A z) (C z) := fun z hz =>
     standardField_eq_sheetMin_of_strong h hSE hz
   have hin1 : FLatticePaper.incomingNeg c ∈ (frameAt word).closedPolygon :=
@@ -81,7 +81,7 @@ theorem sheetPolicyA_of_tie {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
     {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
     {c i j : Site} (hc : c ∈ (frameAt word).closedPolygon) (hi : Edge i c) (hj : Edge j c) (hij : i ≠ j)
-    (hb : laplacian (standardField word) c = -1) (hΨc : sheetDiffW word c = 0) (hΨj : sheetDiffW word j = -1) :
+    (hb : laplacian (standardField word) c = -1) (hΨc : sheetDiffW word c = 0) (hΨj : sheetDiffW word j ≤ -1) :
     sheetPolicyA P (frameAt word).sheetShift c i := by
   have hlv : EvenSite (frameAt word).sheetShift := (frameAt word).evenSite_sheetShift
   obtain ⟨hwhite, -⟩ := tie_sheetA_white h hSE hpk hc hi hj hij hb hΨc hΨj
@@ -126,7 +126,8 @@ theorem sheetPolicyA_of_tie {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three
     have hmono := sheetDiff_mono_A h hSE P (c := c) (i := j) (by
       dsimp only [sheetPolicyA, parentPolicy]
       exact hr)
-    rw [hΨc, hΨj] at hmono
+    have hc' := hmono
+    rw [hΨc] at hc'
     omega
   have hret := retained_of_quota hquota hpz hqz hne hnj
   dsimp only [sheetPolicyA, parentPolicy]

@@ -400,3 +400,10 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - PROVED `sheetA_sub_uq_eq_cutPrice`: `A (z − uq) − A z = cutPrice − price G (Z (z − l_v))` for the sheet `A = sheetA Fp`, from the paragraph-5 identity `paragraph5_field_identity_of_strong` at `z − l_v`, with `uq = εU_q`.
 - NOT PROVED: the value of the jump at the rising pair. The positive chart needs which sheet wins at `c − uq` (Q3's "at a tie choose a target winner"), which fixes `A (c − uq) − A c ∈ {0, −1}` and so the jump; that argument is not yet formal.
 - Checks: `checks/SheetDownJump.lean`. Root build clean; sandbox logs clean.
+
+### Task 72 (hResP, the case reduction): HResP.lean
+
+- PROVED `hResP_of_negTie`: the tied rising pair (`Ψ c = 0`, an input `j` with `Ψ j ≤ −1`, rising `σ` pair `(c, i)`, both endpoints with `− uq` in `E`) is excluded, reduced to the negative tied-target exclusion `hNegTie`. The cases: `i ≠ j, Ψ i ≥ 1` (positive chart, `sheetPolicyA_of_tie` retention, `adjacentChart_witness`, `adjacent_chart_excluded`); `Ψ i = 0` or the other input `Ψ = 0` (`plus_adjacent_nonpos_excluded`, the whole star `≤ 0`); `i = j`, `Ψ k ≥ 1` (reflect to `−σ`: the tied centre `I c`, the strict target `I i` (`Ψ = 1`), the input `I k` with `Ψ ≤ −1`), which is `hNegTie`.
+- NOT PROVED: `hNegTie` (the negative tied-target exclusion). Its proof is `neg_adjacent_excluded` with `sheetPolicyA_of_tie` for the retention and the old-root analysis in place of `blackRoot_of_black` (the root is white): `nonfree_root_forced_nonfree` for a nonfree old root, and `H_drop_excluded` / the V-block with the Q19 exceptional endpoint for a free old root.
+- Also generalized `TieCentre`: `tie_sheetA_white` and `sheetPolicyA_of_tie` accept `Ψ j ≤ −1`.
+- Checks: `checks/HResP.lean`. Root build clean; sandbox logs clean.
