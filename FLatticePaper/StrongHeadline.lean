@@ -2,6 +2,7 @@ import FLatticePaper.MainTheorems
 import FLatticePaper.Plane.Induction.I3CSheet
 import FLatticePaper.Plane.Induction.StrongProducer
 import FLatticePaper.Plane.Induction.StrongInduction
+import FLatticePaper.Plane.Induction.BaseFields
 
 /-! Task 39, step 1: the odometers theorem from the strong estimates of the conjugate words.
 
@@ -62,5 +63,26 @@ theorem odometersTheorem_of_residual
   odometersTheorem_of_strong
     (fun word _ _ => Induction.strongEstimates_of_all hpure htwo hres hstar harc (Induction.conjWord word))
     hstar harc hodd hbulk
+
+/-- **The odometers theorem from the named base inputs** (task 41): the base words `3^k` and `2^(k+1)` need only their slip
+fields and their residual; their packets are proved. -/
+theorem odometersTheorem_of_base
+    (hpureSlip : ∀ k : ℕ, Induction.BaseSlip (List.replicate k Digit.three))
+    (hpureRes : ∀ k : ℕ, Induction.StrongResidual (List.replicate k Digit.three))
+    (htwoSlip : ∀ k : ℕ, Induction.BaseSlip (List.replicate (k + 1) Digit.two))
+    (htwoRes : ∀ k : ℕ, Induction.StrongResidual (List.replicate (k + 1) Digit.two))
+    (hres : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word → Induction.StrongResidual word)
+    (hstar : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word → Induction.StarZoneInputs word)
+    (harc : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      Induction.VArcInputs (frameAt word) (standardField word))
+    (hodd : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      OddBlackNoRise (standardField word) (frameAt word).shortShift)
+    (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      Induction.S3NoFortInputs (frameAt word) (standardField word)) :
+    OdometersTheorem :=
+  odometersTheorem_of_residual
+    (fun k => Induction.StrongEstimates.of_base_pure k (hpureSlip k) (hpureRes k))
+    (fun k => Induction.StrongEstimates.of_base_two k (htwoSlip k) (htwoRes k))
+    hres hstar harc hodd hbulk
 
 end FLatticePaper
