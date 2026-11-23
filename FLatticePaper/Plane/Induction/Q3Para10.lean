@@ -1,24 +1,28 @@
 import FLatticePaper.Plane.Induction.Q3VPath
 import FLatticePaper.Plane.Induction.Q3Arithmetic
+import FLatticePaper.Plane.Induction.S3FreeBoundary
 
-/-! Task 60, the first V block at `l = D` and paragraph 10 (fix Q3.md paragraphs 9–10).
+/-! Task 60, the first V block at `l ≤ D` and paragraph 10 (fix Q3.md paragraphs 9–10).
 
-With `N, D` the odd parent, `d = 2D + d_q`, `n = 2N + n_q`, `ε = N d − D n`, `B_0 = s(U_p) = 2C`, `C = DL + N(d−n)`,
-`U_q = (d_q, n_q)`, `U = (d, n)`:
-* a child left V vertex is `IsLeftVertex` (a left boundary site of the closed polygon with the parity-resolved V spectrum);
-* the block vertex at `l = D`: the child floor is `⌊(d−n)D/d⌋ = D − N + ⌊ε/d⌋`, so for `ε = −1` the vertex is
-  `A = (N−D+1, D+N)` with `s(A) = L − 2` (the top of the odd spectrum), and for `ε = +1` the parent vertex
-  `v_D = (N−D, D+N−1)` is replaced by `V_p + I = (N−D+1, D+N−1)`, which has `s = 2n + 2` (above the even spectrum);
-* paragraph 10: `x = v + i U_p` with `x, x + U_q ∈ E` gives `l_χ − s(v) ≤ i B_0 ≤ B_0 + h_χ − s(v)`, hence `i ∈ {0, 1}`
-  for a child left vertex `v`, and `i = 0` for the exceptional vertex `V_p + I` when `ε = +1`.
-The white/black conclusion (a boundary vertex is white; both centres are black) is field-level and is not formalized here. -/
+Notation: `N, D` the odd parent, `d = 2D + d_q`, `n = 2N + n_q` the child, `L = d + n`, `ε = N d − D n`,
+`U = (d, n)` the child's modified kernel, `U_p = (2D, 2N)`, `U_q = (d_q, n_q)`, so `U = U_p + U_q`, and
+`C = DL + N(d − n)`, `B_0 = s(U_p) = 2C`.
+
+There is one notion of a child left V vertex: the V cut `freeV` of S3FreeBoundary (left boundary of the closed polygon
+with `s` in the V spectrum). Here:
+* `block_mem_freeV`: for `1 ≤ l ≤ D` the vertex `(−b, 2l − 1 − b)`, `b = ⌊(d − n) l / d⌋`, is in `freeV`; for `l < D` this
+  is the parent vertex `v_l` (`parent_block_mem_freeV`, by `vBlock_floor_agree`);
+* `VpI_not_freeV`: for `ε = +1` the exceptional vertex `V_p + I` is not in `freeV` (its left neighbour is in `E`);
+* `index_of_freeV`: `x = v + i U_p` with `x, x + U_q ∈ E` and `v ∈ freeV` forces `i ∈ {0, 1}`;
+* `exceptional_i_zero`: for `ε = +1` the window forces `i = 0` at `V_p + I`.
+The white and black-centre contradiction is in Q3White.lean. -/
 
 namespace FLatticePaper.Induction
 
 open Farey FLatticePaper
 
-/-- `T − C ≥ 0` for the child's period denominator `T = d² + 2dn − n²` and `C = D(d+n) + N(d−n)`:
-the difference is `d(d − D − N) + n(2d − D + N − n)`. -/
+/-- `T − C ≥ 0` for `T = d² + 2dn − n²` and `C = D(d+n) + N(d−n)`: the difference is
+`d(d − D − N) + n(2d − D + N − n)`. -/
 theorem periodDen_sub_parentC_nonneg (D N d n : ℤ) (hN0 : 0 ≤ N) (hND : N ≤ D) (hn0 : 0 ≤ n)
     (hnd : n < d) (hdD : 2 * D ≤ d) :
     D * (d + n) + N * (d - n) ≤ d ^ 2 + 2 * d * n - n ^ 2 := by
@@ -32,17 +36,16 @@ theorem sum_le_parentC_gen (D N d n : ℤ) (hD : 0 < D) (hN0 : 0 ≤ N) (hn0 : 0
   nlinarith [mul_nonneg (show (0 : ℤ) ≤ D - 1 by omega) (show (0 : ℤ) ≤ d + n by omega),
     mul_nonneg hN0 (show (0 : ℤ) ≤ d - n by omega)]
 
+/-- `T ≥ 0` for `T = d² + 2dn − n²` with `0 ≤ n < d`. -/
+theorem periodDen_nonneg_gen (d n : ℤ) (hn0 : 0 ≤ n) (hnd : n < d) : 0 ≤ d ^ 2 + 2 * d * n - n ^ 2 := by
+  nlinarith [mul_nonneg hn0 (show (0 : ℤ) ≤ d by omega),
+    mul_nonneg (show (0 : ℤ) ≤ d - n by omega) (show (0 : ℤ) ≤ d + n by omega)]
+
 namespace ChildFrame
 variable (frame : ChildFrame)
 
-/-- A child left V vertex: a left boundary site of the closed polygon whose `s` lies in the parity-resolved V spectrum. -/
-def IsLeftVertex (v : Site) : Prop :=
-  v ∈ frame.closedPolygon ∧ (v.1 - 1, v.2) ∉ frame.closedPolygon ∧
-    (EvenSite v → 0 ≤ frame.sGrade v ∧ frame.sGrade v ≤ 2 * frame.child.num) ∧
-    (¬ EvenSite v → 2 - frame.child.den + frame.child.num ≤ frame.sGrade v ∧
-      frame.sGrade v ≤ frame.child.den + frame.child.num - 2)
-
-/-- The linear facts of a child frame that the arithmetic below uses. -/
+/-- The linear facts of a child frame used by the arithmetic: `d = 2D + d_q`, `n = 2N + n_q`, the parent bounds, and
+`d + n` even. -/
 theorem linear_facts :
     frame.child.den = 2 * frame.parents.odd.den + frame.parents.even.den ∧
     frame.child.num = 2 * frame.parents.odd.num + frame.parents.even.num ∧
@@ -62,6 +65,11 @@ theorem linear_facts :
   refine ⟨hd, hn, hD, hN0, ?_, hq, hn0, hnq, ?_⟩
   · omega
   · omega
+
+theorem periodDen_nonneg : 0 ≤ frame.child.periodDenominator := by
+  obtain ⟨hd, hn, hD, hN0, hND, hq, hn0, hnq, hpar⟩ := frame.linear_facts
+  unfold Fraction.periodDenominator
+  exact periodDen_nonneg_gen _ _ (by omega) (by omega)
 
 theorem sGrade_add (x y : Site) : frame.sGrade (x + y) = frame.sGrade x + frame.sGrade y := by
   unfold sGrade
@@ -142,10 +150,12 @@ theorem sGrade_window_odd (x : Site) (hx : x ∈ frame.closedPolygon)
     · rw [frame.sGrade_add, frame.sGrade_UQ] at hu1
       exact ⟨hx0, by linarith⟩
 
-/-- The index inequality: `x = v + i U_p` with `x, x + U_q ∈ E` and `v` a child left vertex force `i ∈ {0, 1}`. -/
-theorem index_of_left_vertex (v x : Site) (i : ℤ)
+/-- The index inequality: `x = v + i U_p` with `x, x + U_q ∈ E` and `v ∈ freeV` force `i ∈ {0, 1}`. The window of
+the spectrum is `[2 − d + n, L − 2]`, which contains the V cut (its even part `[0, 2n]` and its other part) and the
+windows of `x` in both parities. -/
+theorem index_of_freeV (v x : Site) (i : ℤ)
     (hx : x = v + (i * (2 * frame.parents.odd.den), i * (2 * frame.parents.odd.num)))
-    (hv : frame.IsLeftVertex v) (hxE : x ∈ frame.closedPolygon)
+    (hv : v ∈ frame.freeV) (hxE : x ∈ frame.closedPolygon)
     (hxuE : x + (frame.parents.even.den, frame.parents.even.num) ∈ frame.closedPolygon) :
     i = 0 ∨ i = 1 := by
   obtain ⟨hd, hn, hD, hN0, hND, hq, hn0, hnq, hpar⟩ := frame.linear_facts
@@ -153,21 +163,22 @@ theorem index_of_left_vertex (v x : Site) (i : ℤ)
   have hs : frame.sGrade x = frame.sGrade v + i * (2 * frame.parentC) := by
     rw [hx, frame.sGrade_addUp]
   have hB : 0 < 2 * frame.parentC := by omega
-  by_cases hvpar : EvenSite v
-  · obtain ⟨hl, hh⟩ := hv.2.2.1 hvpar
-    have hxpar : EvenSite x := by
-      rw [hx]
-      exact (frame.evenSite_add_Up v i).mpr hvpar
-    obtain ⟨w0, w1⟩ := frame.sGrade_window_even x hxE hxuE hxpar
-    exact index_mem_zero_one_of_spectrum i (2 * frame.parentC) 0 (frame.sGrade v) (2 * frame.child.num) hB
-      (by omega) hl hh (by linarith) (by linarith)
-  · obtain ⟨hl, hh⟩ := hv.2.2.2 hvpar
-    have hxpar : ¬ EvenSite x := by
-      rw [hx]
-      exact fun h => hvpar ((frame.evenSite_add_Up v i).mp h)
-    obtain ⟨w0, w1⟩ := frame.sGrade_window_odd x hxE hxuE hxpar
-    exact index_mem_zero_one_of_spectrum i (2 * frame.parentC) (2 - frame.child.den + frame.child.num)
-      (frame.sGrade v) (frame.child.den + frame.child.num - 2) hB (by omega) hl hh (by linarith) (by linarith)
+  simp only [ChildFrame.freeV, Set.mem_setOf_eq] at hv
+  obtain ⟨-, -, hvs⟩ := hv
+  unfold ChildFrame.vSpectrum at hvs
+  have hlow : 2 - frame.child.den + frame.child.num ≤ frame.sGrade x := by
+    by_cases hxpar : EvenSite x
+    · have h1 := (frame.sGrade_window_even x hxE hxuE hxpar).1
+      omega
+    · exact (frame.sGrade_window_odd x hxE hxuE hxpar).1
+  have hup : frame.sGrade x ≤ 2 * frame.parentC + (frame.child.den + frame.child.num - 2) := by
+    by_cases hxpar : EvenSite x
+    · have h1 := (frame.sGrade_window_even x hxE hxuE hxpar).2
+      omega
+    · exact (frame.sGrade_window_odd x hxE hxuE hxpar).2
+  exact index_mem_zero_one_of_spectrum i (2 * frame.parentC) (2 - frame.child.den + frame.child.num)
+    (frame.sGrade v) (frame.child.den + frame.child.num - 2) hB (by omega) (by omega) (by omega)
+    (by linarith) (by linarith)
 
 /-- The exceptional vertex `V_p + I = (N − D + 1, D + N − 1)`. -/
 theorem sGrade_VpI :
@@ -204,21 +215,157 @@ theorem floor_at_D_neg (h : frame.eps = -1) :
   rw [frame.floor_at_D, h, ediv_eq_neg_one_of_range (-1) frame.child.den (by omega) (by omega) (by norm_num)]
   ring
 
-/-- For `ε = +1` the exceptional vertex `V_p + I` has `s = 2n + 2`, above the even spectrum `[0, 2n]`:
-it is not a child left V vertex. -/
-theorem not_left_VpI_of_pos (h : frame.eps = 1) :
-    ¬ frame.IsLeftVertex (frame.parents.odd.num - frame.parents.odd.den + 1,
-      frame.parents.odd.den + frame.parents.odd.num - 1) := by
+/-- The residue `q = (d − n) l − d ⌊(d − n) l / d⌋` lies in `[1, d − 1]` for `1 ≤ l ≤ D`: `q = 0` would give
+`d ∣ l` (since `ε = ±1` makes `d ∣ ε l`), impossible for `1 ≤ l < d`. -/
+theorem block_q_bounds (l : ℤ) (hl1 : 1 ≤ l) (hl2 : l ≤ frame.parents.odd.den) :
+    1 ≤ (frame.child.den - frame.child.num) * l - frame.child.den * ((frame.child.den - frame.child.num) * l / frame.child.den) ∧
+    (frame.child.den - frame.child.num) * l - frame.child.den * ((frame.child.den - frame.child.num) * l / frame.child.den) ≤
+      frame.child.den - 1 := by
+  obtain ⟨hd, hn, hD, hN0, hND, hq, hn0, hnq, hpar⟩ := frame.linear_facts
+  have hdpos : 0 < frame.child.den := by omega
+  have hlt : l < frame.child.den := by omega
+  have hr0 := Int.emod_nonneg ((frame.child.den - frame.child.num) * l) hdpos.ne'
+  have hr1 := Int.emod_lt_of_pos ((frame.child.den - frame.child.num) * l) hdpos
+  rw [Int.emod_def] at hr0 hr1
+  have hne : (frame.child.den - frame.child.num) * l -
+      frame.child.den * ((frame.child.den - frame.child.num) * l / frame.child.den) ≠ 0 := by
+    intro h0
+    have hxb : (frame.child.den - frame.child.num) * l =
+        frame.child.den * ((frame.child.den - frame.child.num) * l / frame.child.den) := by
+      linarith
+    generalize hb : (frame.child.den - frame.child.num) * l / frame.child.den = b at hxb
+    have hε := frame.eps_eq
+    have hKey : frame.eps * l = frame.child.den *
+        (frame.parents.odd.num * l - frame.parents.odd.den * (l - b)) := by
+      linear_combination l * hε + frame.parents.odd.den * hxb
+    generalize hK : frame.parents.odd.num * l - frame.parents.odd.den * (l - b) = K at hKey
+    rcases frame.eps_unit with h1 | h1 <;> rw [h1] at hKey <;>
+      rcases (show K ≤ -1 ∨ K = 0 ∨ 1 ≤ K by omega) with hK' | rfl | hK' <;> nlinarith
+  generalize hq' : (frame.child.den - frame.child.num) * l -
+      frame.child.den * ((frame.child.den - frame.child.num) * l / frame.child.den) = q at hr0 hr1 hne ⊢
+  constructor <;> omega
+
+/-- The block vertex `(−b, 2l − 1 − b)`, `b = ⌊(d − n) l / d⌋`, for `1 ≤ l ≤ D`, lies in the V cut `freeV`. Its
+`s` is `2q − (d − n)` with `q ∈ [1, d − 1]`, so `s ∈ [2 − d + n, L − 2]`; its left neighbour has `s = 2q − 2d < 0`. -/
+theorem block_mem_freeV (l : ℤ) (hl1 : 1 ≤ l) (hl2 : l ≤ frame.parents.odd.den) :
+    (-((frame.child.den - frame.child.num) * l / frame.child.den),
+      2 * l - 1 - (frame.child.den - frame.child.num) * l / frame.child.den) ∈ frame.freeV := by
+  obtain ⟨hd, hn, hD, hN0, hND, hq, hn0, hnq, hpar⟩ := frame.linear_facts
+  have hdpos : 0 < frame.child.den := by omega
+  have hnl : frame.child.num < frame.child.den := by omega
+  have hnn : 0 ≤ frame.child.num := by omega
+  have hdn : 0 ≤ frame.child.den - frame.child.num := by omega
+  have hl0 : 0 ≤ l := by omega
+  have hdl : 0 ≤ frame.child.den - 2 * l := by omega
+  have hT0 := frame.periodDen_nonneg
+  obtain ⟨b, hb⟩ : ∃ b, (frame.child.den - frame.child.num) * l / frame.child.den = b := ⟨_, rfl⟩
+  have hb0 : 0 ≤ b := by
+    rw [← hb]
+    exact Int.ediv_nonneg (mul_nonneg hdn hl0) hdpos.le
+  have hbl : b ≤ l := by
+    have hA := Int.ediv_mul_le ((frame.child.den - frame.child.num) * l) hdpos.ne'
+    rw [hb] at hA
+    by_contra hc
+    have h5 : l + 1 ≤ b := by omega
+    nlinarith [mul_le_mul_of_nonneg_right h5 hdpos.le, mul_nonneg hnn hl0]
+  have hq' := frame.block_q_bounds l hl1 hl2
+  rw [hb] at hq'
+  obtain ⟨q, hqdef⟩ : ∃ q, q = (frame.child.den - frame.child.num) * l - frame.child.den * b := ⟨_, rfl⟩
+  rw [← hqdef] at hq'
+  obtain ⟨hq1, hq2⟩ := hq'
+  have hs : frame.sGrade (-b, 2 * l - 1 - b) = 2 * q - (frame.child.den - frame.child.num) := by
+    rw [hqdef]
+    unfold ChildFrame.sGrade
+    dsimp only
+    ring
+  have hsn : frame.sGrade (-b - 1, 2 * l - 1 - b) = 2 * q - 2 * frame.child.den := by
+    rw [hqdef]
+    unfold ChildFrame.sGrade
+    dsimp only
+    ring
+  rw [hb]
+  simp only [ChildFrame.freeV, Set.mem_setOf_eq]
+  refine ⟨?_, ?_, ?_⟩
+  · rw [frame.mem_closedPolygon_iff]
+    right
+    refine ⟨?_, ?_, ?_, ?_, ?_⟩
+    · unfold EvenSite
+      dsimp only
+      omega
+    · unfold ChildFrame.tGrade Fraction.periodDenominator
+      dsimp only
+      nlinarith [mul_nonneg hdpos.le hdl, mul_nonneg hnn (show (0 : ℤ) ≤ 2 * frame.child.den - frame.child.num by omega),
+        mul_nonneg hb0 hdn]
+    · unfold ChildFrame.tGrade
+      dsimp only
+      nlinarith [mul_le_mul_of_nonneg_right hbl hdn, mul_nonneg hl0 hnn, mul_nonneg hl0 hdpos.le]
+    · rw [hs]
+      omega
+    · rw [hs]
+      omega
+  · show (-b - 1, 2 * l - 1 - b) ∉ frame.closedPolygon
+    intro hmem
+    rw [frame.mem_closedPolygon_iff] at hmem
+    rcases hmem with ⟨-, -, -, hs0, -⟩ | ⟨hne, -⟩
+    · rw [hsn] at hs0
+      omega
+    · exact hne (by unfold EvenSite; dsimp only; omega)
+  · unfold ChildFrame.vSpectrum
+    rw [hs]
+    exact ⟨by omega, Or.inr ⟨by omega, by omega⟩⟩
+
+/-- The parent vertex `v_l = (−b'_l, 2l − 1 − b'_l)`, `b'_l = ⌊(D − N) l / D⌋`, for `1 ≤ l < D` lies in `freeV`: the
+child and parent floors agree (`vBlock_floor_agree`). -/
+theorem parent_block_mem_freeV (l : ℤ) (hl1 : 1 ≤ l) (hl2 : l < frame.parents.odd.den) :
+    (-((frame.parents.odd.den - frame.parents.odd.num) * l / frame.parents.odd.den),
+      2 * l - 1 - (frame.parents.odd.den - frame.parents.odd.num) * l / frame.parents.odd.den) ∈ frame.freeV := by
+  have hf := vBlock_floor_agree frame l hl1 hl2
+  have hm := frame.block_mem_freeV l hl1 (by omega)
+  rw [hf] at hm
+  exact hm
+
+/-- `V_p + I = (N − D + 1, D + N − 1)` is not in `freeV` when `ε = +1`: its left neighbour `(N − D, D + N − 1)` is in `E`
+(odd branch, with `s = 2 − d + n` and `t ∈ [n − T, d]`). -/
+theorem VpI_not_freeV (h : frame.eps = 1) :
+    (frame.parents.odd.num - frame.parents.odd.den + 1, frame.parents.odd.den + frame.parents.odd.num - 1) ∉
+      frame.freeV := by
+  obtain ⟨hd, hn, hD, hN0, hND, hq, hn0, hnq, hpar⟩ := frame.linear_facts
+  have hnl : frame.child.num < frame.child.den := by omega
+  have hnn : 0 ≤ frame.child.num := by omega
+  have hdD : 2 * frame.parents.odd.den ≤ frame.child.den := by omega
+  have hCT := periodDen_sub_parentC_nonneg _ _ _ _ hN0 hND.le hnn hnl hdD
+  have hT0 := frame.periodDen_nonneg
+  have hsn : frame.sGrade (frame.parents.odd.num - frame.parents.odd.den + 1 - 1,
+      frame.parents.odd.den + frame.parents.odd.num - 1) = 2 * frame.eps - frame.child.den + frame.child.num := by
+    rw [frame.eps_eq]
+    unfold ChildFrame.sGrade
+    dsimp only
+    ring
+  rw [h] at hsn
   intro hv
-  have hev : EvenSite (frame.parents.odd.num - frame.parents.odd.den + 1,
-      frame.parents.odd.den + frame.parents.odd.num - 1) := by
-    unfold EvenSite
+  simp only [ChildFrame.freeV, Set.mem_setOf_eq] at hv
+  obtain ⟨-, hout, -⟩ := hv
+  apply hout
+  show (frame.parents.odd.num - frame.parents.odd.den + 1 - 1,
+    frame.parents.odd.den + frame.parents.odd.num - 1) ∈ frame.closedPolygon
+  rw [frame.mem_closedPolygon_iff]
+  right
+  refine ⟨?_, ?_, ?_, ?_, ?_⟩
+  · unfold EvenSite
     dsimp only
     omega
-  obtain ⟨-, -, hs, -⟩ := hv
-  have := (hs hev).2
-  rw [frame.sGrade_VpI, h] at this
-  omega
+  · unfold ChildFrame.tGrade Fraction.periodDenominator
+    dsimp only
+    nlinarith [hCT]
+  · unfold ChildFrame.tGrade
+    dsimp only
+    nlinarith [mul_nonneg hn0 (show (0 : ℤ) ≤ frame.parents.odd.den - frame.parents.odd.num by omega),
+      mul_nonneg (show (0 : ℤ) ≤ frame.child.den by omega)
+        (show (0 : ℤ) ≤ frame.parents.odd.den + frame.parents.odd.num by omega)]
+  · rw [hsn]
+    omega
+  · rw [hsn]
+    omega
 
 /-- The exceptional vertex with `s = 2n + 2` (`ε = +1`): the window forces `i = 0`. -/
 theorem exceptional_i_zero (h : frame.eps = 1) (x : Site) (i : ℤ)
@@ -253,89 +400,6 @@ theorem exceptional_i_zero (h : frame.eps = 1) (x : Site) (i : ℤ)
     have hi : i ≤ -1 := by omega
     nlinarith [mul_nonneg (show (0 : ℤ) ≤ -1 - i by omega) hCnn]
   omega
-
-/-- The block vertex at `l = D` for `ε = −1`: the child floor is `D − N − 1`, so the vertex is
-`A = (N − D + 1, D + N)`, and `s(A) = 2ε + L = L − 2`, the top of the odd spectrum. -/
-theorem sGrade_childFloorD (h : frame.eps = -1) :
-    frame.sGrade (frame.parents.odd.num - frame.parents.odd.den + 1, frame.parents.odd.den + frame.parents.odd.num) =
-      frame.child.den + frame.child.num - 2 := by
-  have h2 : frame.sGrade (frame.parents.odd.num - frame.parents.odd.den + 1,
-      frame.parents.odd.den + frame.parents.odd.num) = 2 * frame.eps + frame.child.den + frame.child.num := by
-    rw [frame.eps_eq]
-    unfold sGrade
-    dsimp only
-    ring
-  rw [h2, h]
-  ring
-
-/-- `s(A − (1,0)) = 2ε`: the left neighbour of the child-floor vertex has `s = −2` when `ε = −1`. -/
-theorem sGrade_left_neighbour :
-    frame.sGrade (frame.parents.odd.num - frame.parents.odd.den, frame.parents.odd.den + frame.parents.odd.num) =
-      2 * frame.eps := by
-  rw [frame.eps_eq]
-  unfold sGrade
-  dsimp only
-  ring
-
-/-- The W = 0 block vertex at `l = D` is a child left V vertex. -/
-theorem isLeftVertex_childFloorD (h : frame.eps = -1) :
-    frame.IsLeftVertex (frame.parents.odd.num - frame.parents.odd.den + 1,
-      frame.parents.odd.den + frame.parents.odd.num) := by
-  obtain ⟨hd, hn, hD, hN0, hND, hq, hn0, hnq, hpar⟩ := frame.linear_facts
-  have hnd : frame.child.num < frame.child.den := by omega
-  have hnn : 0 ≤ frame.child.num := by omega
-  have hdD : 2 * frame.parents.odd.den ≤ frame.child.den := by omega
-  have hCT : frame.parents.odd.den * (frame.child.den + frame.child.num) +
-      frame.parents.odd.num * (frame.child.den - frame.child.num) ≤
-      frame.child.den ^ 2 + 2 * frame.child.den * frame.child.num - frame.child.num ^ 2 :=
-    periodDen_sub_parentC_nonneg _ _ _ _ hN0 hND.le hnn hnd hdD
-  have hs := frame.sGrade_childFloorD h
-  have hsl := frame.sGrade_left_neighbour
-  rw [h] at hsl
-  have hodd : ¬ EvenSite (frame.parents.odd.num - frame.parents.odd.den + 1,
-      frame.parents.odd.den + frame.parents.odd.num) := by
-    unfold EvenSite
-    dsimp only
-    omega
-  have hnb : EvenSite (frame.parents.odd.num - frame.parents.odd.den + 1 - 1,
-      frame.parents.odd.den + frame.parents.odd.num) := by
-    unfold EvenSite
-    dsimp only
-    omega
-  have hT0 : 0 ≤ frame.child.periodDenominator := by
-    unfold Fraction.periodDenominator
-    nlinarith [mul_nonneg hnn (show (0 : ℤ) ≤ frame.child.den by omega),
-      mul_nonneg (show (0 : ℤ) ≤ frame.child.den - frame.child.num by omega)
-        (show (0 : ℤ) ≤ frame.child.den + frame.child.num by omega)]
-  unfold IsLeftVertex
-  refine ⟨?_, ?_, fun he => absurd he hodd, fun _ => ⟨?_, ?_⟩⟩
-  · rw [frame.mem_closedPolygon_iff]
-    right
-    refine ⟨hodd, ?_, ?_, ?_, ?_⟩
-    · unfold ChildFrame.tGrade Fraction.periodDenominator
-      dsimp only
-      nlinarith
-    · unfold ChildFrame.tGrade
-      dsimp only
-      nlinarith [mul_nonneg hnn (show (0 : ℤ) ≤ frame.parents.odd.den - frame.parents.odd.num - 1 by omega),
-        mul_nonneg (show (0 : ℤ) ≤ frame.child.den by omega)
-          (show (0 : ℤ) ≤ frame.parents.odd.den + frame.parents.odd.num by omega)]
-    · rw [hs]
-      omega
-    · rw [hs]
-      omega
-  · show (frame.parents.odd.num - frame.parents.odd.den + 1 - 1, frame.parents.odd.den + frame.parents.odd.num) ∉
-      frame.closedPolygon
-    intro hmem
-    rw [frame.mem_closedPolygon_iff] at hmem
-    rcases hmem with ⟨_, _, _, hs0, _⟩ | ⟨hne, _⟩
-    · simp only [add_sub_cancel_right] at hs0
-      rw [hsl] at hs0
-      omega
-    · exact hne hnb
-  · rw [hs]
-    omega
-  · rw [hs]
 
 end ChildFrame
 
