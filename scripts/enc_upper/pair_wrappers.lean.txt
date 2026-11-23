@@ -1,0 +1,44 @@
+/-- The even-child inclusion for every proper pair (the field `encEven` of `PairHyps`). -/
+theorem encEven_all (p q : Fraction) (h : ParPair p q) :
+    evenChildS (decide (p.det q = 1)) (HSet p) (HSet q) p q ⊆ HSet ((Parents.mk p q).current .even) := by
+  obtain ⟨pn, pd⟩ := p
+  obtain ⟨qn, qd⟩ := q
+  obtain ⟨h1, h2, h3, h4, h5, h6, h7⟩ := h
+  dsimp only at h1 h2 h3 h4 h5 h6 h7
+  have hC : (Parents.mk ⟨pn, pd⟩ ⟨qn, qd⟩).current .even = ⟨2 * pn + qn, 2 * pd + qd⟩ := by
+    simp [Parents.current, Parents.combine]
+  rw [hC]
+  have hodd : (pn + pd) % 2 = 1 := h5
+  have heven : (qn + qd) % 2 = 0 := h6
+  rcases h7 with hD | hD
+  · have hδ : pd * qn - pn * qd = -1 := by
+      simp only [Fraction.det] at hD; linarith
+    rw [decide_eq_true (show Fraction.det ⟨pn, pd⟩ ⟨qn, qd⟩ = 1 from hD)]
+    exact encEven_T pn pd qd qn (by omega) h2 (by omega) h4 hδ (by omega) (by omega)
+  · have hδ : pd * qn - pn * qd = 1 := by
+      simp only [Fraction.det] at hD; linarith
+    rw [decide_eq_false (by intro hc; simp only [Fraction.det] at hc; linarith)]
+    exact encEven_F pn pd qd qn (by omega) h2 (by omega) h4 hδ (by omega) (by omega)
+
+/-- The odd-child inclusion for every proper pair (the field `encOdd` of `PairHyps`). -/
+theorem encOdd_all (p q : Fraction) (h : ParPair p q) :
+    oddChildS (decide (p.det q = 1)) (HSet p) (HSet q) p q ⊆ HSet ((Parents.mk p q).current .odd) := by
+  obtain ⟨pn, pd⟩ := p
+  obtain ⟨qn, qd⟩ := q
+  obtain ⟨h1, h2, h3, h4, h5, h6, h7⟩ := h
+  dsimp only at h1 h2 h3 h4 h5 h6 h7
+  have hC : (Parents.mk ⟨pn, pd⟩ ⟨qn, qd⟩).current .odd = ⟨1 * pn + qn, 1 * pd + qd⟩ := by
+    simp [Parents.current, Parents.combine]
+  rw [hC]
+  have hodd : (pn + pd) % 2 = 1 := h5
+  have heven : (qn + qd) % 2 = 0 := h6
+  rcases h7 with hD | hD
+  · have hδ : pd * qn - pn * qd = -1 := by
+      simp only [Fraction.det] at hD; linarith
+    rw [decide_eq_true (show Fraction.det ⟨pn, pd⟩ ⟨qn, qd⟩ = 1 from hD)]
+    exact encOdd_T pn pd qd qn (by omega) h2 (by omega) h4 hδ (by omega) (by omega)
+  · have hδ : pd * qn - pn * qd = 1 := by
+      simp only [Fraction.det] at hD; linarith
+    rw [decide_eq_false (by intro hc; simp only [Fraction.det] at hc; linarith)]
+    exact encOdd_F pn pd qd qn (by omega) h2 (by omega) h4 hδ (by omega) (by omega)
+
