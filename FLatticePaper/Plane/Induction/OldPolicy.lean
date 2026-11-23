@@ -25,9 +25,10 @@ open Farey FLatticePaper
 /-- The reflection centre `I = (1, −1)` of the Q3 argument. -/
 def reflectionI : Site := (1, -1)
 
-/-- The earlier canonical policy on the conjugate field `G` of `frame`, with the forced seed `seed`. The functions `p`
-and `b` are the primitive and the raw-slip quantities of paragraphs 5 and 7; they are data here. -/
-structure OldPolicyData (frame : ChildFrame) (G : Field) (seed : Site → Site → Prop) where
+/-- The earlier canonical policy on the conjugate field `G` of `frame`, with the forced seed `seed`, of the sign `η` (the word's sign
+`eps`, Q3: the matched parent policy maps to the earlier conjugate sign `(−, eps)`). The functions `p` and `b` are the primitive and
+the raw-slip quantities of paragraphs 5 and 7; they are data here. -/
+structure OldPolicyData (frame : ChildFrame) (G : Field) (seed : Site → Site → Prop) (η : ℤ) where
   /-- The retained edges of the policy. -/
   retained : Site → Site → Prop
   /-- Quota: a black centre retains both inputs, a white centre at least one. -/
@@ -39,10 +40,9 @@ structure OldPolicyData (frame : ChildFrame) (G : Field) (seed : Site → Site �
   /-- The conjugate's raw slip `D'_η(y) = G y − G (y + η σ_c)` (`σ_c` the conjugate's short shift, `η = ±1`) does not
   increase along the retained edges. By paragraph 6 the raw slip `b` of the sheets is `(1 + ε) − D'_ε(Z ·)`, so `b` does not
   decrease along the retained edges (task 69 (b)). -/
-  rawSlipNonincreasing : ∀ η : ℤ, (η = 1 ∨ η = -1) →
-    NonincreasingAlong (fun y => G y - G (y + η • frame.shortShift)) retained
+  rawSlipNonincreasing : NonincreasingAlong (fun y => G y - G (y + η • frame.shortShift)) retained
   /-- The chain potential `Φ_η` does not increase along the retained edges, for `η = ±1`. -/
-  chainNonincreasing : ∀ η : ℤ, (η = 1 ∨ η = -1) → NonincreasingAlong (frame.chainPotential G η) retained
+  chainNonincreasing : NonincreasingAlong (frame.chainPotential G η) retained
   /-- Reflection about `I` at the roots the Q3 argument uses (`nonfree_drop_excluded`): a retained edge from a black root (which keeps
   both inputs) or a forced-white edge, is carried to a retained edge. The reflection of the clause system carries both kinds of
   root to the same kind, so this is what the canonical construction provides from the quota, `forcedRetained` and the symmetry. -/

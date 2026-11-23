@@ -67,7 +67,7 @@ theorem min_sub_left_eq (a b : ℤ) : min a b - a = min 0 (b - a) := by
 /-- The first common chart witness (`η = +1`): both ends in `A` (strict root), the shifted values from the sheets. -/
 theorem firstChart_witness {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) {seed : Site → Site → Prop}
-    (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed) {c i : Site}
+    (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps) {c i : Site}
     (hc : c ∈ (frameAt word).closedPolygon) (hi : i ∈ (frameAt word).closedPolygon)
     (hEdge : Edge i c) (hcs : c + (frameAt word).shortShift ∈ (frameAt word).closedPolygon)
     (his : i + (frameAt word).shortShift ∈ (frameAt word).closedPolygon)
@@ -98,7 +98,7 @@ theorem firstChart_witness {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
 theorem adjacentChart_witness {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
     {seed : Site → Site → Prop}
-    (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed) {c i : Site}
+    (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps) {c i : Site}
     (hc : c ∈ (frameAt word).closedPolygon) (hi : i ∈ (frameAt word).closedPolygon)
     (hcq : c - ((frameAt word).eps * (frameAt word).parents.even.den,
       (frameAt word).eps * (frameAt word).parents.even.num) ∈ (frameAt word).closedPolygon)
@@ -143,7 +143,7 @@ theorem ChildFrame.not_rising_of_input_exit {F : Field} (frame : ChildFrame) (hP
 retention `hret`. -/
 theorem noBlackPairRise_of_chart_cover {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hrep : ∀ c i, RisingBlackPair (standardField word) (frameAt word).shortShift c i →
       c ∈ (frameAt word).closedPolygon → i ∈ (frameAt word).closedPolygon)
     (hstrict : ∀ c i, RisingBlackPair (standardField word) (frameAt word).shortShift c i →

@@ -148,7 +148,7 @@ the M-white ties. The quota, the chain monotonicity and the `(−1, 2η)` increm
 `rankIncr_two_of_ranked`); the exchange is the packet's (`sheetExchange_of_packet`); the square data is `sheet_square_of_parent`. -/
 theorem hagree_M_tie_of_ranked (word : Word) (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) {seed : Site → Site → Prop}
-    (P : FLatticePaper.W1Phase.OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    (P : FLatticePaper.W1Phase.OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hpar : ∀ c : Site, (frameAt word).sheetC (FqW word) c = (frameAt word).sheetA (FqW word) c →
       laplacian (MW word) c = 0 →
       FLatticePaper.W1SheetSquare.ParentSquare P.retained (zTurn (c - (frameAt word).sheetShift))) :
@@ -157,7 +157,7 @@ theorem hagree_M_tie_of_ranked (word : Word) (h : ∃ x ∈ word, x ≠ Digit.th
       sheetQC P.retained (frameAt word).sheetShift (frameAt word).centre c
         (FLatticePaper.W1Pointers.pointerOf (sheetQ P.retained (frameAt word).sheetShift) c) :=
   hagree_M_tie word h hSE P.retained P.quota
-    (P.chainNonincreasing (frameAt word).eps (frameAt word).eps_unit)
+    P.chainNonincreasing
     (FLatticePaper.W1Inherited.rankIncr_two_of_ranked P (child_det_ne_zero (conjWord word)) hSE.priceDrift hSE.slipDrift
       (frameAt word).eps_unit)
     (fun c hT hM => FLatticePaper.W1SheetSquare.sheet_square_of_parent (frameAt word).evenSite_sheetShift c (hpar c hT hM))
@@ -167,7 +167,7 @@ the parent square data at the M-white ties is needed only at free parent roots (
 `parentSquare_nonfree` (the top unit of the forced derivation of the retained input, from `W1Forced`). -/
 theorem hagree_M_tie_of_inherited (word : Word) (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) {seed : Site → Site → Prop}
-    (P : FLatticePaper.W1Phase.OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    (P : FLatticePaper.W1Phase.OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hs : seed = fun _ _ => False)
     (hW1 : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
       (standardField (conjWord word)))

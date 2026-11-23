@@ -152,8 +152,8 @@ theorem noBlackPairRise_of_cases {F : Field} (frame : ChildFrame) (hP : frame.Pa
 /-- The first common chart from `OldPolicyData`: its chain potential does not increase along the retained edges
 (`chainNonincreasing`); the named inputs are that the first-chart edges are retained and that the shifted price does not
 decrease on them. -/
-theorem noBlackPairRise_of_oldPolicy {G : Field} {seed : Site → Site → Prop} (frame : ChildFrame) (hP : frame.Packet G)
-    (P : OldPolicyData frame G seed)
+theorem noBlackPairRise_of_oldPolicy {η : ℤ} {G : Field} {seed : Site → Site → Prop} (frame : ChildFrame) (hP : frame.Packet G)
+    (P : OldPolicyData frame G seed η) (hη : η = 1)
     (firstCommon adjacentPositive exitSameSlip negativeNonfree negativeFreeH negativeFreeV exceptionalVertex :
       Site → Site → Prop)
     (hcover : ∀ c i, RisingBlackPair G frame.shortShift c i →
@@ -171,7 +171,7 @@ theorem noBlackPairRise_of_oldPolicy {G : Field} {seed : Site → Site → Prop}
     NoBlackPairRise G frame.shortShift :=
   frame.noBlackPairRise_of_cases hP firstCommon adjacentPositive exitSameSlip negativeNonfree negativeFreeH
     negativeFreeV exceptionalVertex hcover
-    (fun c i h => ⟨P.chainNonincreasing 1 (Or.inl rfl) c i (hfirst_retained c i h), hfirst_price c i h⟩)
+    (fun c i h => ⟨by subst hη; exact P.chainNonincreasing c i (hfirst_retained c i h), hfirst_price c i h⟩)
     hadj hexit hnonfree hfreeH hfreeV hexc
 
 end ChildFrame

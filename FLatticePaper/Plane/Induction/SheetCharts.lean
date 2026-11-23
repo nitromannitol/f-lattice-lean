@@ -71,11 +71,11 @@ theorem sheetDiff_unit {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (h
 /-- (a) `Ψ` does not decrease along the A-policy edges: the conjugate chain potential does not increase along the retained
 edges, at the sheet coordinates `c − l_v`, `i − l_v`. -/
 theorem sheetDiff_mono_A {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     {c i : Site} (h : sheetPolicyA P (frameAt word).sheetShift c i) :
     sheetDiffW word c ≤ sheetDiffW word i := by
   obtain ⟨K, hK⟩ := sheetDiff_eq_neg_chain hw hSE
-  have hmono := P.chainNonincreasing (frameAt word).eps (frameAt word).eps_unit
+  have hmono := P.chainNonincreasing
     (zTurn (c - (frameAt word).sheetShift)) (zTurn (i - (frameAt word).sheetShift)) h
   have key : sheetChainPotential word (standardField (conjWord word)) (i - (frameAt word).sheetShift) ≤
       sheetChainPotential word (standardField (conjWord word)) (c - (frameAt word).sheetShift) := by
@@ -97,7 +97,7 @@ theorem sheetMin_A_of_strict_root {word : Word} (hw : ∃ x ∈ word, x ≠ Digi
 `min(0, Ψ − 2)` at both ends (the paper's chart formula, part of the cover's witness), and the edge retained by the
 A-policy. -/
 def FirstChartEdge {word : Word} {seed : Site → Site → Prop}
-    (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed) (c i : Site) : Prop :=
+    (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps) (c i : Site) : Prop :=
   standardField word c = (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) c ∧
   standardField word i = (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) i ∧
   standardField word (c + (frameAt word).shortShift) -
@@ -111,7 +111,7 @@ def FirstChartEdge {word : Word} {seed : Site → Site → Prop}
 /-- (b) A rise is impossible in the first common chart. -/
 theorem first_chart_excluded {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) {seed : Site → Site → Prop}
-    (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed) {c i : Site}
+    (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps) {c i : Site}
     (h : FirstChartEdge P c i) :
     ¬ RisingBlackPair (standardField word) (frameAt word).shortShift c i := by
   intro hr
@@ -127,7 +127,7 @@ theorem first_chart_excluded {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.thr
 `A` equal to `min{p(x), Ψ + p(x − e)}` at `x = z − l_v` (the paper's chart formula, part of the cover's witness), and the edge
 retained by the A-policy. -/
 def AdjacentChartEdge {word : Word} {seed : Site → Site → Prop}
-    (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed) (c i : Site) : Prop :=
+    (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps) (c i : Site) : Prop :=
   standardField word c = (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) c ∧
   standardField word i = (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) i ∧
   1 ≤ sheetDiffW word i ∧
@@ -145,7 +145,7 @@ def AdjacentChartEdge {word : Word} {seed : Site → Site → Prop}
 `p(x_c)`, and `p` does not decrease along the retained edge. -/
 theorem adjacent_chart_excluded {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) {seed : Site → Site → Prop}
-    (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed) {c i : Site}
+    (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps) {c i : Site}
     (h : AdjacentChartEdge P c i) :
     ¬ RisingBlackPair (standardField word) (frameAt word).shortShift c i := by
   intro hr
@@ -208,7 +208,7 @@ theorem exceptional_hT_proved {word : Word} (h : ∃ x ∈ word, x ≠ Digit.thr
 exceptional drops, the H drop (with the named `hweb` inside the cover) and the free V block are closed. -/
 theorem noBlackPairRise_of_charts {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (exitSameSlip : Site → Site → Prop)
     (hW1 : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num
       (frameAt (conjWord word)).child.den (standardField (conjWord word)))

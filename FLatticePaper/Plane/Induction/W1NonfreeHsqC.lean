@@ -75,15 +75,15 @@ theorem parentSquare_of_out {G : Field} {Q : Site → Site → Prop} {z : Site} 
   exact ⟨q0, q1, q2, a, b, hz, hq0, hq1, hq2, hcov, hne01, hne12, hne02, hin, hrej, hE1, hE2, hE3, hR0, hR1, hR2⟩
 
 /-- The `C`-policy at `K − p` is the `A`-policy at `p`. -/
-theorem policyC_of_A {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (Pd : OldPolicyData frame G seed)
+theorem policyC_of_A {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (Pd : OldPolicyData frame G seed η)
     (lv K : Site) {u v : Site} (h : sheetPolicyA Pd lv u v) : sheetPolicyC Pd lv K (K - u) (K - v) := by
   show sheetPolicyA Pd lv (K - (K - u)) (K - (K - v))
   rw [sub_sub_cancel, sub_sub_cancel]
   exact h
 
 /-- The `C`-pointer at the reflected corner is the reflection of the `A`-pointer, by uniqueness of the `A`-pointer. -/
-theorem pointerOf_sheetC_reflect {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
-    (Pd : OldPolicyData frame G seed) (lv K : Site) (hK : (K.1 + K.2) % 2 = 0) (p nx : Site)
+theorem pointerOf_sheetC_reflect {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
+    (Pd : OldPolicyData frame G seed η) (lv K : Site) (hK : (K.1 + K.2) % 2 = 0) (p nx : Site)
     (hnx : Edge nx p) (hQ : sheetPolicyA Pd lv p nx) (hu : ∀ j, sheetPolicyA Pd lv p j → j = nx) :
     pointerOf (sheetPolicyC Pd lv K) (K - p) = K - nx := by
   have hin : Edge (K - nx) (K - p) := (edge_reflect K hK nx p).2 hnx
@@ -97,7 +97,7 @@ theorem pointerOf_sheetC_reflect {frame : ChildFrame} {G : Field} {seed : Site �
   exact pointer_of_unique (sheetPolicyC Pd lv K) (K - p) (K - nx) hin hQC huC
 
 /-- The `sheetOut` at a site with `Ψ < 0` is its `C`-pointer. -/
-theorem sheetOut_of_neg {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed)
+theorem sheetOut_of_neg {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed η)
     (lv centre : Site) (psi : Site → ℤ) {c : Site} (h : psi c < 0) :
     sheetOut P lv centre psi c = pointerOf (sheetPolicyC P.toOldPolicyWitness.toOldPolicyData lv centre) c := by
   unfold sheetOut
@@ -136,7 +136,7 @@ theorem lapG_zero_of_nonneg {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.thre
 
 /-- A corner `p` of the parent square, reflected: its `M`-laplacian, and its reflected `C`-pointer in the reflected square. -/
 theorem corner_C {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
-    {seed : Site → Site → Prop} (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hs : seed = fun _ _ => False)
     (hW1 : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
       (standardField (conjWord word)))
@@ -210,7 +210,7 @@ theorem transGen_lift_map {α β : Type} {r : α → α → Prop} {p : β → β
 
 /-- **The `hsq` at a strict `C`-centre off the collar** (task 94). The `A`-square at `K − c` reflects to the square at `c`. -/
 theorem hsq_C_offcollar {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
-    {seed : Site → Site → Prop} (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hs : seed = fun _ _ => False)
     (hW1 : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
       (standardField (conjWord word)))
@@ -331,7 +331,7 @@ theorem hsq_C_offcollar {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (
 /-- **The `hsq` at every strict centre with `M`-laplacian `0`** (task 94): the collar case and the free parent roots are named inputs,
 and the off-collar case is `hsq_offcollar` (`Ψ ≥ 0`) or `hsq_C_offcollar` (`Ψ < 0`). -/
 theorem hsq_all_of_inputs {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
-    {seed : Site → Site → Prop} (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hs : seed = fun _ _ => False)
     (hW1 : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
       (standardField (conjWord word)))
@@ -352,7 +352,7 @@ theorem hsq_all_of_inputs {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three)
 
 /-- **W1Forced of the sheet minimum from the named inputs** (task 94): the collar and free-root inputs give `W1Forced` of `MW word`. -/
 theorem W1Forced_of_inputs {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
-    {seed : Site → Site → Prop} (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hs : seed = fun _ _ => False)
     (hW1 : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
       (standardField (conjWord word)))

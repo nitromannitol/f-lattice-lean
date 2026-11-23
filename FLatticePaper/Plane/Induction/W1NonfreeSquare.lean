@@ -15,8 +15,8 @@ open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.SquareClauses FLa
 open FLatticePaper.W1PrivateSquare FLatticePaper.W1MSheet
 
 /-- **The parent square at a nonfree white root** (task 88). -/
-theorem parentSquare_nonfree {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
-    (P : OldPolicyData frame G seed) (hs : seed = fun _ _ => False) (hP : frame.Packet G)
+theorem parentSquare_nonfree {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
+    (P : OldPolicyData frame G seed η) (hs : seed = fun _ _ => False) (hP : frame.Packet G)
     (hW1 : FLatticePaper.W1.W1Forced frame.child.num frame.child.den G) {z : Site}
     (hz : laplacian G z = 0) (hnf : Nonfree frame z) :
     ParentSquare P.retained z := by

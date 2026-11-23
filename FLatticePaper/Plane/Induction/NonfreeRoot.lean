@@ -13,8 +13,8 @@ open Farey FLatticePaper
 
 /-- **The nonfree root condition.** For a retained edge `z → z'` of the old policy with `z` strict-interior, `W1Forced` gives the
 unseeded forced edge at `z`, and the uniqueness of the retained input identifies it with `z'`. -/
-theorem nonfree_root_forced {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
-    (P : OldPolicyData frame G seed) {n d : ℤ} (hbin : ∀ c, laplacian G c = -1 ∨ laplacian G c = 0)
+theorem nonfree_root_forced {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
+    (P : OldPolicyData frame G seed η) {n d : ℤ} (hbin : ∀ c, laplacian G c = -1 ∨ laplacian G c = 0)
     (hW1 : FLatticePaper.W1.W1Forced n d G) {z z' : Site} (hSI : FLatticePaper.W1.StrictInterior n d z)
     (hr : P.retained z z') :
     laplacian G z = -1 ∨ FLatticePaper.SquareClauses.ForcedEdge G (fun _ _ => False) z z' := by

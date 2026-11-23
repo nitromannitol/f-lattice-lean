@@ -16,7 +16,7 @@ open Farey FLatticePaper
 /-- **Case (a) of the negative tied target: a nonfree old root.** -/
 theorem negTie_drop_of_nonfree {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hW1 : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num
       (frameAt (conjWord word)).child.den (standardField (conjWord word)))
     (hslip : ∀ z ∈ (frameAt word).closedPolygon,

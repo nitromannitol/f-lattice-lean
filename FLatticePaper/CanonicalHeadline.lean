@@ -26,7 +26,7 @@ theorem odometersTheorem_of_canonical
     (htwoRes : ∀ k : ℕ, Induction.StrongResidual (List.replicate (k + 1) Digit.two))
     (hres : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word → Induction.StrongResidual word)
     (hcan : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
-      Nonempty (Induction.CanonicalSignedPolicy (frameAt (conjWord word)) (standardField (conjWord word))))
+      Nonempty (Induction.CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word))))
     (hResP : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       ∀ c i, RisingBlackPair (standardField word) (frameAt word).shortShift c i →
         c ∈ (frameAt word).closedPolygon →
@@ -46,7 +46,8 @@ theorem odometersTheorem_of_canonical
       (fun k => Induction.StrongEstimates.of_base_two k (htwoSlip k) (htwoRes k)) hres
   exact odometersTheorem_of_policy hpureSlip hpureRes htwoSlip htwoRes hres
     (fun word hw hn => ⟨fun _ _ => False, ⟨Induction.oldPolicyData_of_canonical
-      (standardField_reflectI_conj word (hE (conjWord word))) (hcan word hw hn).some⟩⟩)
+      (standardField_reflectI_conj word (hE (conjWord word))) (hcan word hw hn).some (frameAt word).eps
+      (frameAt word).eps_unit⟩⟩)
     hResP hResN hbulk
 
 end FLatticePaper

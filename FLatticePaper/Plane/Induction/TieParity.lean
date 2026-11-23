@@ -42,7 +42,7 @@ theorem sheetDiffW_eq_one_of_parity {word : Word} (h : ∃ x ∈ word, x ≠ Dig
 the strict root. Ties at the centre are excluded here with no further hypothesis. -/
 theorem rising_option1_excluded {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     {c i : Site} (hr : RisingBlackPair (standardField word) (frameAt word).shortShift c i)
     (hcE : c ∈ (frameAt word).closedPolygon) (hiE : i ∈ (frameAt word).closedPolygon)
     (hcs : c + (frameAt word).shortShift ∈ (frameAt word).closedPolygon)

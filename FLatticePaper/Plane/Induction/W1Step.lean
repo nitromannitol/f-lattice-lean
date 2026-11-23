@@ -29,15 +29,15 @@ noncomputable def sheetPsi (word : Word) (c : Site) : ℤ :=
   (frameAt word).sheetC (FqW word) c - (frameAt word).sheetA (FqW word) c
 
 /-- The child arrow of §5: `A` where `Ψ ≥ 0` (the common arrow on the ties), `C` where `Ψ < 0`. -/
-noncomputable def sheetOut {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
-    (P : OldPolicyRanked frame G seed) (lv centre : Site) (psi : Site → ℤ) (c : Site) : Site :=
+noncomputable def sheetOut {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
+    (P : OldPolicyRanked frame G seed η) (lv centre : Site) (psi : Site → ℤ) (c : Site) : Site :=
   if 0 ≤ psi c then
     FLatticePaper.W1Pointers.pointerOf (sheetPolicyA P.toOldPolicyWitness.toOldPolicyData lv) c
   else FLatticePaper.W1Pointers.pointerOf (sheetPolicyC P.toOldPolicyWitness.toOldPolicyData lv centre) c
 
 /-- The child arrow is an input of its centre. -/
-theorem sheetOut_input {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
-    (P : OldPolicyRanked frame G seed) (lv centre : Site) (psi : Site → ℤ) (c : Site) :
+theorem sheetOut_input {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
+    (P : OldPolicyRanked frame G seed η) (lv centre : Site) (psi : Site → ℤ) (c : Site) :
     sheetOut P lv centre psi c = incomingNeg c ∨ sheetOut P lv centre psi c = incomingPos c := by
   unfold sheetOut
   split_ifs
@@ -47,7 +47,7 @@ theorem sheetOut_input {frame : ChildFrame} {G : Field} {seed : Site → Site �
 /-- **W1Forced_step** (task 89 (3)): from the strict-interior square data `hsq` of the sheet minimum, with the child arrows `sheetOut` and the
 phase `Ψ`, the sheet minimum is forced on the strict interior of the word's child. -/
 theorem W1Forced_step {seed : Site → Site → Prop} (word : Word)
-    (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hsq : ∀ c : Site, StrictInterior (frameAt word).child.num (frameAt word).child.den c →
       laplacian (MW word) c = 0 → ∃ a b : ℤ,
         c ∈ squareCorners a b ∧ (∀ c' ∈ squareCorners a b, StrictInterior (frameAt word).child.num (frameAt word).child.den c') ∧

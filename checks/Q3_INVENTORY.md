@@ -726,3 +726,23 @@ Scope to confirm with the lead: §1's star containment needs `c = d − n ≥ 3`
   `hoppQuota`, `hoppPrice` (to become `ChainPairData` fields), and `HasUnitPrice` (the unit increment, derived at the even-shifted edge
   by `TwoRank.edge_add_of_even`).
 - Checks: `checks/BothFreeRise.lean`. Root build: 0 warnings, 0 linter notes.
+
+### Task 72 / Q20 (per-sign canonical policies and the eta-indexed OldPolicyData): one refactor commit
+
+- `OldPolicyData frame G seed η`: the sign is an explicit parameter; `rawSlipNonincreasing` and `chainNonincreasing` are stated for `η`
+  only (no quantifier over one relation). Lead decision: the sign is the word's `eps` (Q3: the matched parent policy maps to the earlier
+  conjugate sign `(−, eps)`), not the conjugate frame's `eps`.
+- `CanonicalPolicy frame F η` (S3Canonical): the permit is the sign-`η` raw slip; `S3NoFortInputs_of_canonical` and
+  `restrictedNoFort_of_canonical` are the unit-sign bridge (`one_shift_fun`, `permitted_one`).
+- `CanonicalSignedPolicy frame F η` (CanonicalSigned): per sign, with the field `prescribed : PrescribedAt frame F η policy` (Q1: the
+  sign-`η` prescription at free centres). `CanonicalSignedGames frame F`: `game η hη` for `η = ±1`, and the chain claim
+  `chainNonincreasing` along `game η`. `chainPairs_of_games G η hη` gives the `ChainPairData` of `game η` with the opposite policy
+  `game (−η)` (its raw slip, quota and price monotonicity are those of the sign `−η` policy).
+- `oldPolicyData_of_canonical hF G η hη`: the sign-`η` component. The headline (CanonicalHeadline, StrongHeadline) passes
+  `η := (frameAt word).eps`, `(frameAt word).eps_unit`.
+- Word-level consumers take `η := (frameAt word).eps` in their `OldPolicyData` binders; `NoBlackPair.noBlackPairRise_of_oldPolicy` takes
+  `η = 1` explicitly. `W1Witness.OldPolicyWitness` and `W1Phase.OldPolicyRanked` take `η` as a trailing explicit parameter.
+- `TwoRank.rise_local_frame` and `BothFreeRise.chain_nonincreasing_of_free_roots` take the sign-`η` canonical policy; the reduction
+  takes the games family and reads the prescription links from the two games.
+- Root build: 0 warnings, 0 linter notes, 0 errors. Guards: `checks/CanonicalSigned.lean` (the stale `rawSlipMinus` entry removed),
+  `checks/NonfreeRoot.lean` (import of `NonfreeRoot` added: the guard was already unreachable from its import chain).

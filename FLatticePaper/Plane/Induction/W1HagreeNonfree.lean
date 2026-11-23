@@ -38,8 +38,8 @@ theorem zTurn_neighbors (c lv : Site) (hlv : EvenSite lv) :
 /-- **The A policy retains its pointer** (task 81): at a sheet point whose parent point is binary, the A policy retains
 `pointerOf (sheetPolicyA P lv) c`. The quota at the parent root supplies one retained input (both at a black root), and the parent
 correspondence of `zTurn_neighbors` transports it to the sheet inputs. -/
-theorem sheetPolicyA_pointer_retained {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
-    (P : OldPolicyData frame G seed) (hbin : ∀ z, laplacian G z = -1 ∨ laplacian G z = 0) (lv : Site)
+theorem sheetPolicyA_pointer_retained {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
+    (P : OldPolicyData frame G seed η) (hbin : ∀ z, laplacian G z = -1 ∨ laplacian G z = 0) (lv : Site)
     (hlv : EvenSite lv) (c : Site) :
     sheetPolicyA P lv c (FLatticePaper.W1Pointers.pointerOf (sheetPolicyA P lv) c) := by
   obtain ⟨hq1, hq0⟩ := P.quota
@@ -72,8 +72,8 @@ theorem sheetPolicyA_pointer_retained {frame : ChildFrame} {G : Field} {seed : S
 
 /-- **The common arrow at a nonfree sheet root** (task 81, partial hagree): the C policy retains the A pointer at every sheet point whose
 parent root `Z (c − lv)` is nonfree, by the reflection of the policy (the parent edge of the pointer is black or forced). -/
-theorem hagree_at_nonfree_root {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
-    (P : OldPolicyData frame G seed) (hP : frame.Packet G)
+theorem hagree_at_nonfree_root {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
+    (P : OldPolicyData frame G seed η) (hP : frame.Packet G)
     (hW1 : FLatticePaper.W1.W1Forced frame.child.num frame.child.den G) (lv c : Site) (hlv : EvenSite lv)
     (hnf : Nonfree frame (zTurn (c - lv))) :
     sheetPolicyC P lv (reflectionI + lv + lv) c (FLatticePaper.W1Pointers.pointerOf (sheetPolicyA P lv) c) := by

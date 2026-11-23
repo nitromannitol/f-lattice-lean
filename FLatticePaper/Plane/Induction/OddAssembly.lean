@@ -11,7 +11,7 @@ open Farey FLatticePaper
 
 theorem oddBlackNoRise_of_leaves {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hslip : ∀ z ∈ (frameAt word).closedPolygon,
       0 ≤ standardField word z - standardField word (z + (frameAt word).shortShift) ∧
         standardField word z - standardField word (z + (frameAt word).shortShift) ≤ 2)

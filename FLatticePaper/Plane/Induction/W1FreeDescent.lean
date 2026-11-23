@@ -35,8 +35,8 @@ theorem other_input_outside {z p0 : Site} {a b : ℤ} (hz : z ∈ squareCorners 
 
 /-- **The descent for free roots** (task 83): every free white root `z` of `S` (on which the rank is bounded by `B`) has a forced input
 `o`, `ForcedEdge G z o`, where `o` is the input of `z` outside its table square. -/
-theorem free_forced_of_descent {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
-    (P : FLatticePaper.W1Phase.OldPolicyRanked frame G seed) (hP : frame.Packet G)
+theorem free_forced_of_descent {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
+    (P : FLatticePaper.W1Phase.OldPolicyRanked frame G seed η) (hP : frame.Packet G)
     (hW1 : FLatticePaper.W1.W1Forced frame.child.num frame.child.den G)
     (S : Set Site) (B : ℤ) (hB : ∀ x ∈ S, P.rank x ≤ B)
     (hrow : ∀ z ∈ S, ¬ Nonfree frame z → laplacian G z = 0 → ∃ p0 p1 p2 : Site, ∃ a b : ℤ,
@@ -162,8 +162,8 @@ theorem free_forced_of_descent {frame : ChildFrame} {G : Field} {seed : Site →
 /-- **`hagree` at a free sheet root** (task 83, identification (c)): for a sheet point `c` whose parent root `z = Z (c − lv)` is free and
 white and lies in `S`, the C policy retains the A pointer. The descent gives the forced input `o` of `z`; the A policy retains the pointer's
 parent image `w`, so `forcedWhiteUnique` gives `o = w`, and the reflection `sheetPolicyC_of_sheetPolicyA` (parent edge forced) applies. -/
-theorem hagree_at_free_root {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
-    (P : FLatticePaper.W1Phase.OldPolicyRanked frame G seed) (hP : frame.Packet G)
+theorem hagree_at_free_root {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
+    (P : FLatticePaper.W1Phase.OldPolicyRanked frame G seed η) (hP : frame.Packet G)
     (hW1 : FLatticePaper.W1.W1Forced frame.child.num frame.child.den G)
     (S : Set Site) (B : ℤ) (hB : ∀ x ∈ S, P.rank x ≤ B)
     (hrow : ∀ z ∈ S, ¬ Nonfree frame z → laplacian G z = 0 → ∃ p0 p1 p2 : Site, ∃ a b : ℤ,

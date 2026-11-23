@@ -23,7 +23,7 @@ def excVertex (frame : ChildFrame) : Site :=
 
 theorem noBlackPairRise_of_sheet_cases {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (firstCommon adjacentPositive exitSameSlip : Site → Site → Prop)
     (hW1 : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num
       (frameAt (conjWord word)).child.den (standardField (conjWord word)))

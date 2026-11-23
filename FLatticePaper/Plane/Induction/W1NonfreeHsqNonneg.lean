@@ -23,8 +23,8 @@ open FLatticePaper.W1NonfreeOut FLatticePaper.W1NonfreeSheet FLatticePaper.W1Non
 open FLatticePaper.W1Pointers FLatticePaper.W1NonfreeSquare FLatticePaper.W1CollarFrame
 
 /-- The parent square with its output at a nonfree white root (task 93, the copy of `parentSquare_nonfree`). -/
-theorem parentSquareOut_nonfree {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
-    (P : OldPolicyData frame G seed) (hs : seed = fun _ _ => False) (hP : frame.Packet G)
+theorem parentSquareOut_nonfree {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
+    (P : OldPolicyData frame G seed η) (hs : seed = fun _ _ => False) (hP : frame.Packet G)
     (hW1 : FLatticePaper.W1.W1Forced frame.child.num frame.child.den G) {z : Site}
     (hz : laplacian G z = 0) (hnf : Nonfree frame z) :
     ParentSquareOut G P.retained z := by
@@ -40,7 +40,7 @@ theorem parentSquareOut_nonfree {frame : ChildFrame} {G : Field} {seed : Site �
     · exact parentSquareOut_of_forced P.quota P.forcedRetained P.forcedWhiteUnique hF
 
 /-- The sheet output of a centre with `Ψ ≥ 0` is its `A`-pointer. -/
-theorem sheetOut_of_nonneg {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed)
+theorem sheetOut_of_nonneg {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed η)
     (lv centre : Site) (psi : Site → ℤ) {c : Site} (h : 0 ≤ psi c) :
     sheetOut P lv centre psi c = pointerOf (sheetPolicyA P.toOldPolicyWitness.toOldPolicyData lv) c := by
   unfold sheetOut
@@ -68,7 +68,7 @@ theorem corner_close {a b : ℤ} {c w : Site} (hc : c ∈ squareCorners a b) (hw
 
 /-- A corner `p` of the square with `Ψ p ≥ 0`: `M`-laplacian `−1`, or `0` with `A`-pointer its successor `nx`. -/
 theorem corner_nonneg {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     {p nx : Site} (hnx : Edge nx p) (hQ : sheetPolicyA P (frameAt word).sheetShift p nx)
     (hL : laplacian (standardField (conjWord word)) (zTurn (p - (frameAt word).sheetShift)) = -1 ∨
       (laplacian (standardField (conjWord word)) (zTurn (p - (frameAt word).sheetShift)) = 0 ∧
@@ -100,7 +100,7 @@ theorem corner_nonneg {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hS
 /-- The square at a centre `c` with `Ψ c ≥ 0` and `M`-laplacian `0`: corners, nonnegativity, the tie condition, the corner clauses, the
 rejected input, and the chain to the centre. -/
 theorem square_nonneg {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
-    {seed : Site → Site → Prop} (Pd : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (Pd : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     {c : Site} (hc0 : 0 ≤ sheetPsi word c) (hM : laplacian (MW word) c = 0)
     (hpar : ParentSquareOut (standardField (conjWord word)) Pd.retained (zTurn (c - (frameAt word).sheetShift))) :
     ∃ p0 p1 p2 o' : Site, ∃ a b : ℤ,
@@ -157,7 +157,7 @@ theorem square_nonneg {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hS
 
 /-- The `hsq` clause of `W1Step` at the centre `c`, as a predicate. -/
 def HsqAt (word : Word) {seed : Site → Site → Prop}
-    (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed) (c : Site) : Prop :=
+    (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps) (c : Site) : Prop :=
   ∃ a b : ℤ,
     c ∈ squareCorners a b ∧
     (∀ c' ∈ squareCorners a b, StrictInterior (frameAt word).child.num (frameAt word).child.den c') ∧
@@ -174,7 +174,7 @@ def HsqAt (word : Word) {seed : Site → Site → Prop}
 /-- **The off-collar `hsq` at a strict centre with `Ψ c ≥ 0`** (task 93). The parent square is `ParentSquareOut` at a nonfree root, or the
 named free-root input `hfree`. -/
 theorem hsq_offcollar {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
-    {seed : Site → Site → Prop} (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hs : seed = fun _ _ => False)
     (hW1 : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
       (standardField (conjWord word)))
@@ -237,7 +237,7 @@ theorem hsq_offcollar {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hS
 
 /-- **The `hsq` at strict centres with `Ψ c ≥ 0`, with the collar case as a named input** (task 93). -/
 theorem hsq_nonneg_of_inputs {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
-    {seed : Site → Site → Prop} (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hs : seed = fun _ _ => False)
     (hW1 : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
       (standardField (conjWord word)))

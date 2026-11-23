@@ -139,7 +139,7 @@ along it (`oppRawSlip`, the `ChainPairData` input), a rise `Φ_η(z) < Φ_η(u)`
 
 Named inputs (the audit's stated monotonicities and unit bound, not derived here): `hoppPrice` (the price does not increase along
 the opposite policy) and `hunit` (the shifted price moves by at most one along an F-policy edge). -/
-theorem rise_local_frame (frame : ChildFrame) {F : Field} (C : CanonicalSignedPolicy frame F) {η : ℤ}
+theorem rise_local_frame (frame : ChildFrame) {F : Field} {η : ℤ} (C : CanonicalSignedPolicy frame F η)
     (hη : η = 1 ∨ η = -1) (opp : Site → Site → Prop)
     (hoppRaw : NonincreasingAlong (fun y => F y - F (y + (-η) • frame.shortShift)) opp)
     (hoppQuota : RetainQuota F opp)
@@ -185,10 +185,7 @@ theorem rise_local_frame (frame : ChildFrame) {F : Field} (C : CanonicalSignedPo
       exact Or.inl ha
     · rw [incomingPos_add c _ hsη] at hb
       exact Or.inr hb
-  have hDP : NonincreasingAlong (frame.slip F η) C.policy := by
-    rcases hη with rfl | rfl
-    · exact rawSlipPlus_of_canonical C
-    · exact rawSlipMinus_of_canonical C
+  have hDP : NonincreasingAlong (frame.slip F η) C.policy := rawSlip_of_canonical C
   have hDG : NondecreasingAlong (frame.slip F η)
       (fun c i => opp (c + η • frame.shortShift) (i + η • frame.shortShift)) := by
     intro c i h

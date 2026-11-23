@@ -1,4 +1,5 @@
 import FLatticePaper.CanonicalHeadline
+import FLatticePaper.Plane.Induction.NonfreeRoot
 
 /-! Checks for task 72 (nonfree roots): the W1Forced root condition of the drop lemma, the uniqueness of the retained input at a forced
 white (derived from the canonical policy), and the headline. Each `#guard_msgs` fails unless the axioms are standard. -/

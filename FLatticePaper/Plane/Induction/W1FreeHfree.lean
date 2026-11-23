@@ -163,8 +163,8 @@ theorem rowSq_of_tableShape {R : Site → Site → Prop} {S : Set Site} {z : Sit
 
 /-- **The free parent roots' `ParentSquareOut` from the table** (task 95): a free white root `z ∈ S` (with the rank bound `B` on `S`) has a
 forced edge (`free_forced_of_descent`), so its parent square with output holds (`parentSquareOut_of_forced`). -/
-theorem parentSquareOut_of_table {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
-    (P : FLatticePaper.W1Phase.OldPolicyRanked frame G seed) (hs : seed = fun _ _ => False)
+theorem parentSquareOut_of_table {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
+    (P : FLatticePaper.W1Phase.OldPolicyRanked frame G seed η) (hs : seed = fun _ _ => False)
     (hP : frame.Packet G) (hW1 : FLatticePaper.W1.W1Forced frame.child.num frame.child.den G)
     (S : Set Site) (B : ℤ) (hB : ∀ x ∈ S, P.rank x ≤ B)
     (hTab : ∀ z ∈ S, ¬ Nonfree frame z → laplacian G z = 0 → TableShape P.retained S z)
@@ -185,7 +185,7 @@ def sheetParentSet (word : Word) : Set Site :=
 with output holds. -/
 theorem hfree_sheet {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
     {seed : Site → Site → Prop} (P : FLatticePaper.W1Phase.OldPolicyRanked (frameAt (conjWord word))
-      (standardField (conjWord word)) seed)
+      (standardField (conjWord word)) seed (frameAt word).eps)
     (hs : seed = fun _ _ => False)
     (hW1 : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
       (standardField (conjWord word)))
@@ -202,7 +202,7 @@ theorem hfree_sheet {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE 
 /-- **W1Forced of the sheet minimum from the table, the rank bound and the collar input** (task 95). -/
 theorem W1Forced_of_tables {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
     {seed : Site → Site → Prop} (P : FLatticePaper.W1Phase.OldPolicyRanked (frameAt (conjWord word))
-      (standardField (conjWord word)) seed)
+      (standardField (conjWord word)) seed (frameAt word).eps)
     (hs : seed = fun _ _ => False)
     (hW1 : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
       (standardField (conjWord word)))

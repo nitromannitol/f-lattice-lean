@@ -79,7 +79,7 @@ theorem rank_bound_le {U V : Site} (hD : U.1 * V.2 - U.2 * V.1 ≠ 0) {Φ R : Si
 /-- **The rank of the policy bounded on the sheet parent set** (task 96): a rank `R`, strictly decreasing along the retained edges, bounded
 above on `sheetParentSet word`. -/
 theorem sheetParent_rank_bound {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
-    {seed : Site → Site → Prop} (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed) :
+    {seed : Site → Site → Prop} (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps) :
     ∃ R : Site → ℤ, (∀ c i : Site, P.retained c i → R i < R c) ∧ ∃ B : ℤ, ∀ x ∈ sheetParentSet word, R x ≤ B := by
   obtain ⟨K, hK⟩ := tie_iff_chain word h hSE.packet
   obtain ⟨r, lam, hlam, hstrict, hU, hV⟩ :=
@@ -106,8 +106,8 @@ theorem sheetParent_rank_bound {word : Word} (h : ∃ x ∈ word, x ≠ Digit.th
   unfold chainPot
   linarith
 
-theorem free_forced_of_descent_rk {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
-    (P : FLatticePaper.W1Phase.OldPolicyRanked frame G seed) (hP : frame.Packet G)
+theorem free_forced_of_descent_rk {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
+    (P : FLatticePaper.W1Phase.OldPolicyRanked frame G seed η) (hP : frame.Packet G)
     (hW1 : FLatticePaper.W1.W1Forced frame.child.num frame.child.den G)
     (S : Set Site) (B : ℤ) (Rk : Site → ℤ) (hdec : ∀ c i : Site, P.retained c i → Rk i < Rk c)
       (hB : ∀ x ∈ S, Rk x ≤ B)
@@ -232,8 +232,8 @@ theorem free_forced_of_descent_rk {frame : ChildFrame} {G : Field} {seed : Site 
   exact key ((B - Rk z).toNat + 1) z hz hfree hw (by push_cast; omega)
 
 /-- The parent square with output at a free white root of a set with a bounded rank `Rk` (the copy of `parentSquareOut_of_table`). -/
-theorem parentSquareOut_of_table_rk {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
-    (P : FLatticePaper.W1Phase.OldPolicyRanked frame G seed) (hs : seed = fun _ _ => False)
+theorem parentSquareOut_of_table_rk {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
+    (P : FLatticePaper.W1Phase.OldPolicyRanked frame G seed η) (hs : seed = fun _ _ => False)
     (hP : frame.Packet G) (hW1 : FLatticePaper.W1.W1Forced frame.child.num frame.child.den G)
     (S : Set Site) (B : ℤ) (Rk : Site → ℤ) (hdec : ∀ c i : Site, P.retained c i → Rk i < Rk c)
     (hB : ∀ x ∈ S, Rk x ≤ B)
@@ -247,7 +247,7 @@ theorem parentSquareOut_of_table_rk {frame : ChildFrame} {G : Field} {seed : Sit
 
 /-- **The lead's `hfree` on the sheet, with the rank bound from the drift** (task 96): the table is the only named input. -/
 theorem hfree_sheet_rk {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
-    {seed : Site → Site → Prop} (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hs : seed = fun _ _ => False)
     (hW1 : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
       (standardField (conjWord word)))
@@ -263,7 +263,7 @@ theorem hfree_sheet_rk {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (h
 
 /-- **W1Forced of the sheet minimum from the table and the collar input** (task 96): the rank bound is now derived, not named. -/
 theorem W1Forced_of_tables_rk {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
-    {seed : Site → Site → Prop} (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hs : seed = fun _ _ => False)
     (hW1 : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
       (standardField (conjWord word)))

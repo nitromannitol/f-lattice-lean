@@ -25,7 +25,7 @@ theorem HRootWeb_iff_bounds {N D t : ℤ} (hN : 1 ≤ N) (hND : N + 1 ≤ D) :
 
 theorem noBlackPairRise_of_cover {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (inputExit : Site → Site → Prop)
     (hW1 : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num
       (frameAt (conjWord word)).child.den (standardField (conjWord word)))

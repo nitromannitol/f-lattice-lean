@@ -3,7 +3,7 @@ import FLatticePaper.Plane.Induction.W1Constructor
 
 /-! Task 62 (2): the witness data of the earlier canonical policy, as a structure extending `OldPolicyData` (w3's file is not edited).
 
-`OldPolicyWitness frame G seed` adds to the policy the strict-interior witnesses of its forced whites: for every forced white `c`
+`OldPolicyWitness frame G seed η` adds to the policy the strict-interior witnesses of its forced whites: for every forced white `c`
 with its forced input `i` (not a seed), the forcing of `(c, i)` is a derivation `ForcedEdgeIn` whose squares lie in the strict interior
 of the earlier child (`StrictInterior`). This is the earlier W1 forcing (the induction hypothesis of §4: "the actual earlier unit
 witness"), in the form that the child's aligned-collar squares use. `witnessSquare` extracts from such a derivation the unit square of
@@ -14,8 +14,8 @@ namespace FLatticePaper.W1Witness
 open Farey FLatticePaper FLatticePaper.SquareClauses FLatticePaper.AndOrRank FLatticePaper.Induction FLatticePaper.W1
 
 /-- The earlier canonical policy with its strict-interior witnesses and private squares at the forced whites. -/
-structure OldPolicyWitness (frame : ChildFrame) (G : Field) (seed : Site → Site → Prop)
-    extends OldPolicyData frame G seed where
+structure OldPolicyWitness (frame : ChildFrame) (G : Field) (seed : Site → Site → Prop) (η : ℤ)
+    extends OldPolicyData frame G seed η where
   /-- Every forced non-seed white of the earlier field is forced by a derivation whose squares lie in the earlier strict interior. -/
   strictForced : ∀ c i, ForcedEdge G seed c i → ¬ seed c i →
     ForcedEdgeIn G (StrictInterior frame.child.num frame.child.den) seed c i

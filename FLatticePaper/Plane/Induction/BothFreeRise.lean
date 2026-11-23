@@ -12,12 +12,6 @@ namespace FLatticePaper.BothFreeRise
 
 open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.BothFreeGrades
 
-/-- The policy `P` of sign `η` prescribes the free directions: at a free H (V) white centre its only selected input is the prescribed
-one. -/
-def PrescribedAt (frame : ChildFrame) (F : Field) (η : ℤ) (P : Site → Site → Prop) : Prop :=
-  (∀ c, c ∈ frame.freeH → laplacian F c = 0 → ∀ j, P c j ↔ j = c + frame.prescribedH η c) ∧
-  (∀ c, c ∈ frame.freeV → laplacian F c = 0 → ∀ j, P c j ↔ j = c + frame.prescribedV η c)
-
 theorem shiftσ_eq (frame : ChildFrame) (η : ℤ) : shiftσ frame η = η • frame.shortShift := by
   ext <;> simp
 
@@ -89,26 +83,25 @@ theorem both_free_rise_false (frame : ChildFrame) {F : Field} (hS : frame.HasStr
       apply hvu
       rw [hu, hv, hag]
 
-/-- **The chain monotonicity from the free roots.** `Φ_η` does not increase along the F-policy `C.policy`, given: the per-sign
-prescription links (`hLinkP` for sign `η`, `hLinkQ` for the translated opposite policy `opp` of sign `−η`), the opposite policy's raw
-slip monotonicity (`ChainPairData.oppRawSlip`), its quota and price monotonicity (`hoppQuota`, `hoppPrice`), the unit shifted-price
-increments (`hunit`, from `HasUnitPrice`), the harmonic window at a shifted V root (`hwin`), and the forced transfer (`hfree`: a rise's
-roots are free, the audit's finite unit forcing step, NOT yet formalized). -/
-theorem chain_nonincreasing_of_free_roots (frame : ChildFrame) {F : Field} (C : CanonicalSignedPolicy frame F)
-    (hS : frame.HasStrips F) {η : ℤ} (hη : η = 1 ∨ η = -1) (opp : Site → Site → Prop)
-    (hoppRaw : NonincreasingAlong (fun y => F y - F (y + (-η) • frame.shortShift)) opp)
-    (hoppQuota : RetainQuota F opp) (hoppPrice : ∀ c i, opp c i → frame.price F i ≤ frame.price F c)
+/-- **The chain monotonicity from the free roots.** `Φ_η` does not increase along the sign-`η` game `G.game η` of the canonical signed
+games, given: the forced transfer (`hfree`: a rise's roots are free, the audit's finite unit forcing step, NOT yet formalized), and the
+shifted-V window at a rise (`hwin`, derivable from `z' ∈ freeV`: verified on all free V centres of the words of length ≤ 6). The
+prescription links are the fields `prescribed` of the two games (sign `η` and the opposite sign `−η`); the opposite policy's raw slip,
+quota and price come from its game; the unit increments from `HasUnitPrice`. -/
+theorem chain_nonincreasing_of_free_roots (frame : ChildFrame) {F : Field} (G : CanonicalSignedGames frame F)
+    (hS : frame.HasStrips F) {η : ℤ} (hη : η = 1 ∨ η = -1)
     (hlapF : ∀ c, laplacian F c = -1 ∨ laplacian F c = 0) (hU : HasUnitPrice frame F)
-    (hLinkP : PrescribedAt frame F η C.policy) (hLinkQ : PrescribedAt frame F (-η) opp)
-    (hfree : ∀ z u, C.policy z u → frame.chainPotential F η z < frame.chainPotential F η u →
+    (hfree : ∀ z u, (G.game η hη).policy z u → frame.chainPotential F η z < frame.chainPotential F η u →
       (z ∈ frame.freeH ∨ z ∈ frame.freeV) ∧ (z + η • frame.shortShift ∈ frame.freeH ∨ z + η • frame.shortShift ∈ frame.freeV))
-    (hwin : ∀ z u, C.policy z u → frame.chainPotential F η z < frame.chainPotential F η u →
+    (hwin : ∀ z u, (G.game η hη).policy z u → frame.chainPotential F η z < frame.chainPotential F η u →
       z + η • frame.shortShift ∈ frame.freeV →
       (3 - 2 * frame.child.den ≤ frame.sGrade (z + η • frame.shortShift) ∧
         frame.sGrade (z + η • frame.shortShift) ≤ 2 * (frame.child.den + frame.child.num) - 1) ∧
       (3 - 2 * frame.child.den ≤ frame.sGrade (u + η • frame.shortShift) ∧
         frame.sGrade (u + η • frame.shortShift) ≤ 2 * (frame.child.den + frame.child.num) - 1)) :
-    NonincreasingAlong (frame.chainPotential F η) C.policy := by
+    NonincreasingAlong (frame.chainPotential F η) (G.game η hη).policy := by
+  set C := G.game η hη with hC
+  set O := G.game (-η) (neg_unit hη) with hO
   intro z u hu
   by_contra hlt
   rw [not_le] at hlt
@@ -120,14 +113,14 @@ theorem chain_nonincreasing_of_free_roots (frame : ChildFrame) {F : Field} (C : 
     have hs : ((η • frame.shortShift).1 + (η • frame.shortShift).2) % 2 = 0 := by
       obtain ⟨k, hk⟩ : (2 : ℤ) ∣ frame.shortShift.1 + frame.shortShift.2 :=
         Int.dvd_of_emod_eq_zero (FLatticePaper.BothFreeGrades.shortShift_even frame)
-      rcases hη with rfl | rfl <;> simp <;> omega
+      rcases hη with h | h <;> simp only [h, Prod.smul_fst, Prod.smul_snd, smul_eq_mul] <;> omega
     have he := TwoRank.edge_add_of_even (η • frame.shortShift) hs (C.policyEdge a b hab)
     have h1 := (hU _ _ he).2
     unfold priceIncrement at h1
     omega
-  obtain ⟨hgF, hF, -, -, hPs, v, hv1, hv2, hvQ⟩ := TwoRank.rise_local_frame frame C hη opp hoppRaw hoppQuota hoppPrice
-    hlapF hunit hu hin hlt
+  obtain ⟨hgF, hF, -, -, hPs, v, hv1, hv2, hvQ⟩ := TwoRank.rise_local_frame frame C hη O.policy
+    (rawSlip_of_canonical O) O.quota (price_nonincreasing_of_canonical O) hlapF hunit hu hin hlt
   obtain ⟨hzF, hzG⟩ := hfree z u hu hlt
-  exact both_free_rise_false frame hS hη hLinkP hLinkQ hu hF hgF hzF hzG hv2 hvQ (fun h => hwin z u hu hlt h) hPs
+  exact both_free_rise_false frame hS hη C.prescribed O.prescribed hu hF hgF hzF hzG hv2 hvQ (fun h => hwin z u hu hlt h) hPs
 
 end FLatticePaper.BothFreeRise

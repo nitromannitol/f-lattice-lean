@@ -79,7 +79,7 @@ theorem tie_sheetA_white {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
 /-- **The A-policy retains the other input of a tied black centre.** -/
 theorem sheetPolicyA_of_tie {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
-    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     {c i j : Site} (hc : c ∈ (frameAt word).closedPolygon) (hi : Edge i c) (hj : Edge j c) (hij : i ≠ j)
     (hb : laplacian (standardField word) c = -1) (hΨc : sheetDiffW word c = 0) (hΨj : sheetDiffW word j ≤ -1) :
     sheetPolicyA P (frameAt word).sheetShift c i := by
