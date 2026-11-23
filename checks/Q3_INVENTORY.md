@@ -540,3 +540,9 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - DEFINED the inherited structure `CollarChains` (fields `out`, `corners`, `phase`): the rejected pointer is outside the square; the other corners are black or forced white with the output in the square; the phase chains reach the centre. These are the parent's collar return chains, to be supplied as data like `OldPolicyWitness`.
 - PROVED `hcollar_of_chains`: from `CollarChains` and the strictness of the collar square (`hstrict`, named), `HsqAt word P c` holds at every strict collar centre with laplacian 0.
 - Checks: `checks/CollarGlue.lean`. Root build clean; sandbox logs clean.
+
+### Task 72 (hcollar, (a) lemma 1): CollarBand.lean
+
+- PROVED `exists_translate_of_not_nonfree`: a root that is not nonfree has a child-deck translate `z + (i U + j V)` in `freeH ∪ freeV`, with `U = (d, n)` and `V = (n − d, n + d)` (the child kernel and transverse).
+- This is the first of the four lemmas for the band (a). The others are the parent identity `c − l_v = I − v + i V_p − j U_p` (with `v = zTurn w`), the sign of the translate index, and the bounds on `s(v)` from the V spectrum and `excVertex`.
+- Checks: `checks/CollarBand.lean`. Root build clean; sandbox logs clean.
