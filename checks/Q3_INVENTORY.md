@@ -414,3 +414,9 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - The hypothesis `hW1` (the conjugate's `W1Forced`) is the input of the covers, not derived here.
 - NOT PROVED (case (b)): a free old root in the conjugate frame. Missing: (i) the strict-interior ⟹ nonfree count (FIXED_FREE §7), (ii) the H-web of the translate of the old root by `−V` or `−K` (`hweb_of_freeH` is stated for free H sites of the physical frame, and the correspondence with the conjugate's free sets via `zTurn` is not in Lean), (iii) the V-block for the translate and the exceptional endpoint of Q19 (`exceptional_drop_excluded` with `exceptional_hT_proved` is proved, but the old root must be the exceptional vertex).
 - Checks: `checks/NegTieNonfree.lean`. Root build clean; sandbox logs clean.
+
+### Task 72 (case (b), link 1: strict interior is nonfree): StrictNonfree.lean
+
+- PROVED `FLatticePaper.Induction.strictInterior_nonfree`: a site of `StrictInterior` (parity-resolved `b − T < t < a`, `h < s < T + c`) is nonfree. The H trace: the windows of `avoid_H_even_low` / `avoid_H_odd_low` exclude every translate `t − jT`. The V trace: a free V translate `s + iT` lies in the parity range of `E` and in `vSpectrum`; odd strict interior points and even ones with `s > L − 2` are excluded for every `i`; even ones with `s ≤ L − 2` are the exceptional case: `i = 0`, `j = 0` (other `j` leave `E`), and the left neighbour lies in `E`.
+- Checks: `checks/StrictNonfree.lean`. Root build clean; sandbox logs clean.
+- Not in this step: links 2 and 3 of case (b).
