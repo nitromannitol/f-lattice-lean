@@ -380,6 +380,7 @@ import FLatticePaper.Plane.Induction.ConjFreeRoot
 import FLatticePaper.Plane.Induction.EvenWindow
 import FLatticePaper.Plane.Induction.NeighbourDrop
 import FLatticePaper.Plane.Induction.EdgeDrop
+import FLatticePaper.Plane.Induction.VPathFloor
 import FLatticePaper.Plane.Induction.HWeb
 import FLatticePaper.Plane.Induction.W1Collar
 import FLatticePaper.Plane.Induction.W1CollarBox
