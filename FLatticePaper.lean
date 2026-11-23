@@ -383,5 +383,6 @@ import FLatticePaper.Plane.Induction.W1ArcBottom
 import FLatticePaper.Plane.Induction.W1VShift
 import FLatticePaper.Plane.Induction.W1ConjPrice
 import FLatticePaper.Plane.Induction.W1BottomValue
+import FLatticePaper.Plane.Induction.W1HlastCollar
 
 /-! Root import for the corrected F-lattice paper. -/
