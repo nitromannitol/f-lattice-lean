@@ -302,6 +302,12 @@ lake env lean checks/SitePairScopeAxioms.lean
 lake env lean checks/SiteCellAxioms.lean
 lake env lean checks/CeilWordsAxioms.lean
 lake env lean checks/SiteHullOddAxioms.lean
+lake env lean checks/SiteHullEvenAxioms.lean
+lake env lean checks/SiteBandAxioms.lean
+lake env lean checks/SiteFwdCoverAxioms.lean
+lake env lean checks/SiteVertCoverAxioms.lean
+lake env lean checks/SiteLowLeftAxioms.lean
+lake env lean checks/SiteUniqueAxioms.lean
 lake env lean checks/VArcLongitudinal.lean
 lake env lean checks/VArcOffers.lean
 lake env lean checks/ParentStepDischarge.lean
