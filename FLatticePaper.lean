@@ -258,5 +258,6 @@ import FLatticePaper.Construction.OddChartParity
 import FLatticePaper.Construction.OddAlternateCopies
 import FLatticePaper.Construction.OddShear
 import FLatticePaper.StrongHeadline
+import FLatticePaper.Plane.Induction.BaseStrip
 
 /-! Root import for the corrected F-lattice paper. -/
