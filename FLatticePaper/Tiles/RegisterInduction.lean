@@ -2,6 +2,7 @@ import FLatticePaper.Tiles.BottomEdges
 import FLatticePaper.Tiles.StandardTiles
 import FLatticePaper.Tiles.StandardClauseA
 import FLatticePaper.Tiles.StandardBoundary
+import FLatticePaper.Tiles.RowsOfBoundary
 
 /-! Task 55 (R1/R3): the register-to-tile link S2, and its induction over words.
 
@@ -14,7 +15,7 @@ Everything else is proved here: the register recursion, its identification with 
 namespace FLatticePaper.Tiles.RegisterInduction
 
 open FLatticePaper FLatticePaper.Farey FLatticePaper.Tiles FLatticePaper.Tiles.Standard FLatticePaper.Tiles.StandardClause
-open FLatticePaper.Tiles.StandardBoundary
+open FLatticePaper.Tiles.StandardBoundary FLatticePaper.Tiles.RegionRuns
 
 /-- The registers after reading `rest` from the prefix `pre`: the recursion of `bottomFrom`, as a function of the registers. -/
 def regsGo : Word → Word → F2Word × F2Word → F2Word × F2Word
@@ -55,15 +56,33 @@ def HasOne2 (w : Word) : Prop := ∃ y ∈ w, y = Digit.one ∨ y = Digit.two
 /-- The prefix `w` has read a letter `1` or `3` (the even register is defined). -/
 def HasOne3 (w : Word) : Prop := ∃ y ∈ w, y = Digit.one ∨ y = Digit.three
 
-/-- S2 for the odd register: the first arc of the odd register tile's boundary is the odd register of `w`. -/
+/-- The arc data of a four-arc loop `boundaryWordOf w1 w2`: the hypotheses of `rows_of_boundary` (the first arc has letters
+one and i, the second i and -1, n1 < n2, a + s2 > 0, the corner conditions Ra and Rb, and w2 ends in i). -/
+def ArcOK (w1 w2 : F2Word) : Prop :=
+  (∀ x ∈ w1, x = Unit4.one ∨ x = Unit4.i) ∧ (∀ x ∈ w2, x = Unit4.i ∨ x = Unit4.negOne) ∧
+    (F2Word.sum w1).2 < (F2Word.sum w2).2 ∧ 0 < (F2Word.sum w1).1 + (F2Word.sum w2).1 ∧
+    ¬ (w1.getLast? = some Unit4.one ∧ w2.head? = some Unit4.negOne) ∧
+    ¬ (w1.head? = some Unit4.i ∧ w2.getLast? = some Unit4.i) ∧ w2.getLast? = some Unit4.i
+
+/-- S2 for the odd register: the first arc of the odd register tile's boundary is the odd register of `w`, and the
+arc data holds. -/
 def S2odd (w : Word) : Prop :=
-  HasOne2 w → ∃ w2 : F2Word,
+  HasOne2 w → ∃ w2 : F2Word, ArcOK (regsAfter w).1 w2 ∧
     IsBoundaryWordAt (cellTileOf (stateAt w).tOdd) (0, 0) (boundaryWordOf (regsAfter w).1 w2)
 
-/-- S2 for the even register: the first arc of the even register tile's boundary is the even register of `w`. -/
+/-- S2 for the even register: the first arc of the even register tile's boundary is the even register of `w`, and the
+arc data holds. -/
 def S2even (w : Word) : Prop :=
-  HasOne3 w → ∃ w2 : F2Word,
+  HasOne3 w → ∃ w2 : F2Word, ArcOK (regsAfter w).2 w2 ∧
     IsBoundaryWordAt (cellTileOf (stateAt w).tEven) (0, 0) (boundaryWordOf (regsAfter w).2 w2)
+
+/-- From S2 for the odd register: the rows of the odd register tile are the arc intervals of its boundary (the converse of R2). -/
+theorem S2odd_rows (w : Word) (h : S2odd w) (hw : HasOne2 w) :
+    ∃ w2 : F2Word, ∀ x k : ℤ, ((x, k) : GInt) ∈ cellTileOf (stateAt w).tOdd ↔
+      RowsOfBoundary.RowG (cntI ((regsAfter w).1 ++ w2)) (F2Word.sum ((regsAfter w).1 ++ w2)).1
+        (FF ((regsAfter w).1 ++ w2)) x k := by
+  obtain ⟨w2, ⟨h1, h2, hn, ha, hRa, hRb, hl⟩, hT⟩ := h hw
+  exact ⟨w2, fun x k => RowsOfBoundary.rows_of_boundary _ (regsAfter w).1 w2 h1 h2 hn ha hRa hRb hl hT x k⟩
 
 def S2 (w : Word) : Prop := S2odd w ∧ S2even w
 
