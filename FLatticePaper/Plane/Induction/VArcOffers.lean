@@ -2,6 +2,7 @@ import FLatticePaper.Plane.Induction.VArcLongitudinal
 import FLatticePaper.Plane.Induction.SheetFacts
 import FLatticePaper.Plane.Induction.SheetRegions
 import FLatticePaper.Plane.Induction.SheetDifference
+import FLatticePaper.Plane.Induction.StrongEstimates
 
 /-! Task 56 (Q2, the offers of the longitudinal exits), derived from the conjugate packet.
 
@@ -696,5 +697,282 @@ theorem second_offer_of_longitudinal {frame conj : ChildFrame} {G : Field}
   rcases frame.eps_unit with h | h
   · exact second_offer_plus hconj hStrips h hv hN hn hs
   · exact second_offer_minus hconj hG hStrips h hv hN hn hsl hs
+
+
+/-! ### The offsets stay in `E` -/
+
+/-- The lattice identity `n s(v) − L t(v) = T v₂` (`L = d + n`, `T = d² + 2dn − n²`, `v₂` the second lattice coordinate). -/
+theorem lattice_identity_second (frame : ChildFrame) (v : Site) :
+    frame.child.num * frame.sGrade v - (frame.child.den + frame.child.num) * frame.tGrade v =
+      frame.child.periodDenominator * v.2 := by
+  have hPD : frame.child.periodDenominator = frame.child.den ^ 2 + 2 * frame.child.den * frame.child.num - frame.child.num ^ 2 := by
+    unfold Fraction.periodDenominator
+    ring
+  rw [hPD]
+  unfold ChildFrame.sGrade ChildFrame.tGrade
+  ring
+
+/-- On an even site the child `t`-grade is even (`d − n` is even, `x − y` is even). -/
+theorem tGrade_even_of_evenSite (frame : ChildFrame) {v : Site} (hv : EvenSite v) : frame.tGrade v % 2 = 0 := by
+  have hev : (frame.child.num + frame.child.den) % 2 = 0 := frame.child_even
+  have hv' : (v.1 + v.2) % 2 = 0 := hv
+  obtain ⟨k, hk⟩ : ∃ k : ℤ, frame.child.den - frame.child.num = 2 * k := ⟨(frame.child.den - frame.child.num) / 2, by omega⟩
+  obtain ⟨m, hm⟩ : ∃ m : ℤ, v.1 - v.2 = 2 * m := ⟨(v.1 - v.2) / 2, by omega⟩
+  have ht : frame.tGrade v = 2 * (frame.child.num * m - k * v.2) := by
+    unfold ChildFrame.tGrade
+    linear_combination frame.child.num * hm - v.2 * hk
+  rw [ht]
+  generalize frame.child.num * m - k * v.2 = A
+  omega
+
+/-- The even top edge is not reached on the longitudinal range: `t = L − 2`, `0 ≤ s ≤ L − 1` is impossible, since the lattice
+identity forces `v₂ = −1`, then `n s = 2n² − 2L`, so `n ∣ 2d` against `gcd(n, d) = 1`. -/
+theorem even_top_false (n d s v2 : ℤ) (hn : 3 ≤ n) (hnd : n + 2 ≤ d) (hcop : IsCoprime n d) (hs0 : 0 ≤ s)
+    (hs1 : s ≤ d + n - 1) (hid : n * s - (d + n) * (d + n - 2) = (d ^ 2 + 2 * d * n - n ^ 2) * v2) : False := by
+  have hT : 0 < d ^ 2 + 2 * d * n - n ^ 2 := by nlinarith
+  have hLT : (d + n) * (d + n - 2) < 2 * (d ^ 2 + 2 * d * n - n ^ 2) := by nlinarith
+  have hneg : v2 < 0 := by
+    by_contra h
+    replace h := not_lt.mp h
+    nlinarith
+  have hgt : -2 < v2 := by
+    by_contra h
+    replace h := not_lt.mp h
+    nlinarith
+  have hv2 : v2 = -1 := by omega
+  subst hv2
+  have hns : n * s = 2 * n ^ 2 - 2 * (d + n) := by linear_combination hid
+  have hdvd : n ∣ 2 * d := ⟨2 * n - s - 2, by linear_combination hns⟩
+  have h2 : n ∣ 2 := hcop.dvd_of_dvd_mul_right hdvd
+  have := Int.le_of_dvd (by norm_num) h2
+  omega
+
+/-- The odd top edge `t = d` is not reached on the longitudinal range `2 − (d − n) ≤ s ≤ L − 1`: the identity forces `v₂ = −1`,
+then `n (s + d − n) = 0`. -/
+theorem odd_top_false (n d s v2 : ℤ) (hn : 3 ≤ n) (hnd : n + 2 ≤ d) (hs0 : 2 - (d - n) ≤ s)
+    (hs1 : s ≤ d + n - 1) (hid : n * s - (d + n) * d = (d ^ 2 + 2 * d * n - n ^ 2) * v2) : False := by
+  have hT : 0 < d ^ 2 + 2 * d * n - n ^ 2 := by nlinarith
+  have hneg : v2 < 0 := by
+    by_contra h
+    replace h := not_lt.mp h
+    nlinarith
+  have hgt : -2 < v2 := by
+    by_contra h
+    replace h := not_lt.mp h
+    nlinarith
+  have hv2 : v2 = -1 := by omega
+  subst hv2
+  have h0 : n * (s + (d - n)) = 0 := by linear_combination hid
+  rcases mul_eq_zero.mp h0 with h | h
+  · omega
+  · omega
+
+/-- The odd edge `t = d − 1` is not reached on the longitudinal range (the identity forces `v₂ = −1`, which is too small). -/
+theorem odd_top_one_false (n d s v2 : ℤ) (hn : 3 ≤ n) (hnd : n + 2 ≤ d) (hs0 : 2 - (d - n) ≤ s)
+    (hs1 : s ≤ d + n - 1) (hid : n * s - (d + n) * (d - 1) = (d ^ 2 + 2 * d * n - n ^ 2) * v2) : False := by
+  have hT : 0 < d ^ 2 + 2 * d * n - n ^ 2 := by nlinarith
+  have hneg : v2 < 0 := by
+    by_contra h
+    replace h := not_lt.mp h
+    nlinarith
+  have hgt : -2 < v2 := by
+    by_contra h
+    replace h := not_lt.mp h
+    nlinarith
+  have hv2 : v2 = -1 := by omega
+  subst hv2
+  nlinarith
+
+
+/-- The offset `X` of the longitudinal exits: `t(X) = 2` and `c − 2 ≤ s(X) ≤ T − c + 1` (`c = d − n`, `T` the period). It is
+`X = U_q` for `W = 1` (`s(X) = T − 2K`) and `X = U_p` for `W = 0` (`s(X) = 2K`), with `K = D(d + n) + N(d − n)`. -/
+theorem offset_data (frame : ChildFrame) :
+    ∃ dX nX : ℤ, frame.offsetX = (dX, nX) ∧
+      frame.child.num * dX - frame.child.den * nX = 2 ∧
+      (frame.child.den - frame.child.num) - 2 ≤
+        (frame.child.den + frame.child.num) * dX + (frame.child.den - frame.child.num) * nX ∧
+      (frame.child.den + frame.child.num) * dX + (frame.child.den - frame.child.num) * nX ≤
+        frame.child.periodDenominator - (frame.child.den - frame.child.num) + 1 ∧
+      (dX + nX) % 2 = 0 := by
+  have hPD : frame.child.periodDenominator =
+      frame.child.den ^ 2 + 2 * frame.child.den * frame.child.num - frame.child.num ^ 2 := by
+    unfold Fraction.periodDenominator
+    ring
+  have hnum := frame.child_num_eq
+  have hden := frame.child_den_eq
+  obtain ⟨hDpos, hN0, hNle⟩ := frame.valid.odd_bounds
+  obtain ⟨hdq0, hnq0, hnqle⟩ := frame.valid.even_bounds
+  have hevpar : (frame.parents.even.num + frame.parents.even.den) % 2 = 0 := frame.valid.even_parity
+  obtain ⟨hnpos, -, hdiff, -, -⟩ := frame.child_facts
+  have hD1 : 1 ≤ frame.parents.odd.den := by omega
+  have hdq1 : 1 ≤ frame.parents.even.den := by omega
+  have hnq0' : 0 ≤ frame.parents.even.num := by omega
+  have hN0' : 0 ≤ frame.parents.odd.num := by omega
+  have hTK : frame.child.periodDenominator =
+      2 * (frame.parents.odd.den * (frame.child.den + frame.child.num) +
+          frame.parents.odd.num * (frame.child.den - frame.child.num)) +
+        frame.parents.even.den * (frame.child.den + frame.child.num) +
+        frame.parents.even.num * (frame.child.den - frame.child.num) := by
+    rw [hPD, hnum, hden]
+    ring
+  have hK : frame.child.den - frame.child.num ≤
+      frame.parents.odd.den * (frame.child.den + frame.child.num) +
+        frame.parents.odd.num * (frame.child.den - frame.child.num) := by
+    nlinarith
+  have hdL : frame.child.den + frame.child.num ≤ frame.parents.even.den * (frame.child.den + frame.child.num) := by
+    nlinarith
+  have hncn : 0 ≤ frame.parents.even.num * (frame.child.den - frame.child.num) := by
+    nlinarith
+  rcases frame.eps_unit with heps | heps
+  · have hW : frame.phaseW = 1 := by
+      unfold ChildFrame.phaseW
+      rw [heps]
+      norm_num
+    have hX : frame.offsetX = (frame.parents.even.den, frame.parents.even.num) := frame.offsetX_of_W1 hW
+    have hε : frame.parents.odd.num * frame.parents.even.den - frame.parents.even.num * frame.parents.odd.den = 1 := by
+      have e : frame.eps = frame.parents.odd.num * frame.parents.even.den - frame.parents.even.num * frame.parents.odd.den :=
+        rfl
+      rw [← e]
+      exact heps
+    refine ⟨frame.parents.even.den, frame.parents.even.num, hX, ?_, ?_, ?_, ?_⟩
+    · rw [hnum, hden]
+      linear_combination 2 * hε
+    · linarith
+    · linarith
+    · omega
+  · have hW : frame.phaseW = 0 := by
+      unfold ChildFrame.phaseW
+      rw [heps]
+      norm_num
+    have hX : frame.offsetX = (2 * frame.parents.odd.den, 2 * frame.parents.odd.num) := frame.offsetX_of_W0 hW
+    have hε : frame.parents.odd.num * frame.child.den - frame.parents.odd.den * frame.child.num = -1 := by
+      have e := frame.eps_eq
+      rw [← e]
+      exact heps
+    refine ⟨2 * frame.parents.odd.den, 2 * frame.parents.odd.num, hX, ?_, ?_, ?_, ?_⟩
+    · linear_combination (-2 : ℤ) * hε
+    · linarith
+    · linarith
+    · omega
+
+/-- The sheet offset keeps the longitudinal point in the closed polygon: the top edges are not reached on the longitudinal range
+(`top_exclusion`), and the offset adds `t = 2` and `s ∈ [c − 2, T − c + 1]`. -/
+theorem mem_offset_of_longRange (frame : ChildFrame) {v : Site} (hv : v ∈ frame.closedPolygon)
+    (hsl : 2 - (frame.child.den - frame.child.num) ≤ frame.sGrade v)
+    (hsu : frame.sGrade v ≤ frame.child.den + frame.child.num - 1) (hn : 3 ≤ frame.child.num) :
+    v + frame.offsetX ∈ frame.closedPolygon := by
+  obtain ⟨dX, nX, hX, ht2, hs1, hs2, hpar⟩ := offset_data frame
+  rw [hX]
+  have hcop : IsCoprime frame.child.num frame.child.den := frame.child_reduced
+  have hPD : frame.child.periodDenominator =
+      frame.child.den ^ 2 + 2 * frame.child.den * frame.child.num - frame.child.num ^ 2 := by
+    unfold Fraction.periodDenominator
+    ring
+  have hev : (frame.child.num + frame.child.den) % 2 = 0 := frame.child_even
+  obtain ⟨hnpos, hnd0, hdiff, -, -⟩ := frame.child_facts
+  have hnd : frame.child.num + 2 ≤ frame.child.den := by omega
+  have htz : frame.tGrade (v + (dX, nX)) = frame.tGrade v + 2 := by
+    unfold ChildFrame.tGrade
+    simp only [Prod.fst_add, Prod.snd_add]
+    linear_combination ht2
+  have hsz : frame.sGrade (v + (dX, nX)) =
+      frame.sGrade v + ((frame.child.den + frame.child.num) * dX + (frame.child.den - frame.child.num) * nX) := by
+    unfold ChildFrame.sGrade
+    simp only [Prod.fst_add, Prod.snd_add]
+    ring
+  have hEq : EvenSite (v + (dX, nX)) ↔ EvenSite v := by
+    unfold EvenSite
+    simp only [Prod.fst_add, Prod.snd_add]
+    omega
+  rcases (frame.mem_closedPolygon_iff v).mp hv with ⟨hve, hb⟩ | ⟨hvo, hb⟩
+  · obtain ⟨hb1, hb2, hb3, hb4⟩ := hb
+    have htop : frame.tGrade v ≤ frame.child.den + frame.child.num - 4 := by
+      have hte := tGrade_even_of_evenSite frame hve
+      by_contra hcon
+      have h1 : frame.tGrade v = frame.child.den + frame.child.num - 2 ∨
+          frame.tGrade v = frame.child.den + frame.child.num - 3 := by
+        omega
+      rcases h1 with h1 | h1
+      · have hid := lattice_identity_second frame v
+        rw [h1, hPD] at hid
+        exact even_top_false frame.child.num frame.child.den (frame.sGrade v) v.2 hn hnd hcop hb3 hsu hid
+      · omega
+    refine (frame.mem_closedPolygon_iff _).mpr (Or.inl ⟨hEq.mpr hve, ?_, ?_, ?_, ?_⟩)
+    · rw [htz]
+      linarith
+    · rw [htz]
+      omega
+    · rw [hsz]
+      linarith
+    · rw [hsz]
+      linarith
+  · obtain ⟨hb1, hb2, hb3, hb4⟩ := hb
+    have htop : frame.tGrade v ≤ frame.child.den - 2 := by
+      by_contra hcon
+      have h1 : frame.tGrade v = frame.child.den - 1 ∨ frame.tGrade v = frame.child.den := by
+        omega
+      rcases h1 with h1 | h1
+      · have hid := lattice_identity_second frame v
+        rw [h1, hPD] at hid
+        exact odd_top_one_false frame.child.num frame.child.den (frame.sGrade v) v.2 hn hnd (by linarith) hsu hid
+      · have hid := lattice_identity_second frame v
+        rw [h1, hPD] at hid
+        exact odd_top_false frame.child.num frame.child.den (frame.sGrade v) v.2 hn hnd (by linarith) hsu hid
+    refine (frame.mem_closedPolygon_iff _).mpr (Or.inr ⟨fun h => hvo (hEq.mp h), ?_, ?_, ?_, ?_⟩)
+    · rw [htz]
+      linarith
+    · rw [htz]
+      omega
+    · rw [hsz]
+      linarith
+    · rw [hsz]
+      linarith
+
+
+/-- The offers of the longitudinal exits, for the quarter-turned earlier field of the packet: `mem` (the offset stays in `E`),
+`first` (`first_offer_of_phase_zero`, `first_offer_of_phase_one` with the named `ParentStepSign`), `second`. -/
+theorem longitudinalOffers_of_conj {frame conj : ChildFrame} {G : Field}
+    (hconj : conj.child = frame.parents.odd.rotate)
+    (hG : HasGeneratorPeriods conj.child G conj.coherentConstantU conj.coherentConstantV)
+    (hStrips : conj.HasStrips G)
+    (hS : frame.StripInputs (frame.sheetMin (quarterTurnField G)))
+    (hPSS : ParentStepSign frame (quarterTurnField G))
+    (hN : 0 < frame.parents.odd.num) (hn : 3 ≤ frame.child.num) :
+    frame.LongitudinalOffers (quarterTurnField G) where
+  mem := fun v hv hr => by
+    obtain ⟨hr1, hr2⟩ := hr
+    exact mem_offset_of_longRange frame hv hr1 hr2 hn
+  first := fun v hv hr => by
+    obtain ⟨hr1, hr2⟩ := hr
+    obtain ⟨hnpos, hnd, -, -, -⟩ := frame.child_facts
+    rcases frame.eps_unit with h | h
+    · have hW : frame.phaseW = 1 := by
+        unfold ChildFrame.phaseW
+        rw [h]
+        norm_num
+      exact first_offer_of_phase_one hconj hStrips hS hPSS hW hN hn hv hr2
+    · have hW : frame.phaseW = 0 := by
+        unfold ChildFrame.phaseW
+        rw [h]
+        norm_num
+      exact first_offer_of_phase_zero hconj hG hS hW hv (by omega)
+  second := fun v hv hr => by
+    obtain ⟨hr1, hr2⟩ := hr
+    exact second_offer_of_longitudinal hconj hG hStrips hv hN hn hr1 hr2
+
+/-- The V-arc range `VArcInputs` of the current word, from the strong estimates of the earlier word `conjWord word`, the named
+`ParentStepSign` (the one input left to w2), and the child strip and height inputs. -/
+theorem vArcInputs_of_strong {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) {F : Field}
+    (hSE : StrongEstimates (conjWord word))
+    (hPSS : ParentStepSign (frameAt word) (quarterTurnField (standardField (conjWord word))))
+    (hS : (frameAt word).StripInputs ((frameAt word).sheetMin (quarterTurnField (standardField (conjWord word)))))
+    (hH : (frameAt word).HeightInputs ((frameAt word).sheetMin (quarterTurnField (standardField (conjWord word)))))
+    (hagree : ∀ y ∈ (frameAt word).closedPolygon,
+      F y = (frameAt word).sheetMin (quarterTurnField (standardField (conjWord word))) y)
+    (hper : HasGeneratorPeriods (frameAt word).child F 0 (frameAt word).coherentConstantV) :
+    VArcInputs (frameAt word) F :=
+  vArcInputs_of_longitudinal h hS hH hagree hper
+    (longitudinalOffers_of_conj (frameAt_conj_child h) hSE.packet.periods hSE.packet.strips hS hPSS
+      (frameAt_odd_num_pos h) (child_num_ge_three h))
 
 end FLatticePaper.Induction

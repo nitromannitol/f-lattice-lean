@@ -11,3 +11,9 @@ import FLatticePaper.Plane.Induction.VArcOffers
 #print axioms FLatticePaper.Induction.second_offer_of_longitudinal
 #print axioms FLatticePaper.Induction.sp_window_plus
 #print axioms FLatticePaper.Induction.sp_window_minus
+#print axioms FLatticePaper.Induction.mem_offset_of_longRange
+#print axioms FLatticePaper.Induction.offset_data
+#print axioms FLatticePaper.Induction.longitudinalOffers_of_conj
+#print axioms FLatticePaper.Induction.vArcInputs_of_strong
+#print axioms FLatticePaper.Induction.even_top_false
+#print axioms FLatticePaper.Induction.odd_top_false
