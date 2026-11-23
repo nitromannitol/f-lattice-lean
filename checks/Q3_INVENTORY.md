@@ -630,3 +630,13 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - PROVED `hstrict_of_strong` (word, hw, hSE) for all four classes: the bottom, top, left (`left_square_strict`) and right (`right_square_strict`) branches of `collarBase`; `hn3` comes from `child_num_ge_three hw`.
 - PROVED `hcollar_discharged` (word, hw, hSE): the collar conclusion `HsqAt` for a strict centre, from the chains only. The `hstrict` input is no longer a hypothesis.
 - Checks: `checks/CollarRight.lean`, `checks/CollarStrict.lean`. Root build clean; sandbox logs clean.
+
+### Task 72 (Q13, the minus sign): scripts and CanonicalSigned.lean
+
+- Scripts fixed (Q13.md l.17): `scripts/s3_free_check.py` and `scripts/s3_removal_check.py` now take the sign `η` in the grading `J_η = cut_on(F, w, 0, 1, η)`, the raw slip `D_η(z) = F z − F(z + η σ)`, the lift coefficient `−η J_η`, and the prescribed directions (both were the plus quantities before).
+- Numerics (words of length ≤ 4, 116 words): the removal rows match the level labels with zero order violations for `η = −1` on the minus row `V_r..V_1, H_0, V_0, H_{−1}..H_{1−d}, V_{−1}..V_{r+1−L}` (116/116), and for `η = +1` on the plus row (116/116). The minus-mirror row fails (1,792 violations at `η = +1`).
+- Prescribed minus edges: all permitted and weakly lower in `(P, J_−)` (no failure entries); every kept edge is permitted (`kept_not_permitted` absent over both signs).
+- The equal-pair acyclicity test in `s3_free_check.py` still reports 4-cycles for `η = −1` at each word (the greedy white choice). The fixer's replay `check_signed_ports.py` (Python 3.9, `--depth 4`) reports 116 words, 9,724 ports and 286,416 classes at each sign with no failure; the difference is the white assignment (the replay saturates the square clauses), so the greedy script is not decisive for acyclicity.
+- Lean: `CanonicalSignedPolicy` now carries the minus permit `permittedMinus` (the analogue of `permitted`, `slipPermits F (fun z => F (z + (−1)•σ))`) in place of the bare field `rawSlipMinus`; `rawSlipMinus_of_canonical` derives the raw slip from it (as `rawSlipPlus_of_canonical` does for `+1`). `S3FreeBoundary`'s `prescribedH η`, `prescribedV η` already take `η ∈ {±1}`.
+- Not done: a general Lean proof of `permittedMinus` from the minus prescription (the plus `permitted` is also an input; the minus one is the same kind of input).
+- Checks: `checks/CanonicalSigned.lean`. Root build: see the commit.

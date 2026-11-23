@@ -35,12 +35,13 @@ def run(args):
     N, D, n, d, T, eps = fr["N"], fr["D"], fr["n"], fr["d"], fr["T"], fr["eps"]
     L = n + d
     P = cut_on(F, w, 1, 0, 1)
-    J = cut_on(F, w, 0, 1, 1)
+    # Task 72 Q13: the grading J_eta = ceil(D_eta/2) and the raw slip D_eta(z) = F(z) - F(z + eta*sigma) use the sign eta.
+    J = cut_on(F, w, 0, 1, eta)
     short = (2 * eps * D, 2 * eps * N)
     U, V = (d, n), (n - d, n + d)
 
     def D1(z):
-        return F(z) - F((z[0] + short[0], z[1] + short[1]))
+        return F(z) - F((z[0] + eta * short[0], z[1] + eta * short[1]))
 
     def permitted(c, i):
         return D1(i) - D1(c) <= 0
@@ -215,7 +216,8 @@ def run(args):
                 level[r] = 1 + max(level[x] for x in graph[r])
                 ready.append(r)
     stats["levelled"] = len(level)
-    stats["level_violations"] = sum(1 for r in reps for t in graph[r] if not level[t] < level[r])
+    stats["level_violations"] = sum(1 for r in reps for t in graph[r]
+                                     if r in level and t in level and not level[t] < level[r])
     # (b) acyclicity (Kahn) on equal-pair kept edges
     indeg = defaultdict(int)
     for r in reps:
