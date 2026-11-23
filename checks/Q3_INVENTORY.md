@@ -51,12 +51,13 @@ Status: *discharged* = supplied by a wrapper from `StrongEstimates (conjWord wor
 
 - **Category (ii) (the old canonical policy and forced-white classification):** no Lean hypothesis in the Q3 files. The paper's uses (the "matched old policy" in paragraph 4, the retention and the monotone policy in paragraphs 6 and 7, the forced-white edges in paragraph 2) are not formalized. The S3 `CanonicalPolicy` structure (S3Canonical.lean) is a different, earlier object.
 - **Category (iii) window mod 2C (chart, paragraph 4):** the common-shift check `q3_chart_mod_check.py` holds with the window `[λ, λ+2C)` taken mod `2C`, on all 417360 pairs (shift 0 or `−ηεU_q`). The Lean `chart_separation` (Q3Inputs.lean:14) covers only the separation step. The window itself is not formalized.
-- **Paragraph 8, V star:** `a ∈ {0,1}` and the `j = 0` translate are not formalized: they use the monotone V path and the translate index of `d_f`, which are not in the codebase's interface. Numerically `a ∈ {0,1}` holds on the child's native V sites (5700/5700, q3_child_native.py).
+- **Paragraph 8, V star (task 60, formalized):** `native_V_a_zero_or_one` (Q3VStar.lean) gives `a ∈ {0,1}` on the native box, from `price_floor_bound_of_strong` and `zeroStrip_of_strong` (category (i)); `aVal_translate_UV` gives `a(x + iU_p + jV_p) = a(x) + j`; `drop_forces_j_zero` gives `j = 0` for a drop 1 → 0. The reading of 'the pair' (which two values of `d_f` form the pair, PROVISIONAL, category (iii)) is not fixed by the text; the lemmas are stated for `a` and for `d_f` values through `a = −p`.
+- **V path (task 60):** the floor agreement `vBlock_floor_agree` (Q3VPath.lean), the box `vbox_tp_bounds` and the odd vertices `odd_vertex_tp_bounds` carry no named hypotheses beyond the child parameters (category (v)).
 - **Paragraph 2 (inputs of a black centre in E):** the exit lemma `exit_centre_on_boundary_spectrum` (Q3Exit.lean:43) reduces the claim to the two named hypotheses (iv). The strip facts of paragraph 2 are field data (i), not used in Lean.
 
 ## Summary of open items
 
-1. `hweb` (Q3Paragraph8.lean:72), category (iv): the H-web floor step.
+1. `hweb` (Q3Paragraph8.lean:72), category (iv): the H-web floor step (the regular even and odd web values; the V-web floor step is in Q3VPath as an arithmetic box, not as a named hypothesis).
 2. (discharged in task 60: `hRectInputs`, `hBoundary`, by W1Exit.lean:303–307.)
 3. The rectangle and boundary readings `openRect`, `onBoundarySpectrum` (Q3Exit.lean:25, 36), category (iii)/(iv): PROVISIONAL.
 4. `hexit` (Q3Window.lean:23, 31, 39, 47), category (iii): the exit reading.
