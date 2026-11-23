@@ -338,5 +338,6 @@ import FLatticePaper.Plane.Induction.W1Witness
 import FLatticePaper.Plane.Induction.W1Return
 import FLatticePaper.Plane.Induction.W1Phase
 import FLatticePaper.Plane.Induction.StrongPriceValues
+import FLatticePaper.Plane.Induction.StrongHSpan
 
 /-! Root import for the corrected F-lattice paper. -/
