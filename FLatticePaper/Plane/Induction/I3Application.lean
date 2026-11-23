@@ -297,18 +297,27 @@ theorem i3_sheet_eq_chainPotential (word : Word) (G : Field) (x : Site) :
   simp only [Prod.fst_add, Prod.snd_add, Prod.smul_fst, Prod.smul_snd, smul_eq_mul, add_sub_assoc]
   ring
 
-/-- **Unit increments of the sheet potential at the matching phase** `eps(word) = ε_u`, from the strong estimates of the
-earlier word `conjWord word`. -/
-theorem i3_sheet_unit_of_strong {word : Word} (h : StrongEstimates (conjWord word))
-    (hphase : (frameAt word).eps = (frameAt (conjWord word)).eps) :
+/-- **The chain potential of the phase `η` of an earlier word has unit increments**, from its strong estimates at that phase. -/
+theorem i3_chainPotential_unit_at {u : Word} (h : StrongEstimates u) (η : ℤ) (hη : η = 1 ∨ η = -1) :
+    ∀ c i, Edge i c →
+      -1 ≤ (frameAt u).chainPotential (standardField u) η i - (frameAt u).chainPotential (standardField u) η c ∧
+        (frameAt u).chainPotential (standardField u) η i - (frameAt u).chainPotential (standardField u) η c ≤ 1 := by
+  obtain ⟨relF, hqF, hmF, -⟩ := h.F2F3_policy η hη
+  obtain ⟨cp, hmH, hqH, -⟩ := h.chain_data η hη
+  exact i3_chainPotential_unit_of_frame (frameAt u) (standardField u) η hη h.packet h.F1_unitSlip
+    h.F1_unitPrice h.F1_noPriceSaddle hqF hqH hmF hmH
+
+/-- **Unit increments of the sheet potential at the word's own phase** `eps(word)`, from the strong estimates of the earlier
+word `conjWord word` at that phase. -/
+theorem i3_sheet_unit_of_strong {word : Word} (h : StrongEstimates (conjWord word)) :
     ∀ c i : Site, Edge i c →
       -1 ≤ sheetChainPotential word (standardField (conjWord word)) i
           - sheetChainPotential word (standardField (conjWord word)) c ∧
         sheetChainPotential word (standardField (conjWord word)) i
           - sheetChainPotential word (standardField (conjWord word)) c ≤ 1 := by
   intro c i hi
-  have key := i3_chainPotential_unit_of_strong h (i3Z c) (i3Z i) (i3_edge_Z hi)
-  rw [i3_sheet_eq_chainPotential, i3_sheet_eq_chainPotential, hphase]
+  have key := i3_chainPotential_unit_at h (frameAt word).eps (frameAt word).eps_unit (i3Z c) (i3Z i) (i3_edge_Z hi)
+  rw [i3_sheet_eq_chainPotential, i3_sheet_eq_chainPotential]
   exact key
 
 end FLatticePaper.Induction
