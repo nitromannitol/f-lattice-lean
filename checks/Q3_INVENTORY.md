@@ -209,3 +209,8 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - `tie_excluded_of_narrow`: every tie `Ψ c = 0 ∨ Ψ i = 0` on a rising σ pair is excluded, except option-2 ties whose centre has an input with `Ψ = −1`. The `Ψ ≤ −1` ties reflect to the strict-centre case; the option-1 ties are excluded by parity; the option-2 ties with a `Ψ = +1` input reflect to a −σ option-2 tie with a `−1` input; the option-2 ties with all inputs `≤ 0` are excluded by `plus_adjacent_nonpos_excluded`.
 - EXACT REMAINING LEAVES (Q16): `hResP` (σ) and `hResN` (−σ): an option-2 rising pair with a tied centre (`Ψ c = 0`) and an input with `Ψ = −1`. Nothing else is assumed beyond the conjugate's `StrongEstimates` and the `OldPolicyData` `P`.
 - Checks: `checks/TieReduce.lean` (6 `#print axioms`, standard only, no `sorryAx`). Zero warnings and errors in the sandbox logs; root build `FLatticePaper` clean.
+
+### Task 70 part 1 status (StrongHeadline.lean: the policy headline)
+
+- `odometersTheorem_of_policy`, `hyperbola_of_policy`, `circlePacking_of_policy`: the headline with `hodd` replaced by the conjugate's old policy at each proper word (`hpol`, with some forced seed) and the two narrowed tie leaves at each proper word (`hResP`, `hResN`), through `oddBlackNoRise_of_narrow`. The other hypotheses (pure and two-power base inputs, residuals, `hbulk`) are unchanged.
+- Checks: `checks/StrongHeadline.lean` (three new `#print axioms`, standard only). Root build clean.

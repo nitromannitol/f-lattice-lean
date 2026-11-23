@@ -5,3 +5,6 @@ import FLatticePaper.StrongHeadline
 #print axioms FLatticePaper.Induction.StrongEstimates.of_producer
 #print axioms FLatticePaper.odometersTheorem_of_residual
 #print axioms FLatticePaper.Induction.strongEstimates_of_all
+#print axioms FLatticePaper.odometersTheorem_of_policy
+#print axioms FLatticePaper.hyperbola_of_policy
+#print axioms FLatticePaper.circlePacking_of_policy
