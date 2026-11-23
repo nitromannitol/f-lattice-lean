@@ -3,6 +3,7 @@ import FLatticePaper.Plane.Induction.W1Phase
 #print axioms FLatticePaper.W1Phase.sheetRankA_decr
 #print axioms FLatticePaper.W1Phase.sheetRankC_decr
 #print axioms FLatticePaper.W1Phase.transGen_rank_lt
+#print axioms FLatticePaper.W1Phase.transGen_rank_lt'
 #print axioms FLatticePaper.W1Phase.lexV_trans
 #print axioms FLatticePaper.W1Phase.no_adjacent_cross
 #print axioms FLatticePaper.W1Phase.lexV_of_return
@@ -18,4 +19,4 @@ import FLatticePaper.Plane.Induction.W1Phase
 #print axioms FLatticePaper.W1Phase.collar_V0_upperLeft
 #print axioms FLatticePaper.W1Phase.collar_H0_upperRight
 #print axioms FLatticePaper.W1Phase.collar_Vlast_upperRight
-#print axioms FLatticePaper.W1Phase.collar_V0_lowerLeft
+#print axioms FLatticePaper.W1Phase.collar_V0_etaPlus
