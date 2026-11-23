@@ -1,3 +1,6 @@
 import FLatticePaper.Plane.Induction.WeightPolicy
 
 #print axioms FLatticePaper.Induction.rankWithIncrements_of_monotone
+#print axioms FLatticePaper.Induction.deckHull_iff_U
+#print axioms FLatticePaper.Induction.deckHull_iff_V
+#print axioms FLatticePaper.Induction.rankWithIncrements_of_monotone_hull
