@@ -55,4 +55,12 @@ theorem laplacian_min_local (F G : Site → ℤ) (k : ℤ) (c : Site)
   dsimp only
   omega
 
+/-- **The minimum is binary.** For binary `F`, `G` and an integer `k`, `min(F, G + k)` takes the two consecutive values `min k 0` and
+`min k 0 + 1` (the audit's "binary" minimum: for `k ≥ 0` it is `F` or `min(F, G)`, for `k ≤ −1` it is `G + k` or `min(F, G + k)`). -/
+theorem min_field_binary (F G : Site → ℤ) (k : ℤ) (hF : ∀ x, F x = 0 ∨ F x = 1) (hG : ∀ x, G x = 0 ∨ G x = 1) (x : Site) :
+    min (F x) (G x + k) = min k 0 ∨ min (F x) (G x + k) = min k 0 + 1 := by
+  have h1 := hF x
+  have h2 := hG x
+  omega
+
 end FLatticePaper.MinAdmission

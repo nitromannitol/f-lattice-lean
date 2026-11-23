@@ -13,3 +13,8 @@ info: 'FLatticePaper.MinAdmission.laplacian_min_local' depends on axioms: [prope
 #guard_msgs in
 #print axioms FLatticePaper.MinAdmission.laplacian_min_local
 
+/--
+info: 'FLatticePaper.MinAdmission.min_field_binary' depends on axioms: [propext, Quot.sound]
+-/
+#guard_msgs in
+#print axioms FLatticePaper.MinAdmission.min_field_binary
