@@ -431,5 +431,7 @@ import FLatticePaper.Plane.Induction.W1SheetSquare
 import FLatticePaper.Plane.Induction.W1PrivateSquare
 import FLatticePaper.Plane.Induction.W1NonfreeSquare
 import FLatticePaper.Plane.Induction.W1ForcedPhase
+import FLatticePaper.Plane.Induction.W1Finite
+import FLatticePaper.Plane.Induction.W1Step
 
 /-! Root import for the corrected F-lattice paper. -/
