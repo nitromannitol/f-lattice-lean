@@ -482,5 +482,6 @@ import FLatticePaper.Plane.Induction.PriceBoundary
 import FLatticePaper.Plane.Induction.FreeLevels
 import FLatticePaper.Plane.Induction.PriceDeck
 import FLatticePaper.Plane.Induction.FreeEnum
+import FLatticePaper.Plane.Induction.FreeCover
 
 /-! Root import for the corrected F-lattice paper. -/
