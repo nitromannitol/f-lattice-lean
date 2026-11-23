@@ -95,6 +95,37 @@ theorem conj_freeV_band {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) {x
   generalize (frameAt word).parentTGrade x + i * oddParentPeriod (frameAt word) = u at hvs ⊢
   omega
 
+/-- **The conjugate H band in the parent `s`-coordinate.** A free conjugate H site `zTurn x + combine i j` forces the translated
+parent `s`-grade `σ = s_p x + j · 2T_p` to lie in one of two bands: `σ` odd in `[N − D + 2, N + D − 2]`, or `σ` even in `[0, 2N]`. -/
+theorem conj_freeH_band {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) {x : Site} {i j : ℤ}
+    (hf : zTurn x + (frameAt (conjWord word)).child.modifiedDeck.combine i j ∈ (frameAt (conjWord word)).freeH) :
+    ((frameAt word).parentSGrade x + j * (2 * oddParentPeriod (frameAt word))) % 2 = 1 ∧
+        (frameAt word).parents.odd.num - (frameAt word).parents.odd.den + 2 ≤
+          (frameAt word).parentSGrade x + j * (2 * oddParentPeriod (frameAt word)) ∧
+        (frameAt word).parentSGrade x + j * (2 * oddParentPeriod (frameAt word)) ≤
+          (frameAt word).parents.odd.num + (frameAt word).parents.odd.den - 2 ∨
+      ((frameAt word).parentSGrade x + j * (2 * oddParentPeriod (frameAt word))) % 2 = 0 ∧
+        0 ≤ (frameAt word).parentSGrade x + j * (2 * oddParentPeriod (frameAt word)) ∧
+        (frameAt word).parentSGrade x + j * (2 * oddParentPeriod (frameAt word)) ≤
+          2 * (frameAt word).parents.odd.num := by
+  have hc : (frameAt (conjWord word)).child = (frameAt word).parents.odd.rotate := frameAt_conj_child h
+  obtain ⟨hn, hd⟩ := conj_child_num_den hc
+  have hN := frameAt_odd_num_pos h
+  have hodd : ((frameAt word).parents.odd.num + (frameAt word).parents.odd.den) % 2 = 1 :=
+    (frameAt word).valid.odd_parity
+  simp only [ChildFrame.freeH, Set.mem_setOf_eq] at hf
+  obtain ⟨-, -, hsp⟩ := hf
+  unfold ChildFrame.hSpectrum at hsp
+  rw [tGrade_add_combine, conj_tGrade_zTurn h, conj_periodDenominator h, hn, hd] at hsp
+  have key : (frameAt word).parents.odd.den + (frameAt word).parents.odd.num -
+      (frameAt word).parentSGrade x - j * (2 * oddParentPeriod (frameAt word)) =
+      (frameAt word).parents.odd.den + (frameAt word).parents.odd.num -
+        ((frameAt word).parentSGrade x + j * (2 * oddParentPeriod (frameAt word))) := by
+    ring
+  rw [key] at hsp
+  generalize (frameAt word).parentSGrade x + j * (2 * oddParentPeriod (frameAt word)) = σ at hsp ⊢
+  omega
+
 /-- The parent `t`-grade of the vertical translate `−i V_p` is `t_p x + i T_p`. -/
 theorem parentTGrade_translate_V (frame : ChildFrame) (x : Site) (i : ℤ) :
     frame.parentTGrade (x + (0 * (2 * frame.parents.odd.den) + -i * (frame.parents.odd.num - frame.parents.odd.den),
