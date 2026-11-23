@@ -31,7 +31,7 @@ theorem dO_step_two (p : Parents) : dO (p.step .two) = dO p + dE p := by
   ring
 
 theorem dE_step_two (p : Parents) : dE (p.step .two) = dE p := by
-  simp only [dO, dE, Parents.step, Parents.current, Parents.combine]
+  simp only [dE, Parents.step]
 
 theorem dO_step_three (p : Parents) : dO (p.step .three) = dO p := by
   simp only [dO, Parents.step]
