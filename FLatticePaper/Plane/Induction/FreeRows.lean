@@ -14,12 +14,11 @@ Each row has `L + d` entries, one for each free label of a deck period.
 
 The removal (Q1 l.30, the trichotomy): if the entry `e` at position `k` lies in the fort, then either a site of the fort has `(P, J)`
 componentwise lower with one strict inequality (contradicting the minimum of `K = P + J` over the fort), or an earlier entry of the row
-lies in the fort (contradicting the induction), or a fan start in the open rectangle touches the parabola of the level `lev k`; then
-`sheet_fan_contradiction`-type reasoning (`fan_terminal_contradiction`) applies, its paid hypothesis being the earlier entries only.
+lies in the fort (contradicting the induction), or a fan start `v₀` in the open rectangle touches its own parabola `parabolaField v₀.2`;
+`fan_terminal_contradiction` then applies, its paid hypothesis being the earlier entries only.
 
-Named inputs of the row lemma: the minimum of `K` at each entry, the window `parabola ≤ F` at each level, the trichotomy at each entry (the
-membership claim, from the forcing of the passage), and the paid set (the boundary touching points of the fort at the level are earlier
-entries). -/
+Named inputs of the row lemma: the minimum of `K` at each entry, the cap window of each touching start, the trichotomy at each entry (the
+membership claim, from the forcing of the passage), and the paid set (the boundary touching points on a start's parabola are earlier entries). -/
 
 namespace FLatticePaper.FreeRows
 
@@ -87,21 +86,24 @@ theorem ordered_removal_list (S : Set Site) (row : List Site)
 For the entry `e` at position `k` (`row[k]? = some e`):
 * `hmin`: `e` is a minimum of `K` over `S` (the fixed pair);
 * `hforce`: if `e ∈ S`, then a fort site has `(P, J)` componentwise lower with one strict inequality, or an earlier entry lies in `S`, or a
-  fan start `v₀ ∈ S` in the open rectangle touches the parabola of level `lev k`;
-* `hwin`: the parabola of level `lev k` lies below `F` on the closed polygon;
-* `hpaid`: a boundary point of the closed polygon in `S` touching the parabola of level `lev k` is an earlier entry of the row.
+  fan start `v₀ ∈ S` in the open rectangle touches its own parabola `parabolaField v₀.2` (the level of the cap `m(k) = −k(k−1)/2` in the
+  coordinate `k = y − b_y`, with `b` the start: ALL_SLOPE_STEP's uniform quadratic cap, not the rounded level `J`);
+* `hwin`: for each touching interior start, its parabola lies below `F` on the closed polygon (the cap window of the start; named);
+* `hpaid`: for such a start, a boundary touching point of `S` on the same parabola is an earlier entry of the row.
 Then no entry of the row lies in `S`. -/
 theorem free_row_empty (F : Field) (frame : ChildFrame) {S : Set Site} (hfort : IsIncomingFort F S)
     (P J K : Site → ℤ) (hK : ∀ z, K z = P z + J z)
-    (row : List Site) (lev : ℕ → ℤ)
+    (row : List Site)
     (hmin : ∀ (k : ℕ) (e : Site), row[k]? = some e → ∀ w ∈ S, K e ≤ K w)
-    (hwin : ∀ k : ℕ, ∀ i ∈ frame.closedPolygon, parabolaField (lev k) i ≤ F i)
-    (hpaid : ∀ (k : ℕ) (e : Site), row[k]? = some e → ∀ w ∈ frame.closedPolygon, ¬ frame.openRect w → w ∈ S →
-      F w = parabolaField (lev k) w → ∃ j, j < k ∧ row[j]? = some w)
+    (hwin : ∀ v0 ∈ S, frame.openRect v0 → F v0 = parabolaField v0.2 v0 →
+      ∀ i ∈ frame.closedPolygon, parabolaField v0.2 i ≤ F i)
+    (hpaid : ∀ (k : ℕ) (e : Site), row[k]? = some e → ∀ v0 ∈ S, frame.openRect v0 → F v0 = parabolaField v0.2 v0 →
+      ∀ w ∈ frame.closedPolygon, ¬ frame.openRect w → w ∈ S → F w = parabolaField v0.2 w →
+      ∃ j, j < k ∧ row[j]? = some w)
     (hforce : ∀ (k : ℕ) (e : Site), row[k]? = some e → e ∈ S →
       (∃ w ∈ S, P w ≤ P e ∧ J w ≤ J e ∧ (P w < P e ∨ J w < J e)) ∨
       (∃ j, j < k ∧ ∃ e', row[j]? = some e' ∧ e' ∈ S) ∨
-      (∃ v0 ∈ S, frame.openRect v0 ∧ F v0 = parabolaField (lev k) v0)) :
+      (∃ v0 ∈ S, frame.openRect v0 ∧ F v0 = parabolaField v0.2 v0)) :
     ∀ (k : ℕ) (e : Site), row[k]? = some e → e ∉ S := by
   refine ordered_removal_list S row ?_
   intro k e he hmem hIH
@@ -113,9 +115,9 @@ theorem free_row_empty (F : Field) (frame : ChildFrame) {S : Set Site} (hfort : 
     omega
   · exact hIH j e' hj he' he'S
   · -- the fan from the interior start ends on a boundary touching point of the fort, which is an earlier entry (contradicting `hIH`)
-    exact fan_terminal_contradiction frame hfort (parabola_binary (lev k)) (parabola_lap_even (lev k)) (hwin k) v0 hv0S
-      hv0c hv0o (fun w hwE hwo hwS hwc => by
-        obtain ⟨j, hj, hjw⟩ := hpaid k e he w hwE hwo hwS hwc
+    exact fan_terminal_contradiction frame hfort (parabola_binary v0.2) (parabola_lap_even v0.2)
+      (hwin v0 hv0S hv0o hv0c) v0 hv0S hv0c hv0o (fun w hwE hwo hwS hwc => by
+        obtain ⟨j, hj, hjw⟩ := hpaid k e he v0 hv0S hv0o hv0c w hwE hwo hwS hwc
         exact hIH j w hj hjw hwS)
 
 end FLatticePaper.FreeRows
