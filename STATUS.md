@@ -212,6 +212,7 @@ lake env lean checks/ZoneSlip.lean
 lake env lean checks/ZoneI1.lean
 lake env lean checks/VArcLongitudinal.lean
 lake env lean checks/VArcOffers.lean
+lake env lean checks/ParentStepDischarge.lean
 lake env lean checks/ChainReflection.lean
 lake env lean checks/ParentStep.lean
 lake env lean checks/ZeroRegion.lean
