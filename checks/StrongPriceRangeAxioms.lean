@@ -1,0 +1,8 @@
+import FLatticePaper.Plane.Induction.StrongPriceRange
+
+#print axioms FLatticePaper.StrongPriceRange.price_upper_of_recurrent
+#print axioms FLatticePaper.StrongPriceRange.price_add_reflect
+#print axioms FLatticePaper.StrongPriceRange.price_le_of_upper_half
+#print axioms FLatticePaper.StrongPriceRange.price_lower_of_upper
+#print axioms FLatticePaper.StrongPriceRange.priceRange_of_recurrent
+#print axioms FLatticePaper.StrongPriceRange.priceRange_of_strong

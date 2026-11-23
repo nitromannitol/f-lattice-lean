@@ -44,4 +44,19 @@ theorem sheetMin_recurrent_of_strong {word : Word} (h : ∃ x ∈ word, x ≠ Di
     (permitC_invariant h hG) hsheet.permitC hsheet.noC
   exact (sheetMin_binary_recurrent_of_chain h hG hsheet.unit rankA rankC hrankA hrankC).2
 
+
+/-- The sheet minimum of the conjugate's strong estimates is binary and recurrent. -/
+theorem sheetMin_binary_recurrent_of_strong {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
+    (hSE : StrongEstimates (conjWord word)) :
+    (∀ z, laplacian ((frameAt word).sheetMin (quarterTurnField (standardField (conjWord word)))) z = -1 ∨
+        laplacian ((frameAt word).sheetMin (quarterTurnField (standardField (conjWord word)))) z = 0) ∧
+      Recurrent ((frameAt word).sheetMin (quarterTurnField (standardField (conjWord word)))) := by
+  have hsheet := i3_sheetLocalInputs_of_strong h hSE
+  have hG := hSE.packet
+  obtain ⟨rankA, hrankA⟩ := constrainedRank_of_variant h hG (i3aGrade_deck h hG)
+    (permitA_invariant h hG) hsheet.permitA hsheet.noA
+  obtain ⟨rankC, hrankC⟩ := constrainedRank_of_variant h hG (tGrade_add_odd_deck word)
+    (permitC_invariant h hG) hsheet.permitC hsheet.noC
+  exact sheetMin_binary_recurrent_of_chain h hG hsheet.unit rankA rankC hrankA hrankC
+
 end FLatticePaper.StrongPriceValues
