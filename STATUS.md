@@ -197,6 +197,7 @@ lake env lean checks/S1S2Window.lean
 lake env lean checks/ChildNumerator.lean
 lake env lean checks/OpenLocal.lean
 lake env lean checks/I3Local.lean
+lake env lean checks/I3Unit.lean
 lake env lean checks/GlobalOdometers.lean
 lake env lean checks/ThreesMidpoint.lean
 lake env lean checks/SlipPermits.lean
