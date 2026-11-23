@@ -350,4 +350,19 @@ theorem hsq_all_of_inputs {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three)
     · exact hsq_offcollar hw hSE P hs hW1 hn3 hfree hcS hcoll hc0 hM
     · exact hsq_C_offcollar hw hSE P hs hW1 hn3 hfree hcS hcoll (by omega) hM
 
+/-- **W1Forced of the sheet minimum from the named inputs** (task 94): the collar and free-root inputs give `W1Forced` of `MW word`. -/
+theorem W1Forced_of_inputs {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
+    {seed : Site → Site → Prop} (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed)
+    (hs : seed = fun _ _ => False)
+    (hW1 : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
+      (standardField (conjWord word)))
+    (hn3 : 3 ≤ (frameAt word).child.num)
+    (hfree : ∀ c : Site, 0 ≤ sheetPsi word c → laplacian (MW word) c = 0 →
+      ¬ Nonfree (frameAt (conjWord word)) (zTurn (c - (frameAt word).sheetShift)) →
+      ParentSquareOut (standardField (conjWord word)) P.retained (zTurn (c - (frameAt word).sheetShift)))
+    (hcollar : ∀ c : Site, StrictInterior (frameAt word).child.num (frameAt word).child.den c →
+      laplacian (MW word) c = 0 → CollarFrame (frameAt word) c → HsqAt word P c) :
+    FLatticePaper.W1.W1Forced (frameAt word).child.num (frameAt word).child.den (MW word) :=
+  FLatticePaper.W1Step.W1Forced_step word P (hsq_all_of_inputs hw hSE P hs hW1 hn3 hfree hcollar)
+
 end FLatticePaper.W1NonfreeHsqC
