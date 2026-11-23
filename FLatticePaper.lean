@@ -174,6 +174,8 @@ import FLatticePaper.Tiles.WordFacts3
 import FLatticePaper.Tiles.SuccessorProof
 import FLatticePaper.Tiles.RowConvexCrossing
 import FLatticePaper.MainTheorems
+import FLatticePaper.Plane.Induction.SignedPolicy
+import FLatticePaper.Plane.Induction.I3Local
 import FLatticePaper.Plane.HarmonicConstant
 import FLatticePaper.Plane.Induction.AlternateFacts
 import FLatticePaper.Plane.GlobalOdometers
