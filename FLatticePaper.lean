@@ -285,6 +285,7 @@ import FLatticePaper.Tiles.SiteFwdCover
 import FLatticePaper.Tiles.SiteVertWord
 import FLatticePaper.Tiles.SiteVertLink
 import FLatticePaper.Tiles.SiteRot
+import FLatticePaper.Tiles.SiteVertCover
 import FLatticePaper.Plane.Induction.S3FreeBoundary
 import FLatticePaper.Plane.Induction.ParentCoordinates
 import FLatticePaper.Plane.Induction.Q3Arithmetic
