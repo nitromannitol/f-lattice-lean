@@ -299,3 +299,11 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - PROVED `nonfree_bridge`: `Nonfree frame z → ∃ v ∈ span, StrictInterior (z + v)` (`exists_shift_mem` puts a translate into the closed polygon).
 - Numeric (scripts/nonfree_bridge_check.py): for 47 odd children `n/d` (`n + 2 ≤ d`, coprime, `d ≤ 21`) and sites in a box, both "no translate on E and boundary spectrum" and "no translate in freeH or freeV" give a strict-interior translate. A first run with a deck window `R = 4` gave failures only at the box corners, which vanished for `R ≥ 8`.
 - Checks: `checks/NonfreeBridge.lean` (two guards, standard axioms only). Module log has no warnings.
+
+### Task 72 (nonfree root, deck form): the cover condition is literally "nonfree" (DeckForced.lean)
+
+- PROVED `laplacian_span_inv`: the Laplacian of the standard packet is invariant under the child deck span. The kernel shifts the field by a constant and the transverse vector by an affine function, whose Laplacian is zero. The invariant set is a subgroup (`span_pred`), so it contains the span.
+- PROVED `forcedEdge_add`: unseeded forced edges are carried by even translations that preserve the Laplacian (squares and inputs translate).
+- PROVED `nonfree_root_forced_nonfree`: a nonfree root of the old policy is black, or its retained edge is the unseeded forced edge. The bridge `nonfree_bridge` gives a strict-interior translate, `W1Forced` gives the forced edge there, translating back gives it at the root, and `forcedWhiteUnique` identifies the retained input.
+- CHANGED: the drop disjunct of SheetCover, SheetCharts and SheetCases now reads `Nonfree (frameAt (conjWord word)) (zTurn x)` (was the strict-interior root). The root condition uses `nonfree_root_forced_nonfree` with `hSE.packet`. The hypothesis `hW1` is unchanged.
+- Checks: `checks/DeckForced.lean` (four guards, standard axioms only). Root log has no warnings.
