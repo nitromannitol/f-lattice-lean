@@ -180,6 +180,12 @@ import FLatticePaper.Plane.Induction.I3Unit
 import FLatticePaper.Tiles.RegisterInduction
 import FLatticePaper.Tiles.RowsOfBoundary
 import FLatticePaper.Plane.Induction.StrongEstimates
+import FLatticePaper.Plane.Induction.VArcTransverse
+import FLatticePaper.Plane.Induction.VArcRange
+import FLatticePaper.Plane.Induction.OddRise
+import FLatticePaper.Plane.Induction.ZeroRegion
+import FLatticePaper.Plane.Induction.ParentStep
+import FLatticePaper.Plane.Induction.I3Application
 import FLatticePaper.Plane.HarmonicConstant
 import FLatticePaper.Plane.Induction.AlternateFacts
 import FLatticePaper.Plane.GlobalOdometers
