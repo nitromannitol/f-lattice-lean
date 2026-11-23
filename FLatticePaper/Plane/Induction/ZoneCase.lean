@@ -144,6 +144,34 @@ theorem zone_minus_nonneg (F : Site → ℤ) (N D nq dq Nu Du epsU : ℤ) (H : Z
     rw [h1 (by rw [ht]; linarith) (by rw [ht]; linarith), h2 (by linarith) (by linarith)]
     simp
 
+/-- The sign of the `ε = +1` zone difference: nonnegative wherever the transverse grade of `Z w` is at least `r`. -/
+theorem zone_plus_nonneg (F : Site → ℤ) (N D nq dq Nu Du epsU : ℤ) (H : ZoneHyp F N D Nu Du epsU)
+    (hε : N * dq - nq * D = 1) (hD2 : 2 ≤ D) (w : Site)
+    (hj : D + N ≤ (D - N) * (-w.2, w.1 - 1).1 - (D + N) * (-w.2, w.1 - 1).2) :
+    0 ≤ F (-(w.2 - (nq + dq)), w.1 - (nq - dq) - 1) - F (-w.2, w.1 - 1) := by
+  have hε2 : epsU ^ 2 = 1 := by rcases H.hepsU with rfl | rfl <;> norm_num
+  rw [value_plus F N D nq dq Nu Du epsU H.hdet hε2 H.hK hε w]
+  have hN := H.hN
+  have hND := H.hND
+  have hσ := t_sigma N D Nu Du epsU H.hdet hε2
+  have ht2 : (D - N) * ((-w.2, w.1 - 1) + (2 * epsU * Du, 2 * epsU * Nu)).1
+      - (D + N) * ((-w.2, w.1 - 1) + (2 * epsU * Du, 2 * epsU * Nu)).2
+      = (D - N) * (-w.2, w.1 - 1).1 - (D + N) * (-w.2, w.1 - 1).2 - 2 := by
+    simp only [Prod.fst_add, Prod.snd_add]
+    linear_combination hσ
+  by_cases hgt : D + N < (D - N) * (-w.2, w.1 - 1).1 - (D + N) * (-w.2, w.1 - 1).2
+  · have := (ZoneSlip.slip_sign F N D Nu Du epsU H.hN H.hND H.hr H.hdet H.hepsU H.hodd H.hK H.hT H.hslip
+      (-w.2, w.1 - 1)).2 hgt
+    linarith
+  · have heq : (D - N) * (-w.2, w.1 - 1).1 - (D + N) * (-w.2, w.1 - 1).2 = D + N :=
+      le_antisymm (not_lt.mp hgt) hj
+    have h1 := H.hstrip (-w.2, w.1 - 1) (by rw [heq]; linarith) (by rw [heq]; linarith)
+    have h2 := H.hstrip ((-w.2, w.1 - 1) + (2 * epsU * Du, 2 * epsU * Nu))
+      (by rw [ht2, heq]; linarith) (by rw [ht2, heq]; linarith)
+    unfold ZoneSlip.slipU
+    rw [h1, h2]
+    simp
+
 end ZoneCase
 
 end FLatticePaper.Induction
