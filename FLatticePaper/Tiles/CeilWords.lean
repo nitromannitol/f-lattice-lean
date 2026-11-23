@@ -153,4 +153,60 @@ theorem childWords_ceil (word : Word) {x y : BinaryWord} {kO lO kE lE : ℤ} (hx
       rw [e1, e2]
       exact A
 
+/-! ### Slopes of the current fractions -/
+
+/-- The ceiling slope of an odd-type fraction: `(2 num, den + num)`. -/
+def sOdd (f : Fraction) : ℤ × ℤ := (2 * f.num, f.den + f.num)
+
+/-- The ceiling slope of an even-type fraction: `(num, (den + num)/2)`. -/
+def sEven (f : Fraction) : ℤ × ℤ := (f.num, (f.den + f.num) / 2)
+
+/-- The odd current fraction after a digit `one`: `(Parents.mk O E).current .odd = O + E`, with slope the sum of the two slopes. -/
+theorem sOdd_cur_one (O E : Fraction) (hE : (E.num + E.den) % 2 = 0) :
+    sOdd ((Parents.mk O E).current .odd) = (2 * (sEven E).1 + (sOdd O).1, 2 * (sEven E).2 + (sOdd O).2) := by
+  unfold sOdd sEven
+  simp only [Parents.current, Parents.combine, one_mul]
+  ext
+  · simp only
+    ring
+  · simp only
+    omega
+
+/-- The even current fraction `2 O + E` has the slope sum. -/
+theorem sEven_cur_two (O E : Fraction) :
+    sEven ((Parents.mk O E).current .even) = ((sEven E).1 + (sOdd O).1, (sEven E).2 + (sOdd O).2) := by
+  unfold sOdd sEven
+  simp only [Parents.current, Parents.combine, one_mul]
+  ext
+  · simp only
+    ring
+  · simp only
+    omega
+
+/-- The determinant in the digit `one` step equals the determinant of the parents. -/
+theorem sig_one (P Q : Fraction) (hQ : (Q.num + Q.den) % 2 = 0) :
+    (sEven ((Parents.mk P Q).current .even)).1 * (sOdd ((Parents.mk P Q).current .odd)).2 -
+      (sOdd ((Parents.mk P Q).current .odd)).1 * (sEven ((Parents.mk P Q).current .even)).2 = Fraction.det P Q := by
+  unfold sOdd sEven Fraction.det
+  simp only [Parents.current, Parents.combine, one_mul]
+  have hY : 2 * ((2 * P.den + Q.den + (2 * P.num + Q.num)) / 2) = 2 * P.den + Q.den + (2 * P.num + Q.num) := by omega
+  linear_combination (-(P.num + Q.num)) * hY
+
+/-- The determinant in the digit `two` and `three` steps is minus the determinant of the parents. -/
+theorem sig_two (P Q : Fraction) (hQ : (Q.num + Q.den) % 2 = 0) :
+    (sEven Q).1 * (sOdd ((Parents.mk P Q).current .odd)).2 -
+      (sOdd ((Parents.mk P Q).current .odd)).1 * (sEven Q).2 = -Fraction.det P Q := by
+  unfold sOdd sEven Fraction.det
+  simp only [Parents.current, Parents.combine, one_mul]
+  have hY : 2 * ((Q.den + Q.num) / 2) = Q.den + Q.num := by omega
+  linear_combination (-(P.num + Q.num)) * hY
+
+theorem sig_three (P Q : Fraction) (hQ : (Q.num + Q.den) % 2 = 0) :
+    (sEven ((Parents.mk P Q).current .even)).1 * (sOdd P).2 -
+      (sOdd P).1 * (sEven ((Parents.mk P Q).current .even)).2 = -Fraction.det P Q := by
+  unfold sOdd sEven Fraction.det
+  simp only [Parents.current, Parents.combine, one_mul]
+  have hY : 2 * ((2 * P.den + Q.den + (2 * P.num + Q.num)) / 2) = 2 * P.den + Q.den + (2 * P.num + Q.num) := by omega
+  linear_combination (-P.num) * hY
+
 end FLatticePaper.Tiles.CeilWords
