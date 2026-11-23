@@ -510,3 +510,11 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - PROVED `origin_mem_freeV`, `even_block_mem_freeV` (the child-frame block vertex `(−b, 2l − b)` with `q ≤ n`).
 - Checks: `checks/OddFreeH.lean`. Root build clean; sandbox logs clean (rc=1 on the warning/error/sorry greps).
 - Remaining for the V block: the excVertex case goes to the exceptional leaf (`exceptional_drop_excluded` with `exceptional_hT_proved`), and the −σ mirror of `BlockPairAt`.
+
+### Task 72 (hNegTie case (b), −σ V-block mirror): NegBlock.lean
+
+- PROVED `laplacian_negShift_eq_of_eps_one`, `laplacian_negShift_eq_of_eps_neg_one`: for the slip `−σ` the black translate `c + (−σ)` equals `(c + U_q) − U_c` (ε = +1) or `(c − U_q) + U_c` (ε = −1), so the child kernel gives `lap(c − σ) = lap(c + U_q)` resp. `lap(c − U_q)`.
+- DEFINED `BlockPairNeg`: the mirror of `BlockPairAt` with base `c` (ε = +1) or `c − U_q` (ε = −1).
+- PROVED `not_rising_of_blockPairNeg`: a `BlockPairNeg` centre is not a black pair with black translate `c + (−σ)` (via `black_centres_contradiction`).
+- Open: the identification of the free root of a −σ tie with `BlockPairNeg c`. For ε = +1 the sheet shift vanishes (`phaseW = 1`), so the root is `c`, and the conjugate free H image of `zTurn c + v` is `I − c + R v` (`I = (1, −1)`), a point reflection of `c` and not a translate. The base of the −σ V block therefore needs the reflected point; this is queried with the lead.
+- Checks: `checks/NegBlock.lean`. Root build clean; sandbox logs clean.
