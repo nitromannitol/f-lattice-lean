@@ -46,10 +46,15 @@ structure OldPolicyData (frame : ChildFrame) (G : Field) (seed : Site → Site �
   /-- Reflection about `I` at the roots the Q3 argument uses (`nonfree_drop_excluded`): a retained edge from a black root (which keeps
   both inputs) or a forced-white edge, is carried to a retained edge. The reflection of the clause system carries both kinds of
   root to the same kind, so this is what the canonical construction provides from the quota, `forcedRetained` and the symmetry. -/
-  reflection : ∀ c i, retained c i → (laplacian G c = -1 ∨ FLatticePaper.SquareClauses.ForcedEdge G seed c i) →
+  reflection : ∀ c i, retained c i →
+    (laplacian G c = -1 ∨ FLatticePaper.SquareClauses.ForcedEdge G (fun _ _ => False) c i) →
     retained (reflectionI - c) (reflectionI - i)
-  /-- The forced-white edges are retained (they are unique at a forced white). -/
+  /-- The forced-white edges are retained. -/
   forcedRetained : ∀ c i, FLatticePaper.SquareClauses.ForcedEdge G seed c i → retained c i
+  /-- At a white with an unseeded forced edge `z → o`, the only retained input is `o` (the W1 forcing of a nonfree root is the
+  retained edge: the canonical policy keeps exactly the selected input at a white). -/
+  forcedWhiteUnique : ∀ z i, retained z i → laplacian G z = 0 →
+    ∀ o, FLatticePaper.SquareClauses.ForcedEdge G (fun _ _ => False) z o → o = i
   /-- The prescribed west input at the exceptional vertex `V_p + I` when `W = 1` (`ε = +1`). -/
   westAtException : frame.eps = 1 →
     retained (frame.parents.odd.num - frame.parents.odd.den + 1, frame.parents.odd.den + frame.parents.odd.num - 1)

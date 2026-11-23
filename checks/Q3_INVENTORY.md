@@ -276,3 +276,11 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 ### Task 72 (d): rawSlipMinus stays a field
 
 - `rawSlipMinus` (sign `−1`, Q1.md l.38) remains a canonical field. Its prescribed directions are Q13, parked. The sign `+1` is derived from `permitted`.
+
+### Task 72 (nonfree roots): the W1Forced root condition of the drop lemma (NonfreeRoot.lean)
+
+- The cover drop disjunct (SheetCover, SheetCharts, SheetCases) now takes the drop root to be strict interior (`W1.StrictInterior`, the nonfree roots), and takes the hypothesis `hW1 : W1Forced (frameAt (conjWord word)).child.num .child.den (standardField (conjWord word))`. The earlier "black or forced" root input is no longer a separate hypothesis.
+- PROVED `nonfree_root_forced`: at a strict-interior root of the old policy, black or the unseeded forced edge to the retained input. It uses `W1Forced` (forced edge `o`) and the new field `OldPolicyData.forcedWhiteUnique`: the only retained input at a white with an unseeded forced edge `z → o` is `o`.
+- DERIVED `forcedWhiteUnique_of_canonical` (CanonicalSigned): `white_policy` plus `forced_sound` on the selection.
+- CHANGED: the reflection hypothesis and `nonfree_drop_excluded` use unseeded forced edges (W1 is unseeded).
+- Checks: `checks/NonfreeRoot.lean` (three guards), `checks/CanonicalSigned.lean` and `checks/ReflectionI.lean` pass. Root build clean (no warnings in the root log).
