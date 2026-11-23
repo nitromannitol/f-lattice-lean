@@ -1,4 +1,5 @@
-import Mathlib.Tactic
+import Mathlib.Tactic.Linarith
+import Mathlib.Tactic.ByContra
 
 /-! # The zero region of I1 (task 49, step 2)
 
