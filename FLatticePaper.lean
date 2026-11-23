@@ -256,5 +256,6 @@ import FLatticePaper.Construction.AlternateIdentification
 import FLatticePaper.Construction.OddChartParity
 import FLatticePaper.Construction.OddAlternateCopies
 import FLatticePaper.Construction.OddShear
+import FLatticePaper.StrongHeadline
 
 /-! Root import for the corrected F-lattice paper. -/
