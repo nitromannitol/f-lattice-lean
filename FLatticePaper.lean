@@ -317,6 +317,9 @@ import FLatticePaper.Tiles.PairEvenW1Q
 import FLatticePaper.Tiles.PairEvenRefl
 import FLatticePaper.Tiles.PairEvenCover
 import FLatticePaper.Tiles.EvenP21
+import FLatticePaper.Tiles.EncUpper
+import FLatticePaper.Tiles.EncFam
+import FLatticePaper.Tiles.EncPieces
 import FLatticePaper.Plane.Induction.S3FreeBoundary
 import FLatticePaper.Plane.Induction.ParentCoordinates
 import FLatticePaper.Plane.Induction.Q3Arithmetic
