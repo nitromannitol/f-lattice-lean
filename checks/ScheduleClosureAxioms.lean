@@ -1,0 +1,5 @@
+import FLatticePaper.Plane.Induction.ScheduleClosure
+
+#print axioms FLatticePaper.ScheduleClosure.minus_closure_empty
+#print axioms FLatticePaper.ScheduleClosure.hFirst_input_not_open
+#print axioms FLatticePaper.ScheduleClosure.vFirst_input_not_open
