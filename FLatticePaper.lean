@@ -264,5 +264,6 @@ import FLatticePaper.Plane.Induction.HarmWrap
 import FLatticePaper.Plane.Induction.ParentStepDischarge
 import FLatticePaper.Plane.Induction.WeightPolicy
 import FLatticePaper.Plane.Induction.S3Canonical
+import FLatticePaper.Plane.Induction.AndOrRank
 
 /-! Root import for the corrected F-lattice paper. -/
