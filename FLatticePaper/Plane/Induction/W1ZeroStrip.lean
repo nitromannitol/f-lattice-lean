@@ -1,6 +1,7 @@
 import FLatticePaper.Plane.Induction.W1Seeds
 import FLatticePaper.Plane.Induction.W1Exit
 import FLatticePaper.Plane.Induction.StrongEstimates
+import FLatticePaper.Plane.Induction.W1Lower
 
 /-! Task 59, step 1 and step 2 (the zero fields at a general word).
 
@@ -156,5 +157,39 @@ theorem odd_zero_of_lower (frame : ChildFrame) {F : Field} (hlt : frame.child.nu
   · rw [sGrade_Z frame x Nu Du hNu hDu]
     rw [hseed]
     omega
+
+/-- The even line from the price chain: the odd lower extension `hlow` is `lower_odd_h0`, which uses the price range, the two
+drifts, the packet strips and the odd seed `hseed`. So the even line is produced from `priceRange`, the drifts and the seed. -/
+theorem zeroEvenLine_of_price (frame : ChildFrame) {F : Field} (hlt : frame.child.num < frame.child.den)
+    (hstrips : frame.HasStrips F)
+    (hPR : ∀ z ∈ frame.closedPolygon, frame.cutPrice - 1 ≤ frame.price F z ∧ frame.price F z ≤ frame.cutPrice)
+    (hPU : ∀ z, frame.price F (z + frame.child.modifiedDeck.kernel) = frame.price F z - 1)
+    (hPV : ∀ z, frame.price F (z + frame.child.modifiedDeck.transverse) = frame.price F z)
+    (hseed : ∀ w : Site, ¬ EvenSite w → frame.sGrade w = 2 - 3 * frame.child.den + frame.child.num →
+      F w = harmonicGrid w)
+    (x : Site) (hx : EvenSite x)
+    (hline : (frame.child.den - frame.child.num) / 2 * x.1 - (frame.child.den + frame.child.num) / 2 * x.2 =
+      -((frame.child.den + frame.child.num) / 2)) :
+    quarterTurnField F x = 0 :=
+  zeroEvenLine_of_lower frame hlt
+    (fun z hz h1 h2 => FLatticePaper.W1Lower.lower_odd_h0 frame hstrips hPR hPU hPV hseed z hz h1 h2) x hx hline
+
+
+/-- The `zeroEvenLine` field of `StrongEstimates u`, from the packet of `u`, the price range and drifts of `u`, and the odd seed
+of `u` (the inputs of `zeroEvenLine_of_price`). -/
+theorem zeroEvenLine_field (u : Word) (hP : (frameAt u).Packet (standardField u))
+    (hPR : ∀ z ∈ (frameAt u).closedPolygon,
+      (frameAt u).cutPrice - 1 ≤ (frameAt u).price (standardField u) z ∧
+        (frameAt u).price (standardField u) z ≤ (frameAt u).cutPrice)
+    (hPU : ∀ z, (frameAt u).price (standardField u) (z + (frameAt u).child.modifiedDeck.kernel) =
+      (frameAt u).price (standardField u) z - 1)
+    (hPV : ∀ z, (frameAt u).price (standardField u) (z + (frameAt u).child.modifiedDeck.transverse) =
+      (frameAt u).price (standardField u) z)
+    (hseed : ∀ w : Site, ¬ EvenSite w → (frameAt u).sGrade w = 2 - 3 * (frameAt u).child.den + (frameAt u).child.num →
+      standardField u w = harmonicGrid w) :
+    ∀ x : Site, (x.1 + x.2) % 2 = 0 →
+      parentN u * x.1 - parentD u * x.2 = -parentD u → quarterTurnField (standardField u) x = 0 :=
+  fun x hx hline =>
+    zeroEvenLine_of_price (frameAt u) (frameAt u).child_facts.2.1 hP.strips hPR hPU hPV hseed x hx hline
 
 end FLatticePaper.W1ZeroStrip
