@@ -214,3 +214,10 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 
 - `odometersTheorem_of_policy`, `hyperbola_of_policy`, `circlePacking_of_policy`: the headline with `hodd` replaced by the conjugate's old policy at each proper word (`hpol`, with some forced seed) and the two narrowed tie leaves at each proper word (`hResP`, `hResN`), through `oddBlackNoRise_of_narrow`. The other hypotheses (pure and two-power base inputs, residuals, `hbulk`) are unchanged.
 - Checks: `checks/StrongHeadline.lean` (three new `#print axioms`, standard only). Root build clean.
+
+### Task 70 part 2 status (ComparisonFields.lean: paragraph 4, the comparison fields)
+
+- PROVED: `cmpLow_le_of_price` (`cmpLow ≤ F` on the closed polygon: `P ≥ c₀ − 1`, the word's price range `hWord.priceRange`, the input `StrongEstimates word`); `cmpUp_le_of_slip` (`F(z+σ) ≤ F z`, `D_+ ≥ 0`, from `slipRange_of_strong`); `cmpDown_le_of_slip` (`F(z−σ) − 2 ≤ F z`, `D_− ≥ −2`, from the slip bound at the reflected site and `slip_reflect_gen`).
+- PROVED: `contact_black_E`: at a black centre `c ∈ E` with `F c = m c` for a binary `m ≤ F` on `E`, both inputs are contacts (`contact_black` with the inputs in `E`, `black_input_mem`).
+- NOT FORMALIZED: the conclusion of paragraph 4 (`P` and `J_η` do not increase along black and forced white edges). It needs the unit-proof transfer through the finite square proof of `SquareClauses` (`forced_sound`) and the W1 exclusion of the resulting empty clause (the unseeded system of `F` by even translation and affine addition). These are the named inputs of paragraph 4 and are not yet stated as Lean hypotheses.
+- Checks: `checks/ComparisonFields.lean` (4 `#print axioms`, standard only). Zero warnings and errors in the sandbox logs.
