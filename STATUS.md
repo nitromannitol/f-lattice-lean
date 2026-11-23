@@ -217,6 +217,7 @@ lake env lean checks/WeightPolicyAxioms.lean
 lake env lean checks/S3Canonical.lean
 lake env lean checks/AndOrRankAxioms.lean
 lake env lean checks/StrongResidualReducedAxioms.lean
+lake env lean checks/PackAssembly.lean
 lake env lean checks/VArcLongitudinal.lean
 lake env lean checks/VArcOffers.lean
 lake env lean checks/ParentStepDischarge.lean
