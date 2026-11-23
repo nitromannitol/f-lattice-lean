@@ -9,8 +9,8 @@ the prescribed free directions, the raw-slip permit `permitted`) with:
 
 * `sel`, `sel_input`, `white_policy`, `squares`: the W1 selection. At each white the policy keeps exactly the selected input, and the
   selection satisfies every unit square clause (`squareClauses_of_strict` gives the clauses from a strict rank). Q1.md l.38.
-* `rawSlipMinus`: the raw slip `D₋(y) = F y − F (y − σ)` does not increase along the policy (Q1.md l.38, sign `−1`). The sign `+1`
-  is `permitted`, so it is derived, not assumed.
+* `permittedMinus`: the minus raw-slip permit (Q13, sign `−1`): each selected input is permitted for `D₋(y) = F y − F (y − σ)`.
+  The raw slip `rawSlipMinus` is derived from it, as `rawSlipPlus_of_canonical` derives the sign `+1` from `permitted`.
 * `chainNonincreasing`: the chain potential `Φ_η = D_η + P(· + ησ)` does not increase along the policy (Q1.md l.40). Not derived: `P` is
   compared at the shifted edge `(c + ησ, i + ησ)`, and `ησ` need not be in the child's deck span (for `3/5` under `1/2`, `1/1` the short
   shift `(−4, −2)` is not in the span of `(5, 3)` and `(−2, 8)`).
@@ -48,8 +48,10 @@ structure CanonicalSignedPolicy (frame : ChildFrame) (F : Field) extends Canonic
   white_policy : ∀ c, laplacian F c = 0 → ∀ i, policy c i ↔ i = sel c
   /-- The selection satisfies every unit square clause. -/
   squares : ∀ a b : ℤ, SquareClauseSat F sel a b
-  /-- The raw slip `D₋(y) = F y − F (y − σ)` does not increase along the policy (Q1.md l.38). -/
-  rawSlipMinus : NonincreasingAlong (fun y => F y - F (y + (-1 : ℤ) • frame.shortShift)) policy
+  /-- The minus raw-slip permit (Q13): every selected input is permitted for the raw slip `D₋(y) = F y − F (y − σ)` with
+the sign `−1` (the analogue of `permitted`). The minus prescription of `S3FreeBoundary` (`prescribedH`, `prescribedV` at `η = −1`)
+is its free-site part; `rawSlipMinus` is derived from it. Q13.md l.17, scripts/s3_free_check.py (`η = −1`). -/
+  permittedMinus : ∀ c i, policy c i → slipPermits F (fun z => F (z + (-1 : ℤ) • frame.shortShift)) c i
   /-- The chain pair for each sign `η = ±1` (§4 of the strong-bulk note, task 72 (a)). -/
   chainPairs : ∀ η : ℤ, (η = 1 ∨ η = -1) → ChainPairData frame F η policy
   /-- A retained edge is an edge of the graph: the retained input is an input of its centre. -/
@@ -98,13 +100,21 @@ theorem rawSlipPlus_of_canonical {frame : ChildFrame} {F : Field} (C : Canonical
   simp only [one_smul]
   linarith
 
+/-- The raw slip with sign `−1` does not increase along the policy: it is the minus permit `permittedMinus` (Q13). -/
+theorem rawSlipMinus_of_canonical {frame : ChildFrame} {F : Field} (C : CanonicalSignedPolicy frame F) :
+    NonincreasingAlong (fun y => F y - F (y + (-1 : ℤ) • frame.shortShift)) C.policy := by
+  intro c i h
+  have h1 := C.permittedMinus c i h
+  simp only [slipPermits, slipIncrement] at h1
+  linarith
+
 /-- Both raw-slip signs do not increase along the policy. -/
 theorem rawSlip_of_canonical {frame : ChildFrame} {F : Field} (C : CanonicalSignedPolicy frame F) :
     ∀ η : ℤ, (η = 1 ∨ η = -1) → NonincreasingAlong (fun y => F y - F (y + η • frame.shortShift)) C.policy := by
   intro η hη
   rcases hη with rfl | rfl
   · exact rawSlipPlus_of_canonical C
-  · exact C.rawSlipMinus
+  · exact rawSlipMinus_of_canonical C
 
 /-- The translated g-policy `c ↦ opp (c + ησ)` has `D_η` nondecreasing along it: `D_η(c) = −D_{−η}(c + ησ)` (§4 of the note). -/
 theorem translated_rawSlip {frame : ChildFrame} {F : Field} {η : ℤ} {P : Site → Site → Prop}

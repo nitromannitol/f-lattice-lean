@@ -1,4 +1,4 @@
-"""Task 58 (c): the Q1 removal lists at the fixed pair (c0, 0) against the prescribed kept edges (eta = +1), words <= 4.
+"""Task 58 (c): the Q1 removal lists at the fixed pair (c0, 0) against the prescribed kept edges, for eta = +1 and -1 (Q13), words <= 4.
 
 Level sites: each free representative of s3_free_check.py (H_j, V_j) has one translate at the fixed pair (c0, 0), with
   H_j + i U  -> H_{j + d i},   i = P(z) - c0,
@@ -15,7 +15,7 @@ from collections import defaultdict
 import permit_local as pl
 import open_inputs_check as oc
 from exact_quotient import cut_on, words
-from s3_free_check import EAST, NORTH, SOUTH
+from s3_free_check import EAST, NORTH, SOUTH, WEST
 
 
 def list_labels(row, r, d, n):
@@ -33,7 +33,8 @@ def list_labels(row, r, d, n):
     raise ValueError(row)
 
 
-def run(w):
+def run(job):
+    w, eta = job
     w = list(w)
     F, _ = pl.standard(tuple(w))
     fr = oc.frame(w)
@@ -41,7 +42,7 @@ def run(w):
     L = n + d
     r = D + N
     P = cut_on(F, w, 1, 0, 1)
-    J = cut_on(F, w, 0, 1, 1)
+    J = cut_on(F, w, 0, 1, eta)   # Q13: the grading J_eta uses the sign eta
     U, V = (d, n), (n - d, n + d)
 
     def tg(z):
@@ -76,7 +77,7 @@ def run(w):
     level = {}
     for rep, (kind, j) in free.items():
         i = P(rep) - c0
-        jj = -J(rep)
+        jj = -eta * J(rep)            # Q13: the level-zero lift coefficient is -eta J_eta
         lam = (rep[0] + i * U[0] + jj * V[0], rep[1] + i * U[1] + jj * V[1])
         assert P(lam) == c0 and J(lam) == 0
         lab = ("H", j + d * i) if kind == "H" else ("V", j + L * jj)
@@ -87,13 +88,17 @@ def run(w):
         kind, j = free[rep]
         if kind == "H":
             if j == 0:
-                return SOUTH          # -eta north, eta = +1
+                return SOUTH if eta == 1 else NORTH   # -eta north
             if j == d - 1:
                 return NORTH
             return EAST if oc.even_site(rep) else NORTH
-        if j == 0 or j == L - 1:
-            return EAST               # V_0: east; V_{L-1}: eta east
-        return EAST if oc.even_site(rep) else SOUTH
+        if j == 0:
+            return EAST                               # V_0: east
+        if j == L - 1:
+            return EAST if eta == 1 else WEST         # V_{L-1}: eta east
+        if oc.even_site(rep):
+            return EAST if eta == 1 else WEST         # eta east at even internal V
+        return SOUTH if eta == 1 else NORTH           # -eta north at odd internal V
 
     pairs = []
     for lam, rep in level.items():
@@ -113,21 +118,22 @@ def run(w):
         same = labels == set(seq)
         bad = sum(1 for a, b in pairs if b is not None and (b not in pos or a not in pos or not pos[b] < pos[a]))
         out[row] = (same, bad)
-    return tuple(w), out, (n, d, L, r)
+    return tuple(w), eta, out, (n, d, L, r)
 
 
 if __name__ == "__main__":
     ws = list(words(4))
     stats = defaultdict(int)
+    jobs = [(w, e) for w in ws for e in (1, -1)]
     with Pool(12) as pool:
-        for w, out, (n, d, L, r) in pool.imap_unordered(run, ws):
+        for w, eta, out, (n, d, L, r) in pool.imap_unordered(run, jobs):
             for row, (same, bad) in out.items():
-                stats[(row, "labels equal" if same else "labels differ")] += 1
-                stats[(row, "order violations", bad)] += 0
+                key = (eta, row)
+                stats[(key, "labels equal" if same else "labels differ")] += 1
                 if same and bad == 0:
-                    stats[(row, "consistent")] += 1
+                    stats[(key, "consistent")] += 1
                 if same:
-                    stats[(row, "sum violations")] += bad
+                    stats[(key, "order violations total")] += bad
             stats[("L == 2r+2", L == 2 * r + 2)] += 1
     for k in sorted(stats, key=str):
         if stats[k]:
