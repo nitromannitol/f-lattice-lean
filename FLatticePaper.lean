@@ -274,5 +274,8 @@ import FLatticePaper.Plane.Induction.S3FreeBoundary
 import FLatticePaper.Plane.Induction.ParentCoordinates
 import FLatticePaper.Plane.Induction.Q3Arithmetic
 import FLatticePaper.Plane.Induction.ParentWeb
+import FLatticePaper.Plane.Induction.Q3Exit
+import FLatticePaper.Plane.Induction.Q3Window
+import FLatticePaper.Plane.Induction.Q3Shift
 
 /-! Root import for the corrected F-lattice paper. -/
