@@ -8,7 +8,8 @@ fields are exactly the properties the Q3 argument uses (paragraphs 3, 6, 7 and t
 
 * `retained`, `quota`: the retained edges; a black centre retains both inputs, a white one at least one (`RetainQuota`).
   This is the retention of the chosen parent edge at a black or tied minimum.
-* `pNondecreasing`, `bNondecreasing`: the primitive `p` and the raw slip `b` do not decrease along the retained edges.
+* `priceNonincreasing`, `bNondecreasing`: the conjugate's price `P'` does not increase (so `p = c₀ − P'(Z·)` does not
+  decrease, task 63) and the raw slip `b` does not decrease along the retained edges.
 * `chainNonincreasing`: the chain potential `Φ_η` does not increase along them (the chain gap monotonicity).
 * `reflection`: reflection about `I = (1, −1)` maps retained edges to retained edges (`f(I − x) = f(x)`).
 * `forcedRetained`: the forced-white edges (`ForcedEdge`) are retained.
@@ -31,9 +32,10 @@ structure OldPolicyData (frame : ChildFrame) (G : Field) (seed : Site → Site �
   retained : Site → Site → Prop
   /-- Quota: a black centre retains both inputs, a white centre at least one. -/
   quota : RetainQuota G retained
-  /-- The primitive `p` of paragraph 5 (`p(x) = f(x − εU_q) − f(x)`) does not decrease along the retained edges. -/
-  pFun : Site → ℤ
-  pNondecreasing : NondecreasingAlong pFun retained
+  /-- The conjugate's own primitive price `P' = frame.price G` (with the conjugate's `parentShift`) does not increase along
+  the retained edges. By paragraph 5, `p(x) = c₀ − P'(Zx)` with `Z x = (−x₂, x₁ − 1)`, so this is `p` nondecreasing along
+  the transported policy (task 63; the current frame's `parentShift` plays no role). -/
+  priceNonincreasing : NonincreasingAlong (frame.price G) retained
   /-- The raw slip `b` of paragraph 7 does not decrease along the retained edges. -/
   bFun : Site → ℤ
   bNondecreasing : NondecreasingAlong bFun retained

@@ -302,5 +302,7 @@ import FLatticePaper.Plane.Induction.Q3White
 import FLatticePaper.Plane.Induction.Q3Rise
 import FLatticePaper.Plane.Induction.OldPolicy
 import FLatticePaper.Plane.Induction.NoBlackPair
+import FLatticePaper.Plane.Induction.MatchedPolicy
+import FLatticePaper.Plane.Induction.SheetCases
 
 /-! Root import for the corrected F-lattice paper. -/
