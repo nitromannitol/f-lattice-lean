@@ -132,12 +132,11 @@ theorem fwdOffset_succ_iff (ℓ' : BinaryWord) (j : ℕ) (hj : j < ℓ'.length) 
 
 /-- **The forward string by index.** The sites of the forward horizontal string of a ceiling word are exactly the cursor sites of
 its indices, with the offsets of `FwdOffset`. -/
-theorem stringSites_fwd_iff (n d : ℤ) (ℓ : BinaryWord) (hC : CeilWord ℓ (2 * n) (d + n)) (hn : 0 < n) (hnd : n < d)
-    (z : ℤ × ℤ) :
-    z ∈ stringSites false false ℓ ↔
-      ∃ k : ℕ, k < ℓ.length ∧ ∃ b : ℤ × ℤ, FwdOffset ℓ k b ∧
-        z = (2 * (k : ℤ) + 1 - qPrefix ℓ (k + 1) + b.1, qPrefix ℓ (k + 1) - 1 + b.2) := by
-  obtain ⟨ℓ', rfl⟩ := first_letter_q ℓ n d hC hn hnd
+theorem stringSites_fwd_iff_cons (ℓ' : BinaryWord) (z : ℤ × ℤ) :
+    z ∈ stringSites false false (Letter.q :: ℓ') ↔
+      ∃ k : ℕ, k < (Letter.q :: ℓ').length ∧ ∃ b : ℤ × ℤ, FwdOffset (Letter.q :: ℓ') k b ∧
+        z = (2 * (k : ℤ) + 1 - qPrefix (Letter.q :: ℓ') (k + 1) + b.1,
+          qPrefix (Letter.q :: ℓ') (k + 1) - 1 + b.2) := by
   have hlen : ℓ'.length + 1 = (Letter.q :: ℓ').length := rfl
   have hs : stringSites false false (Letter.q :: ℓ') =
       ((baseSites Letter.q false).map fun b => ((0 : ℤ) + b.1, (0 : ℤ) + b.2)) ++
@@ -168,5 +167,14 @@ theorem stringSites_fwd_iff (n d : ℤ) (ℓ : BinaryWord) (hC : CeilWord ℓ (2
       rw [hz, qPrefix_cons_succ]
       refine Prod.ext ?_ ?_ <;> simp
       all_goals omega
+
+/-- **The forward string by index** for a ceiling word: its first letter is `q`, and the sites are the cursor sites. -/
+theorem stringSites_fwd_iff (n d : ℤ) (ℓ : BinaryWord) (hC : CeilWord ℓ (2 * n) (d + n)) (hn : 0 < n) (hnd : n < d)
+    (z : ℤ × ℤ) :
+    z ∈ stringSites false false ℓ ↔
+      ∃ k : ℕ, k < ℓ.length ∧ ∃ b : ℤ × ℤ, FwdOffset ℓ k b ∧
+        z = (2 * (k : ℤ) + 1 - qPrefix ℓ (k + 1) + b.1, qPrefix ℓ (k + 1) - 1 + b.2) := by
+  obtain ⟨ℓ', rfl⟩ := first_letter_q ℓ n d hC hn hnd
+  exact stringSites_fwd_iff_cons ℓ' z
 
 end FLatticePaper.Tiles.SiteFwdLink

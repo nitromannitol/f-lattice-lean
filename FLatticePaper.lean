@@ -280,6 +280,8 @@ import FLatticePaper.Tiles.SiteMarksCursor
 import FLatticePaper.Tiles.SiteLowLeft
 import FLatticePaper.Tiles.SiteUnique
 import FLatticePaper.Tiles.SiteFwdLink
+import FLatticePaper.Tiles.SiteBand
+import FLatticePaper.Tiles.SiteFwdCover
 import FLatticePaper.Plane.Induction.S3FreeBoundary
 import FLatticePaper.Plane.Induction.ParentCoordinates
 import FLatticePaper.Plane.Induction.Q3Arithmetic
