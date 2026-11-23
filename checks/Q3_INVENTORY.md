@@ -746,3 +746,13 @@ Scope to confirm with the lead: §1's star containment needs `c = d − n ≥ 3`
   takes the games family and reads the prescription links from the two games.
 - Root build: 0 warnings, 0 linter notes, 0 errors. Guards: `checks/CanonicalSigned.lean` (the stale `rawSlipMinus` entry removed),
   `checks/NonfreeRoot.lean` (import of `NonfreeRoot` added: the guard was already unreachable from its import chain).
+
+### Task 72 / Q20 (minimum admission of the two-rank argument): MinAdmission.lean
+
+- PROVED `min_lap_local` (arithmetic, omega): for binary `F`, `g` values at a centre and its two inputs, with the quotas of `F` and `g`
+  and the monotonicity of `D = F − g` at the inputs of a black centre, the Laplacian of `min(F, g + k)` is `0` or `−1`.
+- PROVED `laplacian_min_local` (field): the same statement for fields, with the monotonicity hypotheses stated as the audit states them.
+- PROVED `min_field_binary`: `min(F, g + k)` takes the two consecutive values `min k 0` and `min k 0 + 1`.
+- NOT yet: the acyclic minimum policy with its square
+  clauses (the audit's lexicographic construction, `TWO_RANK_RAW_PHI_AUDIT.md` §2). The forced transfer needs that policy.
+- Checks: `checks/MinAdmission.lean`. Root build: 0 warnings, 0 linter notes.
