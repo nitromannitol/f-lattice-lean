@@ -300,6 +300,7 @@ import FLatticePaper.Tiles.PairNominal
 import FLatticePaper.Tiles.PairCellForms
 import FLatticePaper.Tiles.PairCellWindows
 import FLatticePaper.Tiles.PairBoxes
+import FLatticePaper.Tiles.PairBoxesP0
 import FLatticePaper.Plane.Induction.S3FreeBoundary
 import FLatticePaper.Plane.Induction.ParentCoordinates
 import FLatticePaper.Plane.Induction.Q3Arithmetic
