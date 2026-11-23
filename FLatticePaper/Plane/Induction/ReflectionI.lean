@@ -26,11 +26,12 @@ theorem incomingNeg_reflectI (x : Site) :
   · have h' : EvenSite (reflectionI - x) := (evenSite_reflectI x).mpr h
     rw [if_pos h, if_pos h']
     unfold reflectionI
-    ext <;> simp <;> ring
+    ext <;> simp
   · have h' : ¬ EvenSite (reflectionI - x) := fun hh => h ((evenSite_reflectI x).mp hh)
     rw [if_neg h, if_neg h']
     unfold reflectionI
-    ext <;> simp <;> ring
+    ext <;> simp
+    ring
 
 theorem incomingPos_reflectI (x : Site) :
     incomingPos (reflectionI - x) = reflectionI - incomingNeg x := by
@@ -39,11 +40,13 @@ theorem incomingPos_reflectI (x : Site) :
   · have h' : EvenSite (reflectionI - x) := (evenSite_reflectI x).mpr h
     rw [if_pos h, if_pos h']
     unfold reflectionI
-    ext <;> simp <;> ring
+    ext <;> simp
+    ring
   · have h' : ¬ EvenSite (reflectionI - x) := fun hh => h ((evenSite_reflectI x).mp hh)
     rw [if_neg h, if_neg h']
     unfold reflectionI
-    ext <;> simp <;> ring
+    ext <;> simp
+    ring
 
 /-- An edge `i → c` is carried to the edge `I − i → I − c`. -/
 theorem edge_reflectI {i c : Site} (h : Edge i c) : Edge (reflectionI - i) (reflectionI - c) := by
