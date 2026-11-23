@@ -2,6 +2,9 @@ import FLatticePaper.Plane.Induction.CollarTop
 import FLatticePaper.Plane.Induction.CollarOneOne
 import FLatticePaper.Plane.Induction.W1NonfreeHsqC
 import FLatticePaper.Plane.Induction.CollarGlue
+import FLatticePaper.Plane.Induction.CollarLeft
+import FLatticePaper.Plane.Induction.CollarRight
+import FLatticePaper.Plane.Induction.ChildNumerator
 
 /-! Task 72 (hcollar, band (a)): the `collarBase` split for `hstrict`.
 
@@ -14,24 +17,17 @@ namespace FLatticePaper.CollarStrict
 open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.W1 FLatticePaper.W1Phase FLatticePaper.W1MSheet
   FLatticePaper.W1Step FLatticePaper.W1CollarFrame FLatticePaper.AndOrRank FLatticePaper.CollarGlue
   FLatticePaper.CollarBottomSquare FLatticePaper.CollarTop FLatticePaper.W1NonfreeHsqNonneg
+  FLatticePaper.CollarLeft FLatticePaper.CollarRight
 
-/-- `hstrict` for a word, from the left and right class inputs. -/
+/-- `hstrict` for a word: the bottom, top, left and right classes (`collarBase`). -/
 theorem hstrict_of_strong {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three)
-    (hSE : StrongEstimates (conjWord word))
-    (hL : ∀ c, StrictInterior (frameAt word).child.num (frameAt word).child.den c →
-      CollarFrame (frameAt word) c → laplacian (MW word) c = 0 → ¬ BottomArc (frameAt word) c →
-        ¬ TopArc (frameAt word) c → LeftArc (frameAt word) c →
-        ∀ c' ∈ squareCorners c.1 c.2, StrictInterior (frameAt word).child.num (frameAt word).child.den c')
-    (hR : ∀ c, StrictInterior (frameAt word).child.num (frameAt word).child.den c →
-      CollarFrame (frameAt word) c → laplacian (MW word) c = 0 → ¬ BottomArc (frameAt word) c →
-        ¬ TopArc (frameAt word) c → ¬ LeftArc (frameAt word) c →
-        ∀ c' ∈ squareCorners (c.1 - 1) (c.2 - 1),
-          StrictInterior (frameAt word).child.num (frameAt word).child.den c') :
+    (hSE : StrongEstimates (conjWord word)) :
     ∀ c, StrictInterior (frameAt word).child.num (frameAt word).child.den c →
       CollarFrame (frameAt word) c → laplacian (MW word) c = 0 →
         ∀ c' ∈ collarSquare (frameAt word) c,
           StrictInterior (frameAt word).child.num (frameAt word).child.den c' := by
   intro c hcS hcol hM
+  have hn3 : 3 ≤ (frameAt word).child.num := FLatticePaper.Induction.child_num_ge_three hw
   have hne : c ≠ (1, 1) := by
     rintro rfl
     have h1 := FLatticePaper.Induction.laplacian_MW_one_one hw hSE
@@ -46,25 +42,17 @@ theorem hstrict_of_strong {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three)
       rw [h, FLatticePaper.Induction.laplacian_MW_one_one hw hSE, hM] at h1
       norm_num at h1
     exact top_square_strict (frameAt word) hcS hne' hT
-  · exact hL c hcS hcol hM hB hT hLf
-  · exact hR c hcS hcol hM hB hT hLf
+  · exact left_square_strict (frameAt word) hn3 hcS hB hT hLf
+  · exact right_square_strict (frameAt word) hn3 hcS hB hT
+      (FLatticePaper.CollarRight.rightArc_of_collarFrame (frameAt word) hcol hB hT hLf)
 
-/-- `hcollar` for a word, from the inherited chains and the left and right class inputs. -/
+/-- `hcollar` for a word, from the inherited chains (the strict-centre premise is the collar's own). -/
 theorem hcollar_discharged {word : Word} {seed : Site → Site → Prop}
     (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed)
     (chains : CollarChains word P)
-    (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
-    (hL : ∀ c, StrictInterior (frameAt word).child.num (frameAt word).child.den c →
-      CollarFrame (frameAt word) c → laplacian (MW word) c = 0 → ¬ BottomArc (frameAt word) c →
-        ¬ TopArc (frameAt word) c → LeftArc (frameAt word) c →
-        ∀ c' ∈ squareCorners c.1 c.2, StrictInterior (frameAt word).child.num (frameAt word).child.den c')
-    (hR : ∀ c, StrictInterior (frameAt word).child.num (frameAt word).child.den c →
-      CollarFrame (frameAt word) c → laplacian (MW word) c = 0 → ¬ BottomArc (frameAt word) c →
-        ¬ TopArc (frameAt word) c → ¬ LeftArc (frameAt word) c →
-        ∀ c' ∈ squareCorners (c.1 - 1) (c.2 - 1),
-          StrictInterior (frameAt word).child.num (frameAt word).child.den c') :
+    (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word)) :
     ∀ c : Site, StrictInterior (frameAt word).child.num (frameAt word).child.den c →
       laplacian (MW word) c = 0 → CollarFrame (frameAt word) c → HsqAt word P c :=
-  hcollar_of_chains P chains (hstrict_of_strong hw hSE hL hR)
+  hcollar_of_chains P chains (hstrict_of_strong hw hSE)
 
 end FLatticePaper.CollarStrict

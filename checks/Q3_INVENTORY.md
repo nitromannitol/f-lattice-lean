@@ -623,3 +623,10 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - PROVED `left_corners_even`, `left_corners_odd` (grade arithmetic: the upper-right corners of a strict left centre are strict given `t` bounds from `¬Bottom` and `¬Top`, and the `s` bound from the witness; `T > 6d − 4` from `n ≥ 3`).
 - PROVED `left_square_strict` (hn3 : 3 ≤ num): a strict centre with `¬BottomArc`, `¬TopArc`, `LeftArc` has its square `squareCorners c1 c2` strict. The left class no longer needs a boundary-existence lemma: the bottom neighbours of the centre and of `R − c` supply the `t` bounds.
 - Checks: `checks/CollarLeft.lean`. Root build clean; sandbox logs clean.
+
+### Task 72 (hcollar, band (a), right class and the closed collar): CollarRight.lean, CollarStrict.lean
+
+- PROVED `right_square_strict`: a strict right centre, not bottom, top or left, with a right witness `v − U ∈ freeV` (from `CollarFrame` via `rightArc_of_collarFrame`), has its lower-left square `squareCorners (c1−1) (c2−1)` strict. The upper and lower `t` bounds come from `¬Bottom` and `¬Top` (`t_bounds_even`, `t_bounds_odd`, as on the left); the lower `s` bound is `sGrade_ge_of_rightArc`: `s(v−U) ≥ 2−d+n` and `s(U) = T` give `s(c) ≥ T + 2 − 3d + n`.
+- PROVED `hstrict_of_strong` (word, hw, hSE) for all four classes: the bottom, top, left (`left_square_strict`) and right (`right_square_strict`) branches of `collarBase`; `hn3` comes from `child_num_ge_three hw`.
+- PROVED `hcollar_discharged` (word, hw, hSE): the collar conclusion `HsqAt` for a strict centre, from the chains only. The `hstrict` input is no longer a hypothesis.
+- Checks: `checks/CollarRight.lean`, `checks/CollarStrict.lean`. Root build clean; sandbox logs clean.
