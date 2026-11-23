@@ -1,0 +1,8 @@
+import FLatticePaper.Plane.Induction.StrongHStrip
+
+#print axioms FLatticePaper.StrongHStrip.slip_eq_zero_of_tBand
+#print axioms FLatticePaper.StrongHStrip.tGrade_even_endpoint
+#print axioms FLatticePaper.StrongHStrip.even_inputs_tGrade
+#print axioms FLatticePaper.StrongHStrip.star_tBand_of_even_root
+#print axioms FLatticePaper.StrongHStrip.slip_zero_on_even_star
+#print axioms FLatticePaper.StrongHStrip.slip_zero_on_native_even_endpoint

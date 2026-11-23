@@ -1,0 +1,4 @@
+import FLatticePaper.Plane.Induction.StrongUnitPrice
+
+#print axioms FLatticePaper.StrongUnitPrice.price_mem_of_star
+#print axioms FLatticePaper.StrongUnitPrice.unitPrice_and_noSaddle
