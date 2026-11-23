@@ -76,7 +76,7 @@ theorem main_even_bwd3 (k x y : ℤ) (hk : 0 ≤ k) (hp : (x + y) % 2 = 0)
     have hc' : y ≤ -1 := by omega
     have hx1 : 0 < x := by
       by_contra h
-      push_neg at h
+      push Not at h
       nlinarith [mul_nonneg (show (0 : ℤ) ≤ 2 * k + 3 by omega) (show (0 : ℤ) ≤ -x by omega)]
     nlinarith [mul_nonneg (show (0 : ℤ) ≤ k + 2 by omega) (show (0 : ℤ) ≤ -1 - y by omega)]
   have hx2 : x ≤ 2 * k + 4 := by

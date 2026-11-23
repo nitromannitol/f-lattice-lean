@@ -57,7 +57,7 @@ theorem main_even_fwd (d x y : ℤ) (hd : 4 ≤ d) (hde : d % 2 = 0) (hp : (x + 
   have hS2 : 2 ≤ x + y := by omega
   refine ⟨?_, ?_, ?_, ?_⟩
   · by_contra hc
-    push_neg at hc
+    push Not at hc
     have hy : d + 1 ≤ y := by nlinarith
     rcases (show y = d + 1 ∨ y = d + 2 by omega) with rfl | rfl
     · have hx : x = 2 - d := by nlinarith
@@ -82,7 +82,7 @@ theorem main_odd_fwd (d x y : ℤ) (hd : 4 ≤ d) (hde : d % 2 = 0) (hp : (x + y
       3 - d ≤ (d + 1) * x + (d - 1) * y ∧ (d + 1) * x + (d - 1) * y ≤ 2 * d ^ 2 + 5 * d - 3 := by
   refine ⟨?_, ?_, ?_, ?_⟩
   · by_contra hc
-    push_neg at hc
+    push Not at hc
     have hy : d + 2 ≤ y := by nlinarith
     have hy' : y = d + 2 := by omega
     subst hy'

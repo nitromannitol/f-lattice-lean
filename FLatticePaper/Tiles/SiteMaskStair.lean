@@ -58,7 +58,7 @@ theorem stair_even_iff (d x y : ℤ) (hd : 3 ≤ d) (hdo : d % 2 = 1) (hp : (x +
       have hB : 2 ≤ x + y := by omega
       refine ⟨?_, ?_, ?_, ?_⟩
       · by_contra hc
-        push_neg at hc
+        push Not at hc
         have hx : x = 2 - d := by nlinarith
         have hy : y = d + 1 := by nlinarith
         omega
