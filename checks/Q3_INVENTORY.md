@@ -553,3 +553,10 @@ Shift and sign mismatches found in this step (not chosen; for the lead):
 - PROVED `sW_centre_identity`: for the conjugate translate `p = i U_c + j V_c`, `s(c) = 2n + s(l_v) + 2 i (Nd − Dn) − j s(U_p) − s(v)` with `v = zTurn (zTurn (c − l_v) + p)` and `s` the word `s`-grade.
 - Checks: `checks/CollarIdentity.lean`. Root build clean; sandbox logs clean.
 - Open: the sign of `j` and the value `i = 1` (they come from the H spectrum of the translate, i.e. from the parent grades `s_p(c − l_v)`), and the bounds on `s(v)` (from `vSpectrum`, `s(v) ∈ [2 − d + n, L − 2]`).
+
+### Task 72 (hcollar, band (a), H-point bounds): CollarBottomBand.lean
+
+- PROVED `even_H_bounds`: an even H point `v` of the closed polygon has `l = (v.1 + v.2)/2 ≥ 1`, `v.2 ≤ l − 1` (the floor law) and `s(v) ≥ 2 d l + 2 n`.
+- PROVED `odd_H_bounds`: an odd H point `v` of the closed polygon is `(1, 0)` or has `s(v) ≥ 3 L`.
+- Numerics correction: the earlier band numerics used a box with `|y| ≤ 2n + 2`, too small; the strict region reaches `y ≈ L`. With the corrected box, the top (V-translate) collar fails the bottom square for odd centres. The top collar uses the square LR, and the centre reflection `z ↦ R − z` (`R = (n+1, 2n+d−1)`) maps strict top centres to strict bottom centres (grade identities, parity preserved), and maps the top witness `w + V` to the bottom witness `U + I − w`, which is a free H point (checked numerically; grade proof: `t ↦ L − t`, `s ↦ T + 2n − s`).
+- Checks: `checks/CollarBottomBand.lean`. Root build clean; sandbox logs clean.
