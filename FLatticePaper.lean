@@ -187,6 +187,12 @@ import FLatticePaper.Plane.Induction.OddRise
 import FLatticePaper.Plane.Induction.ZeroRegion
 import FLatticePaper.Plane.Induction.ParentStep
 import FLatticePaper.Plane.Induction.I3Application
+import FLatticePaper.Plane.Induction.I3Permits
+import FLatticePaper.Plane.Induction.VArcLongitudinal
+import FLatticePaper.Plane.Induction.VArcOffers
+import FLatticePaper.Plane.Induction.ZoneSheet
+import FLatticePaper.Plane.Induction.I3NoA
+import FLatticePaper.Plane.Induction.I3CSheet
 import FLatticePaper.Plane.HarmonicConstant
 import FLatticePaper.Plane.Induction.AlternateFacts
 import FLatticePaper.Plane.GlobalOdometers
@@ -251,5 +257,9 @@ import FLatticePaper.Construction.AlternateIdentification
 import FLatticePaper.Construction.OddChartParity
 import FLatticePaper.Construction.OddAlternateCopies
 import FLatticePaper.Construction.OddShear
+import FLatticePaper.StrongHeadline
+import FLatticePaper.Plane.Induction.BaseStrip
+import FLatticePaper.Plane.Induction.ZoneI1
+import FLatticePaper.Plane.Induction.ParentStepDischarge
 
 /-! Root import for the corrected F-lattice paper. -/

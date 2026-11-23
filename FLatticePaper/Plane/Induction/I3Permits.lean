@@ -53,18 +53,17 @@ theorem i3_retainQuota_quarterTurn (G : Field) (policy : Site → Site → Prop)
 /-- **The `Ξ`-permits have the quota at the matching phase**: the policy of the earlier word, pulled back by `Z`, lies in
 the permit relation `Ξ i ≤ Ξ c` (its monotonicity), and a quota inside a relation gives the quota of the relation. This is the
 field `permitA` of `SheetLocalInputs`. -/
-theorem i3_permitA_of_strong {word : Word} (h : StrongEstimates (conjWord word))
-    (hphase : (frameAt word).eps = (frameAt (conjWord word)).eps) :
+theorem i3_permitA_of_strong {word : Word} (h : StrongEstimates (conjWord word)) :
     PermitLocal (quarterTurnField (standardField (conjWord word)))
       (fun c i => sheetChainPotential word (standardField (conjWord word)) i ≤
         sheetChainPotential word (standardField (conjWord word)) c) := by
-  obtain ⟨policy, hq, hmono, -⟩ := h.F2F3_policy
+  obtain ⟨policy, hq, hmono, -⟩ := h.F2F3_policy (frameAt word).eps (frameAt word).eps_unit
   have hT := i3_retainQuota_quarterTurn _ policy hq
   have hsub : ∀ c i, policy (i3Z c) (i3Z i) →
       sheetChainPotential word (standardField (conjWord word)) i ≤
         sheetChainPotential word (standardField (conjWord word)) c := by
     intro c i hp
-    rw [i3_sheet_eq_chainPotential, i3_sheet_eq_chainPotential, hphase]
+    rw [i3_sheet_eq_chainPotential, i3_sheet_eq_chainPotential]
     exact hmono (i3Z c) (i3Z i) hp
   rw [← retainQuota_iff_permitLocal]
   constructor
