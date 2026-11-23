@@ -1,0 +1,10 @@
+import FLatticePaper.Plane.Induction.StrongChartSlip
+import FLatticePaper.Plane.Induction.StrongSourceRep
+import FLatticePaper.Plane.Induction.StrongDeckSpan
+
+#print axioms FLatticePaper.StrongChartSlip.slip_chart_dichotomy
+#print axioms FLatticePaper.StrongSourceRep.standardField_eq_sheetMin_rep
+#print axioms FLatticePaper.StrongDeckSpan.star_window_of_common_layer
+#print axioms FLatticePaper.StrongDeckSpan.unitPrice_of_star_windows
+#print axioms FLatticePaper.StrongDeckSpan.deck_rep_mem
+#print axioms FLatticePaper.StrongDeckSpan.price_of_deck_rep
