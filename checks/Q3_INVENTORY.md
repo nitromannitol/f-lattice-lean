@@ -689,3 +689,10 @@ Scope to confirm with the lead: §1's star containment needs `c = d − n ≥ 3`
 - `price_const_on_star_of_word` (BothFreeGrades.lean): the §1 star price constancy from the word hypotheses and `HasStrips`.
 - Checks: `checks/ArcRanges.lean`, `checks/ChildGap.lean`, `checks/BothFreeGrades.lean`. Root build: see the commit.
 - Still named: which sites form the native V star (`StarS` is on the grade), the deck character of lifts, and the two-rank reduction (`ChainPairData.chainNonincreasing`).
+
+### Task 72 / Q13 (minus permit, H band): MinusPermit.lean
+
+- PROVED `prescribedH_minus_eq`: the minus prescription at a free H site is east at even sites, north at odd sites.
+- PROVED `minus_permit_H`: at a free H site, the minus prescription is permitted for the raw slip `D₋(w) = F w − F(w − σ)`: `slipPermits F (w ↦ F(w + (−1)•σ)) z (z + prescribedH (−1) z)`. The zero strip of `HasStrips` (`F = 0` on grades `[1 − d, n + 2d − 1]`) carries the four values `F z, F (z+ε), F (z−σ), F (z+ε−σ)`, since the H spectrum and its unit neighbours lie in that band (`n ≥ 1`, `n + 2 ≤ d`).
+- Remaining for `permittedMinus`: the V-site permits (harmonic values on the translates) and the white edges (the selection), which need the field values.
+- Checks: `checks/MinusPermit.lean`. Root build clean (0 `^warning` lines).
