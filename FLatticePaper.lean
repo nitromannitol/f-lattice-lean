@@ -180,6 +180,7 @@ import FLatticePaper.Plane.Induction.I3Unit
 import FLatticePaper.Tiles.RegisterInduction
 import FLatticePaper.Tiles.RowsOfBoundary
 import FLatticePaper.Plane.Induction.StrongEstimates
+import FLatticePaper.Plane.Induction.ChainReflection
 import FLatticePaper.Plane.Induction.VArcTransverse
 import FLatticePaper.Plane.Induction.VArcRange
 import FLatticePaper.Plane.Induction.OddRise

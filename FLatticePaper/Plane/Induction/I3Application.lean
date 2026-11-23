@@ -1,5 +1,6 @@
 import FLatticePaper.Plane.Induction.I3Unit
 import FLatticePaper.Plane.Induction.StrongEstimates
+import FLatticePaper.Plane.Induction.ChainReflection
 import FLatticePaper.Plane.Induction.SheetMinFromConj
 import FLatticePaper.Plane.Induction.WordInduction
 
@@ -277,8 +278,8 @@ theorem i3_chainPotential_unit_of_strong {u : Word} (h : StrongEstimates u) :
           - (frameAt u).chainPotential (standardField u) (frameAt u).eps c ∧
         (frameAt u).chainPotential (standardField u) (frameAt u).eps i
           - (frameAt u).chainPotential (standardField u) (frameAt u).eps c ≤ 1 := by
-  obtain ⟨relF, hqF, hmF, -⟩ := h.F2F3_policy
-  obtain ⟨cp, -, R, w, hmH, hqH, -⟩ := h.F2F4_chain
+  obtain ⟨relF, hqF, hmF, -⟩ := h.F2F3_policy (frameAt u).eps (frameAt u).eps_unit
+  obtain ⟨cp, hmH, hqH, -⟩ := h.chain_data (frameAt u).eps (frameAt u).eps_unit
   exact i3_chainPotential_unit_of_frame (frameAt u) (standardField u) (frameAt u).eps
     (frameAt u).eps_unit h.packet h.F1_unitSlip h.F1_unitPrice h.F1_noPriceSaddle hqF hqH hmF hmH
 
