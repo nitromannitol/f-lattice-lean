@@ -32,7 +32,11 @@ def deckVec (frame : ChildFrame) (i j : ℤ) : Site :=
 
 /-- The full-star classification of STRONG_PRICE_AND_ALTERNATE_STEP §3: for every centre `c` there is one deck translate `deckVec i j`,
 common to the star of `c`, such that each site `x` of that star, moved by the translate, lies in the closed polygon, in the H-star band,
-or is a V source. -/
+or is a V source.
+
+No restriction of the centres is needed. If `τ` classifies the star of `c`, then `τ − μ` classifies the star of `c + μ` (the translate
+moves the two stars together), so the statement over all centres is the statement over a fundamental domain of the deck. Every star is
+full: each of its centres has both incoming inputs. -/
 def StarClassified (frame : ChildFrame) (F : Field) : Prop :=
   ∀ c : Site, ∃ i j : ℤ, ∀ x : Site,
     (x = c ∨ x = FLatticePaper.incomingNeg c ∨ x = FLatticePaper.incomingPos c) →

@@ -484,6 +484,7 @@ import FLatticePaper.Plane.Induction.StrongHSpan
 import FLatticePaper.Plane.Induction.StrongHStrip
 import FLatticePaper.Plane.Induction.StrongPriceRange
 import FLatticePaper.Plane.Induction.StrongUnitPrice
+import FLatticePaper.Plane.Induction.StarCover
 import FLatticePaper.Plane.Induction.StrongPriceInputs
 import FLatticePaper.Plane.Induction.StrongDeckSpan
 import FLatticePaper.Plane.Induction.StrongSourceRep
