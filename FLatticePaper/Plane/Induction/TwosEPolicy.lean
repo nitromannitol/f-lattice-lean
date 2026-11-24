@@ -168,6 +168,26 @@ theorem twosSel_white_freeClass {a η : ℤ} {F : Field} {c i : Site} (h : lapla
         i = (c.1 + (freeDisp a η u.1 u.2).1, c.2 + (freeDisp a η u.1 u.2).2) := by
   simp [TwosSel, h, hf]
 
+/-- Two free aliases of one site coincide: H and V sites are pairwise not translates by a period vector with coefficients in
+`[-2, 2]` (the alias indices differ by at most two). -/
+theorem freeAlias_unique {a : ℤ} (ha : 4 ≤ a) {c u u' : Site} (hu : AliasOf a c u) (hu' : AliasOf a c u')
+    (hf : FreeSite a u.1 u.2) (hf' : FreeSite a u'.1 u'.2) : u = u' := by
+  obtain ⟨i, l, hi, hl, rfl⟩ := hu
+  obtain ⟨i', l', hi', hl', rfl⟩ := hu'
+  rcases hi with rfl | rfl | rfl <;> rcases hl with rfl | rfl | rfl <;>
+    rcases hi' with rfl | rfl | rfl <;> rcases hl' with rfl | rfl | rfl <;>
+    simp only [FreeSite, FreeHSite, FreeVSite, Prod.mk.injEq] at hf hf' ⊢ <;> omega
+
+/-- A white centre of a free class keeps exactly one input. -/
+theorem twosSel_white_freeClass_eq {a η : ℤ} (ha : 4 ≤ a) {F : Field} {c i i' : Site} (h : laplacian F c = 0)
+    (hf : FreeClass a c) (hi : TwosSel a η F c i) (hi' : TwosSel a η F c i') : i = i' := by
+  rw [twosSel_white_freeClass h hf] at hi hi'
+  obtain ⟨u, hu, hfu, rfl⟩ := hi
+  obtain ⟨u', hu', hfu', rfl⟩ := hi'
+  have heq := freeAlias_unique ha hu hu' hfu hfu'
+  subst heq
+  rfl
+
 end FLatticePaper.TwosEPolicy
 
 end
