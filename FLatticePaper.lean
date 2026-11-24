@@ -159,6 +159,7 @@ import FLatticePaper.Plane.Induction.ReflectedRankPlus
 import FLatticePaper.Plane.Induction.ReflectedMinusStrict
 import FLatticePaper.Plane.Induction.ReflectedMinusNonNative
 import FLatticePaper.Plane.Induction.ReflectedMinusFull
+import FLatticePaper.Plane.Induction.RankWithValues
 import FLatticePaper.Plane.Induction.ThreesMidpoint
 import FLatticePaper.Plane.Induction.ThreesLeaves
 import FLatticePaper.Plane.Induction.TwosLeaves
