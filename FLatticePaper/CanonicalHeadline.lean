@@ -5,6 +5,8 @@ import FLatticePaper.Plane.Induction.EPolicyFinal
 import FLatticePaper.Plane.Induction.StrongSeedInduction
 import FLatticePaper.Plane.Induction.GamesPolicy
 import FLatticePaper.Plane.Induction.TwosResidual
+import FLatticePaper.Plane.Induction.HResPWire
+import FLatticePaper.Plane.Induction.HResNCases
 
 /-! Task 71: the odometers headline with the canonical signed games at every proper word.
 
@@ -48,7 +50,8 @@ theorem exists_ne_three_of_not_replicate_three (w : Word) (h : ¬ ∃ k : ℕ, w
 
 /-- **The odometers theorem from the canonical signed games (task 71).** The per-word inputs are `hgames` (the games with a deck rank at
 each proper non-two-power word, which give the policy `hpol` and the canonical games of the conjugate `hcan`) and `hbd` (the boundary
-bound, Q22); the twos conjugates take the input `htwoGames`. -/
+bound, Q22). The tied rising pair `hResP` is derived from the V-block input `hQ21` (the conjugate H-cut case of the negative tie) and the
+conjugate `W1Forced` input `hW1`. -/
 theorem odometersTheorem_of_canonical
     (hpureSlip : ∀ k : ℕ, Induction.BaseSlip (List.replicate k Digit.three))
     (hpureRes : ∀ k : ℕ, Induction.StrongResidual (List.replicate k Digit.three))
@@ -56,16 +59,21 @@ theorem odometersTheorem_of_canonical
     (hgames : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word → Induction.GamesWithRank word)
     (hbd : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       ∀ z, OnBoundary (frameAt word).closedPolygon z → (frameAt word).price (standardField word) z ≤ (frameAt word).cutPrice)
-    (hResP : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
-      ∀ c i, RisingBlackPair (standardField word) (frameAt word).shortShift c i →
-        c ∈ (frameAt word).closedPolygon →
-        (c - (frameAt word).uq ∈ (frameAt word).closedPolygon ∧ i - (frameAt word).uq ∈ (frameAt word).closedPolygon) →
-        sheetDiffW word c = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j = -1) → False)
-    (hResN : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+    (hW1 : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
+        (standardField (conjWord word)))
+    (hQ21 : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      ∀ c i, RisingBlackPair (standardField word) (-(frameAt word).shortShift) c i →
+        c ∈ (frameAt word).closedPolygon → i ∈ (frameAt word).closedPolygon →
+        c + (frameAt word).uq ∈ (frameAt word).closedPolygon → i + (frameAt word).uq ∈ (frameAt word).closedPolygon →
+        sheetDiffW word c = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j ≤ -1) → 1 ≤ sheetDiffW word i →
+        ∀ v ∈ (frameAt (conjWord word)).child.modifiedDeck.span,
+          zTurn (c - (frameAt word).sheetShift) + v ∈ (frameAt (conjWord word)).freeH → False)
+    (hTie0 : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       ∀ c i, RisingBlackPair (standardField word) (-(frameAt word).shortShift) c i →
         c ∈ (frameAt word).closedPolygon →
-        (c + (frameAt word).uq ∈ (frameAt word).closedPolygon ∧ i + (frameAt word).uq ∈ (frameAt word).closedPolygon) →
-        sheetDiffW word c = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j = -1) → False)
+        c + (frameAt word).uq ∈ (frameAt word).closedPolygon → i + (frameAt word).uq ∈ (frameAt word).closedPolygon →
+        sheetDiffW word c = 0 → sheetDiffW word i = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j = -1) → False)
     (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       Induction.S3NoFortInputs (frameAt word) (standardField word)) :
     OdometersTheorem := by
@@ -95,6 +103,31 @@ theorem odometersTheorem_of_canonical
     fun word hw hn => Induction.strongResidual_of_conj hw (Induction.exists_ne_two_of_not_twoPow hw hn)
       (hE (conjWord word)) (hbd word hw hn) ((hJ (conjWord word)).2)
       (Induction.policy_of_gamesWithRank (hgames word hw hn))
+  -- the tied rising pair hResP, from the V-block input hQ21 and the conjugate W1Forced hW1
+  have hResP : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      ∀ c i, RisingBlackPair (standardField word) (frameAt word).shortShift c i →
+        c ∈ (frameAt word).closedPolygon →
+        (c - (frameAt word).uq ∈ (frameAt word).closedPolygon ∧ i - (frameAt word).uq ∈ (frameAt word).closedPolygon) →
+        sheetDiffW word c = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j = -1) → False :=
+    fun word hw hn => Induction.hResP_of_Q21 hw (hE word) (hE (conjWord word)) ((hJ (conjWord word)).2)
+      (Induction.oldPolicyData_of_canonical (standardField_reflectI_conj word (hE (conjWord word)))
+        (hcan word hw hn).some (frameAt word).eps (frameAt word).eps_unit)
+      (hW1 word hw hn) (hQ21 word hw hn)
+  -- the tied negative rising pair hResN, from the negative tie (hNegTie_of_Q21) and the tied-target case hTie0
+  have hResN : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      ∀ c i, RisingBlackPair (standardField word) (-(frameAt word).shortShift) c i →
+        c ∈ (frameAt word).closedPolygon →
+        (c + (frameAt word).uq ∈ (frameAt word).closedPolygon ∧ i + (frameAt word).uq ∈ (frameAt word).closedPolygon) →
+        sheetDiffW word c = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j = -1) → False :=
+    fun word hw hn c i hr hcE hpair hΨc hj =>
+      Induction.hResN_of_cases hw (hE (conjWord word)) (hE word).packet
+        (Induction.oldPolicyData_of_canonical (standardField_reflectI_conj word (hE (conjWord word)))
+          (hcan word hw hn).some (frameAt word).eps (frameAt word).eps_unit)
+        (Induction.hNegTie_of_Q21 hw (hE word) (hE (conjWord word)) ((hJ (conjWord word)).2)
+          (Induction.oldPolicyData_of_canonical (standardField_reflectI_conj word (hE (conjWord word)))
+            (hcan word hw hn).some (frameAt word).eps (frameAt word).eps_unit)
+          (hW1 word hw hn) (hQ21 word hw hn))
+        (hTie0 word hw hn) hr hcE hpair.1 hpair.2 hΨc hj
   exact odometersTheorem_of_policy hpureSlip hpureRes htwoSlip htwoRes hres
     (fun word hw hn => ⟨fun _ _ => False, ⟨Induction.oldPolicyData_of_canonical
       (standardField_reflectI_conj word (hE (conjWord word))) (hcan word hw hn).some (frameAt word).eps
@@ -103,26 +136,32 @@ theorem odometersTheorem_of_canonical
 
 /-- **The odometers theorem with the pure threes inputs discharged (task 71).** The pure threes inputs `BaseSlip` and `StrongResidual`
 come from `pure_threes_final`. The named inputs are `htwoGames` (the twos games with a deck rank; the twos base slip and the twos residual
-follow from it), `hgames` (the proper non-two-power words), `hbd` (Q22), `hResP`, `hResN` and `hbulk`. -/
+follow from it), `hgames` (the proper non-two-power words), `hbd` (Q22), `hW1` (the conjugate `W1Forced`), `hQ21` (the V-block input),
+`hTie0` (the tied-target case of the negative tied rising pair) and `hbulk`. -/
 theorem odometersTheorem_of_canonical_pure
     (htwoGames : ∀ k : ℕ, Induction.GamesWithRank (List.replicate (k + 1) Digit.two))
     (hgames : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word → Induction.GamesWithRank word)
     (hbd : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       ∀ z, OnBoundary (frameAt word).closedPolygon z → (frameAt word).price (standardField word) z ≤ (frameAt word).cutPrice)
-    (hResP : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
-      ∀ c i, RisingBlackPair (standardField word) (frameAt word).shortShift c i →
-        c ∈ (frameAt word).closedPolygon →
-        (c - (frameAt word).uq ∈ (frameAt word).closedPolygon ∧ i - (frameAt word).uq ∈ (frameAt word).closedPolygon) →
-        sheetDiffW word c = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j = -1) → False)
-    (hResN : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+    (hW1 : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
+        (standardField (conjWord word)))
+    (hQ21 : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      ∀ c i, RisingBlackPair (standardField word) (-(frameAt word).shortShift) c i →
+        c ∈ (frameAt word).closedPolygon → i ∈ (frameAt word).closedPolygon →
+        c + (frameAt word).uq ∈ (frameAt word).closedPolygon → i + (frameAt word).uq ∈ (frameAt word).closedPolygon →
+        sheetDiffW word c = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j ≤ -1) → 1 ≤ sheetDiffW word i →
+        ∀ v ∈ (frameAt (conjWord word)).child.modifiedDeck.span,
+          zTurn (c - (frameAt word).sheetShift) + v ∈ (frameAt (conjWord word)).freeH → False)
+    (hTie0 : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       ∀ c i, RisingBlackPair (standardField word) (-(frameAt word).shortShift) c i →
         c ∈ (frameAt word).closedPolygon →
-        (c + (frameAt word).uq ∈ (frameAt word).closedPolygon ∧ i + (frameAt word).uq ∈ (frameAt word).closedPolygon) →
-        sheetDiffW word c = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j = -1) → False)
+        c + (frameAt word).uq ∈ (frameAt word).closedPolygon → i + (frameAt word).uq ∈ (frameAt word).closedPolygon →
+        sheetDiffW word c = 0 → sheetDiffW word i = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j = -1) → False)
     (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       Induction.S3NoFortInputs (frameAt word) (standardField word)) :
     OdometersTheorem :=
   odometersTheorem_of_canonical FLatticePaper.EPolicy.pure_threes_inputs.1 FLatticePaper.EPolicy.pure_threes_inputs.2
-    htwoGames hgames hbd hResP hResN hbulk
+    htwoGames hgames hbd hW1 hQ21 hTie0 hbulk
 
 end FLatticePaper
