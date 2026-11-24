@@ -356,4 +356,250 @@ theorem chainM_cand (k : ℕ) {c i : Site}
   rw [e1, e2, e3, e4, twosPsi_lattice, twosPsi_lattice]
   linarith [key]
 
+
+set_option maxHeartbeats 400000 in
+theorem twosPsi_free_H0 (k : ℕ) {u1 u2 : ℤ} (h1 : u1 = 1) (h2 : u2 = 0) :
+    twosPsi k (u1 - 1 + (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).1) (u2 - 1 + (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).2) ≤ twosPsi k (u1 - 1) (u2 - 1) := by
+  rw [freeDisp_H0 (η := -1) ⟨h1, h2⟩]
+  dsimp only
+  have eX := twosPsi_U k (u1 - 1 + 0) (u2 - 1 + -(-1))
+  have eY := twosPsi_U k (u1 - 1) (u2 - 1)
+  have key : twosPsi k (u1 - 1 + 0 + (2 * (k : ℤ) + 5)) (u2 - 1 + -(-1) + (2 * (k : ℤ) + 3)) ≤ twosPsi k (u1 - 1 + (2 * (k : ℤ) + 5)) (u2 - 1 + (2 * (k : ℤ) + 3)) := by
+    have hkX : TwosKey (2 * (k : ℤ) + 4) (u1 - 1 + 0 + (2 * (k : ℤ) + 5)) (u2 - 1 + -(-1) + (2 * (k : ℤ) + 3)) := by
+      rw [twosKey_pos]
+      omega
+    have hkY : TwosKey (2 * (k : ℤ) + 4) (u1 - 1 + (2 * (k : ℤ) + 5)) (u2 - 1 + (2 * (k : ℤ) + 3)) := by
+      rw [twosKey_pos]
+      omega
+    have hpX := twos_price_delta k hkX
+    have hpY := twos_price_delta k hkY
+    unfold TwosDelta at hpX hpY
+    have hsX := twos_slip_value k hkX
+    have hsY := twos_slip_value k hkY
+    unfold TwosSlipZ0 TwosSlipZ2 at hsX hsY
+    unfold twosPsi twosP
+    omega
+  linarith [eX, eY, key]
+
+set_option maxHeartbeats 400000 in
+theorem twosPsi_free_Ha1 (k : ℕ) {u1 u2 : ℤ} (h1 : u1 = 2 * (k : ℤ) + 4 + 1) (h2 : u2 = 2 * (k : ℤ) + 4 - 2) :
+    twosPsi k (u1 - 1 + (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).1) (u2 - 1 + (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).2) ≤ twosPsi k (u1 - 1) (u2 - 1) := by
+  rw [freeDisp_Hodd (η := -1) (Or.inr (Or.inr ⟨h1, h2⟩)) (by omega) (by show ¬ (u1 + u2) % 2 = 0; omega)]
+  dsimp only
+  have eX := twosPsi_V k (u1 - 1 + 0) (u2 - 1 + 1)
+  have eY := twosPsi_V k (u1 - 1) (u2 - 1)
+  have key : twosPsi k (u1 - 1 + 0 + -2) (u2 - 1 + 1 + (4 * (k : ℤ) + 8)) ≤ twosPsi k (u1 - 1 + -2) (u2 - 1 + (4 * (k : ℤ) + 8)) := by
+    have hkX : TwosKey (2 * (k : ℤ) + 4) (u1 - 1 + 0 + -2) (u2 - 1 + 1 + (4 * (k : ℤ) + 8)) := by
+      rw [twosKey_pos]
+      omega
+    have hkY : TwosKey (2 * (k : ℤ) + 4) (u1 - 1 + -2) (u2 - 1 + (4 * (k : ℤ) + 8)) := by
+      rw [twosKey_pos]
+      omega
+    have hpX := twos_price_delta k hkX
+    have hpY := twos_price_delta k hkY
+    unfold TwosDelta at hpX hpY
+    have hsX := twos_slip_value k hkX
+    have hsY := twos_slip_value k hkY
+    unfold TwosSlipZ0 TwosSlipZ2 at hsX hsY
+    unfold twosPsi twosP
+    omega
+  linarith [eX, eY, key]
+
+set_option maxHeartbeats 400000 in
+theorem twosPsi_free_V0 (k : ℕ) {u1 u2 : ℤ} (h1 : u1 = 0) (h2 : u2 = 0) :
+    twosPsi k (u1 - 1 + (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).1) (u2 - 1 + (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).2) ≤ twosPsi k (u1 - 1) (u2 - 1) := by
+  rw [freeDisp_V0 (η := -1) ⟨h1, h2⟩]
+  dsimp only
+  have eX := twosPsi_U k (u1 - 1 + 1) (u2 - 1 + 0)
+  have eY := twosPsi_U k (u1 - 1) (u2 - 1)
+  have key : twosPsi k (u1 - 1 + 1 + (2 * (k : ℤ) + 5)) (u2 - 1 + 0 + (2 * (k : ℤ) + 3)) ≤ twosPsi k (u1 - 1 + (2 * (k : ℤ) + 5)) (u2 - 1 + (2 * (k : ℤ) + 3)) := by
+    have hkX : TwosKey (2 * (k : ℤ) + 4) (u1 - 1 + 1 + (2 * (k : ℤ) + 5)) (u2 - 1 + 0 + (2 * (k : ℤ) + 3)) := by
+      rw [twosKey_pos]
+      omega
+    have hkY : TwosKey (2 * (k : ℤ) + 4) (u1 - 1 + (2 * (k : ℤ) + 5)) (u2 - 1 + (2 * (k : ℤ) + 3)) := by
+      rw [twosKey_pos]
+      omega
+    have hpX := twos_price_delta k hkX
+    have hpY := twos_price_delta k hkY
+    unfold TwosDelta at hpX hpY
+    have hsX := twos_slip_value k hkX
+    have hsY := twos_slip_value k hkY
+    unfold TwosSlipZ0 TwosSlipZ2 at hsX hsY
+    unfold twosPsi twosP
+    omega
+  linarith [eX, eY, key]
+
+set_option maxHeartbeats 400000 in
+theorem twosPsi_free_H (k : ℕ) {u1 u2 : ℤ} (hx1 : 2 ≤ u1) (hx2 : u1 ≤ 2 * (k : ℤ) + 4) (h2 : u2 = u1 - 2) :
+    twosPsi k (u1 - 1 + (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).1) (u2 - 1 + (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).2) ≤ twosPsi k (u1 - 1) (u2 - 1) := by
+  rw [freeDisp_Heven (η := -1) (Or.inr (Or.inl ⟨hx1, hx2, h2⟩)) (by omega) (by show (u1 + u2) % 2 = 0; omega)]
+  dsimp only
+  have eX := twosPsi_V k (u1 - 1 + 1) (u2 - 1 + 0)
+  have eY := twosPsi_V k (u1 - 1) (u2 - 1)
+  have key : twosPsi k (u1 - 1 + 1 + -2) (u2 - 1 + 0 + (4 * (k : ℤ) + 8)) ≤ twosPsi k (u1 - 1 + -2) (u2 - 1 + (4 * (k : ℤ) + 8)) := by
+    have hkX : TwosKey (2 * (k : ℤ) + 4) (u1 - 1 + 1 + -2) (u2 - 1 + 0 + (4 * (k : ℤ) + 8)) := by
+      rw [twosKey_pos]
+      omega
+    have hkY : TwosKey (2 * (k : ℤ) + 4) (u1 - 1 + -2) (u2 - 1 + (4 * (k : ℤ) + 8)) := by
+      rw [twosKey_pos]
+      omega
+    have hpX := twos_price_delta k hkX
+    have hpY := twos_price_delta k hkY
+    unfold TwosDelta at hpX hpY
+    have hsX := twos_slip_value k hkX
+    have hsY := twos_slip_value k hkY
+    unfold TwosSlipZ0 TwosSlipZ2 at hsX hsY
+    unfold twosPsi twosP
+    omega
+  linarith [eX, eY, key]
+
+set_option maxHeartbeats 400000 in
+theorem twosPsi_free_V0e (k : ℕ) {u1 u2 : ℤ} (h1 : u1 = 0) (hy1 : 1 ≤ u2) (hy2 : u2 ≤ 2 * (k : ℤ) + 4 - 1) (hp : u2 % 2 = 0) :
+    twosPsi k (u1 - 1 + (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).1) (u2 - 1 + (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).2) ≤ twosPsi k (u1 - 1) (u2 - 1) := by
+  rw [freeDisp_Veven (η := -1) (Or.inl ⟨h1, by omega, by omega⟩) (by omega) (by show (u1 + u2) % 2 = 0; omega)]
+  dsimp only
+  have eX := twosPsi_U k (u1 - 1 + -1) (u2 - 1 + 0)
+  have eY := twosPsi_U k (u1 - 1) (u2 - 1)
+  have key : twosPsi k (u1 - 1 + -1 + (2 * (k : ℤ) + 5)) (u2 - 1 + 0 + (2 * (k : ℤ) + 3)) ≤ twosPsi k (u1 - 1 + (2 * (k : ℤ) + 5)) (u2 - 1 + (2 * (k : ℤ) + 3)) := by
+    have hkX : TwosKey (2 * (k : ℤ) + 4) (u1 - 1 + -1 + (2 * (k : ℤ) + 5)) (u2 - 1 + 0 + (2 * (k : ℤ) + 3)) := by
+      rw [twosKey_pos]
+      omega
+    have hkY : TwosKey (2 * (k : ℤ) + 4) (u1 - 1 + (2 * (k : ℤ) + 5)) (u2 - 1 + (2 * (k : ℤ) + 3)) := by
+      rw [twosKey_pos]
+      omega
+    have hpX := twos_price_delta k hkX
+    have hpY := twos_price_delta k hkY
+    unfold TwosDelta at hpX hpY
+    have hsX := twos_slip_value k hkX
+    have hsY := twos_slip_value k hkY
+    unfold TwosSlipZ0 TwosSlipZ2 at hsX hsY
+    unfold twosPsi twosP
+    omega
+  linarith [eX, eY, key]
+
+set_option maxHeartbeats 400000 in
+theorem twosPsi_free_V0o (k : ℕ) {u1 u2 : ℤ} (h1 : u1 = 0) (hy1 : 1 ≤ u2) (hy2 : u2 ≤ 2 * (k : ℤ) + 4 - 1) (hp : u2 % 2 = 1) :
+    twosPsi k (u1 - 1 + (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).1) (u2 - 1 + (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).2) ≤ twosPsi k (u1 - 1) (u2 - 1) := by
+  rw [freeDisp_Vodd (η := -1) (Or.inl ⟨h1, by omega, by omega⟩) (by omega) (by show ¬ (u1 + u2) % 2 = 0; omega)]
+  dsimp only
+  have eX := twosPsi_U k (u1 - 1 + 0) (u2 - 1 + -(-1))
+  have eY := twosPsi_U k (u1 - 1) (u2 - 1)
+  have key : twosPsi k (u1 - 1 + 0 + (2 * (k : ℤ) + 5)) (u2 - 1 + -(-1) + (2 * (k : ℤ) + 3)) ≤ twosPsi k (u1 - 1 + (2 * (k : ℤ) + 5)) (u2 - 1 + (2 * (k : ℤ) + 3)) := by
+    have hkX : TwosKey (2 * (k : ℤ) + 4) (u1 - 1 + 0 + (2 * (k : ℤ) + 5)) (u2 - 1 + -(-1) + (2 * (k : ℤ) + 3)) := by
+      rw [twosKey_pos]
+      omega
+    have hkY : TwosKey (2 * (k : ℤ) + 4) (u1 - 1 + (2 * (k : ℤ) + 5)) (u2 - 1 + (2 * (k : ℤ) + 3)) := by
+      rw [twosKey_pos]
+      omega
+    have hpX := twos_price_delta k hkX
+    have hpY := twos_price_delta k hkY
+    unfold TwosDelta at hpX hpY
+    have hsX := twos_slip_value k hkX
+    have hsY := twos_slip_value k hkY
+    unfold TwosSlipZ0 TwosSlipZ2 at hsX hsY
+    unfold twosPsi twosP
+    omega
+  linarith [eX, eY, key]
+
+set_option maxHeartbeats 400000 in
+theorem twosPsi_free_V1e (k : ℕ) {u1 u2 : ℤ} (h1 : u1 = -1) (hy1 : 2 * (k : ℤ) + 4 ≤ u2) (hy2 : u2 < 2 * (2 * (k : ℤ) + 4)) (hp : (u2 - 1) % 2 = 0) :
+    twosPsi k (u1 - 1 + (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).1) (u2 - 1 + (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).2) ≤ twosPsi k (u1 - 1) (u2 - 1) := by
+  rw [freeDisp_Veven (η := -1) (Or.inr ⟨h1, by omega, by omega⟩) (by omega) (by show (u1 + u2) % 2 = 0; omega)]
+  dsimp only
+  have eX := twosPsi_U k (u1 - 1 + -1) (u2 - 1 + 0)
+  have eY := twosPsi_U k (u1 - 1) (u2 - 1)
+  have key : twosPsi k (u1 - 1 + -1 + (2 * (k : ℤ) + 5)) (u2 - 1 + 0 + (2 * (k : ℤ) + 3)) ≤ twosPsi k (u1 - 1 + (2 * (k : ℤ) + 5)) (u2 - 1 + (2 * (k : ℤ) + 3)) := by
+    have hkX : TwosKey (2 * (k : ℤ) + 4) (u1 - 1 + -1 + (2 * (k : ℤ) + 5)) (u2 - 1 + 0 + (2 * (k : ℤ) + 3)) := by
+      rw [twosKey_pos]
+      omega
+    have hkY : TwosKey (2 * (k : ℤ) + 4) (u1 - 1 + (2 * (k : ℤ) + 5)) (u2 - 1 + (2 * (k : ℤ) + 3)) := by
+      rw [twosKey_pos]
+      omega
+    have hpX := twos_price_delta k hkX
+    have hpY := twos_price_delta k hkY
+    unfold TwosDelta at hpX hpY
+    have hsX := twos_slip_value k hkX
+    have hsY := twos_slip_value k hkY
+    unfold TwosSlipZ0 TwosSlipZ2 at hsX hsY
+    unfold twosPsi twosP
+    omega
+  linarith [eX, eY, key]
+
+set_option maxHeartbeats 400000 in
+theorem twosPsi_free_V1o (k : ℕ) {u1 u2 : ℤ} (h1 : u1 = -1) (hy1 : 2 * (k : ℤ) + 4 ≤ u2) (hy2 : u2 < 2 * (2 * (k : ℤ) + 4)) (hp : (u2 - 1) % 2 = 1) :
+    twosPsi k (u1 - 1 + (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).1) (u2 - 1 + (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).2) ≤ twosPsi k (u1 - 1) (u2 - 1) := by
+  rw [freeDisp_Vodd (η := -1) (Or.inr ⟨h1, by omega, by omega⟩) (by omega) (by show ¬ (u1 + u2) % 2 = 0; omega)]
+  dsimp only
+  have eX := twosPsi_U k (u1 - 1 + 0) (u2 - 1 + -(-1))
+  have eY := twosPsi_U k (u1 - 1) (u2 - 1)
+  have key : twosPsi k (u1 - 1 + 0 + (2 * (k : ℤ) + 5)) (u2 - 1 + -(-1) + (2 * (k : ℤ) + 3)) ≤ twosPsi k (u1 - 1 + (2 * (k : ℤ) + 5)) (u2 - 1 + (2 * (k : ℤ) + 3)) := by
+    have hkX : TwosKey (2 * (k : ℤ) + 4) (u1 - 1 + 0 + (2 * (k : ℤ) + 5)) (u2 - 1 + -(-1) + (2 * (k : ℤ) + 3)) := by
+      rw [twosKey_pos]
+      omega
+    have hkY : TwosKey (2 * (k : ℤ) + 4) (u1 - 1 + (2 * (k : ℤ) + 5)) (u2 - 1 + (2 * (k : ℤ) + 3)) := by
+      rw [twosKey_pos]
+      omega
+    have hpX := twos_price_delta k hkX
+    have hpY := twos_price_delta k hkY
+    unfold TwosDelta at hpX hpY
+    have hsX := twos_slip_value k hkX
+    have hsY := twos_slip_value k hkY
+    unfold TwosSlipZ0 TwosSlipZ2 at hsX hsY
+    unfold twosPsi twosP
+    omega
+  linarith [eX, eY, key]
+
+
+set_option maxHeartbeats 400000 in
+/-- **The free branch of the sign `−1` chain claim:** the free displacement of sign `−1` does not raise `Ψ`. -/
+theorem twosPsi_free (k : ℕ) {u1 u2 : ℤ} (hF : FreeSite (2 * (k : ℤ) + 4) u1 u2) :
+    twosPsi k (u1 - 1 + (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).1) (u2 - 1 + (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).2) ≤
+      twosPsi k (u1 - 1) (u2 - 1) := by
+  rcases hF with hH | hV
+  · rcases hH with ⟨h1, h2⟩ | ⟨hx1, hx2, h2⟩ | ⟨h1, h2⟩
+    · exact twosPsi_free_H0 k h1 h2
+    · exact twosPsi_free_H k hx1 hx2 h2
+    · exact twosPsi_free_Ha1 k h1 h2
+  · rcases hV with ⟨h1, hy1, hy2⟩ | ⟨h1, hy1, hy2⟩
+    · rcases eq_or_lt_of_le hy1 with h0 | hpos
+      · exact twosPsi_free_V0 k h1 h0.symm
+      · by_cases hp : u2 % 2 = 0
+        · exact twosPsi_free_V0e k h1 (by omega) (by omega) hp
+        · exact twosPsi_free_V0o k h1 (by omega) (by omega) (by omega)
+    · by_cases hp : (u2 - 1) % 2 = 0
+      · exact twosPsi_free_V1e k h1 hy1 hy2 hp
+      · exact twosPsi_free_V1o k h1 hy1 hy2 (by omega)
+
+set_option maxHeartbeats 400000 in
+/-- **The free branch of the sign `−1` chain potential:** `Φ₋₁(i) ≤ Φ₋₁(c)` for a free selection of sign `−1`. -/
+theorem chainM_free (k : ℕ) {c i : Site}
+    (hT : ∃ u : Site, AliasOf (2 * (k : ℤ) + 4) c u ∧ FreeSite (2 * (k : ℤ) + 4) u.1 u.2 ∧
+      i = (c.1 + (freeDisp (2 * (k : ℤ) + 4) (-1) u.1 u.2).1, c.2 + (freeDisp (2 * (k : ℤ) + 4) (-1) u.1 u.2).2)) :
+    (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) (-1) i ≤
+      (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) (-1) c := by
+  obtain ⟨⟨u1, u2⟩, ⟨i', l, hu⟩, hF, hi⟩ := hT
+  have hF' : FreeSite (2 * (k : ℤ) + 4) u1 u2 := hF
+  have hu1 : u1 = c.1 - i' * (2 * (k : ℤ) + 4 + 1) + 2 * l := congrArg Prod.fst hu
+  have hu2 : u2 = c.2 - i' * (2 * (k : ℤ) + 4 - 1) - 2 * (2 * (k : ℤ) + 4) * l := congrArg Prod.snd hu
+  have key := twosPsi_free k hF'
+  rw [chainM_eq, chainM_eq]
+  have e1 : i.1 - 1 = u1 - 1 + (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).1 + (i' * (2 * (k : ℤ) + 5) + l * (-2)) := by
+    rw [hi]
+    dsimp only
+    rw [hu1]
+    ring
+  have e2 : i.2 - 1 = u2 - 1 + (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).2 + (i' * (2 * (k : ℤ) + 3) + l * (4 * (k : ℤ) + 8)) := by
+    rw [hi]
+    dsimp only
+    rw [hu2]
+    ring
+  have e3 : c.1 - 1 = u1 - 1 + (i' * (2 * (k : ℤ) + 5) + l * (-2)) := by
+    rw [hu1]
+    ring
+  have e4 : c.2 - 1 = u2 - 1 + (i' * (2 * (k : ℤ) + 3) + l * (4 * (k : ℤ) + 8)) := by
+    rw [hu2]
+    ring
+  rw [e1, e2, e3, e4, twosPsi_lattice, twosPsi_lattice]
+  linarith [key]
+
 end FLatticePaper.TwosEPolicy
