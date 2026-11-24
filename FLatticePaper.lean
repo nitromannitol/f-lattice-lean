@@ -152,6 +152,7 @@ import FLatticePaper.Plane.Induction.TwosPeriods
 import FLatticePaper.Plane.Induction.TwosValues
 import FLatticePaper.Plane.Induction.TwosDrifts
 import FLatticePaper.Plane.Induction.TwosZeroStrip
+import FLatticePaper.Plane.Induction.TwosPriceRange
 import FLatticePaper.Plane.Induction.TwosStripFacts
 import FLatticePaper.Construction.NearOneBaseCases
 import FLatticePaper.Construction.BaseCases

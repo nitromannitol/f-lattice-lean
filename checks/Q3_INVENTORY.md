@@ -818,3 +818,16 @@ Scope to confirm with the lead: §1's star containment needs `c = d − n ≥ 3`
 - Corrects the drift entry above: the zero strip does not need the piecewise representatives; it is free from the packet.
 - Still open for StrongResidual (2^(k+1)): zeroEvenLine (needs priceRange, the drifts, and an odd seed F w = harmonicGrid w on
   sGrade = 2−3d+n), priceRange, F1_unitPrice, F1_noPriceSaddle; and BaseSlip (F1_unitSlip, F1_noSlipSaddle, slipRange).
+
+### Task 72 / twos base (recurrence and the price range of standardField (2^(k+1)), conditional on the boundary bound): TwosPriceRange.lean
+- PROVED: `twos_standardField_recurrentField k : RecurrentField (standardField (2^(k+1)))`, from `ladderOdd_exists_recurrent_extension`,
+  `rotateLadderField_recurrent`, `twos_standardField_eq_rotate` (the identity holds for any such extension S), the twos packet
+  binarity, and `recurrentField_of_recurrent`.
+- PROVED, conditional: `twos_priceRange_of_boundary k (hbd)`: `c₀ − 1 ≤ P ≤ c₀` on the closed polygon, from
+  `StrongPriceRange.priceRange_of_recurrent` with `M = F`, the packet binarity and reflection, and `twos_price_drift_kernel/transverse`.
+- NAMED INPUT `hbd`: `P ≤ c₀` on `OnBoundary E`. Checked numerically for k = 0..4 (boundary P takes only c₀ − 1 and c₀). Not proved:
+  z − parentShift leaves E for about half the boundary points, and no constant deck shift (i,j) returns it into E on a whole side
+  (checked, k = 1..4); the explicit window representatives (floor-dependent) are needed.
+- Checks: checks/TwosPriceRange.lean (axioms standard for the two lemmas; the price range is conditional on hbd).
+- NOT yet: hbd, zeroEvenLine (its seed sGrade = 2−3d+n lies outside E), F1_unitPrice and F1_noPriceSaddle (unitPrice_and_noSaddle needs
+  StarClassified, which has no twos producer), BaseSlip.
