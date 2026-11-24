@@ -194,6 +194,7 @@ import FLatticePaper.Plane.Induction.TwosSquares
 import FLatticePaper.Plane.Induction.TwosSquareLeaves
 import FLatticePaper.Plane.Induction.TwosSquareCover
 import FLatticePaper.Plane.Induction.TwosSquareShift
+import FLatticePaper.Plane.Induction.TwosPriceMono
 import FLatticePaper.Construction.NearOneBaseCases
 import FLatticePaper.Construction.BaseCases
 import FLatticePaper.Construction.OffsetTables
