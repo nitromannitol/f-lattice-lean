@@ -153,6 +153,12 @@ import FLatticePaper.Plane.Induction.ReflectedRank
 import FLatticePaper.Plane.Induction.ReflectedStrict
 import FLatticePaper.Plane.Induction.ReflectedEdges
 import FLatticePaper.Plane.Induction.ReflectedNonNative
+import FLatticePaper.Plane.Induction.ReflectedFull
+import FLatticePaper.Plane.Induction.QRankPlusDeck
+import FLatticePaper.Plane.Induction.ReflectedRankPlus
+import FLatticePaper.Plane.Induction.ReflectedMinusStrict
+import FLatticePaper.Plane.Induction.ReflectedMinusNonNative
+import FLatticePaper.Plane.Induction.ReflectedMinusFull
 import FLatticePaper.Plane.Induction.ThreesMidpoint
 import FLatticePaper.Plane.Induction.ThreesLeaves
 import FLatticePaper.Plane.Induction.TwosLeaves

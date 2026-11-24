@@ -1,0 +1,10 @@
+import FLatticePaper.Plane.Induction.ReflectedMinusFull
+
+#print axioms FLatticePaper.ReflectedMinusStrict.R0minus_strict_native
+#print axioms FLatticePaper.ReflectedMinusNonNative.minus_tri_A
+#print axioms FLatticePaper.ReflectedMinusNonNative.minus_tri_B
+#print axioms FLatticePaper.ReflectedMinusNonNative.minus_tri_C
+#print axioms FLatticePaper.ReflectedMinusNonNative.minus_tri_D
+#print axioms FLatticePaper.ReflectedMinusFull.minus_white_cases
+#print axioms FLatticePaper.ReflectedMinusFull.minus_core_full
+#print axioms FLatticePaper.ReflectedMinusFull.R0minus_edge_full
