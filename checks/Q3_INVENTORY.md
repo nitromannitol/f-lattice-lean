@@ -862,3 +862,12 @@ Scope to confirm with the lead: §1's star containment needs `c = d − n ≥ 3`
 - Leaves: C when `(z₁,z₂−z₁)` is in `hC` (shift +U, kernel period), A when `hA` (shift 0, tile identity), B otherwise (shift −V,
   transverse period with `ladderEvenConstantV_eq` and `twos_transverseGrade_explicit`).
 - Checks: checks/TwosPriceE.lean (axioms standard).
+
+### Task 72 / twos base (the even zero line of StrongResidual (2^(k+1)), from the one-point odd seed): TwosZeroEven.lean
+- PROVED: `twos_zeroEvenLine k` (the zeroEvenLine field of StrongResidual (2^(k+1))), by `W1ZeroStrip.zeroEvenLine_field` with the twos
+  packet, the price range (`twos_priceRange_E`), the price drifts, and the odd seed `twos_hseed`.
+- Seed: the odd line `d x₁ + x₂ = −d−1` (d = 2k+4) is the orbit `w₀ + ℤ·V`, `w₀ = (0, −(2k+5))` (`twos_odd_line`); `F − harmonicGrid`
+  is V-invariant (`twos_harm_transverse`, `twos_G_transverse`, `twos_G_orbit`); and `F w₀ = −(k+2)² = harmonicGrid w₀`
+  (`twos_seed_value` through `w₀ + U + V`, in the tile; `twos_harm_seed`).
+- Checks: checks/TwosZeroEven.lean (axioms standard). Root build: 0 warnings, 0 errors (sandbox log).
+- Still open for StrongResidual (2^(k+1)): F1_unitPrice, F1_noPriceSaddle, BaseSlip.
