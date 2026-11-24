@@ -12,7 +12,8 @@ For the reflected point `Rc - p`, `Rc = (2, d+1)`, this file proves the classifi
 * `retained_black` / `retainedP_black`: at a native black `p`, both parity-correct displacements are retained at `Rc - p`.
 
 The corner classification uses the reduced correction Laplacian `lapV_even_native`; all cases are finite alias
-enumerations closed by `interval_cases` and `omega`.
+enumerations closed by `interval_cases` and `omega`. `edge_white_plus`, `edge_white_minus`, `edge_black_plus`, `edge_black_minus`
+reduce a `RetNat` edge at a native centre to a `Retained` (`RetainedP`) edge at the reflected point.
 -/
 
 namespace FLatticePaper.ReflectWitness
@@ -369,5 +370,59 @@ theorem white_retained_minus (d x y : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (h
       · exact absurd hev h
     exact white_retainedP_even d x y hd hdodd hN hev hx1
   · exact white_retainedP_odd d x y hd hdodd hN hev hW
+
+/-! ### Edges of the policy at native centres -/
+
+theorem edge_white_plus (d x y e1 e2 : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (hN : NativeP d (x, y))
+    (hW : WhiteN d (x, y)) (h : RetNat d 1 False (x, y) ((x, y) + (e1, e2))) :
+    Retained d (2 - x) (d + 1 - y) (-e1) (-e2) := by
+  have he := (retNat_white_pt hd hdodd (Or.inl rfl) hN hW (e1, e2)).mp h
+  have hR := white_retained_plus d x y hd hdodd hN hW
+  rw [← he] at hR
+  exact hR
+
+theorem edge_black (d x y e1 e2 : ℤ) (η : ℤ) (_hd : 3 ≤ d) (_hdodd : d % 2 = 1) (_hN : NativeP d (x, y))
+    (_hB : ¬ WhiteN d (x, y)) (h : RetNat d η True (x, y) ((x, y) + (e1, e2))) :
+    ((x + y) % 2 = 0 ∧ -e2 = 0) ∨ ((x + y) % 2 ≠ 0 ∧ -e1 = 0) := by
+  obtain ⟨h1, -⟩ := h
+  by_cases hev : (x + y) % 2 = 0
+  · left
+    refine ⟨hev, ?_⟩
+    have hE : FLatticePaper.EvenSite (x, y) := hev
+    rcases h1 with h1 | h1
+    · rw [incomingNeg_even hE] at h1
+      simp only [Prod.mk_add_mk, Prod.mk.injEq] at h1
+      omega
+    · rw [incomingPos_even hE] at h1
+      simp only [Prod.mk_add_mk, Prod.mk.injEq] at h1
+      omega
+  · right
+    refine ⟨hev, ?_⟩
+    have hO : ¬ FLatticePaper.EvenSite (x, y) := hev
+    rcases h1 with h1 | h1
+    · rw [incomingNeg_odd hO] at h1
+      simp only [Prod.mk_add_mk, Prod.mk.injEq] at h1
+      omega
+    · rw [incomingPos_odd hO] at h1
+      simp only [Prod.mk_add_mk, Prod.mk.injEq] at h1
+      omega
+
+theorem edge_black_plus (d x y e1 e2 : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (hN : NativeP d (x, y))
+    (hB : ¬ WhiteN d (x, y)) (h : RetNat d 1 True (x, y) ((x, y) + (e1, e2))) :
+    Retained d (2 - x) (d + 1 - y) (-e1) (-e2) :=
+  retained_black d x y (-e1) (-e2) hd hdodd hN hB (edge_black d x y e1 e2 1 hd hdodd hN hB h)
+
+theorem edge_white_minus (d x y e1 e2 : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (hN : NativeP d (x, y))
+    (hW : WhiteN d (x, y)) (h : RetNat d (-1) False (x, y) ((x, y) + (e1, e2))) :
+    RetainedP d (2 - x) (d + 1 - y) (-e1) (-e2) := by
+  have he := (retNat_white_pt hd hdodd (Or.inr rfl) hN hW (e1, e2)).mp h
+  have hR := white_retained_minus d x y hd hdodd hN hW
+  rw [← he] at hR
+  exact hR
+
+theorem edge_black_minus (d x y e1 e2 : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (hN : NativeP d (x, y))
+    (hB : ¬ WhiteN d (x, y)) (h : RetNat d (-1) True (x, y) ((x, y) + (e1, e2))) :
+    RetainedP d (2 - x) (d + 1 - y) (-e1) (-e2) :=
+  retainedP_black d x y (-e1) (-e2) hd hdodd hN hB (edge_black d x y e1 e2 (-1) hd hdodd hN hB h)
 
 end FLatticePaper.ReflectWitness
