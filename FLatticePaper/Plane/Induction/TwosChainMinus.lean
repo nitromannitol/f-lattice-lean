@@ -3643,4 +3643,131 @@ theorem chainM_black_oddP_gen (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ)
   · exact chainM_strip_oP_s4 k hn hp hB h
   · exact chainM_strip_oP_s5 k hn hp hB h
 
+/-- A lattice shift `(−p)U + (−q)V` of the pair `(a, b)` raises `Ψ` by `p + 2q`. -/
+theorem psi_alias_shift (k : ℕ) (a b p q : ℤ) :
+    twosPsi k (a - p * (2 * (k : ℤ) + 5) + 2 * q) (b - p * (2 * (k : ℤ) + 3) - 2 * (2 * (k : ℤ) + 4) * q) =
+      twosPsi k a b + p + 2 * q := by
+  have h := twosPsi_lattice k a b (-p) (-q)
+  have e1 : a - p * (2 * (k : ℤ) + 5) + 2 * q = a + ((-p) * (2 * (k : ℤ) + 5) + (-q) * (-2)) := by ring
+  have e2 : b - p * (2 * (k : ℤ) + 3) - 2 * (2 * (k : ℤ) + 4) * q =
+      b + ((-p) * (2 * (k : ℤ) + 3) + (-q) * (4 * (k : ℤ) + 8)) := by ring
+  rw [e1, e2, h]
+  ring
+
+set_option maxHeartbeats 400000 in
+/-- **The black branch at a native centre:** the input of a native black centre of charge `-1` does not raise `Ψ`. -/
+theorem chainM_black_native (k : ℕ) {S : Field}
+    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees S 0)
+    (hperiod : HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4)) S 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
+    {x y j1 j2 : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y)
+    (hl : laplacian (standardField (List.replicate (k + 1) Digit.two)) (x, y) = -1)
+    (he : Edge (j1, j2) (x, y)) :
+    twosPsi k (j1 - 1) (j2 - 1) ≤ twosPsi k (x - 1) (y - 1) := by
+  have hR := black_region_of_lap k hagree hperiod hn hl
+  by_cases hp : EvenSite (x, y)
+  · have hW : ¬ LadderOddOddWhite (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1) := by
+      rcases hR with ⟨hE, _⟩ | ⟨_, hW⟩
+      · exact absurd ((evenSite_rot (2 * (k : ℤ) + 4) x y).mp hE) (not_not.mpr hp)
+      · exact hW
+    have hpar : (x + y) % 2 = 0 := hp
+    rcases edge_even_cases x y j1 j2 hp he with ⟨h1, h2⟩ | ⟨h1, h2⟩
+    · subst j1 j2
+      rw [show x - 1 - 1 = x - 2 by ring]
+      by_cases hx0 : x = 0
+      · exact chainM_black_evenL_zero k hn hpar hW hx0
+      · by_cases hx1 : x = 1 ∧ y ≤ 2 * (k : ℤ) + 3
+        · exact chainM_black_evenL_one k hn hpar hx1.1 hx1.2
+        · exact chainM_black_evenL_gen k hn hpar hW hx0 hx1
+    · subst j1 j2
+      rw [show x + 1 - 1 = x by ring]
+      exact chainM_black_evenR_gen k hn hpar hW
+  · have hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1) := by
+      rcases hR with ⟨_, hB⟩ | ⟨hNE, _⟩
+      · exact hB
+      · exact absurd ((evenSite_rot (2 * (k : ℤ) + 4) x y).mpr hp) hNE
+    have hpar : (x + y) % 2 = 1 := by
+      have hq := hp
+      unfold EvenSite at hq
+      dsimp only at hq
+      omega
+    rcases edge_odd_cases x y j1 j2 hp he with ⟨h1, h2⟩ | ⟨h1, h2⟩
+    · subst j1 j2
+      rw [show y - 1 - 1 = y - 2 by ring]
+      exact chainM_black_oddN_gen k hn hpar hB
+    · subst j1 j2
+      rw [show y + 1 - 1 = y by ring]
+      exact chainM_black_oddP_gen k hn hpar hB
+
+set_option maxHeartbeats 400000 in
+/-- **The black branch of the chain claim:** the native copy of a black centre is black, and the lattice shift transfers the claim. -/
+theorem chainM_black (k : ℕ) {S : Field}
+    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees S 0)
+    (hperiod : HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4)) S 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
+    {c i : Site}
+    (hl : laplacian (standardField (List.replicate (k + 1) Digit.two)) c = -1) (he : Edge i c) :
+    (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) (-1) i ≤
+      (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) (-1) c := by
+  obtain ⟨c1, c2⟩ := c
+  obtain ⟨i1, i2⟩ := i
+  have ha2 : (2 * (k : ℤ) + 4) % 2 = 0 := by omega
+  have hvalid := ladderOdd_valid_twos k
+  obtain ⟨u, hA, hn⟩ := native_copy_exists ha2 hvalid (c1, c2)
+  have hlu := laplacian_twos_alias hagree hperiod hA
+  obtain ⟨u1, u2⟩ := u
+  obtain ⟨p, q, hpq⟩ := hA
+  have hu1 : u1 = c1 - p * (2 * (k : ℤ) + 4 + 1) + 2 * q := congrArg Prod.fst hpq
+  have hu2 : u2 = c2 - p * (2 * (k : ℤ) + 4 - 1) - 2 * (2 * (k : ℤ) + 4) * q := congrArg Prod.snd hpq
+  have hlu' : laplacian (standardField (List.replicate (k + 1) Digit.two)) (u1, u2) = -1 := by
+    rw [hlu]
+    exact hl
+  obtain ⟨j1, hj1⟩ : ∃ j : ℤ, j = i1 - p * (2 * (k : ℤ) + 4 + 1) + 2 * q := ⟨_, rfl⟩
+  obtain ⟨j2, hj2⟩ : ∃ j : ℤ, j = i2 - p * (2 * (k : ℤ) + 4 - 1) - 2 * (2 * (k : ℤ) + 4) * q := ⟨_, rfl⟩
+  have hμ : (-p * (2 * (k : ℤ) + 4 + 1) + 2 * q + (-p * (2 * (k : ℤ) + 4 - 1) - 2 * (2 * (k : ℤ) + 4) * q)) % 2 = 0 := by
+    have e : -p * (2 * (k : ℤ) + 4 + 1) + 2 * q + (-p * (2 * (k : ℤ) + 4 - 1) - 2 * (2 * (k : ℤ) + 4) * q) =
+        2 * (-p * (2 * (k : ℤ) + 4) + q - (2 * (k : ℤ) + 4) * q) := by ring
+    rw [e]
+    exact Int.mul_emod_right _ _
+  have hE := (edge_add (i1, i2) (c1, c2) (-p * (2 * (k : ℤ) + 4 + 1) + 2 * q)
+    (-p * (2 * (k : ℤ) + 4 - 1) - 2 * (2 * (k : ℤ) + 4) * q) hμ).mpr he
+  dsimp only at hE
+  have hE' : Edge (j1, j2) (u1, u2) := by
+    rw [hj1, hj2, hu1, hu2]
+    rw [show i1 + (-p * (2 * (k : ℤ) + 4 + 1) + 2 * q) = i1 - p * (2 * (k : ℤ) + 4 + 1) + 2 * q by ring,
+      show i2 + (-p * (2 * (k : ℤ) + 4 - 1) - 2 * (2 * (k : ℤ) + 4) * q) =
+        i2 - p * (2 * (k : ℤ) + 4 - 1) - 2 * (2 * (k : ℤ) + 4) * q by ring,
+      show c1 + (-p * (2 * (k : ℤ) + 4 + 1) + 2 * q) = c1 - p * (2 * (k : ℤ) + 4 + 1) + 2 * q by ring,
+      show c2 + (-p * (2 * (k : ℤ) + 4 - 1) - 2 * (2 * (k : ℤ) + 4) * q) =
+        c2 - p * (2 * (k : ℤ) + 4 - 1) - 2 * (2 * (k : ℤ) + 4) * q by ring] at hE
+    exact hE
+  have hb := chainM_black_native k hagree hperiod hn hlu' hE'
+  have e1 : j1 - 1 = (i1 - 1) - p * (2 * (k : ℤ) + 5) + 2 * q := by
+    rw [hj1]
+    ring
+  have e2 : j2 - 1 = (i2 - 1) - p * (2 * (k : ℤ) + 3) - 2 * (2 * (k : ℤ) + 4) * q := by
+    rw [hj2]
+    ring
+  have f1 : u1 - 1 = (c1 - 1) - p * (2 * (k : ℤ) + 5) + 2 * q := by
+    rw [hu1]
+    ring
+  have f2 : u2 - 1 = (c2 - 1) - p * (2 * (k : ℤ) + 3) - 2 * (2 * (k : ℤ) + 4) * q := by
+    rw [hu2]
+    ring
+  rw [e1, e2, f1, f2, psi_alias_shift, psi_alias_shift] at hb
+  rw [chainM_eq, chainM_eq]
+  dsimp only
+  linarith
+
+/-- **The chain potential of sign `−1` does not increase along the selected inputs** (`TwosSel` at `η = −1`). -/
+theorem twosChainM_nonincreasing (k : ℕ) {S : Field}
+    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees S 0)
+    (hperiod : HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4)) S 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
+    {c i : Site}
+    (hT : TwosSel (2 * (k : ℤ) + 4) (-1) (standardField (List.replicate (k + 1) Digit.two)) c i) :
+    (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) (-1) i ≤
+      (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) (-1) c := by
+  rcases hT with ⟨hl, he⟩ | ⟨hl, ⟨u, hu, hF, hi⟩ | ⟨hnf, u, hu, hn, hg, hi⟩⟩
+  · exact chainM_black k hagree hperiod hl he
+  · exact chainM_free k ⟨u, hu, hF, hi⟩
+  · exact chainM_cand k ⟨u, hu, hn, hg, hi⟩
+
 end FLatticePaper.TwosEPolicy
