@@ -46,7 +46,7 @@ private theorem ladderOdd_rankCorrection_sub_representative {den : ℤ} {correct
   rw [sub_add_cancel] at h
   exact h.trans (hcorrect _ hmem)
 
-set_option maxHeartbeats 850000 in
+set_option maxHeartbeats 400000 in
 private theorem ladderOdd_rank_even_black {den x y : ℤ} (hden : BaseMask.ladderOdd.Valid den)
     {correction : Field} (hcorrect : ∀ point ∈ (BaseMask.ladderOdd.raw den).sites,
       correction point = ladderOddRankCorrection den point)
@@ -68,7 +68,82 @@ private theorem ladderOdd_rank_even_black {den x y : ℤ} (hden : BaseMask.ladde
   · by_cases hlast : y = den + 1 <;> constructor <;> ladder_rank
   · by_cases hcol : x = den <;> constructor <;> ladder_rank
 
-set_option maxHeartbeats 1000000 in
+set_option maxHeartbeats 400000 in
+/-- A linear consequence of the odd black case of the B5 raw ladder, derived with `hblack` in its own declaration. -/
+private theorem ladderOdd_black_range {den x y : ℤ} (hden : BaseMask.ladderOdd.Valid den)
+    (hpoint : (x, y) ∈ (BaseMask.ladderOdd.raw den).sites) (hodd : ¬ EvenSite (x, y))
+    (hblack : ¬ LadderOddOddWhite den (x, y))  :
+    1 ≤ y ∧ y ≤ den + 1 ∧ 1 ≤ x + y ∧ x + y ≤ 2 * den + 3 := by
+  have ⟨hmin, hd⟩ := hden
+  have hxy : (x + y) % 2 ≠ 0 := hodd
+  obtain ⟨hx, hy, hshape⟩ := BaseMask.mem_ladderOdd_raw_iff.mp hpoint
+  dsimp only at hx hy
+  simp only [BaseMask.LadderOddCorner] at hshape
+  simp only [LadderOddOddWhite, LadderOddLowerBoundary, reflectLadderOdd, Prod.fst_sub,
+    Prod.snd_sub] at hblack
+  omega
+
+set_option maxHeartbeats 400000 in
+/-- A linear consequence of the odd black case of the B5 raw ladder, derived with `hblack` in its own declaration. -/
+private theorem ladderOdd_black_row {den x y : ℤ} (hden : BaseMask.ladderOdd.Valid den)
+    (hpoint : (x, y) ∈ (BaseMask.ladderOdd.raw den).sites) (hodd : ¬ EvenSite (x, y))
+    (hblack : ¬ LadderOddOddWhite den (x, y)) (hleft : x ≤ 0) :
+    2 ≤ y := by
+  have ⟨hmin, hd⟩ := hden
+  have hxy : (x + y) % 2 ≠ 0 := hodd
+  obtain ⟨hx, hy, hshape⟩ := BaseMask.mem_ladderOdd_raw_iff.mp hpoint
+  dsimp only at hx hy
+  simp only [BaseMask.LadderOddCorner] at hshape
+  simp only [LadderOddOddWhite, LadderOddLowerBoundary, reflectLadderOdd, Prod.fst_sub,
+    Prod.snd_sub] at hblack
+  omega
+
+set_option maxHeartbeats 400000 in
+/-- A linear consequence of the odd black case of the B5 raw ladder, derived with `hblack` in its own declaration. -/
+private theorem ladderOdd_black_end {den x y : ℤ} (hden : BaseMask.ladderOdd.Valid den)
+    (hpoint : (x, y) ∈ (BaseMask.ladderOdd.raw den).sites) (hodd : ¬ EvenSite (x, y))
+    (hblack : ¬ LadderOddOddWhite den (x, y)) (hleft : ¬ x ≤ 0) (_hsum : x + y ≤ den + 1) (hshelf : x + y = den + 1) :
+    x = 1 ∧ y = den := by
+  have ⟨hmin, hd⟩ := hden
+  have hxy : (x + y) % 2 ≠ 0 := hodd
+  obtain ⟨hx, hy, hshape⟩ := BaseMask.mem_ladderOdd_raw_iff.mp hpoint
+  dsimp only at hx hy
+  simp only [BaseMask.LadderOddCorner] at hshape
+  simp only [LadderOddOddWhite, LadderOddLowerBoundary, reflectLadderOdd, Prod.fst_sub,
+    Prod.snd_sub] at hblack
+  omega
+
+set_option maxHeartbeats 400000 in
+/-- A linear consequence of the odd black case of the B5 raw ladder, derived with `hblack` in its own declaration. -/
+private theorem ladderOdd_black_far {den x y : ℤ} (hden : BaseMask.ladderOdd.Valid den)
+    (hpoint : (x, y) ∈ (BaseMask.ladderOdd.raw den).sites) (hodd : ¬ EvenSite (x, y))
+    (hblack : ¬ LadderOddOddWhite den (x, y)) (hleft : ¬ x ≤ 0) (hsum : ¬ x + y ≤ den + 1) (hmid : x ≤ den) :
+    den + 5 ≤ x + y := by
+  have ⟨hmin, hd⟩ := hden
+  have hxy : (x + y) % 2 ≠ 0 := hodd
+  obtain ⟨hx, hy, hshape⟩ := BaseMask.mem_ladderOdd_raw_iff.mp hpoint
+  dsimp only at hx hy
+  simp only [BaseMask.LadderOddCorner] at hshape
+  simp only [LadderOddOddWhite, LadderOddLowerBoundary, reflectLadderOdd, Prod.fst_sub,
+    Prod.snd_sub] at hblack
+  omega
+
+set_option maxHeartbeats 400000 in
+/-- A linear consequence of the odd black case of the B5 raw ladder, derived with `hblack` in its own declaration. -/
+private theorem ladderOdd_black_right {den x y : ℤ} (hden : BaseMask.ladderOdd.Valid den)
+    (hpoint : (x, y) ∈ (BaseMask.ladderOdd.raw den).sites) (hodd : ¬ EvenSite (x, y))
+    (hblack : ¬ LadderOddOddWhite den (x, y)) (hleft : ¬ x ≤ 0) (hsum : ¬ x + y ≤ den + 1) (hmid : ¬ x ≤ den) :
+    den + 1 ≤ x ∧ x ≤ 2 * den - 1 ∧ den + 3 ≤ x + y ∧ x + y ≤ 2 * den + 1 ∧ 2 ≤ y ∧ y ≤ den := by
+  have ⟨hmin, hd⟩ := hden
+  have hxy : (x + y) % 2 ≠ 0 := hodd
+  obtain ⟨hx, hy, hshape⟩ := BaseMask.mem_ladderOdd_raw_iff.mp hpoint
+  dsimp only at hx hy
+  simp only [BaseMask.LadderOddCorner] at hshape
+  simp only [LadderOddOddWhite, LadderOddLowerBoundary, reflectLadderOdd, Prod.fst_sub,
+    Prod.snd_sub] at hblack
+  omega
+
+set_option maxHeartbeats 400000 in
 private theorem ladderOdd_rank_odd_black {den x y : ℤ} (hden : BaseMask.ladderOdd.Valid den)
     {correction : Field} (hcorrect : ∀ point ∈ (BaseMask.ladderOdd.raw den).sites,
       correction point = ladderOddRankCorrection den point)
@@ -83,34 +158,90 @@ private theorem ladderOdd_rank_odd_black {den x y : ℤ} (hden : BaseMask.ladder
     hblack (Or.inr (Or.inl ((ladderOdd_up_notMem_iff hden hpoint hodd).mp h)))
   obtain ⟨hx, hy, hshape⟩ := BaseMask.mem_ladderOdd_raw_iff.mp hpoint
   dsimp only at hx hy
-  simp only [BaseMask.LadderOddCorner] at hshape
-  simp only [LadderOddOddWhite, LadderOddLowerBoundary, reflectLadderOdd, Prod.fst_sub, Prod.snd_sub] at hblack
-  have hrange : 1 ≤ y ∧ y ≤ den + 1 ∧ 1 ≤ x + y ∧ x + y ≤ 2 * den + 3 := by omega
+  have hrange := ladderOdd_black_range hden hpoint hodd hblack
   rw [hcorrect _ hpoint, hcorrect _ hn, hcorrect _ hp]
-  clear hshape hcorrect hn hp hpoint
+  clear hshape hcorrect hn hp
   by_cases hleft : x ≤ 0
-  · have hrow : 2 ≤ y := by omega
+  · have hrow := ladderOdd_black_row hden hpoint hodd hblack hleft
     clear hblack
     constructor <;> ladder_rank
   · by_cases hsum : x + y ≤ den + 1
     · by_cases hshelf : x + y = den + 1
-      · have hend : x = 1 ∧ y = den := by omega
+      · have hend := ladderOdd_black_end hden hpoint hodd hblack hleft hsum hshelf
         clear hblack
         constructor <;> ladder_rank
       · clear hblack
         constructor <;> ladder_rank
     · by_cases hmid : x ≤ den
-      · have hfar : den + 5 ≤ x + y := by omega
+      · have hfar := ladderOdd_black_far hden hpoint hodd hblack hleft hsum hmid
         clear hblack
         constructor <;> ladder_rank
-      · have hright : den + 1 ≤ x ∧ x ≤ 2 * den - 1 ∧
-            den + 3 ≤ x + y ∧ x + y ≤ 2 * den + 1 ∧ 2 ≤ y ∧ y ≤ den := by omega
+      · have hright := ladderOdd_black_right hden hpoint hodd hblack hleft hsum hmid
         clear hblack
         by_cases hrow : y = 2
         · by_cases hdiag : x = den + 1 <;> constructor <;> ladder_rank
         · by_cases hsumTop : x + y = 2 * den + 1 <;> constructor <;> ladder_rank
 
-set_option maxHeartbeats 1200000 in
+set_option maxHeartbeats 400000 in
+/-- A linear consequence of the even white case of the B5 raw ladder, derived with `hwhite` in its own declaration. -/
+private theorem ladderOdd_even_white_body {den x y : ℤ} (hden : BaseMask.ladderOdd.Valid den)
+    (hpoint : (x, y) ∈ (BaseMask.ladderOdd.raw den).sites) (heven : (x + y) % 2 = 0) (hleft : ¬ ((x = 0 ∧ y = 0) ∨ (x = 2 - den ∧ y = den)))
+    (hright : ¬ ((2 ≤ x ∧ 1 ≤ y ∧ x + y ≤ den) ∨ (den + 2 ≤ x ∧ 2 ≤ y ∧ x + y ≤ 2 * den) ∨
+      (x + y = 2 * den + 2 ∧ den + 2 ≤ x ∧ 3 ≤ y)))
+    (hcorner : ¬ ((x = 2 * den ∧ y = 2) ∨ (x = den + 2 ∧ y = den + 2))) (hwhite : ¬ LadderOddEvenBlack den (x, y)) :
+    1 ≤ x + y ∧ x + y ≤ 2 * den + 3 ∧
+      ¬ ((y = 0 ∧ den ≤ x) ∨ (y = den + 2 ∧ x ≤ 2)) := by
+  have ⟨hmin, hd⟩ := hden
+  obtain ⟨hx, hy, hshape⟩ := BaseMask.mem_ladderOdd_raw_iff.mp hpoint
+  dsimp only at hx hy
+  simp only [BaseMask.LadderOddCorner] at hshape
+  simp only [LadderOddEvenBlack] at hwhite
+  omega
+
+set_option maxHeartbeats 400000 in
+/-- A linear consequence of the even white case of the B5 raw ladder, derived with `hwhite` in its own declaration. -/
+private theorem ladderOdd_even_white_xTop {den x y : ℤ} (hden : BaseMask.ladderOdd.Valid den)
+    (hpoint : (x, y) ∈ (BaseMask.ladderOdd.raw den).sites) (heven : (x + y) % 2 = 0) (_hright : ¬ ((2 ≤ x ∧ 1 ≤ y ∧ x + y ≤ den) ∨ (den + 2 ≤ x ∧ 2 ≤ y ∧ x + y ≤ 2 * den) ∨
+      (x + y = 2 * den + 2 ∧ den + 2 ≤ x ∧ 3 ≤ y))) (_hcorner : ¬ ((x = 2 * den ∧ y = 2) ∨ (x = den + 2 ∧ y = den + 2)))
+    (hleftCol : ¬ x ≤ 0) (_hbottom : ¬ y = 0) (htop : y = den + 2)
+    (hbody : 1 ≤ x + y ∧ x + y ≤ 2 * den + 3 ∧
+      ¬ ((y = 0 ∧ den ≤ x) ∨ (y = den + 2 ∧ x ≤ 2))) (_hwhite : ¬ LadderOddEvenBlack den (x, y)) :
+    4 ≤ x ∧ x ≤ den := by
+  have ⟨hmin, hd⟩ := hden
+  obtain ⟨hx, hy, hshape⟩ := BaseMask.mem_ladderOdd_raw_iff.mp hpoint
+  dsimp only at hx hy
+  simp only [BaseMask.LadderOddCorner] at hshape
+  omega
+
+set_option maxHeartbeats 400000 in
+/-- A linear consequence of the even white case of the B5 raw ladder, derived with `hwhite` in its own declaration. -/
+private theorem ladderOdd_even_white_remain {den x y : ℤ} (hden : BaseMask.ladderOdd.Valid den)
+    (hpoint : (x, y) ∈ (BaseMask.ladderOdd.raw den).sites) (heven : (x + y) % 2 = 0) (hright : ¬ ((2 ≤ x ∧ 1 ≤ y ∧ x + y ≤ den) ∨ (den + 2 ≤ x ∧ 2 ≤ y ∧ x + y ≤ 2 * den) ∨
+      (x + y = 2 * den + 2 ∧ den + 2 ≤ x ∧ 3 ≤ y))) (hcorner : ¬ ((x = 2 * den ∧ y = 2) ∨ (x = den + 2 ∧ y = den + 2)))
+    (hleftCol : ¬ x ≤ 0) (hbottom : ¬ y = 0) (htop : ¬ y = den + 2)
+    (hshelf : ¬ (y = 1 ∧ den + 3 ≤ x))
+    (hbody : 1 ≤ x + y ∧ x + y ≤ 2 * den + 3 ∧
+      ¬ ((y = 0 ∧ den ≤ x) ∨ (y = den + 2 ∧ x ≤ 2))) (hwhite : ¬ LadderOddEvenBlack den (x, y)) :
+    (x = 1 ∧ y = den + 1) ∨ (x = den + 1 ∧ y = 1) ∨
+      (x ≤ den ∧ y ≤ den + 1 ∧ den + 4 ≤ x + y) := by
+  have ⟨hmin, hd⟩ := hden
+  obtain ⟨hx, hy, hshape⟩ := BaseMask.mem_ladderOdd_raw_iff.mp hpoint
+  dsimp only at hx hy
+  simp only [BaseMask.LadderOddCorner] at hshape
+  simp only [LadderOddEvenBlack] at hwhite
+  
+  by_cases h1 : x = 1
+  · refine Or.inl ⟨h1, ?_⟩
+    clear hright hcorner hshelf hleftCol hbottom htop
+    omega
+  · by_cases h2 : x = den + 1
+    · refine Or.inr (Or.inl ⟨h2, ?_⟩)
+      clear hcorner hshelf htop hleftCol
+      omega
+    · refine Or.inr (Or.inr ?_)
+      omega
+
+set_option maxHeartbeats 400000 in
 private theorem ladderOdd_rank_even_white {den x y : ℤ} (hden : BaseMask.ladderOdd.Valid den)
     {correction : Field} (hcorrect : ∀ point ∈ (BaseMask.ladderOdd.raw den).sites,
       correction point = ladderOddRankCorrection den point)
@@ -123,7 +254,6 @@ private theorem ladderOdd_rank_even_white {den x y : ℤ} (hden : BaseMask.ladde
   obtain ⟨hx, hy, hshape⟩ := BaseMask.mem_ladderOdd_raw_iff.mp hpoint
   dsimp only at hx hy
   simp only [BaseMask.LadderOddCorner] at hshape
-  simp only [LadderOddEvenBlack] at hwhite
   rw [hcorrect _ hpoint]
   by_cases hleft : (x = 0 ∧ y = 0) ∨ (x = 2 - den ∧ y = den)
   · left
@@ -145,23 +275,23 @@ private theorem ladderOdd_rank_even_white {den x y : ℤ} (hden : BaseMask.ladde
   rw [hcorrect _ hn]
   by_cases hcorner : (x = 2 * den ∧ y = 2) ∨ (x = den + 2 ∧ y = den + 2)
   · rcases hcorner with h | h <;> ladder_rank
-  have hbody : 1 ≤ x + y ∧ x + y ≤ 2 * den + 3 ∧
-      ¬ ((y = 0 ∧ den ≤ x) ∨ (y = den + 2 ∧ x ≤ 2)) := by omega
+  have hbody := ladderOdd_even_white_body hden hpoint heven hleft hright hcorner hwhite
   clear hshape
   by_cases hleftCol : x ≤ 0
   · ladder_rank
   · by_cases hbottom : y = 0
     · ladder_rank
     · by_cases htop : y = den + 2
-      · have hxTop : 4 ≤ x ∧ x ≤ den := by omega
+      · have hxTop := ladderOdd_even_white_xTop hden hpoint heven hright hcorner hleftCol hbottom htop hbody hwhite
+        clear hwhite
         ladder_rank
       · by_cases hshelf : y = 1 ∧ den + 3 ≤ x
         · ladder_rank
-        · have hremain : (x = 1 ∧ y = den + 1) ∨ (x = den + 1 ∧ y = 1) ∨
-              (x ≤ den ∧ y ≤ den + 1 ∧ den + 4 ≤ x + y) := by omega
+        · have hremain := ladderOdd_even_white_remain hden hpoint heven hright hcorner hleftCol hbottom htop hshelf hbody hwhite
+          clear hwhite
           rcases hremain with h | h | h <;> ladder_rank
 
-set_option maxHeartbeats 1200000 in
+set_option maxHeartbeats 400000 in
 private theorem ladderOdd_rank_odd_white {den x y : ℤ} (hden : BaseMask.ladderOdd.Valid den)
     {correction : Field} (hcorrect : ∀ point ∈ (BaseMask.ladderOdd.raw den).sites,
       correction point = ladderOddRankCorrection den point)
@@ -201,7 +331,8 @@ private theorem ladderOdd_rank_odd_white {den x y : ℤ} (hden : BaseMask.ladder
         clear hshape
         by_cases hstart : x = den <;> ladder_rank
   by_cases hup : LadderOddLowerBoundary den (reflectLadderOdd den (x, y))
-  · simp only [LadderOddLowerBoundary, reflectLadderOdd, Prod.fst_sub, Prod.snd_sub] at hup
+  · clear hlo
+    simp only [LadderOddLowerBoundary, reflectLadderOdd, Prod.fst_sub, Prod.snd_sub] at hup
     rcases hup with hdiag | htop | hshelf
     · right
       have hp : ((x, y + 1) : Site) - (2 * den, 2) ∈ (BaseMask.ladderOdd.raw den).sites := by ladder_mem
@@ -237,11 +368,13 @@ private theorem ladderOdd_rank_odd_white {den x y : ℤ} (hden : BaseMask.ladder
   rcases hwhite with hdiag | hdiag | hcorner | hcorner
   · left
     have hrange : 2 ≤ y ∧ 2 ≤ x ∧ x ≤ den - 1 := by omega
+    clear hlo hup
     rw [hcorrect _ hn]
     clear hshape
     ladder_rank
   · right
     have hrange : 3 ≤ x ∧ x ≤ den ∧ y ≤ den := by omega
+    clear hlo hup
     rw [hcorrect _ hp]
     clear hshape
     ladder_rank
