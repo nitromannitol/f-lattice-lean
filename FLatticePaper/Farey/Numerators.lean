@@ -52,4 +52,74 @@ theorem current_even_num_ge_three (w : Word) (h : ∃ x ∈ w, x ≠ Digit.three
   unfold parentsAt
   omega
 
+/-- The registers `den − num` of the parents: once `2a + b ≥ 4` (with `a, b ≥ 0`), every digit keeps it, since each digit maps
+`(a, b)` to `(a + b, 2a + b)`, `(a + b, b)` or `(a, 2a + b)`. -/
+theorem diff_preserved (w : Word) (p : Parents) (ha : 0 ≤ p.odd.den - p.odd.num) (hb : 0 ≤ p.even.den - p.even.num)
+    (h4 : 4 ≤ 2 * (p.odd.den - p.odd.num) + (p.even.den - p.even.num)) :
+    4 ≤ 2 * ((p.walk w).odd.den - (p.walk w).odd.num) + ((p.walk w).even.den - (p.walk w).even.num) := by
+  induction w generalizing p with
+  | nil => simpa [Parents.walk] using h4
+  | cons digit tail ih =>
+    rw [Parents.walk_cons]
+    have hstep : 0 ≤ (p.step digit).odd.den - (p.step digit).odd.num ∧
+        0 ≤ (p.step digit).even.den - (p.step digit).even.num ∧
+        4 ≤ 2 * ((p.step digit).odd.den - (p.step digit).odd.num) +
+          ((p.step digit).even.den - (p.step digit).even.num) := by
+      cases digit
+      · simp only [Parents.step, Parents.current, Parents.combine]
+        refine ⟨by omega, by omega, by omega⟩
+      · simp only [Parents.step, Parents.current, Parents.combine]
+        refine ⟨by omega, by omega, by omega⟩
+      · simp only [Parents.step, Parents.current, Parents.combine]
+        refine ⟨by omega, by omega, by omega⟩
+    exact ih _ hstep.1 hstep.2.1 hstep.2.2
+
+/-- A word with a digit other than `two` has, at its current even register, `den − num ≥ 4` (with `2a + b` the registers' sum). -/
+theorem walk_diff_ge (w : Word) (p : Parents) (ha : 1 ≤ p.odd.den - p.odd.num) (hb : 0 ≤ p.even.den - p.even.num)
+    (h : ∃ x ∈ w, x ≠ Digit.two) :
+    4 ≤ 2 * ((p.walk w).odd.den - (p.walk w).odd.num) + ((p.walk w).even.den - (p.walk w).even.num) := by
+  induction w generalizing p with
+  | nil =>
+    obtain ⟨x, hx, -⟩ := h
+    simp at hx
+  | cons digit tail ih =>
+    rw [Parents.walk_cons]
+    cases digit
+    · -- digit one: the register after one already has 2a + b ≥ 4
+      have hstep : 4 ≤ 2 * ((p.step Digit.one).odd.den - (p.step Digit.one).odd.num) +
+          ((p.step Digit.one).even.den - (p.step Digit.one).even.num) := by
+        simp only [Parents.step, Parents.current, Parents.combine]
+        omega
+      exact diff_preserved tail _ (by simp only [Parents.step, Parents.current, Parents.combine]; omega)
+        (by simp only [Parents.step, Parents.current, Parents.combine]; omega) hstep
+    · -- digit two: the head is not used; the tail carries the witness
+      have hw : ∃ x ∈ tail, x ≠ Digit.two := by
+        obtain ⟨x, hx, hne⟩ := h
+        rcases List.mem_cons.mp hx with rfl | hx'
+        · exact absurd rfl hne
+        · exact ⟨x, hx', hne⟩
+      exact ih _ (by simp only [Parents.step, Parents.current, Parents.combine]; omega)
+        (by simp only [Parents.step, Parents.current, Parents.combine]; omega) hw
+    · -- digit three
+      have hstep : 4 ≤ 2 * ((p.step Digit.three).odd.den - (p.step Digit.three).odd.num) +
+          ((p.step Digit.three).even.den - (p.step Digit.three).even.num) := by
+        simp only [Parents.step, Parents.current, Parents.combine]
+        omega
+      exact diff_preserved tail _ (by simp only [Parents.step, Parents.current, Parents.combine]; omega)
+        (by simp only [Parents.step, Parents.current, Parents.combine]; omega) hstep
+
+/-- The child of a word with a digit other than `two` has `den − num ≥ 4`. -/
+theorem current_even_diff_ge_four (w : Word) (h : ∃ x ∈ w, x ≠ Digit.two) :
+    4 ≤ ((parentsAt w).current .even).den - ((parentsAt w).current .even).num := by
+  have hroot0 : (1 : ℤ) ≤ (root : Parents).odd.den - (root : Parents).odd.num := by
+    show (1 : ℤ) ≤ 1 - 0
+    omega
+  have hroot1 : (0 : ℤ) ≤ (root : Parents).even.den - (root : Parents).even.num := by
+    show (0 : ℤ) ≤ 1 - 1
+    omega
+  have hw := walk_diff_ge w root hroot0 hroot1 h
+  unfold parentsAt
+  simp only [Parents.current, Parents.combine]
+  omega
+
 end FLatticePaper.Farey
