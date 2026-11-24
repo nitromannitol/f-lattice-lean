@@ -166,6 +166,9 @@ import FLatticePaper.Plane.Induction.TwosTileCover
 import FLatticePaper.Plane.Induction.TwosPriceE
 import FLatticePaper.Plane.Induction.TwosZeroEven
 import FLatticePaper.Plane.Induction.TwosStripFacts
+import FLatticePaper.Plane.Induction.TwosEPolicy
+import FLatticePaper.Plane.Induction.TwosLaplacianTile
+import FLatticePaper.Plane.Induction.TwosNativeCopy
 import FLatticePaper.Construction.NearOneBaseCases
 import FLatticePaper.Construction.BaseCases
 import FLatticePaper.Construction.OffsetTables
