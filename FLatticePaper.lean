@@ -527,5 +527,6 @@ import FLatticePaper.Plane.Induction.EHPrice
 import FLatticePaper.Plane.Induction.PriceInputs
 import FLatticePaper.Plane.Induction.CutRows
 import FLatticePaper.Construction.PureRank
+import FLatticePaper.Construction.PureRankWhite
 
 /-! Root import for the corrected F-lattice paper. -/
