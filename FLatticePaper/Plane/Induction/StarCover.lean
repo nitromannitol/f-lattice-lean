@@ -1,4 +1,4 @@
-import Mathlib
+import Mathlib.Data.Int.Notation
 
 /-!
 # The covering of the grade torus by the three kinds of full stars (STRONG_PRICE §3, combinatorial core)
@@ -91,7 +91,8 @@ theorem box_cover (n d T t s : ℤ) (hno : n % 2 = 1) (hdo : d % 2 = 1) (hn : 3 
     (t % 2 = 1 ∧ ¬ (T - (d - n) + 2 ≤ s ∧ s ≤ T - 2) ∧
         OkSite n d T (t - T) s ∧ OkSite n d T (t - T + d) (s - (d - n)) ∧
           OkSite n d T (t - T - d) (s + (d - n))) := by
-  rcases Int.emod_two_eq_zero_or_one t with ht | ht
+  have hpar : t % 2 = 0 ∨ t % 2 = 1 := by omega
+  rcases hpar with ht | ht
   · obtain ⟨h1, h2, h3⟩ := box_even n d T t s hno hdo hn hnd hT hTe ht ht0 htT hs0 hsT hs2
     exact Or.inl ⟨ht, h1, h2, h3⟩
   · by_cases hb : T - (d - n) + 2 ≤ s ∧ s ≤ T - 2
