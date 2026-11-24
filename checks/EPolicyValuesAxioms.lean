@@ -1,0 +1,5 @@
+import FLatticePaper.Plane.Induction.EPolicyValues
+
+#print axioms FLatticePaper.EPolicy.roundedSlip_nonincreasing_of_slip
+#print axioms FLatticePaper.EPolicy.canonicalSignedPolicy_reciprocal
+#print axioms FLatticePaper.EPolicy.canonicalSignedGames_reciprocal
