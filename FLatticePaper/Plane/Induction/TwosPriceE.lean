@@ -233,8 +233,8 @@ theorem priceB_main (k : ℕ) (z1 z2 : ℤ) (hk : KeyMain (2 * (k : ℤ) + 4) z1
 
 set_option maxHeartbeats 400000 in
 theorem priceB_s1 (k : ℕ) (z1 z2 : ℤ) (hk : KeyS1 (2 * (k : ℤ) + 4) z1 z2)
-    (hA : ¬(0 ≤ z1 ∧ z2 - z1 ≤ 2 * (k : ℤ) + 4 ∧ z2 ≤ 2 * (2 * (k : ℤ) + 4) - 1))
-    (hC : ¬((z1 = -1 ∧ z2 - z1 = 2 * (k : ℤ) + 4 + 1) ∨ (z1 = 0 ∧ z2 - z1 ≤ 1))) :
+    (_hA : ¬(0 ≤ z1 ∧ z2 - z1 ≤ 2 * (k : ℤ) + 4 ∧ z2 ≤ 2 * (2 * (k : ℤ) + 4) - 1))
+    (_hC : ¬((z1 = -1 ∧ z2 - z1 = 2 * (k : ℤ) + 4 + 1) ∨ (z1 = 0 ∧ z2 - z1 ≤ 1))) :
     (k : ℤ) ^ 2 + 5 * (k : ℤ) + 5 - 1 ≤
         paperNearLadderValue (2 * (k : ℤ) + 4) (z1, z2 + 1) -
           paperNearLadderValue (2 * (k : ℤ) + 4) (z1 + 1, z2 - (2 * (k : ℤ) + 4)) -
@@ -281,8 +281,8 @@ theorem priceB_s2 (k : ℕ) (z1 z2 : ℤ) (hk : KeyS2 (2 * (k : ℤ) + 4) z1 z2)
 
 set_option maxHeartbeats 400000 in
 theorem priceB_s3 (k : ℕ) (z1 z2 : ℤ) (hk : KeyS3 (2 * (k : ℤ) + 4) z1 z2)
-    (hA : ¬(0 ≤ z1 ∧ z2 - z1 ≤ 2 * (k : ℤ) + 4 ∧ z2 ≤ 2 * (2 * (k : ℤ) + 4) - 1))
-    (hC : ¬((z1 = -1 ∧ z2 - z1 = 2 * (k : ℤ) + 4 + 1) ∨ (z1 = 0 ∧ z2 - z1 ≤ 1))) :
+    (_hA : ¬(0 ≤ z1 ∧ z2 - z1 ≤ 2 * (k : ℤ) + 4 ∧ z2 ≤ 2 * (2 * (k : ℤ) + 4) - 1))
+    (_hC : ¬((z1 = -1 ∧ z2 - z1 = 2 * (k : ℤ) + 4 + 1) ∨ (z1 = 0 ∧ z2 - z1 ≤ 1))) :
     (k : ℤ) ^ 2 + 5 * (k : ℤ) + 5 - 1 ≤
         paperNearLadderValue (2 * (k : ℤ) + 4) (z1, z2 + 1) -
           paperNearLadderValue (2 * (k : ℤ) + 4) (z1 + 1, z2 - (2 * (k : ℤ) + 4)) -
@@ -348,7 +348,7 @@ theorem priceC_main (k : ℕ) (z1 z2 : ℤ) (hk : KeyMain (2 * (k : ℤ) + 4) z1
 
 set_option maxHeartbeats 400000 in
 theorem priceC_s1 (k : ℕ) (z1 z2 : ℤ) (hk : KeyS1 (2 * (k : ℤ) + 4) z1 z2)
-    (hC : (z1 = -1 ∧ z2 - z1 = 2 * (k : ℤ) + 4 + 1) ∨ (z1 = 0 ∧ z2 - z1 ≤ 1)) :
+    (_hC : (z1 = -1 ∧ z2 - z1 = 2 * (k : ℤ) + 4 + 1) ∨ (z1 = 0 ∧ z2 - z1 ≤ 1)) :
     (k : ℤ) ^ 2 + 5 * (k : ℤ) + 5 - 1 ≤
         paperNearLadderValue (2 * (k : ℤ) + 4) (z1, z2 + 1) -
           paperNearLadderValue (2 * (k : ℤ) + 4) (z1 + (2 * (k : ℤ) + 4), z2 + 2 * (2 * (k : ℤ) + 4) - 1) +
@@ -386,7 +386,7 @@ theorem priceC_s2 (k : ℕ) (z1 z2 : ℤ) (hk : KeyS2 (2 * (k : ℤ) + 4) z1 z2)
 
 set_option maxHeartbeats 400000 in
 theorem priceC_s3 (k : ℕ) (z1 z2 : ℤ) (hk : KeyS3 (2 * (k : ℤ) + 4) z1 z2)
-    (hC : (z1 = -1 ∧ z2 - z1 = 2 * (k : ℤ) + 4 + 1) ∨ (z1 = 0 ∧ z2 - z1 ≤ 1)) :
+    (_hC : (z1 = -1 ∧ z2 - z1 = 2 * (k : ℤ) + 4 + 1) ∨ (z1 = 0 ∧ z2 - z1 ≤ 1)) :
     (k : ℤ) ^ 2 + 5 * (k : ℤ) + 5 - 1 ≤
         paperNearLadderValue (2 * (k : ℤ) + 4) (z1, z2 + 1) -
           paperNearLadderValue (2 * (k : ℤ) + 4) (z1 + (2 * (k : ℤ) + 4), z2 + 2 * (2 * (k : ℤ) + 4) - 1) +
@@ -484,7 +484,7 @@ theorem twos_priceRange_E (k : ℕ) (z : Site)
   · by_cases hA : 0 ≤ z.1 ∧ z.2 - z.1 ≤ 2 * (k : ℤ) + 4 ∧ z.2 ≤ 2 * (2 * (k : ℤ) + 4) - 1
     · have hF := standardField_twos_eq_tile k (w := (z.1 - 1, z.2 + (2 * (k : ℤ) + 3)))
         (x := (z.1 - 1, z.2 + (2 * (k : ℤ) + 4)))
-        (by ext <;> dsimp only <;> ring) (memA_tile (2 * (k : ℤ) + 4) z.1 z.2 hd hk hA hC)
+        (by ext <;> (dsimp only; try ring)) (memA_tile (2 * (k : ℤ) + 4) z.1 z.2 hd hk hA hC)
       rw [hF]
       rcases hk with h | h | h | h | h
       · exact priceA_main k z.1 z.2 h hA
@@ -501,7 +501,7 @@ theorem twos_priceRange_E (k : ℕ) (z : Site)
       dsimp only at hTr
       have hF := standardField_twos_eq_tile k (w := (z.1 + 1, z.2 - (2 * (k : ℤ) + 5)))
         (x := (z.1 + 1, z.2 - (2 * (k : ℤ) + 4)))
-        (by ext <;> dsimp only <;> ring) (memB_tile (2 * (k : ℤ) + 4) z.1 z.2 hd hk hA hC)
+        (by ext <;> (dsimp only; try ring)) (memB_tile (2 * (k : ℤ) + 4) z.1 z.2 hd hk hA hC)
       rw [hTr, hF]
       rcases hk with h | h | h | h | h
       · have h' := priceB_main k z.1 z.2 h hA hC
