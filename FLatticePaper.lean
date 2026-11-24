@@ -163,6 +163,8 @@ import FLatticePaper.Plane.Induction.RankWithValues
 import FLatticePaper.Plane.Induction.TwosPriceForm
 import FLatticePaper.Plane.Induction.TwosPriceClosed
 import FLatticePaper.Plane.Induction.TwosPriceDelta
+import FLatticePaper.Plane.Induction.TwosUnitPrice
+import FLatticePaper.Plane.Induction.TwosNoPriceSaddle
 import FLatticePaper.Plane.Induction.ThreesMidpoint
 import FLatticePaper.Plane.Induction.ThreesLeaves
 import FLatticePaper.Plane.Induction.TwosLeaves
