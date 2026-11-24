@@ -48,4 +48,67 @@ theorem selDisp_nativeRep_deck (k : ℕ) (η : ℤ) (hη : η = 1 ∨ η = -1) (
     linear_combination e2 - f2
   exact (selDisp_dup (by omega) hd hη hy1 hy2 hq1 hq2).symm
 
+/-- Translating a square translates its corners. -/
+theorem mem_squareCorners_translate (a b : ℤ) (l c : ℤ × ℤ) :
+    c ∈ squareCorners a b ↔ c + l ∈ squareCorners (a + l.1) (b + l.2) := by
+  obtain ⟨x, y⟩ := c
+  obtain ⟨l1, l2⟩ := l
+  unfold squareCorners
+  simp only [Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk]
+  constructor
+  · intro h
+    omega
+  · intro h
+    omega
+
+/-- The unit square clause transfers across a deck translation: a non-kept corner of the square stays non-kept. -/
+theorem squareClause_translate (k : ℕ) (η : ℤ) (hη : η = 1 ∨ η = -1) (a b : ℤ) (i j : ℤ)
+    (h : SquareClauseSat (reciprocalField k) (selF k η) a b) :
+    SquareClauseSat (reciprocalField k) (selF k η) (a + ((Fraction.mk 1 (2 * (k : ℤ) + 3)).modifiedDeck.combine i j).1)
+      (b + ((Fraction.mk 1 (2 * (k : ℤ) + 3)).modifiedDeck.combine i j).2) := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  have hl0 : (((Fraction.mk 1 (2 * (k : ℤ) + 3)).modifiedDeck.combine i j).1 +
+      ((Fraction.mk 1 (2 * (k : ℤ) + 3)).modifiedDeck.combine i j).2) % 2 = 0 :=
+    combine_sum_even hd i j
+  set l := (Fraction.mk 1 (2 * (k : ℤ) + 3)).modifiedDeck.combine i j with hl
+  unfold SquareClauseSat at h ⊢
+  intro hall
+  apply h
+  intro c hc
+  have hc' := hall (c + l) ((mem_squareCorners_translate a b l c).1 hc)
+  have hlap : laplacian (reciprocalField k) (c + l) = laplacian (reciprocalField k) c :=
+    laplacian_reciprocal_deck k c i j
+  have hsel : selF k η (c + l) = selF k η c + l := by
+    unfold selF
+    rw [selDisp_nativeRep_deck k η hη c i j]
+    abel
+  unfold keptInside at hc' ⊢
+  rw [hlap, hsel] at hc'
+  by_cases hb : laplacian (reciprocalField k) c = -1
+  · rw [if_pos hb] at hc' ⊢
+    rw [incomingNeg_add hl0, incomingPos_add hl0] at hc'
+    rcases hc' with h1 | h1
+    · exact Or.inl ((mem_squareCorners_translate a b l _).mpr h1)
+    · exact Or.inr ((mem_squareCorners_translate a b l _).mpr h1)
+  · rw [if_neg hb] at hc' ⊢
+    exact (mem_squareCorners_translate a b l _).mpr hc'
+
+/-- The clause at every square follows from the clause at the native lower-left squares. -/
+theorem squareClause_all (k : ℕ) (η : ℤ) (hη : η = 1 ∨ η = -1)
+    (hnat : ∀ a b : ℤ, NativeP (2 * (k : ℤ) + 3) (a, b) →
+      SquareClauseSat (reciprocalField k) (selF k η) a b) (a b : ℤ) :
+    SquareClauseSat (reciprocalField k) (selF k η) a b := by
+  obtain ⟨⟨y1, y2⟩, hyN, i, j, hab⟩ := exists_native_rep (stairEven_valid_reciprocal k) (a, b)
+  have hy := squareClause_translate k η hη y1 y2 i j (hnat y1 y2 hyN)
+  have h1 : y1 + ((Fraction.mk 1 (2 * (k : ℤ) + 3)).modifiedDeck.combine i j).1 = a := by
+    have := congrArg Prod.fst hab
+    simp only [Prod.fst_add] at this
+    linarith
+  have h2 : y2 + ((Fraction.mk 1 (2 * (k : ℤ) + 3)).modifiedDeck.combine i j).2 = b := by
+    have := congrArg Prod.snd hab
+    simp only [Prod.snd_add] at this
+    linarith
+  rw [h1, h2] at hy
+  exact hy
+
 end FLatticePaper.EPolicy
