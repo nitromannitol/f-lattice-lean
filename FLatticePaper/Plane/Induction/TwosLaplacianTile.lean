@@ -52,4 +52,108 @@ theorem laplacian_twos_native (k : ℕ) {S : Field}
   exact ladderOdd_laplacian_on_raw (ladderOdd_valid_twos k) hagree hperiod _
     (nativeT_rot_raw (by omega) hu)
 
+set_option maxHeartbeats 400000 in
+/-- The white cover on the odd-`t` branch, with `t = y - x ≤ a - 1`. -/
+theorem cover_E_lo (a x y : ℤ) (ha2 : a % 2 = 0) (ha4 : 4 ≤ a) (hu : NativeT a x y)
+    (he : EvenSite (2 * a - y, x + 1)) (hb : ¬ LadderOddEvenBlack a (2 * a - y, x + 1)) (ht : y - x ≤ a - 1) :
+    CandGuard a x y ∨ FreeSite a x y ∨ FreeSite a (x + 2) (y - 2 * a) ∨
+      FreeSite a (x - (a + 1)) (y - (a - 1)) := by
+  simp only [EvenSite, LadderOddEvenBlack] at he hb
+  simp only [NativeT] at hu
+  rcases (by omega : y - x = -3 ∨ y - x = -1 ∨ (1 ≤ y - x ∧ y - x ≤ a - 3) ∨ y - x = a - 1) with h | h | h | h
+  · exact Or.inr (Or.inl (by simp only [FreeSite, FreeHSite, FreeVSite]; omega))
+  · rcases (by omega : x = 1 ∨ x = a + 1 ∨ (2 ≤ x ∧ x ≤ a)) with h' | h' | h'
+    · exact Or.inr (Or.inl (by simp only [FreeSite, FreeHSite, FreeVSite]; omega))
+    · exact Or.inr (Or.inr (Or.inr (by simp only [FreeSite, FreeHSite, FreeVSite]; omega)))
+    · exact Or.inl (Or.inl (by simp only [CandLow]; omega))
+  · rcases (by omega : x = 0 ∨ x = a + 1 ∨ (1 ≤ x ∧ x ≤ a)) with h' | h' | h'
+    · exact Or.inr (Or.inl (by simp only [FreeSite, FreeHSite, FreeVSite]; omega))
+    · exact Or.inr (Or.inr (Or.inr (by simp only [FreeSite, FreeHSite, FreeVSite]; omega)))
+    · exact Or.inl (Or.inl (by simp only [CandLow]; omega))
+  · rcases (by omega : x = 0 ∨ x = a ∨ (1 ≤ x ∧ x ≤ a - 1)) with h' | h' | h'
+    · exact Or.inr (Or.inl (by simp only [FreeSite, FreeHSite, FreeVSite]; omega))
+    · exact Or.inr (Or.inr (Or.inr (by simp only [FreeSite, FreeHSite, FreeVSite]; omega)))
+    · exfalso
+      omega
+
+set_option maxHeartbeats 400000 in
+/-- The white cover on the odd-`t` branch, with `t = y - x ≥ a`. -/
+theorem cover_E_hi (a x y : ℤ) (ha2 : a % 2 = 0) (ha4 : 4 ≤ a) (hu : NativeT a x y)
+    (he : EvenSite (2 * a - y, x + 1)) (hb : ¬ LadderOddEvenBlack a (2 * a - y, x + 1)) (ht : a ≤ y - x) :
+    CandGuard a x y ∨ FreeSite a x y ∨ FreeSite a (x + 2) (y - 2 * a) ∨
+      FreeSite a (x - (a + 1)) (y - (a - 1)) := by
+  simp only [EvenSite, LadderOddEvenBlack] at he hb
+  simp only [NativeT] at hu
+  rcases (by omega : (a + 1 ≤ y - x ∧ y - x ≤ 2 * a - 3) ∨ y - x = 2 * a - 1 ∨ y - x = 2 * a + 1) with h | h | h
+  · rcases (by omega : x = -1 ∨ x = a ∨ (0 ≤ x ∧ x ≤ a - 1)) with h' | h' | h'
+    · exact Or.inr (Or.inl (by simp only [FreeSite, FreeHSite, FreeVSite]; omega))
+    · exact Or.inr (Or.inr (Or.inr (by simp only [FreeSite, FreeHSite, FreeVSite]; omega)))
+    · exact Or.inl (Or.inr (Or.inl (by simp only [CandHigh]; omega)))
+  · rcases (by omega : x = -1 ∨ x = a - 1 ∨ x = 0 ∨ (1 ≤ x ∧ x ≤ a - 2)) with h' | h' | h' | h'
+    · exact Or.inr (Or.inl (by simp only [FreeSite, FreeHSite, FreeVSite]; omega))
+    · exact Or.inr (Or.inr (Or.inl (by simp only [FreeSite, FreeHSite, FreeVSite]; omega)))
+    · exfalso
+      omega
+    · exact Or.inl (Or.inr (Or.inl (by simp only [CandHigh]; omega)))
+  · exact Or.inr (Or.inr (Or.inl (by simp only [FreeSite, FreeHSite, FreeVSite]; omega)))
+
+/-- The white cover on the odd-`t` branch (the quarter turn is even), by the two `t` ranges. -/
+theorem cover_E (a x y : ℤ) (ha2 : a % 2 = 0) (ha4 : 4 ≤ a) (hu : NativeT a x y)
+    (he : EvenSite (2 * a - y, x + 1)) (hb : ¬ LadderOddEvenBlack a (2 * a - y, x + 1)) :
+    CandGuard a x y ∨ FreeSite a x y ∨ FreeSite a (x + 2) (y - 2 * a) ∨
+      FreeSite a (x - (a + 1)) (y - (a - 1)) := by
+  by_cases ht : y - x ≤ a - 1
+  · exact cover_E_lo a x y ha2 ha4 hu he hb ht
+  · exact cover_E_hi a x y ha2 ha4 hu he hb (by omega)
+
+set_option maxHeartbeats 400000 in
+/-- The white cover on the even-`t` branch (the quarter turn is odd): the ten charge pieces of `OddWhite`, one alternative each. -/
+theorem cover_O (a x y : ℤ) (ha2 : a % 2 = 0) (ha4 : 4 ≤ a) (_hu : NativeT a x y)
+    (_he : ¬ EvenSite (2 * a - y, x + 1)) (hb : LadderOddOddWhite a (2 * a - y, x + 1)) :
+    CandGuard a x y ∨ FreeSite a x y ∨ FreeSite a (x + 2) (y - 2 * a) ∨
+      FreeSite a (x - (a + 1)) (y - (a - 1)) := by
+  simp only [LadderOddOddWhite, LadderOddLowerBoundary, reflectLadderOdd, Prod.fst_sub, Prod.snd_sub] at hb
+  rcases hb with (h1 | h2 | h3) | (h4 | h5 | h6) | h7 | h8 | h9 | h10
+  · exact Or.inr (Or.inr (Or.inl (by simp only [FreeSite, FreeHSite, FreeVSite]; omega)))
+  · exact Or.inr (Or.inl (by simp only [FreeSite, FreeHSite, FreeVSite]; omega))
+  · by_cases hy : y = a
+    · exact Or.inl (Or.inr (Or.inr (Or.inr (by simp only [CandW]; omega))))
+    · exact Or.inr (Or.inl (by simp only [FreeSite, FreeHSite, FreeVSite]; omega))
+  · exact Or.inr (Or.inl (by simp only [FreeSite, FreeHSite, FreeVSite]; omega))
+  · exact Or.inr (Or.inr (Or.inr (by simp only [FreeSite, FreeHSite, FreeVSite]; omega)))
+  · by_cases ht : y - x = a - 2
+    · exact Or.inl (Or.inr (Or.inr (Or.inl (by simp only [CandE]; omega))))
+    · exact Or.inr (Or.inr (Or.inr (by simp only [FreeSite, FreeHSite, FreeVSite]; omega)))
+  · exact Or.inl (Or.inr (Or.inr (Or.inr (by simp only [CandW]; omega))))
+  · exact Or.inl (Or.inr (Or.inr (Or.inl (by simp only [CandE]; omega))))
+  · exact Or.inr (Or.inr (Or.inl (by simp only [FreeSite, FreeHSite, FreeVSite]; omega)))
+  · exact Or.inr (Or.inl (by simp only [FreeSite, FreeHSite, FreeVSite]; omega))
+
+/-- Every native white is candidate-covered, an H/V site, or a translate of an H/V site by `-V` or `-U`. -/
+theorem native_white_cover (k : ℕ) {S : Field}
+    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees S 0)
+    (hperiod : HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4)) S 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
+    {u : Site} (hu : NativeT (2 * (k : ℤ) + 4) u.1 u.2)
+    (hw : laplacian (standardField (List.replicate (k + 1) Digit.two)) u = 0) :
+    CandGuard (2 * (k : ℤ) + 4) u.1 u.2 ∨ FreeSite (2 * (k : ℤ) + 4) u.1 u.2 ∨
+      FreeSite (2 * (k : ℤ) + 4) (u.1 + 2) (u.2 - 2 * (2 * (k : ℤ) + 4)) ∨
+      FreeSite (2 * (k : ℤ) + 4) (u.1 - (2 * (k : ℤ) + 4 + 1)) (u.2 - (2 * (k : ℤ) + 4 - 1)) := by
+  have hc := laplacian_twos_native k hagree hperiod hu
+  rw [hw, quarterTurn_offset_apply] at hc
+  obtain ⟨x, y⟩ := u
+  dsimp only at hc hu ⊢
+  have ha2 : (2 * (k : ℤ) + 4) % 2 = 0 := by omega
+  have ha4 : 4 ≤ 2 * (k : ℤ) + 4 := by omega
+  by_cases he : EvenSite (2 * (2 * (k : ℤ) + 4) - y, x + 1)
+  · rw [if_pos he] at hc
+    by_cases hb : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)
+    · rw [if_pos hb] at hc
+      norm_num at hc
+    · exact cover_E _ x y ha2 ha4 hu he hb
+  · rw [if_neg he] at hc
+    by_cases hb : LadderOddOddWhite (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)
+    · exact cover_O _ x y ha2 ha4 hu he hb
+    · rw [if_neg hb] at hc
+      norm_num at hc
+
 end FLatticePaper.TwosEPolicy
