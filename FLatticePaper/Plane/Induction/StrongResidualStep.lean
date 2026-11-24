@@ -4,6 +4,8 @@ import FLatticePaper.Plane.Induction.StrongUnitPrice
 import FLatticePaper.Plane.Induction.F2F3Pure
 import FLatticePaper.Plane.Induction.StrongResidual
 import FLatticePaper.Plane.Induction.TieReduce
+import FLatticePaper.Plane.Induction.StarClassify
+import FLatticePaper.Farey.Numerators
 
 /-!
 # The strong residual of a proper word from the conjugate's strong estimates (task w1: the residual, field by field)
@@ -16,7 +18,7 @@ derived from the packet of the word, which is itself derived from the conjugate'
   `slip_transverse`);
 * `zeroStripInterval` from `zeroStripInterval_of_packet`;
 * `zeroEvenLine` from `zeroEvenLine_field`, with the even seed `hseed` named;
-* `F1_unitPrice`, `F1_noPriceSaddle` from `unitPrice_and_noSaddle`, with the star classification `hcls` named;
+* `F1_unitPrice`, `F1_noPriceSaddle` from `unitPrice_and_noSaddle`, with the star classification derived (`hcls` is no longer named);
 * `F2F3_policy` from `rankWithIncrements_of_strict_hull`, with the policy and the strict rank `hpol` named.
 
 The survey of the four named inputs is in `reports/w1-strong-residual-step.md`.
@@ -27,10 +29,12 @@ namespace FLatticePaper.Induction
 open Farey FLatticePaper
 
 /-- **The strong residual of a proper word from the conjugate's strong estimates.** The named inputs are the boundary price bound
-`hbd`, the even seed `hseed`, the star classification `hcls`, and the policy with a strict rank `hpol`.
+`hbd`, the even seed `hseed`, and the policy with a strict rank `hpol` (the star classification is derived; it needs a digit other than `two` too).
 
-`hcls` is `StarClassified` (STRONG_PRICE_AND_ALTERNATE_STEP §3): for each centre, one deck translate common to its star classifies the
-star (each site in the closed polygon, the H-band, or a V source). Checked numerically on the proper words of length at most four.
+`hcls` is no longer an input: the star classification is derived (`StarClassified`, from `starClassified_of_grades`) for every word with
+a digit other than `three` and a digit other than `two` (the proper, non-two-power words), from the strips of the packet. The derivation
+uses the arithmetic of the Farey recursion: `3 ≤ child.num` (`current_even_num_ge_three`) and `4 ≤ child.den − child.num`
+(`current_even_diff_ge_four`). The grade covering that proves it is `StarCover.box_cover`.
 
 `hseed` is named. Its reduction: `standardField word − harmonicGrid` is invariant under the transverse vector (the kernel constant of
 the standard field is `0`, and its transverse constant equals that of `harmonicGrid`; checked on the proper words of length at most
@@ -38,13 +42,13 @@ three), and the odd seed line is a union of transverse orbits. So `hseed` follow
 odd representative of each transverse class on the seed line. The seed line lies below the strip `HasStrips`, so the strip does not
 supply it. Checked numerically on the proper words of length at most four (350 seed points, no disagreement). -/
 theorem strongResidual_of_conj {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
+    (h2 : ∃ x ∈ word, x ≠ Digit.two)
     (hSE : StrongEstimates (conjWord word))
     (hbd : ∀ z, OnBoundary (frameAt word).closedPolygon z →
       (frameAt word).price (standardField word) z ≤ (frameAt word).cutPrice)
     (hseed : ∀ w : Site, ¬ EvenSite w →
       (frameAt word).sGrade w = 2 - 3 * (frameAt word).child.den + (frameAt word).child.num →
         standardField word w = harmonicGrid w)
-    (hcls : FLatticePaper.StrongUnitPrice.StarClassified (frameAt word) (standardField word))
     (hpol : ∀ η : ℤ, (η = 1 ∨ η = -1) → ∃ (policy : Site → Site → Prop) (R : Site → ℤ) (cU cV : ℤ),
       RetainQuota (standardField word) policy ∧
       NonincreasingAlong ((frameAt word).chainPotential (standardField word) η) policy ∧
@@ -69,6 +73,10 @@ theorem strongResidual_of_conj {word : Word} (h : ∃ x ∈ word, x ≠ Digit.th
       (z + (frameAt word).child.modifiedDeck.transverse) = (frameAt word).slip (standardField word) η z + 2 * η :=
     fun η z => (frameAt word).slip_transverse (standardField word) hpk.periods η z
   have hZE := FLatticePaper.W1ZeroStrip.zeroEvenLine_field word hpk hPR hPU hPV hseed
+  have hn3 : 3 ≤ (frameAt word).child.num := FLatticePaper.Farey.current_even_num_ge_three word h
+  have hd4 : 4 ≤ (frameAt word).child.den - (frameAt word).child.num :=
+    FLatticePaper.Farey.current_even_diff_ge_four word h2
+  have hcls := FLatticePaper.StrongUnitPrice.starClassified_of_grades (frameAt word) (standardField word) hn3 hd4 hpk.strips
   have hU := FLatticePaper.StrongUnitPrice.unitPrice_and_noSaddle (frameAt word) (standardField word) hPR hPU hPV hcls
   refine
     { priceRange := hPR
