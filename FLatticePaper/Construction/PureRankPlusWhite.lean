@@ -494,4 +494,26 @@ theorem qplus_gate (d x y dx dy : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (hn : 
       have h4 : x + y ≠ d + 2 := fun h => ha ⟨h, hyd⟩
       exact L_interior_P d x y dx dy hd hdodd hn hf hyd h4 hfi hunit hR r hr
 
+/-- Every native point has its plus rank `qRankP`. -/
+theorem rankOfP_qRankP (d : ℤ) (hd : 3 ≤ d) (x y : ℤ) (hn : NativeP d (x, y)) :
+    RankOfP d (x, y) (qRankP d (x, y)) := by
+  have hb : 2 - d ≤ x ∧ x ≤ d ∧ 0 ≤ y ∧ y ≤ d + 1 := nativeP_bounds d (by omega) (x, y) hn
+  obtain ⟨hx1, hx2, -, hy2⟩ := hb
+  have hn' := hn
+  unfold NativeP at hn'
+  simp only [Prod.mk.injEq] at hn'
+  simp only [qRankP, Prod.mk.injEq]
+  split_ifs with h1 h2 h3 h4 h5
+  · exact rankOfP_self d (x, y) (Or.inl h1)
+  · obtain ⟨rfl, h2'⟩ := h2
+    exact rankOfP_top d x hx1 h2'
+  · obtain ⟨rfl, rfl⟩ := h3
+    exact rankOfP_corner d
+  · have hyd : y ≤ d := by omega
+    exact rankOfP_anti d x y h4 hx2 hyd
+  · rw [h5.1, h5.2]
+    exact rankOfP_fifth d
+  · have hyd : y ≤ d := by omega
+    exact rankOfP_self d (x, y) (rep_interior d x y hn h1 hyd h4 h5)
+
 end FLatticePaper.PureRank
