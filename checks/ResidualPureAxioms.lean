@@ -1,0 +1,4 @@
+import FLatticePaper.Plane.Induction.ResidualPure
+
+#print axioms FLatticePaper.Induction.strongResidual_threes_of_policy
+#print axioms FLatticePaper.Induction.reciprocalField_harmonic_odd_line
