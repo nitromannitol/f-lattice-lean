@@ -144,6 +144,8 @@ import FLatticePaper.Plane.Induction.PolygonRaw
 import FLatticePaper.Plane.Induction.PriceRange
 import FLatticePaper.Plane.Induction.NoSaddle
 import FLatticePaper.Plane.Induction.SlipBase
+import FLatticePaper.Plane.Induction.BaseSlipPure
+import FLatticePaper.Plane.Induction.ResidualPure
 import FLatticePaper.Plane.Induction.ThreesMidpoint
 import FLatticePaper.Plane.Induction.ThreesLeaves
 import FLatticePaper.Plane.Induction.TwosLeaves
