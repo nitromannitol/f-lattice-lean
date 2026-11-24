@@ -1,16 +1,18 @@
 import FLatticePaper.Plane.Induction.EPolicyValues
 
-#print axioms FLatticePaper.EPolicy.reciprocalFrame_odd
-#print axioms FLatticePaper.EPolicy.reciprocalFrame_shortShift
-#print axioms FLatticePaper.EPolicy.reciprocalFrame_parentShift
-#print axioms FLatticePaper.EPolicy.reciprocalFrame_parentSlope
-#print axioms FLatticePaper.EPolicy.price_reciprocal
-#print axioms FLatticePaper.EPolicy.slip_edge_sub
-#print axioms FLatticePaper.EPolicy.slip_edge_le
-#print axioms FLatticePaper.EPolicy.price_edge_sub
-#print axioms FLatticePaper.EPolicy.price_edge_le
-#print axioms FLatticePaper.EPolicy.chain_edge_sub
-#print axioms FLatticePaper.EPolicy.chain_edge_le
-#print axioms FLatticePaper.EPolicy.roundedSlip_nonincreasing_of_slip
-#print axioms FLatticePaper.EPolicy.canonicalSignedPolicy_reciprocal
-#print axioms FLatticePaper.EPolicy.canonicalSignedGames_reciprocal
+#print axioms FLatticePaper.EPolicy.tri_up
+#print axioms FLatticePaper.EPolicy.tri_down
+#print axioms FLatticePaper.EPolicy.mem_raw_of_box
+#print axioms FLatticePaper.EPolicy.incr_hG
+#print axioms FLatticePaper.EPolicy.incr_vert
+#print axioms FLatticePaper.EPolicy.vG_one
+#print axioms FLatticePaper.EPolicy.vG_neg_one
+#print axioms FLatticePaper.EPolicy.vG_P
+#print axioms FLatticePaper.EPolicy.smul_shortShift_recip
+#print axioms FLatticePaper.EPolicy.slip_horiz_le
+#print axioms FLatticePaper.EPolicy.slip_vert_le
+#print axioms FLatticePaper.EPolicy.price_horiz_le
+#print axioms FLatticePaper.EPolicy.price_vert_le
+#print axioms FLatticePaper.EPolicy.chain_horiz_le
+#print axioms FLatticePaper.EPolicy.chain_vert_le
+#print axioms FLatticePaper.EPolicy.retention_horiz
