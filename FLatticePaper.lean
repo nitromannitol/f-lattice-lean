@@ -329,6 +329,10 @@ import FLatticePaper.Tiles.HorizontalStep
 import FLatticePaper.Tiles.HorizontalInduction
 import FLatticePaper.Tiles.BaseFamilies
 import FLatticePaper.Tiles.BaseInvariant
+import FLatticePaper.Tiles.VJunction
+import FLatticePaper.Tiles.VGlue
+import FLatticePaper.Tiles.VStep
+import FLatticePaper.Tiles.VBase
 import FLatticePaper.Plane.Induction.S3FreeBoundary
 import FLatticePaper.Plane.Induction.ParentCoordinates
 import FLatticePaper.Plane.Induction.Q3Arithmetic
