@@ -83,4 +83,89 @@ noncomputable def canonicalSignedGames_reciprocal (k : ℕ) (V : ReciprocalValue
   game := fun η hη => canonicalSignedPolicy_reciprocal k V η hη
   chainNonincreasing := fun η hη => V.chain η hη
 
+/-- The unit increment of a field along `e` at `z`. -/
+def incr (F : Site → ℤ) (e z : Site) : ℤ := F (z + e) - F z
+
+/-- The odd parent of the reciprocal frame is `0/1`. -/
+theorem reciprocalFrame_odd (k : ℕ) : (reciprocalFrame k).parents.odd = ⟨0, 1⟩ := by
+  show (FLatticePaper.Farey.parentsAt (List.replicate k FLatticePaper.Farey.Digit.three)).odd = _
+  rw [FLatticePaper.Tiles.parentsAt_replicate_three]
+
+/-- The short shift of the reciprocal frame is `(-2, 0)`. -/
+theorem reciprocalFrame_shortShift (k : ℕ) : (reciprocalFrame k).shortShift = (-2, 0) := by
+  unfold ChildFrame.shortShift
+  rw [reciprocalFrame_odd, reciprocal_eps]
+  ext <;> simp
+
+/-- The parent shift of the reciprocal frame is `(1, -1)`. -/
+theorem reciprocalFrame_parentShift (k : ℕ) : (reciprocalFrame k).parentShift = (1, -1) := by
+  unfold ChildFrame.parentShift
+  rw [reciprocalFrame_odd, reciprocal_eps]
+  ext <;> simp
+
+/-- The parent slope of the reciprocal frame is `-z₂`. -/
+theorem reciprocalFrame_parentSlope (k : ℕ) (z : Site) : (reciprocalFrame k).parentSlope z = -z.2 := by
+  unfold ChildFrame.parentSlope
+  rw [reciprocalFrame_odd]
+  simp
+
+/-- The price of the reciprocal frame: `P(z) = F z − F(z − (1, −1)) − z₂`. -/
+theorem price_reciprocal (k : ℕ) (F : Site → ℤ) (z : Site) :
+    (reciprocalFrame k).price F z = F z - F (z - (1, -1)) - z.2 := by
+  unfold ChildFrame.price
+  rw [reciprocalFrame_parentShift, reciprocal_eps, reciprocalFrame_parentSlope]
+  ring
+
+/-- **The slip along an edge.** For `i = c + e`: `D(i) − D(c) = Δ_e(c) − Δ_e(c + ησ)`. -/
+theorem slip_edge_sub (F : Site → ℤ) (fr : ChildFrame) (η : ℤ) (c e : Site) :
+    (fr.slip F η (c + e) - fr.slip F η c) = incr F e c - incr F e (c + η • fr.shortShift) := by
+  unfold ChildFrame.slip incr
+  have h : c + e + η • fr.shortShift = c + η • fr.shortShift + e := by abel
+  rw [h]
+  ring
+
+/-- If the increment does not grow along the shift, the slip does not increase along the edge. -/
+theorem slip_edge_le (F : Site → ℤ) (fr : ChildFrame) (η : ℤ) (c e : Site)
+    (h : incr F e c ≤ incr F e (c + η • fr.shortShift)) :
+    fr.slip F η (c + e) ≤ fr.slip F η c := by
+  have := slip_edge_sub F fr η c e
+  linarith
+
+/-- **The price along an edge of the reciprocal frame.** For `i = c + e`: `P(i) − P(c) = Δ_e(c) − Δ_e(c − (1, −1)) − e₂`. -/
+theorem price_edge_sub (k : ℕ) (F : Site → ℤ) (c e : Site) :
+    ((reciprocalFrame k).price F (c + e) - (reciprocalFrame k).price F c) =
+      incr F e c - incr F e (c - (1, -1)) - e.2 := by
+  rw [price_reciprocal, price_reciprocal]
+  unfold incr
+  have h : c + e - (1, -1) = c - (1, -1) + e := by abel
+  rw [h]
+  simp only [Prod.snd_add]
+  ring
+
+/-- If the increment satisfies the price inequality along the edge, the price does not increase along the edge. -/
+theorem price_edge_le (k : ℕ) (F : Site → ℤ) (c e : Site)
+    (h : incr F e c - incr F e (c - (1, -1)) ≤ e.2) :
+    (reciprocalFrame k).price F (c + e) ≤ (reciprocalFrame k).price F c := by
+  have := price_edge_sub k F c e
+  linarith
+
+/-- **The chain potential along an edge of the reciprocal frame.** For `i = c + e`:
+`Φ(i) − Φ(c) = Δ_e(c) − Δ_e(c + ησ − (1, −1)) − e₂`. -/
+theorem chain_edge_sub (k : ℕ) (F : Site → ℤ) (η : ℤ) (c e : Site) :
+    ((reciprocalFrame k).chainPotential F η (c + e) - (reciprocalFrame k).chainPotential F η c) =
+      incr F e c - incr F e (c + η • (reciprocalFrame k).shortShift - (1, -1)) - e.2 := by
+  have hs := slip_edge_sub F (reciprocalFrame k) η c e
+  have hp := price_edge_sub k F (c + η • (reciprocalFrame k).shortShift) e
+  have h1 : c + e + η • (reciprocalFrame k).shortShift = (c + η • (reciprocalFrame k).shortShift) + e := by abel
+  unfold ChildFrame.chainPotential
+  rw [h1]
+  linarith
+
+/-- If the increment satisfies the chain inequality along the edge, the chain potential does not increase along it. -/
+theorem chain_edge_le (k : ℕ) (F : Site → ℤ) (η : ℤ) (c e : Site)
+    (h : incr F e c - incr F e (c + η • (reciprocalFrame k).shortShift - (1, -1)) ≤ e.2) :
+    (reciprocalFrame k).chainPotential F η (c + e) ≤ (reciprocalFrame k).chainPotential F η c := by
+  have := chain_edge_sub k F η c e
+  linarith
+
 end FLatticePaper.EPolicy
