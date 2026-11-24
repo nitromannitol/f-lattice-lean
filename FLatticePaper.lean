@@ -171,6 +171,7 @@ import FLatticePaper.Plane.Induction.TwosSlipUnit
 import FLatticePaper.Plane.Induction.TwosSlipSaddle
 import FLatticePaper.Plane.Induction.TwosBaseSlip
 import FLatticePaper.Plane.Induction.TwosSlipMinus
+import FLatticePaper.Plane.Induction.TwosSlipMinusMono
 import FLatticePaper.Plane.Induction.ThreesMidpoint
 import FLatticePaper.Plane.Induction.ThreesLeaves
 import FLatticePaper.Plane.Induction.TwosLeaves
