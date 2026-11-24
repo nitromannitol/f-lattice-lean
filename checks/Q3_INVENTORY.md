@@ -770,3 +770,16 @@ Scope to confirm with the lead: §1's star containment needs `c = d − n ≥ 3`
 - Checks: `checks/MinPolicy.lean` (axioms: `[propext, Classical.choice, Quot.sound]`).
 - `MinAdmission.lean` (value-binary premises `F, g ∈ {0, 1}`, which the packet never gives) is removed; `MinPolicy.lapM_binary` is the
   admission the chain argument uses.
+
+### Task 72 / Q20 (the free root of a rise, at the deck representative): BothFreeRise.lean
+
+- `hfree` is restated at the representative (Q24): `FreeRiseRep frame η z` asks for one deck vector `δ = combine i j` with `z − δ` in
+  the closed polygon, free H or V, and `z − δ + ησ` free H or V (the same translate). The old literal form was false for plane roots
+  outside `E`, since `freeH`/`freeV` are subsets of `E`.
+- PROVED `rise_false_of_free`: the core rise contradiction (`both_free_rise_false` with the forced rise data) at free roots.
+- `chain_nonincreasing_of_free_roots` now takes `hfree` (at the representative), `hdeck` (the game policy is deck-equivariant) and
+  `hdrift` (the chain potential drifts by a constant along each deck vector). The rise test is on plane lifts; `hdeck` and `hdrift`
+  transport the rise to the representative. `hdeck` is a named input (the policy is chosen on representatives); `hdrift` is the packet's
+  drifts of `P` and `D_η` (fields of `StrongEstimates`), not yet derived here.
+- Checks: `checks/BothFreeRise.lean` (axioms unchanged).
+

@@ -135,23 +135,18 @@ theorem both_free_rise_false (frame : ChildFrame) {F : Field} (hS : frame.HasStr
       apply hvu
       rw [hu, hv, hag]
 
-/-- **The chain monotonicity from the free roots.** `Φ_η` does not increase along the sign-`η` game `G.game η` of the canonical signed
-games, given: the forced transfer (`hfree`: a rise's roots are free, the audit's finite unit forcing step, NOT yet formalized), and the
-shifted-V window at a rise (`hwin`, derivable from `z' ∈ freeV`: verified on all free V centres of the words of length ≤ 6). The
-prescription links are the fields `prescribed` of the two games (sign `η` and the opposite sign `−η`); the opposite policy's raw slip,
-quota and price come from its game; the unit increments from `HasUnitPrice`. -/
-theorem chain_nonincreasing_of_free_roots (frame : ChildFrame) {F : Field} (G : CanonicalSignedGames frame F)
+/-- **A rise at free roots is impossible.** At a sign-`η` policy edge `z → u` of the canonical signed games with
+`Φ_η z < Φ_η u`, the roots `z` and `z + ησ` cannot both be free: the two selections differ (`both_free_rise_false`), and the audit's
+forced transfer supplies the freeness (see `chain_nonincreasing_of_free_roots`). -/
+theorem rise_false_of_free (frame : ChildFrame) {F : Field} (G : CanonicalSignedGames frame F)
     (hS : frame.HasStrips F) {η : ℤ} (hη : η = 1 ∨ η = -1)
     (hc : 3 ≤ frame.child.den - frame.child.num)
     (hlapF : ∀ c, laplacian F c = -1 ∨ laplacian F c = 0) (hU : HasUnitPrice frame F)
-    (hfree : ∀ z u, (G.game η hη).policy z u → frame.chainPotential F η z < frame.chainPotential F η u →
-      (z ∈ frame.freeH ∨ z ∈ frame.freeV) ∧ (z + η • frame.shortShift ∈ frame.freeH ∨ z + η • frame.shortShift ∈ frame.freeV)) :
-    NonincreasingAlong (frame.chainPotential F η) (G.game η hη).policy := by
+    {z u : Site} (hu : (G.game η hη).policy z u) (hlt : frame.chainPotential F η z < frame.chainPotential F η u)
+    (hzF : z ∈ frame.freeH ∨ z ∈ frame.freeV)
+    (hzG : z + η • frame.shortShift ∈ frame.freeH ∨ z + η • frame.shortShift ∈ frame.freeV) : False := by
   set C := G.game η hη with hC
   set O := G.game (-η) (neg_unit hη) with hO
-  intro z u hu
-  by_contra hlt
-  rw [not_le] at hlt
   have hin : u = incomingNeg z ∨ u = incomingPos z := C.policyEdge z u hu
   -- the unit shifted-price increment on the F-policy edge, from `HasUnitPrice` at the even-translated edge `(u + ησ, z + ησ)`
   have hunit : ∀ a b, C.policy a b →
@@ -167,7 +162,6 @@ theorem chain_nonincreasing_of_free_roots (frame : ChildFrame) {F : Field} (G : 
     omega
   obtain ⟨hgF, hF, -, -, hPs, v, hv1, hv2, hvQ⟩ := TwoRank.rise_local_frame frame C hη O.policy
     (rawSlip_of_canonical O) O.quota (price_nonincreasing_of_canonical O) hlapF hunit hu hin hlt
-  obtain ⟨hzF, hzG⟩ := hfree z u hu hlt
   -- the input `u + ησ` of the shifted centre, from the edge `u → z` translated by the even shift
   have hs : ((η • frame.shortShift).1 + (η • frame.shortShift).2) % 2 = 0 := by
     obtain ⟨k, hk⟩ : (2 : ℤ) ∣ frame.shortShift.1 + frame.shortShift.2 :=
@@ -175,5 +169,42 @@ theorem chain_nonincreasing_of_free_roots (frame : ChildFrame) {F : Field} (G : 
     rcases hη with h | h <;> simp only [h, Prod.smul_fst, Prod.smul_snd, smul_eq_mul] <;> omega
   have hu' := TwoRank.edge_add_of_even (η • frame.shortShift) hs (C.policyEdge z u hu)
   exact both_free_rise_false frame hS hη hc C.prescribed O.prescribed hu hF hgF hzF hzG hv2 hvQ hu' hPs
+
+/-- **The free root of a rise, at the deck representative.** There is a deck vector `δ = combine i j` such that the representative
+`z − δ` of the root lies in the closed polygon `E`, is a free H or V centre, and its shifted root `z − δ + ησ` (the same translate) is
+a free H or V centre. -/
+def FreeRiseRep (frame : ChildFrame) (η : ℤ) (z : Site) : Prop :=
+  ∃ i j : ℤ,
+    z - frame.child.modifiedDeck.combine i j ∈ frame.closedPolygon ∧
+    (z - frame.child.modifiedDeck.combine i j ∈ frame.freeH ∨ z - frame.child.modifiedDeck.combine i j ∈ frame.freeV) ∧
+    (z - frame.child.modifiedDeck.combine i j + η • frame.shortShift ∈ frame.freeH ∨
+      z - frame.child.modifiedDeck.combine i j + η • frame.shortShift ∈ frame.freeV)
+
+/-- **The chain monotonicity from the free roots at the representative.** `Φ_η` does not increase along the sign-`η` game
+`G.game η`, given: (`hfree`) every rise's root is free at its deck representative (`FreeRiseRep`, the audit's forced-transfer step,
+NOT yet formalized); (`hdeck`) the canonical game policy is deck-equivariant (it is chosen on representatives); (`hdrift`) the chain
+potential drifts by a constant along each deck vector (the packet's drifts of `P` and `D_η`). The rise test is on the plane lifts;
+the transported rise `(z − δ, u − δ)` is then a rise at the representative, and `rise_false_of_free` applies. -/
+theorem chain_nonincreasing_of_free_roots (frame : ChildFrame) {F : Field} (G : CanonicalSignedGames frame F)
+    (hS : frame.HasStrips F) {η : ℤ} (hη : η = 1 ∨ η = -1)
+    (hc : 3 ≤ frame.child.den - frame.child.num)
+    (hlapF : ∀ c, laplacian F c = -1 ∨ laplacian F c = 0) (hU : HasUnitPrice frame F)
+    (hfree : ∀ z u, (G.game η hη).policy z u → frame.chainPotential F η z < frame.chainPotential F η u →
+      FreeRiseRep frame η z)
+    (hdeck : ∀ z u (i j : ℤ), (G.game η hη).policy z u →
+      (G.game η hη).policy (z - frame.child.modifiedDeck.combine i j) (u - frame.child.modifiedDeck.combine i j))
+    (hdrift : ∀ i j : ℤ, ∃ c : ℤ, ∀ x,
+      frame.chainPotential F η (x - frame.child.modifiedDeck.combine i j) = frame.chainPotential F η x + c) :
+    NonincreasingAlong (frame.chainPotential F η) (G.game η hη).policy := by
+  intro z u hu
+  by_contra hnot
+  rw [not_le] at hnot
+  obtain ⟨i, j, -, hF1, hF2⟩ := hfree z u hu hnot
+  obtain ⟨c, hcd⟩ := hdrift i j
+  have hlt : frame.chainPotential F η (z - frame.child.modifiedDeck.combine i j) <
+      frame.chainPotential F η (u - frame.child.modifiedDeck.combine i j) := by
+    rw [hcd, hcd]
+    linarith
+  exact rise_false_of_free frame G hS hη hc hlapF hU (hdeck z u i j hu) hlt hF1 hF2
 
 end FLatticePaper.BothFreeRise
