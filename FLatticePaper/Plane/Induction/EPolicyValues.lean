@@ -1519,4 +1519,137 @@ theorem incr_T (k : ℕ) (e z : Site) :
   rw [h1, pT (z + e), pT z]
   linarith
 
+/-- The unit increment is invariant under the kernel translation `U = (d, 1)`. -/
+theorem incr_U_inv (k : ℕ) (e z : Site) :
+    incr (reciprocalField k) e (z + ((2 * (k : ℤ) + 3), 1)) = incr (reciprocalField k) e z := by
+  unfold incr
+  have h1 : z + ((2 * (k : ℤ) + 3), 1) + e = (z + e) + ((2 * (k : ℤ) + 3), 1) := by abel
+  rw [h1, reciprocalField_add_U k (z + e), reciprocalField_add_U k z]
+
+/-- The increment along `(1, 0)` at `(d + 1, 0)` vanishes. -/
+theorem incr_right0 (k : ℕ) : incr (reciprocalField k) (1, 0) (2 * (k : ℤ) + 4, 0) = 0 := by
+  have h1 := incr_T k (1, 0) (2 * (k : ℤ) + 4, 0)
+  have hT : (2 * (k : ℤ) + 4, 0) + (1 - (2 * (k : ℤ) + 3), 1 + (2 * (k : ℤ) + 3)) = (2, (2 * (k : ℤ) + 3) + 1) := by ext <;> (simp; try ring)
+  rw [hT] at h1
+  have h2 := incr_U_inv k (1, 0) (2 - (2 * (k : ℤ) + 3), (2 * (k : ℤ) + 3))
+  have hU : (2 - (2 * (k : ℤ) + 3), (2 * (k : ℤ) + 3)) + ((2 * (k : ℤ) + 3), 1) = (2, (2 * (k : ℤ) + 3) + 1) := by ext <;> (simp; try ring)
+  rw [hU] at h2
+  have h3 := incr_hG k 1 (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3) + 1) (2 * (k : ℤ) + 3) (by omega))
+    (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))
+  unfold hG at h3
+  rw [if_neg (not_stairCorner _ (2 - (2 * (k : ℤ) + 3) + 1) (2 * (k : ℤ) + 3) (by omega)), if_neg (not_stairCorner _ (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))] at h3
+  have h4 : incr (reciprocalField k) (1, 0) (2, (2 * (k : ℤ) + 3) + 1) = 1 := by
+    rw [h2, h3]
+    omega
+  norm_num at h1
+  linarith
+
+/-- The increment along `(1, 0)` at `(d, 1)` vanishes. -/
+theorem incr_right1 (k : ℕ) : incr (reciprocalField k) (1, 0) ((2 * (k : ℤ) + 3), 1) = 0 := by
+  have h2 := incr_U_inv k (1, 0) ((0 : ℤ), (0 : ℤ))
+  have hU : ((0 : ℤ), (0 : ℤ)) + ((2 * (k : ℤ) + 3), 1) = ((2 * (k : ℤ) + 3), 1) := by ext <;> simp
+  rw [hU] at h2
+  rw [h2]
+  have hp00 : ((0 : ℤ), (0 : ℤ)) ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites := by
+    rw [BaseMask.mem_stairEven_raw_iff]
+    exact ⟨⟨by omega, by omega⟩, ⟨by omega, by omega⟩, Or.inl (Or.inl ⟨rfl, rfl⟩)⟩
+  have hp10 : ((1 : ℤ), (0 : ℤ)) ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites := mem_raw_of_box k 1 0 (by omega)
+  have e : ((0 : ℤ), (0 : ℤ)) + (1, 0) = (1, 0) := by ext <;> simp
+  have key := incr_raw_stair k (1, 0) ((0 : ℤ), (0 : ℤ)) hp00 (by rw [e]; exact hp10)
+  rw [key, e]
+  unfold BaseMask.stairEvenValue
+  simp [BaseMask.StairEvenCorner]
+
+/-- **Bottom row, the right end (centre `(d - 1, 0)`), slip.** -/
+theorem bot_R_D (k : ℕ) (η x : ℤ) (hη : η = 1 ∨ η = -1) (hk : 1 ≤ (k : ℤ)) (hx : x = 2 * (k : ℤ) + 2) :
+    incr (reciprocalField k) (1, 0) (x, 0) ≤ incr (reciprocalField k) (1, 0) (x - 2 * η, 0) := by
+  have i1 := incr_hG k 1 x 0 (mem_raw_of_box k (x + 1) 0 (by omega)) (mem_raw_of_box k x 0 (by omega))
+  rcases hη with rfl | rfl
+  · have i2 := incr_hG k 1 (x - 2 * 1) 0 (mem_raw_of_box k (x - 2 * 1 + 1) 0 (by omega))
+      (mem_raw_of_box k (x - 2 * 1) 0 (by omega))
+    rw [i1, i2]
+    unfold hG
+    rw [if_neg (not_stairCorner _ (x + 1) 0 (by omega)), if_neg (not_stairCorner _ x 0 (by omega)),
+      if_neg (not_stairCorner _ (x - 2 * 1 + 1) 0 (by omega)), if_neg (not_stairCorner _ (x - 2 * 1) 0 (by omega))]
+    omega
+  · have hp : x - 2 * -1 = 2 * (k : ℤ) + 4 := by omega
+    rw [i1, hp, incr_right0 k]
+    unfold hG
+    rw [if_neg (not_stairCorner _ (x + 1) 0 (by omega)), if_neg (not_stairCorner _ x 0 (by omega))]
+    omega
+
+/-- **Bottom row, the right end, price.** -/
+theorem bot_R_P (k : ℕ) (x : ℤ) (hk : 1 ≤ (k : ℤ)) (hx : x = 2 * (k : ℤ) + 2) :
+    incr (reciprocalField k) (1, 0) (x, 0) - incr (reciprocalField k) (1, 0) (x - 1, 1) ≤ 0 := by
+  have i1 := incr_hG k 1 x 0 (mem_raw_of_box k (x + 1) 0 (by omega)) (mem_raw_of_box k x 0 (by omega))
+  have i3 := incr_hG k 1 (x - 1) 1 (mem_raw_of_box k (x - 1 + 1) 1 (by omega))
+    (mem_raw_of_box k (x - 1) 1 (by omega))
+  rw [i1, i3]
+  unfold hG
+  rw [if_neg (not_stairCorner _ (x + 1) 0 (by omega)), if_neg (not_stairCorner _ x 0 (by omega)),
+    if_neg (not_stairCorner _ (x - 1 + 1) 1 (by omega)), if_neg (not_stairCorner _ (x - 1) 1 (by omega))]
+  omega
+
+/-- **Bottom row, the right end, chain.** -/
+theorem bot_R_Phi (k : ℕ) (η x : ℤ) (hη : η = 1 ∨ η = -1) (hk : 1 ≤ (k : ℤ)) (hx : x = 2 * (k : ℤ) + 2) :
+    incr (reciprocalField k) (1, 0) (x, 0) - incr (reciprocalField k) (1, 0) (x - 2 * η - 1, 1) ≤ 0 := by
+  have i1 := incr_hG k 1 x 0 (mem_raw_of_box k (x + 1) 0 (by omega)) (mem_raw_of_box k x 0 (by omega))
+  rcases hη with rfl | rfl
+  · have i4 := incr_hG k 1 (x - 2 * 1 - 1) 1 (mem_raw_of_box k (x - 2 * 1 - 1 + 1) 1 (by omega))
+      (mem_raw_of_box k (x - 2 * 1 - 1) 1 (by omega))
+    rw [i1, i4]
+    unfold hG
+    rw [if_neg (not_stairCorner _ (x + 1) 0 (by omega)), if_neg (not_stairCorner _ x 0 (by omega)),
+      if_neg (not_stairCorner _ (x - 2 * 1 - 1 + 1) 1 (by omega)), if_neg (not_stairCorner _ (x - 2 * 1 - 1) 1 (by omega))]
+    omega
+  · have hp : x - 2 * -1 - 1 = 2 * (k : ℤ) + 3 := by omega
+    rw [i1, hp, incr_right1 k]
+    unfold hG
+    rw [if_neg (not_stairCorner _ (x + 1) 0 (by omega)), if_neg (not_stairCorner _ x 0 (by omega))]
+    omega
+
+/-- **Bottom row, the right end, slip on the policy edge.** -/
+theorem slip_bot_R (k : ℕ) (η x s : ℤ) (hη : η = 1 ∨ η = -1) (hk : 1 ≤ (k : ℤ)) (hx : x = 2 * (k : ℤ) + 2)
+    (hpol : ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) (x, 0) ((x, 0) + (s, 0))) :
+    (reciprocalFrame k).slip (reciprocalField k) η ((x, 0) + (s, 0)) ≤ (reciprocalFrame k).slip (reciprocalField k) η (x, 0) := by
+  have hN : NativeP (2 * (k : ℤ) + 3) (x, 0) := by
+    unfold NativeP; left; dsimp only; omega
+  have hsgn := retention_bot_even k η x s hη hN (by omega) (by omega) hpol
+  subst hsgn
+  apply slip_edge_le (reciprocalField k) (reciprocalFrame k) η (x, 0) (1, 0)
+  have e1 : (x, 0) + η • (reciprocalFrame k).shortShift = (x - 2 * η, 0) := by
+    rw [smul_shortShift_recip k η]
+    ext <;> (simp; try ring)
+  rw [e1]
+  exact bot_R_D k η x hη hk hx
+
+/-- **Bottom row, the right end, price on the policy edge.** -/
+theorem price_bot_R (k : ℕ) (η x s : ℤ) (hη : η = 1 ∨ η = -1) (hk : 1 ≤ (k : ℤ)) (hx : x = 2 * (k : ℤ) + 2)
+    (hpol : ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) (x, 0) ((x, 0) + (s, 0))) :
+    (reciprocalFrame k).price (reciprocalField k) ((x, 0) + (s, 0)) ≤ (reciprocalFrame k).price (reciprocalField k) (x, 0) := by
+  have hN : NativeP (2 * (k : ℤ) + 3) (x, 0) := by
+    unfold NativeP; left; dsimp only; omega
+  have hsgn := retention_bot_even k η x s hη hN (by omega) (by omega) hpol
+  subst hsgn
+  apply price_edge_le k (reciprocalField k) (x, 0) (1, 0)
+  have e1 : (x, 0) - (1, -1) = (x - 1, 1) := by ext <;> (simp; try ring)
+  rw [e1]
+  exact bot_R_P k x hk hx
+
+/-- **Bottom row, the right end, chain on the policy edge.** -/
+theorem chain_bot_R (k : ℕ) (η x s : ℤ) (hη : η = 1 ∨ η = -1) (hk : 1 ≤ (k : ℤ)) (hx : x = 2 * (k : ℤ) + 2)
+    (hpol : ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) (x, 0) ((x, 0) + (s, 0))) :
+    (reciprocalFrame k).chainPotential (reciprocalField k) η ((x, 0) + (s, 0)) ≤
+      (reciprocalFrame k).chainPotential (reciprocalField k) η (x, 0) := by
+  have hN : NativeP (2 * (k : ℤ) + 3) (x, 0) := by
+    unfold NativeP; left; dsimp only; omega
+  have hsgn := retention_bot_even k η x s hη hN (by omega) (by omega) hpol
+  subst hsgn
+  apply chain_edge_le k (reciprocalField k) η (x, 0) (1, 0)
+  have e2 : (x, 0) + η • (reciprocalFrame k).shortShift - (1, -1) = (x - 2 * η - 1, 1) := by
+    rw [smul_shortShift_recip k η]
+    ext <;> (simp; try ring)
+  rw [e2]
+  exact bot_R_Phi k η x hη hk hx
+
 end FLatticePaper.EPolicy
