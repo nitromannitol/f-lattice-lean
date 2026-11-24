@@ -7,3 +7,5 @@ import FLatticePaper.Plane.Induction.EPolicyValues
 #print axioms FLatticePaper.EPolicy.F_U_pt
 #print axioms FLatticePaper.EPolicy.retained_sign_sum2
 #print axioms FLatticePaper.EPolicy.diagLow_D_horiz
+#print axioms FLatticePaper.EPolicy.diagLow_P_horiz
+#print axioms FLatticePaper.EPolicy.diagLow_Phi_horiz

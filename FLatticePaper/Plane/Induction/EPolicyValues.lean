@@ -537,4 +537,74 @@ theorem diagLow_D_horiz (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1)
       if_neg (not_stairCorner _ (x - 2 * -1 + -1) y (by omega))]
     omega
 
+/-- **Lower-left diagonal, horizontal price (sum 2).** On the sum-2 segment every site of the price is raw. -/
+theorem diagLow_P_horiz (k : ℕ) (x y s : ℤ) (hs : s = 1 ∨ s = -1)
+    (hsum : x + y = 2) (hy : 1 ≤ y) (hx : 6 - (2 * (k : ℤ) + 3) ≤ x)
+    (hsign : x = 1 ∨ (x ≤ 0 ∧ s = -1) ∨ (1 ≤ x ∧ s = 1)) :
+    incr (reciprocalField k) (s, 0) (x, y) - incr (reciprocalField k) (s, 0) (x - 1, y + 1) ≤ 0 := by
+  have e1 : ∀ a b : ℤ, (a, b) + (s, 0) = (a + s, b) := fun a b => by ext <;> simp
+  unfold incr
+  rw [e1 x y, e1 (x - 1) (y + 1)]
+  have htri := tri_up y
+  rcases hs with rfl | rfl
+  · rw [F_raw_pt k (x + 1) y (by omega), F_raw_pt k x y (by omega), F_raw_pt k (x - 1 + 1) (y + 1) (by omega),
+      F_raw_pt k (x - 1) (y + 1) (by omega)]
+    unfold BaseMask.stairEvenValue
+    dsimp only
+    rw [if_neg (not_stairCorner _ (x + 1) y (by omega)), if_neg (not_stairCorner _ x y (by omega)),
+      if_neg (not_stairCorner _ (x - 1 + 1) (y + 1) (by omega)), if_neg (not_stairCorner _ (x - 1) (y + 1) (by omega))]
+    omega
+  · rw [F_raw_pt k (x + -1) y (by omega), F_raw_pt k x y (by omega), F_raw_pt k (x - 1 + -1) (y + 1) (by omega),
+      F_raw_pt k (x - 1) (y + 1) (by omega)]
+    unfold BaseMask.stairEvenValue
+    dsimp only
+    rw [if_neg (not_stairCorner _ (x + -1) y (by omega)), if_neg (not_stairCorner _ x y (by omega)),
+      if_neg (not_stairCorner _ (x - 1 + -1) (y + 1) (by omega)), if_neg (not_stairCorner _ (x - 1) (y + 1) (by omega))]
+    omega
+
+/-- **Lower-left diagonal, horizontal chain (sum 2).** The shifted sites `(x - 2 eta - 1, y + 1)` are read through their
+`U`-translates when they leave the raw domain (eta = 1). -/
+theorem diagLow_Phi_horiz (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1) (hs : s = 1 ∨ s = -1)
+    (hsum : x + y = 2) (hy : 1 ≤ y) (hx : 6 - (2 * (k : ℤ) + 3) ≤ x)
+    (hsign : x = 1 ∨ (x ≤ 0 ∧ s = -1) ∨ (1 ≤ x ∧ s = 1)) :
+    incr (reciprocalField k) (s, 0) (x, y) - incr (reciprocalField k) (s, 0) (x - 2 * η - 1, y + 1) ≤ 0 := by
+  have e1 : ∀ a b : ℤ, (a, b) + (s, 0) = (a + s, b) := fun a b => by ext <;> simp
+  unfold incr
+  rw [e1 x y, e1 (x - 2 * η - 1) (y + 1)]
+  have htri := tri_up y
+  have htri2 := tri_up (y + 1)
+  rcases hη with rfl | rfl <;> rcases hs with rfl | rfl
+  · rw [F_raw_pt k (x + 1) y (by omega), F_raw_pt k x y (by omega), F_U_pt k (x - 2 * 1 - 1) (y + 1) (by omega),
+      F_raw_pt k (x - 2 * 1 - 1 + 1) (y + 1) (by omega)]
+    unfold BaseMask.stairEvenValue
+    dsimp only
+    rw [if_neg (not_stairCorner _ (x + 1) y (by omega)), if_neg (not_stairCorner _ x y (by omega)),
+      if_neg (not_stairCorner _ (x - 2 * 1 - 1 + (2 * (k : ℤ) + 3)) (y + 1 + 1) (by omega)),
+      if_neg (not_stairCorner _ (x - 2 * 1 - 1 + 1) (y + 1) (by omega))]
+    omega
+  · rw [F_raw_pt k (x + -1) y (by omega), F_raw_pt k x y (by omega), F_U_pt k (x - 2 * 1 - 1) (y + 1) (by omega),
+      F_U_pt k (x - 2 * 1 - 1 + -1) (y + 1) (by omega)]
+    unfold BaseMask.stairEvenValue
+    dsimp only
+    rw [if_neg (not_stairCorner _ (x + -1) y (by omega)), if_neg (not_stairCorner _ x y (by omega)),
+      if_neg (not_stairCorner _ (x - 2 * 1 - 1 + (2 * (k : ℤ) + 3)) (y + 1 + 1) (by omega)),
+      if_neg (not_stairCorner _ (x - 2 * 1 - 1 + -1 + (2 * (k : ℤ) + 3)) (y + 1 + 1) (by omega))]
+    omega
+  · rw [F_raw_pt k (x + 1) y (by omega), F_raw_pt k x y (by omega), F_raw_pt k (x - 2 * -1 - 1) (y + 1) (by omega),
+      F_raw_pt k (x - 2 * -1 - 1 + 1) (y + 1) (by omega)]
+    unfold BaseMask.stairEvenValue
+    dsimp only
+    rw [if_neg (not_stairCorner _ (x + 1) y (by omega)), if_neg (not_stairCorner _ x y (by omega)),
+      if_neg (not_stairCorner _ (x - 2 * -1 - 1) (y + 1) (by omega)),
+      if_neg (not_stairCorner _ (x - 2 * -1 - 1 + 1) (y + 1) (by omega))]
+    omega
+  · rw [F_raw_pt k (x + -1) y (by omega), F_raw_pt k x y (by omega), F_raw_pt k (x - 2 * -1 - 1) (y + 1) (by omega),
+      F_raw_pt k (x - 2 * -1 - 1 + -1) (y + 1) (by omega)]
+    unfold BaseMask.stairEvenValue
+    dsimp only
+    rw [if_neg (not_stairCorner _ (x + -1) y (by omega)), if_neg (not_stairCorner _ x y (by omega)),
+      if_neg (not_stairCorner _ (x - 2 * -1 - 1) (y + 1) (by omega)),
+      if_neg (not_stairCorner _ (x - 2 * -1 - 1 + -1) (y + 1) (by omega))]
+    omega
+
 end FLatticePaper.EPolicy
