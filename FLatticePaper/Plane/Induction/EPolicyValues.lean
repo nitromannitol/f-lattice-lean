@@ -251,4 +251,167 @@ theorem horiz_Phi_ineq (d η x y s : ℤ) (hd : d % 2 = 1) (hbox : 5 - d ≤ x �
     rw [if_pos hE] at h1
     split_ifs at h1 <;> (try simp only [Prod.mk.injEq] at *) <;> omega
 
+/-- The vertical stair increment: `vG y s` for the step `(0, s)` from row `y` (`s = ±1`). -/
+def vG (y s : ℤ) : ℤ := if s = 1 then -y else y + -1
+
+theorem tri_up (y : ℤ) : (y + 1) * (y + 1 - 1) / 2 - y * (y - 1) / 2 = y := by
+  have h : (y + 1) * (y + 1 - 1) = y * (y - 1) + 2 * y := by ring
+  rw [h]
+  generalize y * (y - 1) = A
+  omega
+
+theorem tri_down (y : ℤ) : y * (y - 1) / 2 - (y + -1) * (y + -1 - 1) / 2 = y + -1 := by
+  have h : y * (y - 1) = (y + -1) * (y + -1 - 1) + 2 * (y + -1) := by ring
+  rw [h]
+  generalize (y + -1) * (y + -1 - 1) = B
+  omega
+
+theorem not_stairCorner (d a b : ℤ) (h : ¬ ((a = 0 ∧ b = 0) ∨ (a = 2 ∧ b = d + 1))) :
+    ¬ BaseMask.StairEvenCorner d (a, b) := h
+
+/-- A site of the interior box is a raw site of the stair tile. -/
+theorem mem_raw_of_box (k : ℕ) (a b : ℤ)
+    (h : 2 - (2 * (k : ℤ) + 3) ≤ a ∧ a ≤ 2 * (k : ℤ) + 3 ∧ 0 ≤ b ∧ b ≤ 2 * (k : ℤ) + 3 + 1 ∧
+      1 ≤ a + b ∧ a + b ≤ 2 * (k : ℤ) + 3 + 2) :
+    (a, b) ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites := by
+  rw [BaseMask.mem_stairEven_raw_iff]
+  exact ⟨⟨h.1, h.2.1⟩, ⟨h.2.2.1, h.2.2.2.1⟩, Or.inr ⟨h.2.2.2.2.1, h.2.2.2.2.2⟩⟩
+
+/-- The horizontal increment of the reciprocal field at a raw site is `hG`. -/
+theorem incr_hG (k : ℕ) (s u v : ℤ) (hpt : (u + s, v) ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites)
+    (hu : (u, v) ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites) :
+    incr (reciprocalField k) (s, 0) (u, v) = hG (2 * (k : ℤ) + 3) u v s := by
+  have e : (u, v) + (s, 0) = (u + s, v) := by ext <;> simp
+  rw [incr_raw_stair k (s, 0) (u, v) hu (by rw [e]; exact hpt), e, stair_step_eq_hG]
+
+/-- The vertical increment of the reciprocal field at a raw site, away from the corners, is `vG`. -/
+theorem incr_vert (k : ℕ) (s x y : ℤ) (hs : s = 1 ∨ s = -1)
+    (h0 : (x, y) ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites)
+    (h1 : (x, y + s) ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites)
+    (c0 : ¬ ((x = 0 ∧ y = 0) ∨ (x = 2 ∧ y = 2 * (k : ℤ) + 3 + 1)))
+    (c1 : ¬ ((x = 0 ∧ y + s = 0) ∨ (x = 2 ∧ y + s = 2 * (k : ℤ) + 3 + 1))) :
+    incr (reciprocalField k) (0, s) (x, y) = vG y s := by
+  have e : (x, y) + (0, s) = (x, y + s) := by ext <;> simp
+  rw [incr_raw_stair k (0, s) (x, y) h0 (by rw [e]; exact h1), e]
+  rcases hs with rfl | rfl
+  · have h := tri_up y
+    rw [show vG y 1 = -y from by unfold vG; simp]
+    unfold BaseMask.stairEvenValue
+    dsimp only
+    rw [if_neg (not_stairCorner _ _ _ c1), if_neg (not_stairCorner _ _ _ c0)]
+    linarith
+  · have h := tri_down y
+    rw [show vG y (-1) = y + -1 from by unfold vG; norm_num]
+    unfold BaseMask.stairEvenValue
+    dsimp only
+    rw [if_neg (not_stairCorner _ _ _ c1), if_neg (not_stairCorner _ _ _ c0)]
+    linarith
+
+/-- The vertical price/chain inequality: `vG y s − vG (y + 1) s ≤ s`. -/
+theorem vG_one (y : ℤ) : vG y 1 = -y := by unfold vG; simp
+
+theorem vG_neg_one (y : ℤ) : vG y (-1) = y + -1 := by unfold vG; norm_num
+
+theorem vG_P (y s : ℤ) (hs : s = 1 ∨ s = -1) : vG y s - vG (y + 1) s ≤ s := by
+  rcases hs with rfl | rfl
+  · rw [vG_one, vG_one]; linarith
+  · rw [vG_neg_one, vG_neg_one]; linarith
+
+theorem smul_shortShift_recip (k : ℕ) (η : ℤ) : η • (reciprocalFrame k).shortShift = (-2 * η, 0) := by
+  rw [reciprocalFrame_shortShift]
+  ext <;> (simp; try ring)
+
+/-- **Horizontal slip on the interior box.** -/
+theorem slip_horiz_le (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1) (hs : s = 1 ∨ s = -1)
+    (hbox : 6 - (2 * (k : ℤ) + 3) ≤ x ∧ x ≤ 2 * (k : ℤ) + 3 - 3 ∧ 1 ≤ y ∧ y ≤ 2 * (k : ℤ) + 3 - 1 ∧
+      4 ≤ x + y ∧ x + y ≤ 2 * (k : ℤ) + 3 - 1)
+    (hpar : (x + y) % 2 = 0) (hret : x = 1 ∨ (s, 0) = selDisp (2 * (k : ℤ) + 3) η (x, y)) :
+    (reciprocalFrame k).slip (reciprocalField k) η ((x, y) + (s, 0)) ≤
+      (reciprocalFrame k).slip (reciprocalField k) η (x, y) := by
+  apply slip_edge_le (reciprocalField k) (reciprocalFrame k) η (x, y) (s, 0)
+  rw [smul_shortShift_recip k η]
+  have e1 : (x, y) + (-2 * η, 0) = (x - 2 * η, y) := by ext <;> (simp; try ring)
+  rw [e1, incr_hG k s x y (mem_raw_of_box k (x + s) y (by omega)) (mem_raw_of_box k x y (by omega)),
+    incr_hG k s (x - 2 * η) y (mem_raw_of_box k (x - 2 * η + s) y (by omega))
+      (mem_raw_of_box k (x - 2 * η) y (by omega))]
+  exact horiz_D_ineq (2 * (k : ℤ) + 3) η x y s (by omega) (by omega) hpar hret
+
+/-- **Vertical slip on the interior box** (no retention needed). -/
+theorem slip_vert_le (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1) (hs : s = 1 ∨ s = -1)
+    (hbox : 6 - (2 * (k : ℤ) + 3) ≤ x ∧ x ≤ 2 * (k : ℤ) + 3 - 3 ∧ 1 ≤ y ∧ y ≤ 2 * (k : ℤ) + 3 - 1 ∧
+      4 ≤ x + y ∧ x + y ≤ 2 * (k : ℤ) + 3 - 1) :
+    (reciprocalFrame k).slip (reciprocalField k) η ((x, y) + (0, s)) ≤
+      (reciprocalFrame k).slip (reciprocalField k) η (x, y) := by
+  apply slip_edge_le (reciprocalField k) (reciprocalFrame k) η (x, y) (0, s)
+  rw [smul_shortShift_recip k η]
+  have e1 : (x, y) + (-2 * η, 0) = (x - 2 * η, y) := by ext <;> (simp; try ring)
+  rw [e1, incr_vert k s x y hs (mem_raw_of_box k x y (by omega)) (mem_raw_of_box k x (y + s) (by omega))
+      (by omega) (by omega),
+    incr_vert k s (x - 2 * η) y hs (mem_raw_of_box k (x - 2 * η) y (by omega))
+      (mem_raw_of_box k (x - 2 * η) (y + s) (by omega)) (by omega) (by omega)]
+
+/-- **Horizontal price on the interior box.** -/
+theorem price_horiz_le (k : ℕ) (η x y s : ℤ) (hs : s = 1 ∨ s = -1)
+    (hbox : 6 - (2 * (k : ℤ) + 3) ≤ x ∧ x ≤ 2 * (k : ℤ) + 3 - 3 ∧ 1 ≤ y ∧ y ≤ 2 * (k : ℤ) + 3 - 1 ∧
+      4 ≤ x + y ∧ x + y ≤ 2 * (k : ℤ) + 3 - 1)
+    (hpar : (x + y) % 2 = 0) (hret : x = 1 ∨ (s, 0) = selDisp (2 * (k : ℤ) + 3) η (x, y)) :
+    (reciprocalFrame k).price (reciprocalField k) ((x, y) + (s, 0)) ≤
+      (reciprocalFrame k).price (reciprocalField k) (x, y) := by
+  apply price_edge_le k (reciprocalField k) (x, y) (s, 0)
+  have e1 : (x, y) - (1, -1) = (x - 1, y + 1) := by ext <;> (simp; try ring)
+  rw [e1, incr_hG k s x y (mem_raw_of_box k (x + s) y (by omega)) (mem_raw_of_box k x y (by omega)),
+    incr_hG k s (x - 1) (y + 1) (mem_raw_of_box k (x - 1 + s) (y + 1) (by omega))
+      (mem_raw_of_box k (x - 1) (y + 1) (by omega))]
+  dsimp only
+  have := horiz_P_ineq (2 * (k : ℤ) + 3) η x y s (by omega) (by omega) hpar hret
+  linarith
+
+/-- **Vertical price on the interior box** (no retention needed). -/
+theorem price_vert_le (k : ℕ) (x y s : ℤ) (hs : s = 1 ∨ s = -1)
+    (hbox : 6 - (2 * (k : ℤ) + 3) ≤ x ∧ x ≤ 2 * (k : ℤ) + 3 - 3 ∧ 1 ≤ y ∧ y ≤ 2 * (k : ℤ) + 3 - 1 ∧
+      4 ≤ x + y ∧ x + y ≤ 2 * (k : ℤ) + 3 - 1) :
+    (reciprocalFrame k).price (reciprocalField k) ((x, y) + (0, s)) ≤
+      (reciprocalFrame k).price (reciprocalField k) (x, y) := by
+  apply price_edge_le k (reciprocalField k) (x, y) (0, s)
+  have e1 : (x, y) - (1, -1) = (x - 1, y + 1) := by ext <;> (simp; try ring)
+  rw [e1, incr_vert k s x y hs (mem_raw_of_box k x y (by omega)) (mem_raw_of_box k x (y + s) (by omega))
+      (by omega) (by omega),
+    incr_vert k s (x - 1) (y + 1) hs (mem_raw_of_box k (x - 1) (y + 1) (by omega))
+      (mem_raw_of_box k (x - 1) (y + 1 + s) (by omega)) (by omega) (by omega)]
+  dsimp only
+  exact vG_P y s hs
+
+/-- **Horizontal chain on the interior box.** -/
+theorem chain_horiz_le (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1) (hs : s = 1 ∨ s = -1)
+    (hbox : 6 - (2 * (k : ℤ) + 3) ≤ x ∧ x ≤ 2 * (k : ℤ) + 3 - 3 ∧ 1 ≤ y ∧ y ≤ 2 * (k : ℤ) + 3 - 1 ∧
+      4 ≤ x + y ∧ x + y ≤ 2 * (k : ℤ) + 3 - 1)
+    (hpar : (x + y) % 2 = 0) (hret : x = 1 ∨ (s, 0) = selDisp (2 * (k : ℤ) + 3) η (x, y)) :
+    (reciprocalFrame k).chainPotential (reciprocalField k) η ((x, y) + (s, 0)) ≤
+      (reciprocalFrame k).chainPotential (reciprocalField k) η (x, y) := by
+  apply chain_edge_le k (reciprocalField k) η (x, y) (s, 0)
+  rw [smul_shortShift_recip k η]
+  have e2 : (x, y) + (-2 * η, 0) - (1, -1) = (x - 2 * η - 1, y + 1) := by ext <;> (simp; try ring)
+  rw [e2, incr_hG k s x y (mem_raw_of_box k (x + s) y (by omega)) (mem_raw_of_box k x y (by omega)),
+    incr_hG k s (x - 2 * η - 1) (y + 1) (mem_raw_of_box k (x - 2 * η - 1 + s) (y + 1) (by omega))
+      (mem_raw_of_box k (x - 2 * η - 1) (y + 1) (by omega))]
+  dsimp only
+  have := horiz_Phi_ineq (2 * (k : ℤ) + 3) η x y s (by omega) (by omega) hpar hret
+  linarith
+
+/-- **Vertical chain on the interior box** (no retention needed). -/
+theorem chain_vert_le (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1) (hs : s = 1 ∨ s = -1)
+    (hbox : 6 - (2 * (k : ℤ) + 3) ≤ x ∧ x ≤ 2 * (k : ℤ) + 3 - 3 ∧ 1 ≤ y ∧ y ≤ 2 * (k : ℤ) + 3 - 1 ∧
+      4 ≤ x + y ∧ x + y ≤ 2 * (k : ℤ) + 3 - 1) :
+    (reciprocalFrame k).chainPotential (reciprocalField k) η ((x, y) + (0, s)) ≤
+      (reciprocalFrame k).chainPotential (reciprocalField k) η (x, y) := by
+  apply chain_edge_le k (reciprocalField k) η (x, y) (0, s)
+  rw [smul_shortShift_recip k η]
+  have e2 : (x, y) + (-2 * η, 0) - (1, -1) = (x - 2 * η - 1, y + 1) := by ext <;> (simp; try ring)
+  rw [e2, incr_vert k s x y hs (mem_raw_of_box k x y (by omega)) (mem_raw_of_box k x (y + s) (by omega))
+      (by omega) (by omega),
+    incr_vert k s (x - 2 * η - 1) (y + 1) hs (mem_raw_of_box k (x - 2 * η - 1) (y + 1) (by omega))
+      (mem_raw_of_box k (x - 2 * η - 1) (y + 1 + s) (by omega)) (by omega) (by omega)]
+  dsimp only
+  exact vG_P y s hs
+
 end FLatticePaper.EPolicy
