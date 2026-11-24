@@ -783,3 +783,38 @@ Scope to confirm with the lead: §1's star containment needs `c = d − n ≥ 3`
   drifts of `P` and `D_η` (fields of `StrongEstimates`), not yet derived here.
 - Checks: `checks/BothFreeRise.lean` (axioms unchanged).
 
+### Task 72 / twos base (the closed form and the deck reduction of standardField (2^(k+1))): TwosValues.lean
+
+- PROVED `standardField_twos_eq_paperNear`: for z in the closed polygon of 2^(k+1), `standardField (2^(k+1)) z =
+  paperNearLadderValue (2k+4) (z.1, z.2 + 1)` (no hypothesis: `twos_standardField_eq_rotate`, `rotate_eq_on_E`, and the ladder
+  extension of `ladderOdd_exists_extension`). The archive's native domain of the doubled ladder lies in this polygon, and its chart is
+  the identity.
+- PROVED `standardField_twos_reduction`: `2 F(z) = 2 P(y) + 2 j (−t(y) + cV) − T j (j−1)` for `z = y + combine i j`, `y` in the closed
+  polygon, with the period constants of `twos_standardField_periods`.
+- Numerics (scripts route in scratchpad twos_base_numerics.py), k = 0..4: slip range [0,2] on E, unit slip, no even slip saddle, unit
+  price, no price saddle, price range [cutPrice−1, cutPrice], price drifts (−1, 0), slip drifts (0, 2η), zero strip and zero even line of
+  quarterTurnField: all hold.
+- Checks: checks/TwosValues.lean (axioms standard). Root build: 0 warnings, 0 linter notes, 0 errors.
+- NOT yet: the increments (HasUnitSlip, HasUnitPrice), NoEvenSlipSaddle, NoPriceSaddle, the drifts, the zero strips and the price range
+  as Lean theorems; BaseSlip and StrongResidual minus the policy field at 2^(k+1).
+
+
+### Task 72 / twos base (the drifts of the price and of the short slip of standardField (2^(k+1))): TwosDrifts.lean
+- PROVED: `twos_slip_drift_kernel` (D_η(z+U) − D_η z = 0), `twos_slip_drift_transverse` (= 2η for η = ±1),
+  `twos_price_drift_kernel` (P(z+U) − P z = −1), `twos_price_drift_transverse` (P(z+T) − P z = 0), from the period lemmas
+  `period_kernel_apply`, `period_transverse_apply` (for any field with the period constants (0, cV)) and the explicit frame
+  (`twos_eps_explicit`, `twos_parents_explicit`, `twos_shortShift_explicit`, `twos_parentShift_explicit`,
+  `twos_parentSlope_explicit`, `twos_kernel_explicit`, `twos_transverse_explicit`, `twos_transverseGrade_explicit`).
+- Periods: `twos_standardField_hasPeriods k : HasGeneratorPeriods (frameAt (2^(k+1))).child (standardField (2^(k+1))) 0 (ladderEvenConstantV (2k+4))`.
+- Checks: checks/TwosDrifts.lean (axioms standard). Root build: 0 warnings, 0 linter notes, 0 errors.
+- Zero strip: see the TwosZeroStrip entry below (it is free from the packet).
+- Price range [cutPrice−1, cutPrice] on E checked numerically (k = 0..3); z − parentShift leaves E for about 40% of E. NOT yet in Lean:
+  the price range, the increments, BaseSlip and StrongResidual minus the policy field.
+
+### Task 72 / twos base (the zero strip field of StrongResidual at 2^(k+1)): TwosZeroStrip.lean
+- PROVED: `twos_zeroStripInterval k`, the `zeroStripInterval` field of `StrongResidual (2^(k+1))`, from `twos_packet_standard`
+  (with `twos_zero_strip` and `twos_harm_strip`) and `W1ZeroStrip.zeroStripInterval_of_packet`. No new arithmetic.
+- Checks: checks/TwosZeroStrip.lean (axioms standard).
+- Corrects the drift entry above: the zero strip does not need the piecewise representatives; it is free from the packet.
+- Still open for StrongResidual (2^(k+1)): zeroEvenLine (needs priceRange, the drifts, and an odd seed F w = harmonicGrid w on
+  sGrade = 2−3d+n), priceRange, F1_unitPrice, F1_noPriceSaddle; and BaseSlip (F1_unitSlip, F1_noSlipSaddle, slipRange).
