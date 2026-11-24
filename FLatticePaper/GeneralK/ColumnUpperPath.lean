@@ -8,7 +8,6 @@ private theorem cast_emod_toNat (value : ℤ) {period : ℕ} (hpos : 0 < period)
     (((value % (period : ℤ)).toNat : ℕ) : ℤ) = value % (period : ℤ) :=
   Int.toNat_of_nonneg (Int.emod_nonneg _ (by exact_mod_cast hpos.ne'))
 
-set_option maxHeartbeats 800000 in
 /-- An actual column restriction whose correction lies within the exact shape
 alphabet has first-entry growth at most the largest cycle endpoint. -/
 theorem le_cyclePeak_of_bounded_column_restriction (slice : ColumnSlice) (sector : slice.Sector)
