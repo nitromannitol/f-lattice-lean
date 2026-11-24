@@ -224,4 +224,63 @@ theorem candDisp_high_up {a p q : ℤ} (hH : CandHigh a p q) (hm : ¬ q < 2 * a 
   unfold candDisp
   rw [if_neg hnE, if_neg hnW, if_pos (Or.inr hH), if_neg hnL, if_neg hm]
 
+/-- The free table on the H site `(1,0)`. -/
+theorem freeDisp_H0 {a η x y : ℤ} (hH0 : x = 1 ∧ y = 0) : freeDisp a η x y = (0, -η) := by
+  unfold freeDisp
+  rw [if_pos (show FreeHSite a x y from Or.inl hH0), if_pos hH0]
+
+/-- The free table on an even H site other than `(1,0)`. -/
+theorem freeDisp_Heven {a η x y : ℤ} (hH : FreeHSite a x y) (hn : ¬ (x = 1 ∧ y = 0)) (he : EvenSite (x, y)) :
+    freeDisp a η x y = (1, 0) := by
+  unfold freeDisp
+  rw [if_pos hH, if_neg hn, if_pos he]
+
+/-- The free table on an odd H site. -/
+theorem freeDisp_Hodd {a η x y : ℤ} (hH : FreeHSite a x y) (hn : ¬ (x = 1 ∧ y = 0)) (ho : ¬ EvenSite (x, y)) :
+    freeDisp a η x y = (0, 1) := by
+  unfold freeDisp
+  rw [if_pos hH, if_neg hn, if_neg ho]
+
+/-- The free table on `V_0 = (0,0)`. -/
+theorem freeDisp_V0 {a η x y : ℤ} (hV0 : x = 0 ∧ y = 0) : freeDisp a η x y = (1, 0) := by
+  have hnH : ¬ FreeHSite a x y := by
+    simp only [FreeHSite]
+    omega
+  unfold freeDisp
+  rw [if_neg hnH, if_pos hV0]
+
+/-- The free table on an even V site other than `(0,0)`. -/
+theorem freeDisp_Veven {a η x y : ℤ} (hV : FreeVSite a x y) (hn : ¬ (x = 0 ∧ y = 0)) (he : EvenSite (x, y)) :
+    freeDisp a η x y = (η, 0) := by
+  have hnH : ¬ FreeHSite a x y := by
+    simp only [FreeVSite, FreeHSite] at hV ⊢
+    omega
+  unfold freeDisp
+  rw [if_neg hnH, if_neg hn, if_pos he]
+
+/-- The free table on an odd V site. -/
+theorem freeDisp_Vodd {a η x y : ℤ} (hV : FreeVSite a x y) (hn : ¬ (x = 0 ∧ y = 0)) (ho : ¬ EvenSite (x, y)) :
+    freeDisp a η x y = (0, -η) := by
+  have hnH : ¬ FreeHSite a x y := by
+    simp only [FreeVSite, FreeHSite] at hV ⊢
+    omega
+  unfold freeDisp
+  rw [if_neg hnH, if_neg hn, if_neg ho]
+
+/-- The generic free witness: a white corner `v` of the square, with a free alias `h` (an H or V site), whose retained input
+`v + freeDisp h` leaves the square, gives the square clause for the sign `η`. -/
+theorem sq_of_free_witness {a η : ℤ} {F : Field} {u v h : Site} (hv : SqCorner u v) (hlap : laplacian F v = 0)
+    (hh : AliasOf a v h) (hfs : FreeSite a h.1 h.2)
+    (hout : SqOut u (v.1 + (freeDisp a η h.1 h.2).1, v.2 + (freeDisp a η h.1 h.2).2)) : SqClause a η F u :=
+  ⟨v, hv, hlap, _, (twosSel_white_freeClass hlap ⟨h, hh, hfs⟩).mpr ⟨h, hh, hfs, rfl⟩, hout⟩
+
+/-- The free witness with explicit coordinates of the free alias and an explicit displacement `d` of the free table. -/
+theorem sq_of_free_witness' {a η : ℤ} {F : Field} {u v : Site} {h1 h2 : ℤ} {d : Site} (hv : SqCorner u v)
+    (hlap : laplacian F v = 0) (hh : AliasOf a v (h1, h2)) (hfs : FreeSite a h1 h2) (hdisp : freeDisp a η h1 h2 = d)
+    (hout : SqOut u (v.1 + d.1, v.2 + d.2)) : SqClause a η F u := by
+  refine ⟨v, hv, hlap, (v.1 + d.1, v.2 + d.2), ?_, hout⟩
+  refine (twosSel_white_freeClass hlap ⟨(h1, h2), hh, hfs⟩).mpr ⟨(h1, h2), hh, hfs, ?_⟩
+  show (v.1 + d.1, v.2 + d.2) = (v.1 + (freeDisp a η h1 h2).1, v.2 + (freeDisp a η h1 h2).2)
+  rw [hdisp]
+
 end FLatticePaper.TwosEPolicy
