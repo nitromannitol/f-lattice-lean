@@ -137,6 +137,13 @@ import FLatticePaper.Plane.Induction.TwosField
 import FLatticePaper.Plane.Induction.TwosSheets
 import FLatticePaper.Plane.Induction.TwosChain
 import FLatticePaper.Plane.Induction.TwosReciprocal
+import FLatticePaper.Plane.Induction.ReciprocalIncrements
+import FLatticePaper.Plane.Induction.PureBasePrice
+import FLatticePaper.Plane.Induction.PureBaseUnitPrice
+import FLatticePaper.Plane.Induction.PolygonRaw
+import FLatticePaper.Plane.Induction.PriceRange
+import FLatticePaper.Plane.Induction.NoSaddle
+import FLatticePaper.Plane.Induction.SlipBase
 import FLatticePaper.Plane.Induction.ThreesMidpoint
 import FLatticePaper.Plane.Induction.ThreesLeaves
 import FLatticePaper.Plane.Induction.TwosLeaves
@@ -245,6 +252,9 @@ import FLatticePaper.Tiles.StandardSimple
 import FLatticePaper.Tiles.ArcInequality
 import FLatticePaper.Tiles.CheckerFree
 import FLatticePaper.Tiles.SeamFinal
+import FLatticePaper.Tiles.SeamBase
+import FLatticePaper.Tiles.InterfaceStacked
+import FLatticePaper.Tiles.StringCorners
 import FLatticePaper.Tiles.SeamSymm
 import FLatticePaper.Tiles.RightSub
 import FLatticePaper.Tiles.OriginCell
@@ -530,5 +540,15 @@ import FLatticePaper.Plane.Induction.EHPrice
 import FLatticePaper.Plane.Induction.PriceInputs
 import FLatticePaper.Plane.Induction.CutRows
 import FLatticePaper.Construction.PureRank
+import FLatticePaper.Construction.PureRankWhite
+import FLatticePaper.Construction.PureRankPlus
+import FLatticePaper.Construction.PureRankPlusWhite
+import FLatticePaper.Construction.EPolicy
+import FLatticePaper.Plane.Induction.EPolicyLap
+import FLatticePaper.Plane.Induction.EPolicyFields
+import FLatticePaper.Plane.Induction.EPolicyFreeV
+import FLatticePaper.Plane.Induction.EPolicyPrescribed
+import FLatticePaper.Plane.Induction.EPolicySquares
+import FLatticePaper.Plane.Induction.EPolicyValues
 
 /-! Root import for the corrected F-lattice paper. -/
