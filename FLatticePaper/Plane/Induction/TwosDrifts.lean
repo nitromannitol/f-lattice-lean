@@ -52,7 +52,8 @@ theorem twos_parentShift_explicit (k : ℕ) :
     (frameAt (List.replicate (k + 1) Digit.two)).parentShift = (1, -(2 * (k : ℤ) + 3)) := by
   unfold ChildFrame.parentShift
   rw [twos_eps_explicit, twos_parents_explicit]
-  ext <;> simp <;> ring
+  ext <;> simp
+  ring
 
 theorem twos_parentSlope_explicit (k : ℕ) (z : Site) :
     (frameAt (List.replicate (k + 1) Digit.two)).parentSlope z =
@@ -64,7 +65,7 @@ theorem twos_shortShift_explicit (k : ℕ) :
     (frameAt (List.replicate (k + 1) Digit.two)).shortShift = (-2 * ((k : ℤ) + 2), -2 * ((k : ℤ) + 1)) := by
   unfold ChildFrame.shortShift
   rw [twos_eps_explicit, twos_parents_explicit]
-  ext <;> simp <;> ring
+  ext <;> simp
 
 theorem twos_child_explicit (k : ℕ) :
     (frameAt (List.replicate (k + 1) Digit.two)).child = ⟨2 * (k : ℤ) + 3, 2 * (k : ℤ) + 5⟩ :=
@@ -77,7 +78,8 @@ theorem twos_kernel_explicit (k : ℕ) :
 theorem twos_transverse_explicit (k : ℕ) :
     (frameAt (List.replicate (k + 1) Digit.two)).child.modifiedDeck.transverse = (-2, 4 * (k : ℤ) + 8) := by
   rw [ChildFrame.child_modifiedDeck_transverse, twos_child_explicit]
-  ext <;> simp <;> ring
+  ext <;> simp
+  ring
 
 theorem twos_transverseGrade_explicit (k : ℕ) (z : Site) :
     (frameAt (List.replicate (k + 1) Digit.two)).child.transverseGrade z =
@@ -103,7 +105,7 @@ theorem twos_slip_drift_kernel (k : ℕ) (η : ℤ) (z : Site) :
   ring
 
 /-- **The slip drift along the transverse.** `D_η(z + T) − D_η z = 2η` for `η = ±1`. -/
-theorem twos_slip_drift_transverse (k : ℕ) (η : ℤ) (hη : η = 1 ∨ η = -1) (z : Site) :
+theorem twos_slip_drift_transverse (k : ℕ) (η : ℤ) (_hη : η = 1 ∨ η = -1) (z : Site) :
     (frameAt (List.replicate (k + 1) Digit.two)).slip
         (standardField (List.replicate (k + 1) Digit.two)) η
         (z + (frameAt (List.replicate (k + 1) Digit.two)).child.modifiedDeck.transverse) -
