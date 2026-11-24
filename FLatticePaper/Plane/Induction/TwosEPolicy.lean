@@ -89,6 +89,85 @@ def TwosSel (a η : ℤ) (F : Field) (c i : Site) : Prop :=
      (¬ FreeClass a c ∧ ∃ u, AliasOf a c u ∧ NativeT a u.1 u.2 ∧ CandGuard a u.1 u.2 ∧
         i = (c.1 + (candDisp a u.1 u.2).1, c.2 + (candDisp a u.1 u.2).2))))
 
+/-- The period-lattice class key: `key c = (n c.1 - d c.2) mod T` with `n = a-1`, `d = a+1`, `T = 2a^2+4a-2`. -/
+def classKey (a : ℤ) (c : Site) : ℤ := ((a - 1) * c.1 - (a + 1) * c.2) % (2 * a * a + 4 * a - 2)
+
+/-- The closed tile: the native points, except the duplicated free copies `v + U` and `v + V` of native H/V sites (the copies
+that are not H/V sites themselves). Checked against the computed tile, one site per class, for `a = 4, 6, 8, 10`
+(`scripts/twos_tile_rank.py`). -/
+def TwosTile (a : ℤ) (p : Site) : Prop :=
+  NativeT a p.1 p.2 ∧
+    ¬ ((∃ v : Site, FreeSite a v.1 v.2 ∧ NativeT a v.1 v.2 ∧
+          (p = (v.1 + (a + 1), v.2 + (a - 1)) ∨ p = (v.1 - 2, v.2 + 2 * a))) ∧ ¬ FreeSite a p.1 p.2)
+
+/-- The H-table value of the archive's `freer` (`globalrank.py`). -/
+def freeH (a η x _y : ℤ) : ℤ :=
+  let j := if x = 1 then 0 else x - 1
+  if η = 1 then (if j = 0 then 2 * a + 1 else if j = a then 1 else 2 * (a + 1 - x))
+  else (if j = 0 then 4 else if j = 1 then 1 else if j = a then 6 else 2 * a + 7 - 2 * x)
+
+/-- The V-table value of the archive's `freer` (`globalrank.py`). -/
+def freeV (a η _x y : ℤ) : ℤ :=
+  let r := y - a
+  if η = 1 then (if y < a then 2 * y - y % 2 else 2 * r + 1 + r % 2)
+  else if y = 0 then 5
+    else if y < a then 2 * a + 3 - 2 * y - y % 2
+    else if y = a then 2
+    else if y = a + 1 then 1
+    else 2 * a + 4 - 2 * r + r % 2
+
+/-- The bulk value of the archive (`globalrank.py` `bulkr`). -/
+def bulkR (a η x y : ℤ) : ℤ :=
+  let h := y - x
+  let o := (x + y) % 2
+  let cen := if h ≤ a - 2 then a - 1 else 2 * a - 1
+  let off := if h ≤ a - 2 then 2 * a - 2 else 2 * a
+  let dd := y - cen
+  let r0 := off - 2 * (if dd < 0 then -dd else dd) - o
+  let r := if η = -1 then (if y = cen + 1 then 1 - o else r0 + (if y < cen + 1 then 1 else 5)) else r0
+  let first := if η = 1 then (if x = a then 2 * a - 3 else 2 * a + 1 - 2 * y)
+    else (if x = 2 then 2 else 2 * a + 6 - 2 * y)
+  let mid := if η = 1 then 2 * x + 3 else (if x = 1 then 2 * a else 2 * x + 4)
+  if h = -1 then first else if h = a - 1 then mid else r
+
+/-- The nine alias addresses of `(X, Y)` in the archive's order (`globalrank.py` `addresses`). -/
+def aliasAddrs (a X Y : ℤ) : List Site :=
+  [(0, 0), (0, -1), (0, 1), (-1, 0), (-1, -1), (-1, 1), (1, 0), (1, -1), (1, 1)].map
+    (fun il => (X - il.1 * (a + 1) + 2 * il.2, Y - il.1 * (a - 1) - 2 * a * il.2))
+
+/-- The first true guard's value, else the default (the archive's nested `If`). -/
+def pickFirst : List (Prop × ℤ) → ℤ → ℤ
+  | [], d => d
+  | (g, v) :: rest, d => if g then v else pickFirst rest d
+
+/-- The archive's `deckrank` at `(X, Y)`: the free offers of the nine addresses (in order), then the bulk offers. -/
+def deckAt (a η X Y : ℤ) : ℤ :=
+  let addrs := aliasAddrs a X Y
+  pickFirst
+    (addrs.flatMap (fun u => [(FreeHSite a u.1 u.2, freeH a η u.1 u.2), (FreeVSite a u.1 u.2, freeV a η u.1 u.2)]) ++
+      addrs.map (fun u => (NativeT a u.1 u.2, bulkR a η u.1 u.2)))
+    (-1000)
+
+/-- A tile point of the class `k`. The tile has one point per class, so this is that point (`Classical.epsilon`). -/
+def tilePoint (a k : ℤ) : Site := Classical.epsilon (fun p => TwosTile a p ∧ classKey a p = k)
+
+/-- The deck-periodic rank: the archive's `deckrank` at the tile point of the class of `c`. It depends only on `classKey`, so it
+is periodic under the period lattice. -/
+def rhoTwos (a η : ℤ) (c : Site) : ℤ :=
+  deckAt a η (tilePoint a (classKey a c)).1 (tilePoint a (classKey a c)).2
+
+/-- Black centres (`laplacian = -1`) keep both incoming inputs. -/
+theorem twosSel_black {a η : ℤ} {F : Field} {c i : Site} (h : laplacian F c = -1) :
+    TwosSel a η F c i ↔ (i = incomingNeg c ∨ i = incomingPos c) := by
+  simp [TwosSel, h, Edge]
+
+/-- A white centre of a free class keeps only the free-table input of its free alias. -/
+theorem twosSel_white_freeClass {a η : ℤ} {F : Field} {c i : Site} (h : laplacian F c = 0) (hf : FreeClass a c) :
+    TwosSel a η F c i ↔
+      ∃ u, AliasOf a c u ∧ FreeSite a u.1 u.2 ∧
+        i = (c.1 + (freeDisp a η u.1 u.2).1, c.2 + (freeDisp a η u.1 u.2).2) := by
+  simp [TwosSel, h, hf]
+
 end FLatticePaper.TwosEPolicy
 
 end
