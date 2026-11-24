@@ -798,3 +798,17 @@ Scope to confirm with the lead: §1's star containment needs `c = d − n ≥ 3`
 - NOT yet: the increments (HasUnitSlip, HasUnitPrice), NoEvenSlipSaddle, NoPriceSaddle, the drifts, the zero strips and the price range
   as Lean theorems; BaseSlip and StrongResidual minus the policy field at 2^(k+1).
 
+
+### Task 72 / twos base (the drifts of the price and of the short slip of standardField (2^(k+1))): TwosDrifts.lean
+- PROVED: `twos_slip_drift_kernel` (D_η(z+U) − D_η z = 0), `twos_slip_drift_transverse` (= 2η for η = ±1),
+  `twos_price_drift_kernel` (P(z+U) − P z = −1), `twos_price_drift_transverse` (P(z+T) − P z = 0), from the period lemmas
+  `period_kernel_apply`, `period_transverse_apply` (for any field with the period constants (0, cV)) and the explicit frame
+  (`twos_eps_explicit`, `twos_parents_explicit`, `twos_shortShift_explicit`, `twos_parentShift_explicit`,
+  `twos_parentSlope_explicit`, `twos_kernel_explicit`, `twos_transverse_explicit`, `twos_transverseGrade_explicit`).
+- Periods: `twos_standardField_hasPeriods k : HasGeneratorPeriods (frameAt (2^(k+1))).child (standardField (2^(k+1))) 0 (ladderEvenConstantV (2k+4))`.
+- Checks: checks/TwosDrifts.lean (axioms standard). Root build: 0 warnings, 0 linter notes, 0 errors.
+- Zero strip (quarterTurnField) checked numerically, not yet in Lean: F(Z x) = harmonicGrid(Z x) on the whole zone (k = 0,1,2),
+  but the set where F equals harmonicGrid is not a grade strip, so the zero strip needs the explicit window representatives (sewnField)
+  rather than the period lemmas alone.
+- Price range [cutPrice−1, cutPrice] on E checked numerically (k = 0..3); z − parentShift leaves E for about 40% of E, so it needs
+  representatives too. NOT yet in Lean: zero strips, zero even line, price range, the increments, BaseSlip and StrongResidual minus policy.
