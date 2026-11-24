@@ -506,6 +506,7 @@ import FLatticePaper.Plane.Induction.StarClassify
 import FLatticePaper.Plane.Induction.SeedTransverse
 import FLatticePaper.Plane.Induction.SeedPoint
 import FLatticePaper.Plane.Induction.StrongSeedInduction
+import FLatticePaper.Plane.Induction.GamesPolicy
 import FLatticePaper.Plane.Induction.StrongPriceInputs
 import FLatticePaper.Plane.Induction.StrongDeckSpan
 import FLatticePaper.Plane.Induction.StrongSourceRep
