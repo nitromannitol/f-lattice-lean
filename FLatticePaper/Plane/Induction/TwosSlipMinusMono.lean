@@ -533,4 +533,54 @@ theorem twosSlip_free_minus (k : ℕ) {u1 u2 : ℤ} (hF : FreeSite (2 * (k : ℤ
       · exact twosSlipM_free_V1e k h1 hy1 hy2 hp
       · exact twosSlipM_free_V1o k h1 hy1 hy2 (by omega)
 
+
+/-- The alias bookkeeping: a difference of the reflected slips at `u` and `u − δ` transfers to the sign `−1` slips at `c` and
+`c + δ`, when `u` is a lattice translate of `c`. -/
+theorem slipM_le_of_alias (k : ℕ) {c i : Site} {u1 u2 δ1 δ2 : ℤ}
+    (hu : AliasOf (2 * (k : ℤ) + 4) c (u1, u2)) (hi : i = (c.1 + δ1, c.2 + δ2))
+    (h : twosSlip k (1 - u1 - δ1, -1 - u2 - δ2) ≤ twosSlip k (1 - u1, -1 - u2)) :
+    (frameAt (List.replicate (k + 1) Digit.two)).slip (standardField (List.replicate (k + 1) Digit.two)) (-1) i ≤
+      (frameAt (List.replicate (k + 1) Digit.two)).slip (standardField (List.replicate (k + 1) Digit.two)) (-1) c := by
+  obtain ⟨i', l, hu⟩ := hu
+  have hu1 : u1 = c.1 - i' * (2 * (k : ℤ) + 4 + 1) + 2 * l := congrArg Prod.fst hu
+  have hu2 : u2 = c.2 - i' * (2 * (k : ℤ) + 4 - 1) - 2 * (2 * (k : ℤ) + 4) * l := congrArg Prod.snd hu
+  rw [slip_minus_eq_iRefl, slip_minus_eq_iRefl]
+  have hL1 : ((1 : ℤ), (-1 : ℤ)) - c = (1 - u1, -1 - u2) +
+      ((-i') * (2 * (k : ℤ) + 5) + (-l) * (-2), (-i') * (2 * (k : ℤ) + 3) + (-l) * (4 * (k : ℤ) + 8)) := by
+    apply Prod.ext
+    · simp only [Prod.fst_add, Prod.fst_sub]
+      rw [hu1]
+      ring
+    · simp only [Prod.snd_add, Prod.snd_sub]
+      rw [hu2]
+      ring
+  have hL2 : ((1 : ℤ), (-1 : ℤ)) - i = (1 - u1 - δ1, -1 - u2 - δ2) +
+      ((-i') * (2 * (k : ℤ) + 5) + (-l) * (-2), (-i') * (2 * (k : ℤ) + 3) + (-l) * (4 * (k : ℤ) + 8)) := by
+    rw [hi]
+    apply Prod.ext
+    · simp only [Prod.fst_add, Prod.fst_sub]
+      rw [hu1]
+      ring
+    · simp only [Prod.snd_add, Prod.snd_sub]
+      rw [hu2]
+      ring
+  rw [hL1, hL2, twosSlip_lattice, twosSlip_lattice]
+  linarith [h]
+
+set_option maxHeartbeats 400000 in
+/-- **The slip of sign `−1` does not increase along the selected inputs of the twos signed policy.** -/
+theorem twosSlipM_nonincreasing (k : ℕ) {S : Field}
+    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees S 0)
+    (hperiod : HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4)) S 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
+    {c i : Site}
+    (hT : TwosSel (2 * (k : ℤ) + 4) (-1) (standardField (List.replicate (k + 1) Digit.two)) c i) :
+    (frameAt (List.replicate (k + 1) Digit.two)).slip (standardField (List.replicate (k + 1) Digit.two)) (-1) i ≤
+      (frameAt (List.replicate (k + 1) Digit.two)).slip (standardField (List.replicate (k + 1) Digit.two)) (-1) c := by
+  rcases hT with ⟨hl, he⟩ | ⟨hl, ⟨u, hu, hF, hi⟩ | ⟨hnf, u, hu, hn, hg, hi⟩⟩
+  · exact twosSlipM_black k hagree hperiod hl he
+  · obtain ⟨u1, u2⟩ := u
+    have hF' : FreeSite (2 * (k : ℤ) + 4) u1 u2 := hF
+    exact slipM_le_of_alias k hu hi (twosSlip_free_minus k hF')
+  · exact twosSlipM_cand k ⟨u, hu, hn, hg, hi⟩
+
 end FLatticePaper.Induction
