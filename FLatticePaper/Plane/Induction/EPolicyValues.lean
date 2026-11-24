@@ -1,5 +1,6 @@
 import FLatticePaper.Plane.Induction.EPolicySquares
 import FLatticePaper.Plane.Induction.CanonicalSigned
+import FLatticePaper.Plane.Induction.ReciprocalIncrements
 
 /-!
 # The value inequalities of the signed policy e(-1, eta) on the reciprocal field (task 118, W1 base)
@@ -20,6 +21,7 @@ The rounded slip `J_η = ⌈D_η/2⌉` does not increase along the policy: it fo
 namespace FLatticePaper.EPolicy
 
 open FLatticePaper FLatticePaper.Induction
+open FLatticePaper.Construction
 
 /-- The value inequalities of the signed policy e(-1, eta) on the reciprocal field `reciprocalField k` (the items 4 and the
 strict rank of the note): the raw slip and the price do not increase along the policy, the chain potential does not increase
@@ -167,5 +169,86 @@ theorem chain_edge_le (k : ℕ) (F : Site → ℤ) (η : ℤ) (c e : Site)
     (reciprocalFrame k).chainPotential F η (c + e) ≤ (reciprocalFrame k).chainPotential F η c := by
   have := chain_edge_sub k F η c e
   linarith
+
+/-- The raw increment: for raw `p` and `p + e` the increment of the reciprocal field is the stair difference. -/
+theorem incr_raw_stair (k : ℕ) (e p : Site)
+    (hp : p ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites)
+    (hpe : p + e ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites) :
+    incr (reciprocalField k) e p =
+      BaseMask.stairEvenValue (2 * (k : ℤ) + 3) (p + e) - BaseMask.stairEvenValue (2 * (k : ℤ) + 3) p := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  have h := reciprocal_native_step k (z := p) (y := p) (e := e) (i := 0) (j := 0) hp hpe
+    (by simp [combine_mk_one hd])
+  unfold incr
+  rw [h]
+  ring
+
+/-- The horizontal stair increment on row `y` at column `x` with step `s`. -/
+def hG (d x y s : ℤ) : ℤ :=
+  (min (x + s - 1) 0 - min (x - 1) 0) +
+    ((if BaseMask.StairEvenCorner d (x + s, y) then 1 else 0) - (if BaseMask.StairEvenCorner d (x, y) then 1 else 0))
+
+theorem stair_step_eq_hG (d x y s : ℤ) :
+    BaseMask.stairEvenValue d (x + s, y) - BaseMask.stairEvenValue d (x, y) = hG d x y s := by
+  unfold hG BaseMask.stairEvenValue
+  dsimp only
+  ring
+
+/-- The stair corner indicator vanishes away from the two corners `(0, 0)` and `(2, d + 1)`. -/
+theorem stair_corner_zero (d a b : ℤ) (h : ¬ ((a = 0 ∧ b = 0) ∨ (a = 2 ∧ b = d + 1))) :
+    (if BaseMask.StairEvenCorner d (a, b) then (1 : ℤ) else 0) = 0 := by
+  rw [if_neg]
+  exact fun hc => h hc
+
+/-- **Horizontal slip, interior.** On the interior box (all shifted sites raw and off the corners), the retained horizontal step does not increase the slip: `D(i) ≤ D(c)`. -/
+theorem horiz_D_ineq (d η x y s : ℤ) (hd : d % 2 = 1) (hbox : 5 - d ≤ x ∧ x ≤ d - 3 ∧ 1 ≤ y ∧ y ≤ d - 1 ∧ 3 ≤ x + y ∧ x + y ≤ d)
+    (hpar : (x + y) % 2 = 0) (hret : x = 1 ∨ (s, 0) = selDisp d η (x, y)) :
+    hG d x y s ≤ hG d (x - 2 * η) y s := by
+  unfold hG
+  rw [stair_corner_zero d (x + s) (y) (by omega)]
+  rw [stair_corner_zero d (x) (y) (by omega)]
+  rw [stair_corner_zero d (x - 2 * η + s) (y) (by omega)]
+  rw [stair_corner_zero d (x - 2 * η) (y) (by omega)]
+  rcases hret with h1 | h1
+  · subst h1
+    omega
+  · have hE : EvenSite (x, y) := by unfold EvenSite; dsimp only; omega
+    unfold selDisp at h1
+    rw [if_pos hE] at h1
+    split_ifs at h1 <;> (try simp only [Prod.mk.injEq] at *) <;> omega
+
+/-- **Horizontal price, interior.** The retained horizontal step does not increase the price, the shift `(-1, 1)`. -/
+theorem horiz_P_ineq (d η x y s : ℤ) (hd : d % 2 = 1) (hbox : 5 - d ≤ x ∧ x ≤ d - 3 ∧ 1 ≤ y ∧ y ≤ d - 1 ∧ 3 ≤ x + y ∧ x + y ≤ d)
+    (hpar : (x + y) % 2 = 0) (hret : x = 1 ∨ (s, 0) = selDisp d η (x, y)) :
+    hG d x y s ≤ hG d (x - 1) (y + 1) s := by
+  unfold hG
+  rw [stair_corner_zero d (x + s) (y) (by omega)]
+  rw [stair_corner_zero d (x) (y) (by omega)]
+  rw [stair_corner_zero d (x - 1 + s) (y + 1) (by omega)]
+  rw [stair_corner_zero d (x - 1) (y + 1) (by omega)]
+  rcases hret with h1 | h1
+  · subst h1
+    omega
+  · have hE : EvenSite (x, y) := by unfold EvenSite; dsimp only; omega
+    unfold selDisp at h1
+    rw [if_pos hE] at h1
+    split_ifs at h1 <;> (try simp only [Prod.mk.injEq] at *) <;> omega
+
+/-- **Horizontal chain, interior.** The retained horizontal step does not increase the chain potential, the shift `(-2η - 1, 1)`. -/
+theorem horiz_Phi_ineq (d η x y s : ℤ) (hd : d % 2 = 1) (hbox : 5 - d ≤ x ∧ x ≤ d - 3 ∧ 1 ≤ y ∧ y ≤ d - 1 ∧ 3 ≤ x + y ∧ x + y ≤ d)
+    (hpar : (x + y) % 2 = 0) (hret : x = 1 ∨ (s, 0) = selDisp d η (x, y)) :
+    hG d x y s ≤ hG d (x - 2 * η - 1) (y + 1) s := by
+  unfold hG
+  rw [stair_corner_zero d (x + s) (y) (by omega)]
+  rw [stair_corner_zero d (x) (y) (by omega)]
+  rw [stair_corner_zero d (x - 2 * η - 1 + s) (y + 1) (by omega)]
+  rw [stair_corner_zero d (x - 2 * η - 1) (y + 1) (by omega)]
+  rcases hret with h1 | h1
+  · subst h1
+    omega
+  · have hE : EvenSite (x, y) := by unfold EvenSite; dsimp only; omega
+    unfold selDisp at h1
+    rw [if_pos hE] at h1
+    split_ifs at h1 <;> (try simp only [Prod.mk.injEq] at *) <;> omega
 
 end FLatticePaper.EPolicy
