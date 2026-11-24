@@ -27,3 +27,14 @@ info: 'FLatticePaper.BothFreeRise.shiftσ_eq' depends on axioms: [propext, Quot.
 #guard_msgs in
 #print axioms FLatticePaper.BothFreeRise.shiftσ_eq
 
+/--
+info: 'FLatticePaper.BothFreeRise.window_centre_of_freeV' depends on axioms: [propext, Classical.choice, Quot.sound]
+-/
+#guard_msgs in
+#print axioms FLatticePaper.BothFreeRise.window_centre_of_freeV
+
+/--
+info: 'FLatticePaper.BothFreeRise.window_input_of_freeV' depends on axioms: [propext, Classical.choice, Quot.sound]
+-/
+#guard_msgs in
+#print axioms FLatticePaper.BothFreeRise.window_input_of_freeV

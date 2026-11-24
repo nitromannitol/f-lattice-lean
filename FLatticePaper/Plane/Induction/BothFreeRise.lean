@@ -33,23 +33,75 @@ theorem price_const_of_window (frame : ChildFrame) (F : Field) (hS : frame.HasSt
     exact hS.2 _ (by omega) (by omega)
   exact price_const_on_star frame F hz1 hz2 hu1 hu2
 
+/-- **The window of a free V centre.** Its grade lies in the harmonic window `[3 − 2d, 2L − 1]` (`vSpectrum`). -/
+theorem window_centre_of_freeV (frame : ChildFrame) {z : Site} (hz : z ∈ frame.freeV) :
+    3 - 2 * frame.child.den ≤ frame.sGrade z ∧ frame.sGrade z ≤ 2 * (frame.child.den + frame.child.num) - 1 := by
+  obtain ⟨-, -, hvs⟩ := hz
+  obtain ⟨hn0, hnd, -, hd3, -⟩ := frame.child_facts
+  unfold ChildFrame.vSpectrum at hvs
+  omega
+
+/-- **The window of an input of a free V centre.** For a free V centre `z` with `c = d − n ≥ 3`, each input `u` of `z` has grade in the
+harmonic window: an even centre is in `E` (grade `≥ 0`), so its horizontal inputs have grade `s ∓ L`; an odd centre has grade `s ≥ 2 − c`,
+so its vertical inputs have grade `s ∓ c`. -/
+theorem window_input_of_freeV (frame : ChildFrame) (hc : 3 ≤ frame.child.den - frame.child.num) {z u : Site}
+    (hz : z ∈ frame.freeV) (hu : u = incomingNeg z ∨ u = incomingPos z) :
+    3 - 2 * frame.child.den ≤ frame.sGrade u ∧ frame.sGrade u ≤ 2 * (frame.child.den + frame.child.num) - 1 := by
+  obtain ⟨hcl, -, hvs⟩ := hz
+  obtain ⟨hn0, hnd, -, hd3, -⟩ := frame.child_facts
+  unfold ChildFrame.vSpectrum at hvs
+  have hE := (frame.mem_closedPolygon_iff z).mp hcl
+  rcases hu with rfl | rfl
+  · unfold incomingNeg
+    by_cases he : EvenSite z
+    · rw [if_pos he]
+      have e : frame.sGrade (z.1 - 1, z.2) = frame.sGrade z - (frame.child.den + frame.child.num) := by
+        unfold ChildFrame.sGrade; ring
+      rw [e]
+      have hs0 : 0 ≤ frame.sGrade z := by
+        rcases hE with h | h
+        · exact h.2.2.2.1
+        · exact absurd he h.1
+      omega
+    · rw [if_neg he]
+      have e : frame.sGrade (z.1, z.2 - 1) = frame.sGrade z - (frame.child.den - frame.child.num) := by
+        unfold ChildFrame.sGrade; ring
+      rw [e]
+      omega
+  · unfold incomingPos
+    by_cases he : EvenSite z
+    · rw [if_pos he]
+      have e : frame.sGrade (z.1 + 1, z.2) = frame.sGrade z + (frame.child.den + frame.child.num) := by
+        unfold ChildFrame.sGrade; ring
+      rw [e]
+      have hs0 : 0 ≤ frame.sGrade z := by
+        rcases hE with h | h
+        · exact h.2.2.2.1
+        · exact absurd he h.1
+      omega
+    · rw [if_neg he]
+      have e : frame.sGrade (z.1, z.2 + 1) = frame.sGrade z + (frame.child.den - frame.child.num) := by
+        unfold ChildFrame.sGrade; ring
+      rw [e]
+      omega
+
 /-- **Both-free exclusion.** A rise `P(u + ησ) = P(z + ησ) + 1` at `z → u` (with `z`, `z + ησ` white and the other input `v` of `z`
-selected by the translated opposite policy `Q`) is impossible when both roots are free. -/
+selected by the translated opposite policy `Q`) is impossible when both roots are free. The shifted-V case uses the price constancy on
+the V star, whose window is derived from the freeness of the centre (`window_centre_of_freeV`, `window_input_of_freeV`). -/
 theorem both_free_rise_false (frame : ChildFrame) {F : Field} (hS : frame.HasStrips F) {η : ℤ} (hη : η = 1 ∨ η = -1)
+    (hc : 3 ≤ frame.child.den - frame.child.num)
     {P Q : Site → Site → Prop} (hP : PrescribedAt frame F η P) (hQ : PrescribedAt frame F (-η) Q)
     {z u v : Site} (hPu : P z u) (hwF : laplacian F z = 0) (hwG : laplacian F (z + η • frame.shortShift) = 0)
     (hzF : z ∈ frame.freeH ∨ z ∈ frame.freeV)
     (hzG : z + η • frame.shortShift ∈ frame.freeH ∨ z + η • frame.shortShift ∈ frame.freeV)
     (hvu : v ≠ u) (hvQ : Q (z + η • frame.shortShift) (v + η • frame.shortShift))
-    (hwin : z + η • frame.shortShift ∈ frame.freeV →
-      (3 - 2 * frame.child.den ≤ frame.sGrade (z + η • frame.shortShift) ∧
-        frame.sGrade (z + η • frame.shortShift) ≤ 2 * (frame.child.den + frame.child.num) - 1) ∧
-      (3 - 2 * frame.child.den ≤ frame.sGrade (u + η • frame.shortShift) ∧
-        frame.sGrade (u + η • frame.shortShift) ≤ 2 * (frame.child.den + frame.child.num) - 1))
+    (hu' : u + η • frame.shortShift = incomingNeg (z + η • frame.shortShift) ∨
+      u + η • frame.shortShift = incomingPos (z + η • frame.shortShift))
     (hrise : frame.price F (u + η • frame.shortShift) = frame.price F (z + η • frame.shortShift) + 1) : False := by
   by_cases hz'V : z + η • frame.shortShift ∈ frame.freeV
   · -- the shifted centre is a V root: the price is constant on its star, against the unit rise
-    obtain ⟨hw1, hw2⟩ := hwin hz'V
+    have hw1 := window_centre_of_freeV frame hz'V
+    have hw2 := window_input_of_freeV frame hc hz'V hu'
     have := price_const_of_window frame F hS hw1 hw2
     omega
   · have hz'H : z + η • frame.shortShift ∈ frame.freeH := by
@@ -90,15 +142,10 @@ prescription links are the fields `prescribed` of the two games (sign `η` and t
 quota and price come from its game; the unit increments from `HasUnitPrice`. -/
 theorem chain_nonincreasing_of_free_roots (frame : ChildFrame) {F : Field} (G : CanonicalSignedGames frame F)
     (hS : frame.HasStrips F) {η : ℤ} (hη : η = 1 ∨ η = -1)
+    (hc : 3 ≤ frame.child.den - frame.child.num)
     (hlapF : ∀ c, laplacian F c = -1 ∨ laplacian F c = 0) (hU : HasUnitPrice frame F)
     (hfree : ∀ z u, (G.game η hη).policy z u → frame.chainPotential F η z < frame.chainPotential F η u →
-      (z ∈ frame.freeH ∨ z ∈ frame.freeV) ∧ (z + η • frame.shortShift ∈ frame.freeH ∨ z + η • frame.shortShift ∈ frame.freeV))
-    (hwin : ∀ z u, (G.game η hη).policy z u → frame.chainPotential F η z < frame.chainPotential F η u →
-      z + η • frame.shortShift ∈ frame.freeV →
-      (3 - 2 * frame.child.den ≤ frame.sGrade (z + η • frame.shortShift) ∧
-        frame.sGrade (z + η • frame.shortShift) ≤ 2 * (frame.child.den + frame.child.num) - 1) ∧
-      (3 - 2 * frame.child.den ≤ frame.sGrade (u + η • frame.shortShift) ∧
-        frame.sGrade (u + η • frame.shortShift) ≤ 2 * (frame.child.den + frame.child.num) - 1)) :
+      (z ∈ frame.freeH ∨ z ∈ frame.freeV) ∧ (z + η • frame.shortShift ∈ frame.freeH ∨ z + η • frame.shortShift ∈ frame.freeV)) :
     NonincreasingAlong (frame.chainPotential F η) (G.game η hη).policy := by
   set C := G.game η hη with hC
   set O := G.game (-η) (neg_unit hη) with hO
@@ -121,6 +168,12 @@ theorem chain_nonincreasing_of_free_roots (frame : ChildFrame) {F : Field} (G : 
   obtain ⟨hgF, hF, -, -, hPs, v, hv1, hv2, hvQ⟩ := TwoRank.rise_local_frame frame C hη O.policy
     (rawSlip_of_canonical O) O.quota (price_nonincreasing_of_canonical O) hlapF hunit hu hin hlt
   obtain ⟨hzF, hzG⟩ := hfree z u hu hlt
-  exact both_free_rise_false frame hS hη C.prescribed O.prescribed hu hF hgF hzF hzG hv2 hvQ (fun h => hwin z u hu hlt h) hPs
+  -- the input `u + ησ` of the shifted centre, from the edge `u → z` translated by the even shift
+  have hs : ((η • frame.shortShift).1 + (η • frame.shortShift).2) % 2 = 0 := by
+    obtain ⟨k, hk⟩ : (2 : ℤ) ∣ frame.shortShift.1 + frame.shortShift.2 :=
+      Int.dvd_of_emod_eq_zero (FLatticePaper.BothFreeGrades.shortShift_even frame)
+    rcases hη with h | h <;> simp only [h, Prod.smul_fst, Prod.smul_snd, smul_eq_mul] <;> omega
+  have hu' := TwoRank.edge_add_of_even (η • frame.shortShift) hs (C.policyEdge z u hu)
+  exact both_free_rise_false frame hS hη hc C.prescribed O.prescribed hu hF hgF hzF hzG hv2 hvQ hu' hPs
 
 end FLatticePaper.BothFreeRise
