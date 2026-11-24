@@ -183,4 +183,434 @@ theorem square_rule (k : ℕ) (η : ℤ) (hη : η = 1 ∨ η = -1) (a b p q i j
     ext <;> simp only [Prod.fst_add, Prod.snd_add] <;> ring
   exact squareClause_of_rep k η hη a b hw hr i j hwr (lap_zero_of_native k hr hwhite) hout
 
+set_option maxHeartbeats 400000 in
+theorem sq_leaf_one_1 (k : ℕ) (a b : ℤ) (hN : NativeP (2 * (k : ℤ) + 3) (a, b)) (_h0 : a + b ≤ (2 * (k : ℤ) + 3) + 2) (h1 : (a + b) % 2 = 0) (_h2 : b ≤ (2 * (k : ℤ) + 3)) (h3 : b ≤ (2 * (k : ℤ) + 3) - 1) (h4 : a ≤ (2 * (k : ℤ) + 3) - 1) (h5 : a + b ≤ (2 * (k : ℤ) + 3)) (h6 : a ≤ 0) (h7 : b ≤ 0) :
+    SquareClauseSat (reciprocalField k) (selF k 1) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  simp only [NativeP, Prod.mk.injEq] at hN
+  refine square_rule k 1 (by norm_num) a b 1 0 0 0 (by norm_num) (by norm_num) ?_ ?_ ?_
+  · simp only [NativeP, Prod.mk.injEq]; omega
+  · unfold EvenSite; dsimp only; omega
+  · rw [combine_mk_one hd]; unfold selDisp squareCorners; split_ifs <;>
+      (try simp only [EvenSite, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk, not_or, not_and] at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem sq_leaf_one_2 (k : ℕ) (a b : ℤ) (hN : NativeP (2 * (k : ℤ) + 3) (a, b)) (_h0 : a + b ≤ (2 * (k : ℤ) + 3) + 2) (h1 : (a + b) % 2 = 0) (_h2 : b ≤ (2 * (k : ℤ) + 3)) (h3 : b ≤ (2 * (k : ℤ) + 3) - 1) (h4 : a ≤ (2 * (k : ℤ) + 3) - 1) (h5 : a + b ≤ (2 * (k : ℤ) + 3)) (h6 : a ≤ 0) (h7 : ¬ (b ≤ 0)) :
+    SquareClauseSat (reciprocalField k) (selF k 1) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  simp only [NativeP, Prod.mk.injEq] at hN
+  refine square_rule k 1 (by norm_num) a b 0 0 0 0 (by norm_num) (by norm_num) ?_ ?_ ?_
+  · simp only [NativeP, Prod.mk.injEq]; omega
+  · unfold EvenSite; dsimp only; omega
+  · rw [combine_mk_one hd]; unfold selDisp squareCorners; split_ifs <;>
+      (try simp only [EvenSite, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk, not_or, not_and] at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem sq_leaf_one_3 (k : ℕ) (a b : ℤ) (hN : NativeP (2 * (k : ℤ) + 3) (a, b)) (_h0 : a + b ≤ (2 * (k : ℤ) + 3) + 2) (h1 : (a + b) % 2 = 0) (_h2 : b ≤ (2 * (k : ℤ) + 3)) (h3 : b ≤ (2 * (k : ℤ) + 3) - 1) (h4 : a ≤ (2 * (k : ℤ) + 3) - 1) (h5 : a + b ≤ (2 * (k : ℤ) + 3)) (h6 : ¬ (a ≤ 0)) :
+    SquareClauseSat (reciprocalField k) (selF k 1) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  simp only [NativeP, Prod.mk.injEq] at hN
+  refine square_rule k 1 (by norm_num) a b 1 1 0 0 (by norm_num) (by norm_num) ?_ ?_ ?_
+  · simp only [NativeP, Prod.mk.injEq]; omega
+  · unfold EvenSite; dsimp only; omega
+  · rw [combine_mk_one hd]; unfold selDisp squareCorners; split_ifs <;>
+      (try simp only [EvenSite, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk, not_or, not_and] at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem sq_leaf_one_4 (k : ℕ) (a b : ℤ) (_hN : NativeP (2 * (k : ℤ) + 3) (a, b)) (h0 : a + b ≤ (2 * (k : ℤ) + 3) + 2) (h1 : (a + b) % 2 = 0) (_h2 : b ≤ (2 * (k : ℤ) + 3)) (h3 : b ≤ (2 * (k : ℤ) + 3) - 1) (h4 : a ≤ (2 * (k : ℤ) + 3) - 1) (h5 : ¬ (a + b ≤ (2 * (k : ℤ) + 3))) :
+    SquareClauseSat (reciprocalField k) (selF k 1) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  refine square_rule k 1 (by norm_num) a b 1 0 0 0 (by norm_num) (by norm_num) ?_ ?_ ?_
+  · simp only [NativeP, Prod.mk.injEq]; omega
+  · unfold EvenSite; dsimp only; omega
+  · rw [combine_mk_one hd]; unfold selDisp squareCorners; split_ifs <;>
+      (try simp only [EvenSite, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk, not_or, not_and] at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem sq_leaf_one_5 (k : ℕ) (a b : ℤ) (hN : NativeP (2 * (k : ℤ) + 3) (a, b)) (h0 : a + b ≤ (2 * (k : ℤ) + 3) + 2) (h1 : (a + b) % 2 = 0) (_h2 : b ≤ (2 * (k : ℤ) + 3)) (h3 : b ≤ (2 * (k : ℤ) + 3) - 1) (h4 : ¬ (a ≤ (2 * (k : ℤ) + 3) - 1)) :
+    SquareClauseSat (reciprocalField k) (selF k 1) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  simp only [NativeP, Prod.mk.injEq] at hN
+  refine square_rule k 1 (by norm_num) a b 1 0 1 (-1) (by norm_num) (by norm_num) ?_ ?_ ?_
+  · simp only [NativeP, Prod.mk.injEq]; omega
+  · unfold EvenSite; dsimp only; omega
+  · rw [combine_mk_one hd]; unfold selDisp squareCorners; split_ifs <;>
+      (try simp only [EvenSite, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk, not_or, not_and] at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem sq_leaf_one_6 (k : ℕ) (a b : ℤ) (hN : NativeP (2 * (k : ℤ) + 3) (a, b)) (h0 : a + b ≤ (2 * (k : ℤ) + 3) + 2) (h1 : (a + b) % 2 = 0) (h2 : b ≤ (2 * (k : ℤ) + 3)) (h3 : ¬ (b ≤ (2 * (k : ℤ) + 3) - 1)) :
+    SquareClauseSat (reciprocalField k) (selF k 1) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  simp only [NativeP, Prod.mk.injEq] at hN
+  refine square_rule k 1 (by norm_num) a b 1 1 0 0 (by norm_num) (by norm_num) ?_ ?_ ?_
+  · simp only [NativeP, Prod.mk.injEq]; omega
+  · unfold EvenSite; dsimp only; omega
+  · rw [combine_mk_one hd]; unfold selDisp squareCorners; split_ifs <;>
+      (try simp only [EvenSite, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk, not_or, not_and] at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem sq_leaf_one_7 (k : ℕ) (a b : ℤ) (hN : NativeP (2 * (k : ℤ) + 3) (a, b)) (h0 : a + b ≤ (2 * (k : ℤ) + 3) + 2) (h1 : (a + b) % 2 = 0) (h2 : ¬ (b ≤ (2 * (k : ℤ) + 3))) :
+    SquareClauseSat (reciprocalField k) (selF k 1) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  simp only [NativeP, Prod.mk.injEq] at hN
+  refine square_rule k 1 (by norm_num) a b 1 1 0 1 (by norm_num) (by norm_num) ?_ ?_ ?_
+  · simp only [NativeP, Prod.mk.injEq]; omega
+  · unfold EvenSite; dsimp only; omega
+  · rw [combine_mk_one hd]; unfold selDisp squareCorners; split_ifs <;>
+      (try simp only [EvenSite, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk, not_or, not_and] at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem sq_leaf_one_8 (k : ℕ) (a b : ℤ) (hN : NativeP (2 * (k : ℤ) + 3) (a, b)) (h0 : a + b ≤ (2 * (k : ℤ) + 3) + 2) (h1 : ¬ ((a + b) % 2 = 0)) (h2 : a + b ≤ 1) :
+    SquareClauseSat (reciprocalField k) (selF k 1) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  simp only [NativeP, Prod.mk.injEq] at hN
+  refine square_rule k 1 (by norm_num) a b 0 0 0 0 (by norm_num) (by norm_num) ?_ ?_ ?_
+  · simp only [NativeP, Prod.mk.injEq]; omega
+  · unfold EvenSite; dsimp only; omega
+  · rw [combine_mk_one hd]; unfold selDisp squareCorners; split_ifs <;>
+      (try simp only [EvenSite, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk, not_or, not_and] at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem sq_leaf_one_9 (k : ℕ) (a b : ℤ) (hN : NativeP (2 * (k : ℤ) + 3) (a, b)) (_h0 : a + b ≤ (2 * (k : ℤ) + 3) + 2) (h1 : ¬ ((a + b) % 2 = 0)) (h2 : ¬ (a + b ≤ 1)) (_h3 : b ≤ (2 * (k : ℤ) + 3)) (h4 : a + b ≤ (2 * (k : ℤ) + 3)) (h5 : b ≤ (2 * (k : ℤ) + 3) - 1) (h6 : a ≤ 0) :
+    SquareClauseSat (reciprocalField k) (selF k 1) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  simp only [NativeP, Prod.mk.injEq] at hN
+  refine square_rule k 1 (by norm_num) a b 0 1 0 0 (by norm_num) (by norm_num) ?_ ?_ ?_
+  · simp only [NativeP, Prod.mk.injEq]; omega
+  · unfold EvenSite; dsimp only; omega
+  · rw [combine_mk_one hd]; unfold selDisp squareCorners; split_ifs <;>
+      (try simp only [EvenSite, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk, not_or, not_and] at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem sq_leaf_one_10 (k : ℕ) (a b : ℤ) (hN : NativeP (2 * (k : ℤ) + 3) (a, b)) (_h0 : a + b ≤ (2 * (k : ℤ) + 3) + 2) (h1 : ¬ ((a + b) % 2 = 0)) (h2 : ¬ (a + b ≤ 1)) (_h3 : b ≤ (2 * (k : ℤ) + 3)) (h4 : a + b ≤ (2 * (k : ℤ) + 3)) (h5 : b ≤ (2 * (k : ℤ) + 3) - 1) (h6 : ¬ (a ≤ 0)) (h7 : a ≤ (2 * (k : ℤ) + 3) - 1) :
+    SquareClauseSat (reciprocalField k) (selF k 1) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  simp only [NativeP, Prod.mk.injEq] at hN
+  refine square_rule k 1 (by norm_num) a b 1 0 0 0 (by norm_num) (by norm_num) ?_ ?_ ?_
+  · simp only [NativeP, Prod.mk.injEq]; omega
+  · unfold EvenSite; dsimp only; omega
+  · rw [combine_mk_one hd]; unfold selDisp squareCorners; split_ifs <;>
+      (try simp only [EvenSite, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk, not_or, not_and] at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem sq_leaf_one_11 (k : ℕ) (a b : ℤ) (hN : NativeP (2 * (k : ℤ) + 3) (a, b)) (_h0 : a + b ≤ (2 * (k : ℤ) + 3) + 2) (_h1 : ¬ ((a + b) % 2 = 0)) (h2 : ¬ (a + b ≤ 1)) (_h3 : b ≤ (2 * (k : ℤ) + 3)) (h4 : a + b ≤ (2 * (k : ℤ) + 3)) (h5 : b ≤ (2 * (k : ℤ) + 3) - 1) (h6 : ¬ (a ≤ 0)) (h7 : ¬ (a ≤ (2 * (k : ℤ) + 3) - 1)) :
+    SquareClauseSat (reciprocalField k) (selF k 1) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  simp only [NativeP, Prod.mk.injEq] at hN
+  refine square_rule k 1 (by norm_num) a b 1 0 1 (-1) (by norm_num) (by norm_num) ?_ ?_ ?_
+  · simp only [NativeP, Prod.mk.injEq]; omega
+  · unfold EvenSite; dsimp only; omega
+  · rw [combine_mk_one hd]; unfold selDisp squareCorners; split_ifs <;>
+      (try simp only [EvenSite, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk, not_or, not_and] at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem sq_leaf_one_12 (k : ℕ) (a b : ℤ) (_hN : NativeP (2 * (k : ℤ) + 3) (a, b)) (_h0 : a + b ≤ (2 * (k : ℤ) + 3) + 2) (_h1 : ¬ ((a + b) % 2 = 0)) (h2 : ¬ (a + b ≤ 1)) (h3 : b ≤ (2 * (k : ℤ) + 3)) (h4 : a + b ≤ (2 * (k : ℤ) + 3)) (h5 : ¬ (b ≤ (2 * (k : ℤ) + 3) - 1)) :
+    SquareClauseSat (reciprocalField k) (selF k 1) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  refine square_rule k 1 (by norm_num) a b 1 1 0 0 (by norm_num) (by norm_num) ?_ ?_ ?_
+  · simp only [NativeP, Prod.mk.injEq]; omega
+  · unfold EvenSite; dsimp only; omega
+  · rw [combine_mk_one hd]; unfold selDisp squareCorners; split_ifs <;>
+      (try simp only [EvenSite, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk, not_or, not_and] at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem sq_leaf_one_13 (k : ℕ) (a b : ℤ) (hN : NativeP (2 * (k : ℤ) + 3) (a, b)) (h0 : a + b ≤ (2 * (k : ℤ) + 3) + 2) (h1 : ¬ ((a + b) % 2 = 0)) (h2 : ¬ (a + b ≤ 1)) (h3 : b ≤ (2 * (k : ℤ) + 3)) (h4 : ¬ (a + b ≤ (2 * (k : ℤ) + 3))) :
+    SquareClauseSat (reciprocalField k) (selF k 1) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  simp only [NativeP, Prod.mk.injEq] at hN
+  refine square_rule k 1 (by norm_num) a b 0 0 0 0 (by norm_num) (by norm_num) ?_ ?_ ?_
+  · simp only [NativeP, Prod.mk.injEq]; omega
+  · unfold EvenSite; dsimp only; omega
+  · rw [combine_mk_one hd]; unfold selDisp squareCorners; split_ifs <;>
+      (try simp only [EvenSite, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk, not_or, not_and] at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem sq_leaf_one_14 (k : ℕ) (a b : ℤ) (hN : NativeP (2 * (k : ℤ) + 3) (a, b)) (h0 : a + b ≤ (2 * (k : ℤ) + 3) + 2) (h1 : ¬ ((a + b) % 2 = 0)) (h2 : ¬ (a + b ≤ 1)) (h3 : ¬ (b ≤ (2 * (k : ℤ) + 3))) :
+    SquareClauseSat (reciprocalField k) (selF k 1) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  simp only [NativeP, Prod.mk.injEq] at hN
+  refine square_rule k 1 (by norm_num) a b 1 0 0 0 (by norm_num) (by norm_num) ?_ ?_ ?_
+  · simp only [NativeP, Prod.mk.injEq]; omega
+  · unfold EvenSite; dsimp only; omega
+  · rw [combine_mk_one hd]; unfold selDisp squareCorners; split_ifs <;>
+      (try simp only [EvenSite, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk, not_or, not_and] at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem sq_leaf_one_15 (k : ℕ) (a b : ℤ) (hN : NativeP (2 * (k : ℤ) + 3) (a, b)) (h0 : ¬ (a + b ≤ (2 * (k : ℤ) + 3) + 2)) :
+    SquareClauseSat (reciprocalField k) (selF k 1) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  simp only [NativeP, Prod.mk.injEq] at hN
+  refine square_rule k 1 (by norm_num) a b 1 1 1 0 (by norm_num) (by norm_num) ?_ ?_ ?_
+  · simp only [NativeP, Prod.mk.injEq]; omega
+  · unfold EvenSite; dsimp only; omega
+  · rw [combine_mk_one hd]; unfold selDisp squareCorners; split_ifs <;>
+      (try simp only [EvenSite, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk, not_or, not_and] at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem sq_leaf_neg_1 (k : ℕ) (a b : ℤ) (hN : NativeP (2 * (k : ℤ) + 3) (a, b)) (_h0 : a + b ≤ (2 * (k : ℤ) + 3) + 2) (h1 : (a + b) % 2 = 0) (h2 : b ≤ (2 * (k : ℤ) + 3)) (h3 : a + b ≤ (2 * (k : ℤ) + 3)) (h4 : a ≤ 0) (h5 : b ≤ 0) :
+    SquareClauseSat (reciprocalField k) (selF k (-1)) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  simp only [NativeP, Prod.mk.injEq] at hN
+  refine square_rule k (-1) (by norm_num) a b 0 1 0 0 (by norm_num) (by norm_num) ?_ ?_ ?_
+  · simp only [NativeP, Prod.mk.injEq]; omega
+  · unfold EvenSite; dsimp only; omega
+  · rw [combine_mk_one hd]; unfold selDisp squareCorners; split_ifs <;>
+      (try simp only [EvenSite, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk, not_or, not_and] at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem sq_leaf_neg_2 (k : ℕ) (a b : ℤ) (hN : NativeP (2 * (k : ℤ) + 3) (a, b)) (_h0 : a + b ≤ (2 * (k : ℤ) + 3) + 2) (h1 : (a + b) % 2 = 0) (h2 : b ≤ (2 * (k : ℤ) + 3)) (h3 : a + b ≤ (2 * (k : ℤ) + 3)) (h4 : a ≤ 0) (h5 : ¬ (b ≤ 0)) :
+    SquareClauseSat (reciprocalField k) (selF k (-1)) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  simp only [NativeP, Prod.mk.injEq] at hN
+  refine square_rule k (-1) (by norm_num) a b 0 0 0 0 (by norm_num) (by norm_num) ?_ ?_ ?_
+  · simp only [NativeP, Prod.mk.injEq]; omega
+  · unfold EvenSite; dsimp only; omega
+  · rw [combine_mk_one hd]; unfold selDisp squareCorners; split_ifs <;>
+      (try simp only [EvenSite, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk, not_or, not_and] at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem sq_leaf_neg_3 (k : ℕ) (a b : ℤ) (hN : NativeP (2 * (k : ℤ) + 3) (a, b)) (_h0 : a + b ≤ (2 * (k : ℤ) + 3) + 2) (h1 : (a + b) % 2 = 0) (h2 : b ≤ (2 * (k : ℤ) + 3)) (h3 : a + b ≤ (2 * (k : ℤ) + 3)) (h4 : ¬ (a ≤ 0)) :
+    SquareClauseSat (reciprocalField k) (selF k (-1)) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  simp only [NativeP, Prod.mk.injEq] at hN
+  refine square_rule k (-1) (by norm_num) a b 1 1 0 0 (by norm_num) (by norm_num) ?_ ?_ ?_
+  · simp only [NativeP, Prod.mk.injEq]; omega
+  · unfold EvenSite; dsimp only; omega
+  · rw [combine_mk_one hd]; unfold selDisp squareCorners; split_ifs <;>
+      (try simp only [EvenSite, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk, not_or, not_and] at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem sq_leaf_neg_4 (k : ℕ) (a b : ℤ) (hN : NativeP (2 * (k : ℤ) + 3) (a, b)) (h0 : a + b ≤ (2 * (k : ℤ) + 3) + 2) (h1 : (a + b) % 2 = 0) (h2 : b ≤ (2 * (k : ℤ) + 3)) (h3 : ¬ (a + b ≤ (2 * (k : ℤ) + 3))) :
+    SquareClauseSat (reciprocalField k) (selF k (-1)) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  simp only [NativeP, Prod.mk.injEq] at hN
+  refine square_rule k (-1) (by norm_num) a b 0 1 0 0 (by norm_num) (by norm_num) ?_ ?_ ?_
+  · simp only [NativeP, Prod.mk.injEq]; omega
+  · unfold EvenSite; dsimp only; omega
+  · rw [combine_mk_one hd]; unfold selDisp squareCorners; split_ifs <;>
+      (try simp only [EvenSite, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk, not_or, not_and] at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem sq_leaf_neg_5 (k : ℕ) (a b : ℤ) (hN : NativeP (2 * (k : ℤ) + 3) (a, b)) (h0 : a + b ≤ (2 * (k : ℤ) + 3) + 2) (h1 : (a + b) % 2 = 0) (h2 : ¬ (b ≤ (2 * (k : ℤ) + 3))) :
+    SquareClauseSat (reciprocalField k) (selF k (-1)) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  simp only [NativeP, Prod.mk.injEq] at hN
+  refine square_rule k (-1) (by norm_num) a b 1 1 0 1 (by norm_num) (by norm_num) ?_ ?_ ?_
+  · simp only [NativeP, Prod.mk.injEq]; omega
+  · unfold EvenSite; dsimp only; omega
+  · rw [combine_mk_one hd]; unfold selDisp squareCorners; split_ifs <;>
+      (try simp only [EvenSite, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk, not_or, not_and] at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem sq_leaf_neg_6 (k : ℕ) (a b : ℤ) (hN : NativeP (2 * (k : ℤ) + 3) (a, b)) (h0 : a + b ≤ (2 * (k : ℤ) + 3) + 2) (h1 : ¬ ((a + b) % 2 = 0)) (h2 : a ≤ 0) (h3 : b ≤ (2 * (k : ℤ) + 3) - 1) :
+    SquareClauseSat (reciprocalField k) (selF k (-1)) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  simp only [NativeP, Prod.mk.injEq] at hN
+  refine square_rule k (-1) (by norm_num) a b 0 1 0 0 (by norm_num) (by norm_num) ?_ ?_ ?_
+  · simp only [NativeP, Prod.mk.injEq]; omega
+  · unfold EvenSite; dsimp only; omega
+  · rw [combine_mk_one hd]; unfold selDisp squareCorners; split_ifs <;>
+      (try simp only [EvenSite, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk, not_or, not_and] at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem sq_leaf_neg_7 (k : ℕ) (a b : ℤ) (hN : NativeP (2 * (k : ℤ) + 3) (a, b)) (h0 : a + b ≤ (2 * (k : ℤ) + 3) + 2) (_h1 : ¬ ((a + b) % 2 = 0)) (h2 : a ≤ 0) (h3 : ¬ (b ≤ (2 * (k : ℤ) + 3) - 1)) (h4 : b ≤ (2 * (k : ℤ) + 3)) :
+    SquareClauseSat (reciprocalField k) (selF k (-1)) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  simp only [NativeP, Prod.mk.injEq] at hN
+  refine square_rule k (-1) (by norm_num) a b 1 1 0 0 (by norm_num) (by norm_num) ?_ ?_ ?_
+  · simp only [NativeP, Prod.mk.injEq]; omega
+  · unfold EvenSite; dsimp only; omega
+  · rw [combine_mk_one hd]; unfold selDisp squareCorners; split_ifs <;>
+      (try simp only [EvenSite, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk, not_or, not_and] at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem sq_leaf_neg_8 (k : ℕ) (a b : ℤ) (hN : NativeP (2 * (k : ℤ) + 3) (a, b)) (h0 : a + b ≤ (2 * (k : ℤ) + 3) + 2) (h1 : ¬ ((a + b) % 2 = 0)) (h2 : a ≤ 0) (_h3 : ¬ (b ≤ (2 * (k : ℤ) + 3) - 1)) (h4 : ¬ (b ≤ (2 * (k : ℤ) + 3))) :
+    SquareClauseSat (reciprocalField k) (selF k (-1)) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  simp only [NativeP, Prod.mk.injEq] at hN
+  refine square_rule k (-1) (by norm_num) a b 1 0 0 0 (by norm_num) (by norm_num) ?_ ?_ ?_
+  · simp only [NativeP, Prod.mk.injEq]; omega
+  · unfold EvenSite; dsimp only; omega
+  · rw [combine_mk_one hd]; unfold selDisp squareCorners; split_ifs <;>
+      (try simp only [EvenSite, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk, not_or, not_and] at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem sq_leaf_neg_9 (k : ℕ) (a b : ℤ) (hN : NativeP (2 * (k : ℤ) + 3) (a, b)) (_h0 : a + b ≤ (2 * (k : ℤ) + 3) + 2) (h1 : ¬ ((a + b) % 2 = 0)) (h2 : ¬ (a ≤ 0)) (h3 : b ≤ (2 * (k : ℤ) + 3)) (h4 : a + b ≤ (2 * (k : ℤ) + 3)) (h5 : a ≤ (2 * (k : ℤ) + 3) - 2) :
+    SquareClauseSat (reciprocalField k) (selF k (-1)) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  simp only [NativeP, Prod.mk.injEq] at hN
+  refine square_rule k (-1) (by norm_num) a b 1 0 0 0 (by norm_num) (by norm_num) ?_ ?_ ?_
+  · simp only [NativeP, Prod.mk.injEq]; omega
+  · unfold EvenSite; dsimp only; omega
+  · rw [combine_mk_one hd]; unfold selDisp squareCorners; split_ifs <;>
+      (try simp only [EvenSite, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk, not_or, not_and] at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem sq_leaf_neg_10 (k : ℕ) (a b : ℤ) (hN : NativeP (2 * (k : ℤ) + 3) (a, b)) (_h0 : a + b ≤ (2 * (k : ℤ) + 3) + 2) (_h1 : ¬ ((a + b) % 2 = 0)) (h2 : ¬ (a ≤ 0)) (h3 : b ≤ (2 * (k : ℤ) + 3)) (h4 : a + b ≤ (2 * (k : ℤ) + 3)) (h5 : ¬ (a ≤ (2 * (k : ℤ) + 3) - 2)) :
+    SquareClauseSat (reciprocalField k) (selF k (-1)) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  simp only [NativeP, Prod.mk.injEq] at hN
+  refine square_rule k (-1) (by norm_num) a b 1 1 1 0 (by norm_num) (by norm_num) ?_ ?_ ?_
+  · simp only [NativeP, Prod.mk.injEq]; omega
+  · unfold EvenSite; dsimp only; omega
+  · rw [combine_mk_one hd]; unfold selDisp squareCorners; split_ifs <;>
+      (try simp only [EvenSite, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk, not_or, not_and] at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem sq_leaf_neg_11 (k : ℕ) (a b : ℤ) (hN : NativeP (2 * (k : ℤ) + 3) (a, b)) (h0 : a + b ≤ (2 * (k : ℤ) + 3) + 2) (h1 : ¬ ((a + b) % 2 = 0)) (h2 : ¬ (a ≤ 0)) (h3 : b ≤ (2 * (k : ℤ) + 3)) (h4 : ¬ (a + b ≤ (2 * (k : ℤ) + 3))) :
+    SquareClauseSat (reciprocalField k) (selF k (-1)) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  simp only [NativeP, Prod.mk.injEq] at hN
+  refine square_rule k (-1) (by norm_num) a b 0 1 1 0 (by norm_num) (by norm_num) ?_ ?_ ?_
+  · simp only [NativeP, Prod.mk.injEq]; omega
+  · unfold EvenSite; dsimp only; omega
+  · rw [combine_mk_one hd]; unfold selDisp squareCorners; split_ifs <;>
+      (try simp only [EvenSite, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk, not_or, not_and] at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem sq_leaf_neg_12 (k : ℕ) (a b : ℤ) (_hN : NativeP (2 * (k : ℤ) + 3) (a, b)) (h0 : a + b ≤ (2 * (k : ℤ) + 3) + 2) (_h1 : ¬ ((a + b) % 2 = 0)) (h2 : ¬ (a ≤ 0)) (h3 : ¬ (b ≤ (2 * (k : ℤ) + 3))) :
+    SquareClauseSat (reciprocalField k) (selF k (-1)) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  refine square_rule k (-1) (by norm_num) a b 1 1 1 0 (by norm_num) (by norm_num) ?_ ?_ ?_
+  · simp only [NativeP, Prod.mk.injEq]; omega
+  · unfold EvenSite; dsimp only; omega
+  · rw [combine_mk_one hd]; unfold selDisp squareCorners; split_ifs <;>
+      (try simp only [EvenSite, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk, not_or, not_and] at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem sq_leaf_neg_13 (k : ℕ) (a b : ℤ) (hN : NativeP (2 * (k : ℤ) + 3) (a, b)) (h0 : ¬ (a + b ≤ (2 * (k : ℤ) + 3) + 2)) :
+    SquareClauseSat (reciprocalField k) (selF k (-1)) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  simp only [NativeP, Prod.mk.injEq] at hN
+  refine square_rule k (-1) (by norm_num) a b 0 0 0 0 (by norm_num) (by norm_num) ?_ ?_ ?_
+  · simp only [NativeP, Prod.mk.injEq]; omega
+  · unfold EvenSite; dsimp only; omega
+  · rw [combine_mk_one hd]; unfold selDisp squareCorners; split_ifs <;>
+      (try simp only [EvenSite, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq, Prod.mk_add_mk, not_or, not_and] at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem squares_native_one (k : ℕ) (a b : ℤ) (hN : NativeP (2 * (k : ℤ) + 3) (a, b)) :
+    SquareClauseSat (reciprocalField k) (selF k 1) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  by_cases h0 : a + b ≤ (2 * (k : ℤ) + 3) + 2
+  ·
+    by_cases h1 : (a + b) % 2 = 0
+    ·
+      by_cases h2 : b ≤ (2 * (k : ℤ) + 3)
+      ·
+        by_cases h3 : b ≤ (2 * (k : ℤ) + 3) - 1
+        ·
+          by_cases h4 : a ≤ (2 * (k : ℤ) + 3) - 1
+          ·
+            by_cases h5 : a + b ≤ (2 * (k : ℤ) + 3)
+            ·
+              by_cases h6 : a ≤ 0
+              ·
+                by_cases h7 : b ≤ 0
+                ·
+                  exact sq_leaf_one_1 k a b hN h0 h1 h2 h3 h4 h5 h6 h7
+                ·
+                  exact sq_leaf_one_2 k a b hN h0 h1 h2 h3 h4 h5 h6 h7
+              ·
+                exact sq_leaf_one_3 k a b hN h0 h1 h2 h3 h4 h5 h6
+            ·
+              exact sq_leaf_one_4 k a b hN h0 h1 h2 h3 h4 h5
+          ·
+            exact sq_leaf_one_5 k a b hN h0 h1 h2 h3 h4
+        ·
+          exact sq_leaf_one_6 k a b hN h0 h1 h2 h3
+      ·
+        exact sq_leaf_one_7 k a b hN h0 h1 h2
+    ·
+      by_cases h2 : a + b ≤ 1
+      ·
+        exact sq_leaf_one_8 k a b hN h0 h1 h2
+      ·
+        by_cases h3 : b ≤ (2 * (k : ℤ) + 3)
+        ·
+          by_cases h4 : a + b ≤ (2 * (k : ℤ) + 3)
+          ·
+            by_cases h5 : b ≤ (2 * (k : ℤ) + 3) - 1
+            ·
+              by_cases h6 : a ≤ 0
+              ·
+                exact sq_leaf_one_9 k a b hN h0 h1 h2 h3 h4 h5 h6
+              ·
+                by_cases h7 : a ≤ (2 * (k : ℤ) + 3) - 1
+                ·
+                  exact sq_leaf_one_10 k a b hN h0 h1 h2 h3 h4 h5 h6 h7
+                ·
+                  exact sq_leaf_one_11 k a b hN h0 h1 h2 h3 h4 h5 h6 h7
+            ·
+              exact sq_leaf_one_12 k a b hN h0 h1 h2 h3 h4 h5
+          ·
+            exact sq_leaf_one_13 k a b hN h0 h1 h2 h3 h4
+        ·
+          exact sq_leaf_one_14 k a b hN h0 h1 h2 h3
+  ·
+    exact sq_leaf_one_15 k a b hN h0
+
+set_option maxHeartbeats 400000 in
+theorem squares_native_neg (k : ℕ) (a b : ℤ) (hN : NativeP (2 * (k : ℤ) + 3) (a, b)) :
+    SquareClauseSat (reciprocalField k) (selF k (-1)) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  by_cases h0 : a + b ≤ (2 * (k : ℤ) + 3) + 2
+  ·
+    by_cases h1 : (a + b) % 2 = 0
+    ·
+      by_cases h2 : b ≤ (2 * (k : ℤ) + 3)
+      ·
+        by_cases h3 : a + b ≤ (2 * (k : ℤ) + 3)
+        ·
+          by_cases h4 : a ≤ 0
+          ·
+            by_cases h5 : b ≤ 0
+            ·
+              exact sq_leaf_neg_1 k a b hN h0 h1 h2 h3 h4 h5
+            ·
+              exact sq_leaf_neg_2 k a b hN h0 h1 h2 h3 h4 h5
+          ·
+            exact sq_leaf_neg_3 k a b hN h0 h1 h2 h3 h4
+        ·
+          exact sq_leaf_neg_4 k a b hN h0 h1 h2 h3
+      ·
+        exact sq_leaf_neg_5 k a b hN h0 h1 h2
+    ·
+      by_cases h2 : a ≤ 0
+      ·
+        by_cases h3 : b ≤ (2 * (k : ℤ) + 3) - 1
+        ·
+          exact sq_leaf_neg_6 k a b hN h0 h1 h2 h3
+        ·
+          by_cases h4 : b ≤ (2 * (k : ℤ) + 3)
+          ·
+            exact sq_leaf_neg_7 k a b hN h0 h1 h2 h3 h4
+          ·
+            exact sq_leaf_neg_8 k a b hN h0 h1 h2 h3 h4
+      ·
+        by_cases h3 : b ≤ (2 * (k : ℤ) + 3)
+        ·
+          by_cases h4 : a + b ≤ (2 * (k : ℤ) + 3)
+          ·
+            by_cases h5 : a ≤ (2 * (k : ℤ) + 3) - 2
+            ·
+              exact sq_leaf_neg_9 k a b hN h0 h1 h2 h3 h4 h5
+            ·
+              exact sq_leaf_neg_10 k a b hN h0 h1 h2 h3 h4 h5
+          ·
+            exact sq_leaf_neg_11 k a b hN h0 h1 h2 h3 h4
+        ·
+          exact sq_leaf_neg_12 k a b hN h0 h1 h2 h3
+  ·
+    exact sq_leaf_neg_13 k a b hN h0
+
+/-- The unit square clauses of the signed policy e(-1, eta) on the reciprocal field at every square. -/
+theorem squares_reciprocal (k : ℕ) (η : ℤ) (hη : η = 1 ∨ η = -1) (a b : ℤ) :
+    SquareClauseSat (reciprocalField k) (selF k η) a b := by
+  have hnat : ∀ a' b' : ℤ, NativeP (2 * (k : ℤ) + 3) (a', b') → SquareClauseSat (reciprocalField k) (selF k η) a' b' := by
+    rcases hη with rfl | rfl
+    · exact fun a' b' hN => squares_native_one k a' b' hN
+    · exact fun a' b' hN => squares_native_neg k a' b' hN
+  exact squareClause_all k η hη hnat a b
+
 end FLatticePaper.EPolicy
