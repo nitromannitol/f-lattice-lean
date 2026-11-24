@@ -602,4 +602,98 @@ theorem chainM_free (k : ℕ) {c i : Site}
   rw [e1, e2, e3, e4, twosPsi_lattice, twosPsi_lattice]
   linarith [key]
 
+
+open Classical in
+/-- The price on the polygon: `P = c₀ − [TwosDelta]`. -/
+theorem twos_price_ite (k : ℕ) {z1 z2 : ℤ} (hk : TwosKey (2 * (k : ℤ) + 4) z1 z2) :
+    twosP k (z1, z2) = ((k : ℤ) ^ 2 + 5 * (k : ℤ) + 5) - (if TwosDelta k z1 z2 then 1 else 0) := by
+  by_cases hd : TwosDelta k z1 z2
+  · rw [if_pos hd]
+    rcases twos_price_delta k hk with ⟨h1, h2⟩ | ⟨h1, h2⟩
+    · exact absurd hd h2
+    · unfold twosP
+      linarith
+  · rw [if_neg hd]
+    rcases twos_price_delta k hk with ⟨h1, h2⟩ | ⟨h1, h2⟩
+    · unfold twosP
+      linarith
+    · exact absurd h2 hd
+
+open Classical in
+/-- The band form of `Ψ`: `Ψ(q) ≤ Ψ(p)` when `δ(p) + D(p) ≤ δ(q) + D(q)` on polygon points. -/
+theorem psi_le_of_band (k : ℕ) {p1 p2 q1 q2 : ℤ} (hp : TwosKey (2 * (k : ℤ) + 4) p1 p2)
+    (hq : TwosKey (2 * (k : ℤ) + 4) q1 q2)
+    (h : (if TwosDelta k p1 p2 then (1 : ℤ) else 0) + twosSlip k (p1, p2) ≤
+      (if TwosDelta k q1 q2 then (1 : ℤ) else 0) + twosSlip k (q1, q2)) :
+    twosPsi k q1 q2 ≤ twosPsi k p1 p2 := by
+  unfold twosPsi
+  rw [twos_price_ite k hp, twos_price_ite k hq]
+  linarith
+
+/-- `Ψ` is invariant up to the constant `−1` under the kernel translate `U`. -/
+theorem psi_U_shift (k : ℕ) (a b : ℤ) :
+    twosPsi k (a + (2 * (k : ℤ) + 5)) (b + (2 * (k : ℤ) + 3)) = twosPsi k a b - 1 := by
+  have e1 : a + (2 * (k : ℤ) + 5) = a + (1 * (2 * (k : ℤ) + 5) + 0 * (-2)) := by ring
+  have e2 : b + (2 * (k : ℤ) + 3) = b + (1 * (2 * (k : ℤ) + 3) + 0 * (4 * (k : ℤ) + 8)) := by ring
+  rw [e1, e2, twosPsi_lattice]
+  ring
+
+theorem even_black_negs (k : ℕ) {x y : ℤ}
+    (hW : ¬ LadderOddOddWhite (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) :
+    ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2) ∧
+    ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1) ∧
+    ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4)) ∧
+    ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3) ∧
+    ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3) ∧
+    ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2) ∧
+    ¬ (y - x = (2 * (k : ℤ) + 4) ∧ 0 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4) - 2) ∧
+    ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4)) ∧
+    ¬ (x = 0 ∧ y = 2 * (2 * (k : ℤ) + 4)) ∧
+    ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2) := by
+  have n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2) := fun h => hW (ow_of_regions k (Or.inl h))
+  have n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1) := fun h => hW (ow_of_regions k (Or.inr (Or.inl h)))
+  have n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4)) := fun h => hW (ow_of_regions k (Or.inr (Or.inr (Or.inl h))))
+  have n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3) := fun h => hW (ow_of_regions k (Or.inr (Or.inr (Or.inr (Or.inl h)))))
+  have n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3) := fun h => hW (ow_of_regions k (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl h))))))
+  have n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2) := fun h => hW (ow_of_regions k (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl h)))))))
+  have n7 : ¬ (y - x = (2 * (k : ℤ) + 4) ∧ 0 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4) - 2) := fun h => hW (ow_of_regions k (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl h))))))))
+  have n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4)) := fun h => hW (ow_of_regions k (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl h)))))))))
+  have n9 : ¬ (x = 0 ∧ y = 2 * (2 * (k : ℤ) + 4)) := fun h => hW (ow_of_regions k (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl h))))))))))
+  have n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2) := fun h => hW (ow_of_regions k (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (h)))))))))))
+  exact ⟨n1, n2, n3, n4, n5, n6, n7, n8, n9, n10⟩
+
+set_option maxHeartbeats 400000 in
+/-- **Even native centre, west input, `x = 0`:** the translate `U` brings both shifted points into the polygon. -/
+theorem chainM_black_evenL_zero (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 0)
+    (hW : ¬ LadderOddOddWhite (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) (hx : x = 0) :
+    twosPsi k (x - 2) (y - 1) ≤ twosPsi k (x - 1) (y - 1) := by
+  obtain ⟨n1, n2, n3, n4, n5, n6, n7, n8, n9, n10⟩ := even_black_negs k hW
+  unfold NativeT at hn
+  subst hx
+  obtain ⟨hb1, hb2⟩ : 0 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) := by
+    clear n1 n2 n3 n4 n5 n6 n7 n8 n9 n10
+    omega
+  have hyr : 2 * (k : ℤ) + 4 + 2 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 2 := by
+    clear n1 n2 n4 n5 n6 n7 n8 n10 hn
+    omega
+  obtain ⟨hy1, hy2⟩ := hyr
+  clear n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 hW hn
+  have hq : TwosKey (2 * (k : ℤ) + 4) ((0 - 2) + (2 * (k : ℤ) + 5)) ((y - 1) + (2 * (k : ℤ) + 3)) := by
+    rw [twosKey_pos]
+    omega
+  have hpK : TwosKey (2 * (k : ℤ) + 4) ((0 - 1) + (2 * (k : ℤ) + 5)) ((y - 1) + (2 * (k : ℤ) + 3)) := by
+    rw [twosKey_pos]
+    omega
+  have key : twosPsi k ((0 - 2) + (2 * (k : ℤ) + 5)) ((y - 1) + (2 * (k : ℤ) + 3)) ≤
+      twosPsi k ((0 - 1) + (2 * (k : ℤ) + 5)) ((y - 1) + (2 * (k : ℤ) + 3)) := by
+    apply psi_le_of_band k hpK hq
+    have hv := twos_slip_value k hpK
+    have hw := twos_slip_value k hq
+    unfold TwosSlipZ0 TwosSlipZ2 at hv hw
+    rcases hv with ⟨v1, v2⟩ | ⟨v1, v2, v3⟩ | ⟨v1, v2⟩ <;>
+      rcases hw with ⟨w1, w2⟩ | ⟨w1, w2, w3⟩ | ⟨w1, w2⟩ <;>
+      split_ifs <;> (try unfold TwosDelta at *) <;> omega
+  rw [psi_U_shift, psi_U_shift] at key
+  linarith
+
 end FLatticePaper.TwosEPolicy
