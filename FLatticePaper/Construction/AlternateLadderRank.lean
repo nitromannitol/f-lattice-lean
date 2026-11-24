@@ -48,7 +48,7 @@ private theorem rankCorrection_sub_representative {den : ℤ} {correction : Fiel
   rw [sub_add_cancel] at h
   exact h.trans (hcorrect _ hmem)
 
-set_option maxHeartbeats 1000000 in
+set_option maxHeartbeats 400000 in
 private theorem ladderOddAlt_rank_even_black {den x y : ℤ} (hden : BaseMask.ladderOddAlt.Valid den)
     {correction : Field} (hcorrect : ∀ point ∈ (BaseMask.ladderOddAlt.raw den).sites,
       correction point = ladderOddAltRankCorrection den point)
@@ -70,7 +70,47 @@ private theorem ladderOddAlt_rank_even_black {den x y : ℤ} (hden : BaseMask.la
   · by_cases hlast : y = den + 1 <;> constructor <;> alternate_ladder_rank
   · by_cases hend : x = den - 2 <;> constructor <;> alternate_ladder_rank
 
-set_option maxHeartbeats 1300000 in
+set_option maxHeartbeats 400000 in
+/-- The default case of the even white B7 rank: the lower left neighbour is not in the raw mask's left boundary. -/
+private theorem ladderOddAlt_even_white_default {den x y : ℤ} {correction : Field}
+    (hden : BaseMask.ladderOddAlt.Valid den)
+    (hcorrect : ∀ point ∈ (BaseMask.ladderOddAlt.raw den).sites,
+      correction point = ladderOddAltRankCorrection den point)
+    (hpoint : (x, y) ∈ (BaseMask.ladderOddAlt.raw den).sites)
+    (heven : (x + y) % 2 = 0)
+    (hs : ¬ (x = 1 - den ∧ y = den - 1))
+    (hc : ¬ BaseMask.LadderOddAltCorner den (x, y))
+    (htop : ¬ LadderOddAltTop den (x, y)) (hband : ¬ LadderOddAltBand den (x, y))
+    (hleft : ¬ LadderOddAltLeftHigh den (x, y)) (hright : ¬ LadderOddAltRightHigh den (x, y))
+    (hwhite : ¬ LadderOddAltEvenBlack den (x, y)) :
+    6 * (x - 1) + correction (x - 1, y) < 6 * x + correction (x, y) := by
+  have ⟨hmin, hd⟩ := hden
+  obtain ⟨hx, hy, hshape⟩ := BaseMask.mem_ladderOddAlt_raw_iff.mp hpoint
+  dsimp only at hx hy
+  have hbody := hshape.resolve_left hc
+  clear hshape
+  dsimp only at hbody
+  rw [hcorrect _ hpoint]
+  have hn : (x - 1, y) ∈ (BaseMask.ladderOddAlt.raw den).sites := not_not.mp (fun h => by
+    rcases (ladderOddAlt_left_notMem_iff hden hpoint heven).mp h with h | h | h
+    · exact hc (Or.inl h)
+    · exact htop ⟨h.2, by omega, by omega⟩
+    · exact hs h)
+  rw [hcorrect _ hn]
+  simp only [LadderOddAltTop, LadderOddAltBand,
+    LadderOddAltLeftHigh, LadderOddAltRightHigh, BaseMask.LadderOddAltCorner,
+    LadderOddAltEvenBlack, BaseMask.LadderOddAltDiagonal] at hwhite hc htop hband hleft hright
+  by_cases hshelf : LadderOddAltShelf den (x, y)
+  · simp only [LadderOddAltShelf] at hshelf
+    alternate_ladder_rank
+  by_cases hmid : LadderOddAltMiddle den (x, y)
+  · simp only [LadderOddAltMiddle] at hmid
+    alternate_ladder_rank
+  simp only [LadderOddAltShelf, LadderOddAltMiddle] at hshelf hmid
+  have hdefault : x < 0 ∨ y = -1 ∨ (x = 0 ∧ y = den) := by omega
+  rcases hdefault with h | h | h <;> alternate_ladder_rank
+
+set_option maxHeartbeats 400000 in
 private theorem ladderOddAlt_rank_even_white {den x y : ℤ} (hden : BaseMask.ladderOddAlt.Valid den)
     {correction : Field} (hcorrect : ∀ point ∈ (BaseMask.ladderOddAlt.raw den).sites,
       correction point = ladderOddAltRankCorrection den point)
@@ -94,9 +134,7 @@ private theorem ladderOddAlt_rank_even_white {den x y : ℤ} (hden : BaseMask.la
     · have hn : (x - 1, y) ∈ (BaseMask.ladderOddAlt.raw den).sites := by alternate_ladder_mem
       rw [hcorrect _ hn]
       alternate_ladder_rank
-  have hbody := hshape.resolve_left hc
   clear hshape
-  dsimp only at hbody
   by_cases htop : LadderOddAltTop den (x, y)
   · simp only [LadderOddAltTop] at htop
     right
@@ -132,24 +170,8 @@ private theorem ladderOddAlt_rank_even_white {den x y : ℤ} (hden : BaseMask.la
       alternate_ladder_mem
     rw [rankCorrection_add_representative hcorrect hper hU _ hn]
     alternate_ladder_rank
-  have hn : (x - 1, y) ∈ (BaseMask.ladderOddAlt.raw den).sites := not_not.mp (fun h => by
-    rcases (ladderOddAlt_left_notMem_iff hden hpoint heven).mp h with h | h | h
-    · exact hc (Or.inl h)
-    · exact htop ⟨h.2, by omega, by omega⟩
-    · exact hs h)
-  rw [hcorrect _ hn]
-  simp only [LadderOddAltTop, LadderOddAltBand,
-    LadderOddAltLeftHigh, LadderOddAltRightHigh, BaseMask.LadderOddAltCorner,
-    LadderOddAltEvenBlack, BaseMask.LadderOddAltDiagonal] at hwhite hc htop hband hleft hright
-  by_cases hshelf : LadderOddAltShelf den (x, y)
-  · simp only [LadderOddAltShelf] at hshelf
-    alternate_ladder_rank
-  by_cases hmid : LadderOddAltMiddle den (x, y)
-  · simp only [LadderOddAltMiddle] at hmid
-    alternate_ladder_rank
-  simp only [LadderOddAltShelf, LadderOddAltMiddle] at hshelf hmid
-  have hdefault : x < 0 ∨ y = -1 ∨ (x = 0 ∧ y = den) := by omega
-  rcases hdefault with h | h | h <;> alternate_ladder_rank
+  · rw [← hcorrect _ hpoint]
+    exact ladderOddAlt_even_white_default hden hcorrect hpoint heven hs hc htop hband hleft hright hwhite
 
 private theorem ladderOddAlt_up_notMem_iff {den x y : ℤ} (hden : BaseMask.ladderOddAlt.Valid den)
     (hsite : (x, y) ∈ (BaseMask.ladderOddAlt.raw den).sites) (hodd : ¬ EvenSite (x, y)) :
@@ -163,7 +185,142 @@ private theorem ladderOddAlt_up_notMem_iff {den x y : ℤ} (hden : BaseMask.ladd
   rw [← reflectLadderOddAlt_mem_iff den (x, y + 1), hshift]
   exact ladderOddAlt_down_notMem_iff hden href hpar
 
-set_option maxHeartbeats 2400000 in
+set_option maxHeartbeats 400000 in
+/-- The rows of the odd black case of the B7 ladder. -/
+private theorem ladderOddAlt_odd_black_rows {den x y : ℤ} (hden : BaseMask.ladderOddAlt.Valid den)
+    (hpoint : (x, y) ∈ (BaseMask.ladderOddAlt.raw den).sites) (hodd : ¬ EvenSite (x, y))
+    (hblack : ¬ LadderOddAltOddWhite den (x, y)) : 0 ≤ y ∧ y ≤ den + 1 := by
+  have ⟨hmin, hd⟩ := hden
+  have hxy : (x + y) % 2 ≠ 0 := hodd
+  obtain ⟨hx, hy, hshape⟩ := BaseMask.mem_ladderOddAlt_raw_iff.mp hpoint
+  dsimp only at hx hy
+  have hbody := hshape.resolve_left (by clear hblack; simp only [BaseMask.LadderOddAltCorner]; omega)
+  dsimp only at hbody
+  have hb1 : ¬ LadderOddAltLowerExit den (x, y) := fun h => hblack (Or.inl h)
+  have hb2 : ¬ LadderOddAltLowerExit den (reflectLadderOddAlt den (x, y)) :=
+    fun h => hblack (Or.inr (Or.inl h))
+  clear hblack hshape
+  simp only [LadderOddAltLowerExit, reflectLadderOddAlt, Prod.fst_sub, Prod.snd_sub] at hb1 hb2
+  omega
+
+set_option maxHeartbeats 400000 in
+/-- The ends of the left-high segment of the odd black case. -/
+private theorem ladderOddAlt_odd_black_xEnds {den x y : ℤ} (hden : BaseMask.ladderOddAlt.Valid den)
+    (hpoint : (x, y) ∈ (BaseMask.ladderOddAlt.raw den).sites) (hodd : ¬ EvenSite (x, y))
+    (hblack : ¬ LadderOddAltOddWhite den (x, y))
+    (hl : LadderOddAltLeftHigh den (x, y)) (hout : x + y = den - 1) :
+    x = 0 ∨ x = den - 1 := by
+  have ⟨hmin, hd⟩ := hden
+  have hxy : (x + y) % 2 ≠ 0 := hodd
+  obtain ⟨hx, hy, hshape⟩ := BaseMask.mem_ladderOddAlt_raw_iff.mp hpoint
+  dsimp only at hx hy
+  have hbody := hshape.resolve_left (by clear hblack; simp only [BaseMask.LadderOddAltCorner]; omega)
+  dsimp only at hbody
+  simp only [LadderOddAltOddWhite, LadderOddAltLowerExit, reflectLadderOddAlt, Prod.fst_sub,
+    Prod.snd_sub] at hblack
+  simp only [LadderOddAltLeftHigh] at hl
+  omega
+
+set_option maxHeartbeats 400000 in
+/-- The row bound of the right-high segment of the odd black case. -/
+private theorem ladderOddAlt_odd_black_row {den x y : ℤ} (hden : BaseMask.ladderOddAlt.Valid den)
+    (hpoint : (x, y) ∈ (BaseMask.ladderOddAlt.raw den).sites) (hodd : ¬ EvenSite (x, y))
+    (hblack : ¬ LadderOddAltOddWhite den (x, y))
+    (hs : ¬ LadderOddAltShelf den (x, y)) (hl : ¬ LadderOddAltLeftHigh den (x, y))
+    (hr : LadderOddAltRightHigh den (x, y)) :
+    2 ≤ y ∧ x ≤ 2 * den - 3 := by
+  have ⟨hmin, hd⟩ := hden
+  have hxy : (x + y) % 2 ≠ 0 := hodd
+  obtain ⟨hx, hy, hshape⟩ := BaseMask.mem_ladderOddAlt_raw_iff.mp hpoint
+  dsimp only at hx hy
+  have hbody := hshape.resolve_left (by clear hblack; simp only [BaseMask.LadderOddAltCorner]; omega)
+  dsimp only at hbody
+  simp only [LadderOddAltOddWhite, LadderOddAltLowerExit, reflectLadderOddAlt, Prod.fst_sub,
+    Prod.snd_sub] at hblack
+  simp only [LadderOddAltShelf] at hs
+  simp only [LadderOddAltLeftHigh] at hl
+  simp only [LadderOddAltRightHigh] at hr
+  clear hbody
+  omega
+
+set_option maxHeartbeats 400000 in
+/-- The spine of the right-high segment of the odd black case. -/
+private theorem ladderOddAlt_odd_black_xSpine {den x y : ℤ} (hden : BaseMask.ladderOddAlt.Valid den)
+    (hpoint : (x, y) ∈ (BaseMask.ladderOddAlt.raw den).sites) (hodd : ¬ EvenSite (x, y))
+    (_hblack : ¬ LadderOddAltOddWhite den (x, y))
+    (_hrow : 2 ≤ y ∧ x ≤ 2 * den - 3) (hdRow : y = den)
+    (hr : LadderOddAltRightHigh den (x, y)) (_hs : ¬ LadderOddAltShelf den (x, y))
+    (_hl : ¬ LadderOddAltLeftHigh den (x, y)) :
+    x = den - 1 := by
+  have ⟨hmin, hd⟩ := hden
+  have hxy : (x + y) % 2 ≠ 0 := hodd
+  obtain ⟨hx, hy, hshape⟩ := BaseMask.mem_ladderOddAlt_raw_iff.mp hpoint
+  dsimp only at hx hy
+  have hbody := hshape.resolve_left (by clear _hblack; simp only [BaseMask.LadderOddAltCorner]; omega)
+  dsimp only at hbody
+  simp only [LadderOddAltRightHigh] at hr
+  omega
+
+set_option maxHeartbeats 400000 in
+/-- The far bound of the middle segment of the odd black case. -/
+private theorem ladderOddAlt_odd_black_far {den x y : ℤ} (hden : BaseMask.ladderOddAlt.Valid den)
+    (hpoint : (x, y) ∈ (BaseMask.ladderOddAlt.raw den).sites) (hodd : ¬ EvenSite (x, y))
+    (hblack : ¬ LadderOddAltOddWhite den (x, y))
+    (hm : LadderOddAltMiddle den (x, y)) (hr : ¬ LadderOddAltRightHigh den (x, y))
+    (hs : ¬ LadderOddAltShelf den (x, y)) (hl : ¬ LadderOddAltLeftHigh den (x, y)) :
+    den + 3 ≤ x + y := by
+  have ⟨hmin, hd⟩ := hden
+  have hxy : (x + y) % 2 ≠ 0 := hodd
+  obtain ⟨hx, hy, hshape⟩ := BaseMask.mem_ladderOddAlt_raw_iff.mp hpoint
+  dsimp only at hx hy
+  have hbody := hshape.resolve_left (by clear hblack; simp only [BaseMask.LadderOddAltCorner]; omega)
+  dsimp only at hbody
+  simp only [LadderOddAltOddWhite, LadderOddAltLowerExit, reflectLadderOddAlt, Prod.fst_sub,
+    Prod.snd_sub] at hblack
+  simp only [LadderOddAltMiddle] at hm
+  simp only [LadderOddAltShelf] at hs
+  simp only [LadderOddAltLeftHigh] at hl
+  simp only [LadderOddAltRightHigh] at hr
+  omega
+
+set_option maxHeartbeats 400000 in
+/-- The default region of the odd black case of the B7 ladder: the left strip with the vertical bounds. -/
+private theorem ladderOddAlt_odd_black_default {den x y : ℤ} (hden : BaseMask.ladderOddAlt.Valid den)
+    (hpoint : (x, y) ∈ (BaseMask.ladderOddAlt.raw den).sites) (hodd : ¬ EvenSite (x, y))
+    (hblack : ¬ LadderOddAltOddWhite den (x, y))
+    (hs : ¬ LadderOddAltShelf den (x, y)) (hl : ¬ LadderOddAltLeftHigh den (x, y))
+    (hr : ¬ LadderOddAltRightHigh den (x, y)) (hm : ¬ LadderOddAltMiddle den (x, y)) :
+    x < 0 ∧ 1 ≤ y ∧ y ≤ den - 1 := by
+  have ⟨hmin, hd⟩ := hden
+  have hxy : (x + y) % 2 ≠ 0 := hodd
+  obtain ⟨hx, hy, hshape⟩ := BaseMask.mem_ladderOddAlt_raw_iff.mp hpoint
+  dsimp only at hx hy
+  have hbody := hshape.resolve_left (by clear hblack; simp only [BaseMask.LadderOddAltCorner]; omega)
+  dsimp only at hbody
+  have hb1 : ¬ LadderOddAltLowerExit den (x, y) := fun h => hblack (Or.inl h)
+  have hb2 : ¬ LadderOddAltLowerExit den (reflectLadderOddAlt den (x, y)) :=
+    fun h => hblack (Or.inr (Or.inl h))
+  have hb3 : ¬ (x = -1 ∧ y = 0) := fun h => hblack (Or.inr (Or.inr (Or.inl h)))
+  have hb4 : ¬ (x = den ∧ y = den + 1) := fun h => hblack (Or.inr (Or.inr (Or.inr (Or.inl h))))
+  have hb5 : ¬ (1 ≤ x ∧ x ≤ den - 2 ∧ (x + y = den - 1 ∨ x + y = den + 1)) :=
+    fun h => hblack (Or.inr (Or.inr (Or.inr (Or.inr h))))
+  clear hblack hshape
+  simp only [LadderOddAltLowerExit, reflectLadderOddAlt, Prod.fst_sub, Prod.snd_sub] at hb1 hb2
+  simp only [LadderOddAltShelf] at hs
+  simp only [LadderOddAltLeftHigh] at hl
+  simp only [LadderOddAltRightHigh] at hr
+  simp only [LadderOddAltMiddle] at hm
+  have hcases : y = -1 ∨ y = 0 ∨ y = den + 2 ∨ y = den + 1 ∨ y = den ∨ (1 ≤ y ∧ y ≤ den - 1) := by
+    clear hs hl hr hm hb1 hb2 hb3 hb4 hb5 hbody; omega
+  rcases hcases with rfl | rfl | rfl | rfl | rfl | ⟨h1, h2⟩
+  · clear hs hl hr hm hb2 hb3 hb4 hb5; omega
+  · clear hs hr hm hb1 hb2 hb4 hb5; omega
+  · clear hs hl hr hm hb1 hb3 hb4 hb5; omega
+  · clear hl hr hm hb1 hb2 hb3 hb5; omega
+  · clear hb1 hb3 hb4 hb5; omega
+  · clear hb1 hb3 hb4 hb5; omega
+
+set_option maxHeartbeats 400000 in
 private theorem ladderOddAlt_rank_odd_black {den x y : ℤ} (hden : BaseMask.ladderOddAlt.Valid den)
     {correction : Field} (hcorrect : ∀ point ∈ (BaseMask.ladderOddAlt.raw den).sites,
       correction point = ladderOddAltRankCorrection den point)
@@ -176,45 +333,45 @@ private theorem ladderOddAlt_rank_odd_black {den x y : ℤ} (hden : BaseMask.lad
     hblack (Or.inl ((ladderOddAlt_down_notMem_iff hden hpoint hxy).mp h))
   have hp : (x, y + 1) ∈ (BaseMask.ladderOddAlt.raw den).sites := not_not.mp fun h =>
     hblack (Or.inr (Or.inl ((ladderOddAlt_up_notMem_iff hden hpoint hodd).mp h)))
-  obtain ⟨hx, hy, hshape⟩ := BaseMask.mem_ladderOddAlt_raw_iff.mp hpoint
+  obtain ⟨hx, hy, -⟩ := BaseMask.mem_ladderOddAlt_raw_iff.mp hpoint
   dsimp only at hx hy
-  have hbody := hshape.resolve_left (by simp only [BaseMask.LadderOddAltCorner]; omega)
-  dsimp only at hbody
-  simp only [LadderOddAltOddWhite, LadderOddAltLowerExit, reflectLadderOddAlt, Prod.fst_sub, Prod.snd_sub] at hblack
-  have hrows : 0 ≤ y ∧ y ≤ den + 1 := by omega
+  have hrows := ladderOddAlt_odd_black_rows hden hpoint hodd hblack
   rw [hcorrect _ hpoint, hcorrect _ hn, hcorrect _ hp]
-  clear hshape hcorrect hn hp hpoint
+  clear hcorrect hn hp
   by_cases hs : LadderOddAltShelf den (x, y)
   · simp only [LadderOddAltShelf] at hs
-    clear hblack hbody
+    clear hblack
     by_cases hx0 : x = 0 <;> constructor <;> alternate_ladder_rank
   by_cases hl : LadderOddAltLeftHigh den (x, y)
-  · simp only [LadderOddAltLeftHigh] at hl
-    by_cases hout : x + y = den - 1
-    · have hxEnds : x = 0 ∨ x = den - 1 := by omega
-      clear hblack hbody
+  · by_cases hout : x + y = den - 1
+    · have hxEnds := ladderOddAlt_odd_black_xEnds hden hpoint hodd hblack hl hout
+      simp only [LadderOddAltLeftHigh] at hl
+      clear hblack
       rcases hxEnds with h | h <;> constructor <;> alternate_ladder_rank
-    · clear hblack hbody
+    · simp only [LadderOddAltLeftHigh] at hl
+      clear hblack
       by_cases hy0 : y = 0 <;> constructor <;> alternate_ladder_rank
   by_cases hr : LadderOddAltRightHigh den (x, y)
-  · simp only [LadderOddAltRightHigh] at hr
-    have hrow : 2 ≤ y ∧ x ≤ 2 * den - 3 := by omega
-    clear hblack hbody
+  · have hrow := ladderOddAlt_odd_black_row hden hpoint hodd hblack hs hl hr
     by_cases hdRow : y = den
-    · have hxSpine : x = den - 1 := by omega
+    · have hxSpine := ladderOddAlt_odd_black_xSpine hden hpoint hodd hblack hrow hdRow hr hs hl
+      simp only [LadderOddAltRightHigh] at hr
+      clear hblack
       constructor <;> alternate_ladder_rank
-    · by_cases hlast : x + y = 2 * den - 1 <;> constructor <;> alternate_ladder_rank
+    · simp only [LadderOddAltRightHigh] at hr
+      clear hblack
+      by_cases hlast : x + y = 2 * den - 1 <;> constructor <;> alternate_ladder_rank
   by_cases hm : LadderOddAltMiddle den (x, y)
-  · simp only [LadderOddAltMiddle] at hm
-    have hfar : den + 3 ≤ x + y := by omega
-    clear hblack hbody
+  · have hfar := ladderOddAlt_odd_black_far hden hpoint hodd hblack hm hr hs hl
+    simp only [LadderOddAltMiddle] at hm
+    clear hblack
     by_cases hlast : y = den <;> constructor <;> alternate_ladder_rank
+  have hdefault := ladderOddAlt_odd_black_default hden hpoint hodd hblack hs hl hr hm
   simp only [LadderOddAltShelf, LadderOddAltLeftHigh, LadderOddAltRightHigh, LadderOddAltMiddle] at hs hl hr hm
-  have hdefault : x < 0 ∧ 1 ≤ y ∧ y ≤ den - 1 := by omega
-  clear hblack hbody
+  clear hblack
   constructor <;> alternate_ladder_rank
 
-set_option maxHeartbeats 1300000 in
+set_option maxHeartbeats 400000 in
 private theorem ladderOddAlt_rank_odd_white {den x y : ℤ} (hden : BaseMask.ladderOddAlt.Valid den)
     {correction : Field} (hcorrect : ∀ point ∈ (BaseMask.ladderOddAlt.raw den).sites,
       correction point = ladderOddAltRankCorrection den point)

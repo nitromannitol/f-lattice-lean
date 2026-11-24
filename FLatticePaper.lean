@@ -186,6 +186,14 @@ import FLatticePaper.Plane.Induction.TwosTileCover
 import FLatticePaper.Plane.Induction.TwosPriceE
 import FLatticePaper.Plane.Induction.TwosZeroEven
 import FLatticePaper.Plane.Induction.TwosStripFacts
+import FLatticePaper.Plane.Induction.TwosEPolicy
+import FLatticePaper.Plane.Induction.TwosLaplacianTile
+import FLatticePaper.Plane.Induction.TwosNativeCopy
+import FLatticePaper.Plane.Induction.TwosQuota
+import FLatticePaper.Plane.Induction.TwosSquares
+import FLatticePaper.Plane.Induction.TwosSquareLeaves
+import FLatticePaper.Plane.Induction.TwosSquareCover
+import FLatticePaper.Plane.Induction.TwosSquareShift
 import FLatticePaper.Construction.NearOneBaseCases
 import FLatticePaper.Construction.BaseCases
 import FLatticePaper.Construction.OffsetTables
@@ -326,7 +334,6 @@ import FLatticePaper.Tiles.SiteVertWord
 import FLatticePaper.Tiles.SiteVertLink
 import FLatticePaper.Tiles.SiteRot
 import FLatticePaper.Tiles.SiteVertCover
-import FLatticePaper.Tiles.SiteHull
 import FLatticePaper.Tiles.SiteHullOdd
 import FLatticePaper.Tiles.SiteHullEven
 import FLatticePaper.Tiles.SiteBoundary
@@ -366,7 +373,6 @@ import FLatticePaper.Tiles.CeilBlocks
 import FLatticePaper.Tiles.HorizontalGlue
 import FLatticePaper.Tiles.HorizontalStep
 import FLatticePaper.Tiles.HorizontalInduction
-import FLatticePaper.Tiles.BaseFamilies
 import FLatticePaper.Tiles.BaseInvariant
 import FLatticePaper.Tiles.VJunction
 import FLatticePaper.Tiles.VGlue
@@ -440,7 +446,6 @@ import FLatticePaper.Plane.Induction.CutTipEscape
 import FLatticePaper.Plane.Induction.TipWhiteness
 import FLatticePaper.Plane.Induction.TipEscape
 import FLatticePaper.Plane.Induction.TipVertex
-import FLatticePaper.Plane.Induction.TipEscape
 import FLatticePaper.Plane.Induction.W0Sheets
 import FLatticePaper.Plane.Induction.TieOneInput
 import FLatticePaper.Plane.Induction.TieCentre
@@ -575,5 +580,9 @@ import FLatticePaper.Plane.Induction.EPolicyFreeV
 import FLatticePaper.Plane.Induction.EPolicyPrescribed
 import FLatticePaper.Plane.Induction.EPolicySquares
 import FLatticePaper.Plane.Induction.EPolicyValues
+import FLatticePaper.Plane.Induction.EPolicyTransfer
+import FLatticePaper.Plane.Induction.EPolicyCover
+import FLatticePaper.Plane.Induction.EPolicyFinal
+import FLatticePaper.Plane.Induction.StrongResidualStep
 
 /-! Root import for the corrected F-lattice paper. -/

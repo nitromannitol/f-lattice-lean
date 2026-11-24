@@ -18,7 +18,7 @@ The lists below are the cell sets of the alternate tiles (corners of cells), gen
 against them. The candidate corners cover every placement that can meet the tile. -/
 
 set_option maxRecDepth 100000
-set_option maxHeartbeats 4000000
+set_option maxHeartbeats 400000
 
 namespace FLatticePaper.Tiles
 open FLatticePaper.Construction

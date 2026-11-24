@@ -1,0 +1,7 @@
+import FLatticePaper.Plane.Induction.StrongResidualStep
+import FLatticePaper.Plane.Induction.StrongDeckSpan
+
+#print axioms FLatticePaper.Induction.strongResidual_of_conj
+#print axioms FLatticePaper.StrongUnitPrice.unitPrice_and_noSaddle
+#print axioms FLatticePaper.StrongUnitPrice.star_window
+#print axioms FLatticePaper.StrongUnitPrice.price_deckVec

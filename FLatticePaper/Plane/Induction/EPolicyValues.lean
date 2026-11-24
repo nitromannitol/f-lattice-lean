@@ -28,7 +28,7 @@ open FLatticePaper.Farey
 
 /-- The value inequalities of the signed policy e(-1, eta) on the reciprocal field `reciprocalField k` (the items 4 and the
 strict rank of the note): the raw slip and the price do not increase along the policy, the chain potential does not increase
-along the policy, and a strict rank decreases along it. -/
+along the policy. The strict rank is derived from these values in `RankWithValues`. -/
 structure ReciprocalValues (k : ℕ) : Prop where
   slip : ∀ η : ℤ, (η = 1 ∨ η = -1) → ∀ c i,
     ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) c i →
@@ -36,8 +36,6 @@ structure ReciprocalValues (k : ℕ) : Prop where
   price : ∀ η : ℤ, (η = 1 ∨ η = -1) → ∀ c i,
     ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) c i →
       (reciprocalFrame k).price (reciprocalField k) i ≤ (reciprocalFrame k).price (reciprocalField k) c
-  rank : ∀ η : ℤ, (η = 1 ∨ η = -1) → ∃ R : Site → ℤ, ∀ c i,
-    ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) c i → R i < R c
   chain : ∀ η : ℤ, (η = 1 ∨ η = -1) →
     NonincreasingAlong ((reciprocalFrame k).chainPotential (reciprocalField k) η)
       (ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)))
@@ -56,7 +54,10 @@ theorem roundedSlip_nonincreasing_of_slip (k : ℕ) (V : ReciprocalValues k) (η
 /-- The canonical signed policy of the sign `η` on the reciprocal field, from the value hypotheses `V`: every field of
 `CanonicalSignedPolicy` is the lemma of the e-policy (quota, selection, squares, prescription, free set), except the value
 inequalities, which are the fields of `V`. -/
-noncomputable def canonicalSignedPolicy_reciprocal (k : ℕ) (V : ReciprocalValues k) (η : ℤ) (hη : η = 1 ∨ η = -1) :
+noncomputable def canonicalSignedPolicy_reciprocal (k : ℕ) (V : ReciprocalValues k)
+    (rank : ∀ η : ℤ, (η = 1 ∨ η = -1) → ∃ R : Site → ℤ, ∀ c i,
+      ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) c i → R i < R c)
+    (η : ℤ) (hη : η = 1 ∨ η = -1) :
     CanonicalSignedPolicy (reciprocalFrame k) (reciprocalField k) η where
   policy := ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k))
   free := FreeGlobal (2 * (k : ℤ) + 3)
@@ -70,8 +71,8 @@ noncomputable def canonicalSignedPolicy_reciprocal (k : ℕ) (V : ReciprocalValu
     rw [cutGrade_one_zero_one, cutGrade_one_zero_one]
     exact V.price η hη c i h
   nonincreasingJ := fun c i h => roundedSlip_nonincreasing_of_slip k V η hη c i h
-  rank := Classical.choose (V.rank η hη)
-  strictRank := fun c i h _ _ => Classical.choose_spec (V.rank η hη) c i h
+  rank := Classical.choose (rank η hη)
+  strictRank := fun c i h _ _ => Classical.choose_spec (rank η hη) c i h
   freePrescribed := fun c _ hw => freePrescribed_e k η hη c hw
   sel := selF k η
   sel_input := fun c _ => selF_input k η hη c
@@ -83,9 +84,11 @@ noncomputable def canonicalSignedPolicy_reciprocal (k : ℕ) (V : ReciprocalValu
 
 /-- **The canonical signed games of the reciprocal field**, assembled from the value hypotheses `V`: the two signs
 `game η` (`η = ±1`) and the chain claim `chainNonincreasing` (the value field `V.chain`). -/
-noncomputable def canonicalSignedGames_reciprocal (k : ℕ) (V : ReciprocalValues k) :
+noncomputable def canonicalSignedGames_reciprocal (k : ℕ) (V : ReciprocalValues k)
+    (rank : ∀ η : ℤ, (η = 1 ∨ η = -1) → ∃ R : Site → ℤ, ∀ c i,
+      ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) c i → R i < R c) :
     CanonicalSignedGames (reciprocalFrame k) (reciprocalField k) where
-  game := fun η hη => canonicalSignedPolicy_reciprocal k V η hη
+  game := fun η hη => canonicalSignedPolicy_reciprocal k V rank η hη
   chainNonincreasing := fun η hη => V.chain η hη
 
 /-- The unit increment of a field along `e` at `z`. -/
@@ -2033,5 +2036,2581 @@ theorem chain_bot1 (k : ℕ) (η s : ℤ) (hη : η = 1 ∨ η = -1)
     ext <;> (simp; try ring)
   rw [e2]
   exact bot1_Phi k η (-η) hη rfl
+
+/-- Increments are invariant under the kernel translation `U`, stated as an equation between two sites. -/
+theorem incr_eq_U (k : ℕ) (e Z W : Site) (h : Z + ((2 * (k : ℤ) + 3), 1) = W) :
+    incr (reciprocalField k) e Z = incr (reciprocalField k) e W := by
+  rw [← h, incr_U_inv]
+
+/-- The transverse translation `T`: the increment at `Z` is that at `Z + T` plus the grade term. -/
+theorem incr_eq_T (k : ℕ) (e Z W : Site) (h : Z + (1 - (2 * (k : ℤ) + 3), 1 + (2 * (k : ℤ) + 3)) = W) :
+    incr (reciprocalField k) e Z = incr (reciprocalField k) e W + ((2 * (k : ℤ) + 3) * e.2 - e.1) := by
+  rw [← h, incr_T]; ring
+
+/-- A site satisfying the corner disjunction is a corner. -/
+theorem corner_yes (d a b : ℤ) (h : (a = 0 ∧ b = 0) ∨ (a = 2 ∧ b = d + 1)) :
+    BaseMask.StairEvenCorner d (a, b) := h
+
+/-- The raw corner (2, D + 1). -/
+theorem mem_raw_corner2 (k : ℕ) : ((2 : ℤ), 2 * (k : ℤ) + 3 + 1) ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites := by
+  rw [BaseMask.mem_stairEven_raw_iff]
+  exact ⟨⟨by omega, by omega⟩, ⟨by omega, by omega⟩, Or.inl (Or.inr ⟨rfl, rfl⟩)⟩
+
+/-- The raw corner (0, 0). -/
+theorem mem_raw_corner0 (k : ℕ) : ((0 : ℤ), (0 : ℤ)) ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites := by
+  rw [BaseMask.mem_stairEven_raw_iff]
+  exact ⟨⟨by omega, by omega⟩, ⟨by omega, by omega⟩, Or.inl (Or.inl ⟨rfl, rfl⟩)⟩
+
+/-- The raw corner (2, D + 1), with its coordinates given by equations. -/
+theorem mem_raw_corner2' (k : ℕ) (a b : ℤ) (ha : a = 2) (hb : b = 2 * (k : ℤ) + 3 + 1) :
+    (a, b) ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites := by
+  subst ha; subst hb; exact mem_raw_corner2 k
+
+/-- The raw corner (0, 0), with its coordinates given by equations. -/
+theorem mem_raw_corner0' (k : ℕ) (a b : ℤ) (ha : a = 0) (hb : b = 0) :
+    (a, b) ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites := by
+  subst ha; subst hb; exact mem_raw_corner0 k
+
+/-- The horizontal stair difference with a corner at the shifted site. -/
+theorem hG_c_plus (d x y s : ℤ) (h1 : BaseMask.StairEvenCorner d (x + s, y)) (h2 : ¬ BaseMask.StairEvenCorner d (x, y)) :
+    hG d x y s = min (x + s - 1) 0 - min (x - 1) 0 + 1 := by
+  unfold hG; rw [if_pos h1, if_neg h2]; ring
+
+/-- The horizontal stair difference with a corner at the base site. -/
+theorem hG_c_minus (d x y s : ℤ) (h1 : ¬ BaseMask.StairEvenCorner d (x + s, y)) (h2 : BaseMask.StairEvenCorner d (x, y)) :
+    hG d x y s = min (x + s - 1) 0 - min (x - 1) 0 - 1 := by
+  unfold hG; rw [if_neg h1, if_pos h2]; ring
+
+/-- The horizontal stair difference with corners at both sites. -/
+theorem hG_cc (d x y s : ℤ) (h1 : BaseMask.StairEvenCorner d (x + s, y)) (h2 : BaseMask.StairEvenCorner d (x, y)) :
+    hG d x y s = min (x + s - 1) 0 - min (x - 1) 0 := by
+  unfold hG; rw [if_pos h1, if_pos h2]; ring
+
+/-- The horizontal stair difference without corners. -/
+theorem hG_nc (d x y s : ℤ) (h1 : ¬ BaseMask.StairEvenCorner d (x + s, y)) (h2 : ¬ BaseMask.StairEvenCorner d (x, y)) :
+    hG d x y s = min (x + s - 1) 0 - min (x - 1) 0 := by
+  unfold hG; rw [if_neg h1, if_neg h2]; ring
+
+
+theorem cls_C1_p_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (1, 0) ((1 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((0 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have hZ2_0 : incr (reciprocalField k) (1, 0) ((1 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = incr (reciprocalField k) (1, 0) ((1), ((2 * (k : ℤ) + 3) + 1)) :=
+    incr_eq_U k (1, 0) ((1 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ((1), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have hZ4_0 : incr (reciprocalField k) (1, 0) ((-1), (0)) = incr (reciprocalField k) (1, 0) ((0 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * 0 - 1) :=
+    incr_eq_T k (1, 0) ((-1), (0)) ((0 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have hZ4_1 : incr (reciprocalField k) (1, 0) ((-1), (0)) = incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 1), (1)) :=
+    incr_eq_U k (1, 0) ((-1), (0)) (((2 * (k : ℤ) + 3) - 1), (1)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((3 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((1), ((2 * (k : ℤ) + 3) + 1)) = min ((1) + (1) - 1) 0 - min ((1) - 1) 0 + (1 - 0) := by
+    rw [incr_hG k (1) (1) ((2 * (k : ℤ) + 3) + 1) (mem_raw_corner2' k _ _ (by omega) (by omega)) (mem_raw_of_box k (1) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_c_plus (2 * (k : ℤ) + 3) (1) ((2 * (k : ℤ) + 3) + 1) (1) (corner_yes (2 * (k : ℤ) + 3) ((1) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (1) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = min ((2 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((2 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((2 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((2 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 1), (1)) = min (((2 * (k : ℤ) + 3) - 1) + (1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) ((2 * (k : ℤ) + 3) - 1) (1) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 1) + (1)) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) (1) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 1) (1) (1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 1) + (1)) (1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 1) (1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C1_p_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (-1, 0) ((1 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (-1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (-1, 0) ((0 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have hZ2_0 : incr (reciprocalField k) (-1, 0) ((1 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = incr (reciprocalField k) (-1, 0) ((1), ((2 * (k : ℤ) + 3) + 1)) :=
+    incr_eq_U k (-1, 0) ((1 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ((1), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have hZ3_0 : incr (reciprocalField k) (-1, 0) ((1), (0)) = incr (reciprocalField k) (-1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * 0 - -1) :=
+    incr_eq_T k (-1, 0) ((1), (0)) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have hZ4_0 : incr (reciprocalField k) (-1, 0) ((-1), (0)) = incr (reciprocalField k) (-1, 0) ((0 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * 0 - -1) :=
+    incr_eq_T k (-1, 0) ((-1), (0)) ((0 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have hZ4_1 : incr (reciprocalField k) (-1, 0) ((-1), (0)) = incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 1), (1)) :=
+    incr_eq_U k (-1, 0) ((-1), (0)) (((2 * (k : ℤ) + 3) - 1), (1)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((3 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((1), ((2 * (k : ℤ) + 3) + 1)) = min ((1) + (-1) - 1) 0 - min ((1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (1) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((1) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (1) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (1) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((1) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (1) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) ((1), (0)) = min ((1) + (-1) - 1) 0 - min ((1) - 1) 0 + (1 - 0) := by
+    rw [incr_hG k (-1) (1) (0) (mem_raw_corner0' k _ _ (by omega) (by omega)) (mem_raw_of_box k (1) (0) (by omega)), hG_c_plus (2 * (k : ℤ) + 3) (1) (0) (-1) (corner_yes (2 * (k : ℤ) + 3) ((1) + (-1)) (0) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (1) (0) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 1), (1)) = min (((2 * (k : ℤ) + 3) - 1) + (-1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) ((2 * (k : ℤ) + 3) - 1) (1) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 1) + (-1)) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) (1) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 1) (1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 1) + (-1)) (1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 1) (1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C1_p_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (0, 1) ((1 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, 1) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, 1) ((0 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 1 := by
+  have hZ2_0 : incr (reciprocalField k) (0, 1) ((0), (-1)) = incr (reciprocalField k) (0, 1) ((1 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) + ((2 * (k : ℤ) + 3) * 1 - 0) :=
+    incr_eq_T k (0, 1) ((0), (-1)) ((1 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) (by ext <;> (simp; try ring))
+  have hZ2_1 : incr (reciprocalField k) (0, 1) ((0), (-1)) = incr (reciprocalField k) (0, 1) ((2 * (k : ℤ) + 3), (0)) :=
+    incr_eq_U k (0, 1) ((0), (-1)) ((2 * (k : ℤ) + 3), (0)) (by ext <;> (simp; try ring))
+  have hZ3_0 : incr (reciprocalField k) (0, 1) ((1), (0)) = incr (reciprocalField k) (0, 1) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * 1 - 0) :=
+    incr_eq_T k (0, 1) ((1), (0)) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have hZ4_0 : incr (reciprocalField k) (0, 1) ((-1), (0)) = incr (reciprocalField k) (0, 1) ((0 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * 1 - 0) :=
+    incr_eq_T k (0, 1) ((-1), (0)) ((0 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have hZ4_1 : incr (reciprocalField k) (0, 1) ((-1), (0)) = incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 1), (1)) :=
+    incr_eq_U k (0, 1) ((-1), (0)) (((2 * (k : ℤ) + 3) - 1), (1)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ2 : incr (reciprocalField k) (0, 1) ((2 * (k : ℤ) + 3), (0)) = -((0)) := by
+    rw [incr_vert k 1 (2 * (k : ℤ) + 3) (0) (Or.inl rfl) (mem_raw_of_box k (2 * (k : ℤ) + 3) (0) (by omega)) (mem_raw_of_box k (2 * (k : ℤ) + 3) ((0) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ3 : incr (reciprocalField k) (0, 1) ((1), (0)) = -((0)) := by
+    rw [incr_vert k 1 (1) (0) (Or.inl rfl) (mem_raw_of_box k (1) (0) (by omega)) (mem_raw_of_box k (1) ((0) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 1), (1)) = -((1)) := by
+    rw [incr_vert k 1 ((2 * (k : ℤ) + 3) - 1) (1) (Or.inl rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) ((1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C1_p_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (0, -1) ((1 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, -1) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, -1) ((0 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ -1 := by
+  have hZ2_0 : incr (reciprocalField k) (0, -1) ((1 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = incr (reciprocalField k) (0, -1) ((1), ((2 * (k : ℤ) + 3) + 1)) :=
+    incr_eq_U k (0, -1) ((1 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ((1), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have hZ4_0 : incr (reciprocalField k) (0, -1) ((-1), (0)) = incr (reciprocalField k) (0, -1) ((0 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * -1 - 0) :=
+    incr_eq_T k (0, -1) ((-1), (0)) ((0 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have hZ4_1 : incr (reciprocalField k) (0, -1) ((-1), (0)) = incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 1), (1)) :=
+    incr_eq_U k (0, -1) ((-1), (0)) (((2 * (k : ℤ) + 3) - 1), (1)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) ((1), ((2 * (k : ℤ) + 3) + 1)) = (((2 * (k : ℤ) + 3) + 1)) + -1 := by
+    rw [incr_vert k (-1) (1) ((2 * (k : ℤ) + 3) + 1) (Or.inr rfl) (mem_raw_of_box k (1) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (1) (((2 * (k : ℤ) + 3) + 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = (((2 * (k : ℤ) + 3) + 1)) + -1 := by
+    rw [incr_vert k (-1) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (Or.inr rfl) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) + 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 1), (1)) = ((1)) + -1 := by
+    rw [incr_vert k (-1) ((2 * (k : ℤ) + 3) - 1) (1) (Or.inr rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) ((1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C1_m_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((3 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((5 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((5 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((5 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((5 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = min ((2 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((2 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((2 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((2 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = min ((4 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C1_m_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (-1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have hZ3_0 : incr (reciprocalField k) (-1, 0) ((1), (0)) = incr (reciprocalField k) (-1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * 0 - -1) :=
+    incr_eq_T k (-1, 0) ((1), (0)) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((3 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((5 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((5 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((5 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((5 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) ((1), (0)) = min ((1) + (-1) - 1) 0 - min ((1) - 1) 0 + (1 - 0) := by
+    rw [incr_hG k (-1) (1) (0) (mem_raw_corner0' k _ _ (by omega) (by omega)) (mem_raw_of_box k (1) (0) (by omega)), hG_c_plus (2 * (k : ℤ) + 3) (1) (0) (-1) (corner_yes (2 * (k : ℤ) + 3) ((1) + (-1)) (0) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (1) (0) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = min ((4 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C1_m_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, 1) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 1 := by
+  have hZ3_0 : incr (reciprocalField k) (0, 1) ((1), (0)) = incr (reciprocalField k) (0, 1) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * 1 - 0) :=
+    incr_eq_T k (0, 1) ((1), (0)) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have hZ4_0 : incr (reciprocalField k) (0, 1) ((3), (0)) = incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * 1 - 0) :=
+    incr_eq_T k (0, 1) ((3), (0)) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ2 : incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ3 : incr (reciprocalField k) (0, 1) ((1), (0)) = -((0)) := by
+    rw [incr_vert k 1 (1) (0) (Or.inl rfl) (mem_raw_of_box k (1) (0) (by omega)) (mem_raw_of_box k (1) ((0) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) ((3), (0)) = -((0)) := by
+    rw [incr_vert k 1 (3) (0) (Or.inl rfl) (mem_raw_of_box k (3) (0) (by omega)) (mem_raw_of_box k (3) ((0) + 1) (by omega)) (by omega) (by omega), vG_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C1_m_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, -1) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ -1 := by
+  have vZ1 : incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = (((2 * (k : ℤ) + 3) + 1)) + -1 := by
+    rw [incr_vert k (-1) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (Or.inr rfl) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) + 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = (((2 * (k : ℤ) + 3) + 1)) + -1 := by
+    rw [incr_vert k (-1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (Or.inr rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) + 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C5_p_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((1 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have hZ4_0 : incr (reciprocalField k) (1, 0) ((0), (0)) = incr (reciprocalField k) (1, 0) ((1 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * 0 - 1) :=
+    incr_eq_T k (1, 0) ((0), (0)) ((1 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((4 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((2 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((2 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((2 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((2 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = min ((3 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) ((0), (0)) = min ((0) + (1) - 1) 0 - min ((0) - 1) 0 + (0 - 1) := by
+    rw [incr_hG k (1) (0) (0) (mem_raw_of_box k ((0) + (1)) (0) (by omega)) (mem_raw_corner0' k _ _ (by omega) (by omega)), hG_c_minus (2 * (k : ℤ) + 3) (0) (0) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((0) + (1)) (0) (by omega)) (corner_yes (2 * (k : ℤ) + 3) (0) (0) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C5_p_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (-1, 0) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (-1, 0) ((1 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have hZ2_0 : incr (reciprocalField k) (-1, 0) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = incr (reciprocalField k) (-1, 0) ((2), ((2 * (k : ℤ) + 3) + 1)) :=
+    incr_eq_U k (-1, 0) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ((2), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have hZ4_0 : incr (reciprocalField k) (-1, 0) ((0), (0)) = incr (reciprocalField k) (-1, 0) ((1 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * 0 - -1) :=
+    incr_eq_T k (-1, 0) ((0), (0)) ((1 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have hZ4_1 : incr (reciprocalField k) (-1, 0) ((0), (0)) = incr (reciprocalField k) (-1, 0) ((2 * (k : ℤ) + 3), (1)) :=
+    incr_eq_U k (-1, 0) ((0), (0)) ((2 * (k : ℤ) + 3), (1)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((4 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((2), ((2 * (k : ℤ) + 3) + 1)) = min ((2) + (-1) - 1) 0 - min ((2) - 1) 0 + (0 - 1) := by
+    rw [incr_hG k (-1) (2) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((2) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_corner2' k _ _ (by omega) (by omega)), hG_c_minus (2 * (k : ℤ) + 3) (2) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((2) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (corner_yes (2 * (k : ℤ) + 3) (2) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = min ((3 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) ((2 * (k : ℤ) + 3), (1)) = min ((2 * (k : ℤ) + 3) + (-1) - 1) 0 - min ((2 * (k : ℤ) + 3) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (2 * (k : ℤ) + 3) (1) (mem_raw_of_box k ((2 * (k : ℤ) + 3) + (-1)) (1) (by omega)) (mem_raw_of_box k (2 * (k : ℤ) + 3) (1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 3) (1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) + (-1)) (1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 3) (1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C5_p_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (0, 1) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, 1) ((1 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 1 := by
+  have hZ3_0 : incr (reciprocalField k) (0, 1) ((2), (0)) = incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * 1 - 0) :=
+    incr_eq_T k (0, 1) ((2), (0)) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have hZ4_0 : incr (reciprocalField k) (0, 1) ((0), (0)) = incr (reciprocalField k) (0, 1) ((1 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * 1 - 0) :=
+    incr_eq_T k (0, 1) ((0), (0)) ((1 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have hZ4_1 : incr (reciprocalField k) (0, 1) ((0), (0)) = incr (reciprocalField k) (0, 1) ((2 * (k : ℤ) + 3), (1)) :=
+    incr_eq_U k (0, 1) ((0), (0)) ((2 * (k : ℤ) + 3), (1)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ2 : incr (reciprocalField k) (0, 1) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ3 : incr (reciprocalField k) (0, 1) ((2), (0)) = -((0)) := by
+    rw [incr_vert k 1 (2) (0) (Or.inl rfl) (mem_raw_of_box k (2) (0) (by omega)) (mem_raw_of_box k (2) ((0) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) ((2 * (k : ℤ) + 3), (1)) = -((1)) := by
+    rw [incr_vert k 1 (2 * (k : ℤ) + 3) (1) (Or.inl rfl) (mem_raw_of_box k (2 * (k : ℤ) + 3) (1) (by omega)) (mem_raw_of_box k (2 * (k : ℤ) + 3) ((1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C5_p_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (0, -1) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, -1) ((1 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ -1 := by
+  have hZ4_0 : incr (reciprocalField k) (0, -1) ((0), (0)) = incr (reciprocalField k) (0, -1) ((1 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * -1 - 0) :=
+    incr_eq_T k (0, -1) ((0), (0)) ((1 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have hZ4_1 : incr (reciprocalField k) (0, -1) ((0), (0)) = incr (reciprocalField k) (0, -1) ((2 * (k : ℤ) + 3), (1)) :=
+    incr_eq_U k (0, -1) ((0), (0)) ((2 * (k : ℤ) + 3), (1)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = (((2 * (k : ℤ) + 3) + 1)) + -1 := by
+    rw [incr_vert k (-1) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (Or.inr rfl) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) + 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) ((2 * (k : ℤ) + 3), (1)) = ((1)) + -1 := by
+    rw [incr_vert k (-1) (2 * (k : ℤ) + 3) (1) (Or.inr rfl) (mem_raw_of_box k (2 * (k : ℤ) + 3) (1) (by omega)) (mem_raw_of_box k (2 * (k : ℤ) + 3) ((1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C5_m_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (1, 0) ((6 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((4 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((6 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((6 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((6 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (6 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((6 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (6 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((6 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (6 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = min ((3 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = min ((5 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((5 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((5 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((5 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C5_m_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (-1, 0) ((6 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((4 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((6 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((6 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((6 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (6 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((6 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (6 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((6 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (6 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = min ((3 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = min ((5 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((5 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((5 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((5 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C5_m_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (0, 1) ((6 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 1 := by
+  have hZ3_0 : incr (reciprocalField k) (0, 1) ((2), (0)) = incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * 1 - 0) :=
+    incr_eq_T k (0, 1) ((2), (0)) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have hZ4_0 : incr (reciprocalField k) (0, 1) ((4), (0)) = incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * 1 - 0) :=
+    incr_eq_T k (0, 1) ((4), (0)) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ2 : incr (reciprocalField k) (0, 1) ((6 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (6 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ3 : incr (reciprocalField k) (0, 1) ((2), (0)) = -((0)) := by
+    rw [incr_vert k 1 (2) (0) (Or.inl rfl) (mem_raw_of_box k (2) (0) (by omega)) (mem_raw_of_box k (2) ((0) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) ((4), (0)) = -((0)) := by
+    rw [incr_vert k 1 (4) (0) (Or.inl rfl) (mem_raw_of_box k (4) (0) (by omega)) (mem_raw_of_box k (4) ((0) + 1) (by omega)) (by omega) (by omega), vG_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C5_m_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (0, -1) ((6 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ -1 := by
+  have vZ1 : incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) ((6 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (6 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = (((2 * (k : ℤ) + 3) + 1)) + -1 := by
+    rw [incr_vert k (-1) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (Or.inr rfl) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) + 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = (((2 * (k : ℤ) + 3) + 1)) + -1 := by
+    rw [incr_vert k (-1) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (Or.inr rfl) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) + 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C7_p_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ≤ incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ∧
+    incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = min ((5 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((5 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (mem_raw_of_box k ((5 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)), hG_nc (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((5 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = min ((3 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((4 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((2 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((2 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((2 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((2 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C7_p_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ≤ incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ∧
+    incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (-1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ 0 := by
+  have hZ2_0 : incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = incr (reciprocalField k) (-1, 0) ((3), ((2 * (k : ℤ) + 3) - 1)) :=
+    incr_eq_U k (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ((3), ((2 * (k : ℤ) + 3) - 1)) (by ext <;> (simp; try ring))
+  have hZ4_0 : incr (reciprocalField k) (-1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = incr (reciprocalField k) (-1, 0) ((2), (2 * (k : ℤ) + 3)) :=
+    incr_eq_U k (-1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ((2), (2 * (k : ℤ) + 3)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = min ((5 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((5 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (mem_raw_of_box k ((5 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)), hG_nc (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((5 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((3), ((2 * (k : ℤ) + 3) - 1)) = min ((3) + (-1) - 1) 0 - min ((3) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (3) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((3) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (3) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3) ((2 * (k : ℤ) + 3) - 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((3) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((4 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) ((2), (2 * (k : ℤ) + 3)) = min ((2) + (-1) - 1) 0 - min ((2) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (2) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((2) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (2) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (2) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((2) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (2) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C7_p_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ≤ incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ∧
+    incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (0, 1) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ 1 := by
+  have vZ1 : incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = -(((2 * (k : ℤ) + 3) - 2)) := by
+    rw [incr_vert k 1 (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (Or.inl rfl) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 2) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ2 : incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = -(((2 * (k : ℤ) + 3) - 2)) := by
+    rw [incr_vert k 1 (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (Or.inl rfl) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 2) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ3 : incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = -(((2 * (k : ℤ) + 3) - 1)) := by
+    rw [incr_vert k 1 (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inl rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = -(((2 * (k : ℤ) + 3) - 1)) := by
+    rw [incr_vert k 1 (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inl rfl) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C7_p_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ≤ incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ∧
+    incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (0, -1) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ -1 := by
+  have hZ2_0 : incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = incr (reciprocalField k) (0, -1) ((3), ((2 * (k : ℤ) + 3) - 1)) :=
+    incr_eq_U k (0, -1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ((3), ((2 * (k : ℤ) + 3) - 1)) (by ext <;> (simp; try ring))
+  have hZ4_0 : incr (reciprocalField k) (0, -1) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = incr (reciprocalField k) (0, -1) ((2), (2 * (k : ℤ) + 3)) :=
+    incr_eq_U k (0, -1) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ((2), (2 * (k : ℤ) + 3)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = (((2 * (k : ℤ) + 3) - 2)) + -1 := by
+    rw [incr_vert k (-1) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (Or.inr rfl) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 2) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) ((3), ((2 * (k : ℤ) + 3) - 1)) = (((2 * (k : ℤ) + 3) - 1)) + -1 := by
+    rw [incr_vert k (-1) (3) ((2 * (k : ℤ) + 3) - 1) (Or.inr rfl) (mem_raw_of_box k (3) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (3) (((2 * (k : ℤ) + 3) - 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = (((2 * (k : ℤ) + 3) - 1)) + -1 := by
+    rw [incr_vert k (-1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inr rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) ((2), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (2) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (2) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (2) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C7_m_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ≤ incr (reciprocalField k) (1, 0) ((7 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ∧
+    incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (1, 0) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = min ((5 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((5 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (mem_raw_of_box k ((5 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)), hG_nc (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((5 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((7 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = min ((7 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((7 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (mem_raw_of_box k ((7 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)), hG_nc (2 * (k : ℤ) + 3) (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((7 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((4 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((6 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((6 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((6 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((6 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C7_m_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ≤ incr (reciprocalField k) (-1, 0) ((7 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ∧
+    incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (-1, 0) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = min ((5 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((5 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (mem_raw_of_box k ((5 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)), hG_nc (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((5 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((7 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = min ((7 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((7 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (mem_raw_of_box k ((7 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)), hG_nc (2 * (k : ℤ) + 3) (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((7 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((4 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((6 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((6 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((6 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((6 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C7_m_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ≤ incr (reciprocalField k) (0, 1) ((7 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ∧
+    incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (0, 1) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ 1 := by
+  have vZ1 : incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = -(((2 * (k : ℤ) + 3) - 2)) := by
+    rw [incr_vert k 1 (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (Or.inl rfl) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 2) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ2 : incr (reciprocalField k) (0, 1) ((7 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = -(((2 * (k : ℤ) + 3) - 2)) := by
+    rw [incr_vert k 1 (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (Or.inl rfl) (mem_raw_of_box k (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (7 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 2) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ3 : incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = -(((2 * (k : ℤ) + 3) - 1)) := by
+    rw [incr_vert k 1 (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inl rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = -(((2 * (k : ℤ) + 3) - 1)) := by
+    rw [incr_vert k 1 (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inl rfl) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C7_m_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ≤ incr (reciprocalField k) (0, -1) ((7 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ∧
+    incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (0, -1) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ -1 := by
+  have vZ1 : incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = (((2 * (k : ℤ) + 3) - 2)) + -1 := by
+    rw [incr_vert k (-1) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (Or.inr rfl) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 2) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) ((7 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = (((2 * (k : ℤ) + 3) - 2)) + -1 := by
+    rw [incr_vert k (-1) (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (Or.inr rfl) (mem_raw_of_box k (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (7 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 2) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = (((2 * (k : ℤ) + 3) - 1)) + -1 := by
+    rw [incr_vert k (-1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inr rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = (((2 * (k : ℤ) + 3) - 1)) + -1 := by
+    rw [incr_vert k (-1) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inr rfl) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C9_p_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((5 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((5 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((5 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((5 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((3 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = min ((4 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = min ((2 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((2 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((2 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((2 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C9_p_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (-1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have hZ4_0 : incr (reciprocalField k) (-1, 0) ((1), (0)) = incr (reciprocalField k) (-1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * 0 - -1) :=
+    incr_eq_T k (-1, 0) ((1), (0)) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((5 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((5 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((5 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((5 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((3 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = min ((4 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) ((1), (0)) = min ((1) + (-1) - 1) 0 - min ((1) - 1) 0 + (1 - 0) := by
+    rw [incr_hG k (-1) (1) (0) (mem_raw_corner0' k _ _ (by omega) (by omega)) (mem_raw_of_box k (1) (0) (by omega)), hG_c_plus (2 * (k : ℤ) + 3) (1) (0) (-1) (corner_yes (2 * (k : ℤ) + 3) ((1) + (-1)) (0) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (1) (0) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C9_p_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, 1) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 1 := by
+  have hZ3_0 : incr (reciprocalField k) (0, 1) ((3), (0)) = incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * 1 - 0) :=
+    incr_eq_T k (0, 1) ((3), (0)) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have hZ4_0 : incr (reciprocalField k) (0, 1) ((1), (0)) = incr (reciprocalField k) (0, 1) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * 1 - 0) :=
+    incr_eq_T k (0, 1) ((1), (0)) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ2 : incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ3 : incr (reciprocalField k) (0, 1) ((3), (0)) = -((0)) := by
+    rw [incr_vert k 1 (3) (0) (Or.inl rfl) (mem_raw_of_box k (3) (0) (by omega)) (mem_raw_of_box k (3) ((0) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) ((1), (0)) = -((0)) := by
+    rw [incr_vert k 1 (1) (0) (Or.inl rfl) (mem_raw_of_box k (1) (0) (by omega)) (mem_raw_of_box k (1) ((0) + 1) (by omega)) (by omega) (by omega), vG_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C9_p_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, -1) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ -1 := by
+  have vZ1 : incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = (((2 * (k : ℤ) + 3) + 1)) + -1 := by
+    rw [incr_vert k (-1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (Or.inr rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) + 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = (((2 * (k : ℤ) + 3) + 1)) + -1 := by
+    rw [incr_vert k (-1) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (Or.inr rfl) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) + 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C9_m_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (1, 0) ((7 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((5 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((5 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((5 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((5 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((7 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((7 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((7 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (7 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((7 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (7 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (7 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((7 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (7 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = min ((4 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = min ((6 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((6 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((6 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((6 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C9_m_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (-1, 0) ((7 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (-1, 0) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((5 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((5 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((5 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((5 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((7 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((7 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((7 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (7 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((7 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (7 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (7 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((7 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (7 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = min ((4 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = min ((6 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((6 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((6 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((6 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C9_m_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (0, 1) ((7 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, 1) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ 1 := by
+  have hZ3_0 : incr (reciprocalField k) (0, 1) ((3), (0)) = incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * 1 - 0) :=
+    incr_eq_T k (0, 1) ((3), (0)) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have hZ4_0 : incr (reciprocalField k) (0, 1) ((5), (0)) = incr (reciprocalField k) (0, 1) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * 1 - 0) :=
+    incr_eq_T k (0, 1) ((5), (0)) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ2 : incr (reciprocalField k) (0, 1) ((7 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (7 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (7 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ3 : incr (reciprocalField k) (0, 1) ((3), (0)) = -((0)) := by
+    rw [incr_vert k 1 (3) (0) (Or.inl rfl) (mem_raw_of_box k (3) (0) (by omega)) (mem_raw_of_box k (3) ((0) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) ((5), (0)) = -((0)) := by
+    rw [incr_vert k 1 (5) (0) (Or.inl rfl) (mem_raw_of_box k (5) (0) (by omega)) (mem_raw_of_box k (5) ((0) + 1) (by omega)) (by omega) (by omega), vG_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C9_m_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (0, -1) ((7 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, -1) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ≤ -1 := by
+  have vZ1 : incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) ((7 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (7 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (7 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = (((2 * (k : ℤ) + 3) + 1)) + -1 := by
+    rw [incr_vert k (-1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (Or.inr rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) + 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = (((2 * (k : ℤ) + 3) + 1)) + -1 := by
+    rw [incr_vert k (-1) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (Or.inr rfl) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) + 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C13_p_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 2), (1)) ≤ incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 4), (1)) ∧
+    incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 2), (1)) - incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 3), (2)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 2), (1)) - incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 5), (2)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 2), (1)) = min (((2 * (k : ℤ) + 3) - 2) + (1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 2) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) ((2 * (k : ℤ) + 3) - 2) (1) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 2) + (1)) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) (1) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 2) (1) (1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 2) + (1)) (1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 2) (1) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 4), (1)) = min (((2 * (k : ℤ) + 3) - 4) + (1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 4) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) ((2 * (k : ℤ) + 3) - 4) (1) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 4) + (1)) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 4) (1) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 4) (1) (1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 4) + (1)) (1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 4) (1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 3), (2)) = min (((2 * (k : ℤ) + 3) - 3) + (1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 3) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) ((2 * (k : ℤ) + 3) - 3) (2) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 3) + (1)) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 3) (2) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 3) (2) (1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 3) + (1)) (2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 3) (2) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 5), (2)) = min (((2 * (k : ℤ) + 3) - 5) + (1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 5) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) ((2 * (k : ℤ) + 3) - 5) (2) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 5) + (1)) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 5) (2) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 5) (2) (1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 5) + (1)) (2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 5) (2) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C13_p_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 2), (1)) ≤ incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 4), (1)) ∧
+    incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 2), (1)) - incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 3), (2)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 2), (1)) - incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 5), (2)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 2), (1)) = min (((2 * (k : ℤ) + 3) - 2) + (-1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 2) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) ((2 * (k : ℤ) + 3) - 2) (1) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 2) + (-1)) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) (1) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 2) (1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 2) + (-1)) (1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 2) (1) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 4), (1)) = min (((2 * (k : ℤ) + 3) - 4) + (-1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 4) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) ((2 * (k : ℤ) + 3) - 4) (1) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 4) + (-1)) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 4) (1) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 4) (1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 4) + (-1)) (1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 4) (1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 3), (2)) = min (((2 * (k : ℤ) + 3) - 3) + (-1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 3) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) ((2 * (k : ℤ) + 3) - 3) (2) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 3) + (-1)) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 3) (2) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 3) (2) (-1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 3) + (-1)) (2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 3) (2) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 5), (2)) = min (((2 * (k : ℤ) + 3) - 5) + (-1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 5) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) ((2 * (k : ℤ) + 3) - 5) (2) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 5) + (-1)) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 5) (2) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 5) (2) (-1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 5) + (-1)) (2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 5) (2) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C13_p_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 2), (1)) ≤ incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 4), (1)) ∧
+    incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 2), (1)) - incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 3), (2)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 2), (1)) - incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 5), (2)) ≤ 1 := by
+  have vZ1 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 2), (1)) = -((1)) := by
+    rw [incr_vert k 1 ((2 * (k : ℤ) + 3) - 2) (1) (Or.inl rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) ((1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ2 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 4), (1)) = -((1)) := by
+    rw [incr_vert k 1 ((2 * (k : ℤ) + 3) - 4) (1) (Or.inl rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 4) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 4) ((1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ3 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 3), (2)) = -((2)) := by
+    rw [incr_vert k 1 ((2 * (k : ℤ) + 3) - 3) (2) (Or.inl rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 3) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 3) ((2) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 5), (2)) = -((2)) := by
+    rw [incr_vert k 1 ((2 * (k : ℤ) + 3) - 5) (2) (Or.inl rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 5) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 5) ((2) + 1) (by omega)) (by omega) (by omega), vG_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C13_p_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 2), (1)) ≤ incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 4), (1)) ∧
+    incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 2), (1)) - incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 3), (2)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 2), (1)) - incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 5), (2)) ≤ -1 := by
+  have vZ1 : incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 2), (1)) = ((1)) + -1 := by
+    rw [incr_vert k (-1) ((2 * (k : ℤ) + 3) - 2) (1) (Or.inr rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) ((1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 4), (1)) = ((1)) + -1 := by
+    rw [incr_vert k (-1) ((2 * (k : ℤ) + 3) - 4) (1) (Or.inr rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 4) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 4) ((1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 3), (2)) = ((2)) + -1 := by
+    rw [incr_vert k (-1) ((2 * (k : ℤ) + 3) - 3) (2) (Or.inr rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 3) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 3) ((2) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 5), (2)) = ((2)) + -1 := by
+    rw [incr_vert k (-1) ((2 * (k : ℤ) + 3) - 5) (2) (Or.inr rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 5) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 5) ((2) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C13_m_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 2), (1)) ≤ incr (reciprocalField k) (1, 0) ((2 * (k : ℤ) + 3), (1)) ∧
+    incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 2), (1)) - incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 3), (2)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 2), (1)) - incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 1), (2)) ≤ 0 := by
+  have hZ2_0 : incr (reciprocalField k) (1, 0) ((2 * (k : ℤ) + 3), (1)) = incr (reciprocalField k) (1, 0) ((0), (0)) :=
+    (incr_eq_U k (1, 0) ((0), (0)) ((2 * (k : ℤ) + 3), (1)) (by ext <;> (simp; try ring))).symm
+  have vZ1 : incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 2), (1)) = min (((2 * (k : ℤ) + 3) - 2) + (1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 2) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) ((2 * (k : ℤ) + 3) - 2) (1) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 2) + (1)) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) (1) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 2) (1) (1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 2) + (1)) (1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 2) (1) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((0), (0)) = min ((0) + (1) - 1) 0 - min ((0) - 1) 0 + (0 - 1) := by
+    rw [incr_hG k (1) (0) (0) (mem_raw_of_box k ((0) + (1)) (0) (by omega)) (mem_raw_corner0' k _ _ (by omega) (by omega)), hG_c_minus (2 * (k : ℤ) + 3) (0) (0) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((0) + (1)) (0) (by omega)) (corner_yes (2 * (k : ℤ) + 3) (0) (0) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 3), (2)) = min (((2 * (k : ℤ) + 3) - 3) + (1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 3) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) ((2 * (k : ℤ) + 3) - 3) (2) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 3) + (1)) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 3) (2) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 3) (2) (1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 3) + (1)) (2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 3) (2) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 1), (2)) = min (((2 * (k : ℤ) + 3) - 1) + (1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) ((2 * (k : ℤ) + 3) - 1) (2) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 1) + (1)) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) (2) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 1) (2) (1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 1) + (1)) (2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 1) (2) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C13_m_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 2), (1)) ≤ incr (reciprocalField k) (-1, 0) ((2 * (k : ℤ) + 3), (1)) ∧
+    incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 2), (1)) - incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 3), (2)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 2), (1)) - incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 1), (2)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 2), (1)) = min (((2 * (k : ℤ) + 3) - 2) + (-1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 2) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) ((2 * (k : ℤ) + 3) - 2) (1) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 2) + (-1)) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) (1) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 2) (1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 2) + (-1)) (1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 2) (1) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((2 * (k : ℤ) + 3), (1)) = min ((2 * (k : ℤ) + 3) + (-1) - 1) 0 - min ((2 * (k : ℤ) + 3) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (2 * (k : ℤ) + 3) (1) (mem_raw_of_box k ((2 * (k : ℤ) + 3) + (-1)) (1) (by omega)) (mem_raw_of_box k (2 * (k : ℤ) + 3) (1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 3) (1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) + (-1)) (1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 3) (1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 3), (2)) = min (((2 * (k : ℤ) + 3) - 3) + (-1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 3) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) ((2 * (k : ℤ) + 3) - 3) (2) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 3) + (-1)) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 3) (2) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 3) (2) (-1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 3) + (-1)) (2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 3) (2) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 1), (2)) = min (((2 * (k : ℤ) + 3) - 1) + (-1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) ((2 * (k : ℤ) + 3) - 1) (2) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 1) + (-1)) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) (2) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 1) (2) (-1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 1) + (-1)) (2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 1) (2) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C13_m_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 2), (1)) ≤ incr (reciprocalField k) (0, 1) ((2 * (k : ℤ) + 3), (1)) ∧
+    incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 2), (1)) - incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 3), (2)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 2), (1)) - incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 1), (2)) ≤ 1 := by
+  have vZ1 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 2), (1)) = -((1)) := by
+    rw [incr_vert k 1 ((2 * (k : ℤ) + 3) - 2) (1) (Or.inl rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) ((1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ2 : incr (reciprocalField k) (0, 1) ((2 * (k : ℤ) + 3), (1)) = -((1)) := by
+    rw [incr_vert k 1 (2 * (k : ℤ) + 3) (1) (Or.inl rfl) (mem_raw_of_box k (2 * (k : ℤ) + 3) (1) (by omega)) (mem_raw_of_box k (2 * (k : ℤ) + 3) ((1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ3 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 3), (2)) = -((2)) := by
+    rw [incr_vert k 1 ((2 * (k : ℤ) + 3) - 3) (2) (Or.inl rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 3) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 3) ((2) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 1), (2)) = -((2)) := by
+    rw [incr_vert k 1 ((2 * (k : ℤ) + 3) - 1) (2) (Or.inl rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) ((2) + 1) (by omega)) (by omega) (by omega), vG_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C13_m_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 2), (1)) ≤ incr (reciprocalField k) (0, -1) ((2 * (k : ℤ) + 3), (1)) ∧
+    incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 2), (1)) - incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 3), (2)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 2), (1)) - incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 1), (2)) ≤ -1 := by
+  have vZ1 : incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 2), (1)) = ((1)) + -1 := by
+    rw [incr_vert k (-1) ((2 * (k : ℤ) + 3) - 2) (1) (Or.inr rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) ((1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) ((2 * (k : ℤ) + 3), (1)) = ((1)) + -1 := by
+    rw [incr_vert k (-1) (2 * (k : ℤ) + 3) (1) (Or.inr rfl) (mem_raw_of_box k (2 * (k : ℤ) + 3) (1) (by omega)) (mem_raw_of_box k (2 * (k : ℤ) + 3) ((1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 3), (2)) = ((2)) + -1 := by
+    rw [incr_vert k (-1) ((2 * (k : ℤ) + 3) - 3) (2) (Or.inr rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 3) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 3) ((2) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 1), (2)) = ((2)) + -1 := by
+    rw [incr_vert k (-1) ((2 * (k : ℤ) + 3) - 1) (2) (Or.inr rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) ((2) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C14_p_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 1), (1)) ≤ incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 3), (1)) ∧
+    incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 1), (1)) - incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 2), (2)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 1), (1)) - incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 4), (2)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 1), (1)) = min (((2 * (k : ℤ) + 3) - 1) + (1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) ((2 * (k : ℤ) + 3) - 1) (1) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 1) + (1)) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) (1) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 1) (1) (1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 1) + (1)) (1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 1) (1) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 3), (1)) = min (((2 * (k : ℤ) + 3) - 3) + (1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 3) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) ((2 * (k : ℤ) + 3) - 3) (1) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 3) + (1)) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 3) (1) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 3) (1) (1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 3) + (1)) (1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 3) (1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 2), (2)) = min (((2 * (k : ℤ) + 3) - 2) + (1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 2) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) ((2 * (k : ℤ) + 3) - 2) (2) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 2) + (1)) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) (2) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 2) (2) (1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 2) + (1)) (2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 2) (2) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 4), (2)) = min (((2 * (k : ℤ) + 3) - 4) + (1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 4) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) ((2 * (k : ℤ) + 3) - 4) (2) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 4) + (1)) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 4) (2) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 4) (2) (1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 4) + (1)) (2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 4) (2) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C14_p_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 1), (1)) ≤ incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 3), (1)) ∧
+    incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 1), (1)) - incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 2), (2)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 1), (1)) - incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 4), (2)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 1), (1)) = min (((2 * (k : ℤ) + 3) - 1) + (-1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) ((2 * (k : ℤ) + 3) - 1) (1) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 1) + (-1)) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) (1) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 1) (1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 1) + (-1)) (1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 1) (1) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 3), (1)) = min (((2 * (k : ℤ) + 3) - 3) + (-1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 3) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) ((2 * (k : ℤ) + 3) - 3) (1) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 3) + (-1)) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 3) (1) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 3) (1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 3) + (-1)) (1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 3) (1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 2), (2)) = min (((2 * (k : ℤ) + 3) - 2) + (-1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 2) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) ((2 * (k : ℤ) + 3) - 2) (2) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 2) + (-1)) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) (2) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 2) (2) (-1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 2) + (-1)) (2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 2) (2) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 4), (2)) = min (((2 * (k : ℤ) + 3) - 4) + (-1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 4) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) ((2 * (k : ℤ) + 3) - 4) (2) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 4) + (-1)) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 4) (2) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 4) (2) (-1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 4) + (-1)) (2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 4) (2) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C14_p_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 1), (1)) ≤ incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 3), (1)) ∧
+    incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 1), (1)) - incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 2), (2)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 1), (1)) - incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 4), (2)) ≤ 1 := by
+  have vZ1 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 1), (1)) = -((1)) := by
+    rw [incr_vert k 1 ((2 * (k : ℤ) + 3) - 1) (1) (Or.inl rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) ((1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ2 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 3), (1)) = -((1)) := by
+    rw [incr_vert k 1 ((2 * (k : ℤ) + 3) - 3) (1) (Or.inl rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 3) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 3) ((1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ3 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 2), (2)) = -((2)) := by
+    rw [incr_vert k 1 ((2 * (k : ℤ) + 3) - 2) (2) (Or.inl rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) ((2) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 4), (2)) = -((2)) := by
+    rw [incr_vert k 1 ((2 * (k : ℤ) + 3) - 4) (2) (Or.inl rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 4) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 4) ((2) + 1) (by omega)) (by omega) (by omega), vG_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C14_p_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 1), (1)) ≤ incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 3), (1)) ∧
+    incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 1), (1)) - incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 2), (2)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 1), (1)) - incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 4), (2)) ≤ -1 := by
+  have vZ1 : incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 1), (1)) = ((1)) + -1 := by
+    rw [incr_vert k (-1) ((2 * (k : ℤ) + 3) - 1) (1) (Or.inr rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) ((1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 3), (1)) = ((1)) + -1 := by
+    rw [incr_vert k (-1) ((2 * (k : ℤ) + 3) - 3) (1) (Or.inr rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 3) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 3) ((1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 2), (2)) = ((2)) + -1 := by
+    rw [incr_vert k (-1) ((2 * (k : ℤ) + 3) - 2) (2) (Or.inr rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) ((2) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 4), (2)) = ((2)) + -1 := by
+    rw [incr_vert k (-1) ((2 * (k : ℤ) + 3) - 4) (2) (Or.inr rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 4) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 4) ((2) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C14_m_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 1), (1)) ≤ incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) + 1), (1)) ∧
+    incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 1), (1)) - incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 2), (2)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 1), (1)) - incr (reciprocalField k) (1, 0) ((2 * (k : ℤ) + 3), (2)) ≤ 0 := by
+  have hZ2_0 : incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) + 1), (1)) = incr (reciprocalField k) (1, 0) ((1), (0)) :=
+    (incr_eq_U k (1, 0) ((1), (0)) (((2 * (k : ℤ) + 3) + 1), (1)) (by ext <;> (simp; try ring))).symm
+  have hZ4_0 : incr (reciprocalField k) (1, 0) ((2 * (k : ℤ) + 3), (2)) = incr (reciprocalField k) (1, 0) ((0), (1)) :=
+    (incr_eq_U k (1, 0) ((0), (1)) ((2 * (k : ℤ) + 3), (2)) (by ext <;> (simp; try ring))).symm
+  have vZ1 : incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 1), (1)) = min (((2 * (k : ℤ) + 3) - 1) + (1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) ((2 * (k : ℤ) + 3) - 1) (1) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 1) + (1)) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) (1) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 1) (1) (1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 1) + (1)) (1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 1) (1) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((1), (0)) = min ((1) + (1) - 1) 0 - min ((1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (1) (0) (mem_raw_of_box k ((1) + (1)) (0) (by omega)) (mem_raw_of_box k (1) (0) (by omega)), hG_nc (2 * (k : ℤ) + 3) (1) (0) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((1) + (1)) (0) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (1) (0) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 2), (2)) = min (((2 * (k : ℤ) + 3) - 2) + (1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 2) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) ((2 * (k : ℤ) + 3) - 2) (2) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 2) + (1)) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) (2) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 2) (2) (1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 2) + (1)) (2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 2) (2) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) ((0), (1)) = min ((0) + (1) - 1) 0 - min ((0) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (0) (1) (mem_raw_of_box k ((0) + (1)) (1) (by omega)) (mem_raw_of_box k (0) (1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (0) (1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((0) + (1)) (1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (0) (1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C14_m_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 1), (1)) ≤ incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) + 1), (1)) ∧
+    incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 1), (1)) - incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 2), (2)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 1), (1)) - incr (reciprocalField k) (-1, 0) ((2 * (k : ℤ) + 3), (2)) ≤ 0 := by
+  have hZ2_0 : incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) + 1), (1)) = incr (reciprocalField k) (-1, 0) ((1), (0)) :=
+    (incr_eq_U k (-1, 0) ((1), (0)) (((2 * (k : ℤ) + 3) + 1), (1)) (by ext <;> (simp; try ring))).symm
+  have vZ1 : incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 1), (1)) = min (((2 * (k : ℤ) + 3) - 1) + (-1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) ((2 * (k : ℤ) + 3) - 1) (1) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 1) + (-1)) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) (1) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 1) (1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 1) + (-1)) (1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 1) (1) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((1), (0)) = min ((1) + (-1) - 1) 0 - min ((1) - 1) 0 + (1 - 0) := by
+    rw [incr_hG k (-1) (1) (0) (mem_raw_corner0' k _ _ (by omega) (by omega)) (mem_raw_of_box k (1) (0) (by omega)), hG_c_plus (2 * (k : ℤ) + 3) (1) (0) (-1) (corner_yes (2 * (k : ℤ) + 3) ((1) + (-1)) (0) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (1) (0) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 2), (2)) = min (((2 * (k : ℤ) + 3) - 2) + (-1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 2) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) ((2 * (k : ℤ) + 3) - 2) (2) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 2) + (-1)) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) (2) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 2) (2) (-1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 2) + (-1)) (2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 2) (2) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) ((2 * (k : ℤ) + 3), (2)) = min ((2 * (k : ℤ) + 3) + (-1) - 1) 0 - min ((2 * (k : ℤ) + 3) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (2 * (k : ℤ) + 3) (2) (mem_raw_of_box k ((2 * (k : ℤ) + 3) + (-1)) (2) (by omega)) (mem_raw_of_box k (2 * (k : ℤ) + 3) (2) (by omega)), hG_nc (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 3) (2) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) + (-1)) (2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 3) (2) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C14_m_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 1), (1)) ≤ incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) + 1), (1)) ∧
+    incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 1), (1)) - incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 2), (2)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 1), (1)) - incr (reciprocalField k) (0, 1) ((2 * (k : ℤ) + 3), (2)) ≤ 1 := by
+  have hZ2_0 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) + 1), (1)) = incr (reciprocalField k) (0, 1) ((1), (0)) :=
+    (incr_eq_U k (0, 1) ((1), (0)) (((2 * (k : ℤ) + 3) + 1), (1)) (by ext <;> (simp; try ring))).symm
+  have hZ4_0 : incr (reciprocalField k) (0, 1) ((2 * (k : ℤ) + 3), (2)) = incr (reciprocalField k) (0, 1) ((0), (1)) :=
+    (incr_eq_U k (0, 1) ((0), (1)) ((2 * (k : ℤ) + 3), (2)) (by ext <;> (simp; try ring))).symm
+  have vZ1 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 1), (1)) = -((1)) := by
+    rw [incr_vert k 1 ((2 * (k : ℤ) + 3) - 1) (1) (Or.inl rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) ((1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ2 : incr (reciprocalField k) (0, 1) ((1), (0)) = -((0)) := by
+    rw [incr_vert k 1 (1) (0) (Or.inl rfl) (mem_raw_of_box k (1) (0) (by omega)) (mem_raw_of_box k (1) ((0) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ3 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 2), (2)) = -((2)) := by
+    rw [incr_vert k 1 ((2 * (k : ℤ) + 3) - 2) (2) (Or.inl rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) ((2) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) ((0), (1)) = -((1)) := by
+    rw [incr_vert k 1 (0) (1) (Or.inl rfl) (mem_raw_of_box k (0) (1) (by omega)) (mem_raw_of_box k (0) ((1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C14_m_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 1), (1)) ≤ incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) + 1), (1)) ∧
+    incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 1), (1)) - incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 2), (2)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 1), (1)) - incr (reciprocalField k) (0, -1) ((2 * (k : ℤ) + 3), (2)) ≤ -1 := by
+  have hZ2_0 : incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) + 1), (1)) = incr (reciprocalField k) (0, -1) ((2), ((2 * (k : ℤ) + 3) + 2)) + ((2 * (k : ℤ) + 3) * -1 - 0) :=
+    incr_eq_T k (0, -1) (((2 * (k : ℤ) + 3) + 1), (1)) ((2), ((2 * (k : ℤ) + 3) + 2)) (by ext <;> (simp; try ring))
+  have hZ2_1 : incr (reciprocalField k) (0, -1) ((2), ((2 * (k : ℤ) + 3) + 2)) = incr (reciprocalField k) (0, -1) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) :=
+    (incr_eq_U k (0, -1) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ((2), ((2 * (k : ℤ) + 3) + 2)) (by ext <;> (simp; try ring))).symm
+  have vZ1 : incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 1), (1)) = ((1)) + -1 := by
+    rw [incr_vert k (-1) ((2 * (k : ℤ) + 3) - 1) (1) (Or.inr rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) ((1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = (((2 * (k : ℤ) + 3) + 1)) + -1 := by
+    rw [incr_vert k (-1) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (Or.inr rfl) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) + 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 2), (2)) = ((2)) + -1 := by
+    rw [incr_vert k (-1) ((2 * (k : ℤ) + 3) - 2) (2) (Or.inr rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) ((2) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) ((2 * (k : ℤ) + 3), (2)) = ((2)) + -1 := by
+    rw [incr_vert k (-1) (2 * (k : ℤ) + 3) (2) (Or.inr rfl) (mem_raw_of_box k (2 * (k : ℤ) + 3) (2) (by omega)) (mem_raw_of_box k (2 * (k : ℤ) + 3) ((2) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C15_p_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) ((1), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (1, 0) ((-1), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (1, 0) ((1), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (1, 0) ((0), (2 * (k : ℤ) + 3)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) ((1), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (1, 0) ((-2), (2 * (k : ℤ) + 3)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (1, 0) ((1), ((2 * (k : ℤ) + 3) - 1)) = min ((1) + (1) - 1) 0 - min ((1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (1) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((1) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (1) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (1) ((2 * (k : ℤ) + 3) - 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((1) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (1) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((-1), ((2 * (k : ℤ) + 3) - 1)) = min ((-1) + (1) - 1) 0 - min ((-1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (-1) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((-1) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (-1) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (-1) ((2 * (k : ℤ) + 3) - 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((-1) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (-1) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) ((0), (2 * (k : ℤ) + 3)) = min ((0) + (1) - 1) 0 - min ((0) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (0) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((0) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (0) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (0) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((0) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (0) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) ((-2), (2 * (k : ℤ) + 3)) = min ((-2) + (1) - 1) 0 - min ((-2) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (-2) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((-2) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (-2) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (-2) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((-2) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (-2) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C15_p_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) ((1), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (-1, 0) ((-1), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (-1, 0) ((1), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (-1, 0) ((0), (2 * (k : ℤ) + 3)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) ((1), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (-1, 0) ((-2), (2 * (k : ℤ) + 3)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (-1, 0) ((1), ((2 * (k : ℤ) + 3) - 1)) = min ((1) + (-1) - 1) 0 - min ((1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (1) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((1) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (1) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (1) ((2 * (k : ℤ) + 3) - 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((1) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (1) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((-1), ((2 * (k : ℤ) + 3) - 1)) = min ((-1) + (-1) - 1) 0 - min ((-1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (-1) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((-1) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (-1) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (-1) ((2 * (k : ℤ) + 3) - 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((-1) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (-1) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) ((0), (2 * (k : ℤ) + 3)) = min ((0) + (-1) - 1) 0 - min ((0) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (0) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((0) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (0) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (0) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((0) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (0) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) ((-2), (2 * (k : ℤ) + 3)) = min ((-2) + (-1) - 1) 0 - min ((-2) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (-2) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((-2) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (-2) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (-2) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((-2) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (-2) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C15_p_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) ((1), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (0, 1) ((-1), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (0, 1) ((1), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (0, 1) ((0), (2 * (k : ℤ) + 3)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) ((1), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (0, 1) ((-2), (2 * (k : ℤ) + 3)) ≤ 1 := by
+  have vZ1 : incr (reciprocalField k) (0, 1) ((1), ((2 * (k : ℤ) + 3) - 1)) = -(((2 * (k : ℤ) + 3) - 1)) := by
+    rw [incr_vert k 1 (1) ((2 * (k : ℤ) + 3) - 1) (Or.inl rfl) (mem_raw_of_box k (1) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (1) (((2 * (k : ℤ) + 3) - 1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ2 : incr (reciprocalField k) (0, 1) ((-1), ((2 * (k : ℤ) + 3) - 1)) = -(((2 * (k : ℤ) + 3) - 1)) := by
+    rw [incr_vert k 1 (-1) ((2 * (k : ℤ) + 3) - 1) (Or.inl rfl) (mem_raw_of_box k (-1) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (-1) (((2 * (k : ℤ) + 3) - 1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ3 : incr (reciprocalField k) (0, 1) ((0), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (0) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (0) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (0) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) ((-2), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (-2) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (-2) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (-2) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C15_p_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) ((1), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (0, -1) ((-1), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (0, -1) ((1), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (0, -1) ((0), (2 * (k : ℤ) + 3)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) ((1), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (0, -1) ((-2), (2 * (k : ℤ) + 3)) ≤ -1 := by
+  have vZ1 : incr (reciprocalField k) (0, -1) ((1), ((2 * (k : ℤ) + 3) - 1)) = (((2 * (k : ℤ) + 3) - 1)) + -1 := by
+    rw [incr_vert k (-1) (1) ((2 * (k : ℤ) + 3) - 1) (Or.inr rfl) (mem_raw_of_box k (1) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (1) (((2 * (k : ℤ) + 3) - 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) ((-1), ((2 * (k : ℤ) + 3) - 1)) = (((2 * (k : ℤ) + 3) - 1)) + -1 := by
+    rw [incr_vert k (-1) (-1) ((2 * (k : ℤ) + 3) - 1) (Or.inr rfl) (mem_raw_of_box k (-1) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (-1) (((2 * (k : ℤ) + 3) - 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) ((0), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (0) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (0) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (0) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) ((-2), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (-2) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (-2) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (-2) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C15_m_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) ((1), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (1, 0) ((3), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (1, 0) ((1), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (1, 0) ((0), (2 * (k : ℤ) + 3)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) ((1), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (1, 0) ((2), (2 * (k : ℤ) + 3)) ≤ 0 := by
+  have hZ2_0 : incr (reciprocalField k) (1, 0) ((3), ((2 * (k : ℤ) + 3) - 1)) = incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) :=
+    (incr_eq_U k (1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ((3), ((2 * (k : ℤ) + 3) - 1)) (by ext <;> (simp; try ring))).symm
+  have hZ4_0 : incr (reciprocalField k) (1, 0) ((2), (2 * (k : ℤ) + 3)) = incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) :=
+    (incr_eq_U k (1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ((2), (2 * (k : ℤ) + 3)) (by ext <;> (simp; try ring))).symm
+  have vZ1 : incr (reciprocalField k) (1, 0) ((1), ((2 * (k : ℤ) + 3) - 1)) = min ((1) + (1) - 1) 0 - min ((1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (1) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((1) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (1) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (1) ((2 * (k : ℤ) + 3) - 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((1) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (1) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = min ((3 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) ((0), (2 * (k : ℤ) + 3)) = min ((0) + (1) - 1) 0 - min ((0) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (0) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((0) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (0) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (0) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((0) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (0) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((2 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((2 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((2 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((2 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C15_m_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) ((1), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (-1, 0) ((3), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (-1, 0) ((1), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (-1, 0) ((0), (2 * (k : ℤ) + 3)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) ((1), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (-1, 0) ((2), (2 * (k : ℤ) + 3)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (-1, 0) ((1), ((2 * (k : ℤ) + 3) - 1)) = min ((1) + (-1) - 1) 0 - min ((1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (1) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((1) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (1) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (1) ((2 * (k : ℤ) + 3) - 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((1) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (1) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((3), ((2 * (k : ℤ) + 3) - 1)) = min ((3) + (-1) - 1) 0 - min ((3) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (3) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((3) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (3) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3) ((2 * (k : ℤ) + 3) - 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((3) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) ((0), (2 * (k : ℤ) + 3)) = min ((0) + (-1) - 1) 0 - min ((0) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (0) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((0) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (0) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (0) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((0) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (0) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) ((2), (2 * (k : ℤ) + 3)) = min ((2) + (-1) - 1) 0 - min ((2) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (2) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((2) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (2) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (2) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((2) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (2) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C15_m_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) ((1), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (0, -1) ((3), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (0, -1) ((1), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (0, -1) ((0), (2 * (k : ℤ) + 3)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) ((1), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (0, -1) ((2), (2 * (k : ℤ) + 3)) ≤ -1 := by
+  have vZ1 : incr (reciprocalField k) (0, -1) ((1), ((2 * (k : ℤ) + 3) - 1)) = (((2 * (k : ℤ) + 3) - 1)) + -1 := by
+    rw [incr_vert k (-1) (1) ((2 * (k : ℤ) + 3) - 1) (Or.inr rfl) (mem_raw_of_box k (1) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (1) (((2 * (k : ℤ) + 3) - 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) ((3), ((2 * (k : ℤ) + 3) - 1)) = (((2 * (k : ℤ) + 3) - 1)) + -1 := by
+    rw [incr_vert k (-1) (3) ((2 * (k : ℤ) + 3) - 1) (Or.inr rfl) (mem_raw_of_box k (3) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (3) (((2 * (k : ℤ) + 3) - 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) ((0), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (0) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (0) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (0) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) ((2), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (2) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (2) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (2) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+/-- The upward vertical increment on the row `d + 1` for `3 - d <= X <= 1` is `-d` (transverse shift to the bottom row). -/
+theorem incr_row_up (k : ℕ) (X : ℤ) (h1 : 3 - (2 * (k : ℤ) + 3) ≤ X) (h2 : X ≤ 1) :
+    incr (reciprocalField k) (0, 1) (X, (2 * (k : ℤ) + 3) + 1) = -(2 * (k : ℤ) + 3) := by
+  have hT := incr_eq_T k (0, 1) (X + (2 * (k : ℤ) + 3) - 1, 0) (X, (2 * (k : ℤ) + 3) + 1)
+    (by ext <;> (simp; try ring))
+  have hV : incr (reciprocalField k) (0, 1) (X + (2 * (k : ℤ) + 3) - 1, 0) = 0 := by
+    have i := incr_vert k 1 (X + (2 * (k : ℤ) + 3) - 1) 0 (Or.inl rfl)
+      (mem_raw_of_box k (X + (2 * (k : ℤ) + 3) - 1) 0 (by omega))
+      (mem_raw_of_box k (X + (2 * (k : ℤ) + 3) - 1) (0 + 1) (by omega)) (by omega) (by omega)
+    rw [i, vG_one]; ring
+  rw [hV] at hT
+  dsimp only at hT
+  linarith
+
+theorem top_p_px_p (k : ℕ) (hk : 2 ≤ (k : ℤ)) (x : ℤ)
+    (hx1 : 6 - (2 * (k : ℤ) + 3) ≤ x) (hx2 : x ≤ -2) :
+    incr (reciprocalField k) (1, 0) (x, (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (1, 0) ((x - 2), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (1, 0) (x, (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((x - 1), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) (x, (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((x - 3), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have v1 : incr (reciprocalField k) (1, 0) (x, (2 * (k : ℤ) + 3)) = min (x + (1) - 1) 0 - min (x - 1) 0 := by
+    rw [incr_hG k (1) x (2 * (k : ℤ) + 3) (mem_raw_of_box k (x + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k x (2 * (k : ℤ) + 3) (by omega)),
+      hG_nc (2 * (k : ℤ) + 3) x (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) (x + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) x (2 * (k : ℤ) + 3) (by omega))]
+  have v2 : incr (reciprocalField k) (1, 0) ((x - 2), (2 * (k : ℤ) + 3)) = min ((x - 2) + (1) - 1) 0 - min ((x - 2) - 1) 0 := by
+    rw [incr_hG k (1) (x - 2) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((x - 2) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (x - 2) (2 * (k : ℤ) + 3) (by omega)),
+      hG_nc (2 * (k : ℤ) + 3) (x - 2) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((x - 2) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (x - 2) (2 * (k : ℤ) + 3) (by omega))]
+  have v3 : incr (reciprocalField k) (1, 0) ((x - 1), ((2 * (k : ℤ) + 3) + 1)) = min ((x - 1) + (1) - 1) 0 - min ((x - 1) - 1) 0 := by
+    rw [incr_hG k (1) (x - 1) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((x - 1) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (x - 1) ((2 * (k : ℤ) + 3) + 1) (by omega)),
+      hG_nc (2 * (k : ℤ) + 3) (x - 1) ((2 * (k : ℤ) + 3) + 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((x - 1) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (x - 1) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+  have v4 : incr (reciprocalField k) (1, 0) ((x - 3), ((2 * (k : ℤ) + 3) + 1)) = min ((x - 3) + (1) - 1) 0 - min ((x - 3) - 1) 0 := by
+    rw [incr_hG k (1) (x - 3) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((x - 3) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (x - 3) ((2 * (k : ℤ) + 3) + 1) (by omega)),
+      hG_nc (2 * (k : ℤ) + 3) (x - 3) ((2 * (k : ℤ) + 3) + 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((x - 3) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (x - 3) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+  exact ⟨by omega, by omega, by omega⟩
+
+theorem top_p_mx_p (k : ℕ) (hk : 2 ≤ (k : ℤ)) (x : ℤ)
+    (hx1 : 6 - (2 * (k : ℤ) + 3) ≤ x) (hx2 : x ≤ -2) :
+    incr (reciprocalField k) (-1, 0) (x, (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (-1, 0) ((x - 2), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (-1, 0) (x, (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (-1, 0) ((x - 1), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) (x, (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (-1, 0) ((x - 3), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have v1 : incr (reciprocalField k) (-1, 0) (x, (2 * (k : ℤ) + 3)) = min (x + (-1) - 1) 0 - min (x - 1) 0 := by
+    rw [incr_hG k (-1) x (2 * (k : ℤ) + 3) (mem_raw_of_box k (x + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k x (2 * (k : ℤ) + 3) (by omega)),
+      hG_nc (2 * (k : ℤ) + 3) x (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) (x + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) x (2 * (k : ℤ) + 3) (by omega))]
+  have v2 : incr (reciprocalField k) (-1, 0) ((x - 2), (2 * (k : ℤ) + 3)) = min ((x - 2) + (-1) - 1) 0 - min ((x - 2) - 1) 0 := by
+    rw [incr_hG k (-1) (x - 2) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((x - 2) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (x - 2) (2 * (k : ℤ) + 3) (by omega)),
+      hG_nc (2 * (k : ℤ) + 3) (x - 2) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((x - 2) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (x - 2) (2 * (k : ℤ) + 3) (by omega))]
+  have v3 : incr (reciprocalField k) (-1, 0) ((x - 1), ((2 * (k : ℤ) + 3) + 1)) = min ((x - 1) + (-1) - 1) 0 - min ((x - 1) - 1) 0 := by
+    rw [incr_hG k (-1) (x - 1) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((x - 1) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (x - 1) ((2 * (k : ℤ) + 3) + 1) (by omega)),
+      hG_nc (2 * (k : ℤ) + 3) (x - 1) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((x - 1) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (x - 1) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+  have v4 : incr (reciprocalField k) (-1, 0) ((x - 3), ((2 * (k : ℤ) + 3) + 1)) = min ((x - 3) + (-1) - 1) 0 - min ((x - 3) - 1) 0 := by
+    rw [incr_hG k (-1) (x - 3) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((x - 3) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (x - 3) ((2 * (k : ℤ) + 3) + 1) (by omega)),
+      hG_nc (2 * (k : ℤ) + 3) (x - 3) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((x - 3) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (x - 3) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+  exact ⟨by omega, by omega, by omega⟩
+
+theorem top_p_py_p (k : ℕ) (hk : 2 ≤ (k : ℤ)) (x : ℤ)
+    (hx1 : 6 - (2 * (k : ℤ) + 3) ≤ x) (hx2 : x ≤ -2) :
+    incr (reciprocalField k) (0, 1) (x, (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (0, 1) ((x - 2), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (0, 1) (x, (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, 1) ((x - 1), ((2 * (k : ℤ) + 3) + 1)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) (x, (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, 1) ((x - 3), ((2 * (k : ℤ) + 3) + 1)) ≤ 1 := by
+  have v1 : incr (reciprocalField k) (0, 1) (x, (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k (1) x (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k x (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k x ((2 * (k : ℤ) + 3) + (1)) (by omega)) (by omega) (by omega), vG_one]
+  have v2 : incr (reciprocalField k) (0, 1) ((x - 2), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k (1) (x - 2) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (x - 2) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (x - 2) ((2 * (k : ℤ) + 3) + (1)) (by omega)) (by omega) (by omega), vG_one]
+  have v3 : incr (reciprocalField k) (0, 1) ((x - 1), ((2 * (k : ℤ) + 3) + 1)) = -(2 * (k : ℤ) + 3) :=
+    incr_row_up k ((x - 1)) (by omega) (by omega)
+  have v4 : incr (reciprocalField k) (0, 1) ((x - 3), ((2 * (k : ℤ) + 3) + 1)) = -(2 * (k : ℤ) + 3) :=
+    incr_row_up k ((x - 3)) (by omega) (by omega)
+  exact ⟨by omega, by omega, by omega⟩
+
+theorem top_p_my_p (k : ℕ) (hk : 2 ≤ (k : ℤ)) (x : ℤ)
+    (hx1 : 6 - (2 * (k : ℤ) + 3) ≤ x) (hx2 : x ≤ -2) :
+    incr (reciprocalField k) (0, -1) (x, (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (0, -1) ((x - 2), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (0, -1) (x, (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, -1) ((x - 1), ((2 * (k : ℤ) + 3) + 1)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) (x, (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, -1) ((x - 3), ((2 * (k : ℤ) + 3) + 1)) ≤ -1 := by
+  have v1 : incr (reciprocalField k) (0, -1) (x, (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) x (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k x (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k x ((2 * (k : ℤ) + 3) + (-1)) (by omega)) (by omega) (by omega), vG_neg_one]
+  have v2 : incr (reciprocalField k) (0, -1) ((x - 2), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (x - 2) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (x - 2) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (x - 2) ((2 * (k : ℤ) + 3) + (-1)) (by omega)) (by omega) (by omega), vG_neg_one]
+  have v3 : incr (reciprocalField k) (0, -1) ((x - 1), ((2 * (k : ℤ) + 3) + 1)) = (((2 * (k : ℤ) + 3) + 1)) + -1 := by
+    rw [incr_vert k (-1) (x - 1) ((2 * (k : ℤ) + 3) + 1) (Or.inr rfl) (mem_raw_of_box k (x - 1) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (x - 1) (((2 * (k : ℤ) + 3) + 1) + (-1)) (by omega)) (by omega) (by omega), vG_neg_one]
+  have v4 : incr (reciprocalField k) (0, -1) ((x - 3), ((2 * (k : ℤ) + 3) + 1)) = (((2 * (k : ℤ) + 3) + 1)) + -1 := by
+    rw [incr_vert k (-1) (x - 3) ((2 * (k : ℤ) + 3) + 1) (Or.inr rfl) (mem_raw_of_box k (x - 3) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (x - 3) (((2 * (k : ℤ) + 3) + 1) + (-1)) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+theorem top_m_px_m (k : ℕ) (hk : 2 ≤ (k : ℤ)) (x : ℤ)
+    (hx1 : 6 - (2 * (k : ℤ) + 3) ≤ x) (hx2 : x ≤ -2) :
+    incr (reciprocalField k) (1, 0) (x, (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (1, 0) ((x + 2), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (1, 0) (x, (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((x - 1), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) (x, (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((x + 1), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have v1 : incr (reciprocalField k) (1, 0) (x, (2 * (k : ℤ) + 3)) = min (x + (1) - 1) 0 - min (x - 1) 0 := by
+    rw [incr_hG k (1) x (2 * (k : ℤ) + 3) (mem_raw_of_box k (x + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k x (2 * (k : ℤ) + 3) (by omega)),
+      hG_nc (2 * (k : ℤ) + 3) x (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) (x + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) x (2 * (k : ℤ) + 3) (by omega))]
+  have v2 : incr (reciprocalField k) (1, 0) ((x + 2), (2 * (k : ℤ) + 3)) = min ((x + 2) + (1) - 1) 0 - min ((x + 2) - 1) 0 := by
+    rw [incr_hG k (1) (x + 2) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((x + 2) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (x + 2) (2 * (k : ℤ) + 3) (by omega)),
+      hG_nc (2 * (k : ℤ) + 3) (x + 2) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((x + 2) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (x + 2) (2 * (k : ℤ) + 3) (by omega))]
+  have v3 : incr (reciprocalField k) (1, 0) ((x - 1), ((2 * (k : ℤ) + 3) + 1)) = min ((x - 1) + (1) - 1) 0 - min ((x - 1) - 1) 0 := by
+    rw [incr_hG k (1) (x - 1) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((x - 1) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (x - 1) ((2 * (k : ℤ) + 3) + 1) (by omega)),
+      hG_nc (2 * (k : ℤ) + 3) (x - 1) ((2 * (k : ℤ) + 3) + 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((x - 1) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (x - 1) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+  have v4 : incr (reciprocalField k) (1, 0) ((x + 1), ((2 * (k : ℤ) + 3) + 1)) = min ((x + 1) + (1) - 1) 0 - min ((x + 1) - 1) 0 := by
+    rw [incr_hG k (1) (x + 1) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((x + 1) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (x + 1) ((2 * (k : ℤ) + 3) + 1) (by omega)),
+      hG_nc (2 * (k : ℤ) + 3) (x + 1) ((2 * (k : ℤ) + 3) + 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((x + 1) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (x + 1) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+  exact ⟨by omega, by omega, by omega⟩
+
+theorem top_m_mx_m (k : ℕ) (hk : 2 ≤ (k : ℤ)) (x : ℤ)
+    (hx1 : 6 - (2 * (k : ℤ) + 3) ≤ x) (hx2 : x ≤ -2) :
+    incr (reciprocalField k) (-1, 0) (x, (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (-1, 0) ((x + 2), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (-1, 0) (x, (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (-1, 0) ((x - 1), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) (x, (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (-1, 0) ((x + 1), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have v1 : incr (reciprocalField k) (-1, 0) (x, (2 * (k : ℤ) + 3)) = min (x + (-1) - 1) 0 - min (x - 1) 0 := by
+    rw [incr_hG k (-1) x (2 * (k : ℤ) + 3) (mem_raw_of_box k (x + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k x (2 * (k : ℤ) + 3) (by omega)),
+      hG_nc (2 * (k : ℤ) + 3) x (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) (x + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) x (2 * (k : ℤ) + 3) (by omega))]
+  have v2 : incr (reciprocalField k) (-1, 0) ((x + 2), (2 * (k : ℤ) + 3)) = min ((x + 2) + (-1) - 1) 0 - min ((x + 2) - 1) 0 := by
+    rw [incr_hG k (-1) (x + 2) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((x + 2) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (x + 2) (2 * (k : ℤ) + 3) (by omega)),
+      hG_nc (2 * (k : ℤ) + 3) (x + 2) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((x + 2) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (x + 2) (2 * (k : ℤ) + 3) (by omega))]
+  have v3 : incr (reciprocalField k) (-1, 0) ((x - 1), ((2 * (k : ℤ) + 3) + 1)) = min ((x - 1) + (-1) - 1) 0 - min ((x - 1) - 1) 0 := by
+    rw [incr_hG k (-1) (x - 1) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((x - 1) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (x - 1) ((2 * (k : ℤ) + 3) + 1) (by omega)),
+      hG_nc (2 * (k : ℤ) + 3) (x - 1) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((x - 1) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (x - 1) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+  have v4 : incr (reciprocalField k) (-1, 0) ((x + 1), ((2 * (k : ℤ) + 3) + 1)) = min ((x + 1) + (-1) - 1) 0 - min ((x + 1) - 1) 0 := by
+    rw [incr_hG k (-1) (x + 1) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((x + 1) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (x + 1) ((2 * (k : ℤ) + 3) + 1) (by omega)),
+      hG_nc (2 * (k : ℤ) + 3) (x + 1) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((x + 1) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (x + 1) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+  exact ⟨by omega, by omega, by omega⟩
+
+theorem top_m_py_m (k : ℕ) (hk : 2 ≤ (k : ℤ)) (x : ℤ)
+    (hx1 : 6 - (2 * (k : ℤ) + 3) ≤ x) (hx2 : x ≤ -2) :
+    incr (reciprocalField k) (0, 1) (x, (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (0, 1) ((x + 2), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (0, 1) (x, (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, 1) ((x - 1), ((2 * (k : ℤ) + 3) + 1)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) (x, (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, 1) ((x + 1), ((2 * (k : ℤ) + 3) + 1)) ≤ 1 := by
+  have v1 : incr (reciprocalField k) (0, 1) (x, (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k (1) x (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k x (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k x ((2 * (k : ℤ) + 3) + (1)) (by omega)) (by omega) (by omega), vG_one]
+  have v2 : incr (reciprocalField k) (0, 1) ((x + 2), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k (1) (x + 2) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (x + 2) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (x + 2) ((2 * (k : ℤ) + 3) + (1)) (by omega)) (by omega) (by omega), vG_one]
+  have v3 : incr (reciprocalField k) (0, 1) ((x - 1), ((2 * (k : ℤ) + 3) + 1)) = -(2 * (k : ℤ) + 3) :=
+    incr_row_up k ((x - 1)) (by omega) (by omega)
+  have v4 : incr (reciprocalField k) (0, 1) ((x + 1), ((2 * (k : ℤ) + 3) + 1)) = -(2 * (k : ℤ) + 3) :=
+    incr_row_up k ((x + 1)) (by omega) (by omega)
+  exact ⟨by omega, by omega, by omega⟩
+
+theorem top_m_my_m (k : ℕ) (hk : 2 ≤ (k : ℤ)) (x : ℤ)
+    (hx1 : 6 - (2 * (k : ℤ) + 3) ≤ x) (hx2 : x ≤ -2) :
+    incr (reciprocalField k) (0, -1) (x, (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (0, -1) ((x + 2), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (0, -1) (x, (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, -1) ((x - 1), ((2 * (k : ℤ) + 3) + 1)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) (x, (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, -1) ((x + 1), ((2 * (k : ℤ) + 3) + 1)) ≤ -1 := by
+  have v1 : incr (reciprocalField k) (0, -1) (x, (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) x (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k x (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k x ((2 * (k : ℤ) + 3) + (-1)) (by omega)) (by omega) (by omega), vG_neg_one]
+  have v2 : incr (reciprocalField k) (0, -1) ((x + 2), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (x + 2) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (x + 2) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (x + 2) ((2 * (k : ℤ) + 3) + (-1)) (by omega)) (by omega) (by omega), vG_neg_one]
+  have v3 : incr (reciprocalField k) (0, -1) ((x - 1), ((2 * (k : ℤ) + 3) + 1)) = (((2 * (k : ℤ) + 3) + 1)) + -1 := by
+    rw [incr_vert k (-1) (x - 1) ((2 * (k : ℤ) + 3) + 1) (Or.inr rfl) (mem_raw_of_box k (x - 1) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (x - 1) (((2 * (k : ℤ) + 3) + 1) + (-1)) (by omega)) (by omega) (by omega), vG_neg_one]
+  have v4 : incr (reciprocalField k) (0, -1) ((x + 1), ((2 * (k : ℤ) + 3) + 1)) = (((2 * (k : ℤ) + 3) + 1)) + -1 := by
+    rw [incr_vert k (-1) (x + 1) ((2 * (k : ℤ) + 3) + 1) (Or.inr rfl) (mem_raw_of_box k (x + 1) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (x + 1) (((2 * (k : ℤ) + 3) + 1) + (-1)) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+theorem cls_C18_p_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) ((0), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (1, 0) ((-2), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (1, 0) ((0), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((-1), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) ((0), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((-3), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (1, 0) ((0), (2 * (k : ℤ) + 3)) = min ((0) + (1) - 1) 0 - min ((0) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (0) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((0) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (0) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (0) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((0) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (0) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((-2), (2 * (k : ℤ) + 3)) = min ((-2) + (1) - 1) 0 - min ((-2) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (-2) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((-2) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (-2) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (-2) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((-2) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (-2) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) ((-1), ((2 * (k : ℤ) + 3) + 1)) = min ((-1) + (1) - 1) 0 - min ((-1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (-1) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((-1) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (-1) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (-1) ((2 * (k : ℤ) + 3) + 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((-1) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (-1) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) ((-3), ((2 * (k : ℤ) + 3) + 1)) = min ((-3) + (1) - 1) 0 - min ((-3) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (-3) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((-3) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (-3) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (-3) ((2 * (k : ℤ) + 3) + 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((-3) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (-3) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C18_p_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) ((0), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (-1, 0) ((-2), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (-1, 0) ((0), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (-1, 0) ((-1), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) ((0), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (-1, 0) ((-3), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (-1, 0) ((0), (2 * (k : ℤ) + 3)) = min ((0) + (-1) - 1) 0 - min ((0) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (0) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((0) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (0) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (0) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((0) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (0) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((-2), (2 * (k : ℤ) + 3)) = min ((-2) + (-1) - 1) 0 - min ((-2) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (-2) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((-2) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (-2) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (-2) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((-2) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (-2) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) ((-1), ((2 * (k : ℤ) + 3) + 1)) = min ((-1) + (-1) - 1) 0 - min ((-1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (-1) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((-1) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (-1) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (-1) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((-1) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (-1) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) ((-3), ((2 * (k : ℤ) + 3) + 1)) = min ((-3) + (-1) - 1) 0 - min ((-3) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (-3) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((-3) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (-3) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (-3) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((-3) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (-3) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C18_p_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) ((0), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (0, 1) ((-2), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (0, 1) ((0), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, 1) ((-1), ((2 * (k : ℤ) + 3) + 1)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) ((0), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, 1) ((-3), ((2 * (k : ℤ) + 3) + 1)) ≤ 1 := by
+  have hZ3_0 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 2), (0)) = incr (reciprocalField k) (0, 1) ((-1), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * 1 - 0) :=
+    incr_eq_T k (0, 1) (((2 * (k : ℤ) + 3) - 2), (0)) ((-1), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have hZ4_0 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 4), (0)) = incr (reciprocalField k) (0, 1) ((-3), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * 1 - 0) :=
+    incr_eq_T k (0, 1) (((2 * (k : ℤ) + 3) - 4), (0)) ((-3), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (0, 1) ((0), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (0) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (0) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (0) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ2 : incr (reciprocalField k) (0, 1) ((-2), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (-2) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (-2) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (-2) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ3 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 2), (0)) = -((0)) := by
+    rw [incr_vert k 1 ((2 * (k : ℤ) + 3) - 2) (0) (Or.inl rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) (0) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) ((0) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 4), (0)) = -((0)) := by
+    rw [incr_vert k 1 ((2 * (k : ℤ) + 3) - 4) (0) (Or.inl rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 4) (0) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 4) ((0) + 1) (by omega)) (by omega) (by omega), vG_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C18_p_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) ((0), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (0, -1) ((-2), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (0, -1) ((0), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, -1) ((-1), ((2 * (k : ℤ) + 3) + 1)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) ((0), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, -1) ((-3), ((2 * (k : ℤ) + 3) + 1)) ≤ -1 := by
+  have vZ1 : incr (reciprocalField k) (0, -1) ((0), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (0) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (0) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (0) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) ((-2), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (-2) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (-2) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (-2) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) ((-1), ((2 * (k : ℤ) + 3) + 1)) = (((2 * (k : ℤ) + 3) + 1)) + -1 := by
+    rw [incr_vert k (-1) (-1) ((2 * (k : ℤ) + 3) + 1) (Or.inr rfl) (mem_raw_of_box k (-1) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (-1) (((2 * (k : ℤ) + 3) + 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) ((-3), ((2 * (k : ℤ) + 3) + 1)) = (((2 * (k : ℤ) + 3) + 1)) + -1 := by
+    rw [incr_vert k (-1) (-3) ((2 * (k : ℤ) + 3) + 1) (Or.inr rfl) (mem_raw_of_box k (-3) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (-3) (((2 * (k : ℤ) + 3) + 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C18_m_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) ((0), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (1, 0) ((2), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (1, 0) ((0), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((-1), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) ((0), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((1), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have hZ2_0 : incr (reciprocalField k) (1, 0) ((2), (2 * (k : ℤ) + 3)) = incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) :=
+    (incr_eq_U k (1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ((2), (2 * (k : ℤ) + 3)) (by ext <;> (simp; try ring))).symm
+  have vZ1 : incr (reciprocalField k) (1, 0) ((0), (2 * (k : ℤ) + 3)) = min ((0) + (1) - 1) 0 - min ((0) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (0) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((0) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (0) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (0) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((0) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (0) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((2 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((2 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((2 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((2 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) ((-1), ((2 * (k : ℤ) + 3) + 1)) = min ((-1) + (1) - 1) 0 - min ((-1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (-1) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((-1) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (-1) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (-1) ((2 * (k : ℤ) + 3) + 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((-1) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (-1) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) ((1), ((2 * (k : ℤ) + 3) + 1)) = min ((1) + (1) - 1) 0 - min ((1) - 1) 0 + (1 - 0) := by
+    rw [incr_hG k (1) (1) ((2 * (k : ℤ) + 3) + 1) (mem_raw_corner2' k _ _ (by omega) (by omega)) (mem_raw_of_box k (1) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_c_plus (2 * (k : ℤ) + 3) (1) ((2 * (k : ℤ) + 3) + 1) (1) (corner_yes (2 * (k : ℤ) + 3) ((1) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (1) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C18_m_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) ((0), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (-1, 0) ((2), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (-1, 0) ((0), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (-1, 0) ((-1), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) ((0), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (-1, 0) ((1), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (-1, 0) ((0), (2 * (k : ℤ) + 3)) = min ((0) + (-1) - 1) 0 - min ((0) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (0) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((0) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (0) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (0) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((0) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (0) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((2), (2 * (k : ℤ) + 3)) = min ((2) + (-1) - 1) 0 - min ((2) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (2) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((2) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (2) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (2) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((2) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (2) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) ((-1), ((2 * (k : ℤ) + 3) + 1)) = min ((-1) + (-1) - 1) 0 - min ((-1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (-1) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((-1) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (-1) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (-1) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((-1) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (-1) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) ((1), ((2 * (k : ℤ) + 3) + 1)) = min ((1) + (-1) - 1) 0 - min ((1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (1) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((1) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (1) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (1) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((1) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (1) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_C18_m_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) ((0), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (0, -1) ((2), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (0, -1) ((0), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, -1) ((-1), ((2 * (k : ℤ) + 3) + 1)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) ((0), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, -1) ((1), ((2 * (k : ℤ) + 3) + 1)) ≤ -1 := by
+  have vZ1 : incr (reciprocalField k) (0, -1) ((0), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (0) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (0) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (0) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) ((2), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (2) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (2) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (2) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) ((-1), ((2 * (k : ℤ) + 3) + 1)) = (((2 * (k : ℤ) + 3) + 1)) + -1 := by
+    rw [incr_vert k (-1) (-1) ((2 * (k : ℤ) + 3) + 1) (Or.inr rfl) (mem_raw_of_box k (-1) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (-1) (((2 * (k : ℤ) + 3) + 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) ((1), ((2 * (k : ℤ) + 3) + 1)) = (((2 * (k : ℤ) + 3) + 1)) + -1 := by
+    rw [incr_vert k (-1) (1) ((2 * (k : ℤ) + 3) + 1) (Or.inr rfl) (mem_raw_of_box k (1) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (1) (((2 * (k : ℤ) + 3) + 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R1_p_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (-1, 0) ((1 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (-1, 0) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (-1, 0) ((0 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 0 := by
+  have hZ2_0 : incr (reciprocalField k) (-1, 0) ((1 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = incr (reciprocalField k) (-1, 0) ((1), (2 * (k : ℤ) + 3)) :=
+    incr_eq_U k (-1, 0) ((1 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ((1), (2 * (k : ℤ) + 3)) (by ext <;> (simp; try ring))
+  have hZ3_0 : incr (reciprocalField k) (-1, 0) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = incr (reciprocalField k) (-1, 0) ((2), ((2 * (k : ℤ) + 3) + 1)) :=
+    incr_eq_U k (-1, 0) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ((2), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have hZ4_0 : incr (reciprocalField k) (-1, 0) ((0 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = incr (reciprocalField k) (-1, 0) ((0), ((2 * (k : ℤ) + 3) + 1)) :=
+    incr_eq_U k (-1, 0) ((0 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ((0), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((3 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((1), (2 * (k : ℤ) + 3)) = min ((1) + (-1) - 1) 0 - min ((1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (1) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((1) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (1) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (1) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((1) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (1) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) ((2), ((2 * (k : ℤ) + 3) + 1)) = min ((2) + (-1) - 1) 0 - min ((2) - 1) 0 + (0 - 1) := by
+    rw [incr_hG k (-1) (2) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((2) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_corner2' k _ _ (by omega) (by omega)), hG_c_minus (2 * (k : ℤ) + 3) (2) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((2) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (corner_yes (2 * (k : ℤ) + 3) (2) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) ((0), ((2 * (k : ℤ) + 3) + 1)) = min ((0) + (-1) - 1) 0 - min ((0) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (0) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((0) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (0) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (0) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((0) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (0) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R1_m_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((3 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((5 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((5 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((5 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((5 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((2 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((2 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((2 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((2 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((4 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R1_m_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (-1, 0) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 0 := by
+  have hZ3_0 : incr (reciprocalField k) (-1, 0) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = incr (reciprocalField k) (-1, 0) ((2), ((2 * (k : ℤ) + 3) + 1)) :=
+    incr_eq_U k (-1, 0) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ((2), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((3 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((5 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((5 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((5 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((5 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) ((2), ((2 * (k : ℤ) + 3) + 1)) = min ((2) + (-1) - 1) 0 - min ((2) - 1) 0 + (0 - 1) := by
+    rw [incr_hG k (-1) (2) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((2) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_corner2' k _ _ (by omega) (by omega)), hG_c_minus (2 * (k : ℤ) + 3) (2) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((2) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (corner_yes (2 * (k : ℤ) + 3) (2) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((4 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R1_m_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (0, 1) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 1 := by
+  have vZ1 : incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = -(((2 * (k : ℤ) + 3) - 1)) := by
+    rw [incr_vert k 1 (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inl rfl) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ2 : incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = -(((2 * (k : ℤ) + 3) - 1)) := by
+    rw [incr_vert k 1 (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inl rfl) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ3 : incr (reciprocalField k) (0, 1) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R1_m_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (0, -1) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ -1 := by
+  have vZ1 : incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = (((2 * (k : ℤ) + 3) - 1)) + -1 := by
+    rw [incr_vert k (-1) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inr rfl) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = (((2 * (k : ℤ) + 3) - 1)) + -1 := by
+    rw [incr_vert k (-1) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inr rfl) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R2_p_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ≤ incr (reciprocalField k) (-1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ∧
+    incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (-1, 0) ((1 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ 0 := by
+  have hZ2_0 : incr (reciprocalField k) (-1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = incr (reciprocalField k) (-1, 0) ((2), ((2 * (k : ℤ) + 3) - 1)) :=
+    incr_eq_U k (-1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ((2), ((2 * (k : ℤ) + 3) - 1)) (by ext <;> (simp; try ring))
+  have hZ4_0 : incr (reciprocalField k) (-1, 0) ((1 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = incr (reciprocalField k) (-1, 0) ((1), (2 * (k : ℤ) + 3)) :=
+    incr_eq_U k (-1, 0) ((1 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ((1), (2 * (k : ℤ) + 3)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = min ((4 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((2), ((2 * (k : ℤ) + 3) - 1)) = min ((2) + (-1) - 1) 0 - min ((2) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (2) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((2) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (2) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (2) ((2 * (k : ℤ) + 3) - 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((2) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (2) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((3 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) ((1), (2 * (k : ℤ) + 3)) = min ((1) + (-1) - 1) 0 - min ((1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (1) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((1) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (1) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (1) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((1) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (1) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R2_m_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ≤ incr (reciprocalField k) (1, 0) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ∧
+    incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = min ((4 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = min ((6 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((6 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (mem_raw_of_box k ((6 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)), hG_nc (2 * (k : ℤ) + 3) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((6 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((3 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((5 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((5 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((5 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((5 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R2_m_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ≤ incr (reciprocalField k) (-1, 0) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ∧
+    incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = min ((4 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = min ((6 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((6 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (mem_raw_of_box k ((6 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)), hG_nc (2 * (k : ℤ) + 3) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((6 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((3 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((5 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((5 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((5 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((5 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R2_m_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ≤ incr (reciprocalField k) (0, 1) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ∧
+    incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ 1 := by
+  have vZ1 : incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = -(((2 * (k : ℤ) + 3) - 2)) := by
+    rw [incr_vert k 1 (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (Or.inl rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 2) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ2 : incr (reciprocalField k) (0, 1) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = -(((2 * (k : ℤ) + 3) - 2)) := by
+    rw [incr_vert k 1 (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (Or.inl rfl) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 2) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ3 : incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = -(((2 * (k : ℤ) + 3) - 1)) := by
+    rw [incr_vert k 1 (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inl rfl) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = -(((2 * (k : ℤ) + 3) - 1)) := by
+    rw [incr_vert k 1 (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inl rfl) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R2_m_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ≤ incr (reciprocalField k) (0, -1) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ∧
+    incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ -1 := by
+  have vZ1 : incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = (((2 * (k : ℤ) + 3) - 2)) + -1 := by
+    rw [incr_vert k (-1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (Or.inr rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 2) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = (((2 * (k : ℤ) + 3) - 2)) + -1 := by
+    rw [incr_vert k (-1) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (Or.inr rfl) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 2) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = (((2 * (k : ℤ) + 3) - 1)) + -1 := by
+    rw [incr_vert k (-1) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inr rfl) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = (((2 * (k : ℤ) + 3) - 1)) + -1 := by
+    rw [incr_vert k (-1) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inr rfl) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R3_p_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) ≤ incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) ∧
+    incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) - incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) - incr (reciprocalField k) (-1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ≤ 0 := by
+  have hZ2_0 : incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) = incr (reciprocalField k) (-1, 0) ((3), ((2 * (k : ℤ) + 3) - 2)) :=
+    incr_eq_U k (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) ((3), ((2 * (k : ℤ) + 3) - 2)) (by ext <;> (simp; try ring))
+  have hZ4_0 : incr (reciprocalField k) (-1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = incr (reciprocalField k) (-1, 0) ((2), ((2 * (k : ℤ) + 3) - 1)) :=
+    incr_eq_U k (-1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ((2), ((2 * (k : ℤ) + 3) - 1)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) = min ((5 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((5 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (mem_raw_of_box k ((5 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 3) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((5 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((3), ((2 * (k : ℤ) + 3) - 2)) = min ((3) + (-1) - 1) 0 - min ((3) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (3) ((2 * (k : ℤ) + 3) - 2) (mem_raw_of_box k ((3) + (-1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (3) ((2 * (k : ℤ) + 3) - 2) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3) ((2 * (k : ℤ) + 3) - 2) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((3) + (-1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3) ((2 * (k : ℤ) + 3) - 2) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = min ((4 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) ((2), ((2 * (k : ℤ) + 3) - 1)) = min ((2) + (-1) - 1) 0 - min ((2) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (2) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((2) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (2) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (2) ((2 * (k : ℤ) + 3) - 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((2) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (2) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R3_m_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) ≤ incr (reciprocalField k) (1, 0) ((7 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) ∧
+    incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) - incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) - incr (reciprocalField k) (1, 0) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) = min ((5 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((5 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (mem_raw_of_box k ((5 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 3) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((5 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((7 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) = min ((7 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((7 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (mem_raw_of_box k ((7 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 3) (by omega)) (mem_raw_of_box k (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((7 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = min ((4 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = min ((6 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((6 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (mem_raw_of_box k ((6 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)), hG_nc (2 * (k : ℤ) + 3) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((6 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R3_m_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) ≤ incr (reciprocalField k) (-1, 0) ((7 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) ∧
+    incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) - incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) - incr (reciprocalField k) (-1, 0) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) = min ((5 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((5 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (mem_raw_of_box k ((5 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 3) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((5 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((7 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) = min ((7 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((7 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (mem_raw_of_box k ((7 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 3) (by omega)) (mem_raw_of_box k (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((7 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = min ((4 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = min ((6 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((6 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (mem_raw_of_box k ((6 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)), hG_nc (2 * (k : ℤ) + 3) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((6 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R3_m_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) ≤ incr (reciprocalField k) (0, 1) ((7 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) ∧
+    incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) - incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) - incr (reciprocalField k) (0, 1) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ≤ 1 := by
+  have vZ1 : incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) = -(((2 * (k : ℤ) + 3) - 3)) := by
+    rw [incr_vert k 1 (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (Or.inl rfl) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ2 : incr (reciprocalField k) (0, 1) ((7 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) = -(((2 * (k : ℤ) + 3) - 3)) := by
+    rw [incr_vert k 1 (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (Or.inl rfl) (mem_raw_of_box k (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (by omega)) (mem_raw_of_box k (7 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ3 : incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = -(((2 * (k : ℤ) + 3) - 2)) := by
+    rw [incr_vert k 1 (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (Or.inl rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 2) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = -(((2 * (k : ℤ) + 3) - 2)) := by
+    rw [incr_vert k 1 (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (Or.inl rfl) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 2) + 1) (by omega)) (by omega) (by omega), vG_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R3_m_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) ≤ incr (reciprocalField k) (0, -1) ((7 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) ∧
+    incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) - incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) - incr (reciprocalField k) (0, -1) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ≤ -1 := by
+  have vZ1 : incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) = (((2 * (k : ℤ) + 3) - 3)) + -1 := by
+    rw [incr_vert k (-1) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (Or.inr rfl) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) ((7 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) = (((2 * (k : ℤ) + 3) - 3)) + -1 := by
+    rw [incr_vert k (-1) (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (Or.inr rfl) (mem_raw_of_box k (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (by omega)) (mem_raw_of_box k (7 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = (((2 * (k : ℤ) + 3) - 2)) + -1 := by
+    rw [incr_vert k (-1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (Or.inr rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 2) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = (((2 * (k : ℤ) + 3) - 2)) + -1 := by
+    rw [incr_vert k (-1) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (Or.inr rfl) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 2) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R4_p_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (1, 0) ((1 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 0 := by
+  have hZ4_0 : incr (reciprocalField k) (1, 0) ((1 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = incr (reciprocalField k) (1, 0) ((1), ((2 * (k : ℤ) + 3) + 1)) :=
+    incr_eq_U k (1, 0) ((1 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ((1), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((4 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((2 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((2 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((2 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((2 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((3 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) ((1), ((2 * (k : ℤ) + 3) + 1)) = min ((1) + (1) - 1) 0 - min ((1) - 1) 0 + (1 - 0) := by
+    rw [incr_hG k (1) (1) ((2 * (k : ℤ) + 3) + 1) (mem_raw_corner2' k _ _ (by omega) (by omega)) (mem_raw_of_box k (1) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_c_plus (2 * (k : ℤ) + 3) (1) ((2 * (k : ℤ) + 3) + 1) (1) (corner_yes (2 * (k : ℤ) + 3) ((1) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (1) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R4_p_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (-1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (-1, 0) ((1 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 0 := by
+  have hZ2_0 : incr (reciprocalField k) (-1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = incr (reciprocalField k) (-1, 0) ((2), (2 * (k : ℤ) + 3)) :=
+    incr_eq_U k (-1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ((2), (2 * (k : ℤ) + 3)) (by ext <;> (simp; try ring))
+  have hZ4_0 : incr (reciprocalField k) (-1, 0) ((1 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = incr (reciprocalField k) (-1, 0) ((1), ((2 * (k : ℤ) + 3) + 1)) :=
+    incr_eq_U k (-1, 0) ((1 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ((1), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((4 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((2), (2 * (k : ℤ) + 3)) = min ((2) + (-1) - 1) 0 - min ((2) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (2) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((2) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (2) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (2) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((2) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (2) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((3 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) ((1), ((2 * (k : ℤ) + 3) + 1)) = min ((1) + (-1) - 1) 0 - min ((1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (1) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((1) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (1) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (1) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((1) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (1) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R4_p_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (0, 1) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (0, 1) ((1 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 1 := by
+  have hZ4_0 : incr (reciprocalField k) (0, 1) ((0), (-1)) = incr (reciprocalField k) (0, 1) ((1 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) + ((2 * (k : ℤ) + 3) * 1 - 0) :=
+    incr_eq_T k (0, 1) ((0), (-1)) ((1 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) (by ext <;> (simp; try ring))
+  have hZ4_1 : incr (reciprocalField k) (0, 1) ((0), (-1)) = incr (reciprocalField k) (0, 1) ((2 * (k : ℤ) + 3), (0)) :=
+    incr_eq_U k (0, 1) ((0), (-1)) ((2 * (k : ℤ) + 3), (0)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = -(((2 * (k : ℤ) + 3) - 1)) := by
+    rw [incr_vert k 1 (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inl rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ2 : incr (reciprocalField k) (0, 1) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = -(((2 * (k : ℤ) + 3) - 1)) := by
+    rw [incr_vert k 1 (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inl rfl) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ3 : incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) ((2 * (k : ℤ) + 3), (0)) = -((0)) := by
+    rw [incr_vert k 1 (2 * (k : ℤ) + 3) (0) (Or.inl rfl) (mem_raw_of_box k (2 * (k : ℤ) + 3) (0) (by omega)) (mem_raw_of_box k (2 * (k : ℤ) + 3) ((0) + 1) (by omega)) (by omega) (by omega), vG_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R4_p_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (0, -1) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (0, -1) ((1 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ -1 := by
+  have hZ2_0 : incr (reciprocalField k) (0, -1) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = incr (reciprocalField k) (0, -1) ((2), (2 * (k : ℤ) + 3)) :=
+    incr_eq_U k (0, -1) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ((2), (2 * (k : ℤ) + 3)) (by ext <;> (simp; try ring))
+  have hZ4_0 : incr (reciprocalField k) (0, -1) ((1 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = incr (reciprocalField k) (0, -1) ((1), ((2 * (k : ℤ) + 3) + 1)) :=
+    incr_eq_U k (0, -1) ((1 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ((1), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = (((2 * (k : ℤ) + 3) - 1)) + -1 := by
+    rw [incr_vert k (-1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inr rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) ((2), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (2) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (2) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (2) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) ((1), ((2 * (k : ℤ) + 3) + 1)) = (((2 * (k : ℤ) + 3) + 1)) + -1 := by
+    rw [incr_vert k (-1) (1) ((2 * (k : ℤ) + 3) + 1) (Or.inr rfl) (mem_raw_of_box k (1) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (1) (((2 * (k : ℤ) + 3) + 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R4_m_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (1, 0) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((4 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((6 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((6 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((6 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((6 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((3 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((5 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((5 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((5 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((5 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R4_m_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (-1, 0) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((4 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((6 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((6 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((6 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((6 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((3 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((5 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((5 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((5 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((5 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R4_m_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (0, 1) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 1 := by
+  have vZ1 : incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = -(((2 * (k : ℤ) + 3) - 1)) := by
+    rw [incr_vert k 1 (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inl rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ2 : incr (reciprocalField k) (0, 1) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = -(((2 * (k : ℤ) + 3) - 1)) := by
+    rw [incr_vert k 1 (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inl rfl) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ3 : incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R4_m_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (0, -1) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ -1 := by
+  have vZ1 : incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = (((2 * (k : ℤ) + 3) - 1)) + -1 := by
+    rw [incr_vert k (-1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inr rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) ((6 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = (((2 * (k : ℤ) + 3) - 1)) + -1 := by
+    rw [incr_vert k (-1) (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inr rfl) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R5_p_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((5 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((5 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((5 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((5 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((3 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((4 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((2 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((2 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((2 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((2 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R5_p_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (-1, 0) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 0 := by
+  have hZ4_0 : incr (reciprocalField k) (-1, 0) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = incr (reciprocalField k) (-1, 0) ((2), ((2 * (k : ℤ) + 3) + 1)) :=
+    incr_eq_U k (-1, 0) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ((2), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((5 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((5 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((5 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((5 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((3 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((4 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) ((2), ((2 * (k : ℤ) + 3) + 1)) = min ((2) + (-1) - 1) 0 - min ((2) - 1) 0 + (0 - 1) := by
+    rw [incr_hG k (-1) (2) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((2) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_corner2' k _ _ (by omega) (by omega)), hG_c_minus (2 * (k : ℤ) + 3) (2) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((2) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (corner_yes (2 * (k : ℤ) + 3) (2) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R5_p_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (0, 1) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 1 := by
+  have vZ1 : incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = -(((2 * (k : ℤ) + 3) - 1)) := by
+    rw [incr_vert k 1 (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inl rfl) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ2 : incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = -(((2 * (k : ℤ) + 3) - 1)) := by
+    rw [incr_vert k 1 (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inl rfl) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ3 : incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R5_p_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (0, -1) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ -1 := by
+  have vZ1 : incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = (((2 * (k : ℤ) + 3) - 1)) + -1 := by
+    rw [incr_vert k (-1) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inr rfl) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = (((2 * (k : ℤ) + 3) - 1)) + -1 := by
+    rw [incr_vert k (-1) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inr rfl) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R5_m_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (1, 0) ((7 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (1, 0) ((6 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((5 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((5 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((5 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((5 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((7 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((7 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((7 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((7 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((7 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((4 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) ((6 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((6 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((6 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (6 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((6 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (6 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((6 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (6 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R5_m_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (-1, 0) ((7 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (-1, 0) ((6 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (-1, 0) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((5 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((5 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((5 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((5 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((7 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((7 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((7 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((7 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((7 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((4 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) ((6 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((6 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((6 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (6 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((6 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (6 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((6 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (6 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R5_m_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (0, 1) ((7 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (0, 1) ((6 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ 1 := by
+  have vZ1 : incr (reciprocalField k) (0, 1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = -(((2 * (k : ℤ) + 3) - 1)) := by
+    rw [incr_vert k 1 (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inl rfl) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ2 : incr (reciprocalField k) (0, 1) ((7 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = -(((2 * (k : ℤ) + 3) - 1)) := by
+    rw [incr_vert k 1 (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inl rfl) (mem_raw_of_box k (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (7 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ3 : incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) ((6 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (6 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R5_m_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (0, -1) ((7 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (0, -1) ((6 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ≤ -1 := by
+  have vZ1 : incr (reciprocalField k) (0, -1) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = (((2 * (k : ℤ) + 3) - 1)) + -1 := by
+    rw [incr_vert k (-1) (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inr rfl) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (5 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) ((7 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = (((2 * (k : ℤ) + 3) - 1)) + -1 := by
+    rw [incr_vert k (-1) (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inr rfl) (mem_raw_of_box k (7 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (7 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) ((6 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (6 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (6 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R6_p_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) ((2), ((2 * (k : ℤ) + 3) - 2)) ≤ incr (reciprocalField k) (0, 1) ((0), ((2 * (k : ℤ) + 3) - 2)) ∧
+    incr (reciprocalField k) (0, 1) ((2), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (0, 1) ((1), ((2 * (k : ℤ) + 3) - 1)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) ((2), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (0, 1) ((-1), ((2 * (k : ℤ) + 3) - 1)) ≤ 1 := by
+  have vZ1 : incr (reciprocalField k) (0, 1) ((2), ((2 * (k : ℤ) + 3) - 2)) = -(((2 * (k : ℤ) + 3) - 2)) := by
+    rw [incr_vert k 1 (2) ((2 * (k : ℤ) + 3) - 2) (Or.inl rfl) (mem_raw_of_box k (2) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (2) (((2 * (k : ℤ) + 3) - 2) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ2 : incr (reciprocalField k) (0, 1) ((0), ((2 * (k : ℤ) + 3) - 2)) = -(((2 * (k : ℤ) + 3) - 2)) := by
+    rw [incr_vert k 1 (0) ((2 * (k : ℤ) + 3) - 2) (Or.inl rfl) (mem_raw_of_box k (0) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (0) (((2 * (k : ℤ) + 3) - 2) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ3 : incr (reciprocalField k) (0, 1) ((1), ((2 * (k : ℤ) + 3) - 1)) = -(((2 * (k : ℤ) + 3) - 1)) := by
+    rw [incr_vert k 1 (1) ((2 * (k : ℤ) + 3) - 1) (Or.inl rfl) (mem_raw_of_box k (1) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (1) (((2 * (k : ℤ) + 3) - 1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) ((-1), ((2 * (k : ℤ) + 3) - 1)) = -(((2 * (k : ℤ) + 3) - 1)) := by
+    rw [incr_vert k 1 (-1) ((2 * (k : ℤ) + 3) - 1) (Or.inl rfl) (mem_raw_of_box k (-1) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (-1) (((2 * (k : ℤ) + 3) - 1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R6_p_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) ((2), ((2 * (k : ℤ) + 3) - 2)) ≤ incr (reciprocalField k) (0, -1) ((0), ((2 * (k : ℤ) + 3) - 2)) ∧
+    incr (reciprocalField k) (0, -1) ((2), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (0, -1) ((1), ((2 * (k : ℤ) + 3) - 1)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) ((2), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (0, -1) ((-1), ((2 * (k : ℤ) + 3) - 1)) ≤ -1 := by
+  have vZ1 : incr (reciprocalField k) (0, -1) ((2), ((2 * (k : ℤ) + 3) - 2)) = (((2 * (k : ℤ) + 3) - 2)) + -1 := by
+    rw [incr_vert k (-1) (2) ((2 * (k : ℤ) + 3) - 2) (Or.inr rfl) (mem_raw_of_box k (2) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (2) (((2 * (k : ℤ) + 3) - 2) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) ((0), ((2 * (k : ℤ) + 3) - 2)) = (((2 * (k : ℤ) + 3) - 2)) + -1 := by
+    rw [incr_vert k (-1) (0) ((2 * (k : ℤ) + 3) - 2) (Or.inr rfl) (mem_raw_of_box k (0) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (0) (((2 * (k : ℤ) + 3) - 2) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) ((1), ((2 * (k : ℤ) + 3) - 1)) = (((2 * (k : ℤ) + 3) - 1)) + -1 := by
+    rw [incr_vert k (-1) (1) ((2 * (k : ℤ) + 3) - 1) (Or.inr rfl) (mem_raw_of_box k (1) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (1) (((2 * (k : ℤ) + 3) - 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) ((-1), ((2 * (k : ℤ) + 3) - 1)) = (((2 * (k : ℤ) + 3) - 1)) + -1 := by
+    rw [incr_vert k (-1) (-1) ((2 * (k : ℤ) + 3) - 1) (Or.inr rfl) (mem_raw_of_box k (-1) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (-1) (((2 * (k : ℤ) + 3) - 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R6_m_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) ((2), ((2 * (k : ℤ) + 3) - 2)) ≤ incr (reciprocalField k) (0, 1) ((4), ((2 * (k : ℤ) + 3) - 2)) ∧
+    incr (reciprocalField k) (0, 1) ((2), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (0, 1) ((1), ((2 * (k : ℤ) + 3) - 1)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) ((2), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (0, 1) ((3), ((2 * (k : ℤ) + 3) - 1)) ≤ 1 := by
+  have hZ2_0 : incr (reciprocalField k) (0, 1) ((4), ((2 * (k : ℤ) + 3) - 2)) = incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) :=
+    (incr_eq_U k (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) ((4), ((2 * (k : ℤ) + 3) - 2)) (by ext <;> (simp; try ring))).symm
+  have hZ4_0 : incr (reciprocalField k) (0, 1) ((3), ((2 * (k : ℤ) + 3) - 1)) = incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) :=
+    (incr_eq_U k (0, 1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ((3), ((2 * (k : ℤ) + 3) - 1)) (by ext <;> (simp; try ring))).symm
+  have vZ1 : incr (reciprocalField k) (0, 1) ((2), ((2 * (k : ℤ) + 3) - 2)) = -(((2 * (k : ℤ) + 3) - 2)) := by
+    rw [incr_vert k 1 (2) ((2 * (k : ℤ) + 3) - 2) (Or.inl rfl) (mem_raw_of_box k (2) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (2) (((2 * (k : ℤ) + 3) - 2) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ2 : incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) = -(((2 * (k : ℤ) + 3) - 3)) := by
+    rw [incr_vert k 1 (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (Or.inl rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ3 : incr (reciprocalField k) (0, 1) ((1), ((2 * (k : ℤ) + 3) - 1)) = -(((2 * (k : ℤ) + 3) - 1)) := by
+    rw [incr_vert k 1 (1) ((2 * (k : ℤ) + 3) - 1) (Or.inl rfl) (mem_raw_of_box k (1) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (1) (((2 * (k : ℤ) + 3) - 1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = -(((2 * (k : ℤ) + 3) - 2)) := by
+    rw [incr_vert k 1 (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (Or.inl rfl) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 2) + 1) (by omega)) (by omega) (by omega), vG_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R6_m_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) ((2), ((2 * (k : ℤ) + 3) - 2)) ≤ incr (reciprocalField k) (0, -1) ((4), ((2 * (k : ℤ) + 3) - 2)) ∧
+    incr (reciprocalField k) (0, -1) ((2), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (0, -1) ((1), ((2 * (k : ℤ) + 3) - 1)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) ((2), ((2 * (k : ℤ) + 3) - 2)) - incr (reciprocalField k) (0, -1) ((3), ((2 * (k : ℤ) + 3) - 1)) ≤ -1 := by
+  have vZ1 : incr (reciprocalField k) (0, -1) ((2), ((2 * (k : ℤ) + 3) - 2)) = (((2 * (k : ℤ) + 3) - 2)) + -1 := by
+    rw [incr_vert k (-1) (2) ((2 * (k : ℤ) + 3) - 2) (Or.inr rfl) (mem_raw_of_box k (2) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (2) (((2 * (k : ℤ) + 3) - 2) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) ((4), ((2 * (k : ℤ) + 3) - 2)) = (((2 * (k : ℤ) + 3) - 2)) + -1 := by
+    rw [incr_vert k (-1) (4) ((2 * (k : ℤ) + 3) - 2) (Or.inr rfl) (mem_raw_of_box k (4) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (4) (((2 * (k : ℤ) + 3) - 2) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) ((1), ((2 * (k : ℤ) + 3) - 1)) = (((2 * (k : ℤ) + 3) - 1)) + -1 := by
+    rw [incr_vert k (-1) (1) ((2 * (k : ℤ) + 3) - 1) (Or.inr rfl) (mem_raw_of_box k (1) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (1) (((2 * (k : ℤ) + 3) - 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) ((3), ((2 * (k : ℤ) + 3) - 1)) = (((2 * (k : ℤ) + 3) - 1)) + -1 := by
+    rw [incr_vert k (-1) (3) ((2 * (k : ℤ) + 3) - 1) (Or.inr rfl) (mem_raw_of_box k (3) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (3) (((2 * (k : ℤ) + 3) - 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R7_p_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) ((-1), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (1, 0) ((-3), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (1, 0) ((-1), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((-2), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) ((-1), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((-4), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (1, 0) ((-1), (2 * (k : ℤ) + 3)) = min ((-1) + (1) - 1) 0 - min ((-1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (-1) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((-1) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (-1) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (-1) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((-1) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (-1) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((-3), (2 * (k : ℤ) + 3)) = min ((-3) + (1) - 1) 0 - min ((-3) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (-3) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((-3) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (-3) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (-3) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((-3) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (-3) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) ((-2), ((2 * (k : ℤ) + 3) + 1)) = min ((-2) + (1) - 1) 0 - min ((-2) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (-2) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((-2) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (-2) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (-2) ((2 * (k : ℤ) + 3) + 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((-2) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (-2) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) ((-4), ((2 * (k : ℤ) + 3) + 1)) = min ((-4) + (1) - 1) 0 - min ((-4) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (-4) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((-4) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (-4) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (-4) ((2 * (k : ℤ) + 3) + 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((-4) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (-4) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R7_p_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) ((-1), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (-1, 0) ((-3), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (-1, 0) ((-1), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (-1, 0) ((-2), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) ((-1), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (-1, 0) ((-4), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (-1, 0) ((-1), (2 * (k : ℤ) + 3)) = min ((-1) + (-1) - 1) 0 - min ((-1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (-1) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((-1) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (-1) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (-1) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((-1) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (-1) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((-3), (2 * (k : ℤ) + 3)) = min ((-3) + (-1) - 1) 0 - min ((-3) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (-3) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((-3) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (-3) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (-3) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((-3) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (-3) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) ((-2), ((2 * (k : ℤ) + 3) + 1)) = min ((-2) + (-1) - 1) 0 - min ((-2) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (-2) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((-2) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (-2) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (-2) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((-2) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (-2) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) ((-4), ((2 * (k : ℤ) + 3) + 1)) = min ((-4) + (-1) - 1) 0 - min ((-4) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (-4) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((-4) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (-4) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (-4) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((-4) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (-4) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R7_p_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) ((-1), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (0, 1) ((-3), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (0, 1) ((-1), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, 1) ((-2), ((2 * (k : ℤ) + 3) + 1)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) ((-1), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, 1) ((-4), ((2 * (k : ℤ) + 3) + 1)) ≤ 1 := by
+  have hZ3_0 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 3), (0)) = incr (reciprocalField k) (0, 1) ((-2), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * 1 - 0) :=
+    incr_eq_T k (0, 1) (((2 * (k : ℤ) + 3) - 3), (0)) ((-2), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have hZ4_0 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 5), (0)) = incr (reciprocalField k) (0, 1) ((-4), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * 1 - 0) :=
+    incr_eq_T k (0, 1) (((2 * (k : ℤ) + 3) - 5), (0)) ((-4), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (0, 1) ((-1), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (-1) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (-1) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (-1) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ2 : incr (reciprocalField k) (0, 1) ((-3), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (-3) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (-3) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (-3) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ3 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 3), (0)) = -((0)) := by
+    rw [incr_vert k 1 ((2 * (k : ℤ) + 3) - 3) (0) (Or.inl rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 3) (0) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 3) ((0) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 5), (0)) = -((0)) := by
+    rw [incr_vert k 1 ((2 * (k : ℤ) + 3) - 5) (0) (Or.inl rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 5) (0) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 5) ((0) + 1) (by omega)) (by omega) (by omega), vG_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R7_p_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) ((-1), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (0, -1) ((-3), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (0, -1) ((-1), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, -1) ((-2), ((2 * (k : ℤ) + 3) + 1)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) ((-1), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, -1) ((-4), ((2 * (k : ℤ) + 3) + 1)) ≤ -1 := by
+  have vZ1 : incr (reciprocalField k) (0, -1) ((-1), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (-1) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (-1) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (-1) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) ((-3), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (-3) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (-3) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (-3) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) ((-2), ((2 * (k : ℤ) + 3) + 1)) = (((2 * (k : ℤ) + 3) + 1)) + -1 := by
+    rw [incr_vert k (-1) (-2) ((2 * (k : ℤ) + 3) + 1) (Or.inr rfl) (mem_raw_of_box k (-2) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (-2) (((2 * (k : ℤ) + 3) + 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) ((-4), ((2 * (k : ℤ) + 3) + 1)) = (((2 * (k : ℤ) + 3) + 1)) + -1 := by
+    rw [incr_vert k (-1) (-4) ((2 * (k : ℤ) + 3) + 1) (Or.inr rfl) (mem_raw_of_box k (-4) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (-4) (((2 * (k : ℤ) + 3) + 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R7_m_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) ((-1), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (-1, 0) ((1), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (-1, 0) ((-1), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (-1, 0) ((-2), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) ((-1), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (-1, 0) ((0), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (-1, 0) ((-1), (2 * (k : ℤ) + 3)) = min ((-1) + (-1) - 1) 0 - min ((-1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (-1) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((-1) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (-1) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (-1) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((-1) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (-1) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((1), (2 * (k : ℤ) + 3)) = min ((1) + (-1) - 1) 0 - min ((1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (1) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((1) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (1) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (1) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((1) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (1) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) ((-2), ((2 * (k : ℤ) + 3) + 1)) = min ((-2) + (-1) - 1) 0 - min ((-2) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (-2) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((-2) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (-2) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (-2) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((-2) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (-2) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) ((0), ((2 * (k : ℤ) + 3) + 1)) = min ((0) + (-1) - 1) 0 - min ((0) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (0) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((0) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (0) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (0) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((0) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (0) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R8_p_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) ((1), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (1, 0) ((-1), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (1, 0) ((1), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((0), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) ((1), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((-2), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (1, 0) ((1), (2 * (k : ℤ) + 3)) = min ((1) + (1) - 1) 0 - min ((1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (1) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((1) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (1) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (1) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((1) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (1) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((-1), (2 * (k : ℤ) + 3)) = min ((-1) + (1) - 1) 0 - min ((-1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (-1) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((-1) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (-1) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (-1) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((-1) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (-1) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) ((0), ((2 * (k : ℤ) + 3) + 1)) = min ((0) + (1) - 1) 0 - min ((0) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (0) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((0) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (0) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (0) ((2 * (k : ℤ) + 3) + 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((0) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (0) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) ((-2), ((2 * (k : ℤ) + 3) + 1)) = min ((-2) + (1) - 1) 0 - min ((-2) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (-2) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((-2) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (-2) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (-2) ((2 * (k : ℤ) + 3) + 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((-2) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (-2) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R8_p_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) ((1), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (-1, 0) ((-1), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (-1, 0) ((1), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (-1, 0) ((0), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) ((1), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (-1, 0) ((-2), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have vZ1 : incr (reciprocalField k) (-1, 0) ((1), (2 * (k : ℤ) + 3)) = min ((1) + (-1) - 1) 0 - min ((1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (1) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((1) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (1) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (1) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((1) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (1) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((-1), (2 * (k : ℤ) + 3)) = min ((-1) + (-1) - 1) 0 - min ((-1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (-1) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((-1) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (-1) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (-1) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((-1) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (-1) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) ((0), ((2 * (k : ℤ) + 3) + 1)) = min ((0) + (-1) - 1) 0 - min ((0) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (0) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((0) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (0) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (0) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((0) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (0) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) ((-2), ((2 * (k : ℤ) + 3) + 1)) = min ((-2) + (-1) - 1) 0 - min ((-2) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (-2) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((-2) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (-2) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (-2) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((-2) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (-2) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R8_m_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) ((1), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (1, 0) ((3), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (1, 0) ((1), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((0), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) ((1), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((2), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have hZ2_0 : incr (reciprocalField k) (1, 0) ((3), (2 * (k : ℤ) + 3)) = incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) :=
+    (incr_eq_U k (1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ((3), (2 * (k : ℤ) + 3)) (by ext <;> (simp; try ring))).symm
+  have hZ4_0 : incr (reciprocalField k) (1, 0) ((2), ((2 * (k : ℤ) + 3) + 1)) = incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) :=
+    (incr_eq_U k (1, 0) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ((2), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))).symm
+  have vZ1 : incr (reciprocalField k) (1, 0) ((1), (2 * (k : ℤ) + 3)) = min ((1) + (1) - 1) 0 - min ((1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (1) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((1) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (1) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (1) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((1) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (1) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((3 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) ((0), ((2 * (k : ℤ) + 3) + 1)) = min ((0) + (1) - 1) 0 - min ((0) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (0) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((0) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (0) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (0) ((2 * (k : ℤ) + 3) + 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((0) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (0) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((2 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((2 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((2 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((2 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R8_m_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) ((1), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (-1, 0) ((3), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (-1, 0) ((1), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (-1, 0) ((0), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) ((1), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (-1, 0) ((2), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have hZ2_0 : incr (reciprocalField k) (-1, 0) ((3), (2 * (k : ℤ) + 3)) = incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) :=
+    (incr_eq_U k (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ((3), (2 * (k : ℤ) + 3)) (by ext <;> (simp; try ring))).symm
+  have vZ1 : incr (reciprocalField k) (-1, 0) ((1), (2 * (k : ℤ) + 3)) = min ((1) + (-1) - 1) 0 - min ((1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (1) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((1) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (1) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (1) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((1) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (1) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((3 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) ((0), ((2 * (k : ℤ) + 3) + 1)) = min ((0) + (-1) - 1) 0 - min ((0) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (0) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((0) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (0) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (0) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((0) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (0) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) ((2), ((2 * (k : ℤ) + 3) + 1)) = min ((2) + (-1) - 1) 0 - min ((2) - 1) 0 + (0 - 1) := by
+    rw [incr_hG k (-1) (2) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((2) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_corner2' k _ _ (by omega) (by omega)), hG_c_minus (2 * (k : ℤ) + 3) (2) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((2) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (corner_yes (2 * (k : ℤ) + 3) (2) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R9_p_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) ((0), (0)) ≤ incr (reciprocalField k) (1, 0) ((-2), (0)) ∧
+    incr (reciprocalField k) (1, 0) ((0), (0)) - incr (reciprocalField k) (1, 0) ((-1), (1)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) ((0), (0)) - incr (reciprocalField k) (1, 0) ((-3), (1)) ≤ 0 := by
+  have hZ2_0 : incr (reciprocalField k) (1, 0) ((-2), (0)) = incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 2), (1)) :=
+    incr_eq_U k (1, 0) ((-2), (0)) (((2 * (k : ℤ) + 3) - 2), (1)) (by ext <;> (simp; try ring))
+  have hZ3_0 : incr (reciprocalField k) (1, 0) ((-1), (1)) = incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 1), (2)) :=
+    incr_eq_U k (1, 0) ((-1), (1)) (((2 * (k : ℤ) + 3) - 1), (2)) (by ext <;> (simp; try ring))
+  have hZ4_0 : incr (reciprocalField k) (1, 0) ((-3), (1)) = incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 3), (2)) :=
+    incr_eq_U k (1, 0) ((-3), (1)) (((2 * (k : ℤ) + 3) - 3), (2)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (1, 0) ((0), (0)) = min ((0) + (1) - 1) 0 - min ((0) - 1) 0 + (0 - 1) := by
+    rw [incr_hG k (1) (0) (0) (mem_raw_of_box k ((0) + (1)) (0) (by omega)) (mem_raw_corner0' k _ _ (by omega) (by omega)), hG_c_minus (2 * (k : ℤ) + 3) (0) (0) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((0) + (1)) (0) (by omega)) (corner_yes (2 * (k : ℤ) + 3) (0) (0) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 2), (1)) = min (((2 * (k : ℤ) + 3) - 2) + (1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 2) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) ((2 * (k : ℤ) + 3) - 2) (1) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 2) + (1)) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) (1) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 2) (1) (1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 2) + (1)) (1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 2) (1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 1), (2)) = min (((2 * (k : ℤ) + 3) - 1) + (1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) ((2 * (k : ℤ) + 3) - 1) (2) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 1) + (1)) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) (2) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 1) (2) (1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 1) + (1)) (2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 1) (2) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 3), (2)) = min (((2 * (k : ℤ) + 3) - 3) + (1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 3) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) ((2 * (k : ℤ) + 3) - 3) (2) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 3) + (1)) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 3) (2) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 3) (2) (1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 3) + (1)) (2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 3) (2) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_R9_m_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) ((0), (0)) ≤ incr (reciprocalField k) (1, 0) ((2), (0)) ∧
+    incr (reciprocalField k) (1, 0) ((0), (0)) - incr (reciprocalField k) (1, 0) ((-1), (1)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) ((0), (0)) - incr (reciprocalField k) (1, 0) ((1), (1)) ≤ 0 := by
+  have hZ3_0 : incr (reciprocalField k) (1, 0) ((-1), (1)) = incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 1), (2)) :=
+    incr_eq_U k (1, 0) ((-1), (1)) (((2 * (k : ℤ) + 3) - 1), (2)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (1, 0) ((0), (0)) = min ((0) + (1) - 1) 0 - min ((0) - 1) 0 + (0 - 1) := by
+    rw [incr_hG k (1) (0) (0) (mem_raw_of_box k ((0) + (1)) (0) (by omega)) (mem_raw_corner0' k _ _ (by omega) (by omega)), hG_c_minus (2 * (k : ℤ) + 3) (0) (0) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((0) + (1)) (0) (by omega)) (corner_yes (2 * (k : ℤ) + 3) (0) (0) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((2), (0)) = min ((2) + (1) - 1) 0 - min ((2) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (2) (0) (mem_raw_of_box k ((2) + (1)) (0) (by omega)) (mem_raw_of_box k (2) (0) (by omega)), hG_nc (2 * (k : ℤ) + 3) (2) (0) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((2) + (1)) (0) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (2) (0) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 1), (2)) = min (((2 * (k : ℤ) + 3) - 1) + (1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) ((2 * (k : ℤ) + 3) - 1) (2) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 1) + (1)) (2) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) (2) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 1) (2) (1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 1) + (1)) (2) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 1) (2) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) ((1), (1)) = min ((1) + (1) - 1) 0 - min ((1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (1) (1) (mem_raw_of_box k ((1) + (1)) (1) (by omega)) (mem_raw_of_box k (1) (1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (1) (1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((1) + (1)) (1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (1) (1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+/-- The stair identity at the corner: the difference of the two stair values is `1 - d`. -/
+theorem stairE_c2low (D : ℤ) :
+    -((D + 1) * (D + 1 - 1) / 2) + min ((2 : ℤ) + 0 - 1) 0 + 1 - (-(D * (D - 1) / 2) + min ((2 : ℤ) - 1) 0 + 0) = 1 - D := by
+  have key := tri_up D
+  have hm1 : min ((2 : ℤ) + 0 - 1) 0 = 0 := by norm_num
+  have hm2 : min ((2 : ℤ) - 1) 0 = 0 := by norm_num
+  rw [hm1, hm2]
+  linarith
+
+/-- The increment of the cell `(2, d)` upward into the corner `(2, d + 1)` is `1 - d` (stair values). -/
+theorem incr_c2low_up (k : ℕ) :
+    incr (reciprocalField k) (0, 1) ((2 : ℤ), 2 * (k : ℤ) + 3) = 1 - (2 * (k : ℤ) + 3) := by
+  have hp : ((2 : ℤ), 2 * (k : ℤ) + 3) ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites :=
+    mem_raw_of_box k 2 (2 * (k : ℤ) + 3) (by omega)
+  have hpe : ((2 : ℤ), 2 * (k : ℤ) + 3) + (0, 1) ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites := by
+    have e : ((2 : ℤ), 2 * (k : ℤ) + 3) + (0, 1) = ((2 : ℤ), 2 * (k : ℤ) + 3 + 1) := by
+      ext <;> (simp; try ring)
+    rw [e]; exact mem_raw_corner2 k
+  rw [incr_raw_stair k (0, 1) _ hp hpe]
+  have hc1 : BaseMask.StairEvenCorner (2 * (k : ℤ) + 3) (((2 : ℤ), 2 * (k : ℤ) + 3) + (0, 1)) := by
+    unfold BaseMask.StairEvenCorner; right; constructor <;> simp
+  have hc0 : ¬ BaseMask.StairEvenCorner (2 * (k : ℤ) + 3) ((2 : ℤ), 2 * (k : ℤ) + 3) :=
+    not_stairCorner _ _ _ (by omega)
+  unfold BaseMask.stairEvenValue
+  rw [if_pos hc1, if_neg hc0]
+  simp only [Prod.fst_add, Prod.snd_add]
+  exact stairE_c2low (2 * (k : ℤ) + 3)
+
+/-- The increment of the corner `(2, d + 1)` downward is `d - 1`. -/
+theorem incr_c2_dn (k : ℕ) :
+    incr (reciprocalField k) (0, -1) ((2 : ℤ), 2 * (k : ℤ) + 3 + 1) = (2 * (k : ℤ) + 3) + -1 := by
+  have h := incr_c2low_up k
+  have hd : incr (reciprocalField k) (0, -1) ((2 : ℤ), 2 * (k : ℤ) + 3 + 1) =
+      -incr (reciprocalField k) (0, 1) ((2 : ℤ), 2 * (k : ℤ) + 3) := by
+    unfold incr
+    have e1 : ((2 : ℤ), 2 * (k : ℤ) + 3 + 1) + (0, -1) = ((2 : ℤ), 2 * (k : ℤ) + 3) := by
+      ext <;> (simp; try ring)
+    have e2 : ((2 : ℤ), 2 * (k : ℤ) + 3) + (0, 1) = ((2 : ℤ), 2 * (k : ℤ) + 3 + 1) := by
+      ext <;> (simp; try ring)
+    rw [e1, e2]; ring
+  rw [hd, h]; ring
+
+/-- The corner `(2, d + 1)`, upward: the increment is `-d`. -/
+theorem incr_c2_up (k : ℕ) :
+    incr (reciprocalField k) (0, 1) ((2 : ℤ), 2 * (k : ℤ) + 3 + 1) = -(2 * (k : ℤ) + 3) := by
+  have h := incr_U_inv k (0, 1) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3))
+  have e : (2 - (2 * (k : ℤ) + 3), (2 * (k : ℤ) + 3)) + ((2 * (k : ℤ) + 3), 1) = ((2 : ℤ), 2 * (k : ℤ) + 3 + 1) := by
+    ext <;> (simp; try ring)
+  rw [e] at h
+  rw [h, incr_vert k 1 (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inl rfl)
+    (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))
+    (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3 + 1) (by omega)) (by omega) (by omega), vG_one]
+
+theorem cls_K1_p_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) ((2), ((2 * (k : ℤ) + 3) + 1)) ≤ incr (reciprocalField k) (1, 0) ((0), ((2 * (k : ℤ) + 3) + 1)) ∧
+    incr (reciprocalField k) (1, 0) ((2), ((2 * (k : ℤ) + 3) + 1)) - incr (reciprocalField k) (1, 0) ((1), ((2 * (k : ℤ) + 3) + 2)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) ((2), ((2 * (k : ℤ) + 3) + 1)) - incr (reciprocalField k) (1, 0) ((-1), ((2 * (k : ℤ) + 3) + 2)) ≤ 0 := by
+  have hZ1_0 : incr (reciprocalField k) (1, 0) ((2), ((2 * (k : ℤ) + 3) + 1)) = incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) :=
+    (incr_eq_U k (1, 0) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ((2), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))).symm
+  have hZ3_0 : incr (reciprocalField k) (1, 0) ((2 * (k : ℤ) + 3), (1)) = incr (reciprocalField k) (1, 0) ((1), ((2 * (k : ℤ) + 3) + 2)) + ((2 * (k : ℤ) + 3) * 0 - 1) :=
+    incr_eq_T k (1, 0) ((2 * (k : ℤ) + 3), (1)) ((1), ((2 * (k : ℤ) + 3) + 2)) (by ext <;> (simp; try ring))
+  have hZ3_1 : incr (reciprocalField k) (1, 0) ((2 * (k : ℤ) + 3), (1)) = incr (reciprocalField k) (1, 0) ((0), (0)) :=
+    (incr_eq_U k (1, 0) ((0), (0)) ((2 * (k : ℤ) + 3), (1)) (by ext <;> (simp; try ring))).symm
+  have hZ4_0 : incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 2), (1)) = incr (reciprocalField k) (1, 0) ((-1), ((2 * (k : ℤ) + 3) + 2)) + ((2 * (k : ℤ) + 3) * 0 - 1) :=
+    incr_eq_T k (1, 0) (((2 * (k : ℤ) + 3) - 2), (1)) ((-1), ((2 * (k : ℤ) + 3) + 2)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((2 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((2 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((2 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((2 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((0), ((2 * (k : ℤ) + 3) + 1)) = min ((0) + (1) - 1) 0 - min ((0) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (0) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((0) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (0) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (0) ((2 * (k : ℤ) + 3) + 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((0) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (0) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) ((0), (0)) = min ((0) + (1) - 1) 0 - min ((0) - 1) 0 + (0 - 1) := by
+    rw [incr_hG k (1) (0) (0) (mem_raw_of_box k ((0) + (1)) (0) (by omega)) (mem_raw_corner0' k _ _ (by omega) (by omega)), hG_c_minus (2 * (k : ℤ) + 3) (0) (0) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((0) + (1)) (0) (by omega)) (corner_yes (2 * (k : ℤ) + 3) (0) (0) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) (((2 * (k : ℤ) + 3) - 2), (1)) = min (((2 * (k : ℤ) + 3) - 2) + (1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 2) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) ((2 * (k : ℤ) + 3) - 2) (1) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 2) + (1)) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) (1) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 2) (1) (1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 2) + (1)) (1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 2) (1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_K1_p_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) ((2), ((2 * (k : ℤ) + 3) + 1)) ≤ incr (reciprocalField k) (-1, 0) ((0), ((2 * (k : ℤ) + 3) + 1)) ∧
+    incr (reciprocalField k) (-1, 0) ((2), ((2 * (k : ℤ) + 3) + 1)) - incr (reciprocalField k) (-1, 0) ((1), ((2 * (k : ℤ) + 3) + 2)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) ((2), ((2 * (k : ℤ) + 3) + 1)) - incr (reciprocalField k) (-1, 0) ((-1), ((2 * (k : ℤ) + 3) + 2)) ≤ 0 := by
+  have hZ3_0 : incr (reciprocalField k) (-1, 0) ((2 * (k : ℤ) + 3), (1)) = incr (reciprocalField k) (-1, 0) ((1), ((2 * (k : ℤ) + 3) + 2)) + ((2 * (k : ℤ) + 3) * 0 - -1) :=
+    incr_eq_T k (-1, 0) ((2 * (k : ℤ) + 3), (1)) ((1), ((2 * (k : ℤ) + 3) + 2)) (by ext <;> (simp; try ring))
+  have hZ4_0 : incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 2), (1)) = incr (reciprocalField k) (-1, 0) ((-1), ((2 * (k : ℤ) + 3) + 2)) + ((2 * (k : ℤ) + 3) * 0 - -1) :=
+    incr_eq_T k (-1, 0) (((2 * (k : ℤ) + 3) - 2), (1)) ((-1), ((2 * (k : ℤ) + 3) + 2)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (-1, 0) ((2), ((2 * (k : ℤ) + 3) + 1)) = min ((2) + (-1) - 1) 0 - min ((2) - 1) 0 + (0 - 1) := by
+    rw [incr_hG k (-1) (2) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((2) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_corner2' k _ _ (by omega) (by omega)), hG_c_minus (2 * (k : ℤ) + 3) (2) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((2) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (corner_yes (2 * (k : ℤ) + 3) (2) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((0), ((2 * (k : ℤ) + 3) + 1)) = min ((0) + (-1) - 1) 0 - min ((0) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (0) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((0) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (0) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (0) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((0) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (0) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) ((2 * (k : ℤ) + 3), (1)) = min ((2 * (k : ℤ) + 3) + (-1) - 1) 0 - min ((2 * (k : ℤ) + 3) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (2 * (k : ℤ) + 3) (1) (mem_raw_of_box k ((2 * (k : ℤ) + 3) + (-1)) (1) (by omega)) (mem_raw_of_box k (2 * (k : ℤ) + 3) (1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 3) (1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) + (-1)) (1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 3) (1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) (((2 * (k : ℤ) + 3) - 2), (1)) = min (((2 * (k : ℤ) + 3) - 2) + (-1) - 1) 0 - min (((2 * (k : ℤ) + 3) - 2) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) ((2 * (k : ℤ) + 3) - 2) (1) (mem_raw_of_box k (((2 * (k : ℤ) + 3) - 2) + (-1)) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) (1) (by omega)), hG_nc (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 2) (1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) (((2 * (k : ℤ) + 3) - 2) + (-1)) (1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) - 2) (1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_K1_p_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) ((2), ((2 * (k : ℤ) + 3) + 1)) ≤ incr (reciprocalField k) (0, 1) ((0), ((2 * (k : ℤ) + 3) + 1)) ∧
+    incr (reciprocalField k) (0, 1) ((2), ((2 * (k : ℤ) + 3) + 1)) - incr (reciprocalField k) (0, 1) ((1), ((2 * (k : ℤ) + 3) + 2)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) ((2), ((2 * (k : ℤ) + 3) + 1)) - incr (reciprocalField k) (0, 1) ((-1), ((2 * (k : ℤ) + 3) + 2)) ≤ 1 := by
+  have hZ1_0 : incr (reciprocalField k) (0, 1) ((2), ((2 * (k : ℤ) + 3) + 1)) = incr (reciprocalField k) (0, 1) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) :=
+    (incr_eq_U k (0, 1) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ((2), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))).symm
+  have hZ2_0 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 1), (0)) = incr (reciprocalField k) (0, 1) ((0), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * 1 - 0) :=
+    incr_eq_T k (0, 1) (((2 * (k : ℤ) + 3) - 1), (0)) ((0), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have hZ3_0 : incr (reciprocalField k) (0, 1) ((2 * (k : ℤ) + 3), (1)) = incr (reciprocalField k) (0, 1) ((1), ((2 * (k : ℤ) + 3) + 2)) + ((2 * (k : ℤ) + 3) * 1 - 0) :=
+    incr_eq_T k (0, 1) ((2 * (k : ℤ) + 3), (1)) ((1), ((2 * (k : ℤ) + 3) + 2)) (by ext <;> (simp; try ring))
+  have hZ4_0 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 2), (1)) = incr (reciprocalField k) (0, 1) ((-1), ((2 * (k : ℤ) + 3) + 2)) + ((2 * (k : ℤ) + 3) * 1 - 0) :=
+    incr_eq_T k (0, 1) (((2 * (k : ℤ) + 3) - 2), (1)) ((-1), ((2 * (k : ℤ) + 3) + 2)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (0, 1) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ2 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 1), (0)) = -((0)) := by
+    rw [incr_vert k 1 ((2 * (k : ℤ) + 3) - 1) (0) (Or.inl rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) (0) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) ((0) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ3 : incr (reciprocalField k) (0, 1) ((2 * (k : ℤ) + 3), (1)) = -((1)) := by
+    rw [incr_vert k 1 (2 * (k : ℤ) + 3) (1) (Or.inl rfl) (mem_raw_of_box k (2 * (k : ℤ) + 3) (1) (by omega)) (mem_raw_of_box k (2 * (k : ℤ) + 3) ((1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 2), (1)) = -((1)) := by
+    rw [incr_vert k 1 ((2 * (k : ℤ) + 3) - 2) (1) (Or.inl rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) ((1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_K1_p_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) ((2), ((2 * (k : ℤ) + 3) + 1)) ≤ incr (reciprocalField k) (0, -1) ((0), ((2 * (k : ℤ) + 3) + 1)) ∧
+    incr (reciprocalField k) (0, -1) ((2), ((2 * (k : ℤ) + 3) + 1)) - incr (reciprocalField k) (0, -1) ((1), ((2 * (k : ℤ) + 3) + 2)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) ((2), ((2 * (k : ℤ) + 3) + 1)) - incr (reciprocalField k) (0, -1) ((-1), ((2 * (k : ℤ) + 3) + 2)) ≤ -1 := by
+  have hZ1_0 : incr (reciprocalField k) (0, -1) ((2), ((2 * (k : ℤ) + 3) + 1)) = incr (reciprocalField k) (0, -1) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) :=
+    (incr_eq_U k (0, -1) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ((2), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))).symm
+  have hZ3_0 : incr (reciprocalField k) (0, -1) ((2 * (k : ℤ) + 3), (1)) = incr (reciprocalField k) (0, -1) ((1), ((2 * (k : ℤ) + 3) + 2)) + ((2 * (k : ℤ) + 3) * -1 - 0) :=
+    incr_eq_T k (0, -1) ((2 * (k : ℤ) + 3), (1)) ((1), ((2 * (k : ℤ) + 3) + 2)) (by ext <;> (simp; try ring))
+  have hZ4_0 : incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 2), (1)) = incr (reciprocalField k) (0, -1) ((-1), ((2 * (k : ℤ) + 3) + 2)) + ((2 * (k : ℤ) + 3) * -1 - 0) :=
+    incr_eq_T k (0, -1) (((2 * (k : ℤ) + 3) - 2), (1)) ((-1), ((2 * (k : ℤ) + 3) + 2)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (0, -1) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) ((0), ((2 * (k : ℤ) + 3) + 1)) = (((2 * (k : ℤ) + 3) + 1)) + -1 := by
+    rw [incr_vert k (-1) (0) ((2 * (k : ℤ) + 3) + 1) (Or.inr rfl) (mem_raw_of_box k (0) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (0) (((2 * (k : ℤ) + 3) + 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) ((2 * (k : ℤ) + 3), (1)) = ((1)) + -1 := by
+    rw [incr_vert k (-1) (2 * (k : ℤ) + 3) (1) (Or.inr rfl) (mem_raw_of_box k (2 * (k : ℤ) + 3) (1) (by omega)) (mem_raw_of_box k (2 * (k : ℤ) + 3) ((1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) (((2 * (k : ℤ) + 3) - 2), (1)) = ((1)) + -1 := by
+    rw [incr_vert k (-1) ((2 * (k : ℤ) + 3) - 2) (1) (Or.inr rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) (1) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) ((1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_K1_m_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) ((2), ((2 * (k : ℤ) + 3) + 1)) ≤ incr (reciprocalField k) (1, 0) ((4), ((2 * (k : ℤ) + 3) + 1)) ∧
+    incr (reciprocalField k) (1, 0) ((2), ((2 * (k : ℤ) + 3) + 1)) - incr (reciprocalField k) (1, 0) ((1), ((2 * (k : ℤ) + 3) + 2)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) ((2), ((2 * (k : ℤ) + 3) + 1)) - incr (reciprocalField k) (1, 0) ((3), ((2 * (k : ℤ) + 3) + 2)) ≤ 0 := by
+  have hZ1_0 : incr (reciprocalField k) (1, 0) ((2), ((2 * (k : ℤ) + 3) + 1)) = incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) :=
+    (incr_eq_U k (1, 0) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ((2), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))).symm
+  have hZ2_0 : incr (reciprocalField k) (1, 0) ((4), ((2 * (k : ℤ) + 3) + 1)) = incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) :=
+    (incr_eq_U k (1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ((4), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))).symm
+  have hZ3_0 : incr (reciprocalField k) (1, 0) ((2 * (k : ℤ) + 3), (1)) = incr (reciprocalField k) (1, 0) ((1), ((2 * (k : ℤ) + 3) + 2)) + ((2 * (k : ℤ) + 3) * 0 - 1) :=
+    incr_eq_T k (1, 0) ((2 * (k : ℤ) + 3), (1)) ((1), ((2 * (k : ℤ) + 3) + 2)) (by ext <;> (simp; try ring))
+  have hZ3_1 : incr (reciprocalField k) (1, 0) ((2 * (k : ℤ) + 3), (1)) = incr (reciprocalField k) (1, 0) ((0), (0)) :=
+    (incr_eq_U k (1, 0) ((0), (0)) ((2 * (k : ℤ) + 3), (1)) (by ext <;> (simp; try ring))).symm
+  have hZ4_0 : incr (reciprocalField k) (1, 0) ((3), ((2 * (k : ℤ) + 3) + 2)) = incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) :=
+    (incr_eq_U k (1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ((3), ((2 * (k : ℤ) + 3) + 2)) (by ext <;> (simp; try ring))).symm
+  have vZ1 : incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((2 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((2 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((2 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((2 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((4 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) ((0), (0)) = min ((0) + (1) - 1) 0 - min ((0) - 1) 0 + (0 - 1) := by
+    rw [incr_hG k (1) (0) (0) (mem_raw_of_box k ((0) + (1)) (0) (by omega)) (mem_raw_corner0' k _ _ (by omega) (by omega)), hG_c_minus (2 * (k : ℤ) + 3) (0) (0) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((0) + (1)) (0) (by omega)) (corner_yes (2 * (k : ℤ) + 3) (0) (0) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = min ((3 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_K1_m_mx (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (-1, 0) ((2), ((2 * (k : ℤ) + 3) + 1)) ≤ incr (reciprocalField k) (-1, 0) ((4), ((2 * (k : ℤ) + 3) + 1)) ∧
+    incr (reciprocalField k) (-1, 0) ((2), ((2 * (k : ℤ) + 3) + 1)) - incr (reciprocalField k) (-1, 0) ((1), ((2 * (k : ℤ) + 3) + 2)) ≤ 0 ∧
+    incr (reciprocalField k) (-1, 0) ((2), ((2 * (k : ℤ) + 3) + 1)) - incr (reciprocalField k) (-1, 0) ((3), ((2 * (k : ℤ) + 3) + 2)) ≤ 0 := by
+  have hZ2_0 : incr (reciprocalField k) (-1, 0) ((4), ((2 * (k : ℤ) + 3) + 1)) = incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) :=
+    (incr_eq_U k (-1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ((4), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))).symm
+  have hZ3_0 : incr (reciprocalField k) (-1, 0) ((2 * (k : ℤ) + 3), (1)) = incr (reciprocalField k) (-1, 0) ((1), ((2 * (k : ℤ) + 3) + 2)) + ((2 * (k : ℤ) + 3) * 0 - -1) :=
+    incr_eq_T k (-1, 0) ((2 * (k : ℤ) + 3), (1)) ((1), ((2 * (k : ℤ) + 3) + 2)) (by ext <;> (simp; try ring))
+  have hZ4_0 : incr (reciprocalField k) (-1, 0) ((3), ((2 * (k : ℤ) + 3) + 2)) = incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) :=
+    (incr_eq_U k (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ((3), ((2 * (k : ℤ) + 3) + 2)) (by ext <;> (simp; try ring))).symm
+  have vZ1 : incr (reciprocalField k) (-1, 0) ((2), ((2 * (k : ℤ) + 3) + 1)) = min ((2) + (-1) - 1) 0 - min ((2) - 1) 0 + (0 - 1) := by
+    rw [incr_hG k (-1) (2) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((2) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_corner2' k _ _ (by omega) (by omega)), hG_c_minus (2 * (k : ℤ) + 3) (2) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((2) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (corner_yes (2 * (k : ℤ) + 3) (2) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (-1, 0) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((4 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (-1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (-1, 0) ((2 * (k : ℤ) + 3), (1)) = min ((2 * (k : ℤ) + 3) + (-1) - 1) 0 - min ((2 * (k : ℤ) + 3) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (2 * (k : ℤ) + 3) (1) (mem_raw_of_box k ((2 * (k : ℤ) + 3) + (-1)) (1) (by omega)) (mem_raw_of_box k (2 * (k : ℤ) + 3) (1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 3) (1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3) + (-1)) (1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 3) (1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (-1, 0) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = min ((3 - (2 * (k : ℤ) + 3)) + (-1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (-1) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (-1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (-1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_K1_m_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) ((2), ((2 * (k : ℤ) + 3) + 1)) ≤ incr (reciprocalField k) (0, 1) ((4), ((2 * (k : ℤ) + 3) + 1)) ∧
+    incr (reciprocalField k) (0, 1) ((2), ((2 * (k : ℤ) + 3) + 1)) - incr (reciprocalField k) (0, 1) ((1), ((2 * (k : ℤ) + 3) + 2)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) ((2), ((2 * (k : ℤ) + 3) + 1)) - incr (reciprocalField k) (0, 1) ((3), ((2 * (k : ℤ) + 3) + 2)) ≤ 1 := by
+  have hZ1_0 : incr (reciprocalField k) (0, 1) ((2), ((2 * (k : ℤ) + 3) + 1)) = incr (reciprocalField k) (0, 1) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) :=
+    (incr_eq_U k (0, 1) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ((2), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))).symm
+  have hZ2_0 : incr (reciprocalField k) (0, 1) ((4), ((2 * (k : ℤ) + 3) + 1)) = incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) :=
+    (incr_eq_U k (0, 1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ((4), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))).symm
+  have hZ3_0 : incr (reciprocalField k) (0, 1) ((2 * (k : ℤ) + 3), (1)) = incr (reciprocalField k) (0, 1) ((1), ((2 * (k : ℤ) + 3) + 2)) + ((2 * (k : ℤ) + 3) * 1 - 0) :=
+    incr_eq_T k (0, 1) ((2 * (k : ℤ) + 3), (1)) ((1), ((2 * (k : ℤ) + 3) + 2)) (by ext <;> (simp; try ring))
+  have hZ4_0 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) + 2), (1)) = incr (reciprocalField k) (0, 1) ((3), ((2 * (k : ℤ) + 3) + 2)) + ((2 * (k : ℤ) + 3) * 1 - 0) :=
+    incr_eq_T k (0, 1) (((2 * (k : ℤ) + 3) + 2), (1)) ((3), ((2 * (k : ℤ) + 3) + 2)) (by ext <;> (simp; try ring))
+  have hZ4_1 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) + 2), (1)) = incr (reciprocalField k) (0, 1) ((2), (0)) :=
+    (incr_eq_U k (0, 1) ((2), (0)) (((2 * (k : ℤ) + 3) + 2), (1)) (by ext <;> (simp; try ring))).symm
+  have vZ1 : incr (reciprocalField k) (0, 1) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ2 : incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ3 : incr (reciprocalField k) (0, 1) ((2 * (k : ℤ) + 3), (1)) = -((1)) := by
+    rw [incr_vert k 1 (2 * (k : ℤ) + 3) (1) (Or.inl rfl) (mem_raw_of_box k (2 * (k : ℤ) + 3) (1) (by omega)) (mem_raw_of_box k (2 * (k : ℤ) + 3) ((1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) ((2), (0)) = -((0)) := by
+    rw [incr_vert k 1 (2) (0) (Or.inl rfl) (mem_raw_of_box k (2) (0) (by omega)) (mem_raw_of_box k (2) ((0) + 1) (by omega)) (by omega) (by omega), vG_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_K1_m_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) ((2), ((2 * (k : ℤ) + 3) + 1)) ≤ incr (reciprocalField k) (0, -1) ((4), ((2 * (k : ℤ) + 3) + 1)) ∧
+    incr (reciprocalField k) (0, -1) ((2), ((2 * (k : ℤ) + 3) + 1)) - incr (reciprocalField k) (0, -1) ((1), ((2 * (k : ℤ) + 3) + 2)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) ((2), ((2 * (k : ℤ) + 3) + 1)) - incr (reciprocalField k) (0, -1) ((3), ((2 * (k : ℤ) + 3) + 2)) ≤ -1 := by
+  have hZ1_0 : incr (reciprocalField k) (0, -1) ((2), ((2 * (k : ℤ) + 3) + 1)) = incr (reciprocalField k) (0, -1) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) :=
+    (incr_eq_U k (0, -1) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ((2), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))).symm
+  have hZ2_0 : incr (reciprocalField k) (0, -1) ((4), ((2 * (k : ℤ) + 3) + 1)) = incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) :=
+    (incr_eq_U k (0, -1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ((4), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))).symm
+  have hZ3_0 : incr (reciprocalField k) (0, -1) ((2 * (k : ℤ) + 3), (1)) = incr (reciprocalField k) (0, -1) ((1), ((2 * (k : ℤ) + 3) + 2)) + ((2 * (k : ℤ) + 3) * -1 - 0) :=
+    incr_eq_T k (0, -1) ((2 * (k : ℤ) + 3), (1)) ((1), ((2 * (k : ℤ) + 3) + 2)) (by ext <;> (simp; try ring))
+  have hZ4_0 : incr (reciprocalField k) (0, -1) ((3), ((2 * (k : ℤ) + 3) + 2)) = incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) :=
+    (incr_eq_U k (0, -1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) ((3), ((2 * (k : ℤ) + 3) + 2)) (by ext <;> (simp; try ring))).symm
+  have vZ1 : incr (reciprocalField k) (0, -1) ((2 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) ((2 * (k : ℤ) + 3), (1)) = ((1)) + -1 := by
+    rw [incr_vert k (-1) (2 * (k : ℤ) + 3) (1) (Or.inr rfl) (mem_raw_of_box k (2 * (k : ℤ) + 3) (1) (by omega)) (mem_raw_of_box k (2 * (k : ℤ) + 3) ((1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) + 1)) = (((2 * (k : ℤ) + 3) + 1)) + -1 := by
+    rw [incr_vert k (-1) (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (Or.inr rfl) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) + 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_K2_p_my (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, -1) ((2), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (0, -1) ((0), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (0, -1) ((2), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, -1) ((1), ((2 * (k : ℤ) + 3) + 1)) ≤ -1 ∧
+    incr (reciprocalField k) (0, -1) ((2), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, -1) ((-1), ((2 * (k : ℤ) + 3) + 1)) ≤ -1 := by
+  have vZ1 : incr (reciprocalField k) (0, -1) ((2), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (2) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (2) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (2) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ2 : incr (reciprocalField k) (0, -1) ((0), (2 * (k : ℤ) + 3)) = ((2 * (k : ℤ) + 3)) + -1 := by
+    rw [incr_vert k (-1) (0) (2 * (k : ℤ) + 3) (Or.inr rfl) (mem_raw_of_box k (0) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (0) ((2 * (k : ℤ) + 3) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ3 : incr (reciprocalField k) (0, -1) ((1), ((2 * (k : ℤ) + 3) + 1)) = (((2 * (k : ℤ) + 3) + 1)) + -1 := by
+    rw [incr_vert k (-1) (1) ((2 * (k : ℤ) + 3) + 1) (Or.inr rfl) (mem_raw_of_box k (1) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (1) (((2 * (k : ℤ) + 3) + 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  have vZ4 : incr (reciprocalField k) (0, -1) ((-1), ((2 * (k : ℤ) + 3) + 1)) = (((2 * (k : ℤ) + 3) + 1)) + -1 := by
+    rw [incr_vert k (-1) (-1) ((2 * (k : ℤ) + 3) + 1) (Or.inr rfl) (mem_raw_of_box k (-1) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (-1) (((2 * (k : ℤ) + 3) + 1) + -1) (by omega)) (by omega) (by omega), vG_neg_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_K2_p_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) ((2), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (1, 0) ((0), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (1, 0) ((2), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((1), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) ((2), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((-1), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have hZ1_0 : incr (reciprocalField k) (1, 0) ((2), (2 * (k : ℤ) + 3)) = incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) :=
+    (incr_eq_U k (1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ((2), (2 * (k : ℤ) + 3)) (by ext <;> (simp; try ring))).symm
+  have vZ1 : incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((2 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((2 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((2 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((2 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((0), (2 * (k : ℤ) + 3)) = min ((0) + (1) - 1) 0 - min ((0) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (0) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((0) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (0) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (0) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((0) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (0) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) ((1), ((2 * (k : ℤ) + 3) + 1)) = min ((1) + (1) - 1) 0 - min ((1) - 1) 0 + (1 - 0) := by
+    rw [incr_hG k (1) (1) ((2 * (k : ℤ) + 3) + 1) (mem_raw_corner2' k _ _ (by omega) (by omega)) (mem_raw_of_box k (1) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_c_plus (2 * (k : ℤ) + 3) (1) ((2 * (k : ℤ) + 3) + 1) (1) (corner_yes (2 * (k : ℤ) + 3) ((1) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (1) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) ((-1), ((2 * (k : ℤ) + 3) + 1)) = min ((-1) + (1) - 1) 0 - min ((-1) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (-1) ((2 * (k : ℤ) + 3) + 1) (mem_raw_of_box k ((-1) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (mem_raw_of_box k (-1) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (-1) ((2 * (k : ℤ) + 3) + 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((-1) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (-1) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_K2_m_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) ((2), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (0, 1) ((4), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (0, 1) ((2), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, 1) ((1), ((2 * (k : ℤ) + 3) + 1)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) ((2), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, 1) ((3), ((2 * (k : ℤ) + 3) + 1)) ≤ 1 := by
+  have hZ2_0 : incr (reciprocalField k) (0, 1) ((4), (2 * (k : ℤ) + 3)) = incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) :=
+    (incr_eq_U k (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ((4), (2 * (k : ℤ) + 3)) (by ext <;> (simp; try ring))).symm
+  have hZ3_0 : incr (reciprocalField k) (0, 1) ((2 * (k : ℤ) + 3), (0)) = incr (reciprocalField k) (0, 1) ((1), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * 1 - 0) :=
+    incr_eq_T k (0, 1) ((2 * (k : ℤ) + 3), (0)) ((1), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have hZ4_0 : incr (reciprocalField k) (0, 1) ((3), ((2 * (k : ℤ) + 3) + 1)) = incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) :=
+    (incr_eq_U k (0, 1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ((3), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))).symm
+  have vZ1 : incr (reciprocalField k) (0, 1) ((2), (2 * (k : ℤ) + 3)) = 1 - (2 * (k : ℤ) + 3) := incr_c2low_up k
+  have vZ2 : incr (reciprocalField k) (0, 1) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = -(((2 * (k : ℤ) + 3) - 1)) := by
+    rw [incr_vert k 1 (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (Or.inl rfl) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ3 : incr (reciprocalField k) (0, 1) ((2 * (k : ℤ) + 3), (0)) = -((0)) := by
+    rw [incr_vert k 1 (2 * (k : ℤ) + 3) (0) (Or.inl rfl) (mem_raw_of_box k (2 * (k : ℤ) + 3) (0) (by omega)) (mem_raw_of_box k (2 * (k : ℤ) + 3) ((0) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_K2_m_px (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (1, 0) ((2), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (1, 0) ((4), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (1, 0) ((2), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((1), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 ∧
+    incr (reciprocalField k) (1, 0) ((2), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (1, 0) ((3), ((2 * (k : ℤ) + 3) + 1)) ≤ 0 := by
+  have hZ1_0 : incr (reciprocalField k) (1, 0) ((2), (2 * (k : ℤ) + 3)) = incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) :=
+    (incr_eq_U k (1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ((2), (2 * (k : ℤ) + 3)) (by ext <;> (simp; try ring))).symm
+  have hZ2_0 : incr (reciprocalField k) (1, 0) ((4), (2 * (k : ℤ) + 3)) = incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) :=
+    (incr_eq_U k (1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) ((4), (2 * (k : ℤ) + 3)) (by ext <;> (simp; try ring))).symm
+  have hZ4_0 : incr (reciprocalField k) (1, 0) ((3), ((2 * (k : ℤ) + 3) + 1)) = incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) :=
+    (incr_eq_U k (1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) ((3), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))).symm
+  have vZ1 : incr (reciprocalField k) (1, 0) ((2 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((2 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((2 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((2 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((2 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ2 : incr (reciprocalField k) (1, 0) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) = min ((4 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((4 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (mem_raw_of_box k ((4 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega)), hG_nc (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)) + (1)) ((2 * (k : ℤ) + 3) - 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) (by omega))]
+    ring
+  have vZ3 : incr (reciprocalField k) (1, 0) ((1), ((2 * (k : ℤ) + 3) + 1)) = min ((1) + (1) - 1) 0 - min ((1) - 1) 0 + (1 - 0) := by
+    rw [incr_hG k (1) (1) ((2 * (k : ℤ) + 3) + 1) (mem_raw_corner2' k _ _ (by omega) (by omega)) (mem_raw_of_box k (1) ((2 * (k : ℤ) + 3) + 1) (by omega)), hG_c_plus (2 * (k : ℤ) + 3) (1) ((2 * (k : ℤ) + 3) + 1) (1) (corner_yes (2 * (k : ℤ) + 3) ((1) + (1)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (1) ((2 * (k : ℤ) + 3) + 1) (by omega))]
+    ring
+  have vZ4 : incr (reciprocalField k) (1, 0) ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) = min ((3 - (2 * (k : ℤ) + 3)) + (1) - 1) 0 - min ((3 - (2 * (k : ℤ) + 3)) - 1) 0 + (0 - 0) := by
+    rw [incr_hG k (1) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (mem_raw_of_box k ((3 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega)), hG_nc (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (1) (not_stairCorner (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)) + (1)) (2 * (k : ℤ) + 3) (by omega)) (not_stairCorner (2 * (k : ℤ) + 3) (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))]
+    ring
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_K3_m_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) ((1), ((2 * (k : ℤ) + 3) - 1)) ≤ incr (reciprocalField k) (0, 1) ((3), ((2 * (k : ℤ) + 3) - 1)) ∧
+    incr (reciprocalField k) (0, 1) ((1), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (0, 1) ((0), (2 * (k : ℤ) + 3)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) ((1), ((2 * (k : ℤ) + 3) - 1)) - incr (reciprocalField k) (0, 1) ((2), (2 * (k : ℤ) + 3)) ≤ 1 := by
+  have hZ2_0 : incr (reciprocalField k) (0, 1) ((3), ((2 * (k : ℤ) + 3) - 1)) = incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) :=
+    (incr_eq_U k (0, 1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) ((3), ((2 * (k : ℤ) + 3) - 1)) (by ext <;> (simp; try ring))).symm
+  have vZ1 : incr (reciprocalField k) (0, 1) ((1), ((2 * (k : ℤ) + 3) - 1)) = -(((2 * (k : ℤ) + 3) - 1)) := by
+    rw [incr_vert k 1 (1) ((2 * (k : ℤ) + 3) - 1) (Or.inl rfl) (mem_raw_of_box k (1) ((2 * (k : ℤ) + 3) - 1) (by omega)) (mem_raw_of_box k (1) (((2 * (k : ℤ) + 3) - 1) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ2 : incr (reciprocalField k) (0, 1) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) = -(((2 * (k : ℤ) + 3) - 2)) := by
+    rw [incr_vert k 1 (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (Or.inl rfl) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) (by omega)) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (((2 * (k : ℤ) + 3) - 2) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ3 : incr (reciprocalField k) (0, 1) ((0), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (0) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (0) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (0) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) ((2), (2 * (k : ℤ) + 3)) = 1 - (2 * (k : ℤ) + 3) := incr_c2low_up k
+  exact ⟨by omega, by omega, by omega⟩
+
+
+theorem cls_K4_m_py (k : ℕ) (hk : 2 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) ((0), (2 * (k : ℤ) + 3)) ≤ incr (reciprocalField k) (0, 1) ((2), (2 * (k : ℤ) + 3)) ∧
+    incr (reciprocalField k) (0, 1) ((0), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, 1) ((-1), ((2 * (k : ℤ) + 3) + 1)) ≤ 1 ∧
+    incr (reciprocalField k) (0, 1) ((0), (2 * (k : ℤ) + 3)) - incr (reciprocalField k) (0, 1) ((1), ((2 * (k : ℤ) + 3) + 1)) ≤ 1 := by
+  have hZ3_0 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 2), (0)) = incr (reciprocalField k) (0, 1) ((-1), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * 1 - 0) :=
+    incr_eq_T k (0, 1) (((2 * (k : ℤ) + 3) - 2), (0)) ((-1), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have hZ4_0 : incr (reciprocalField k) (0, 1) ((2 * (k : ℤ) + 3), (0)) = incr (reciprocalField k) (0, 1) ((1), ((2 * (k : ℤ) + 3) + 1)) + ((2 * (k : ℤ) + 3) * 1 - 0) :=
+    incr_eq_T k (0, 1) ((2 * (k : ℤ) + 3), (0)) ((1), ((2 * (k : ℤ) + 3) + 1)) (by ext <;> (simp; try ring))
+  have vZ1 : incr (reciprocalField k) (0, 1) ((0), (2 * (k : ℤ) + 3)) = -((2 * (k : ℤ) + 3)) := by
+    rw [incr_vert k 1 (0) (2 * (k : ℤ) + 3) (Or.inl rfl) (mem_raw_of_box k (0) (2 * (k : ℤ) + 3) (by omega)) (mem_raw_of_box k (0) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ2 : incr (reciprocalField k) (0, 1) ((2), (2 * (k : ℤ) + 3)) = 1 - (2 * (k : ℤ) + 3) := incr_c2low_up k
+  have vZ3 : incr (reciprocalField k) (0, 1) (((2 * (k : ℤ) + 3) - 2), (0)) = -((0)) := by
+    rw [incr_vert k 1 ((2 * (k : ℤ) + 3) - 2) (0) (Or.inl rfl) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) (0) (by omega)) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2) ((0) + 1) (by omega)) (by omega) (by omega), vG_one]
+  have vZ4 : incr (reciprocalField k) (0, 1) ((2 * (k : ℤ) + 3), (0)) = -((0)) := by
+    rw [incr_vert k 1 (2 * (k : ℤ) + 3) (0) (Or.inl rfl) (mem_raw_of_box k (2 * (k : ℤ) + 3) (0) (by omega)) (mem_raw_of_box k (2 * (k : ℤ) + 3) ((0) + 1) (by omega)) (by omega) (by omega), vG_one]
+  exact ⟨by omega, by omega, by omega⟩
 
 end FLatticePaper.EPolicy

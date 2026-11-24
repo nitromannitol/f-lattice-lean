@@ -1,6 +1,7 @@
 import FLatticePaper.StrongHeadline
 import FLatticePaper.Plane.Induction.CanonicalSigned
 import FLatticePaper.Plane.Induction.W1Strips
+import FLatticePaper.Plane.Induction.EPolicyFinal
 
 /-! Task 71: the odometers headline with the canonical signed policy at every proper word, in place of the old policy `hpol`.
 `hcan` supplies, at each proper word `w`, a canonical signed policy of the conjugate `conjWord w`; `oldPolicyData_of_canonical`
@@ -48,6 +49,50 @@ theorem odometersTheorem_of_canonical
     (fun word hw hn => ⟨fun _ _ => False, ⟨Induction.oldPolicyData_of_canonical
       (standardField_reflectI_conj word (hE (conjWord word))) (hcan word hw hn).some (frameAt word).eps
       (frameAt word).eps_unit⟩⟩)
+    hResP hResN hbulk
+
+/-- The canonical signed games at the conjugate of a pure threes word, from `pure_threes_final` (`reciprocalFrame k` is
+`frameAt (3^k)` and `standardField_threes` identifies the field). -/
+theorem canonical_at_threes (word : Word) (hp : ∃ k : ℕ, conjWord word = List.replicate k Digit.three) :
+    Nonempty (Induction.CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word))) := by
+  obtain ⟨k, hk⟩ := hp
+  have hf : frameAt (conjWord word) = reciprocalFrame k := by
+    rw [hk]
+    try rfl
+  have hF : standardField (conjWord word) = reciprocalField k := by
+    rw [hk, standardField_threes]
+  rw [hf, hF]
+  exact FLatticePaper.EPolicy.pure_threes_final.2.2 k
+
+/-- **The odometers theorem from the canonical signed policy, with the pure threes inputs discharged (task 71).** The pure
+threes inputs `BaseSlip` and `StrongResidual` come from `pure_threes_final`, and the canonical signed policy is required only
+at the words whose conjugate is not a pure threes word. -/
+theorem odometersTheorem_of_canonical_pure
+    (htwoSlip : ∀ k : ℕ, Induction.BaseSlip (List.replicate (k + 1) Digit.two))
+    (htwoRes : ∀ k : ℕ, Induction.StrongResidual (List.replicate (k + 1) Digit.two))
+    (hres : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word → Induction.StrongResidual word)
+    (hcan : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      ¬ (∃ k : ℕ, conjWord word = List.replicate k Digit.three) →
+      Nonempty (Induction.CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word))))
+    (hResP : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      ∀ c i, RisingBlackPair (standardField word) (frameAt word).shortShift c i →
+        c ∈ (frameAt word).closedPolygon →
+        (c - (frameAt word).uq ∈ (frameAt word).closedPolygon ∧ i - (frameAt word).uq ∈ (frameAt word).closedPolygon) →
+        sheetDiffW word c = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j = -1) → False)
+    (hResN : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      ∀ c i, RisingBlackPair (standardField word) (-(frameAt word).shortShift) c i →
+        c ∈ (frameAt word).closedPolygon →
+        (c + (frameAt word).uq ∈ (frameAt word).closedPolygon ∧ i + (frameAt word).uq ∈ (frameAt word).closedPolygon) →
+        sheetDiffW word c = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j = -1) → False)
+    (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      Induction.S3NoFortInputs (frameAt word) (standardField word)) :
+    OdometersTheorem :=
+  odometersTheorem_of_canonical FLatticePaper.EPolicy.pure_threes_inputs.1 FLatticePaper.EPolicy.pure_threes_inputs.2
+    htwoSlip htwoRes hres
+    (fun word hw hn => by
+      by_cases hp : ∃ k : ℕ, conjWord word = List.replicate k Digit.three
+      · exact canonical_at_threes word hp
+      · exact hcan word hw hn hp)
     hResP hResN hbulk
 
 end FLatticePaper
