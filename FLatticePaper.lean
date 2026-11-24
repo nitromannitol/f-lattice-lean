@@ -138,6 +138,7 @@ import FLatticePaper.Plane.Induction.TwosSheets
 import FLatticePaper.Plane.Induction.TwosChain
 import FLatticePaper.Plane.Induction.TwosReciprocal
 import FLatticePaper.Plane.Induction.ReciprocalIncrements
+import FLatticePaper.Plane.Induction.PureBasePrice
 import FLatticePaper.Plane.Induction.ThreesMidpoint
 import FLatticePaper.Plane.Induction.ThreesLeaves
 import FLatticePaper.Plane.Induction.TwosLeaves

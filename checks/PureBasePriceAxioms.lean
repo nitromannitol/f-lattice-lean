@@ -1,0 +1,6 @@
+import FLatticePaper.Plane.Induction.PureBasePrice
+
+#print axioms FLatticePaper.Induction.priceDrift_threes
+#print axioms FLatticePaper.Induction.slipDrift_threes
+#print axioms FLatticePaper.Induction.strongResidual_priceDrift_threes
+#print axioms FLatticePaper.Induction.strongResidual_slipDrift_threes
