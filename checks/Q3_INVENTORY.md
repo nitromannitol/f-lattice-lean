@@ -747,16 +747,6 @@ Scope to confirm with the lead: §1's star containment needs `c = d − n ≥ 3`
 - Root build: 0 warnings, 0 linter notes, 0 errors. Guards: `checks/CanonicalSigned.lean` (the stale `rawSlipMinus` entry removed),
   `checks/NonfreeRoot.lean` (import of `NonfreeRoot` added: the guard was already unreachable from its import chain).
 
-### Task 72 / Q20 (minimum admission of the two-rank argument): MinAdmission.lean
-
-- PROVED `min_lap_local` (arithmetic, omega): for binary `F`, `g` values at a centre and its two inputs, with the quotas of `F` and `g`
-  and the monotonicity of `D = F − g` at the inputs of a black centre, the Laplacian of `min(F, g + k)` is `0` or `−1`.
-- PROVED `laplacian_min_local` (field): the same statement for fields, with the monotonicity hypotheses stated as the audit states them.
-- PROVED `min_field_binary`: `min(F, g + k)` takes the two consecutive values `min k 0` and `min k 0 + 1`.
-- NOT yet: the acyclic minimum policy with its square
-  clauses (the audit's lexicographic construction, `TWO_RANK_RAW_PHI_AUDIT.md` §2). The forced transfer needs that policy.
-- Checks: `checks/MinAdmission.lean`. Root build: 0 warnings, 0 linter notes.
-
 ### Task 72 / Q20 (the shifted-V window, derived): BothFreeRise.lean
 
 - PROVED `window_centre_of_freeV`: a free V centre has `sGrade` in `[3 − 2d, 2L − 1]` (from `vSpectrum`, `c ≥ 1`).
@@ -778,5 +768,5 @@ Scope to confirm with the lead: §1's star containment needs `c = d − n ≥ 3`
 - PROVED `msel_squareClauses`: `SquareClauseSat (mF …) (msel …) a b` for all `a b`, from `squareClauses_of_burning`.
 - NOT in this module: the forced transfer (the `ForcedEdge` induction) and the removal of `hfree` from `chain_nonincreasing_of_free_roots`.
 - Checks: `checks/MinPolicy.lean` (axioms: `[propext, Classical.choice, Quot.sound]`).
-- Note: `MinAdmission.lean` (min_lap_local, laplacian_min_local, min_field_binary) assumes the values `F, g ∈ {0, 1}`, which the packet
-  does not give (only the Laplacian is binary); `MinPolicy.lapM_binary` supersedes it for the chain argument.
+- `MinAdmission.lean` (value-binary premises `F, g ∈ {0, 1}`, which the packet never gives) is removed; `MinPolicy.lapM_binary` is the
+  admission the chain argument uses.
