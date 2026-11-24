@@ -1,4 +1,7 @@
 import FLatticePaper.Graph
+import Mathlib.Tactic.Ring
+import Mathlib.Tactic.Linarith
+import Mathlib.Tactic.IntervalCases
 
 noncomputable section
 
@@ -70,10 +73,10 @@ def freeDisp (a η x y : ℤ) : Site :=
   else if x = 0 ∧ y = 0 then (1, 0)
   else if EvenSite (x, y) then (η, 0) else (0, -η)
 
-/-- The alias translates of a site: `u = c - (i U + l V)` with `i, l ∈ {-1, 0, 1}` (`globalrank.py` `addresses`). -/
+/-- The lattice translates of a site: `u = c - (i U + l V)` with `i, l ∈ ℤ` (the whole period lattice, so that the policy
+is defined at every site; the window of the archive's `addresses` misses copies far from the native box). -/
 def AliasOf (a : ℤ) (c u : Site) : Prop :=
-  ∃ i l : ℤ, (i = -1 ∨ i = 0 ∨ i = 1) ∧ (l = -1 ∨ l = 0 ∨ l = 1) ∧
-    u = (c.1 - i * (a + 1) + 2 * l, c.2 - i * (a - 1) - 2 * a * l)
+  ∃ i l : ℤ, u = (c.1 - i * (a + 1) + 2 * l, c.2 - i * (a - 1) - 2 * a * l)
 
 /-- A site is in a free class if one of its alias translates is an H or V site. -/
 def FreeClass (a : ℤ) (c : Site) : Prop := ∃ u, AliasOf a c u ∧ FreeSite a u.1 u.2
@@ -168,15 +171,53 @@ theorem twosSel_white_freeClass {a η : ℤ} {F : Field} {c i : Site} (h : lapla
         i = (c.1 + (freeDisp a η u.1 u.2).1, c.2 + (freeDisp a η u.1 u.2).2) := by
   simp [TwosSel, h, hf]
 
-/-- Two free aliases of one site coincide: H and V sites are pairwise not translates by a period vector with coefficients in
-`[-2, 2]` (the alias indices differ by at most two). -/
+/-- Two free sites whose difference is `(I U + L V)` with `I = L = 0` after the bound: the coefficients of a difference of two
+free sites are `0`, since `I T = 2a (q1 - p1) + 2 (q2 - p2)` with `T = 2a^2 + 4a - 2` bounds `|I| ≤ 1`, and the free sites
+are in a box. -/
+theorem free_translate_zero {a I L p1 p2 q1 q2 : ℤ} (ha : 4 ≤ a) (hf : FreeSite a p1 p2) (hf' : FreeSite a q1 q2)
+    (hD1 : q1 - p1 = I * (a + 1) - 2 * L) (hD2 : q2 - p2 = I * (a - 1) + 2 * a * L) : I = 0 ∧ L = 0 := by
+  have hbox : -1 ≤ p1 ∧ p1 ≤ a + 1 ∧ -1 ≤ q1 ∧ q1 ≤ a + 1 ∧ 0 ≤ p2 ∧ p2 < 2 * a ∧ 0 ≤ q2 ∧ q2 < 2 * a := by
+    simp only [FreeSite, FreeHSite, FreeVSite] at hf hf'
+    omega
+  obtain ⟨hp1, hp1', hq1, hq1', hp2, hp2', hq2, hq2'⟩ := hbox
+  have hT : I * (2 * a * a + 4 * a - 2) = 2 * a * (q1 - p1) + 2 * (q2 - p2) := by
+    rw [hD1, hD2]
+    ring
+  have hT0 : 0 < 2 * a * a + 4 * a - 2 := by nlinarith
+  have hI1 : I ≤ 1 := by
+    by_contra hc
+    have h1 : 2 * (2 * a * a + 4 * a - 2) ≤ I * (2 * a * a + 4 * a - 2) :=
+      mul_le_mul_of_nonneg_right (by omega) hT0.le
+    have h2 : 2 * a * (q1 - p1) ≤ 2 * a * (a + 2) := mul_le_mul_of_nonneg_left (by omega) (by omega)
+    nlinarith
+  have hI2 : -1 ≤ I := by
+    by_contra hc
+    have h1 : I * (2 * a * a + 4 * a - 2) ≤ -2 * (2 * a * a + 4 * a - 2) :=
+      mul_le_mul_of_nonneg_right (by omega) hT0.le
+    have h2 : 2 * a * (-(a + 2)) ≤ 2 * a * (q1 - p1) := mul_le_mul_of_nonneg_left (by omega) (by omega)
+    nlinarith
+  have hL1 : L ≤ 1 := by
+    by_contra hc
+    have h1 : 2 * a * 2 ≤ 2 * a * L := mul_le_mul_of_nonneg_left (by omega) (by omega)
+    have h2 : (-1) * (a - 1) ≤ I * (a - 1) := mul_le_mul_of_nonneg_right hI2 (by omega)
+    nlinarith
+  have hL2 : -1 ≤ L := by
+    by_contra hc
+    have h1 : 2 * a * L ≤ 2 * a * (-2) := mul_le_mul_of_nonneg_left (by omega) (by omega)
+    have h2 : I * (a - 1) ≤ 1 * (a - 1) := mul_le_mul_of_nonneg_right hI1 (by omega)
+    nlinarith
+  interval_cases I <;> interval_cases L <;> simp only [FreeSite, FreeHSite, FreeVSite] at hf hf' <;> omega
+
+/-- Two free aliases of one site coincide. -/
 theorem freeAlias_unique {a : ℤ} (ha : 4 ≤ a) {c u u' : Site} (hu : AliasOf a c u) (hu' : AliasOf a c u')
     (hf : FreeSite a u.1 u.2) (hf' : FreeSite a u'.1 u'.2) : u = u' := by
-  obtain ⟨i, l, hi, hl, rfl⟩ := hu
-  obtain ⟨i', l', hi', hl', rfl⟩ := hu'
-  rcases hi with rfl | rfl | rfl <;> rcases hl with rfl | rfl | rfl <;>
-    rcases hi' with rfl | rfl | rfl <;> rcases hl' with rfl | rfl | rfl <;>
-    simp only [FreeSite, FreeHSite, FreeVSite, Prod.mk.injEq] at hf hf' ⊢ <;> omega
+  obtain ⟨i, l, hi⟩ := hu
+  obtain ⟨i', l', hi'⟩ := hu'
+  have h := free_translate_zero (I := i - i') (L := l - l') ha hf hf'
+    (by rw [hi, hi']; ring) (by rw [hi, hi']; ring)
+  have hii : i = i' := by omega
+  have hll : l = l' := by omega
+  rw [hi, hi', hii, hll]
 
 /-- A white centre of a free class keeps exactly one input. -/
 theorem twosSel_white_freeClass_eq {a η : ℤ} (ha : 4 ≤ a) {F : Field} {c i i' : Site} (h : laplacian F c = 0)
