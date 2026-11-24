@@ -1,0 +1,4 @@
+import FLatticePaper.Plane.Induction.ReflectedStrict
+
+#print axioms FLatticePaper.ReflectedStrict.R0plus_edge_white_plus
+#print axioms FLatticePaper.ReflectedStrict.R0plus_edge_black_plus

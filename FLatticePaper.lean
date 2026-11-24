@@ -150,6 +150,7 @@ import FLatticePaper.Plane.Induction.F2F3Pure
 import FLatticePaper.Plane.Induction.ReflectWitness
 import FLatticePaper.Plane.Induction.QRankDeck
 import FLatticePaper.Plane.Induction.ReflectedRank
+import FLatticePaper.Plane.Induction.ReflectedStrict
 import FLatticePaper.Plane.Induction.ThreesMidpoint
 import FLatticePaper.Plane.Induction.ThreesLeaves
 import FLatticePaper.Plane.Induction.TwosLeaves
