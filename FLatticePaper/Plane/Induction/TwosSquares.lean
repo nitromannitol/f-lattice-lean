@@ -1,4 +1,5 @@
 import FLatticePaper.Plane.Induction.TwosQuota
+import FLatticePaper.Plane.Induction.TwosLaplacianTile
 
 /-! The squares of the twos signed policy (task 72): the free classes on the native box, and the square clause. A native point
 `w` lies in a free class exactly when `w` itself, `w - V` or `w - U` is an H or V site: a free alias `w - (i U + l V)` of a native
@@ -92,5 +93,66 @@ theorem freeClass_native_iff {a : ℤ} (ha : 4 ≤ a) {w : Site} (hw : NativeT a
     · exact ⟨w, ⟨0, 0, by ext <;> simp⟩, h⟩
     · exact ⟨(w.1 + 2, w.2 - 2 * a), ⟨0, 1, by ext <;> simp⟩, h⟩
     · exact ⟨(w.1 - (a + 1), w.2 - (a - 1)), ⟨1, 0, by ext <;> simp⟩, h⟩
+
+/-- The corners of the unit square with lower-left corner `u`. -/
+def SqCorner (u v : Site) : Prop :=
+  v = u ∨ v = (u.1 + 1, u.2) ∨ v = (u.1, u.2 + 1) ∨ v = (u.1 + 1, u.2 + 1)
+
+/-- A site outside the unit square with lower-left corner `u`. -/
+def SqOut (u i : Site) : Prop :=
+  i ≠ u ∧ i ≠ (u.1 + 1, u.2) ∧ i ≠ (u.1, u.2 + 1) ∧ i ≠ (u.1 + 1, u.2 + 1)
+
+/-- The square clause of the unit square with lower-left corner `u` (the negation of "every corner keeps an input inside"):
+some corner `v` is white and retains an input outside the square. -/
+def SqClause (a η : ℤ) (F : Field) (u : Site) : Prop :=
+  ∃ v, SqCorner u v ∧ laplacian F v = 0 ∧ ∃ i, TwosSel a η F v i ∧ SqOut u i
+
+theorem aliasOf_refl (a : ℤ) (c : Site) : AliasOf a c c := ⟨0, 0, by ext <;> simp⟩
+
+theorem aliasOf_trans {a : ℤ} {c u z : Site} (h1 : AliasOf a c u) (h2 : AliasOf a u z) : AliasOf a c z := by
+  obtain ⟨i1, l1, rfl⟩ := h1
+  obtain ⟨i2, l2, rfl⟩ := h2
+  exact ⟨i1 + i2, l1 + l2, by ext <;> simp <;> ring⟩
+
+theorem aliasOf_symm {a : ℤ} {c u : Site} (h : AliasOf a c u) : AliasOf a u c := by
+  obtain ⟨i, l, rfl⟩ := h
+  exact ⟨-i, -l, by ext <;> simp <;> ring⟩
+
+/-- The free classes are invariant under the lattice. -/
+theorem freeClass_alias {a : ℤ} {c c' : Site} (h : AliasOf a c c') : FreeClass a c ↔ FreeClass a c' := by
+  constructor
+  · rintro ⟨u, hu, hf⟩
+    exact ⟨u, aliasOf_trans (aliasOf_symm h) hu, hf⟩
+  · rintro ⟨u, hu, hf⟩
+    exact ⟨u, aliasOf_trans h hu, hf⟩
+
+/-- A native copy of a non-free point is non-free as soon as the native local test fails. -/
+theorem nonfree_of_native_test {a : ℤ} (ha : 4 ≤ a) {v w : Site} (hw : AliasOf a v w) (hwn : NativeT a w.1 w.2)
+    (ht : ¬ (FreeSite a w.1 w.2 ∨ FreeSite a (w.1 + 2) (w.2 - 2 * a) ∨ FreeSite a (w.1 - (a + 1)) (w.2 - (a - 1)))) :
+    ¬ FreeClass a v := by
+  intro h
+  exact ht ((freeClass_native_iff ha hwn).mp ((freeClass_alias hw).mp h))
+
+/-- The Laplacian vanishes at a white point of the charge table (the native copy of the corner). -/
+theorem lap_zero_of_charge {k : ℕ} {S : Field}
+    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees S 0)
+    (hperiod : HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4)) S 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
+    {v w : Site} (hw : AliasOf (2 * (k : ℤ) + 4) v w) (hwn : NativeT (2 * (k : ℤ) + 4) w.1 w.2)
+    (hcharge : (EvenSite (QuarterTurn.counterclockwise.mapSite (2 * (2 * (k : ℤ) + 4), 1) w) ∧
+        ¬ LadderOddEvenBlack (2 * (k : ℤ) + 4) (QuarterTurn.counterclockwise.mapSite (2 * (2 * (k : ℤ) + 4), 1) w)) ∨
+      (¬ EvenSite (QuarterTurn.counterclockwise.mapSite (2 * (2 * (k : ℤ) + 4), 1) w) ∧
+        LadderOddOddWhite (2 * (k : ℤ) + 4) (QuarterTurn.counterclockwise.mapSite (2 * (2 * (k : ℤ) + 4), 1) w))) :
+    laplacian (standardField (List.replicate (k + 1) Digit.two)) v = 0 := by
+  rw [← laplacian_twos_alias hagree hperiod hw, laplacian_twos_native k hagree hperiod hwn]
+  rcases hcharge with ⟨he, hb⟩ | ⟨hn, hb⟩
+  · rw [if_pos he, if_neg hb]
+  · rw [if_neg hn, if_pos hb]
+
+/-- The generic witness: a white corner `v` of the square whose native copy `w` is a non-free candidate point, with its
+candidate input outside the square, gives the square clause for every sign. -/
+theorem sq_of_witness {a η : ℤ} {F : Field} {u v w : Site} (hv : SqCorner u v) (hlap : laplacian F v = 0)
+    (hnf : ¬ FreeClass a v) (hw : AliasOf a v w) (hwn : NativeT a w.1 w.2) (hg : CandGuard a w.1 w.2)
+    (hout : SqOut u (v.1 + (candDisp a w.1 w.2).1, v.2 + (candDisp a w.1 w.2).2)) : SqClause a η F u :=
+  ⟨v, hv, hlap, _, (twosSel_white_nonfree_iff hlap hnf).mpr ⟨w, hw, hwn, hg, rfl⟩, hout⟩
 
 end FLatticePaper.TwosEPolicy
