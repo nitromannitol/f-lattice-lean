@@ -1148,4 +1148,140 @@ theorem chain_sumd_v (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1) (hs :
   rw [e2]
   exact sumd_Phi_vert k η x y s hη hs hsum hx hy
 
+/-- The horizontal increment at a site whose minus-`U` translate carries the step: `hG` at the translate. -/
+theorem incr_hG_negU (k : ℕ) (s a b : ℤ)
+    (hpt : (a - (2 * (k : ℤ) + 3) + s, b - 1) ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites)
+    (hu : (a - (2 * (k : ℤ) + 3), b - 1) ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites) :
+    incr (reciprocalField k) (s, 0) (a, b) = hG (2 * (k : ℤ) + 3) (a - (2 * (k : ℤ) + 3)) (b - 1) s := by
+  have key := incr_hG k s (a - (2 * (k : ℤ) + 3)) (b - 1) hpt hu
+  have eA : (a - (2 * (k : ℤ) + 3), b - 1) + ((2 * (k : ℤ) + 3), 1) = (a, b) := by ext <;> (simp; try ring)
+  have eB : (a - (2 * (k : ℤ) + 3), b - 1) + (s, 0) + ((2 * (k : ℤ) + 3), 1) = (a, b) + (s, 0) := by ext <;> (simp; try ring)
+  have hA := reciprocalField_add_U k (a - (2 * (k : ℤ) + 3), b - 1)
+  have hB := reciprocalField_add_U k ((a - (2 * (k : ℤ) + 3), b - 1) + (s, 0))
+  rw [eA] at hA
+  rw [eB] at hB
+  unfold incr at key ⊢
+  rw [hA, hB]
+  exact key
+
+/-- Retained horizontal step on the sum-`d + 1` centres with `2 <= x <= d - 1`: the step is `+1`. -/
+theorem retention_sumd1 (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1)
+    (hN : NativeP (2 * (k : ℤ) + 3) (x, y)) (hsum : x + y = (2 * (k : ℤ) + 3) + 1) (hx : 2 ≤ x)
+    (hpol : ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) (x, y) ((x, y) + (s, 0))) :
+    s = 1 := by
+  have hE : EvenSite (x, y) := by unfold EvenSite; dsimp only; omega
+  have hw : laplacian (reciprocalField k) (x, y) = 0 := by
+    rw [laplacian_reciprocal_native k hN, if_pos hE]
+    dsimp only
+    rw [if_neg]
+    omega
+  rw [ePolicy_white k η hη (x, y) ((x, y) + (s, 0)) hw, selDisp_nativeRep k η hη hN] at hpol
+  have e : (x, y) + (s, 0) - (x, y) = (s, 0) := by ext <;> (simp; try ring)
+  rw [e] at hpol
+  unfold selDisp at hpol
+  rw [if_pos hE] at hpol
+  split_ifs at hpol <;> (try simp only [Prod.mk.injEq] at *) <;> omega
+
+/-- **Sum d + 1 (white centres, the step `+1`), horizontal slip.** -/
+theorem sumd1_D (k : ℕ) (η x y : ℤ) (hη : η = 1 ∨ η = -1) (hsum : x + y = (2 * (k : ℤ) + 3) + 1) (hx : 2 ≤ x) (hy : 2 ≤ y) :
+    incr (reciprocalField k) (1, 0) (x, y) ≤ incr (reciprocalField k) (1, 0) (x - 2 * η, y) := by
+  have i1 := incr_hG k 1 x y (mem_raw_of_box k (x + 1) y (by omega)) (mem_raw_of_box k x y (by omega))
+  rcases hη with rfl | rfl
+  · have i2 := incr_hG k 1 (x - 2 * 1) y (mem_raw_of_box k (x - 2 * 1 + 1) y (by omega))
+      (mem_raw_of_box k (x - 2 * 1) y (by omega))
+    rw [i1, i2]
+    unfold hG
+    rw [if_neg (not_stairCorner _ (x + 1) y (by omega)), if_neg (not_stairCorner _ x y (by omega)),
+      if_neg (not_stairCorner _ (x - 2 * 1 + 1) y (by omega)), if_neg (not_stairCorner _ (x - 2 * 1) y (by omega))]
+    omega
+  · have i2 := incr_hG_negU k 1 (x - 2 * -1) y
+      (mem_raw_of_box k (x - 2 * -1 - (2 * (k : ℤ) + 3) + 1) (y - 1) (by omega))
+      (mem_raw_of_box k (x - 2 * -1 - (2 * (k : ℤ) + 3)) (y - 1) (by omega))
+    rw [i1, i2]
+    unfold hG
+    rw [if_neg (not_stairCorner _ (x + 1) y (by omega)), if_neg (not_stairCorner _ x y (by omega)),
+      if_neg (not_stairCorner _ (x - 2 * -1 - (2 * (k : ℤ) + 3) + 1) (y - 1) (by omega)),
+      if_neg (not_stairCorner _ (x - 2 * -1 - (2 * (k : ℤ) + 3)) (y - 1) (by omega))]
+    omega
+
+/-- **Sum d + 1, horizontal price (the step `+1`).** -/
+theorem sumd1_P (k : ℕ) (x y : ℤ) (hsum : x + y = (2 * (k : ℤ) + 3) + 1) (hx : 2 ≤ x) (hy : 2 ≤ y) :
+    incr (reciprocalField k) (1, 0) (x, y) - incr (reciprocalField k) (1, 0) (x - 1, y + 1) ≤ 0 := by
+  have i1 := incr_hG k 1 x y (mem_raw_of_box k (x + 1) y (by omega)) (mem_raw_of_box k x y (by omega))
+  have i3 := incr_hG k 1 (x - 1) (y + 1) (mem_raw_of_box k (x - 1 + 1) (y + 1) (by omega))
+    (mem_raw_of_box k (x - 1) (y + 1) (by omega))
+  rw [i1, i3]
+  unfold hG
+  rw [if_neg (not_stairCorner _ (x + 1) y (by omega)), if_neg (not_stairCorner _ x y (by omega)),
+    if_neg (not_stairCorner _ (x - 1 + 1) (y + 1) (by omega)), if_neg (not_stairCorner _ (x - 1) (y + 1) (by omega))]
+  omega
+
+/-- **Sum d + 1, horizontal chain (the step `+1`).** -/
+theorem sumd1_Phi (k : ℕ) (η x y : ℤ) (hη : η = 1 ∨ η = -1) (hsum : x + y = (2 * (k : ℤ) + 3) + 1) (hx : 2 ≤ x) (hy : 2 ≤ y) :
+    incr (reciprocalField k) (1, 0) (x, y) - incr (reciprocalField k) (1, 0) (x - 2 * η - 1, y + 1) ≤ 0 := by
+  have i1 := incr_hG k 1 x y (mem_raw_of_box k (x + 1) y (by omega)) (mem_raw_of_box k x y (by omega))
+  rcases hη with rfl | rfl
+  · have i4 := incr_hG k 1 (x - 2 * 1 - 1) (y + 1) (mem_raw_of_box k (x - 2 * 1 - 1 + 1) (y + 1) (by omega))
+      (mem_raw_of_box k (x - 2 * 1 - 1) (y + 1) (by omega))
+    rw [i1, i4]
+    unfold hG
+    rw [if_neg (not_stairCorner _ (x + 1) y (by omega)), if_neg (not_stairCorner _ x y (by omega)),
+      if_neg (not_stairCorner _ (x - 2 * 1 - 1 + 1) (y + 1) (by omega)),
+      if_neg (not_stairCorner _ (x - 2 * 1 - 1) (y + 1) (by omega))]
+    omega
+  · have i4 := incr_hG_negU k 1 (x - 2 * -1 - 1) (y + 1)
+      (mem_raw_of_box k (x - 2 * -1 - 1 - (2 * (k : ℤ) + 3) + 1) (y + 1 - 1) (by omega))
+      (mem_raw_of_box k (x - 2 * -1 - 1 - (2 * (k : ℤ) + 3)) (y + 1 - 1) (by omega))
+    rw [i1, i4]
+    unfold hG
+    rw [if_neg (not_stairCorner _ (x + 1) y (by omega)), if_neg (not_stairCorner _ x y (by omega)),
+      if_neg (not_stairCorner _ (x - 2 * -1 - 1 - (2 * (k : ℤ) + 3) + 1) (y + 1 - 1) (by omega)),
+      if_neg (not_stairCorner _ (x - 2 * -1 - 1 - (2 * (k : ℤ) + 3)) (y + 1 - 1) (by omega))]
+    omega
+
+/-- **Sum d + 1, horizontal slip on the policy edge.** -/
+theorem slip_sumd1_h (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1)
+    (hsum : x + y = (2 * (k : ℤ) + 3) + 1) (hx : 2 ≤ x) (hy : 2 ≤ y)
+    (hpol : ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) (x, y) ((x, y) + (s, 0))) :
+    (reciprocalFrame k).slip (reciprocalField k) η ((x, y) + (s, 0)) ≤ (reciprocalFrame k).slip (reciprocalField k) η (x, y) := by
+  have hN : NativeP (2 * (k : ℤ) + 3) (x, y) := by
+    unfold NativeP; left; dsimp only; omega
+  have hsgn := retention_sumd1 k η x y s hη hN hsum hx hpol
+  subst hsgn
+  apply slip_edge_le (reciprocalField k) (reciprocalFrame k) η (x, y) (1, 0)
+  rw [smul_shortShift_recip k η]
+  have e1 : (x, y) + (-2 * η, 0) = (x - 2 * η, y) := by ext <;> (simp; try ring)
+  rw [e1]
+  exact sumd1_D k η x y hη hsum hx hy
+
+/-- **Sum d + 1, horizontal price on the policy edge.** -/
+theorem price_sumd1_h (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1)
+    (hsum : x + y = (2 * (k : ℤ) + 3) + 1) (hx : 2 ≤ x) (hy : 2 ≤ y)
+    (hpol : ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) (x, y) ((x, y) + (s, 0))) :
+    (reciprocalFrame k).price (reciprocalField k) ((x, y) + (s, 0)) ≤ (reciprocalFrame k).price (reciprocalField k) (x, y) := by
+  have hN : NativeP (2 * (k : ℤ) + 3) (x, y) := by
+    unfold NativeP; left; dsimp only; omega
+  have hsgn := retention_sumd1 k η x y s hη hN hsum hx hpol
+  subst hsgn
+  apply price_edge_le k (reciprocalField k) (x, y) (1, 0)
+  have e1 : (x, y) - (1, -1) = (x - 1, y + 1) := by ext <;> (simp; try ring)
+  rw [e1]
+  exact sumd1_P k x y hsum hx hy
+
+/-- **Sum d + 1, horizontal chain on the policy edge.** -/
+theorem chain_sumd1_h (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1)
+    (hsum : x + y = (2 * (k : ℤ) + 3) + 1) (hx : 2 ≤ x) (hy : 2 ≤ y)
+    (hpol : ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) (x, y) ((x, y) + (s, 0))) :
+    (reciprocalFrame k).chainPotential (reciprocalField k) η ((x, y) + (s, 0)) ≤
+      (reciprocalFrame k).chainPotential (reciprocalField k) η (x, y) := by
+  have hN : NativeP (2 * (k : ℤ) + 3) (x, y) := by
+    unfold NativeP; left; dsimp only; omega
+  have hsgn := retention_sumd1 k η x y s hη hN hsum hx hpol
+  subst hsgn
+  apply chain_edge_le k (reciprocalField k) η (x, y) (1, 0)
+  rw [smul_shortShift_recip k η]
+  have e2 : (x, y) + (-2 * η, 0) - (1, -1) = (x - 2 * η - 1, y + 1) := by ext <;> (simp; try ring)
+  rw [e2]
+  exact sumd1_Phi k η x y hη hsum hx hy
+
 end FLatticePaper.EPolicy
