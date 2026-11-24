@@ -123,6 +123,7 @@ def leaf_text(idx, path, lab, branches, pieces, bands):
       omega'''
     else:
         alts = []
+        SUBS = ', Prod.fst_sub, Prod.snd_sub' if any(pc.endswith('r') for pc in pieces) else ''
         for pc in sorted(pieces):
             sel = SEL[pc].replace('{h}', '?_')
             alts.append(f'      | (refine {sel}; omega)')
@@ -133,7 +134,7 @@ def leaf_text(idx, path, lab, branches, pieces, bands):
       omega
     · refine Or.inr ⟨he, ?_⟩
       rw [quarterTurn_offset_apply] at he ⊢
-      simp only [EvenSite, LadderOddOddWhite, LadderOddLowerBoundary, reflectLadderOdd] at he ⊢
+      simp only [EvenSite, LadderOddOddWhite, LadderOddLowerBoundary, reflectLadderOdd{SUBS}] at he ⊢
       first
 ''' + '\n'.join(alts)
     band = next(iter(bands))

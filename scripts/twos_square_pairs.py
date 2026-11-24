@@ -13,6 +13,23 @@ from twos_square_leaves import dataset, KEYS, corner_label, ORDER  # noqa: E402
 from twos_square_free import witnesses_free, free_alias  # noqa: E402
 
 
+def piece_of(a, w):
+    """the charge branch of the native point w: 'E' (even quarter turn) or the OddWhite piece that holds."""
+    from twos_square_lean import PIECES, piece_holds
+    X, Y = 2 * a - w[1], w[0] + 1
+    if (X + Y) % 2 == 0:
+        return 'E'
+    pc = [p for p in PIECES if piece_holds(p, X, Y, a)]
+    return pc[0] if pc else 'NONE'
+
+
+def pref_copy(A, v):
+    """the native copy used by the generator: v itself if native, else the first native copy in the window."""
+    from twos_square_rules import native_copy
+    w, lam = native_copy(A, v)
+    return w, lam
+
+
 def pair_labels(K):
     t = Twos(K)
     A = t.a
@@ -24,16 +41,27 @@ def pair_labels(K):
         for e in ORDER:
             r = corner_label(t, A, u, e)
             if r is not None:
-                lab_nf = str(r)
+                lab_nf = r  # (e, lam, d)
                 break
         if lab_nf is not None:
-            lab = (lab_nf, lab_nf)
+            e, lam, d = lab_nf
+            v = (u[0] + e[0], u[1] + e[1])
+            w = (v[0] - lam[0] * (A + 1) + 2 * lam[1], v[1] - lam[0] * (A - 1) - 2 * A * lam[1])
+            lab = '%s;%s' % (str(lab_nf), piece_of(A, w))
+            lab = (lab, lab)
         else:
             labs = []
             for eta in (1, -1):
                 ws = witnesses_free(t, A, forced, u, eta)
-                labs.append(str(sorted(ws)[0]) if ws else 'NONE')
-            lab = ('F' + labs[0], 'F' + labs[1])
+                ws = sorted(ws)
+                if not ws:
+                    labs.append('NONE')
+                    continue
+                e, lam_h, d = ws[0]
+                v = (u[0] + e[0], u[1] + e[1])
+                w, lam_w = pref_copy(A, v)
+                labs.append('F%s;%s;%s' % (str((e, lam_h, d)), str(lam_w), piece_of(A, w) if w else 'NONE'))
+            lab = (labs[0], labs[1])
         x, y = u
         ta = y - x
         f = dict(x=x, xa=x - A, y=y, ya=y - A, y2a=y - 2 * A, t=ta, ta=ta - A, t2a=ta - 2 * A, par=(x + y) % 2)
