@@ -32,3 +32,4 @@ import FLatticePaper.Construction.PureRankPlusWhite
 #print axioms FLatticePaper.PureRank.L_fifth_P
 #print axioms FLatticePaper.PureRank.L_interior_P
 #print axioms FLatticePaper.PureRank.qplus_gate
+#print axioms FLatticePaper.PureRank.rankOfP_qRankP
