@@ -237,23 +237,98 @@ def run(K):
     return t, res
 
 
+def strict_rank(K):
+    """The Lean strictRank field: rank i < rank c for every selected input i of c with P(i) = P(c) and J_eta(i) = J_eta(c).
+    P and J change by constants under the period lattice, so the condition is on residue classes: the directed graph on the
+    T classes (edges key c -> key i for such selected pairs) must have no cycle; a witness rank is the longest path to a sink."""
+    t = Twos(K)
+    cl = t.clauses()
+    forced, _ = t.forced(cl)
+    out = {}
+    for eta in (1, -1):
+        dirs = t.dirs(eta, forced)
+        succ = {r: set() for r in range(t.T)}
+        edges = 0
+        for r in range(t.T):
+            c = t.rep(r)
+            for i in t.retained(dirs, c):
+                if t.price(i) == t.price(c) and t.rounded(eta, i) == t.rounded(eta, c):
+                    edges += 1
+                    succ[r].add(t.key(i))
+        rank, onstack = {}, set()
+
+        def visit(r):
+            if r in rank:
+                return rank[r]
+            if r in onstack:
+                raise ValueError('cycle through class %d' % r)
+            onstack.add(r)
+            v = 0
+            for s in succ[r]:
+                v = max(v, visit(s) + 1)
+            onstack.discard(r)
+            rank[r] = v
+            return v
+        try:
+            for r in range(t.T):
+                visit(r)
+            ok = all(rank[s] < rank[r] for r in succ for s in succ[r])
+            out[eta] = ('acyclic', edges, max(rank.values()), ok)
+        except ValueError as e:
+            out[eta] = ('CYCLE', edges, str(e), False)
+    return out
+
+
+def rank_table(Ks):
+    sys.setrecursionlimit(20000)
+    for K in Ks:
+        r = strict_rank(K)
+        for eta in (1, -1):
+            print('K=%d eta=%+d  (P,J)-flat selected edges %3d  %s  max rank %s  witness ok %s'
+                  % (K, eta, r[eta][1], r[eta][0], r[eta][2], r[eta][3]), flush=True)
+
+
 def table(Ks):
-    print('K  a  T   rounds forced whites freeW freeB | field(U,V,lap)  | eta  edges  P  J  D  Phi  square  nodir  edge  prescr')
+    head = ('K  a   T  whites forced freeW freeB  fieldFail  eta  edges    P    J    D  Phi  square  nodir  edge  prescr  status')
+    print(head)
     allok = True
     for K in Ks:
         t, res = run(K)
-        fld = (res[('field', 'U')], res[('field', 'V')], res[('field', 'lap')])
-        base = '%d  %2d  %3d  %6d %6d %6d %5d %5d | %s' % (K, t.a, t.T, res['rounds'], res['forced'], res['whites'],
-                                                           res['freeWhite'], res['freeBlack'], fld)
+        fld = res[('field', 'U')] + res[('field', 'V')] + res[('field', 'lap')]
         for eta in (1, -1):
-            cols = [res[('edges', eta)], res[('P', eta)], res[('J', eta)], res[('D', eta)], res[('Phi', eta)],
-                    res[('square', eta)], res[('nodir', eta)], res[('edge', eta)], res[('prescribed', eta)]]
-            bad = sum(cols[1:]) + res[('bad-lap', eta)] + sum(fld)
+            cnt = {nm: res[(nm, eta)] for nm in ('edges', 'P', 'J', 'D', 'Phi', 'square', 'nodir', 'edge', 'prescribed')}
+            bad = sum(cnt[nm] for nm in ('P', 'J', 'D', 'Phi', 'square', 'nodir', 'edge', 'prescribed')) \
+                + res[('bad-lap', eta)] + fld
             allok = allok and bad == 0
-            print(base if eta == 1 else ' ' * len(base), '%+d' % eta, cols, 'bad' if bad else 'ok', flush=True)
+            print('%d %3d %3d %6d %6d %5d %5d %9d  %+d  %5d %4d %4d %4d %4d %7d %6d %5d %7d  %s' % (
+                K, t.a, t.T, res['whites'], res['forced'], res['freeWhite'], res['freeBlack'], fld, eta,
+                cnt['edges'], cnt['P'], cnt['J'], cnt['D'], cnt['Phi'], cnt['square'], cnt['nodir'], cnt['edge'],
+                cnt['prescribed'], 'ok' if bad == 0 else 'FAIL'), flush=True)
     print('ALL OK' if allok else 'FAILURES PRESENT')
 
 
+def mutation(K):
+    """Control: every selected input replaced by its opposite. The P, J, D, Phi and square checks must fail."""
+    orig = Twos.dirs
+    Twos.dirs = lambda self, eta, forced: {k: (-v[0], -v[1]) for k, v in orig(self, eta, forced).items()}
+    try:
+        _, res = run(K)
+    finally:
+        Twos.dirs = orig
+    print('control K=%d (selected inputs flipped):' % K, ', '.join(
+        '%s %d/%d' % (nm, res[(nm, 1)], res[(nm, -1)]) for nm in ('P', 'J', 'D', 'Phi', 'square')),
+        '(eta=+1/-1 failure counts)')
+    return all(res[(nm, eta)] > 0 for nm in ('P', 'J', 'D', 'Phi', 'square') for eta in (1, -1))
+
+
 if __name__ == '__main__':
-    Ks = [int(a) for a in sys.argv[1:]] or [1, 2, 3, 4]
-    table(Ks)
+    mode = sys.argv[1] if len(sys.argv) > 1 else 'table'
+    Ks = [int(a) for a in sys.argv[2:]] or [1, 2, 3, 4]
+    if mode == 'table':
+        table(Ks)
+    elif mode == 'mutation':
+        print('control detects every check:', all(mutation(K) for K in Ks))
+    elif mode == 'rank':
+        rank_table(Ks)
+    else:
+        raise SystemExit('usage: twos_signed_e.py [table|mutation|rank] K...')
