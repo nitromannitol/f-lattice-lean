@@ -1,4 +1,5 @@
 import FLatticePaper.Plane.Induction.TwosChainMono
+import FLatticePaper.Plane.Induction.F2F3Pure
 
 /-! Task 73: the twos rank `R = (2d+3) Φ₊₁ + ρ` (sign `+1`), with `d = 2k+5`, `M = 2d+3 = 4k+13`.
 
@@ -10,7 +11,7 @@ import FLatticePaper.Plane.Induction.TwosChainMono
 
 namespace FLatticePaper.TwosEPolicy
 
-open FLatticePaper FLatticePaper.Induction Farey
+open FLatticePaper FLatticePaper.Construction FLatticePaper.Induction Farey
 open scoped Classical
 
 /-- The class key is invariant under the kernel `(2k+5, 2k+3)` of the twos child. -/
@@ -107,5 +108,90 @@ theorem twosRank_transverse (k : ℕ) (z : Site) :
     exact rhoTwos_transverse k 1 (c1, c2)
   rw [hr]
   ring
+
+
+/-- **The twos rank is strict along the selected inputs (sign `+1`), from two tile-level facts.** The chain potential does not
+increase (`twosChain_nonincreasing`). On a drop edge (`Φ` lower at the input) the variation of `ρ` is below the weight `M = 2d+3`
+(`hvar`, the range of `ρ`), so `R` drops. On a flat edge (`Φ` equal) `ρ` itself drops (`hflat`). Both are named here: they are the
+tile-level facts of the archive's deck rank (checked numerically for `K = 1..4` in `scripts/twos_periodic_rank.py`). -/
+theorem twosRank_strict (k : ℕ) {S : Field}
+    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees S 0)
+    (hperiod : HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4)) S 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
+    (hvar : ∀ z w : Site, rhoTwos (2 * (k : ℤ) + 4) 1 z - rhoTwos (2 * (k : ℤ) + 4) 1 w < 2 * (2 * (k : ℤ) + 5) + 3)
+    (hflat : ∀ c i : Site, TwosSel (2 * (k : ℤ) + 4) 1 (standardField (List.replicate (k + 1) Digit.two)) c i →
+      (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) 1 i =
+        (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) 1 c →
+      rhoTwos (2 * (k : ℤ) + 4) 1 i < rhoTwos (2 * (k : ℤ) + 4) 1 c)
+    {c i : Site}
+    (hT : TwosSel (2 * (k : ℤ) + 4) 1 (standardField (List.replicate (k + 1) Digit.two)) c i) :
+    twosRank k i < twosRank k c := by
+  have hC := twosChain_nonincreasing k hagree hperiod hT
+  rcases lt_or_eq_of_le hC with hlt | heq
+  · have hM0 : (0 : ℤ) ≤ 2 * (2 * (k : ℤ) + 5) + 3 := by positivity
+    have h1 := mul_le_mul_of_nonneg_left (show (frameAt (List.replicate (k + 1) Digit.two)).chainPotential
+        (standardField (List.replicate (k + 1) Digit.two)) 1 i + 1 ≤
+          (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) 1 c
+        by omega) hM0
+    have h2 := hvar i c
+    unfold twosRank
+    nlinarith
+  · have h3 := hflat c i hT heq
+    unfold twosRank
+    rw [heq]
+    linarith
+
+
+/-- The sign `+1` slip of the twos frame is `twosSlip`. -/
+theorem slip_one_eq (k : ℕ) (z : Site) :
+    (frameAt (List.replicate (k + 1) Digit.two)).slip (standardField (List.replicate (k + 1) Digit.two)) 1 z = twosSlip k z := by
+  unfold ChildFrame.slip twosSlip
+  simp only [one_smul]
+
+/-- **The twos rank with increments, sign `+1`.** The hull lemma applied to the twos rank `R = (2d+3) Φ₊₁ + ρ`, the price `P` and the
+rounded slip `J`, along the selected inputs `TwosSel`: the rank has increments `(−a, c)` for all positive `a, c`. The strictness
+is `twosRank_strict` (with the named tile-level facts `hvar`, `hflat`); the monotonicity of `P` and `J` is `twosP_nonincreasing` and
+`twosSlip_nonincreasing`. -/
+theorem twos_rankWithIncrements (k : ℕ) {S : Field}
+    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees S 0)
+    (hperiod : HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4)) S 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
+    (hvar : ∀ z w : Site, rhoTwos (2 * (k : ℤ) + 4) 1 z - rhoTwos (2 * (k : ℤ) + 4) 1 w < 2 * (2 * (k : ℤ) + 5) + 3)
+    (hflat : ∀ c i : Site, TwosSel (2 * (k : ℤ) + 4) 1 (standardField (List.replicate (k + 1) Digit.two)) c i →
+      (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) 1 i =
+        (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) 1 c →
+      rhoTwos (2 * (k : ℤ) + 4) 1 i < rhoTwos (2 * (k : ℤ) + 4) 1 c)
+    (a c : ℤ) (ha : 0 < a) (hc : 0 < c) :
+    RankWithIncrements (fun x i => TwosSel (2 * (k : ℤ) + 4) 1 (standardField (List.replicate (k + 1) Digit.two)) x i)
+      (frameAt (List.replicate (k + 1) Digit.two)).child.modifiedDeck.kernel
+      (frameAt (List.replicate (k + 1) Digit.two)).child.modifiedDeck.transverse (-a) (c * 1) := by
+  refine FLatticePaper.EPolicy.rankWithIncrements_of_strict_hull (Or.inl rfl)
+    (P := (frameAt (List.replicate (k + 1) Digit.two)).price (standardField (List.replicate (k + 1) Digit.two)))
+    (J := (frameAt (List.replicate (k + 1) Digit.two)).roundedSlip (standardField (List.replicate (k + 1) Digit.two)) 1)
+    (R := twosRank k) (cU := -(2 * (2 * (k : ℤ) + 5) + 3)) (cV := 2 * (2 * (2 * (k : ℤ) + 5) + 3))
+    ?_ ?_ ?_ ?_ ?_ ?_ ?_ ?_ a c ha hc
+  · intro z
+    linarith [twos_price_drift_kernel k z]
+  · intro z
+    linarith [twos_price_drift_transverse k z]
+  · intro z
+    unfold ChildFrame.roundedSlip
+    have := twos_slip_drift_kernel k 1 z
+    omega
+  · intro z
+    unfold ChildFrame.roundedSlip
+    have := twos_slip_drift_transverse k 1 (Or.inl rfl) z
+    omega
+  · intro x y hxy
+    refine ⟨twosP_nonincreasing k hagree hperiod (Or.inl rfl) hxy, ?_⟩
+    have hs := twosSlip_nonincreasing k hagree hperiod hxy
+    unfold ChildFrame.roundedSlip
+    rw [slip_one_eq, slip_one_eq]
+    omega
+  · intro z
+    rw [twosRank_kernel]
+    ring
+  · intro z
+    exact twosRank_transverse k z
+  · intro x i hxi
+    exact twosRank_strict k hagree hperiod hvar hflat hxi
 
 end FLatticePaper.TwosEPolicy
