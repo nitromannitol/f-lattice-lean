@@ -48,6 +48,6 @@ theorem rankIncr_two_of_ranked {η : ℤ} {frame : ChildFrame} {G : Field} {seed
       P.rawSlipNonincreasing x y h
     unfold ChildFrame.roundedSlip ChildFrame.slip
     omega
-  exact rankWithIncrements_of_monotone_hull hD hη hPU hPV hJU hJV hmono (P.rankIncr η hη) 1 2 one_pos two_pos
+  exact rankWithIncrements_of_monotone_hull hD hη hPU hPV hJU hJV hmono P.rankIncr 1 2 one_pos two_pos
 
 end FLatticePaper.W1Inherited

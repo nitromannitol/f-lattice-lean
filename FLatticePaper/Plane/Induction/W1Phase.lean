@@ -31,10 +31,10 @@ structure OldPolicyRanked (frame : ChildFrame) (G : Field) (seed : Site → Site
   rank : Site → ℤ
   /-- The rank strictly decreases along every retained edge. -/
   rank_decr : ∀ c i, retained c i → rank i < rank c
-  /-- The F2F3 rank has the increments `(−1, η)` on the child's generators, for `η = ±1` (the rank of the archive; `rank_decr` is its strict
-  decrease). The increments `(−1, 2η)` of the same policy follow (`rankIncr_two_of_ranked`, `W1Inherited`). -/
-  rankIncr : ∀ η : ℤ, (η = 1 ∨ η = -1) →
-    RankWithIncrements retained frame.child.modifiedDeck.kernel frame.child.modifiedDeck.transverse (-1) η
+  /-- The rank has the increments `(−1, η)` on the child's generators for the policy's own sign `η` (the matching sign of the
+  archive's cycle characters `−A i + C η j`; the opposite sign fails on the pure words, where the policy has a quotient cycle of
+  winding `U + V` or `U − V`). The increments `(−1, 2η)` of the same policy follow (`rankIncr_two_of_ranked`, `W1Inherited`). -/
+  rankIncr : RankWithIncrements retained frame.child.modifiedDeck.kernel frame.child.modifiedDeck.transverse (-1) η
 
 /-- The A-sheet rank: the rank of the policy at the parent point `zTurn (c − lv)`. -/
 def sheetRankA {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} (P : OldPolicyRanked frame G seed η)
