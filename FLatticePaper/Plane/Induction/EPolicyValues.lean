@@ -24,6 +24,7 @@ namespace FLatticePaper.EPolicy
 open FLatticePaper FLatticePaper.Induction
 open FLatticePaper.Construction
 open FLatticePaper.PureRank
+open FLatticePaper.Farey
 
 /-- The value inequalities of the signed policy e(-1, eta) on the reciprocal field `reciprocalField k` (the items 4 and the
 strict rank of the note): the raw slip and the price do not increase along the policy, the chain potential does not increase
@@ -1499,5 +1500,23 @@ theorem chain_bot_O (k : ℕ) (η x s : ℤ) (hη : η = 1 ∨ η = -1) (hpar : 
   have e2 : (x, 0) + (-2 * η, 0) - (1, -1) = (x - 2 * η - 1, 1) := by ext <;> (simp; try ring)
   simp only [e2]
   exact bot_O_Phi k η x hη hx hxd
+
+/-- **Transverse translation of the increments.** Translating a site by the transverse period `T = (1 - d, 1 + d)` changes the
+unit increment along `e` by the grade increment `-(d e₂ - e₁)`. -/
+theorem incr_T (k : ℕ) (e z : Site) :
+    incr (reciprocalField k) e (z + (1 - (2 * (k : ℤ) + 3), 1 + (2 * (k : ℤ) + 3))) =
+      incr (reciprocalField k) e z - ((2 * (k : ℤ) + 3) * e.2 - e.1) := by
+  have hT := transverse_threes k
+  have pT : ∀ w : Site, reciprocalField k (w + (1 - (2 * (k : ℤ) + 3), 1 + (2 * (k : ℤ) + 3))) =
+      reciprocalField k w - (Fraction.mk 1 (2 * (k : ℤ) + 3)).transverseGrade w + stairEvenConstantV (2 * (k : ℤ) + 3) := by
+    intro w
+    have h := reciprocalField_period_transverse k w
+    rw [hT] at h
+    exact h
+  have ts := transverseGrade_step (2 * (k : ℤ) + 3) z e
+  unfold incr
+  have h1 : z + (1 - (2 * (k : ℤ) + 3), 1 + (2 * (k : ℤ) + 3)) + e = (z + e) + (1 - (2 * (k : ℤ) + 3), 1 + (2 * (k : ℤ) + 3)) := by abel
+  rw [h1, pT (z + e), pT z]
+  linarith
 
 end FLatticePaper.EPolicy
