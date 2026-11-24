@@ -18,6 +18,50 @@ namespace FLatticePaper.EPolicy
 open Farey FLatticePaper FLatticePaper.Induction
 open FLatticePaper.Construction
 
+/-- **The hull lemma from any strict deck-equivariant rank.** Let `R` be strict on the retained edges, with characters `cU, cV`
+on the periods. Let `L = |cU| + |cV| + 1`. For positive `a, b`, the rank `Q = (aL + cU) P + (bL − η cV) J + R` has increments
+`(−a L, b η L)` and is strict on the retained edges, since both coefficients are nonnegative and `P, J` are nonincreasing. -/
+theorem rankWithIncrements_of_strict_hull {retained : Site → Site → Prop} {U V : Site} {η : ℤ}
+    (hη : η = 1 ∨ η = -1) {P J R : Site → ℤ} {cU cV : ℤ}
+    (hPU : ∀ z, P (z + U) = P z - 1) (hPV : ∀ z, P (z + V) = P z)
+    (hJU : ∀ z, J (z + U) = J z) (hJV : ∀ z, J (z + V) = J z + η)
+    (hmono : ∀ x y, retained x y → P y ≤ P x ∧ J y ≤ J x)
+    (hRU : ∀ z, R (z + U) = R z + cU) (hRV : ∀ z, R (z + V) = R z + cV)
+    (hstrict : ∀ x i, retained x i → R i < R x)
+    (a b : ℤ) (ha : 0 < a) (hb : 0 < b) :
+    RankWithIncrements retained U V (-a) (b * η) := by
+  obtain ⟨L, hLdef⟩ : ∃ L : ℤ, L = |cU| + |cV| + 1 := ⟨_, rfl⟩
+  have hL : 1 ≤ L := by linarith [abs_nonneg cU, abs_nonneg cV]
+  have ha1 : 1 ≤ a := ha
+  have hb1 : 1 ≤ b := hb
+  have hcU : -|cU| ≤ cU := neg_abs_le cU
+  have hηcV : η * cV ≤ |cV| := by
+    rcases hη with rfl | rfl
+    · simpa using le_abs_self cV
+    · simpa using neg_le_abs cV
+  have hη2 : η * η = 1 := by rcases hη with rfl | rfl <;> norm_num
+  have haL : L ≤ a * L := by nlinarith
+  have hbL : L ≤ b * L := by nlinarith
+  have hα : 0 ≤ a * L + cU := by linarith [abs_nonneg cV]
+  have hβ : 0 ≤ b * L - η * cV := by linarith [abs_nonneg cU]
+  unfold RankWithIncrements
+  refine ⟨fun z => (a * L + cU) * P z + (b * L - η * cV) * J z + R z, L, by linarith, ?_, ?_, ?_⟩
+  · intro x i hr
+    obtain ⟨hp, hj⟩ := hmono x i hr
+    have h1 := mul_le_mul_of_nonneg_left hp hα
+    have h2 := mul_le_mul_of_nonneg_left hj hβ
+    have h3 := hstrict x i hr
+    dsimp only
+    linarith
+  · intro z
+    dsimp only
+    rw [hPU, hJU, hRU]
+    ring
+  · intro z
+    dsimp only
+    rw [hPV, hJV, hRV]
+    linear_combination (-cV) * hη2
+
 theorem F2F3_threes_of_values (k : ℕ) (V : ReciprocalValues k)
     (hrank : ∀ η : ℤ, (η = 1 ∨ η = -1) →
       RankWithIncrements (ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)))
