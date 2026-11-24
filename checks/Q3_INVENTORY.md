@@ -852,3 +852,13 @@ Scope to confirm with the lead: §1's star containment needs `c = d − n ≥ 3`
   400000 heartbeats (about 2^8 branches per key case); the attempt is kept out of the tree. The even zero line and the increments
   are not started.
 - Checks: checks/TwosPriceE.lean (axioms standard; sq_div4_add uses propext only).
+
+### Task 72 / twos base (the price range of standardField (2^(k+1)) on the closed polygon): TwosPriceE.lean (complete)
+- PROVED: `twos_priceRange_E k z (hz)`: cutPrice − 1 ≤ P ≤ cutPrice on the closed polygon, with cutPrice = k²+5k+5 (`twos_cutPrice`), the
+  price formula (`twos_price_unfold`), and the three-shift cover (`twos_E_key`, `memA_tile`, `memB_tile`, `memC_tile`).
+- Structure: the arithmetic of each case is one declaration per (case, key case): `priceA_{main,s1..s4}`, `priceB_{…}`, `priceC_{…}`
+  (15 declarations). The min/max signs are not fixed by hand: `ring_nf` once per conjunct cancels the quadratic terms, then the splits
+  and `omega` close each leaf (case A passes as one declaration too).
+- Leaves: C when `(z₁,z₂−z₁)` is in `hC` (shift +U, kernel period), A when `hA` (shift 0, tile identity), B otherwise (shift −V,
+  transverse period with `ladderEvenConstantV_eq` and `twos_transverseGrade_explicit`).
+- Checks: checks/TwosPriceE.lean (axioms standard).
