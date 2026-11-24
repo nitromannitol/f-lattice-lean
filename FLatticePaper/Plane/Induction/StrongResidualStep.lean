@@ -5,8 +5,7 @@ import FLatticePaper.Plane.Induction.F2F3Pure
 import FLatticePaper.Plane.Induction.StrongResidual
 import FLatticePaper.Plane.Induction.TieReduce
 import FLatticePaper.Plane.Induction.StarClassify
-import FLatticePaper.Plane.Induction.SeedTransverse
-import FLatticePaper.Plane.Induction.SeedPoint
+import FLatticePaper.Plane.Induction.W1SeedFields
 import FLatticePaper.Farey.Numerators
 
 /-!
@@ -31,25 +30,23 @@ namespace FLatticePaper.Induction
 open Farey FLatticePaper
 
 /-- **The strong residual of a proper word from the conjugate's strong estimates.** The named inputs are the boundary price bound
-`hbd`, the quarter-turn zero `hzero` at the closed-form seed point, and the policy with a strict rank `hpol` (the star classification is derived; it needs a digit other than `two` too).
+`hbd`, the seed fields `hpar` of the conjugate, and the policy with a strict rank `hpol` (the star classification is derived; it needs a digit other than `two` too).
 
 `hcls` is no longer an input: the star classification is derived (`StarClassified`, from `starClassified_of_grades`) for every word with
 a digit other than `three` and a digit other than `two` (the proper, non-two-power words), from the strips of the packet. The derivation
 uses the arithmetic of the Farey recursion: `3 ≤ child.num` (`current_even_num_ge_three`) and `4 ≤ child.den − child.num`
 (`current_even_diff_ge_four`). The grade covering that proves it is `StarCover.box_cover`.
 
-`hzero` is one explicit zero, at the closed-form even point `seedX` of the seed line (SeedPoint). From it the odd seed site
-`seedZ = Z·seedX` lies on the line `sGrade = 2 − 3d + n` and satisfies `F(seedZ) = harmonicGrid(seedZ)` (`seed_check_of_zero`). The
-transverse invariance of `F − harmonicGrid` (SeedTransverse) then carries the seed to the whole odd seed line. The packet's strips alone
-do not reach the seed line, so `hzero` is the named input: the zero of the quarter turn of the word's own field, which the conjugate's
-seeds give (`SeedFields.odd_zero`).
+`hpar : SeedFields (conjWord word)` supplies the seed fields of the word (`seedFields_of_conj`), and the odd seed of the word on the whole
+odd seed line is `SeedFields.odd_bottom` (the quarter-turn zero of the conjugate's seeds). So the seed needs no named check here. The
+closed-form seed site of the seed line is in SeedPoint, and the transverse invariance of `F − harmonicGrid` is in SeedTransverse.
 -/
 theorem strongResidual_of_conj {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (h2 : ∃ x ∈ word, x ≠ Digit.two)
     (hSE : StrongEstimates (conjWord word))
     (hbd : ∀ z, OnBoundary (frameAt word).closedPolygon z →
       (frameAt word).price (standardField word) z ≤ (frameAt word).cutPrice)
-    (hzero : quarterTurnField (standardField word) (FLatticePaper.Induction.SeedPoint.seedX (frameAt word)) = 0)
+    (hpar : FLatticePaper.W1Seeds.SeedFields (conjWord word))
     (hpol : ∀ η : ℤ, (η = 1 ∨ η = -1) → ∃ (policy : Site → Site → Prop) (R : Site → ℤ) (cU cV : ℤ),
       RetainQuota (standardField word) policy ∧
       NonincreasingAlong ((frameAt word).chainPotential (standardField word) η) policy ∧
@@ -60,13 +57,12 @@ theorem strongResidual_of_conj {word : Word} (h : ∃ x ∈ word, x ≠ Digit.th
       (∀ x i, policy x i → R i < R x)) :
     StrongResidual word := by
   have hpk : (frameAt word).Packet (standardField word) := FLatticePaper.Induction.packet_of_strong h hSE
-  obtain ⟨a, b, ha, hb⟩ := FLatticePaper.PriceDeck.child_odd_witness (frameAt word)
-  have hTe := FLatticePaper.StrongUnitPrice.periodDenominator_even_of (frameAt word) a b ha hb
-  have hz0o := FLatticePaper.Induction.SeedPoint.seedZ_odd (frameAt word) b hb
-  have hz0s := FLatticePaper.Induction.SeedPoint.seedZ_on_line (frameAt word)
-  have hz0c := FLatticePaper.Induction.SeedPoint.seed_check_of_zero (frameAt word) (standardField word) hzero
-  have hseed := FLatticePaper.Induction.SeedTransverse.seed_of_check (frameAt word) (standardField word) hpk a ha
-    (FLatticePaper.Induction.SeedPoint.seedZ (frameAt word)) hz0s hz0o hz0c (by omega) (by omega) (by omega) hTe
+  -- the odd seed line of the word: the seed fields of the word, from those of the conjugate
+  have hSeeds := FLatticePaper.W1SeedFields.seedFields_of_conj h hSE hpar
+  have hseed : ∀ w : Site, ¬ EvenSite w →
+      (frameAt word).sGrade w = 2 - 3 * (frameAt word).child.den + (frameAt word).child.num →
+        standardField word w = harmonicGrid w :=
+    fun w hw hs => hSeeds.odd_bottom w hw hs
   have hPR := FLatticePaper.StrongPriceInputs.priceRange_of_conjugate h hSE hbd
   have hPU : ∀ z, (frameAt word).price (standardField word) (z + (frameAt word).child.modifiedDeck.kernel) =
       (frameAt word).price (standardField word) z - 1 :=
