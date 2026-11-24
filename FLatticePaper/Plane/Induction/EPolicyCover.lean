@@ -303,4 +303,585 @@ theorem cov_botOR (k : ℕ) (hk : 1 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ 
     PE_of_price k _ (0, s) (price_bot_OR k η s hη hk hpol),
     CE_of_chain k η _ (0, s) (chain_bot_OR k η s hη hk hpol)⟩
 
+/-- The class of a covered step is shared by deck translates: the covering data transfers along a deck vector. -/
+theorem ecover_transfer (k : ℕ) (η : ℤ) (hη : η = 1 ∨ η = -1) (r0 r e : Site) (i j : ℤ)
+    (hr : r = r0 + (Fraction.mk 1 (2 * (k : ℤ) + 3)).modifiedDeck.combine i j)
+    (hn0 : NativeP (2 * (k : ℤ) + 3) r0) (hn : NativeP (2 * (k : ℤ) + 3) r) (hc : ECover k η r e) :
+    ECover k η r0 e := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  have hlap : laplacian (reciprocalField k) r0 = laplacian (reciprocalField k) r := by
+    rw [hr]; exact (laplacian_reciprocal_deck k r0 i j).symm
+  rcases hc with ⟨hl, he⟩ | ⟨hl, he | he⟩
+  · refine Or.inl ⟨by rw [hlap]; exact hl, ?_⟩
+    have h1 := selDisp_nativeRep k η hη hn
+    have h2 := selDisp_nativeRep_deck k η hη r0 i j
+    have h3 := selDisp_nativeRep k η hη hn0
+    rw [he, ← h1, hr, h2, h3]
+  · refine Or.inr ⟨by rw [hlap]; exact hl, Or.inl ?_⟩
+    rw [he, hr, incomingNeg_add (combine_sum_even hd i j)]
+    abel
+  · refine Or.inr ⟨by rw [hlap]; exact hl, Or.inr ?_⟩
+    rw [he, hr, incomingPos_add (combine_sum_even hd i j)]
+    abel
+
+/-- The three inequalities are shared by deck translates. -/
+theorem cov_shift (k : ℕ) (η : ℤ) (r0 r e : Site) (i j : ℤ)
+    (hr : r = r0 + (Fraction.mk 1 (2 * (k : ℤ) + 3)).modifiedDeck.combine i j)
+    (h : SE k η r0 e ∧ PE k r0 e ∧ CE k η r0 e) : SE k η r e ∧ PE k r e ∧ CE k η r e := by
+  subst hr
+  exact ⟨slip_inc_shift k η e r0 i j h.1, price_inc_shift k e r0 i j h.2.1, chain_inc_shift k η e r0 i j h.2.2⟩
+
+/-- The bottom row `(x, 0)` for every `1 <= x <= d`. -/
+theorem cov_bottom (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (x : ℤ) (e : Site)
+    (hN : NativeP (2 * (k : ℤ) + 3) (x, (0 : ℤ))) (hx1 : 1 ≤ x) (hxd : x ≤ 2 * (k : ℤ) + 3)
+    (hc : ECover k η (x, (0 : ℤ)) e) :
+    SE k η (x, (0 : ℤ)) e ∧ PE k (x, (0 : ℤ)) e ∧ CE k η (x, (0 : ℤ)) e := by
+  have hk1 : 1 ≤ (k : ℤ) := by omega
+  rcases (by omega : x = 1 ∨ x = 2 ∨ (3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 1 ∧ x % 2 = 1) ∨
+      (4 ≤ x ∧ x ≤ 2 * (k : ℤ) ∧ x % 2 = 0) ∨ x = 2 * (k : ℤ) + 2 ∨ x = 2 * (k : ℤ) + 3) with
+    h | h | ⟨h1, h2, h3⟩ | ⟨h1, h2, h3⟩ | h | h
+  · subst h
+    exact cov_bot1 k η hη e hN hc
+  · subst h
+    exact cov_bot2 k hk1 η hη e hN hc
+  · exact cov_bot_odd k η hη x e hN h3 h1 (by omega) hc
+  · exact cov_bot_even k η hη x e hN h3 h1 (by omega) hc
+  · exact cov_botR k hk1 η hη x e hN h hc
+  · subst h
+    exact cov_botOR k hk1 η hη e hN hc
+
+/-- A slip inequality at a point, given as a class inequality at the explicit target `q`. -/
+theorem SE_of_cls (k : ℕ) (η : ℤ) {r q e : Site}
+    (h : incr (reciprocalField k) e r ≤ incr (reciprocalField k) e q) (hab : r + η • (reciprocalFrame k).shortShift = q) :
+    SE k η r e := by
+  unfold SE
+  rw [hab]
+  exact h
+
+/-- A price inequality at a point, given as a class inequality at the explicit target `q`. -/
+theorem PE_of_cls (k : ℕ) {r q e : Site}
+    (h : incr (reciprocalField k) e r - incr (reciprocalField k) e q ≤ e.2) (hab : r - (1, -1) = q) :
+    PE k r e := by
+  unfold PE
+  rw [hab]
+  exact h
+
+/-- A chain inequality at a point, given as a class inequality at the explicit target `q`. -/
+theorem CE_of_cls (k : ℕ) (η : ℤ) {r q e : Site}
+    (h : incr (reciprocalField k) e r - incr (reciprocalField k) e q ≤ e.2)
+    (hab : r + η • (reciprocalFrame k).shortShift - (1, -1) = q) : CE k η r e := by
+  unfold CE
+  rw [hab]
+  exact h
+
+/-- The laplacian vanishes on an even native site away from `x = 1`. -/
+theorem lap_zero_even (k : ℕ) {p : Site} (hN : NativeP (2 * (k : ℤ) + 3) p) (hE : EvenSite p) (hx : p.1 ≠ 1) :
+    laplacian (reciprocalField k) p = 0 := by
+  rw [laplacian_reciprocal_native k hN, if_pos hE, if_neg hx]
+
+/-- The laplacian vanishes on an odd native site outside the band. -/
+theorem lap_zero_odd (k : ℕ) {p : Site} (hN : NativeP (2 * (k : ℤ) + 3) p) (hO : ¬ EvenSite p)
+    (hb : ¬ (0 < p.2 ∧ p.2 < (2 * (k : ℤ) + 3) + 1 ∧ 1 < p.1 + p.2 ∧ p.1 + p.2 < (2 * (k : ℤ) + 3) + 2)) :
+    laplacian (reciprocalField k) p = 0 := by
+  rw [laplacian_reciprocal_native k hN, if_neg hO, if_neg hb]
+
+/-- The rule at an even site left of the axis, away from the special sites: the step is `(-1, 0)`. -/
+theorem selDisp_even_left (d η x y : ℤ) (hE : EvenSite (x, y)) (hx : (x, y).1 ≤ 0)
+    (h1 : ¬ ((x, y) = (2 - d, d) ∨ (x, y) = (2, d + 1)))
+    (h2 : ¬ (((x, y).2 = 0 ∧ 2 ≤ (x, y).1) ∨ (x, y) = (0, 0) ∨ (x, y) = (d, 1) ∨
+      ((x, y).2 = d + 1 ∧ 3 - d ≤ (x, y).1 ∧ (x, y).1 ≤ 0))) :
+    selDisp d η (x, y) = (-1, 0) := by
+  unfold selDisp
+  rw [if_pos hE, if_neg h1, if_neg h2, if_pos hx]
+
+/-- The rule at the origin: the step is `(1, 0)`. -/
+theorem selDisp_origin (d η : ℤ) (hd : 3 ≤ d) : selDisp d η (0, 0) = (1, 0) := by
+  have hE : EvenSite ((0 : ℤ), (0 : ℤ)) := by unfold EvenSite; norm_num
+  have h1 : ¬ (((0 : ℤ), (0 : ℤ)) = (2 - d, d) ∨ ((0 : ℤ), (0 : ℤ)) = (2, d + 1)) := by
+    intro h
+    simp only [Prod.mk.injEq] at h
+    omega
+  unfold selDisp
+  rw [if_pos hE, if_neg h1, if_pos (Or.inr (Or.inl rfl))]
+
+/-- The alias of type A: the row `(x, d + 1)` is the deck translate `(x + d - 1, 0) + T` of a bottom site. -/
+theorem cov_aliasA (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (x : ℤ) (e : Site)
+    (hN : NativeP (2 * (k : ℤ) + 3) (x, 2 * (k : ℤ) + 3 + 1)) (hx1 : 2 - (2 * (k : ℤ) + 3) ≤ x) (hx2 : x ≤ 1)
+    (hc : ECover k η (x, 2 * (k : ℤ) + 3 + 1) e) :
+    SE k η (x, 2 * (k : ℤ) + 3 + 1) e ∧ PE k (x, 2 * (k : ℤ) + 3 + 1) e ∧ CE k η (x, 2 * (k : ℤ) + 3 + 1) e := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  have hr : (x, 2 * (k : ℤ) + 3 + 1) = (x + (2 * (k : ℤ) + 3) - 1, (0 : ℤ)) +
+      (Fraction.mk 1 (2 * (k : ℤ) + 3)).modifiedDeck.combine 0 1 := by
+    rw [combine_mk_one hd]
+    ext <;> (simp; try ring)
+  have hn0 : NativeP (2 * (k : ℤ) + 3) (x + (2 * (k : ℤ) + 3) - 1, (0 : ℤ)) := by
+    unfold NativeP
+    left
+    dsimp only
+    omega
+  have hc0 := ecover_transfer k η hη (x + (2 * (k : ℤ) + 3) - 1, (0 : ℤ)) (x, 2 * (k : ℤ) + 3 + 1) e 0 1 hr hn0 hN hc
+  exact cov_shift k η _ _ e 0 1 hr (cov_bottom k hk η hη (x + (2 * (k : ℤ) + 3) - 1) e hn0 (by omega) (by omega) hc0)
+
+/-- The alias of type B: the cell `(x, 1 - x)` is the deck translate `(x + d, 2 - x) - U` of a top site. -/
+theorem cov_aliasB (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (x : ℤ) (e : Site)
+    (hN : NativeP (2 * (k : ℤ) + 3) (x, 1 - x)) (hx1 : 3 - (2 * (k : ℤ) + 3) ≤ x) (hx2 : x ≤ 0)
+    (hc : ECover k η (x, 1 - x) e) :
+    SE k η (x, 1 - x) e ∧ PE k (x, 1 - x) e ∧ CE k η (x, 1 - x) e := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  have hr : (x, 1 - x) = (x + (2 * (k : ℤ) + 3), 2 - x) +
+      (Fraction.mk 1 (2 * (k : ℤ) + 3)).modifiedDeck.combine (-1) 0 := by
+    rw [combine_mk_one hd]
+    ext <;> (simp; try ring)
+  have hn0 : NativeP (2 * (k : ℤ) + 3) (x + (2 * (k : ℤ) + 3), 2 - x) := by
+    unfold NativeP
+    left
+    dsimp only
+    omega
+  have hc0 := ecover_transfer k η hη (x + (2 * (k : ℤ) + 3), 2 - x) (x, 1 - x) e (-1) 0 hr hn0 hN hc
+  exact cov_shift k η _ _ e (-1) 0 hr (cov_top k η hη (x + (2 * (k : ℤ) + 3)) (2 - x) e hn0
+    (by ring) (by omega) (by omega) hc0)
+
+theorem cov_P1 (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (e : Site)
+    (hc : ECover k η ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) e) :
+    SE k η ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) e ∧ PE k ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) e ∧ CE k η ((3 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) e := by
+  obtain ⟨s, hs, rfl⟩ := ecover_vert k η hη (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) e (by omega) hc
+  rcases hη with rfl | rfl <;> rcases hs with rfl | rfl
+  · exact ⟨SE_of_cls k (1) (cls_C1_p_py k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C1_p_py k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_C1_p_py k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (1) (cls_C1_p_my k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C1_p_my k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_C1_p_my k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_C1_m_py k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C1_m_py k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_C1_m_py k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_C1_m_my k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C1_m_my k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_C1_m_my k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+
+theorem cov_P2 (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (e : Site)
+    (hc : ECover k η ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) e) :
+    SE k η ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) e ∧ PE k ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) e ∧ CE k η ((4 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) e := by
+  obtain ⟨s, hs, rfl⟩ := ecover_horiz k η hη (4 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) e (by omega) hc
+  rcases hη with rfl | rfl <;> rcases hs with rfl | rfl
+  · exact ⟨SE_of_cls k (1) (cls_C5_p_px k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C5_p_px k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_C5_p_px k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (1) (cls_C5_p_mx k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C5_p_mx k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_C5_p_mx k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_C5_m_px k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C5_m_px k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_C5_m_px k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_C5_m_mx k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C5_m_mx k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_C5_m_mx k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+
+theorem cov_P3 (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (e : Site)
+    (hc : ECover k η ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) e) :
+    SE k η ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) e ∧ PE k ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) e ∧ CE k η ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) e := by
+  obtain ⟨s, hs, rfl⟩ := ecover_vert k η hη (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) e (by omega) hc
+  rcases hη with rfl | rfl <;> rcases hs with rfl | rfl
+  · exact ⟨SE_of_cls k (1) (cls_C7_p_py k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C7_p_py k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_C7_p_py k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (1) (cls_C7_p_my k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C7_p_my k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_C7_p_my k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_C7_m_py k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C7_m_py k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_C7_m_py k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_C7_m_my k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C7_m_my k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_C7_m_my k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+
+theorem cov_P4 (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (e : Site)
+    (hc : ECover k η ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) e) :
+    SE k η ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) e ∧ PE k ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) e ∧ CE k η ((5 - (2 * (k : ℤ) + 3)), (2 * (k : ℤ) + 3)) e := by
+  obtain ⟨s, hs, rfl⟩ := ecover_vert k η hη (5 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) e (by omega) hc
+  rcases hη with rfl | rfl <;> rcases hs with rfl | rfl
+  · exact ⟨SE_of_cls k (1) (cls_C9_p_py k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C9_p_py k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_C9_p_py k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (1) (cls_C9_p_my k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C9_p_my k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_C9_p_my k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_C9_m_py k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C9_m_py k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_C9_m_py k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_C9_m_my k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C9_m_my k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_C9_m_my k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+
+theorem cov_P5 (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (e : Site)
+    (hc : ECover k η (((2 * (k : ℤ) + 3) - 2), (1)) e) :
+    SE k η (((2 * (k : ℤ) + 3) - 2), (1)) e ∧ PE k (((2 * (k : ℤ) + 3) - 2), (1)) e ∧ CE k η (((2 * (k : ℤ) + 3) - 2), (1)) e := by
+  obtain ⟨s, hs, rfl⟩ := ecover_horiz k η hη ((2 * (k : ℤ) + 3) - 2) (1) e (by omega) hc
+  rcases hη with rfl | rfl <;> rcases hs with rfl | rfl
+  · exact ⟨SE_of_cls k (1) (cls_C13_p_px k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C13_p_px k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_C13_p_px k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (1) (cls_C13_p_mx k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C13_p_mx k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_C13_p_mx k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_C13_m_px k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C13_m_px k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_C13_m_px k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_C13_m_mx k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C13_m_mx k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_C13_m_mx k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+
+theorem cov_P6 (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (e : Site)
+    (hc : ECover k η (((2 * (k : ℤ) + 3) - 1), (1)) e) :
+    SE k η (((2 * (k : ℤ) + 3) - 1), (1)) e ∧ PE k (((2 * (k : ℤ) + 3) - 1), (1)) e ∧ CE k η (((2 * (k : ℤ) + 3) - 1), (1)) e := by
+  obtain ⟨s, hs, rfl⟩ := ecover_vert k η hη ((2 * (k : ℤ) + 3) - 1) (1) e (by omega) hc
+  rcases hη with rfl | rfl <;> rcases hs with rfl | rfl
+  · exact ⟨SE_of_cls k (1) (cls_C14_p_py k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C14_p_py k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_C14_p_py k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (1) (cls_C14_p_my k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C14_p_my k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_C14_p_my k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_C14_m_py k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C14_m_py k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_C14_m_py k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_C14_m_my k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C14_m_my k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_C14_m_my k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+
+theorem cov_P7 (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (e : Site)
+    (hc : ECover k η ((1), ((2 * (k : ℤ) + 3) - 1)) e) :
+    SE k η ((1), ((2 * (k : ℤ) + 3) - 1)) e ∧ PE k ((1), ((2 * (k : ℤ) + 3) - 1)) e ∧ CE k η ((1), ((2 * (k : ℤ) + 3) - 1)) e := by
+  obtain ⟨s, hs, rfl⟩ := ecover_vert k η hη (1) ((2 * (k : ℤ) + 3) - 1) e (by omega) hc
+  rcases hη with rfl | rfl <;> rcases hs with rfl | rfl
+  · exact ⟨SE_of_cls k (1) (cls_C15_p_py k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C15_p_py k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_C15_p_py k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (1) (cls_C15_p_my k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C15_p_my k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_C15_p_my k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_K3_m_py k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_K3_m_py k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_K3_m_py k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_C15_m_my k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C15_m_my k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_C15_m_my k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+
+theorem cov_P8 (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (e : Site)
+    (hc : ECover k η ((0), (2 * (k : ℤ) + 3)) e) :
+    SE k η ((0), (2 * (k : ℤ) + 3)) e ∧ PE k ((0), (2 * (k : ℤ) + 3)) e ∧ CE k η ((0), (2 * (k : ℤ) + 3)) e := by
+  obtain ⟨s, hs, rfl⟩ := ecover_vert k η hη (0) (2 * (k : ℤ) + 3) e (by omega) hc
+  rcases hη with rfl | rfl <;> rcases hs with rfl | rfl
+  · exact ⟨SE_of_cls k (1) (cls_C18_p_py k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C18_p_py k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_C18_p_py k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (1) (cls_C18_p_my k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C18_p_my k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_C18_p_my k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_K4_m_py k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_K4_m_py k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_K4_m_py k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_C18_m_my k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_C18_m_my k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_C18_m_my k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+
+theorem cov_P12 (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (e : Site)
+    (hc : ECover k η ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) e) :
+    SE k η ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) e ∧ PE k ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) e ∧ CE k η ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) e := by
+  obtain ⟨s, hs, rfl⟩ := ecover_vert k η hη (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) e (by omega) hc
+  rcases hη with rfl | rfl <;> rcases hs with rfl | rfl
+  · exact ⟨SE_of_cls k (1) (cls_R4_p_py k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_R4_p_py k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_R4_p_py k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (1) (cls_R4_p_my k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_R4_p_my k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_R4_p_my k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_R4_m_py k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_R4_m_py k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_R4_m_py k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_R4_m_my k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_R4_m_my k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_R4_m_my k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+
+theorem cov_P13 (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (e : Site)
+    (hc : ECover k η ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) e) :
+    SE k η ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) e ∧ PE k ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) e ∧ CE k η ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) e := by
+  obtain ⟨s, hs, rfl⟩ := ecover_horiz k η hη (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) e (by omega) hc
+  rcases hη with rfl | rfl <;> rcases hs with rfl | rfl
+  · exact ⟨SE_of_cls k (1) (cls_R5_p_px k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_R5_p_px k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_R5_p_px k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (1) (cls_R5_p_mx k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_R5_p_mx k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_R5_p_mx k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_R5_m_px k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_R5_m_px k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_R5_m_px k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_R5_m_mx k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_R5_m_mx k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_R5_m_mx k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+
+theorem cov_P14 (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (e : Site)
+    (hc : ECover k η ((2), ((2 * (k : ℤ) + 3) - 2)) e) :
+    SE k η ((2), ((2 * (k : ℤ) + 3) - 2)) e ∧ PE k ((2), ((2 * (k : ℤ) + 3) - 2)) e ∧ CE k η ((2), ((2 * (k : ℤ) + 3) - 2)) e := by
+  obtain ⟨s, hs, rfl⟩ := ecover_vert k η hη (2) ((2 * (k : ℤ) + 3) - 2) e (by omega) hc
+  rcases hη with rfl | rfl <;> rcases hs with rfl | rfl
+  · exact ⟨SE_of_cls k (1) (cls_R6_p_py k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_R6_p_py k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_R6_p_py k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (1) (cls_R6_p_my k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_R6_p_my k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_R6_p_my k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_R6_m_py k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_R6_m_py k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_R6_m_py k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_R6_m_my k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_R6_m_my k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_R6_m_my k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+
+theorem cov_P16 (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (e : Site)
+    (hc : ECover k η ((1), (2 * (k : ℤ) + 3)) e) :
+    SE k η ((1), (2 * (k : ℤ) + 3)) e ∧ PE k ((1), (2 * (k : ℤ) + 3)) e ∧ CE k η ((1), (2 * (k : ℤ) + 3)) e := by
+  obtain ⟨s, hs, rfl⟩ := ecover_horiz k η hη (1) (2 * (k : ℤ) + 3) e (by omega) hc
+  rcases hη with rfl | rfl <;> rcases hs with rfl | rfl
+  · exact ⟨SE_of_cls k (1) (cls_R8_p_px k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_R8_p_px k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_R8_p_px k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (1) (cls_R8_p_mx k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_R8_p_mx k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_R8_p_mx k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_R8_m_px k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_R8_m_px k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_R8_m_px k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_R8_m_mx k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_R8_m_mx k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_R8_m_mx k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+
+theorem cov_P18 (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (e : Site)
+    (hc : ECover k η ((2), ((2 * (k : ℤ) + 3) + 1)) e) :
+    SE k η ((2), ((2 * (k : ℤ) + 3) + 1)) e ∧ PE k ((2), ((2 * (k : ℤ) + 3) + 1)) e ∧ CE k η ((2), ((2 * (k : ℤ) + 3) + 1)) e := by
+  obtain ⟨s, hs, rfl⟩ := ecover_horiz k η hη (2) ((2 * (k : ℤ) + 3) + 1) e (by omega) hc
+  rcases hη with rfl | rfl <;> rcases hs with rfl | rfl
+  · exact ⟨SE_of_cls k (1) (cls_K1_p_px k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_K1_p_px k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_K1_p_px k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (1) (cls_K1_p_mx k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_K1_p_mx k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_K1_p_mx k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_K1_m_px k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_K1_m_px k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_K1_m_px k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_K1_m_mx k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_K1_m_mx k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_K1_m_mx k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+
+theorem cov_P9 (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (e : Site)
+    (hN : NativeP (2 * (k : ℤ) + 3) ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1))) (hc : ECover k η ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) e) :
+    SE k η ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) e ∧ PE k ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) e ∧ CE k η ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) e := by
+  have hE : EvenSite ((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1)) := by unfold EvenSite; dsimp only; omega
+  have hx : (((3 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 1))).1 ≤ 0 := by dsimp only; omega
+  have hsel : e = (-1, 0) := by
+    rcases hc with ⟨hl, he⟩ | ⟨hl, -⟩
+    · rw [he]
+      exact selDisp_even_left (2 * (k : ℤ) + 3) η (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 1) hE hx
+        (by intro h; simp only [Prod.mk.injEq] at h; omega)
+        (by intro h; simp only [Prod.mk.injEq] at h; omega)
+    · exfalso
+      rw [lap_zero_even k hN hE (by dsimp only; omega)] at hl
+      norm_num at hl
+  subst hsel
+  rcases hη with rfl | rfl
+  · exact ⟨SE_of_cls k (1) (cls_R1_p_mx k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_R1_p_mx k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_R1_p_mx k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_R1_m_mx k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_R1_m_mx k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_R1_m_mx k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+
+theorem cov_P10 (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (e : Site)
+    (hN : NativeP (2 * (k : ℤ) + 3) ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2))) (hc : ECover k η ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) e) :
+    SE k η ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) e ∧ PE k ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) e ∧ CE k η ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) e := by
+  have hE : EvenSite ((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2)) := by unfold EvenSite; dsimp only; omega
+  have hx : (((4 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 2))).1 ≤ 0 := by dsimp only; omega
+  have hsel : e = (-1, 0) := by
+    rcases hc with ⟨hl, he⟩ | ⟨hl, -⟩
+    · rw [he]
+      exact selDisp_even_left (2 * (k : ℤ) + 3) η (4 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 2) hE hx
+        (by intro h; simp only [Prod.mk.injEq] at h; omega)
+        (by intro h; simp only [Prod.mk.injEq] at h; omega)
+    · exfalso
+      rw [lap_zero_even k hN hE (by dsimp only; omega)] at hl
+      norm_num at hl
+  subst hsel
+  rcases hη with rfl | rfl
+  · exact ⟨SE_of_cls k (1) (cls_R2_p_mx k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_R2_p_mx k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_R2_p_mx k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_R2_m_mx k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_R2_m_mx k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_R2_m_mx k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+
+theorem cov_P11 (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (e : Site)
+    (hN : NativeP (2 * (k : ℤ) + 3) ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3))) (hc : ECover k η ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) e) :
+    SE k η ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) e ∧ PE k ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) e ∧ CE k η ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) e := by
+  have hE : EvenSite ((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3)) := by unfold EvenSite; dsimp only; omega
+  have hx : (((5 - (2 * (k : ℤ) + 3)), ((2 * (k : ℤ) + 3) - 3))).1 ≤ 0 := by dsimp only; omega
+  have hsel : e = (-1, 0) := by
+    rcases hc with ⟨hl, he⟩ | ⟨hl, -⟩
+    · rw [he]
+      exact selDisp_even_left (2 * (k : ℤ) + 3) η (5 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) - 3) hE hx
+        (by intro h; simp only [Prod.mk.injEq] at h; omega)
+        (by intro h; simp only [Prod.mk.injEq] at h; omega)
+    · exfalso
+      rw [lap_zero_even k hN hE (by dsimp only; omega)] at hl
+      norm_num at hl
+  subst hsel
+  rcases hη with rfl | rfl
+  · exact ⟨SE_of_cls k (1) (cls_R3_p_mx k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_R3_p_mx k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_R3_p_mx k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_R3_m_mx k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_R3_m_mx k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_R3_m_mx k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+
+theorem cov_P15 (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (e : Site)
+    (hN : NativeP (2 * (k : ℤ) + 3) ((-1), (2 * (k : ℤ) + 3))) (hc : ECover k η ((-1), (2 * (k : ℤ) + 3)) e) :
+    SE k η ((-1), (2 * (k : ℤ) + 3)) e ∧ PE k ((-1), (2 * (k : ℤ) + 3)) e ∧ CE k η ((-1), (2 * (k : ℤ) + 3)) e := by
+  have hE : EvenSite ((-1), (2 * (k : ℤ) + 3)) := by unfold EvenSite; dsimp only; omega
+  have hx : (((-1), (2 * (k : ℤ) + 3))).1 ≤ 0 := by dsimp only; omega
+  have hsel : e = (-1, 0) := by
+    rcases hc with ⟨hl, he⟩ | ⟨hl, -⟩
+    · rw [he]
+      exact selDisp_even_left (2 * (k : ℤ) + 3) η (-1) (2 * (k : ℤ) + 3) hE hx
+        (by intro h; simp only [Prod.mk.injEq] at h; omega)
+        (by intro h; simp only [Prod.mk.injEq] at h; omega)
+    · exfalso
+      rw [lap_zero_even k hN hE (by dsimp only; omega)] at hl
+      norm_num at hl
+  subst hsel
+  rcases hη with rfl | rfl
+  · exact ⟨SE_of_cls k (1) (cls_R7_p_mx k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_R7_p_mx k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_R7_p_mx k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_R7_m_mx k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_R7_m_mx k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_R7_m_mx k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+
+/-- The rule at the top cell `(2, d)`: the step is `(0, -eta)`. -/
+theorem selDisp_top_two (d η : ℤ) (hd : d % 2 = 1) (hd3 : 3 ≤ d) : selDisp d η (2, d) = (0, -η) := by
+  have hO : ¬ EvenSite ((2 : ℤ), d) := by unfold EvenSite; dsimp only; omega
+  unfold selDisp
+  rw [if_neg hO]
+  split_ifs with h
+  · rfl
+  · exfalso
+    simp only at h
+    omega
+
+/-- The origin: the policy keeps `(1, 0)` (both signs). -/
+theorem cov_P17 (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (e : Site)
+    (hN : NativeP (2 * (k : ℤ) + 3) ((0 : ℤ), (0 : ℤ))) (hc : ECover k η ((0 : ℤ), (0 : ℤ)) e) :
+    SE k η ((0 : ℤ), (0 : ℤ)) e ∧ PE k ((0 : ℤ), (0 : ℤ)) e ∧ CE k η ((0 : ℤ), (0 : ℤ)) e := by
+  have hE : EvenSite ((0 : ℤ), (0 : ℤ)) := by unfold EvenSite; norm_num
+  have hsel : e = (1, 0) := by
+    rcases hc with ⟨hl, he⟩ | ⟨hl, -⟩
+    · rw [he]
+      exact selDisp_origin (2 * (k : ℤ) + 3) η (by omega)
+    · exfalso
+      rw [lap_zero_even k hN hE (by norm_num)] at hl
+      norm_num at hl
+  subst hsel
+  rcases hη with rfl | rfl
+  · exact ⟨SE_of_cls k (1) (cls_R9_p_px k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_R9_p_px k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_R9_p_px k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_R9_m_px k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_R9_m_px k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_R9_m_px k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+
+/-- The top cell `(2, d)`: the forced vertical step `(0, -eta)`. -/
+theorem cov_P19 (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (e : Site)
+    (hN : NativeP (2 * (k : ℤ) + 3) ((2 : ℤ), 2 * (k : ℤ) + 3)) (hc : ECover k η ((2 : ℤ), 2 * (k : ℤ) + 3) e) :
+    SE k η ((2 : ℤ), 2 * (k : ℤ) + 3) e ∧ PE k ((2 : ℤ), 2 * (k : ℤ) + 3) e ∧
+      CE k η ((2 : ℤ), 2 * (k : ℤ) + 3) e := by
+  have hO : ¬ EvenSite ((2 : ℤ), 2 * (k : ℤ) + 3) := by unfold EvenSite; dsimp only; omega
+  have hsel : e = (0, -η) := by
+    rcases hc with ⟨hl, he⟩ | ⟨hl, -⟩
+    · rw [he]
+      exact selDisp_top_two (2 * (k : ℤ) + 3) η (by omega) (by omega)
+    · exfalso
+      rw [lap_zero_odd k hN hO (by dsimp only; omega)] at hl
+      norm_num at hl
+  subst hsel
+  rcases hη with rfl | rfl
+  · exact ⟨SE_of_cls k (1) (cls_K2_p_my k hk).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_K2_p_my k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (1) (cls_K2_p_my k hk).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+  · exact ⟨SE_of_cls k (-1) (cls_K2_m_py k hk).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+      PE_of_cls k (cls_K2_m_py k hk).2.1 (by ext <;> (simp; try ring)),
+      CE_of_cls k (-1) (cls_K2_m_py k hk).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+
+/-- The alias of type C: `(d, 1) = (0, 0) + U`. -/
+theorem cov_aliasC (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (e : Site)
+    (hN : NativeP (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 3, (1 : ℤ))) (hc : ECover k η (2 * (k : ℤ) + 3, (1 : ℤ)) e) :
+    SE k η (2 * (k : ℤ) + 3, (1 : ℤ)) e ∧ PE k (2 * (k : ℤ) + 3, (1 : ℤ)) e ∧
+      CE k η (2 * (k : ℤ) + 3, (1 : ℤ)) e := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  have hr : (2 * (k : ℤ) + 3, (1 : ℤ)) = ((0 : ℤ), (0 : ℤ)) +
+      (Fraction.mk 1 (2 * (k : ℤ) + 3)).modifiedDeck.combine 1 0 := by
+    rw [combine_mk_one hd]
+    ext <;> (simp; try ring)
+  have hn0 : NativeP (2 * (k : ℤ) + 3) ((0 : ℤ), (0 : ℤ)) := Or.inr (Or.inl rfl)
+  have hc0 := ecover_transfer k η hη ((0 : ℤ), (0 : ℤ)) _ e 1 0 hr hn0 hN hc
+  exact cov_shift k η _ _ e 1 0 hr (cov_P17 k hk η hη e hn0 hc0)
+
+/-- The alias of type B2: `(2 - d, d) = (2, d + 1) - U`. -/
+theorem cov_aliasB2 (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (e : Site)
+    (hN : NativeP (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3), 2 * (k : ℤ) + 3))
+    (hc : ECover k η (2 - (2 * (k : ℤ) + 3), 2 * (k : ℤ) + 3) e) :
+    SE k η (2 - (2 * (k : ℤ) + 3), 2 * (k : ℤ) + 3) e ∧ PE k (2 - (2 * (k : ℤ) + 3), 2 * (k : ℤ) + 3) e ∧
+      CE k η (2 - (2 * (k : ℤ) + 3), 2 * (k : ℤ) + 3) e := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  have hr : (2 - (2 * (k : ℤ) + 3), 2 * (k : ℤ) + 3) = ((2 : ℤ), 2 * (k : ℤ) + 3 + 1) +
+      (Fraction.mk 1 (2 * (k : ℤ) + 3)).modifiedDeck.combine (-1) 0 := by
+    rw [combine_mk_one hd]
+    ext <;> (simp; try ring)
+  have hn0 : NativeP (2 * (k : ℤ) + 3) ((2 : ℤ), 2 * (k : ℤ) + 3 + 1) := Or.inr (Or.inr rfl)
+  have hc0 := ecover_transfer k η hη ((2 : ℤ), 2 * (k : ℤ) + 3 + 1) _ e (-1) 0 hr hn0 hN hc
+  exact cov_shift k η _ _ e (-1) 0 hr (cov_P18 k hk η hη e hc0)
+
+/-- The top row `(x, d)` for `6 - d <= x <= -2`. -/
+theorem cov_toprow (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (x : ℤ) (e : Site)
+    (hx1 : 6 - (2 * (k : ℤ) + 3) ≤ x) (hx2 : x ≤ -2) (hc : ECover k η (x, 2 * (k : ℤ) + 3) e) :
+    SE k η (x, 2 * (k : ℤ) + 3) e ∧ PE k (x, 2 * (k : ℤ) + 3) e ∧ CE k η (x, 2 * (k : ℤ) + 3) e := by
+  by_cases hpar : (x + (2 * (k : ℤ) + 3)) % 2 = 0
+  · obtain ⟨s, hs, rfl⟩ := ecover_horiz k η hη x (2 * (k : ℤ) + 3) e hpar hc
+    rcases hη with rfl | rfl <;> rcases hs with rfl | rfl
+    · exact ⟨SE_of_cls k (1) (top_p_px_p k hk x hx1 hx2).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+        PE_of_cls k (top_p_px_p k hk x hx1 hx2).2.1 (by ext <;> (simp; try ring)),
+        CE_of_cls k (1) (top_p_px_p k hk x hx1 hx2).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+    · exact ⟨SE_of_cls k (1) (top_p_mx_p k hk x hx1 hx2).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+        PE_of_cls k (top_p_mx_p k hk x hx1 hx2).2.1 (by ext <;> (simp; try ring)),
+        CE_of_cls k (1) (top_p_mx_p k hk x hx1 hx2).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+    · exact ⟨SE_of_cls k (-1) (top_m_px_m k hk x hx1 hx2).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+        PE_of_cls k (top_m_px_m k hk x hx1 hx2).2.1 (by ext <;> (simp; try ring)),
+        CE_of_cls k (-1) (top_m_px_m k hk x hx1 hx2).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+    · exact ⟨SE_of_cls k (-1) (top_m_mx_m k hk x hx1 hx2).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+        PE_of_cls k (top_m_mx_m k hk x hx1 hx2).2.1 (by ext <;> (simp; try ring)),
+        CE_of_cls k (-1) (top_m_mx_m k hk x hx1 hx2).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+  · obtain ⟨s, hs, rfl⟩ := ecover_vert k η hη x (2 * (k : ℤ) + 3) e (by omega) hc
+    rcases hη with rfl | rfl <;> rcases hs with rfl | rfl
+    · exact ⟨SE_of_cls k (1) (top_p_py_p k hk x hx1 hx2).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+        PE_of_cls k (top_p_py_p k hk x hx1 hx2).2.1 (by ext <;> (simp; try ring)),
+        CE_of_cls k (1) (top_p_py_p k hk x hx1 hx2).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+    · exact ⟨SE_of_cls k (1) (top_p_my_p k hk x hx1 hx2).1 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring)),
+        PE_of_cls k (top_p_my_p k hk x hx1 hx2).2.1 (by ext <;> (simp; try ring)),
+        CE_of_cls k (1) (top_p_my_p k hk x hx1 hx2).2.2 (by rw [smul_shortShift_recip k (1)]; ext <;> (simp; try ring))⟩
+    · exact ⟨SE_of_cls k (-1) (top_m_py_m k hk x hx1 hx2).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+        PE_of_cls k (top_m_py_m k hk x hx1 hx2).2.1 (by ext <;> (simp; try ring)),
+        CE_of_cls k (-1) (top_m_py_m k hk x hx1 hx2).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+    · exact ⟨SE_of_cls k (-1) (top_m_my_m k hk x hx1 hx2).1 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring)),
+        PE_of_cls k (top_m_my_m k hk x hx1 hx2).2.1 (by ext <;> (simp; try ring)),
+        CE_of_cls k (-1) (top_m_my_m k hk x hx1 hx2).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
+
 end FLatticePaper.EPolicy
