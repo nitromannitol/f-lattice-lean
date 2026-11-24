@@ -884,4 +884,352 @@ theorem cov_toprow (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨
         PE_of_cls k (top_m_my_m k hk x hx1 hx2).2.1 (by ext <;> (simp; try ring)),
         CE_of_cls k (-1) (top_m_my_m k hk x hx1 hx2).2.2 (by rw [smul_shortShift_recip k (-1)]; ext <;> (simp; try ring))⟩
 
+/-- The alias of type B0: the cell `(2 - d, d - 1)` is the deck translate `(2, d) - U` of the top cell `(2, d)`. -/
+theorem cov_aliasB0 (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (e : Site)
+    (hN : NativeP (2 * (k : ℤ) + 3) (2 - (2 * (k : ℤ) + 3), 2 * (k : ℤ) + 3 - 1))
+    (hc : ECover k η (2 - (2 * (k : ℤ) + 3), 2 * (k : ℤ) + 3 - 1) e) :
+    SE k η (2 - (2 * (k : ℤ) + 3), 2 * (k : ℤ) + 3 - 1) e ∧
+      PE k (2 - (2 * (k : ℤ) + 3), 2 * (k : ℤ) + 3 - 1) e ∧
+      CE k η (2 - (2 * (k : ℤ) + 3), 2 * (k : ℤ) + 3 - 1) e := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  have hr : (2 - (2 * (k : ℤ) + 3), 2 * (k : ℤ) + 3 - 1) = ((2 : ℤ), 2 * (k : ℤ) + 3) +
+      (Fraction.mk 1 (2 * (k : ℤ) + 3)).modifiedDeck.combine (-1) 0 := by
+    rw [combine_mk_one hd]
+    ext <;> (simp; try ring)
+  have hn0 : NativeP (2 * (k : ℤ) + 3) ((2 : ℤ), 2 * (k : ℤ) + 3) := by
+    unfold NativeP
+    left
+    dsimp only
+    omega
+  have hc0 := ecover_transfer k η hη ((2 : ℤ), 2 * (k : ℤ) + 3) _ e (-1) 0 hr hn0 hN hc
+  exact cov_shift k η _ _ e (-1) 0 hr (cov_P19 k hk η hη e hn0 hc0)
+
+theorem cover_ge2 (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (r : Site)
+    (hr : NativeP (2 * (k : ℤ) + 3) r) (e : Site) (hc : ECover k η r e) :
+    SE k η r e ∧ PE k r e ∧ CE k η r e := by
+  obtain ⟨x, y⟩ := r
+  have hN' := hr
+  unfold NativeP at hN'
+  simp only [Prod.mk.injEq] at hN'
+  rcases Int.emod_two_eq_zero_or_one (x + y) with h | h
+  · rcases le_or_gt x (2 - (2 * (k : ℤ) + 3)) with h | h
+    · obtain rfl : x = 2 - (2 * (k : ℤ) + 3) := by omega
+      obtain rfl : y = 2 * (k : ℤ) + 3 := by omega
+      exact cov_aliasB2 k hk η hη e hr hc
+    · rcases le_or_gt x (3 - (2 * (k : ℤ) + 3)) with h | h
+      · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 1) with h | h
+        · obtain rfl : x = (3 - (2 * (k : ℤ) + 3)) := by omega
+          obtain rfl : y = ((2 * (k : ℤ) + 3) - 1) := by omega
+          exact cov_P9 k hk η hη e hr hc
+        · obtain rfl : y = 2 * (k : ℤ) + 3 + 1 := by omega
+          exact cov_aliasA k hk η hη x e hr (by omega) (by omega) hc
+      · rcases le_or_gt x (4 - (2 * (k : ℤ) + 3)) with h | h
+        · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 2) with h | h
+          · obtain rfl : x = (4 - (2 * (k : ℤ) + 3)) := by omega
+            obtain rfl : y = ((2 * (k : ℤ) + 3) - 2) := by omega
+            exact cov_P10 k hk η hη e hr hc
+          · obtain rfl : x = (4 - (2 * (k : ℤ) + 3)) := by omega
+            obtain rfl : y = (2 * (k : ℤ) + 3) := by omega
+            exact cov_P2 k hk η hη e hc
+        · rcases le_or_gt x (5 - (2 * (k : ℤ) + 3)) with h | h
+          · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 3) with h | h
+            · obtain rfl : x = (5 - (2 * (k : ℤ) + 3)) := by omega
+              obtain rfl : y = ((2 * (k : ℤ) + 3) - 3) := by omega
+              exact cov_P11 k hk η hη e hr hc
+            · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 1) with h | h
+              · obtain rfl : x = (5 - (2 * (k : ℤ) + 3)) := by omega
+                obtain rfl : y = ((2 * (k : ℤ) + 3) - 1) := by omega
+                exact cov_P13 k hk η hη e hc
+              · obtain rfl : y = 2 * (k : ℤ) + 3 + 1 := by omega
+                exact cov_aliasA k hk η hη x e hr (by omega) (by omega) hc
+          · rcases le_or_gt x (6 - (2 * (k : ℤ) + 3)) with h | h
+            · rcases le_or_gt x (-2) with h | h
+              · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 3) with h | h
+                · exact cov_low2 k η hη x y e hr (by omega) (by omega) (by omega) hc
+                · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 2) with h | h
+                  · exact cov_interior_even k η hη x y e hr (by omega) (by omega) hc
+                  · obtain rfl : y = 2 * (k : ℤ) + 3 := by omega
+                    exact cov_toprow k hk η hη x e (by omega) (by omega) hc
+              · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 3) with h | h
+                · exact cov_low2 k η hη x y e hr (by omega) (by omega) (by omega) hc
+                · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 2) with h | h
+                  · exact cov_interior_even k η hη x y e hr (by omega) (by omega) hc
+                  · obtain rfl : x = (-1) := by omega
+                    obtain rfl : y = (2 * (k : ℤ) + 3) := by omega
+                    exact cov_P15 k hk η hη e hr hc
+            · rcases le_or_gt x ((2 * (k : ℤ) + 3) - 3) with h | h
+              · rcases le_or_gt x (-2) with h | h
+                · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 3) with h | h
+                  · rcases le_or_gt y (4) with h | h
+                    · exact cov_low2 k η hη x y e hr (by omega) (by omega) (by omega) hc
+                    · rcases le_or_gt (x + y) (2) with h | h
+                      · exact cov_low2 k η hη x y e hr (by omega) (by omega) (by omega) hc
+                      · exact cov_interior_even k η hη x y e hr (by omega) (by omega) hc
+                  · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 2) with h | h
+                    · exact cov_interior_even k η hη x y e hr (by omega) (by omega) hc
+                    · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 1) with h | h
+                      · exact cov_interior_even k η hη x y e hr (by omega) (by omega) hc
+                      · rcases le_or_gt y (2 * (k : ℤ) + 3) with h | h
+                        · obtain rfl : y = 2 * (k : ℤ) + 3 := by omega
+                          exact cov_toprow k hk η hη x e (by omega) (by omega) hc
+                        · obtain rfl : y = 2 * (k : ℤ) + 3 + 1 := by omega
+                          exact cov_aliasA k hk η hη x e hr (by omega) (by omega) hc
+                · rcases le_or_gt x (-1) with h | h
+                  · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 3) with h | h
+                    · rcases le_or_gt y (3) with h | h
+                      · exact cov_low2 k η hη x y e hr (by omega) (by omega) (by omega) hc
+                      · exact cov_interior_even k η hη x y e hr (by omega) (by omega) hc
+                    · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 2) with h | h
+                      · exact cov_interior_even k η hη x y e hr (by omega) (by omega) hc
+                      · obtain rfl : x = (-1) := by omega
+                        obtain rfl : y = (2 * (k : ℤ) + 3) := by omega
+                        exact cov_P15 k hk η hη e hr hc
+                  · rcases le_or_gt x (0) with h | h
+                    · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 3) with h | h
+                      · rcases le_or_gt y (0) with h | h
+                        · obtain rfl : x = 0 := by omega
+                          obtain rfl : y = 0 := by omega
+                          exact cov_P17 k hk η hη e hr hc
+                        · rcases le_or_gt y (2) with h | h
+                          · exact cov_low2 k η hη x y e hr (by omega) (by omega) (by omega) hc
+                          · exact cov_interior_even k η hη x y e hr (by omega) (by omega) hc
+                      · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 1) with h | h
+                        · exact cov_interior_even k η hη x y e hr (by omega) (by omega) hc
+                        · obtain rfl : y = 2 * (k : ℤ) + 3 + 1 := by omega
+                          exact cov_aliasA k hk η hη x e hr (by omega) (by omega) hc
+                    · rcases le_or_gt x (1) with h | h
+                      · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 3) with h | h
+                        · rcases le_or_gt y (1) with h | h
+                          · exact cov_low2 k η hη x y e hr (by omega) (by omega) (by omega) hc
+                          · exact cov_interior_even k η hη x y e hr (by omega) (by omega) hc
+                        · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 2) with h | h
+                          · exact cov_interior_even k η hη x y e hr (by omega) (by omega) hc
+                          · obtain rfl : x = (1) := by omega
+                            obtain rfl : y = (2 * (k : ℤ) + 3) := by omega
+                            exact cov_P16 k hk η hη e hc
+                      · rcases le_or_gt x (2) with h | h
+                        · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 3) with h | h
+                          · rcases le_or_gt y (0) with h | h
+                            · obtain rfl : y = 0 := by omega
+                              exact cov_bottom k hk η hη x e hr (by omega) (by omega) hc
+                            · exact cov_interior_even k η hη x y e hr (by omega) (by omega) hc
+                          · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 1) with h | h
+                            · exact cov_sumd1 k η hη x y e hr (by omega) (by omega) (by omega) hc
+                            · obtain rfl : x = (2) := by omega
+                              obtain rfl : y = ((2 * (k : ℤ) + 3) + 1) := by omega
+                              exact cov_P18 k hk η hη e hc
+                        · rcases le_or_gt x (3) with h | h
+                          · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 3) with h | h
+                            · exact cov_interior_even k η hη x y e hr (by omega) (by omega) hc
+                            · exact cov_sumd1 k η hη x y e hr (by omega) (by omega) (by omega) hc
+                          · rcases le_or_gt y (0) with h | h
+                            · obtain rfl : y = 0 := by omega
+                              exact cov_bottom k hk η hη x e hr (by omega) (by omega) hc
+                            · rcases le_or_gt y (1) with h | h
+                              · exact cov_interior_even k η hη x y e hr (by omega) (by omega) hc
+                              · rcases le_or_gt y (2) with h | h
+                                · exact cov_interior_even k η hη x y e hr (by omega) (by omega) hc
+                                · rcases le_or_gt y (3) with h | h
+                                  · exact cov_interior_even k η hη x y e hr (by omega) (by omega) hc
+                                  · rcases le_or_gt y (4) with h | h
+                                    · rcases le_or_gt (x + y) ((2 * (k : ℤ) + 3) - 1) with h | h
+                                      · exact cov_interior_even k η hη x y e hr (by omega) (by omega) hc
+                                      · exact cov_sumd1 k η hη x y e hr (by omega) (by omega) (by omega) hc
+                                    · rcases le_or_gt (x + y) ((2 * (k : ℤ) + 3) - 1) with h | h
+                                      · exact cov_interior_even k η hη x y e hr (by omega) (by omega) hc
+                                      · exact cov_sumd1 k η hη x y e hr (by omega) (by omega) (by omega) hc
+              · rcases le_or_gt x ((2 * (k : ℤ) + 3) - 2) with h | h
+                · rcases le_or_gt y (1) with h | h
+                  · obtain rfl : x = ((2 * (k : ℤ) + 3) - 2) := by omega
+                    obtain rfl : y = (1) := by omega
+                    exact cov_P5 k hk η hη e hc
+                  · exact cov_sumd1 k η hη x y e hr (by omega) (by omega) (by omega) hc
+                · rcases le_or_gt x ((2 * (k : ℤ) + 3) - 1) with h | h
+                  · rcases le_or_gt y (0) with h | h
+                    · obtain rfl : y = 0 := by omega
+                      exact cov_bottom k hk η hη x e hr (by omega) (by omega) hc
+                    · exact cov_sumd1 k η hη x y e hr (by omega) (by omega) (by omega) hc
+                  · obtain rfl : x = 2 * (k : ℤ) + 3 := by omega
+                    obtain rfl : y = 1 := by omega
+                    exact cov_aliasC k hk η hη e hr hc
+  · rcases le_or_gt x (2 - (2 * (k : ℤ) + 3)) with h | h
+    · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 1) with h | h
+      · obtain rfl : x = 2 - (2 * (k : ℤ) + 3) := by omega
+        obtain rfl : y = 2 * (k : ℤ) + 3 - 1 := by omega
+        exact cov_aliasB0 k hk η hη e hr hc
+      · obtain rfl : y = 2 * (k : ℤ) + 3 + 1 := by omega
+        exact cov_aliasA k hk η hη x e hr (by omega) (by omega) hc
+    · rcases le_or_gt x (3 - (2 * (k : ℤ) + 3)) with h | h
+      · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 2) with h | h
+        · obtain rfl : y = 1 - x := by omega
+          exact cov_aliasB k hk η hη x e hr (by omega) (by omega) hc
+        · obtain rfl : x = (3 - (2 * (k : ℤ) + 3)) := by omega
+          obtain rfl : y = (2 * (k : ℤ) + 3) := by omega
+          exact cov_P1 k hk η hη e hc
+      · rcases le_or_gt x (4 - (2 * (k : ℤ) + 3)) with h | h
+        · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 3) with h | h
+          · obtain rfl : y = 1 - x := by omega
+            exact cov_aliasB k hk η hη x e hr (by omega) (by omega) hc
+          · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 1) with h | h
+            · obtain rfl : x = (4 - (2 * (k : ℤ) + 3)) := by omega
+              obtain rfl : y = ((2 * (k : ℤ) + 3) - 1) := by omega
+              exact cov_P12 k hk η hη e hc
+            · obtain rfl : y = 2 * (k : ℤ) + 3 + 1 := by omega
+              exact cov_aliasA k hk η hη x e hr (by omega) (by omega) hc
+        · rcases le_or_gt x (5 - (2 * (k : ℤ) + 3)) with h | h
+          · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 3) with h | h
+            · obtain rfl : y = 1 - x := by omega
+              exact cov_aliasB k hk η hη x e hr (by omega) (by omega) hc
+            · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 2) with h | h
+              · obtain rfl : x = (5 - (2 * (k : ℤ) + 3)) := by omega
+                obtain rfl : y = ((2 * (k : ℤ) + 3) - 2) := by omega
+                exact cov_P3 k hk η hη e hc
+              · obtain rfl : x = (5 - (2 * (k : ℤ) + 3)) := by omega
+                obtain rfl : y = (2 * (k : ℤ) + 3) := by omega
+                exact cov_P4 k hk η hη e hc
+          · rcases le_or_gt x (6 - (2 * (k : ℤ) + 3)) with h | h
+            · rcases le_or_gt x (-2) with h | h
+              · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 3) with h | h
+                · rcases le_or_gt y (4) with h | h
+                  · exact cov_low1 k η hη x y e hr (by omega) (by omega) (by omega) hc
+                  · rcases le_or_gt (x + y) (1) with h | h
+                    · exact cov_low1 k η hη x y e hr (by omega) (by omega) (by omega) hc
+                    · exact cov_low3 k η hη x y e (by omega) (by omega) (by omega) hc
+                · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 1) with h | h
+                  · exact cov_interior_odd k η hη x y e (by omega) (by omega) hc
+                  · obtain rfl : y = 2 * (k : ℤ) + 3 + 1 := by omega
+                    exact cov_aliasA k hk η hη x e hr (by omega) (by omega) hc
+              · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 3) with h | h
+                · rcases le_or_gt y (2) with h | h
+                  · exact cov_low1 k η hη x y e hr (by omega) (by omega) (by omega) hc
+                  · exact cov_low3 k η hη x y e (by omega) (by omega) (by omega) hc
+                · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 1) with h | h
+                  · exact cov_interior_odd k η hη x y e (by omega) (by omega) hc
+                  · obtain rfl : y = 2 * (k : ℤ) + 3 + 1 := by omega
+                    exact cov_aliasA k hk η hη x e hr (by omega) (by omega) hc
+            · rcases le_or_gt x ((2 * (k : ℤ) + 3) - 3) with h | h
+              · rcases le_or_gt x (-2) with h | h
+                · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 3) with h | h
+                  · rcases le_or_gt y (3) with h | h
+                    · exact cov_low1 k η hη x y e hr (by omega) (by omega) (by omega) hc
+                    · rcases le_or_gt y (4) with h | h
+                      · exact cov_low1 k η hη x y e hr (by omega) (by omega) (by omega) hc
+                      · rcases le_or_gt (x + y) (1) with h | h
+                        · exact cov_low1 k η hη x y e hr (by omega) (by omega) (by omega) hc
+                        · rcases le_or_gt (x + y) (3) with h | h
+                          · exact cov_low3 k η hη x y e (by omega) (by omega) (by omega) hc
+                          · exact cov_interior_odd k η hη x y e (by omega) (by omega) hc
+                  · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 2) with h | h
+                    · exact cov_interior_odd k η hη x y e (by omega) (by omega) hc
+                    · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 1) with h | h
+                      · exact cov_interior_odd k η hη x y e (by omega) (by omega) hc
+                      · rcases le_or_gt y (2 * (k : ℤ) + 3) with h | h
+                        · obtain rfl : y = 2 * (k : ℤ) + 3 := by omega
+                          exact cov_toprow k hk η hη x e (by omega) (by omega) hc
+                        · obtain rfl : y = 2 * (k : ℤ) + 3 + 1 := by omega
+                          exact cov_aliasA k hk η hη x e hr (by omega) (by omega) hc
+                · rcases le_or_gt x (-1) with h | h
+                  · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 3) with h | h
+                    · rcases le_or_gt y (2) with h | h
+                      · exact cov_low1 k η hη x y e hr (by omega) (by omega) (by omega) hc
+                      · rcases le_or_gt y (4) with h | h
+                        · exact cov_low3 k η hη x y e (by omega) (by omega) (by omega) hc
+                        · exact cov_interior_odd k η hη x y e (by omega) (by omega) hc
+                    · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 1) with h | h
+                      · exact cov_interior_odd k η hη x y e (by omega) (by omega) hc
+                      · obtain rfl : y = 2 * (k : ℤ) + 3 + 1 := by omega
+                        exact cov_aliasA k hk η hη x e hr (by omega) (by omega) hc
+                  · rcases le_or_gt x (0) with h | h
+                    · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 3) with h | h
+                      · rcases le_or_gt y (1) with h | h
+                        · exact cov_low1 k η hη x y e hr (by omega) (by omega) (by omega) hc
+                        · rcases le_or_gt y (3) with h | h
+                          · exact cov_low3 k η hη x y e (by omega) (by omega) (by omega) hc
+                          · exact cov_interior_odd k η hη x y e (by omega) (by omega) hc
+                      · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 2) with h | h
+                        · exact cov_interior_odd k η hη x y e (by omega) (by omega) hc
+                        · obtain rfl : x = (0) := by omega
+                          obtain rfl : y = (2 * (k : ℤ) + 3) := by omega
+                          exact cov_P8 k hk η hη e hc
+                    · rcases le_or_gt x (1) with h | h
+                      · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 3) with h | h
+                        · rcases le_or_gt y (0) with h | h
+                          · obtain rfl : y = 0 := by omega
+                            exact cov_bottom k hk η hη x e hr (by omega) (by omega) hc
+                          · rcases le_or_gt y (2) with h | h
+                            · exact cov_low3 k η hη x y e (by omega) (by omega) (by omega) hc
+                            · exact cov_interior_odd k η hη x y e (by omega) (by omega) hc
+                        · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 1) with h | h
+                          · obtain rfl : x = (1) := by omega
+                            obtain rfl : y = ((2 * (k : ℤ) + 3) - 1) := by omega
+                            exact cov_P7 k hk η hη e hc
+                          · obtain rfl : y = 2 * (k : ℤ) + 3 + 1 := by omega
+                            exact cov_aliasA k hk η hη x e hr (by omega) (by omega) hc
+                      · rcases le_or_gt x (2) with h | h
+                        · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 3) with h | h
+                          · rcases le_or_gt y (1) with h | h
+                            · exact cov_low3 k η hη x y e (by omega) (by omega) (by omega) hc
+                            · exact cov_interior_odd k η hη x y e (by omega) (by omega) hc
+                          · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 2) with h | h
+                            · obtain rfl : x = (2) := by omega
+                              obtain rfl : y = ((2 * (k : ℤ) + 3) - 2) := by omega
+                              exact cov_P14 k hk η hη e hc
+                            · obtain rfl : x = 2 := by omega
+                              obtain rfl : y = 2 * (k : ℤ) + 3 := by omega
+                              exact cov_P19 k hk η hη e hr hc
+                        · rcases le_or_gt x (3) with h | h
+                          · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 3) with h | h
+                            · rcases le_or_gt y (0) with h | h
+                              · obtain rfl : y = 0 := by omega
+                                exact cov_bottom k hk η hη x e hr (by omega) (by omega) hc
+                              · rcases le_or_gt y (2) with h | h
+                                · exact cov_interior_odd k η hη x y e (by omega) (by omega) hc
+                                · rcases le_or_gt y (4) with h | h
+                                  · rcases le_or_gt (x + y) ((2 * (k : ℤ) + 3) - 1) with h | h
+                                    · exact cov_interior_odd k η hη x y e (by omega) (by omega) hc
+                                    · exact cov_sumd k η hη x y e (by omega) (by omega) (by omega) hc
+                                  · rcases le_or_gt (x + y) ((2 * (k : ℤ) + 3) - 1) with h | h
+                                    · exact cov_interior_odd k η hη x y e (by omega) (by omega) hc
+                                    · exact cov_sumd k η hη x y e (by omega) (by omega) (by omega) hc
+                            · exact cov_top k η hη x y e hr (by omega) (by omega) (by omega) hc
+                          · rcases le_or_gt y ((2 * (k : ℤ) + 3) - 3) with h | h
+                            · rcases le_or_gt y (0) with h | h
+                              · obtain rfl : y = 0 := by omega
+                                exact cov_bottom k hk η hη x e hr (by omega) (by omega) hc
+                              · rcases le_or_gt y (1) with h | h
+                                · exact cov_interior_odd k η hη x y e (by omega) (by omega) hc
+                                · rcases le_or_gt y (2) with h | h
+                                  · exact cov_interior_odd k η hη x y e (by omega) (by omega) hc
+                                  · rcases le_or_gt y (3) with h | h
+                                    · rcases le_or_gt (x + y) ((2 * (k : ℤ) + 3) - 1) with h | h
+                                      · exact cov_interior_odd k η hη x y e (by omega) (by omega) hc
+                                      · exact cov_sumd k η hη x y e (by omega) (by omega) (by omega) hc
+                                    · rcases le_or_gt y (4) with h | h
+                                      · rcases le_or_gt (x + y) ((2 * (k : ℤ) + 3) - 1) with h | h
+                                        · exact cov_interior_odd k η hη x y e (by omega) (by omega) hc
+                                        · exact cov_sumd k η hη x y e (by omega) (by omega) (by omega) hc
+                                      · rcases le_or_gt (x + y) ((2 * (k : ℤ) + 3) - 1) with h | h
+                                        · exact cov_interior_odd k η hη x y e (by omega) (by omega) hc
+                                        · rcases le_or_gt (x + y) (2 * (k : ℤ) + 3) with h | h
+                                          · exact cov_sumd k η hη x y e (by omega) (by omega) (by omega) hc
+                                          · exact cov_top k η hη x y e hr (by omega) (by omega) (by omega) hc
+                            · exact cov_top k η hη x y e hr (by omega) (by omega) (by omega) hc
+              · rcases le_or_gt x ((2 * (k : ℤ) + 3) - 2) with h | h
+                · rcases le_or_gt y (0) with h | h
+                  · obtain rfl : y = 0 := by omega
+                    exact cov_bottom k hk η hη x e hr (by omega) (by omega) hc
+                  · rcases le_or_gt y (2) with h | h
+                    · exact cov_sumd k η hη x y e (by omega) (by omega) (by omega) hc
+                    · exact cov_top k η hη x y e hr (by omega) (by omega) (by omega) hc
+                · rcases le_or_gt x ((2 * (k : ℤ) + 3) - 1) with h | h
+                  · rcases le_or_gt y (1) with h | h
+                    · obtain rfl : x = ((2 * (k : ℤ) + 3) - 1) := by omega
+                      obtain rfl : y = (1) := by omega
+                      exact cov_P6 k hk η hη e hc
+                    · exact cov_top k η hη x y e hr (by omega) (by omega) (by omega) hc
+                  · rcases le_or_gt y (0) with h | h
+                    · obtain rfl : y = 0 := by omega
+                      exact cov_bottom k hk η hη x e hr (by omega) (by omega) hc
+                    · exact cov_top k η hη x y e hr (by omega) (by omega) (by omega) hc
+
 end FLatticePaper.EPolicy
