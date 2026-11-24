@@ -170,6 +170,7 @@ import FLatticePaper.Plane.Induction.TwosEPolicy
 import FLatticePaper.Plane.Induction.TwosLaplacianTile
 import FLatticePaper.Plane.Induction.TwosNativeCopy
 import FLatticePaper.Plane.Induction.TwosQuota
+import FLatticePaper.Plane.Induction.TwosSquares
 import FLatticePaper.Construction.NearOneBaseCases
 import FLatticePaper.Construction.BaseCases
 import FLatticePaper.Construction.OffsetTables
