@@ -22,6 +22,7 @@ namespace FLatticePaper.EPolicy
 
 open FLatticePaper FLatticePaper.Induction
 open FLatticePaper.Construction
+open FLatticePaper.PureRank
 
 /-- The value inequalities of the signed policy e(-1, eta) on the reciprocal field `reciprocalField k` (the items 4 and the
 strict rank of the note): the raw slip and the price do not increase along the policy, the chain potential does not increase
@@ -413,5 +414,31 @@ theorem chain_vert_le (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1) (hs 
       (mem_raw_of_box k (x - 2 * η - 1) (y + 1 + s) (by omega)) (by omega) (by omega)]
   dsimp only
   exact vG_P y s hs
+
+/-- **Retention of a horizontal step.** For an interior even centre, a retained horizontal step is black (`x = 1`) or the
+selected step of the white centre. -/
+theorem retention_horiz (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1)
+    (hbox : 6 - (2 * (k : ℤ) + 3) ≤ x ∧ x ≤ 2 * (k : ℤ) + 3 - 3 ∧ 1 ≤ y ∧ y ≤ 2 * (k : ℤ) + 3 - 1 ∧
+      4 ≤ x + y ∧ x + y ≤ 2 * (k : ℤ) + 3 - 1)
+    (hpar : (x + y) % 2 = 0)
+    (hpol : ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) (x, y) ((x, y) + (s, 0))) :
+    x = 1 ∨ (s, 0) = selDisp (2 * (k : ℤ) + 3) η (x, y) := by
+  have hN : NativeP (2 * (k : ℤ) + 3) (x, y) := by
+    unfold NativeP
+    exact Or.inl ⟨by dsimp only; omega, by dsimp only; omega, by dsimp only; omega,
+      by dsimp only; omega, by dsimp only; omega, by dsimp only; omega⟩
+  have hE : EvenSite (x, y) := by unfold EvenSite; dsimp only; omega
+  by_cases hx : x = 1
+  · exact Or.inl hx
+  · right
+    have hw : laplacian (reciprocalField k) (x, y) = 0 := by
+      rw [laplacian_reciprocal_native k hN, if_pos hE]
+      dsimp only
+      rw [if_neg hx]
+    rw [ePolicy_white k η hη (x, y) ((x, y) + (s, 0)) hw] at hpol
+    rw [selDisp_nativeRep k η hη hN] at hpol
+    have e : (x, y) + (s, 0) - (x, y) = (s, 0) := by ext <;> (simp; try ring)
+    rw [e] at hpol
+    exact hpol
 
 end FLatticePaper.EPolicy

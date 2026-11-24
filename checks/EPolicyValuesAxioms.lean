@@ -15,3 +15,4 @@ import FLatticePaper.Plane.Induction.EPolicyValues
 #print axioms FLatticePaper.EPolicy.price_vert_le
 #print axioms FLatticePaper.EPolicy.chain_horiz_le
 #print axioms FLatticePaper.EPolicy.chain_vert_le
+#print axioms FLatticePaper.EPolicy.retention_horiz
