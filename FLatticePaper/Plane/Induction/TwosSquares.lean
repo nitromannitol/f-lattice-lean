@@ -155,4 +155,73 @@ theorem sq_of_witness {a η : ℤ} {F : Field} {u v w : Site} (hv : SqCorner u v
     (hout : SqOut u (v.1 + (candDisp a w.1 w.2).1, v.2 + (candDisp a w.1 w.2).2)) : SqClause a η F u :=
   ⟨v, hv, hlap, _, (twosSel_white_nonfree_iff hlap hnf).mpr ⟨w, hw, hwn, hg, rfl⟩, hout⟩
 
+/-- The candidate direction on the east diagonal. -/
+theorem candDisp_E {a p q : ℤ} (hE : CandE a p q) : candDisp a p q = (1, 0) := by
+  have hnL : ¬ (CandLow a p q ∨ CandHigh a p q) := by
+    simp only [CandE, CandLow, CandHigh] at hE ⊢
+    omega
+  unfold candDisp
+  rw [if_pos hE, if_neg hnL]
+
+/-- The candidate direction on the west diagonal. -/
+theorem candDisp_W {a p q : ℤ} (hW : CandW a p q) : candDisp a p q = (-1, 0) := by
+  have hnE : ¬ CandE a p q := by
+    simp only [CandE, CandW] at hW ⊢
+    omega
+  have hnL : ¬ (CandLow a p q ∨ CandHigh a p q) := by
+    simp only [CandW, CandLow, CandHigh] at hW ⊢
+    omega
+  unfold candDisp
+  rw [if_neg hnE, if_pos hW, if_neg hnL]
+
+/-- The candidate direction on the low band, below its middle row: down. -/
+theorem candDisp_low_down {a p q : ℤ} (hL : CandLow a p q) (hm : q < a - 1) : candDisp a p q = (0, -1) := by
+  have hnE : ¬ CandE a p q := by
+    simp only [CandE, CandLow] at hL ⊢
+    omega
+  have hnW : ¬ CandW a p q := by
+    simp only [CandW, CandLow] at hL ⊢
+    omega
+  unfold candDisp
+  rw [if_neg hnE, if_neg hnW, if_pos (Or.inl hL), if_pos hL, if_pos hm]
+
+/-- The candidate direction on the low band, above its middle row: up. -/
+theorem candDisp_low_up {a p q : ℤ} (hL : CandLow a p q) (hm : ¬ q < a - 1) : candDisp a p q = (0, 1) := by
+  have hnE : ¬ CandE a p q := by
+    simp only [CandE, CandLow] at hL ⊢
+    omega
+  have hnW : ¬ CandW a p q := by
+    simp only [CandW, CandLow] at hL ⊢
+    omega
+  unfold candDisp
+  rw [if_neg hnE, if_neg hnW, if_pos (Or.inl hL), if_pos hL, if_neg hm]
+
+/-- The candidate direction on the high band, below its middle row: down. -/
+theorem candDisp_high_down {a p q : ℤ} (hH : CandHigh a p q) (hm : q < 2 * a - 1) : candDisp a p q = (0, -1) := by
+  have hnE : ¬ CandE a p q := by
+    simp only [CandE, CandHigh] at hH ⊢
+    omega
+  have hnW : ¬ CandW a p q := by
+    simp only [CandW, CandHigh] at hH ⊢
+    omega
+  have hnL : ¬ CandLow a p q := by
+    simp only [CandLow, CandHigh] at hH ⊢
+    omega
+  unfold candDisp
+  rw [if_neg hnE, if_neg hnW, if_pos (Or.inr hH), if_neg hnL, if_pos hm]
+
+/-- The candidate direction on the high band, above its middle row: up. -/
+theorem candDisp_high_up {a p q : ℤ} (hH : CandHigh a p q) (hm : ¬ q < 2 * a - 1) : candDisp a p q = (0, 1) := by
+  have hnE : ¬ CandE a p q := by
+    simp only [CandE, CandHigh] at hH ⊢
+    omega
+  have hnW : ¬ CandW a p q := by
+    simp only [CandW, CandHigh] at hH ⊢
+    omega
+  have hnL : ¬ CandLow a p q := by
+    simp only [CandLow, CandHigh] at hH ⊢
+    omega
+  unfold candDisp
+  rw [if_neg hnE, if_neg hnW, if_pos (Or.inr hH), if_neg hnL, if_neg hm]
+
 end FLatticePaper.TwosEPolicy
