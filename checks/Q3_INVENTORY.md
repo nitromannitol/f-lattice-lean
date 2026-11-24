@@ -818,3 +818,37 @@ Scope to confirm with the lead: §1's star containment needs `c = d − n ≥ 3`
 - Corrects the drift entry above: the zero strip does not need the piecewise representatives; it is free from the packet.
 - Still open for StrongResidual (2^(k+1)): zeroEvenLine (needs priceRange, the drifts, and an odd seed F w = harmonicGrid w on
   sGrade = 2−3d+n), priceRange, F1_unitPrice, F1_noPriceSaddle; and BaseSlip (F1_unitSlip, F1_noSlipSaddle, slipRange).
+
+### Task 72 / twos base (recurrence and the price range of standardField (2^(k+1)), conditional on the boundary bound): TwosPriceRange.lean
+- PROVED: `twos_standardField_recurrentField k : RecurrentField (standardField (2^(k+1)))`, from `ladderOdd_exists_recurrent_extension`,
+  `rotateLadderField_recurrent`, `twos_standardField_eq_rotate` (the identity holds for any such extension S), the twos packet
+  binarity, and `recurrentField_of_recurrent`.
+- PROVED, conditional: `twos_priceRange_of_boundary k (hbd)`: `c₀ − 1 ≤ P ≤ c₀` on the closed polygon, from
+  `StrongPriceRange.priceRange_of_recurrent` with `M = F`, the packet binarity and reflection, and `twos_price_drift_kernel/transverse`.
+- NAMED INPUT `hbd`: `P ≤ c₀` on `OnBoundary E`. Checked numerically for k = 0..4 (boundary P takes only c₀ − 1 and c₀). Not proved:
+  z − parentShift leaves E for about half the boundary points, and no constant deck shift (i,j) returns it into E on a whole side
+  (checked, k = 1..4); the explicit window representatives (floor-dependent) are needed.
+- Checks: checks/TwosPriceRange.lean (axioms standard for the two lemmas; the price range is conditional on hbd).
+- NOT yet: hbd, zeroEvenLine (its seed sGrade = 2−3d+n lies outside E), F1_unitPrice and F1_noPriceSaddle (unitPrice_and_noSaddle needs
+  StarClassified, which has no twos producer), BaseSlip.
+
+### Task 72 / twos base (the native tile of standardField (2^(k+1)) and the three-shift cover of the closed polygon): TwosTileCover.lean
+- PROVED: `standardField_twos_eq_tile`: the standard field of 2^(k+1) equals the near-one closed form `paperNearLadderValue (2k+4)` at
+  every site `w` whose point `(w₁, w₂+1)` lies in `paperNearLadderTile (2k+4)`, not only on the closed polygon (from
+  `rotate_tile_identity` and `twos_standardField_eq_rotate`).
+- PROVED: `twos_shift_cover`: for `z` in the closed polygon one of `(z₁−1, z₂+d)`, `(z₁+1, z₂−d)`, `(z₁+d, z₂+2d−1)` (d = 2k+4) lies in
+  the tile: the three shifts are `z − parentShift + (0,1)`, `+ (−V)` and `+ U` (kernel U = (d+1, d−1), transverse V = (−2, 2d)).
+  Proof: `twos_E_arith` gives linear conditions on (z₁, z₂−z₁), and `twos_cover_tree` chooses the shift: `(z₁−1, z₂+d)` if
+  `0 ≤ z₁ ∧ z₂−z₁ ≤ d ∧ z₂ ≤ 2d−1`, else `(z₁+1, z₂−d)` when that is the shift, and `(z₁+d, z₂+2d−1)` on `(z₁=−1, z₂−z₁=d+1)` or `(z₁=0, z₂−z₁≤1)`.
+  The rule was checked numerically for k = 0..4 (no bad leaves on E).
+- Checks: checks/TwosTileCover.lean (axioms standard).
+- The price range of 2^(k+1) on E follows from these (explicit values, cV = 1−d²−3d, cutPrice = k²+5k+5) with no boundary bound.
+
+### Task 72 / twos base (the price range of standardField (2^(k+1)) on E: the explicit price, the closed-polygon key, partial): TwosPriceE.lean
+- PROVED: `sq_div4_add` ((q+2c)²/4 = q²/4 + qc + c²), `twos_cutPrice` (cutPrice = k²+5k+5), `twos_price_unfold` (price z = F z − F(z₁−1, z₂+2k+3) + ((k+1)z₁ − (k+2)z₂)),
+  `TwosKey` (the closed-polygon arithmetic as one predicate) and `twos_E_key` (every z in the closed polygon satisfies it).
+- NOT YET: the three case bounds of the price on E (case A: `(z₁−1, z₂+d)` in the tile; case B: `(z₁+1, z₂−d)` with the transverse constant
+  cV = 1−d²−3d and t(u); case C: `(z₁+d, z₂+2d−1)`). A direct split of the min/max and indicator branches in the case-A bound exceeded
+  400000 heartbeats (about 2^8 branches per key case); the attempt is kept out of the tree. The even zero line and the increments
+  are not started.
+- Checks: checks/TwosPriceE.lean (axioms standard; sq_div4_add uses propext only).
