@@ -1,11 +1,9 @@
 import FLatticePaper.Plane.Induction.EPolicyValues
 
-#print axioms FLatticePaper.EPolicy.reciprocalField_eq_stair
-#print axioms FLatticePaper.EPolicy.reciprocalField_add_U
-#print axioms FLatticePaper.EPolicy.reciprocalField_eq_stair_U
-#print axioms FLatticePaper.EPolicy.F_raw_pt
-#print axioms FLatticePaper.EPolicy.F_U_pt
-#print axioms FLatticePaper.EPolicy.retained_sign_sum2
-#print axioms FLatticePaper.EPolicy.diagLow_D_horiz
-#print axioms FLatticePaper.EPolicy.diagLow_P_horiz
-#print axioms FLatticePaper.EPolicy.diagLow_Phi_horiz
+#print axioms FLatticePaper.EPolicy.incr_vert_U
+#print axioms FLatticePaper.EPolicy.diagLow3_D_vert
+#print axioms FLatticePaper.EPolicy.diagLow3_P_vert
+#print axioms FLatticePaper.EPolicy.diagLow3_Phi_vert
+#print axioms FLatticePaper.EPolicy.diagLow1_D_vert
+#print axioms FLatticePaper.EPolicy.diagLow1_P_vert
+#print axioms FLatticePaper.EPolicy.diagLow1_Phi_vert

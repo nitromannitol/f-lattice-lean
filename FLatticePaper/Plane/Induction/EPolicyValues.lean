@@ -607,4 +607,176 @@ theorem diagLow_Phi_horiz (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1) 
       if_neg (not_stairCorner _ (x - 2 * -1 - 1 + -1) (y + 1) (by omega))]
     omega
 
+theorem incr_vert_U (k : ℕ) (s a b : ℤ) (hs : s = 1 ∨ s = -1)
+    (h0 : (a + (2 * (k : ℤ) + 3), b + 1) ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites)
+    (h1 : (a + (2 * (k : ℤ) + 3), b + 1 + s) ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites)
+    (c0 : ¬ ((a + (2 * (k : ℤ) + 3) = 0 ∧ b + 1 = 0) ∨ (a + (2 * (k : ℤ) + 3) = 2 ∧ b + 1 = (2 * (k : ℤ) + 3) + 1)))
+    (c1 : ¬ ((a + (2 * (k : ℤ) + 3) = 0 ∧ b + 1 + s = 0) ∨ (a + (2 * (k : ℤ) + 3) = 2 ∧ b + 1 + s = (2 * (k : ℤ) + 3) + 1))) :
+    incr (reciprocalField k) (0, s) (a, b) = vG (b + 1) s := by
+  have key := incr_vert k s (a + (2 * (k : ℤ) + 3)) (b + 1) hs h0 h1 c0 c1
+  have hA := reciprocalField_add_U k (a, b)
+  have hB := reciprocalField_add_U k ((a, b) + (0, s))
+  unfold incr at key ⊢
+  rw [← hA, ← hB]
+  have e1 : (a, b) + (0, s) + ((2 * (k : ℤ) + 3), 1) = (a + (2 * (k : ℤ) + 3), b + 1 + s) := by ext <;> (simp; try ring)
+  have e2 : (a, b) + ((2 * (k : ℤ) + 3), 1) = (a + (2 * (k : ℤ) + 3), b + 1) := by ext <;> (simp; try ring)
+  have e4 : (a + (2 * (k : ℤ) + 3), b + 1) + (0, s) = (a + (2 * (k : ℤ) + 3), b + 1 + s) := by ext <;> (simp; try ring)
+  rw [e1, e2]
+  rw [e4] at key
+  exact key
+
+theorem diagLow3_D_vert (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1) (hs : s = 1 ∨ s = -1) (hsum : x + y = 3) (hy : 1 ≤ y)
+    (hx : 6 - (2 * (k : ℤ) + 3) ≤ x) :
+    incr (reciprocalField k) (0, s) (x, y) ≤ incr (reciprocalField k) (0, s) (x - 2 * η, y) := by
+  rcases hη with rfl | rfl <;> rcases hs with rfl | rfl
+  · have hi1 := incr_vert k (1) (x) (y) (by norm_num)
+      (mem_raw_of_box k (x) (y) (by omega)) (mem_raw_of_box k (x) ((y) + (1)) (by omega))
+      (by omega) (by omega)
+    have hi2 := incr_vert k (1) (x - 2 * 1) (y) (by norm_num)
+      (mem_raw_of_box k (x - 2 * 1) (y) (by omega)) (mem_raw_of_box k (x - 2 * 1) ((y) + (1)) (by omega))
+      (by omega) (by omega)
+    linarith [vG_one y, vG_neg_one y, vG_one (y + 1), vG_neg_one (y + 1), vG_one (y + 1 + 1), vG_neg_one (y + 1 + 1)]
+  · have hi3 := incr_vert k (-1) (x) (y) (by norm_num)
+      (mem_raw_of_box k (x) (y) (by omega)) (mem_raw_of_box k (x) ((y) + (-1)) (by omega))
+      (by omega) (by omega)
+    have hi4 := incr_vert_U k (-1) (x - 2 * 1) (y) (by norm_num)
+      (mem_raw_of_box k ((x - 2 * 1) + (2 * (k : ℤ) + 3)) ((y) + 1) (by omega))
+      (mem_raw_of_box k ((x - 2 * 1) + (2 * (k : ℤ) + 3)) ((y) + 1 + (-1)) (by omega)) (by omega) (by omega)
+    linarith [vG_one y, vG_neg_one y, vG_one (y + 1), vG_neg_one (y + 1), vG_one (y + 1 + 1), vG_neg_one (y + 1 + 1)]
+  · have hi5 := incr_vert k (1) (x) (y) (by norm_num)
+      (mem_raw_of_box k (x) (y) (by omega)) (mem_raw_of_box k (x) ((y) + (1)) (by omega))
+      (by omega) (by omega)
+    have hi6 := incr_vert k (1) (x - 2 * -1) (y) (by norm_num)
+      (mem_raw_of_box k (x - 2 * -1) (y) (by omega)) (mem_raw_of_box k (x - 2 * -1) ((y) + (1)) (by omega))
+      (by omega) (by omega)
+    linarith [vG_one y, vG_neg_one y, vG_one (y + 1), vG_neg_one (y + 1), vG_one (y + 1 + 1), vG_neg_one (y + 1 + 1)]
+  · have hi7 := incr_vert k (-1) (x) (y) (by norm_num)
+      (mem_raw_of_box k (x) (y) (by omega)) (mem_raw_of_box k (x) ((y) + (-1)) (by omega))
+      (by omega) (by omega)
+    have hi8 := incr_vert k (-1) (x - 2 * -1) (y) (by norm_num)
+      (mem_raw_of_box k (x - 2 * -1) (y) (by omega)) (mem_raw_of_box k (x - 2 * -1) ((y) + (-1)) (by omega))
+      (by omega) (by omega)
+    linarith [vG_one y, vG_neg_one y, vG_one (y + 1), vG_neg_one (y + 1), vG_one (y + 1 + 1), vG_neg_one (y + 1 + 1)]
+
+theorem diagLow3_P_vert (k : ℕ) (x y s : ℤ) (hs : s = 1 ∨ s = -1) (hsum : x + y = 3) (hy : 1 ≤ y)
+    (hx : 6 - (2 * (k : ℤ) + 3) ≤ x) :
+    incr (reciprocalField k) (0, s) (x, y) - incr (reciprocalField k) (0, s) (x - 1, y + 1) ≤ s := by
+  rcases hs with rfl | rfl
+  · have hi9 := incr_vert k (1) (x) (y) (by norm_num)
+      (mem_raw_of_box k (x) (y) (by omega)) (mem_raw_of_box k (x) ((y) + (1)) (by omega))
+      (by omega) (by omega)
+    have hi10 := incr_vert k (1) (x - 1) (y + 1) (by norm_num)
+      (mem_raw_of_box k (x - 1) (y + 1) (by omega)) (mem_raw_of_box k (x - 1) ((y + 1) + (1)) (by omega))
+      (by omega) (by omega)
+    linarith [vG_one y, vG_neg_one y, vG_one (y + 1), vG_neg_one (y + 1), vG_one (y + 1 + 1), vG_neg_one (y + 1 + 1)]
+  · have hi11 := incr_vert k (-1) (x) (y) (by norm_num)
+      (mem_raw_of_box k (x) (y) (by omega)) (mem_raw_of_box k (x) ((y) + (-1)) (by omega))
+      (by omega) (by omega)
+    have hi12 := incr_vert k (-1) (x - 1) (y + 1) (by norm_num)
+      (mem_raw_of_box k (x - 1) (y + 1) (by omega)) (mem_raw_of_box k (x - 1) ((y + 1) + (-1)) (by omega))
+      (by omega) (by omega)
+    linarith [vG_one y, vG_neg_one y, vG_one (y + 1), vG_neg_one (y + 1), vG_one (y + 1 + 1), vG_neg_one (y + 1 + 1)]
+
+theorem diagLow3_Phi_vert (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1) (hs : s = 1 ∨ s = -1) (hsum : x + y = 3) (hy : 1 ≤ y)
+    (hx : 6 - (2 * (k : ℤ) + 3) ≤ x) :
+    incr (reciprocalField k) (0, s) (x, y) - incr (reciprocalField k) (0, s) (x - 2 * η - 1, y + 1) ≤ s := by
+  rcases hη with rfl | rfl <;> rcases hs with rfl | rfl
+  · have hi13 := incr_vert k (1) (x) (y) (by norm_num)
+      (mem_raw_of_box k (x) (y) (by omega)) (mem_raw_of_box k (x) ((y) + (1)) (by omega))
+      (by omega) (by omega)
+    have hi14 := incr_vert k (1) (x - 2 * 1 - 1) (y + 1) (by norm_num)
+      (mem_raw_of_box k (x - 2 * 1 - 1) (y + 1) (by omega)) (mem_raw_of_box k (x - 2 * 1 - 1) ((y + 1) + (1)) (by omega))
+      (by omega) (by omega)
+    linarith [vG_one y, vG_neg_one y, vG_one (y + 1), vG_neg_one (y + 1), vG_one (y + 1 + 1), vG_neg_one (y + 1 + 1)]
+  · have hi15 := incr_vert k (-1) (x) (y) (by norm_num)
+      (mem_raw_of_box k (x) (y) (by omega)) (mem_raw_of_box k (x) ((y) + (-1)) (by omega))
+      (by omega) (by omega)
+    have hi16 := incr_vert_U k (-1) (x - 2 * 1 - 1) (y + 1) (by norm_num)
+      (mem_raw_of_box k ((x - 2 * 1 - 1) + (2 * (k : ℤ) + 3)) ((y + 1) + 1) (by omega))
+      (mem_raw_of_box k ((x - 2 * 1 - 1) + (2 * (k : ℤ) + 3)) ((y + 1) + 1 + (-1)) (by omega)) (by omega) (by omega)
+    linarith [vG_one y, vG_neg_one y, vG_one (y + 1), vG_neg_one (y + 1), vG_one (y + 1 + 1), vG_neg_one (y + 1 + 1)]
+  · have hi17 := incr_vert k (1) (x) (y) (by norm_num)
+      (mem_raw_of_box k (x) (y) (by omega)) (mem_raw_of_box k (x) ((y) + (1)) (by omega))
+      (by omega) (by omega)
+    have hi18 := incr_vert k (1) (x - 2 * -1 - 1) (y + 1) (by norm_num)
+      (mem_raw_of_box k (x - 2 * -1 - 1) (y + 1) (by omega)) (mem_raw_of_box k (x - 2 * -1 - 1) ((y + 1) + (1)) (by omega))
+      (by omega) (by omega)
+    linarith [vG_one y, vG_neg_one y, vG_one (y + 1), vG_neg_one (y + 1), vG_one (y + 1 + 1), vG_neg_one (y + 1 + 1)]
+  · have hi19 := incr_vert k (-1) (x) (y) (by norm_num)
+      (mem_raw_of_box k (x) (y) (by omega)) (mem_raw_of_box k (x) ((y) + (-1)) (by omega))
+      (by omega) (by omega)
+    have hi20 := incr_vert k (-1) (x - 2 * -1 - 1) (y + 1) (by norm_num)
+      (mem_raw_of_box k (x - 2 * -1 - 1) (y + 1) (by omega)) (mem_raw_of_box k (x - 2 * -1 - 1) ((y + 1) + (-1)) (by omega))
+      (by omega) (by omega)
+    linarith [vG_one y, vG_neg_one y, vG_one (y + 1), vG_neg_one (y + 1), vG_one (y + 1 + 1), vG_neg_one (y + 1 + 1)]
+
+theorem diagLow1_D_vert (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1) (hsgn : s = -η) (hsum : x + y = 1) (hy : 1 ≤ y)
+    (hx : 6 - (2 * (k : ℤ) + 3) ≤ x) :
+    incr (reciprocalField k) (0, s) (x, y) ≤ incr (reciprocalField k) (0, s) (x - 2 * η, y) := by
+  rcases hη with rfl | rfl
+  · have hs' : s = -1 := by omega
+    subst hs'
+    have hi21 := incr_vert_U k (-1) (x) (y) (by norm_num)
+      (mem_raw_of_box k ((x) + (2 * (k : ℤ) + 3)) ((y) + 1) (by omega))
+      (mem_raw_of_box k ((x) + (2 * (k : ℤ) + 3)) ((y) + 1 + (-1)) (by omega)) (by omega) (by omega)
+    have hi22 := incr_vert_U k (-1) (x - 2 * 1) (y) (by norm_num)
+      (mem_raw_of_box k ((x - 2 * 1) + (2 * (k : ℤ) + 3)) ((y) + 1) (by omega))
+      (mem_raw_of_box k ((x - 2 * 1) + (2 * (k : ℤ) + 3)) ((y) + 1 + (-1)) (by omega)) (by omega) (by omega)
+    linarith [vG_one y, vG_neg_one y, vG_one (y + 1), vG_neg_one (y + 1), vG_one (y + 1 + 1), vG_neg_one (y + 1 + 1)]
+  · have hs' : s = 1 := by omega
+    subst hs'
+    have hi23 := incr_vert k (1) (x) (y) (by norm_num)
+      (mem_raw_of_box k (x) (y) (by omega)) (mem_raw_of_box k (x) ((y) + (1)) (by omega))
+      (by omega) (by omega)
+    have hi24 := incr_vert k (1) (x - 2 * -1) (y) (by norm_num)
+      (mem_raw_of_box k (x - 2 * -1) (y) (by omega)) (mem_raw_of_box k (x - 2 * -1) ((y) + (1)) (by omega))
+      (by omega) (by omega)
+    linarith [vG_one y, vG_neg_one y, vG_one (y + 1), vG_neg_one (y + 1), vG_one (y + 1 + 1), vG_neg_one (y + 1 + 1)]
+
+theorem diagLow1_P_vert (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1) (hsgn : s = -η) (hsum : x + y = 1) (hy : 1 ≤ y)
+    (hx : 6 - (2 * (k : ℤ) + 3) ≤ x) :
+    incr (reciprocalField k) (0, s) (x, y) - incr (reciprocalField k) (0, s) (x - 1, y + 1) ≤ s := by
+  rcases hη with rfl | rfl
+  · have hs' : s = -1 := by omega
+    subst hs'
+    have hi25 := incr_vert_U k (-1) (x) (y) (by norm_num)
+      (mem_raw_of_box k ((x) + (2 * (k : ℤ) + 3)) ((y) + 1) (by omega))
+      (mem_raw_of_box k ((x) + (2 * (k : ℤ) + 3)) ((y) + 1 + (-1)) (by omega)) (by omega) (by omega)
+    have hi26 := incr_vert_U k (-1) (x - 1) (y + 1) (by norm_num)
+      (mem_raw_of_box k ((x - 1) + (2 * (k : ℤ) + 3)) ((y + 1) + 1) (by omega))
+      (mem_raw_of_box k ((x - 1) + (2 * (k : ℤ) + 3)) ((y + 1) + 1 + (-1)) (by omega)) (by omega) (by omega)
+    linarith [vG_one y, vG_neg_one y, vG_one (y + 1), vG_neg_one (y + 1), vG_one (y + 1 + 1), vG_neg_one (y + 1 + 1)]
+  · have hs' : s = 1 := by omega
+    subst hs'
+    have hi27 := incr_vert k (1) (x) (y) (by norm_num)
+      (mem_raw_of_box k (x) (y) (by omega)) (mem_raw_of_box k (x) ((y) + (1)) (by omega))
+      (by omega) (by omega)
+    have hi28 := incr_vert k (1) (x - 1) (y + 1) (by norm_num)
+      (mem_raw_of_box k (x - 1) (y + 1) (by omega)) (mem_raw_of_box k (x - 1) ((y + 1) + (1)) (by omega))
+      (by omega) (by omega)
+    linarith [vG_one y, vG_neg_one y, vG_one (y + 1), vG_neg_one (y + 1), vG_one (y + 1 + 1), vG_neg_one (y + 1 + 1)]
+
+theorem diagLow1_Phi_vert (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1) (hsgn : s = -η) (hsum : x + y = 1) (hy : 1 ≤ y)
+    (hx : 6 - (2 * (k : ℤ) + 3) ≤ x) :
+    incr (reciprocalField k) (0, s) (x, y) - incr (reciprocalField k) (0, s) (x - 2 * η - 1, y + 1) ≤ s := by
+  rcases hη with rfl | rfl
+  · have hs' : s = -1 := by omega
+    subst hs'
+    have hi29 := incr_vert_U k (-1) (x) (y) (by norm_num)
+      (mem_raw_of_box k ((x) + (2 * (k : ℤ) + 3)) ((y) + 1) (by omega))
+      (mem_raw_of_box k ((x) + (2 * (k : ℤ) + 3)) ((y) + 1 + (-1)) (by omega)) (by omega) (by omega)
+    have hi30 := incr_vert_U k (-1) (x - 2 * 1 - 1) (y + 1) (by norm_num)
+      (mem_raw_of_box k ((x - 2 * 1 - 1) + (2 * (k : ℤ) + 3)) ((y + 1) + 1) (by omega))
+      (mem_raw_of_box k ((x - 2 * 1 - 1) + (2 * (k : ℤ) + 3)) ((y + 1) + 1 + (-1)) (by omega)) (by omega) (by omega)
+    linarith [vG_one y, vG_neg_one y, vG_one (y + 1), vG_neg_one (y + 1), vG_one (y + 1 + 1), vG_neg_one (y + 1 + 1)]
+  · have hs' : s = 1 := by omega
+    subst hs'
+    have hi31 := incr_vert k (1) (x) (y) (by norm_num)
+      (mem_raw_of_box k (x) (y) (by omega)) (mem_raw_of_box k (x) ((y) + (1)) (by omega))
+      (by omega) (by omega)
+    have hi32 := incr_vert k (1) (x - 2 * -1 - 1) (y + 1) (by norm_num)
+      (mem_raw_of_box k (x - 2 * -1 - 1) (y + 1) (by omega)) (mem_raw_of_box k (x - 2 * -1 - 1) ((y + 1) + (1)) (by omega))
+      (by omega) (by omega)
+    linarith [vG_one y, vG_neg_one y, vG_one (y + 1), vG_neg_one (y + 1), vG_one (y + 1 + 1), vG_neg_one (y + 1 + 1)]
+
 end FLatticePaper.EPolicy
