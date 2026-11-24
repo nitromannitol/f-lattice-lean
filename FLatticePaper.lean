@@ -513,6 +513,8 @@ import FLatticePaper.Plane.Induction.TwosResidual
 import FLatticePaper.Plane.Induction.HResN
 import FLatticePaper.Plane.Induction.FreeHWhite
 import FLatticePaper.Plane.Induction.NegTieFreeV
+import FLatticePaper.Plane.Induction.NegTieTranslate
+import FLatticePaper.Plane.Induction.NegTieSpan
 import FLatticePaper.Plane.Induction.StrongPriceInputs
 import FLatticePaper.Plane.Induction.StrongDeckSpan
 import FLatticePaper.Plane.Induction.StrongSourceRep
