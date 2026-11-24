@@ -4,6 +4,7 @@ import FLatticePaper.Plane.Induction.W1Strips
 import FLatticePaper.Plane.Induction.EPolicyFinal
 import FLatticePaper.Plane.Induction.StrongSeedInduction
 import FLatticePaper.Plane.Induction.GamesPolicy
+import FLatticePaper.Plane.Induction.TwosResidual
 
 /-! Task 71: the odometers headline with the canonical signed games at every proper word.
 
@@ -51,10 +52,7 @@ bound, Q22); the twos conjugates take the input `htwoGames`. -/
 theorem odometersTheorem_of_canonical
     (hpureSlip : ∀ k : ℕ, Induction.BaseSlip (List.replicate k Digit.three))
     (hpureRes : ∀ k : ℕ, Induction.StrongResidual (List.replicate k Digit.three))
-    (htwoSlip : ∀ k : ℕ, Induction.BaseSlip (List.replicate (k + 1) Digit.two))
-    (htwoRes : ∀ k : ℕ, Induction.StrongResidual (List.replicate (k + 1) Digit.two))
-    (htwoGames : ∀ k : ℕ, Nonempty (Induction.CanonicalSignedGames (frameAt (List.replicate (k + 1) Digit.two))
-      (standardField (List.replicate (k + 1) Digit.two))))
+    (htwoGames : ∀ k : ℕ, Induction.GamesWithRank (List.replicate (k + 1) Digit.two))
     (hgames : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word → Induction.GamesWithRank word)
     (hbd : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       ∀ z, OnBoundary (frameAt word).closedPolygon z → (frameAt word).price (standardField word) z ≤ (frameAt word).cutPrice)
@@ -71,6 +69,10 @@ theorem odometersTheorem_of_canonical
     (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       Induction.S3NoFortInputs (frameAt word) (standardField word)) :
     OdometersTheorem := by
+  -- the twos base inputs: the base slip is proved (twos_baseSlip); the residual comes from the twos games with rank
+  have htwoSlip : ∀ k : ℕ, Induction.BaseSlip (List.replicate (k + 1) Digit.two) := fun k => Induction.twos_baseSlip k
+  have htwoRes : ∀ k : ℕ, Induction.StrongResidual (List.replicate (k + 1) Digit.two) :=
+    fun k => Induction.strongResidual_twos_of_games k (htwoGames k)
   -- the canonical games of the conjugate of every proper non-two-power word
   have hcan : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       Nonempty (Induction.CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word))) := by
@@ -80,7 +82,7 @@ theorem odometersTheorem_of_canonical
     · by_cases hq : Induction.IsTwoPow (conjWord word)
       · obtain ⟨k, hk⟩ := hq
         rw [hk]
-        exact htwoGames k
+        exact Induction.games_of_gamesWithRank (htwoGames k)
       · exact Induction.games_of_gamesWithRank
           (hgames (conjWord word) (exists_ne_three_of_not_replicate_three _ hp) hq)
   -- the strong estimates and the seed fields of every word, from `hbd` and the policy of the games
@@ -100,13 +102,10 @@ theorem odometersTheorem_of_canonical
     hResP hResN hbulk
 
 /-- **The odometers theorem with the pure threes inputs discharged (task 71).** The pure threes inputs `BaseSlip` and `StrongResidual`
-come from `pure_threes_final`. The named inputs are `htwoSlip`, `htwoRes` (the twos base), `htwoGames` (the twos conjugates), `hgames`
-(the proper non-two-power words), `hbd` (Q22), `hResP`, `hResN` and `hbulk`. -/
+come from `pure_threes_final`. The named inputs are `htwoGames` (the twos games with a deck rank; the twos base slip and the twos residual
+follow from it), `hgames` (the proper non-two-power words), `hbd` (Q22), `hResP`, `hResN` and `hbulk`. -/
 theorem odometersTheorem_of_canonical_pure
-    (htwoSlip : ∀ k : ℕ, Induction.BaseSlip (List.replicate (k + 1) Digit.two))
-    (htwoRes : ∀ k : ℕ, Induction.StrongResidual (List.replicate (k + 1) Digit.two))
-    (htwoGames : ∀ k : ℕ, Nonempty (Induction.CanonicalSignedGames (frameAt (List.replicate (k + 1) Digit.two))
-      (standardField (List.replicate (k + 1) Digit.two))))
+    (htwoGames : ∀ k : ℕ, Induction.GamesWithRank (List.replicate (k + 1) Digit.two))
     (hgames : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word → Induction.GamesWithRank word)
     (hbd : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       ∀ z, OnBoundary (frameAt word).closedPolygon z → (frameAt word).price (standardField word) z ≤ (frameAt word).cutPrice)
@@ -124,6 +123,6 @@ theorem odometersTheorem_of_canonical_pure
       Induction.S3NoFortInputs (frameAt word) (standardField word)) :
     OdometersTheorem :=
   odometersTheorem_of_canonical FLatticePaper.EPolicy.pure_threes_inputs.1 FLatticePaper.EPolicy.pure_threes_inputs.2
-    htwoSlip htwoRes htwoGames hgames hbd hResP hResN hbulk
+    htwoGames hgames hbd hResP hResN hbulk
 
 end FLatticePaper
