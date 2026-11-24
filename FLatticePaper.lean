@@ -529,5 +529,6 @@ import FLatticePaper.Plane.Induction.CutRows
 import FLatticePaper.Construction.PureRank
 import FLatticePaper.Construction.PureRankWhite
 import FLatticePaper.Construction.PureRankPlus
+import FLatticePaper.Construction.PureRankPlusWhite
 
 /-! Root import for the corrected F-lattice paper. -/

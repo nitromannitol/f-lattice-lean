@@ -1,0 +1,34 @@
+import FLatticePaper.Construction.PureRankPlusWhite
+
+#print axioms FLatticePaper.PureRank.rankOfP_congr
+#print axioms FLatticePaper.PureRank.prescribedPlus_ne_zero_one
+#print axioms FLatticePaper.PureRank.not_freeHitP_zero_one
+#print axioms FLatticePaper.PureRank.retainedP_witness
+#print axioms FLatticePaper.PureRank.not_retainedP_zero_one_of_witness
+#print axioms FLatticePaper.PureRank.retainedP_free_root_eq
+#print axioms FLatticePaper.PureRank.retainedP_iff_of_noFree
+#print axioms FLatticePaper.PureRank.noFreeHitP_top_even
+#print axioms FLatticePaper.PureRank.noFreeHitP_corner
+#print axioms FLatticePaper.PureRank.noFreeHitP_fifth_left
+#print axioms FLatticePaper.PureRank.not_retainedP_top_even_right
+#print axioms FLatticePaper.PureRank.not_retainedP_corner_right
+#print axioms FLatticePaper.PureRank.not_retainedP_fifth_left
+#print axioms FLatticePaper.PureRank.qRankP
+#print axioms FLatticePaper.PureRank.qRankP_free
+#print axioms FLatticePaper.PureRank.qRankP_interior
+#print axioms FLatticePaper.PureRank.qRankP_top
+#print axioms FLatticePaper.PureRank.qRankP_top_even
+#print axioms FLatticePaper.PureRank.qRankP_top_odd
+#print axioms FLatticePaper.PureRank.qRankP_top_one
+#print axioms FLatticePaper.PureRank.qRankP_corner
+#print axioms FLatticePaper.PureRank.qRankP_anti
+#print axioms FLatticePaper.PureRank.qRankP_fifth
+#print axioms FLatticePaper.PureRank.free_root_gate_P
+#print axioms FLatticePaper.PureRank.L_top_even_P
+#print axioms FLatticePaper.PureRank.L_top_odd_P
+#print axioms FLatticePaper.PureRank.L_top_one_P
+#print axioms FLatticePaper.PureRank.L_corner_P
+#print axioms FLatticePaper.PureRank.L_anti_P
+#print axioms FLatticePaper.PureRank.L_fifth_P
+#print axioms FLatticePaper.PureRank.L_interior_P
+#print axioms FLatticePaper.PureRank.qplus_gate
