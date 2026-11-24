@@ -1,6 +1,6 @@
 import FLatticePaper.CanonicalHeadline
 
 #print axioms FLatticePaper.odometersTheorem_of_canonical_pure
-#print axioms FLatticePaper.odometersTheorem_of_canonical
-#print axioms FLatticePaper.Induction.policy_of_gamesWithRank
-#print axioms FLatticePaper.canonical_at_threes
+#print axioms FLatticePaper.Induction.strongResidual_twos_of_games
+#print axioms FLatticePaper.Induction.strongResidual_twos_of_policy
+#print axioms FLatticePaper.Induction.twos_baseSlip
