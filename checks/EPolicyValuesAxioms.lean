@@ -1,9 +1,13 @@
 import FLatticePaper.Plane.Induction.EPolicyValues
 
-#print axioms FLatticePaper.EPolicy.incr_vert_U
-#print axioms FLatticePaper.EPolicy.diagLow3_D_vert
-#print axioms FLatticePaper.EPolicy.diagLow3_P_vert
-#print axioms FLatticePaper.EPolicy.diagLow3_Phi_vert
-#print axioms FLatticePaper.EPolicy.diagLow1_D_vert
-#print axioms FLatticePaper.EPolicy.diagLow1_P_vert
-#print axioms FLatticePaper.EPolicy.diagLow1_Phi_vert
+#print axioms FLatticePaper.EPolicy.retention_horiz
+#print axioms FLatticePaper.EPolicy.retention_vert1
+#print axioms FLatticePaper.EPolicy.slip_low2_h
+#print axioms FLatticePaper.EPolicy.price_low2_h
+#print axioms FLatticePaper.EPolicy.chain_low2_h
+#print axioms FLatticePaper.EPolicy.slip_low3_v
+#print axioms FLatticePaper.EPolicy.price_low3_v
+#print axioms FLatticePaper.EPolicy.chain_low3_v
+#print axioms FLatticePaper.EPolicy.slip_low1_v
+#print axioms FLatticePaper.EPolicy.price_low1_v
+#print axioms FLatticePaper.EPolicy.chain_low1_v

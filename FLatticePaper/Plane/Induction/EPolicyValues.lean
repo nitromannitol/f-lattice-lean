@@ -419,15 +419,10 @@ theorem chain_vert_le (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1) (hs 
 /-- **Retention of a horizontal step.** For an interior even centre, a retained horizontal step is black (`x = 1`) or the
 selected step of the white centre. -/
 theorem retention_horiz (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1)
-    (hbox : 6 - (2 * (k : ℤ) + 3) ≤ x ∧ x ≤ 2 * (k : ℤ) + 3 - 3 ∧ 1 ≤ y ∧ y ≤ 2 * (k : ℤ) + 3 - 1 ∧
-      4 ≤ x + y ∧ x + y ≤ 2 * (k : ℤ) + 3 - 1)
+    (hN : NativeP (2 * (k : ℤ) + 3) (x, y))
     (hpar : (x + y) % 2 = 0)
     (hpol : ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) (x, y) ((x, y) + (s, 0))) :
     x = 1 ∨ (s, 0) = selDisp (2 * (k : ℤ) + 3) η (x, y) := by
-  have hN : NativeP (2 * (k : ℤ) + 3) (x, y) := by
-    unfold NativeP
-    exact Or.inl ⟨by dsimp only; omega, by dsimp only; omega, by dsimp only; omega,
-      by dsimp only; omega, by dsimp only; omega, by dsimp only; omega⟩
   have hE : EvenSite (x, y) := by unfold EvenSite; dsimp only; omega
   by_cases hx : x = 1
   · exact Or.inl hx
@@ -778,5 +773,136 @@ theorem diagLow1_Phi_vert (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1) 
       (mem_raw_of_box k (x - 2 * -1 - 1) (y + 1) (by omega)) (mem_raw_of_box k (x - 2 * -1 - 1) ((y + 1) + (1)) (by omega))
       (by omega) (by omega)
     linarith [vG_one y, vG_neg_one y, vG_one (y + 1), vG_neg_one (y + 1), vG_one (y + 1 + 1), vG_neg_one (y + 1 + 1)]
+
+/-- A retained vertical step at a sum-1 centre is the selected step `(0, -eta)` (the odd down step). -/
+theorem retention_vert1 (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1)
+    (hN : NativeP (2 * (k : ℤ) + 3) (x, y)) (hsum : x + y = 1) (hy : 1 ≤ y)
+    (hpol : ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) (x, y) ((x, y) + (0, s))) :
+    s = -η := by
+  have hN' := hN
+  simp only [NativeP, Prod.mk.injEq] at hN'
+  have hE : ¬ EvenSite (x, y) := by unfold EvenSite; dsimp only; omega
+  have hw : laplacian (reciprocalField k) (x, y) = 0 := by
+    rw [laplacian_reciprocal_native k hN, if_neg hE]
+    dsimp only
+    rw [if_neg]
+    omega
+  rw [ePolicy_white k η hη (x, y) ((x, y) + (0, s)) hw, selDisp_nativeRep k η hη hN] at hpol
+  have e : (x, y) + (0, s) - (x, y) = (0, s) := by ext <;> (simp; try ring)
+  rw [e] at hpol
+  unfold selDisp at hpol
+  rw [if_neg hE] at hpol
+  split_ifs at hpol with hO <;> (try simp only [Prod.mk.injEq] at hpol) <;> (try dsimp only at hO) <;> omega
+
+/-- **Lower-left diagonal, horizontal slip on the policy edge (sum 2).** -/
+theorem slip_low2_h (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1) (hs : s = 1 ∨ s = -1)
+    (hsum : x + y = 2) (hy : 1 ≤ y) (hx : 6 - (2 * (k : ℤ) + 3) ≤ x)
+    (hpol : ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) (x, y) ((x, y) + (s, 0))) :
+    (reciprocalFrame k).slip (reciprocalField k) η ((x, y) + (s, 0)) ≤ (reciprocalFrame k).slip (reciprocalField k) η (x, y) := by
+  have hN : NativeP (2 * (k : ℤ) + 3) (x, y) := by
+    unfold NativeP; left; dsimp only; omega
+  have hsign := retained_sign_sum2 k η x y s hsum hy hx (retention_horiz k η x y s hη hN (by omega) hpol)
+  apply slip_edge_le (reciprocalField k) (reciprocalFrame k) η (x, y) (s, 0)
+  rw [smul_shortShift_recip k η]
+  have e1 : (x, y) + (-2 * η, 0) = (x - 2 * η, y) := by ext <;> (simp; try ring)
+  rw [e1]
+  exact diagLow_D_horiz k η x y s hη hs hsum hy hx hsign
+
+/-- **Lower-left diagonal, horizontal price on the policy edge (sum 2).** -/
+theorem price_low2_h (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1) (hs : s = 1 ∨ s = -1)
+    (hsum : x + y = 2) (hy : 1 ≤ y) (hx : 6 - (2 * (k : ℤ) + 3) ≤ x)
+    (hpol : ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) (x, y) ((x, y) + (s, 0))) :
+    (reciprocalFrame k).price (reciprocalField k) ((x, y) + (s, 0)) ≤ (reciprocalFrame k).price (reciprocalField k) (x, y) := by
+  have hN : NativeP (2 * (k : ℤ) + 3) (x, y) := by
+    unfold NativeP; left; dsimp only; omega
+  have hsign := retained_sign_sum2 k η x y s hsum hy hx (retention_horiz k η x y s hη hN (by omega) hpol)
+  apply price_edge_le k (reciprocalField k) (x, y) (s, 0)
+  have e1 : (x, y) - (1, -1) = (x - 1, y + 1) := by ext <;> (simp; try ring)
+  rw [e1]
+  exact diagLow_P_horiz k x y s hs hsum hy hx hsign
+
+/-- **Lower-left diagonal, horizontal chain on the policy edge (sum 2).** -/
+theorem chain_low2_h (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1) (hs : s = 1 ∨ s = -1)
+    (hsum : x + y = 2) (hy : 1 ≤ y) (hx : 6 - (2 * (k : ℤ) + 3) ≤ x)
+    (hpol : ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) (x, y) ((x, y) + (s, 0))) :
+    (reciprocalFrame k).chainPotential (reciprocalField k) η ((x, y) + (s, 0)) ≤
+      (reciprocalFrame k).chainPotential (reciprocalField k) η (x, y) := by
+  have hN : NativeP (2 * (k : ℤ) + 3) (x, y) := by
+    unfold NativeP; left; dsimp only; omega
+  have hsign := retained_sign_sum2 k η x y s hsum hy hx (retention_horiz k η x y s hη hN (by omega) hpol)
+  apply chain_edge_le k (reciprocalField k) η (x, y) (s, 0)
+  rw [smul_shortShift_recip k η]
+  have e2 : (x, y) + (-2 * η, 0) - (1, -1) = (x - 2 * η - 1, y + 1) := by ext <;> (simp; try ring)
+  rw [e2]
+  exact diagLow_Phi_horiz k η x y s hη hs hsum hy hx hsign
+
+/-- **Lower-left diagonal, vertical slip on the sum-3 edges (black centres).** -/
+theorem slip_low3_v (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1) (hs : s = 1 ∨ s = -1)
+    (hsum : x + y = 3) (hy : 1 ≤ y) (hx : 6 - (2 * (k : ℤ) + 3) ≤ x) :
+    (reciprocalFrame k).slip (reciprocalField k) η ((x, y) + (0, s)) ≤ (reciprocalFrame k).slip (reciprocalField k) η (x, y) := by
+  apply slip_edge_le (reciprocalField k) (reciprocalFrame k) η (x, y) (0, s)
+  rw [smul_shortShift_recip k η]
+  have e1 : (x, y) + (-2 * η, 0) = (x - 2 * η, y) := by ext <;> (simp; try ring)
+  rw [e1]
+  exact diagLow3_D_vert k η x y s hη hs hsum hy hx
+
+/-- **Lower-left diagonal, vertical price on the sum-3 edges.** -/
+theorem price_low3_v (k : ℕ) (x y s : ℤ) (hs : s = 1 ∨ s = -1) (hsum : x + y = 3) (hy : 1 ≤ y)
+    (hx : 6 - (2 * (k : ℤ) + 3) ≤ x) :
+    (reciprocalFrame k).price (reciprocalField k) ((x, y) + (0, s)) ≤ (reciprocalFrame k).price (reciprocalField k) (x, y) := by
+  apply price_edge_le k (reciprocalField k) (x, y) (0, s)
+  have e1 : (x, y) - (1, -1) = (x - 1, y + 1) := by ext <;> (simp; try ring)
+  rw [e1]
+  exact diagLow3_P_vert k x y s hs hsum hy hx
+
+/-- **Lower-left diagonal, vertical chain on the sum-3 edges.** -/
+theorem chain_low3_v (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1) (hs : s = 1 ∨ s = -1)
+    (hsum : x + y = 3) (hy : 1 ≤ y) (hx : 6 - (2 * (k : ℤ) + 3) ≤ x) :
+    (reciprocalFrame k).chainPotential (reciprocalField k) η ((x, y) + (0, s)) ≤
+      (reciprocalFrame k).chainPotential (reciprocalField k) η (x, y) := by
+  apply chain_edge_le k (reciprocalField k) η (x, y) (0, s)
+  rw [smul_shortShift_recip k η]
+  have e2 : (x, y) + (-2 * η, 0) - (1, -1) = (x - 2 * η - 1, y + 1) := by ext <;> (simp; try ring)
+  rw [e2]
+  exact diagLow3_Phi_vert k η x y s hη hs hsum hy hx
+
+/-- **Lower-left diagonal, vertical slip on the retained sum-1 edge.** -/
+theorem slip_low1_v (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1)
+    (hN : NativeP (2 * (k : ℤ) + 3) (x, y)) (hsum : x + y = 1) (hy : 1 ≤ y)
+    (hx : 6 - (2 * (k : ℤ) + 3) ≤ x)
+    (hpol : ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) (x, y) ((x, y) + (0, s))) :
+    (reciprocalFrame k).slip (reciprocalField k) η ((x, y) + (0, s)) ≤ (reciprocalFrame k).slip (reciprocalField k) η (x, y) := by
+  have hsgn := retention_vert1 k η x y s hη hN hsum hy hpol
+  apply slip_edge_le (reciprocalField k) (reciprocalFrame k) η (x, y) (0, s)
+  rw [smul_shortShift_recip k η]
+  have e1 : (x, y) + (-2 * η, 0) = (x - 2 * η, y) := by ext <;> (simp; try ring)
+  rw [e1]
+  exact diagLow1_D_vert k η x y s hη hsgn hsum hy hx
+
+/-- **Lower-left diagonal, vertical price on the retained sum-1 edge.** -/
+theorem price_low1_v (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1)
+    (hN : NativeP (2 * (k : ℤ) + 3) (x, y)) (hsum : x + y = 1) (hy : 1 ≤ y)
+    (hx : 6 - (2 * (k : ℤ) + 3) ≤ x)
+    (hpol : ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) (x, y) ((x, y) + (0, s))) :
+    (reciprocalFrame k).price (reciprocalField k) ((x, y) + (0, s)) ≤ (reciprocalFrame k).price (reciprocalField k) (x, y) := by
+  have hsgn := retention_vert1 k η x y s hη hN hsum hy hpol
+  apply price_edge_le k (reciprocalField k) (x, y) (0, s)
+  have e1 : (x, y) - (1, -1) = (x - 1, y + 1) := by ext <;> (simp; try ring)
+  rw [e1]
+  exact diagLow1_P_vert k η x y s hη hsgn hsum hy hx
+
+/-- **Lower-left diagonal, vertical chain on the retained sum-1 edge.** -/
+theorem chain_low1_v (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1)
+    (hN : NativeP (2 * (k : ℤ) + 3) (x, y)) (hsum : x + y = 1) (hy : 1 ≤ y)
+    (hx : 6 - (2 * (k : ℤ) + 3) ≤ x)
+    (hpol : ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) (x, y) ((x, y) + (0, s))) :
+    (reciprocalFrame k).chainPotential (reciprocalField k) η ((x, y) + (0, s)) ≤
+      (reciprocalFrame k).chainPotential (reciprocalField k) η (x, y) := by
+  have hsgn := retention_vert1 k η x y s hη hN hsum hy hpol
+  apply chain_edge_le k (reciprocalField k) η (x, y) (0, s)
+  rw [smul_shortShift_recip k η]
+  have e2 : (x, y) + (-2 * η, 0) - (1, -1) = (x - 2 * η - 1, y + 1) := by ext <;> (simp; try ring)
+  rw [e2]
+  exact diagLow1_Phi_vert k η x y s hη hsgn hsum hy hx
 
 end FLatticePaper.EPolicy
