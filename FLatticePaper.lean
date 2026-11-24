@@ -548,5 +548,6 @@ import FLatticePaper.Plane.Induction.EPolicyFields
 import FLatticePaper.Plane.Induction.EPolicyFreeV
 import FLatticePaper.Plane.Induction.EPolicyPrescribed
 import FLatticePaper.Plane.Induction.EPolicySquares
+import FLatticePaper.Plane.Induction.EPolicyValues
 
 /-! Root import for the corrected F-lattice paper. -/
