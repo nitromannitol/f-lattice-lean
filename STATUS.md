@@ -445,6 +445,7 @@ lake env lean checks/VerticalAxioms.lean
 lake env lean checks/MarksInAxioms.lean
 lake env lean checks/SeamBaseAxioms.lean
 lake env lean checks/InterfaceStackedAxioms.lean
+lake env lean checks/StringCornersAxioms.lean
 lake env lean checks/VArcLongitudinal.lean
 lake env lean checks/VArcOffers.lean
 lake env lean checks/ParentStepDischarge.lean
