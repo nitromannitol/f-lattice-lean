@@ -111,4 +111,76 @@ theorem squareClause_all (k : ℕ) (η : ℤ) (hη : η = 1 ∨ η = -1)
   rw [h1, h2] at hy
   exact hy
 
+/-- The selection of a deck translate of a native site: `selF (r + l) = (r + l) + selDisp r` for a native `r`. -/
+theorem selF_deck_native (k : ℕ) (η : ℤ) (hη : η = 1 ∨ η = -1) {r : ℤ × ℤ} (hr : NativeP (2 * (k : ℤ) + 3) r) (i j : ℤ) :
+    selF k η (r + (Fraction.mk 1 (2 * (k : ℤ) + 3)).modifiedDeck.combine i j) =
+      r + (Fraction.mk 1 (2 * (k : ℤ) + 3)).modifiedDeck.combine i j + selDisp (2 * (k : ℤ) + 3) η r := by
+  have h1 : selF k η (r + (Fraction.mk 1 (2 * (k : ℤ) + 3)).modifiedDeck.combine i j) =
+      selF k η r + (Fraction.mk 1 (2 * (k : ℤ) + 3)).modifiedDeck.combine i j := by
+    unfold selF
+    rw [selDisp_nativeRep_deck k η hη r i j]
+    abel
+  have h2 : selF k η r = r + selDisp (2 * (k : ℤ) + 3) η r := by
+    unfold selF
+    rw [selDisp_nativeRep k η hη hr]
+  rw [h1, h2]
+  abel
+
+/-- A witness of the unit square clause: a corner `w = r + l` (`r` native, `l` a deck vector) that is white and whose selected
+input `w + selDisp r` leaves the square. -/
+theorem squareClause_of_rep (k : ℕ) (η : ℤ) (hη : η = 1 ∨ η = -1) (a b : ℤ) {w r : ℤ × ℤ}
+    (hw : w ∈ squareCorners a b) (hr : NativeP (2 * (k : ℤ) + 3) r) (i j : ℤ)
+    (hwr : w = r + (Fraction.mk 1 (2 * (k : ℤ) + 3)).modifiedDeck.combine i j)
+    (hlap : laplacian (reciprocalField k) r = 0)
+    (hout : r + (Fraction.mk 1 (2 * (k : ℤ) + 3)).modifiedDeck.combine i j + selDisp (2 * (k : ℤ) + 3) η r ∉
+      squareCorners a b) :
+    SquareClauseSat (reciprocalField k) (selF k η) a b := by
+  intro hall
+  have hk := hall w hw
+  unfold keptInside at hk
+  have hwl : laplacian (reciprocalField k) w = 0 := by
+    rw [hwr, laplacian_reciprocal_deck k r i j]
+    exact hlap
+  rw [if_neg (by rw [hwl]; norm_num)] at hk
+  rw [hwr, selF_deck_native k η hη hr i j] at hk
+  exact hout hk
+
+/-- A native site whose laplacian is zero (a white site), from its even/odd and band conditions. -/
+theorem lap_zero_of_native (k : ℕ) {r : ℤ × ℤ} (hr : NativeP (2 * (k : ℤ) + 3) r)
+    (h : (EvenSite r → r.1 ≠ 1) ∧
+      (¬ EvenSite r → ¬ (0 < r.2 ∧ r.2 < (2 * (k : ℤ) + 3) + 1 ∧ 1 < r.1 + r.2 ∧ r.1 + r.2 < (2 * (k : ℤ) + 3) + 2))) :
+    laplacian (reciprocalField k) r = 0 := by
+  rw [laplacian_reciprocal_native k hr]
+  by_cases he : EvenSite r
+  · rw [if_pos he, if_neg (h.1 he)]
+  · rw [if_neg he, if_neg (h.2 he)]
+
+/-- A witness rule for the native lower-left square `(a, b)`: the corner `(a + p, b + q)` equals the native site
+`r = (a + p, b + q) - (i U + j V)` shifted by the deck vector `i U + j V`, with `r` white and the selected input outside. -/
+theorem square_rule (k : ℕ) (η : ℤ) (hη : η = 1 ∨ η = -1) (a b p q i j : ℤ) (hp : p = 0 ∨ p = 1) (hq : q = 0 ∨ q = 1)
+    (hr : NativeP (2 * (k : ℤ) + 3)
+      (a + p - (i * (2 * (k : ℤ) + 3) + j * (1 - (2 * (k : ℤ) + 3))), b + q - (i + j * (1 + (2 * (k : ℤ) + 3)))))
+    (hwhite : ((EvenSite (a + p - (i * (2 * (k : ℤ) + 3) + j * (1 - (2 * (k : ℤ) + 3))),
+          b + q - (i + j * (1 + (2 * (k : ℤ) + 3)))) →
+          a + p - (i * (2 * (k : ℤ) + 3) + j * (1 - (2 * (k : ℤ) + 3))) ≠ 1) ∧
+        (¬ EvenSite (a + p - (i * (2 * (k : ℤ) + 3) + j * (1 - (2 * (k : ℤ) + 3))),
+          b + q - (i + j * (1 + (2 * (k : ℤ) + 3)))) → ¬ (0 < b + q - (i + j * (1 + (2 * (k : ℤ) + 3))) ∧
+          b + q - (i + j * (1 + (2 * (k : ℤ) + 3))) < (2 * (k : ℤ) + 3) + 1 ∧
+          1 < (a + p - (i * (2 * (k : ℤ) + 3) + j * (1 - (2 * (k : ℤ) + 3)))) + (b + q - (i + j * (1 + (2 * (k : ℤ) + 3)))) ∧
+          (a + p - (i * (2 * (k : ℤ) + 3) + j * (1 - (2 * (k : ℤ) + 3)))) + (b + q - (i + j * (1 + (2 * (k : ℤ) + 3)))) <
+            (2 * (k : ℤ) + 3) + 2))))
+    (hout : (a + p - (i * (2 * (k : ℤ) + 3) + j * (1 - (2 * (k : ℤ) + 3))), b + q - (i + j * (1 + (2 * (k : ℤ) + 3)))) +
+        (Fraction.mk 1 (2 * (k : ℤ) + 3)).modifiedDeck.combine i j +
+        selDisp (2 * (k : ℤ) + 3) η (a + p - (i * (2 * (k : ℤ) + 3) + j * (1 - (2 * (k : ℤ) + 3))),
+          b + q - (i + j * (1 + (2 * (k : ℤ) + 3)))) ∉ squareCorners a b) :
+    SquareClauseSat (reciprocalField k) (selF k η) a b := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  have hw : (a + p, b + q) ∈ squareCorners a b := by
+    rcases hp with rfl | rfl <;> rcases hq with rfl | rfl <;> simp [squareCorners]
+  have hwr : (a + p, b + q) = (a + p - (i * (2 * (k : ℤ) + 3) + j * (1 - (2 * (k : ℤ) + 3))),
+      b + q - (i + j * (1 + (2 * (k : ℤ) + 3)))) + (Fraction.mk 1 (2 * (k : ℤ) + 3)).modifiedDeck.combine i j := by
+    rw [combine_mk_one hd]
+    ext <;> simp only [Prod.fst_add, Prod.snd_add] <;> ring
+  exact squareClause_of_rep k η hη a b hw hr i j hwr (lap_zero_of_native k hr hwhite) hout
+
 end FLatticePaper.EPolicy
