@@ -52,7 +52,6 @@ private theorem stairEvenAlt_diagonal_mem_span {den : ℤ} (hodd : den % 2 = 1) 
   rw [reciprocalEvenDeck_eq hodd]
   exact ⟨1, 1, by apply Prod.ext <;> simp only [PeriodDeck.combine, one_mul] <;> omega⟩
 
-set_option maxHeartbeats 1000000 in
 private theorem stairEvenAlt_rank_even_black {den x y : ℤ} (hden : BaseMask.stairEvenAlt.Valid den)
     {correction : Field} (hcorrect : ∀ point ∈ (BaseMask.stairEvenAlt.raw den).sites,
       correction point = stairEvenAltRankCorrection den point)
@@ -92,13 +91,34 @@ private theorem stairEvenAlt_rank_even_black {den x y : ℤ} (hden : BaseMask.st
     rw [hcorrect _ hleft', rankCorrection_sub_representative hcorrect hperiodic hU _ hright']
     constructor <;> alternate_staircase_rank
 
-set_option maxHeartbeats 1000000 in
-private theorem stairEvenAlt_rank_even_white {den x y : ℤ} (hden : BaseMask.stairEvenAlt.Valid den)
+private theorem stairEvenAlt_rank_even_white_left {den x y : ℤ} (hden : BaseMask.stairEvenAlt.Valid den)
+    {correction : Field} (hcorrect : ∀ point ∈ (BaseMask.stairEvenAlt.raw den).sites,
+      correction point = stairEvenAltRankCorrection den point)
+    (_hperiodic : ∀ step ∈ (reciprocalEvenDeck den).span, Function.Periodic correction step)
+    (hpoint : (x, y) ∈ (BaseMask.stairEvenAlt.raw den).sites)
+    (heven : (x + y) % 2 = 0) (_hwhite : ¬ StairEvenAltEvenBlack den (x, y))
+    (hl : StairEvenAltLeftHigh den (x, y)) :
+    6 * (x - 1) + correction (x - 1, y) < 6 * x + correction (x, y) ∨
+    6 * (x + 1) + correction (x + 1, y) < 6 * x + correction (x, y) := by
+  have ⟨hmin, hodd⟩ := hden
+  obtain ⟨hx, hy, hshape⟩ := BaseMask.mem_stairEvenAlt_raw_iff.mp hpoint
+  dsimp only at hx hy hshape
+  rw [hcorrect _ hpoint]
+  have hU := stairEvenAlt_kernel_mem_span hodd
+  simp only [StairEvenAltLeftHigh] at hl
+  right
+  have hright : (x + 1, y) ∈ (BaseMask.stairEvenAlt.raw den).sites := by alternate_staircase_mem
+  rw [hcorrect _ hright]
+  alternate_staircase_rank
+
+
+private theorem stairEvenAlt_rank_even_white_right {den x y : ℤ} (hden : BaseMask.stairEvenAlt.Valid den)
     {correction : Field} (hcorrect : ∀ point ∈ (BaseMask.stairEvenAlt.raw den).sites,
       correction point = stairEvenAltRankCorrection den point)
     (hperiodic : ∀ step ∈ (reciprocalEvenDeck den).span, Function.Periodic correction step)
     (hpoint : (x, y) ∈ (BaseMask.stairEvenAlt.raw den).sites)
-    (heven : (x + y) % 2 = 0) (hwhite : ¬ StairEvenAltEvenBlack den (x, y)) :
+    (heven : (x + y) % 2 = 0) (hwhite : ¬ StairEvenAltEvenBlack den (x, y))
+    (hl : ¬ StairEvenAltLeftHigh den (x, y)) (hr : StairEvenAltRightHigh den (x, y)) :
     6 * (x - 1) + correction (x - 1, y) < 6 * x + correction (x, y) ∨
     6 * (x + 1) + correction (x + 1, y) < 6 * x + correction (x, y) := by
   have ⟨hmin, hodd⟩ := hden
@@ -107,34 +127,59 @@ private theorem stairEvenAlt_rank_even_white {den x y : ℤ} (hden : BaseMask.st
   simp only [StairEvenAltEvenBlack] at hwhite
   rw [hcorrect _ hpoint]
   have hU := stairEvenAlt_kernel_mem_span hodd
-  by_cases hl : StairEvenAltLeftHigh den (x, y)
-  · simp only [StairEvenAltLeftHigh] at hl
-    right
-    have hright : (x + 1, y) ∈ (BaseMask.stairEvenAlt.raw den).sites := by alternate_staircase_mem
+  simp only [StairEvenAltRightHigh] at hr
+  right
+  by_cases hend : x = den
+  · have hyOne : y = 1 := by omega
+    have hright : ((x + 1, y) : Site) - (den, 1) ∈ (BaseMask.stairEvenAlt.raw den).sites := by
+      alternate_staircase_mem
+    rw [rankCorrection_sub_representative hcorrect hperiodic hU _ hright]
+    alternate_staircase_rank
+  · have hright : (x + 1, y) ∈ (BaseMask.stairEvenAlt.raw den).sites := by alternate_staircase_mem
     rw [hcorrect _ hright]
     alternate_staircase_rank
+
+
+set_option maxHeartbeats 400000 in
+private theorem stairEvenAlt_rank_even_white_center {den x y : ℤ} (hden : BaseMask.stairEvenAlt.Valid den)
+    {correction : Field} (hcorrect : ∀ point ∈ (BaseMask.stairEvenAlt.raw den).sites,
+      correction point = stairEvenAltRankCorrection den point)
+    (hperiodic : ∀ step ∈ (reciprocalEvenDeck den).span, Function.Periodic correction step)
+    (hpoint : (x, y) ∈ (BaseMask.stairEvenAlt.raw den).sites)
+    (heven : (x + y) % 2 = 0) (hwhite : ¬ StairEvenAltEvenBlack den (x, y))
+    (hl : ¬ StairEvenAltLeftHigh den (x, y)) (hr : ¬ StairEvenAltRightHigh den (x, y)) :
+    6 * (x - 1) + correction (x - 1, y) < 6 * x + correction (x, y) ∨
+    6 * (x + 1) + correction (x + 1, y) < 6 * x + correction (x, y) := by
+  have ⟨hmin, hodd⟩ := hden
+  obtain ⟨hx, hy, hshape⟩ := BaseMask.mem_stairEvenAlt_raw_iff.mp hpoint
+  dsimp only at hx hy hshape
+  simp only [StairEvenAltEvenBlack] at hwhite
+  rw [hcorrect _ hpoint]
+  have hU := stairEvenAlt_kernel_mem_span hodd
+  simp only [StairEvenAltLeftHigh, StairEvenAltRightHigh] at hl hr
+  left
+  by_cases hend : x = 4 - 2 * den ∧ y = den - 1
+  · have hleft : ((x - 1, y) : Site) + (den, 1) ∈ (BaseMask.stairEvenAlt.raw den).sites := by
+      alternate_staircase_mem
+    rw [rankCorrection_add_representative hcorrect hperiodic hU _ hleft]
+    alternate_staircase_rank
+  · have hleft : (x - 1, y) ∈ (BaseMask.stairEvenAlt.raw den).sites := by alternate_staircase_mem
+    rw [hcorrect _ hleft]
+    rcases hshape with h | h | h | h | h <;> alternate_staircase_rank
+
+private theorem stairEvenAlt_rank_even_white {den x y : ℤ} (hden : BaseMask.stairEvenAlt.Valid den)
+    {correction : Field} (hcorrect : ∀ point ∈ (BaseMask.stairEvenAlt.raw den).sites,
+      correction point = stairEvenAltRankCorrection den point)
+    (hperiodic : ∀ step ∈ (reciprocalEvenDeck den).span, Function.Periodic correction step)
+    (hpoint : (x, y) ∈ (BaseMask.stairEvenAlt.raw den).sites)
+    (heven : (x + y) % 2 = 0) (hwhite : ¬ StairEvenAltEvenBlack den (x, y)) :
+    6 * (x - 1) + correction (x - 1, y) < 6 * x + correction (x, y) ∨
+    6 * (x + 1) + correction (x + 1, y) < 6 * x + correction (x, y) := by
+  by_cases hl : StairEvenAltLeftHigh den (x, y)
+  · exact stairEvenAlt_rank_even_white_left hden hcorrect hperiodic hpoint heven hwhite hl
   · by_cases hr : StairEvenAltRightHigh den (x, y)
-    · simp only [StairEvenAltRightHigh] at hr
-      right
-      by_cases hend : x = den
-      · have hyOne : y = 1 := by omega
-        have hright : ((x + 1, y) : Site) - (den, 1) ∈ (BaseMask.stairEvenAlt.raw den).sites := by
-          alternate_staircase_mem
-        rw [rankCorrection_sub_representative hcorrect hperiodic hU _ hright]
-        alternate_staircase_rank
-      · have hright : (x + 1, y) ∈ (BaseMask.stairEvenAlt.raw den).sites := by alternate_staircase_mem
-        rw [hcorrect _ hright]
-        alternate_staircase_rank
-    · simp only [StairEvenAltLeftHigh, StairEvenAltRightHigh] at hl hr
-      left
-      by_cases hend : x = 4 - 2 * den ∧ y = den - 1
-      · have hleft : ((x - 1, y) : Site) + (den, 1) ∈ (BaseMask.stairEvenAlt.raw den).sites := by
-          alternate_staircase_mem
-        rw [rankCorrection_add_representative hcorrect hperiodic hU _ hleft]
-        alternate_staircase_rank
-      · have hleft : (x - 1, y) ∈ (BaseMask.stairEvenAlt.raw den).sites := by alternate_staircase_mem
-        rw [hcorrect _ hleft]
-        rcases hshape with h | h | h | h | h <;> alternate_staircase_rank
+    · exact stairEvenAlt_rank_even_white_right hden hcorrect hperiodic hpoint heven hwhite hl hr
+    · exact stairEvenAlt_rank_even_white_center hden hcorrect hperiodic hpoint heven hwhite hl hr
 
 private theorem stairEvenAlt_rankCorrection_eq_parity {den x y : ℤ}
     (hfirst : ¬ ((x = 1 - den ∧ y = 0) ∨ (x = 1 ∧ y = 1)))
@@ -144,12 +189,12 @@ private theorem stairEvenAlt_rankCorrection_eq_parity {den x y : ℤ}
     stairEvenAltRankCorrection den (x, y) = (x + y) % 2 := by
   simp only [stairEvenAltRankCorrection, if_neg hfirst, if_neg hcorner, if_neg hdiag, if_neg hl, if_neg hr]
 
-set_option maxHeartbeats 1000000 in
-private theorem stairEvenAlt_rank_odd_black {den x y : ℤ} (hden : BaseMask.stairEvenAlt.Valid den)
+private theorem stairEvenAlt_rank_odd_black_left {den x y : ℤ} (hden : BaseMask.stairEvenAlt.Valid den)
     {correction : Field} (hcorrect : ∀ point ∈ (BaseMask.stairEvenAlt.raw den).sites,
       correction point = stairEvenAltRankCorrection den point)
     (hpoint : (x, y) ∈ (BaseMask.stairEvenAlt.raw den).sites)
-    (hoddSite : (x + y) % 2 ≠ 0) (hblack : ¬ StairEvenAltOddWhite den (x, y)) :
+    (hoddSite : (x + y) % 2 ≠ 0) (hblack : ¬ StairEvenAltOddWhite den (x, y))
+    (hl : StairEvenAltLeftHigh den (x, y)) :
     correction (x, y - 1) < correction (x, y) ∧ correction (x, y + 1) < correction (x, y) := by
   have ⟨hmin, hodd⟩ := hden
   obtain ⟨hx, hy, hshape⟩ := BaseMask.mem_stairEvenAlt_raw_iff.mp hpoint
@@ -161,32 +206,81 @@ private theorem stairEvenAlt_rank_odd_black {den x y : ℤ} (hden : BaseMask.sta
   have hup : (x, y + 1) ∈ (BaseMask.stairEvenAlt.raw den).sites := by alternate_staircase_mem
   rw [hcorrect _ hpoint, hcorrect _ hdown, hcorrect _ hup]
   clear hcorrect hpoint hdown hup
-  by_cases hl : StairEvenAltLeftHigh den (x, y)
-  · simp only [StairEvenAltLeftHigh] at hl
-    constructor <;> alternate_staircase_rank
-  · by_cases hr : StairEvenAltRightHigh den (x, y)
-    · simp only [StairEvenAltLeftHigh, StairEvenAltRightHigh] at hl hr
-      constructor <;> alternate_staircase_rank
-    · simp only [StairEvenAltLeftHigh, StairEvenAltRightHigh] at hl hr
-      have hcenter : stairEvenAltRankCorrection den (x, y) = (x + y) % 2 := by
-        apply stairEvenAlt_rankCorrection_eq_parity
-        all_goals
-          try simp only [StairEvenAltLeftHigh, StairEvenAltRightHigh]
-          omega
-      have hlower : stairEvenAltRankCorrection den (x, y - 1) = (x + (y - 1)) % 2 := by
-        apply stairEvenAlt_rankCorrection_eq_parity
-        all_goals
-          try simp only [StairEvenAltLeftHigh, StairEvenAltRightHigh]
-          omega
-      have hupper : stairEvenAltRankCorrection den (x, y + 1) = (x + (y + 1)) % 2 := by
-        apply stairEvenAlt_rankCorrection_eq_parity
-        all_goals
-          try simp only [StairEvenAltLeftHigh, StairEvenAltRightHigh]
-          omega
-      rw [hcenter, hlower, hupper]
-      omega
+  simp only [StairEvenAltLeftHigh] at hl
+  constructor <;> alternate_staircase_rank
 
-set_option maxHeartbeats 1000000 in
+
+set_option maxHeartbeats 400000 in
+private theorem stairEvenAlt_rank_odd_black_right {den x y : ℤ} (hden : BaseMask.stairEvenAlt.Valid den)
+    {correction : Field} (hcorrect : ∀ point ∈ (BaseMask.stairEvenAlt.raw den).sites,
+      correction point = stairEvenAltRankCorrection den point)
+    (hpoint : (x, y) ∈ (BaseMask.stairEvenAlt.raw den).sites)
+    (hoddSite : (x + y) % 2 ≠ 0) (hblack : ¬ StairEvenAltOddWhite den (x, y))
+    (hl : ¬ StairEvenAltLeftHigh den (x, y)) (hr : StairEvenAltRightHigh den (x, y)) :
+    correction (x, y - 1) < correction (x, y) ∧ correction (x, y + 1) < correction (x, y) := by
+  have ⟨hmin, hodd⟩ := hden
+  obtain ⟨hx, hy, hshape⟩ := BaseMask.mem_stairEvenAlt_raw_iff.mp hpoint
+  dsimp only at hx hy hshape
+  simp only [StairEvenAltOddWhite] at hblack
+  have hbody : 0 ≤ y ∧ y ≤ den ∧ 2 - den ≤ x + y ∧ x + y ≤ den + 2 := by omega
+  clear hshape
+  have hdown : (x, y - 1) ∈ (BaseMask.stairEvenAlt.raw den).sites := by alternate_staircase_mem
+  have hup : (x, y + 1) ∈ (BaseMask.stairEvenAlt.raw den).sites := by alternate_staircase_mem
+  rw [hcorrect _ hpoint, hcorrect _ hdown, hcorrect _ hup]
+  clear hcorrect hpoint hdown hup
+  simp only [StairEvenAltLeftHigh, StairEvenAltRightHigh] at hl hr
+  constructor <;> alternate_staircase_rank
+
+
+set_option maxHeartbeats 400000 in
+private theorem stairEvenAlt_rank_odd_black_center {den x y : ℤ} (hden : BaseMask.stairEvenAlt.Valid den)
+    {correction : Field} (hcorrect : ∀ point ∈ (BaseMask.stairEvenAlt.raw den).sites,
+      correction point = stairEvenAltRankCorrection den point)
+    (hpoint : (x, y) ∈ (BaseMask.stairEvenAlt.raw den).sites)
+    (hoddSite : (x + y) % 2 ≠ 0) (hblack : ¬ StairEvenAltOddWhite den (x, y))
+    (hl : ¬ StairEvenAltLeftHigh den (x, y)) (hr : ¬ StairEvenAltRightHigh den (x, y)) :
+    correction (x, y - 1) < correction (x, y) ∧ correction (x, y + 1) < correction (x, y) := by
+  have ⟨hmin, hodd⟩ := hden
+  obtain ⟨hx, hy, hshape⟩ := BaseMask.mem_stairEvenAlt_raw_iff.mp hpoint
+  dsimp only at hx hy hshape
+  simp only [StairEvenAltOddWhite] at hblack
+  have hbody : 0 ≤ y ∧ y ≤ den ∧ 2 - den ≤ x + y ∧ x + y ≤ den + 2 := by omega
+  clear hshape
+  have hdown : (x, y - 1) ∈ (BaseMask.stairEvenAlt.raw den).sites := by alternate_staircase_mem
+  have hup : (x, y + 1) ∈ (BaseMask.stairEvenAlt.raw den).sites := by alternate_staircase_mem
+  rw [hcorrect _ hpoint, hcorrect _ hdown, hcorrect _ hup]
+  clear hcorrect hpoint hdown hup
+  simp only [StairEvenAltLeftHigh, StairEvenAltRightHigh] at hl hr
+  have hcenter : stairEvenAltRankCorrection den (x, y) = (x + y) % 2 :=
+    stairEvenAlt_rankCorrection_eq_parity (den := den) (x := x) (y := y)
+      (by clear * - hmin hodd hx hy hoddSite; omega) (by clear * - hmin hodd hx hy hbody; omega) (by clear * - hmin hodd hx hy hoddSite; omega)
+      (by simp only [StairEvenAltLeftHigh]; clear * - hmin hodd hx hy hl; omega)
+      (by simp only [StairEvenAltRightHigh]; clear * - hmin hodd hx hy hr; omega)
+  have hlower : stairEvenAltRankCorrection den (x, y - 1) = (x + (y - 1)) % 2 :=
+    stairEvenAlt_rankCorrection_eq_parity (den := den) (x := x) (y := y - 1)
+      (by clear * - hmin hodd hx hy hblack; omega) (by clear * - hmin hodd hx hy hbody; omega) (by clear * - hmin hodd hx hy hblack; omega)
+      (by simp only [StairEvenAltLeftHigh]; clear * - hmin hodd hx hy hl hoddSite; omega)
+      (by simp only [StairEvenAltRightHigh]; clear * - hmin hodd hx hy hbody hr; omega)
+  have hupper : stairEvenAltRankCorrection den (x, y + 1) = (x + (y + 1)) % 2 :=
+    stairEvenAlt_rankCorrection_eq_parity (den := den) (x := x) (y := y + 1)
+      (by clear * - hmin hodd hx hy hblack; omega) (by clear * - hmin hodd hx hy hblack; omega) (by clear * - hmin hodd hx hy hblack; omega)
+      (by simp only [StairEvenAltLeftHigh]; clear * - hmin hodd hx hy hbody hl; omega)
+      (by simp only [StairEvenAltRightHigh]; clear * - hmin hodd hx hy hblack hr; omega)
+  exact ⟨by clear * - hoddSite hcenter hlower hupper; omega, by clear * - hoddSite hcenter hlower hupper; omega⟩
+
+private theorem stairEvenAlt_rank_odd_black {den x y : ℤ} (hden : BaseMask.stairEvenAlt.Valid den)
+    {correction : Field} (hcorrect : ∀ point ∈ (BaseMask.stairEvenAlt.raw den).sites,
+      correction point = stairEvenAltRankCorrection den point)
+    (hpoint : (x, y) ∈ (BaseMask.stairEvenAlt.raw den).sites)
+    (hoddSite : (x + y) % 2 ≠ 0) (hblack : ¬ StairEvenAltOddWhite den (x, y)) :
+    correction (x, y - 1) < correction (x, y) ∧ correction (x, y + 1) < correction (x, y) := by
+  by_cases hl : StairEvenAltLeftHigh den (x, y)
+  · exact stairEvenAlt_rank_odd_black_left hden hcorrect hpoint hoddSite hblack hl
+  · by_cases hr : StairEvenAltRightHigh den (x, y)
+    · exact stairEvenAlt_rank_odd_black_right hden hcorrect hpoint hoddSite hblack hl hr
+    · exact stairEvenAlt_rank_odd_black_center hden hcorrect hpoint hoddSite hblack hl hr
+
+set_option maxHeartbeats 400000 in
 private theorem stairEvenAlt_rank_odd_white {den x y : ℤ} (hden : BaseMask.stairEvenAlt.Valid den)
     {correction : Field} (hcorrect : ∀ point ∈ (BaseMask.stairEvenAlt.raw den).sites,
       correction point = stairEvenAltRankCorrection den point)
