@@ -25,7 +25,7 @@ local macro "staircase_charge" : tactic => `(tactic|
      simp only [true_and, and_true, true_or, or_true, false_and, and_false, false_or, or_false,
        not_true_eq_false, not_false_eq_true] at hclause)))
 
-set_option maxHeartbeats 850000 in
+set_option maxHeartbeats 400000 in
 private theorem stairEvenAlt_laplacian_even {den : ℤ} (hden : BaseMask.stairEvenAlt.Valid den)
     {standard : Field} (hagree : (BaseMask.stairEven.raw den).Agrees standard 0)
     (hperiod : HasGeneratorPeriods (Fraction.mk 1 den) standard 0 (stairEvenConstantV den))
@@ -58,11 +58,13 @@ private theorem stairEvenAlt_laplacian_even {den : ℤ} (hden : BaseMask.stairEv
   · staircase_charge
   · staircase_charge
 
-set_option maxHeartbeats 850000 in
-private theorem stairEvenAlt_laplacian_odd {den : ℤ} (hden : BaseMask.stairEvenAlt.Valid den)
+set_option maxHeartbeats 400000 in
+/-- The first branch of the odd-site Laplacian of the B3 raw mask: the body `0 ≤ y ≤ d`, `2−d ≤ x+y ≤ d+2`. -/
+private theorem stairEvenAlt_laplacian_odd_body {den : ℤ} (hden : BaseMask.stairEvenAlt.Valid den)
     {standard : Field} (hagree : (BaseMask.stairEven.raw den).Agrees standard 0)
     (hperiod : HasGeneratorPeriods (Fraction.mk 1 den) standard 0 (stairEvenConstantV den))
-    (point : Site) (hmem : point ∈ (BaseMask.stairEvenAlt.raw den).sites) (he : ¬ EvenSite point) :
+    (point : Site) (hmem : point ∈ (BaseMask.stairEvenAlt.raw den).sites) (he : ¬ EvenSite point)
+    (hbody : 0 ≤ point.2 ∧ point.2 ≤ den ∧ 2 - den ≤ point.1 + point.2 ∧ point.1 + point.2 ≤ den + 2) :
     laplacian (stairEvenAltField den standard) point =
       if StairEvenAltOddWhite den point then 0 else -1 := by
   have hmin := hden.1
@@ -73,59 +75,174 @@ private theorem stairEvenAlt_laplacian_odd {den : ℤ} (hden : BaseMask.stairEve
     stairEvenAltResidual_on_raw hden hagree hperiod hmem,
     stairEvenAltResidual_incomingPos_reflect hden hagree hperiod]
   obtain ⟨x, y⟩ := point
-  obtain ⟨hx, hy, hshape⟩ := BaseMask.mem_stairEvenAlt_raw_iff.mp hmem
-  dsimp only at hx hy hshape
+  obtain ⟨hx, hy, -⟩ := BaseMask.mem_stairEvenAlt_raw_iff.mp hmem
+  dsimp only at hx hy hbody
   have hxy : (x + y) % 2 ≠ 0 := he
   rw [if_neg he, stairEvenAltResidual_incomingNeg_odd hden hagree hperiod hmem he,
     stairEvenAltResidual_incomingNeg_odd hden hagree hperiod href (fun h => he (hpar.mp h))]
   simp only [StairEvenAltOddWhite, reflectStairEvenAlt, Prod.fst_sub, Prod.snd_sub,
     BaseMask.StairEvenAltBump]
+  let neg := (y = 0 ∧ 3 ≤ x) ∨ (x + y = 2 - den ∧ 1 ≤ y ∧ y ≤ den - 2) ∨
+      (x + y = 3 ∧ 2 ≤ y ∧ y ≤ den)
+  let pos := (y = den ∧ x ≤ 1 - den) ∨ (x + y = den + 2 ∧ 2 ≤ y ∧ y ≤ den - 1) ∨
+      (x + y = 1 ∧ 0 ≤ y ∧ y ≤ den - 2)
+  have hcenter : ¬ BaseMask.StairEvenAltBump den (x, y) := by
+    dsimp only [BaseMask.StairEvenAltBump]
+    (clear * - hbody hx hy hmin hd hxy; omega)
+  have hexclusive : ¬ (neg ∧ pos) := by unfold neg pos; (clear * - hbody hx hy hmin hd hxy; omega)
+  have hwhite : StairEvenAltOddWhite den (x, y) ↔ neg ∨ pos := by
+    unfold neg pos
+    dsimp only [StairEvenAltOddWhite]
+    by_cases h0 : y = 0
+    · (clear * - hbody hx hy hmin hd hxy; omega)
+    · by_cases hd' : y = den <;> (clear * - hbody hx hy hmin hd hxy hd'; omega)
+  have hneg : (if x = 1 - den ∧ y = -1 then (2 : ℤ)
+      else if y = -1 ∨ (y = 0 ∧ 3 ≤ x) ∨
+        (x + y = 2 - den ∧ 1 ≤ y ∧ y ≤ den - 2) ∨
+        (x + y = 3 ∧ 2 ≤ y ∧ y ≤ den) ∨ (x = 3 ∧ y = den + 1)
+      then 1 else 0) = if neg then 1 else 0 := by
+    rw [if_neg (by clear * - hbody hx hy hmin hd hxy; omega)]
+    apply if_congr ?_ rfl rfl
+    unfold neg
+    (clear * - hbody hx hy hmin hd hxy; omega)
+  have hpos : (if 4 - den - x = 1 - den ∧ den - y = -1 then (2 : ℤ)
+      else if den - y = -1 ∨ (den - y = 0 ∧ 3 ≤ 4 - den - x) ∨
+        ((4 - den - x) + (den - y) = 2 - den ∧ 1 ≤ den - y ∧ den - y ≤ den - 2) ∨
+        ((4 - den - x) + (den - y) = 3 ∧ 2 ≤ den - y ∧ den - y ≤ den) ∨
+        (4 - den - x = 3 ∧ den - y = den + 1)
+      then 1 else 0) = if pos then 1 else 0 := by
+    clear hneg
+    rw [if_neg (by clear * - hbody hx hy hmin hd hxy; omega)]
+    apply if_congr ?_ rfl rfl
+    unfold pos
+    (clear * - hbody hx hy hmin hd hxy; omega)
+  rw [hneg]
+  erw [hpos]
+  rw [if_neg hcenter, if_congr hwhite rfl rfl]
+  by_cases hn : neg
+  · have hp : ¬ pos := fun hp => hexclusive ⟨hn, hp⟩
+    simp [hn, hp]
+  · by_cases hp : pos <;> simp [hn, hp]
+
+set_option maxHeartbeats 400000 in
+/-- A branch of the odd-site Laplacian of the B3 raw mask. -/
+private theorem stairEvenAlt_laplacian_odd_lo {den : ℤ} (hden : BaseMask.stairEvenAlt.Valid den)
+    {standard : Field} (hagree : (BaseMask.stairEven.raw den).Agrees standard 0)
+    (hperiod : HasGeneratorPeriods (Fraction.mk 1 den) standard 0 (stairEvenConstantV den))
+    (point : Site) (hmem : point ∈ (BaseMask.stairEvenAlt.raw den).sites) (he : ¬ EvenSite point)
+    (hl : point.2 = -1 ∧ 1 - den ≤ point.1 ∧ point.1 ≤ 0) :
+    laplacian (stairEvenAltField den standard) point =
+      if StairEvenAltOddWhite den point then 0 else -1 := by
+  have hmin := hden.1
+  have hd := hden.2
+  have href := (reflectStairEvenAlt_mem_iff den point).mpr hmem
+  have hpar := evenSite_reflectStairEvenAlt_iff den point
+  rw [laplacian_stairEvenAltField_eq_background_add_residual, laplacian_stairEvenAltBackground,
+    stairEvenAltResidual_on_raw hden hagree hperiod hmem,
+    stairEvenAltResidual_incomingPos_reflect hden hagree hperiod]
+  obtain ⟨x, y⟩ := point
+  obtain ⟨hx, hy, -⟩ := BaseMask.mem_stairEvenAlt_raw_iff.mp hmem
+  dsimp only at hx hy hl
+  have hxy : (x + y) % 2 ≠ 0 := he
+  rw [if_neg he, stairEvenAltResidual_incomingNeg_odd hden hagree hperiod hmem he,
+    stairEvenAltResidual_incomingNeg_odd hden hagree hperiod href (fun h => he (hpar.mp h))]
+  simp only [StairEvenAltOddWhite, reflectStairEvenAlt, Prod.fst_sub, Prod.snd_sub,
+    BaseMask.StairEvenAltBump]
+  by_cases htip : x = 1 - den <;> staircase_charge
+
+set_option maxHeartbeats 400000 in
+/-- A branch of the odd-site Laplacian of the B3 raw mask. -/
+private theorem stairEvenAlt_laplacian_odd_hi {den : ℤ} (hden : BaseMask.stairEvenAlt.Valid den)
+    {standard : Field} (hagree : (BaseMask.stairEven.raw den).Agrees standard 0)
+    (hperiod : HasGeneratorPeriods (Fraction.mk 1 den) standard 0 (stairEvenConstantV den))
+    (point : Site) (hmem : point ∈ (BaseMask.stairEvenAlt.raw den).sites) (he : ¬ EvenSite point)
+    (hu : point.2 = den + 1 ∧ 4 - den ≤ point.1 ∧ point.1 ≤ 3) :
+    laplacian (stairEvenAltField den standard) point =
+      if StairEvenAltOddWhite den point then 0 else -1 := by
+  have hmin := hden.1
+  have hd := hden.2
+  have href := (reflectStairEvenAlt_mem_iff den point).mpr hmem
+  have hpar := evenSite_reflectStairEvenAlt_iff den point
+  rw [laplacian_stairEvenAltField_eq_background_add_residual, laplacian_stairEvenAltBackground,
+    stairEvenAltResidual_on_raw hden hagree hperiod hmem,
+    stairEvenAltResidual_incomingPos_reflect hden hagree hperiod]
+  obtain ⟨x, y⟩ := point
+  obtain ⟨hx, hy, -⟩ := BaseMask.mem_stairEvenAlt_raw_iff.mp hmem
+  dsimp only at hx hy hu
+  have hxy : (x + y) % 2 ≠ 0 := he
+  rw [if_neg he, stairEvenAltResidual_incomingNeg_odd hden hagree hperiod hmem he,
+    stairEvenAltResidual_incomingNeg_odd hden hagree hperiod href (fun h => he (hpar.mp h))]
+  simp only [StairEvenAltOddWhite, reflectStairEvenAlt, Prod.fst_sub, Prod.snd_sub,
+    BaseMask.StairEvenAltBump]
+  by_cases htip : x = 3 <;> staircase_charge
+
+set_option maxHeartbeats 400000 in
+/-- A branch of the odd-site Laplacian of the B3 raw mask. -/
+private theorem stairEvenAlt_laplacian_odd_l4 {den : ℤ} (hden : BaseMask.stairEvenAlt.Valid den)
+    {standard : Field} (hagree : (BaseMask.stairEven.raw den).Agrees standard 0)
+    (hperiod : HasGeneratorPeriods (Fraction.mk 1 den) standard 0 (stairEvenConstantV den))
+    (point : Site) (hmem : point ∈ (BaseMask.stairEvenAlt.raw den).sites) (he : ¬ EvenSite point)
+    (hl : point.1 = 1 - den ∧ point.2 = 0) :
+    laplacian (stairEvenAltField den standard) point =
+      if StairEvenAltOddWhite den point then 0 else -1 := by
+  have hmin := hden.1
+  have hd := hden.2
+  have href := (reflectStairEvenAlt_mem_iff den point).mpr hmem
+  have hpar := evenSite_reflectStairEvenAlt_iff den point
+  rw [laplacian_stairEvenAltField_eq_background_add_residual, laplacian_stairEvenAltBackground,
+    stairEvenAltResidual_on_raw hden hagree hperiod hmem,
+    stairEvenAltResidual_incomingPos_reflect hden hagree hperiod]
+  obtain ⟨x, y⟩ := point
+  obtain ⟨hx, hy, -⟩ := BaseMask.mem_stairEvenAlt_raw_iff.mp hmem
+  dsimp only at hx hy hl
+  have hxy : (x + y) % 2 ≠ 0 := he
+  rw [if_neg he, stairEvenAltResidual_incomingNeg_odd hden hagree hperiod hmem he,
+    stairEvenAltResidual_incomingNeg_odd hden hagree hperiod href (fun h => he (hpar.mp h))]
+  simp only [StairEvenAltOddWhite, reflectStairEvenAlt, Prod.fst_sub, Prod.snd_sub,
+    BaseMask.StairEvenAltBump]
+  (clear * - hx hy hmin hd hxy hl; omega)
+
+set_option maxHeartbeats 400000 in
+/-- A branch of the odd-site Laplacian of the B3 raw mask. -/
+private theorem stairEvenAlt_laplacian_odd_r5 {den : ℤ} (hden : BaseMask.stairEvenAlt.Valid den)
+    {standard : Field} (hagree : (BaseMask.stairEven.raw den).Agrees standard 0)
+    (hperiod : HasGeneratorPeriods (Fraction.mk 1 den) standard 0 (stairEvenConstantV den))
+    (point : Site) (hmem : point ∈ (BaseMask.stairEvenAlt.raw den).sites) (he : ¬ EvenSite point)
+    (hr : point.1 = 3 ∧ point.2 = den) :
+    laplacian (stairEvenAltField den standard) point =
+      if StairEvenAltOddWhite den point then 0 else -1 := by
+  have hmin := hden.1
+  have hd := hden.2
+  have href := (reflectStairEvenAlt_mem_iff den point).mpr hmem
+  have hpar := evenSite_reflectStairEvenAlt_iff den point
+  rw [laplacian_stairEvenAltField_eq_background_add_residual, laplacian_stairEvenAltBackground,
+    stairEvenAltResidual_on_raw hden hagree hperiod hmem,
+    stairEvenAltResidual_incomingPos_reflect hden hagree hperiod]
+  obtain ⟨x, y⟩ := point
+  obtain ⟨hx, hy, -⟩ := BaseMask.mem_stairEvenAlt_raw_iff.mp hmem
+  dsimp only at hx hy hr
+  have hxy : (x + y) % 2 ≠ 0 := he
+  rw [if_neg he, stairEvenAltResidual_incomingNeg_odd hden hagree hperiod hmem he,
+    stairEvenAltResidual_incomingNeg_odd hden hagree hperiod href (fun h => he (hpar.mp h))]
+  simp only [StairEvenAltOddWhite, reflectStairEvenAlt, Prod.fst_sub, Prod.snd_sub,
+    BaseMask.StairEvenAltBump]
+  (clear * - hx hy hmin hd hxy hr; omega)
+
+set_option maxHeartbeats 400000 in
+/-- The odd-site Laplacian of the B3 raw mask in the physical chart. -/
+private theorem stairEvenAlt_laplacian_odd {den : ℤ} (hden : BaseMask.stairEvenAlt.Valid den)
+    {standard : Field} (hagree : (BaseMask.stairEven.raw den).Agrees standard 0)
+    (hperiod : HasGeneratorPeriods (Fraction.mk 1 den) standard 0 (stairEvenConstantV den))
+    (point : Site) (hmem : point ∈ (BaseMask.stairEvenAlt.raw den).sites) (he : ¬ EvenSite point) :
+    laplacian (stairEvenAltField den standard) point =
+      if StairEvenAltOddWhite den point then 0 else -1 := by
+  obtain ⟨-, -, hshape⟩ := BaseMask.mem_stairEvenAlt_raw_iff.mp hmem
   rcases hshape with hbody | hl | hu | hl | hr
-  · let neg := (y = 0 ∧ 3 ≤ x) ∨ (x + y = 2 - den ∧ 1 ≤ y ∧ y ≤ den - 2) ∨
-        (x + y = 3 ∧ 2 ≤ y ∧ y ≤ den)
-    let pos := (y = den ∧ x ≤ 1 - den) ∨ (x + y = den + 2 ∧ 2 ≤ y ∧ y ≤ den - 1) ∨
-        (x + y = 1 ∧ 0 ≤ y ∧ y ≤ den - 2)
-    have hcenter : ¬ BaseMask.StairEvenAltBump den (x, y) := by
-      dsimp only [BaseMask.StairEvenAltBump]
-      omega
-    have hexclusive : ¬ (neg ∧ pos) := by unfold neg pos; omega
-    have hwhite : StairEvenAltOddWhite den (x, y) ↔ neg ∨ pos := by
-      unfold neg pos
-      dsimp only [StairEvenAltOddWhite]
-      by_cases h0 : y = 0
-      · omega
-      · by_cases hd' : y = den <;> omega
-    have hneg : (if x = 1 - den ∧ y = -1 then (2 : ℤ)
-        else if y = -1 ∨ (y = 0 ∧ 3 ≤ x) ∨
-          (x + y = 2 - den ∧ 1 ≤ y ∧ y ≤ den - 2) ∨
-          (x + y = 3 ∧ 2 ≤ y ∧ y ≤ den) ∨ (x = 3 ∧ y = den + 1)
-        then 1 else 0) = if neg then 1 else 0 := by
-      rw [if_neg (by omega)]
-      apply if_congr ?_ rfl rfl
-      unfold neg
-      omega
-    have hpos : (if 4 - den - x = 1 - den ∧ den - y = -1 then (2 : ℤ)
-        else if den - y = -1 ∨ (den - y = 0 ∧ 3 ≤ 4 - den - x) ∨
-          ((4 - den - x) + (den - y) = 2 - den ∧ 1 ≤ den - y ∧ den - y ≤ den - 2) ∨
-          ((4 - den - x) + (den - y) = 3 ∧ 2 ≤ den - y ∧ den - y ≤ den) ∨
-          (4 - den - x = 3 ∧ den - y = den + 1)
-        then 1 else 0) = if pos then 1 else 0 := by
-      clear hneg
-      rw [if_neg (by omega)]
-      apply if_congr ?_ rfl rfl
-      unfold pos
-      omega
-    rw [hneg]
-    erw [hpos]
-    rw [if_neg hcenter, if_congr hwhite rfl rfl]
-    by_cases hn : neg
-    · have hp : ¬ pos := fun hp => hexclusive ⟨hn, hp⟩
-      simp [hn, hp]
-    · by_cases hp : pos <;> simp [hn, hp]
-  · by_cases htip : x = 1 - den <;> staircase_charge
-  · by_cases htip : x = 3 <;> staircase_charge
-  · omega
-  · omega
+  · exact stairEvenAlt_laplacian_odd_body hden hagree hperiod point hmem he hbody
+  · exact stairEvenAlt_laplacian_odd_lo hden hagree hperiod point hmem he hl
+  · exact stairEvenAlt_laplacian_odd_hi hden hagree hperiod point hmem he hu
+  · exact stairEvenAlt_laplacian_odd_l4 hden hagree hperiod point hmem he hl
+  · exact stairEvenAlt_laplacian_odd_r5 hden hagree hperiod point hmem he hr
 
 /-- The B3 Laplacian on the occupied raw mask in the physical chart. -/
 theorem stairEvenAlt_laplacian_on_raw {den : ℤ} (hden : BaseMask.stairEvenAlt.Valid den)
