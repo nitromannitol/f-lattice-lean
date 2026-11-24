@@ -2,6 +2,7 @@ import FLatticePaper.StrongHeadline
 import FLatticePaper.Plane.Induction.CanonicalSigned
 import FLatticePaper.Plane.Induction.W1Strips
 import FLatticePaper.Plane.Induction.EPolicyFinal
+import FLatticePaper.Plane.Induction.StrongSeedInduction
 
 /-! Task 71: the odometers headline with the canonical signed policy at every proper word, in place of the old policy `hpol`.
 `hcan` supplies, at each proper word `w`, a canonical signed policy of the conjugate `conjWord w`; `oldPolicyData_of_canonical`
@@ -25,7 +26,17 @@ theorem odometersTheorem_of_canonical
     (hpureRes : ∀ k : ℕ, Induction.StrongResidual (List.replicate k Digit.three))
     (htwoSlip : ∀ k : ℕ, Induction.BaseSlip (List.replicate (k + 1) Digit.two))
     (htwoRes : ∀ k : ℕ, Induction.StrongResidual (List.replicate (k + 1) Digit.two))
-    (hres : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word → Induction.StrongResidual word)
+    (hbd : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      ∀ z, OnBoundary (frameAt word).closedPolygon z → (frameAt word).price (standardField word) z ≤ (frameAt word).cutPrice)
+    (hpol : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      ∀ η : ℤ, (η = 1 ∨ η = -1) → ∃ (policy : Site → Site → Prop) (R : Site → ℤ) (cU cV : ℤ),
+        RetainQuota (standardField word) policy ∧
+        NonincreasingAlong ((frameAt word).chainPotential (standardField word) η) policy ∧
+        NonincreasingAlong ((frameAt word).price (standardField word)) policy ∧
+        NonincreasingAlong ((frameAt word).roundedSlip (standardField word) η) policy ∧
+        (∀ z, R (z + (frameAt word).child.modifiedDeck.kernel) = R z + cU) ∧
+        (∀ z, R (z + (frameAt word).child.modifiedDeck.transverse) = R z + cV) ∧
+        (∀ x i, policy x i → R i < R x))
     (hcan : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       Nonempty (Induction.CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word))))
     (hResP : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
@@ -41,10 +52,14 @@ theorem odometersTheorem_of_canonical
     (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       Induction.S3NoFortInputs (frameAt word) (standardField word)) :
     OdometersTheorem := by
-  have hE : ∀ word : Word, Induction.StrongEstimates word :=
-    Induction.strongEstimates_of_residual_all
-      (fun k => Induction.StrongEstimates.of_base_pure k (hpureSlip k) (hpureRes k))
-      (fun k => Induction.StrongEstimates.of_base_two k (htwoSlip k) (htwoRes k)) hres
+  -- the strong estimates and the seed fields of every word, from the per-word inputs `hbd` and `hpol`
+  have hJ := Induction.strongSeeds_of_all
+    (fun k => Induction.StrongEstimates.of_base_pure k (hpureSlip k) (hpureRes k))
+    (fun k => Induction.StrongEstimates.of_base_two k (htwoSlip k) (htwoRes k)) hbd hpol
+  have hE : ∀ word : Word, Induction.StrongEstimates word := fun word => (hJ word).1
+  have hres : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word → Induction.StrongResidual word :=
+    fun word hw hn => Induction.strongResidual_of_conj hw (Induction.exists_ne_two_of_not_twoPow hw hn)
+      (hE (conjWord word)) (hbd word hw hn) ((hJ (conjWord word)).2) (hpol word hw hn)
   exact odometersTheorem_of_policy hpureSlip hpureRes htwoSlip htwoRes hres
     (fun word hw hn => ⟨fun _ _ => False, ⟨Induction.oldPolicyData_of_canonical
       (standardField_reflectI_conj word (hE (conjWord word))) (hcan word hw hn).some (frameAt word).eps
@@ -70,7 +85,17 @@ at the words whose conjugate is not a pure threes word. -/
 theorem odometersTheorem_of_canonical_pure
     (htwoSlip : ∀ k : ℕ, Induction.BaseSlip (List.replicate (k + 1) Digit.two))
     (htwoRes : ∀ k : ℕ, Induction.StrongResidual (List.replicate (k + 1) Digit.two))
-    (hres : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word → Induction.StrongResidual word)
+    (hbd : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      ∀ z, OnBoundary (frameAt word).closedPolygon z → (frameAt word).price (standardField word) z ≤ (frameAt word).cutPrice)
+    (hpol : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      ∀ η : ℤ, (η = 1 ∨ η = -1) → ∃ (policy : Site → Site → Prop) (R : Site → ℤ) (cU cV : ℤ),
+        RetainQuota (standardField word) policy ∧
+        NonincreasingAlong ((frameAt word).chainPotential (standardField word) η) policy ∧
+        NonincreasingAlong ((frameAt word).price (standardField word)) policy ∧
+        NonincreasingAlong ((frameAt word).roundedSlip (standardField word) η) policy ∧
+        (∀ z, R (z + (frameAt word).child.modifiedDeck.kernel) = R z + cU) ∧
+        (∀ z, R (z + (frameAt word).child.modifiedDeck.transverse) = R z + cV) ∧
+        (∀ x i, policy x i → R i < R x))
     (hcan : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       ¬ (∃ k : ℕ, conjWord word = List.replicate k Digit.three) →
       Nonempty (Induction.CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word))))
@@ -88,7 +113,7 @@ theorem odometersTheorem_of_canonical_pure
       Induction.S3NoFortInputs (frameAt word) (standardField word)) :
     OdometersTheorem :=
   odometersTheorem_of_canonical FLatticePaper.EPolicy.pure_threes_inputs.1 FLatticePaper.EPolicy.pure_threes_inputs.2
-    htwoSlip htwoRes hres
+    htwoSlip htwoRes hbd hpol
     (fun word hw hn => by
       by_cases hp : ∃ k : ℕ, conjWord word = List.replicate k Digit.three
       · exact canonical_at_threes word hp

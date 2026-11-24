@@ -2,3 +2,5 @@ import FLatticePaper.CanonicalHeadline
 
 #print axioms FLatticePaper.odometersTheorem_of_canonical_pure
 #print axioms FLatticePaper.canonical_at_threes
+#print axioms FLatticePaper.Induction.strongResidual_of_conj
+#print axioms FLatticePaper.Induction.strongSeeds_of_all
