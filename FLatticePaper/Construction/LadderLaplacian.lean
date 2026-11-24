@@ -242,7 +242,6 @@ theorem ladderOdd_up_notMem_iff {den x y : ℤ} (hden : BaseMask.ladderOdd.Valid
   rw [← reflectLadderOdd_mem_iff den (x, y + 1), hshift]
   exact ladderOdd_down_notMem_iff hden href hpar
 
-set_option maxHeartbeats 600000 in
 theorem ladderOdd_laplacian_on_even_raw {den x y : ℤ} (hden : BaseMask.ladderOdd.Valid den)
     {field : Field} (hagree : (BaseMask.ladderOdd.raw den).Agrees field 0)
     (hperiod : HasGeneratorPeriods (Fraction.mk 1 den) field 0 (stairEvenConstantV den))
