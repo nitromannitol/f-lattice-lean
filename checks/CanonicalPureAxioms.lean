@@ -1,0 +1,3 @@
+import FLatticePaper.CanonicalHeadline
+
+#print axioms FLatticePaper.odometersTheorem_of_canonical_pure
