@@ -1,7 +1,7 @@
-import FLatticePaper.Plane.Induction.EPolicyCover
+import FLatticePaper.Plane.Induction.EPolicyFinal
 
-#print axioms FLatticePaper.EPolicy.slip_field_ge2
-#print axioms FLatticePaper.EPolicy.price_field_ge2
-#print axioms FLatticePaper.EPolicy.chain_field_ge2
-#print axioms FLatticePaper.EPolicy.lap_cases
-#print axioms FLatticePaper.EPolicy.ecover_of_ePolicy
+#print axioms FLatticePaper.EPolicy.pure_threes_final
+#print axioms FLatticePaper.EPolicy.pure_threes_inputs
+#print axioms FLatticePaper.EPolicy.valuesAll
+#print axioms FLatticePaper.EPolicy.canonicalGames
+#print axioms FLatticePaper.EPolicy.rank_field
