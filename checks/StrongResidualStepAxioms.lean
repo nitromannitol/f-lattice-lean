@@ -1,4 +1,5 @@
 import FLatticePaper.Plane.Induction.StrongResidualStep
+import FLatticePaper.Plane.Induction.SeedPoint
 
 #print axioms FLatticePaper.Induction.strongResidual_of_conj
 #print axioms FLatticePaper.Induction.SeedPoint.seed_check_of_zero
