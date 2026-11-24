@@ -696,4 +696,135 @@ theorem chainM_black_evenL_zero (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : �
   rw [psi_U_shift, psi_U_shift] at key
   linarith
 
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_black_evenL_one_c00 (k : ℕ) {x y : ℤ} (_hx : x = 1) (_hb1 : 0 ≤ y) (_hb2 : y ≤ 2 * (2 * (k : ℤ) + 4)) (_hy : y ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 0)
+    (_hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3))) (_hqK : TwosKey (2 * (k : ℤ) + 4) (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)))
+    (_hv : twosSlip k (x - 1 + (2 * (k : ℤ) + 5), y - 1 + (2 * (k : ℤ) + 3)) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3))) (_hw : twosSlip k (x - 2 + (2 * (k : ℤ) + 5), y - 1 + (2 * (k : ℤ) + 3)) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3))) :
+    (if TwosDelta k (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)) then (1 : ℤ) else 0) + twosSlip k ((x - 1 + (2 * (k : ℤ) + 5)), (y - 1 + (2 * (k : ℤ) + 3))) ≤ (if TwosDelta k (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)) then (1 : ℤ) else 0) + twosSlip k ((x - 2 + (2 * (k : ℤ) + 5)), (y - 1 + (2 * (k : ℤ) + 3))) := by
+  rw [twosKey_pos] at _hpK _hqK
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_black_evenL_one_c01 (k : ℕ) {x y : ℤ} (_hx : x = 1) (_hb1 : 0 ≤ y) (_hb2 : y ≤ 2 * (2 * (k : ℤ) + 4)) (_hy : y ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 0)
+    (_hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3))) (_hqK : TwosKey (2 * (k : ℤ) + 4) (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)))
+    (_hv : twosSlip k (x - 1 + (2 * (k : ℤ) + 5), y - 1 + (2 * (k : ℤ) + 3)) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3))) (_hw : twosSlip k (x - 2 + (2 * (k : ℤ) + 5), y - 1 + (2 * (k : ℤ) + 3)) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3))) :
+    (if TwosDelta k (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)) then (1 : ℤ) else 0) + twosSlip k ((x - 1 + (2 * (k : ℤ) + 5)), (y - 1 + (2 * (k : ℤ) + 3))) ≤ (if TwosDelta k (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)) then (1 : ℤ) else 0) + twosSlip k ((x - 2 + (2 * (k : ℤ) + 5)), (y - 1 + (2 * (k : ℤ) + 3))) := by
+  rw [twosKey_pos] at _hpK _hqK
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_black_evenL_one_c02 (k : ℕ) {x y : ℤ} (_hx : x = 1) (_hb1 : 0 ≤ y) (_hb2 : y ≤ 2 * (2 * (k : ℤ) + 4)) (_hy : y ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 0)
+    (_hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3))) (_hqK : TwosKey (2 * (k : ℤ) + 4) (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)))
+    (_hv : twosSlip k (x - 1 + (2 * (k : ℤ) + 5), y - 1 + (2 * (k : ℤ) + 3)) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3))) (_hw : twosSlip k (x - 2 + (2 * (k : ℤ) + 5), y - 1 + (2 * (k : ℤ) + 3)) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3))) :
+    (if TwosDelta k (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)) then (1 : ℤ) else 0) + twosSlip k ((x - 1 + (2 * (k : ℤ) + 5)), (y - 1 + (2 * (k : ℤ) + 3))) ≤ (if TwosDelta k (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)) then (1 : ℤ) else 0) + twosSlip k ((x - 2 + (2 * (k : ℤ) + 5)), (y - 1 + (2 * (k : ℤ) + 3))) := by
+  rw [twosKey_pos] at _hpK _hqK
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_black_evenL_one_c10 (k : ℕ) {x y : ℤ} (_hx : x = 1) (_hb1 : 0 ≤ y) (_hb2 : y ≤ 2 * (2 * (k : ℤ) + 4)) (_hy : y ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 0)
+    (_hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3))) (_hqK : TwosKey (2 * (k : ℤ) + 4) (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)))
+    (_hv : twosSlip k (x - 1 + (2 * (k : ℤ) + 5), y - 1 + (2 * (k : ℤ) + 3)) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3))) (_hw : twosSlip k (x - 2 + (2 * (k : ℤ) + 5), y - 1 + (2 * (k : ℤ) + 3)) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3))) :
+    (if TwosDelta k (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)) then (1 : ℤ) else 0) + twosSlip k ((x - 1 + (2 * (k : ℤ) + 5)), (y - 1 + (2 * (k : ℤ) + 3))) ≤ (if TwosDelta k (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)) then (1 : ℤ) else 0) + twosSlip k ((x - 2 + (2 * (k : ℤ) + 5)), (y - 1 + (2 * (k : ℤ) + 3))) := by
+  rw [twosKey_pos] at _hpK _hqK
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_black_evenL_one_c11 (k : ℕ) {x y : ℤ} (_hx : x = 1) (_hb1 : 0 ≤ y) (_hb2 : y ≤ 2 * (2 * (k : ℤ) + 4)) (_hy : y ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 0)
+    (_hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3))) (_hqK : TwosKey (2 * (k : ℤ) + 4) (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)))
+    (_hv : twosSlip k (x - 1 + (2 * (k : ℤ) + 5), y - 1 + (2 * (k : ℤ) + 3)) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3))) (_hw : twosSlip k (x - 2 + (2 * (k : ℤ) + 5), y - 1 + (2 * (k : ℤ) + 3)) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3))) :
+    (if TwosDelta k (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)) then (1 : ℤ) else 0) + twosSlip k ((x - 1 + (2 * (k : ℤ) + 5)), (y - 1 + (2 * (k : ℤ) + 3))) ≤ (if TwosDelta k (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)) then (1 : ℤ) else 0) + twosSlip k ((x - 2 + (2 * (k : ℤ) + 5)), (y - 1 + (2 * (k : ℤ) + 3))) := by
+  rw [twosKey_pos] at _hpK _hqK
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_black_evenL_one_c12 (k : ℕ) {x y : ℤ} (_hx : x = 1) (_hb1 : 0 ≤ y) (_hb2 : y ≤ 2 * (2 * (k : ℤ) + 4)) (_hy : y ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 0)
+    (_hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3))) (_hqK : TwosKey (2 * (k : ℤ) + 4) (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)))
+    (_hv : twosSlip k (x - 1 + (2 * (k : ℤ) + 5), y - 1 + (2 * (k : ℤ) + 3)) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3))) (_hw : twosSlip k (x - 2 + (2 * (k : ℤ) + 5), y - 1 + (2 * (k : ℤ) + 3)) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3))) :
+    (if TwosDelta k (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)) then (1 : ℤ) else 0) + twosSlip k ((x - 1 + (2 * (k : ℤ) + 5)), (y - 1 + (2 * (k : ℤ) + 3))) ≤ (if TwosDelta k (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)) then (1 : ℤ) else 0) + twosSlip k ((x - 2 + (2 * (k : ℤ) + 5)), (y - 1 + (2 * (k : ℤ) + 3))) := by
+  rw [twosKey_pos] at _hpK _hqK
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_black_evenL_one_c20 (k : ℕ) {x y : ℤ} (_hx : x = 1) (_hb1 : 0 ≤ y) (_hb2 : y ≤ 2 * (2 * (k : ℤ) + 4)) (_hy : y ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 0)
+    (_hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3))) (_hqK : TwosKey (2 * (k : ℤ) + 4) (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)))
+    (_hv : twosSlip k (x - 1 + (2 * (k : ℤ) + 5), y - 1 + (2 * (k : ℤ) + 3)) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3))) (_hw : twosSlip k (x - 2 + (2 * (k : ℤ) + 5), y - 1 + (2 * (k : ℤ) + 3)) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3))) :
+    (if TwosDelta k (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)) then (1 : ℤ) else 0) + twosSlip k ((x - 1 + (2 * (k : ℤ) + 5)), (y - 1 + (2 * (k : ℤ) + 3))) ≤ (if TwosDelta k (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)) then (1 : ℤ) else 0) + twosSlip k ((x - 2 + (2 * (k : ℤ) + 5)), (y - 1 + (2 * (k : ℤ) + 3))) := by
+  rw [twosKey_pos] at _hpK _hqK
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_black_evenL_one_c21 (k : ℕ) {x y : ℤ} (_hx : x = 1) (_hb1 : 0 ≤ y) (_hb2 : y ≤ 2 * (2 * (k : ℤ) + 4)) (_hy : y ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 0)
+    (_hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3))) (_hqK : TwosKey (2 * (k : ℤ) + 4) (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)))
+    (_hv : twosSlip k (x - 1 + (2 * (k : ℤ) + 5), y - 1 + (2 * (k : ℤ) + 3)) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3))) (_hw : twosSlip k (x - 2 + (2 * (k : ℤ) + 5), y - 1 + (2 * (k : ℤ) + 3)) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3))) :
+    (if TwosDelta k (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)) then (1 : ℤ) else 0) + twosSlip k ((x - 1 + (2 * (k : ℤ) + 5)), (y - 1 + (2 * (k : ℤ) + 3))) ≤ (if TwosDelta k (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)) then (1 : ℤ) else 0) + twosSlip k ((x - 2 + (2 * (k : ℤ) + 5)), (y - 1 + (2 * (k : ℤ) + 3))) := by
+  rw [twosKey_pos] at _hpK _hqK
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_black_evenL_one_c22 (k : ℕ) {x y : ℤ} (_hx : x = 1) (_hb1 : 0 ≤ y) (_hb2 : y ≤ 2 * (2 * (k : ℤ) + 4)) (_hy : y ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 0)
+    (_hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3))) (_hqK : TwosKey (2 * (k : ℤ) + 4) (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)))
+    (_hv : twosSlip k (x - 1 + (2 * (k : ℤ) + 5), y - 1 + (2 * (k : ℤ) + 3)) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3))) (_hw : twosSlip k (x - 2 + (2 * (k : ℤ) + 5), y - 1 + (2 * (k : ℤ) + 3)) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3))) :
+    (if TwosDelta k (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)) then (1 : ℤ) else 0) + twosSlip k ((x - 1 + (2 * (k : ℤ) + 5)), (y - 1 + (2 * (k : ℤ) + 3))) ≤ (if TwosDelta k (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)) then (1 : ℤ) else 0) + twosSlip k ((x - 2 + (2 * (k : ℤ) + 5)), (y - 1 + (2 * (k : ℤ) + 3))) := by
+  rw [twosKey_pos] at _hpK _hqK
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+/-- **Even native centre, west input, `x = 1`, `y ≤ d − 1`:** the translate `U` brings both shifted points into the polygon. -/
+theorem chainM_black_evenL_one (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 0)
+    (hx : x = 1) (hy : y ≤ 2 * (k : ℤ) + 3) :
+    twosPsi k (x - 2) (y - 1) ≤ twosPsi k (x - 1) (y - 1) := by
+  have hnb := hn
+  unfold NativeT at hnb
+  obtain ⟨hb1, hb2⟩ : 0 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) := by
+    omega
+  have hq : TwosKey (2 * (k : ℤ) + 4) (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)) := by
+    rw [twosKey_pos]
+    omega
+  have hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)) := by
+    rw [twosKey_pos]
+    omega
+  have key : twosPsi k (x - 2 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)) ≤ twosPsi k (x - 1 + (2 * (k : ℤ) + 5)) (y - 1 + (2 * (k : ℤ) + 3)) := by
+    apply psi_le_of_band k hpK hq
+    have hv := twos_slip_value k hpK
+    have hw := twos_slip_value k hq
+    rcases hv with hv | hv | hv <;> rcases hw with hw | hw | hw
+    · exact chainM_black_evenL_one_c00 k hx hb1 hb2 hy hp hpK hq hv hw
+    · exact chainM_black_evenL_one_c01 k hx hb1 hb2 hy hp hpK hq hv hw
+    · exact chainM_black_evenL_one_c02 k hx hb1 hb2 hy hp hpK hq hv hw
+    · exact chainM_black_evenL_one_c10 k hx hb1 hb2 hy hp hpK hq hv hw
+    · exact chainM_black_evenL_one_c11 k hx hb1 hb2 hy hp hpK hq hv hw
+    · exact chainM_black_evenL_one_c12 k hx hb1 hb2 hy hp hpK hq hv hw
+    · exact chainM_black_evenL_one_c20 k hx hb1 hb2 hy hp hpK hq hv hw
+    · exact chainM_black_evenL_one_c21 k hx hb1 hb2 hy hp hpK hq hv hw
+    · exact chainM_black_evenL_one_c22 k hx hb1 hb2 hy hp hpK hq hv hw
+  rw [psi_U_shift, psi_U_shift] at key
+  linarith
+
 end FLatticePaper.TwosEPolicy
