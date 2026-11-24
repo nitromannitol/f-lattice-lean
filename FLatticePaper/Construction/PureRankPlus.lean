@@ -1085,4 +1085,2921 @@ theorem gateP_V_odd (d x : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (hx1 : 2 - d 
   · exact gateP_V_odd_i2_j0 d x ⟨hd, hdodd, hx1, hx0⟩ hrep
   · exact gateP_V_odd_i2_j1 d x ⟨hd, hdodd, hx1, hx0⟩ hrep
 
+
+/-! ## The interior and boundary plus gates (step (ii), plus sources) -/
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_even_im2_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 0 ∧ x + y ≠ 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) (-2) (-1))) :
+    valPlus d (shiftP d (x - 1, y) (-2) (-1)) - (-2) * (2 * d) - (-1) * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_even_im2_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 0 ∧ x + y ≠ 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) (-2) 0)) :
+    valPlus d (shiftP d (x - 1, y) (-2) 0) - (-2) * (2 * d) - 0 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_even_im2_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 0 ∧ x + y ≠ 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) (-2) 1)) :
+    valPlus d (shiftP d (x - 1, y) (-2) 1) - (-2) * (2 * d) - 1 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_even_im1_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 0 ∧ x + y ≠ 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) (-1) (-1))) :
+    valPlus d (shiftP d (x - 1, y) (-1) (-1)) - (-1) * (2 * d) - (-1) * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_even_im1_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 0 ∧ x + y ≠ 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) (-1) 0)) :
+    valPlus d (shiftP d (x - 1, y) (-1) 0) - (-1) * (2 * d) - 0 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_even_im1_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 0 ∧ x + y ≠ 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) (-1) 1)) :
+    valPlus d (shiftP d (x - 1, y) (-1) 1) - (-1) * (2 * d) - 1 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_even_i0_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 0 ∧ x + y ≠ 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) 0 (-1))) :
+    valPlus d (shiftP d (x - 1, y) 0 (-1)) - 0 * (2 * d) - (-1) * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_even_i0_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 0 ∧ x + y ≠ 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) 0 0)) :
+    valPlus d (shiftP d (x - 1, y) 0 0) - 0 * (2 * d) - 0 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_even_i0_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 0 ∧ x + y ≠ 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) 0 1)) :
+    valPlus d (shiftP d (x - 1, y) 0 1) - 0 * (2 * d) - 1 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_even_i1_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 0 ∧ x + y ≠ 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) 1 (-1))) :
+    valPlus d (shiftP d (x - 1, y) 1 (-1)) - 1 * (2 * d) - (-1) * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_even_i1_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 0 ∧ x + y ≠ 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) 1 0)) :
+    valPlus d (shiftP d (x - 1, y) 1 0) - 1 * (2 * d) - 0 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_even_i1_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 0 ∧ x + y ≠ 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) 1 1)) :
+    valPlus d (shiftP d (x - 1, y) 1 1) - 1 * (2 * d) - 1 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_even_i2_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 0 ∧ x + y ≠ 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) 2 (-1))) :
+    valPlus d (shiftP d (x - 1, y) 2 (-1)) - 2 * (2 * d) - (-1) * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_even_i2_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 0 ∧ x + y ≠ 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) 2 0)) :
+    valPlus d (shiftP d (x - 1, y) 2 0) - 2 * (2 * d) - 0 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_even_i2_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 0 ∧ x + y ≠ 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) 2 1)) :
+    valPlus d (shiftP d (x - 1, y) 2 1) - 2 * (2 * d) - 1 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_even (d x y : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (hn : NativeP d (x, y)) (hf : ¬ IsFreeP d (x, y)) (hy : y ≤ d) (hx0 : x ≤ 0) (hpar : (x + y) % 2 = 0) (h2 : x + y ≠ 2) (r : ℤ) (hr : RankOfP d (x - 1, y) r) :
+    r < valPlus d (x, y) := by
+  rw [valPlus_int_left d x y hf hx0 h2]
+  have hb : 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2 := by
+    unfold NativeP at hn
+    unfold IsFreeP IsHc IsVc at hf
+    simp only [Prod.mk.injEq] at hn hf
+    omega
+  obtain ⟨hb1, hb2, hb3, hb4, hb5⟩ := hb
+  clear hn hf
+  obtain ⟨i, j, hi, hrep, rfl⟩ := hr
+  obtain ⟨hi1, hi2, hj1, hj2⟩ := hi
+  interval_cases i <;> interval_cases j
+  · exact gateP_int_left_even_im2_jm1 d x y ⟨hd, hdodd, hy, hx0, hpar, h2, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_left_even_im2_j0 d x y ⟨hd, hdodd, hy, hx0, hpar, h2, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_left_even_im2_j1 d x y ⟨hd, hdodd, hy, hx0, hpar, h2, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_left_even_im1_jm1 d x y ⟨hd, hdodd, hy, hx0, hpar, h2, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_left_even_im1_j0 d x y ⟨hd, hdodd, hy, hx0, hpar, h2, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_left_even_im1_j1 d x y ⟨hd, hdodd, hy, hx0, hpar, h2, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_left_even_i0_jm1 d x y ⟨hd, hdodd, hy, hx0, hpar, h2, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_left_even_i0_j0 d x y ⟨hd, hdodd, hy, hx0, hpar, h2, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_left_even_i0_j1 d x y ⟨hd, hdodd, hy, hx0, hpar, h2, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_left_even_i1_jm1 d x y ⟨hd, hdodd, hy, hx0, hpar, h2, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_left_even_i1_j0 d x y ⟨hd, hdodd, hy, hx0, hpar, h2, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_left_even_i1_j1 d x y ⟨hd, hdodd, hy, hx0, hpar, h2, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_left_even_i2_jm1 d x y ⟨hd, hdodd, hy, hx0, hpar, h2, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_left_even_i2_j0 d x y ⟨hd, hdodd, hy, hx0, hpar, h2, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_left_even_i2_j1 d x y ⟨hd, hdodd, hy, hx0, hpar, h2, hb1, hb2, hb3, hb4, hb5⟩ hrep
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_diag_im2_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ x + y = 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) (-2) (-1))) :
+    valPlus d (shiftP d (x - 1, y) (-2) (-1)) - (-2) * (2 * d) - (-1) * (2 * (d + 1)) < 2 * y := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_diag_im2_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ x + y = 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) (-2) 0)) :
+    valPlus d (shiftP d (x - 1, y) (-2) 0) - (-2) * (2 * d) - 0 * (2 * (d + 1)) < 2 * y := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_diag_im2_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ x + y = 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) (-2) 1)) :
+    valPlus d (shiftP d (x - 1, y) (-2) 1) - (-2) * (2 * d) - 1 * (2 * (d + 1)) < 2 * y := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_diag_im1_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ x + y = 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) (-1) (-1))) :
+    valPlus d (shiftP d (x - 1, y) (-1) (-1)) - (-1) * (2 * d) - (-1) * (2 * (d + 1)) < 2 * y := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_diag_im1_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ x + y = 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) (-1) 0)) :
+    valPlus d (shiftP d (x - 1, y) (-1) 0) - (-1) * (2 * d) - 0 * (2 * (d + 1)) < 2 * y := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_diag_im1_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ x + y = 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) (-1) 1)) :
+    valPlus d (shiftP d (x - 1, y) (-1) 1) - (-1) * (2 * d) - 1 * (2 * (d + 1)) < 2 * y := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_diag_i0_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ x + y = 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) 0 (-1))) :
+    valPlus d (shiftP d (x - 1, y) 0 (-1)) - 0 * (2 * d) - (-1) * (2 * (d + 1)) < 2 * y := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_diag_i0_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ x + y = 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) 0 0)) :
+    valPlus d (shiftP d (x - 1, y) 0 0) - 0 * (2 * d) - 0 * (2 * (d + 1)) < 2 * y := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_diag_i0_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ x + y = 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) 0 1)) :
+    valPlus d (shiftP d (x - 1, y) 0 1) - 0 * (2 * d) - 1 * (2 * (d + 1)) < 2 * y := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_diag_i1_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ x + y = 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) 1 (-1))) :
+    valPlus d (shiftP d (x - 1, y) 1 (-1)) - 1 * (2 * d) - (-1) * (2 * (d + 1)) < 2 * y := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_diag_i1_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ x + y = 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) 1 0)) :
+    valPlus d (shiftP d (x - 1, y) 1 0) - 1 * (2 * d) - 0 * (2 * (d + 1)) < 2 * y := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_diag_i1_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ x + y = 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) 1 1)) :
+    valPlus d (shiftP d (x - 1, y) 1 1) - 1 * (2 * d) - 1 * (2 * (d + 1)) < 2 * y := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_diag_i2_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ x + y = 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) 2 (-1))) :
+    valPlus d (shiftP d (x - 1, y) 2 (-1)) - 2 * (2 * d) - (-1) * (2 * (d + 1)) < 2 * y := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_diag_i2_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ x + y = 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) 2 0)) :
+    valPlus d (shiftP d (x - 1, y) 2 0) - 2 * (2 * d) - 0 * (2 * (d + 1)) < 2 * y := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_diag_i2_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ x + y = 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) 2 1)) :
+    valPlus d (shiftP d (x - 1, y) 2 1) - 2 * (2 * d) - 1 * (2 * (d + 1)) < 2 * y := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_left_diag (d x y : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (_hn : NativeP d (x, y)) (hf : ¬ IsFreeP d (x, y)) (hy : y ≤ d) (hx0 : x ≤ 0) (hs : x + y = 2) (r : ℤ) (hr : RankOfP d (x - 1, y) r) :
+    r < valPlus d (x, y) := by
+  rw [valPlus_int_left2 d x y hf hx0 hs]
+  have hb : 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2 := by
+    unfold NativeP at _hn
+    unfold IsFreeP IsHc IsVc at hf
+    simp only [Prod.mk.injEq] at _hn hf
+    omega
+  obtain ⟨hb1, hb2, hb3, hb4, hb5⟩ := hb
+  clear _hn hf
+  obtain ⟨i, j, hi, hrep, rfl⟩ := hr
+  obtain ⟨hi1, hi2, hj1, hj2⟩ := hi
+  interval_cases i <;> interval_cases j
+  · exact gateP_int_left_diag_im2_jm1 d x y ⟨hd, hdodd, hy, hx0, hs, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_left_diag_im2_j0 d x y ⟨hd, hdodd, hy, hx0, hs, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_left_diag_im2_j1 d x y ⟨hd, hdodd, hy, hx0, hs, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_left_diag_im1_jm1 d x y ⟨hd, hdodd, hy, hx0, hs, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_left_diag_im1_j0 d x y ⟨hd, hdodd, hy, hx0, hs, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_left_diag_im1_j1 d x y ⟨hd, hdodd, hy, hx0, hs, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_left_diag_i0_jm1 d x y ⟨hd, hdodd, hy, hx0, hs, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_left_diag_i0_j0 d x y ⟨hd, hdodd, hy, hx0, hs, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_left_diag_i0_j1 d x y ⟨hd, hdodd, hy, hx0, hs, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_left_diag_i1_jm1 d x y ⟨hd, hdodd, hy, hx0, hs, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_left_diag_i1_j0 d x y ⟨hd, hdodd, hy, hx0, hs, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_left_diag_i1_j1 d x y ⟨hd, hdodd, hy, hx0, hs, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_left_diag_i2_jm1 d x y ⟨hd, hdodd, hy, hx0, hs, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_left_diag_i2_j0 d x y ⟨hd, hdodd, hy, hx0, hs, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_left_diag_i2_j1 d x y ⟨hd, hdodd, hy, hx0, hs, hb1, hb2, hb3, hb4, hb5⟩ hrep
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_right_even_im2_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x + 1, y) (-2) (-1))) :
+    valPlus d (shiftP d (x + 1, y) (-2) (-1)) - (-2) * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_right_even_im2_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x + 1, y) (-2) 0)) :
+    valPlus d (shiftP d (x + 1, y) (-2) 0) - (-2) * (2 * d) - 0 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_right_even_im2_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x + 1, y) (-2) 1)) :
+    valPlus d (shiftP d (x + 1, y) (-2) 1) - (-2) * (2 * d) - 1 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_right_even_im1_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x + 1, y) (-1) (-1))) :
+    valPlus d (shiftP d (x + 1, y) (-1) (-1)) - (-1) * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_right_even_im1_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x + 1, y) (-1) 0)) :
+    valPlus d (shiftP d (x + 1, y) (-1) 0) - (-1) * (2 * d) - 0 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_right_even_im1_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x + 1, y) (-1) 1)) :
+    valPlus d (shiftP d (x + 1, y) (-1) 1) - (-1) * (2 * d) - 1 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_right_even_i0_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x + 1, y) 0 (-1))) :
+    valPlus d (shiftP d (x + 1, y) 0 (-1)) - 0 * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_right_even_i0_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x + 1, y) 0 0)) :
+    valPlus d (shiftP d (x + 1, y) 0 0) - 0 * (2 * d) - 0 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_right_even_i0_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x + 1, y) 0 1)) :
+    valPlus d (shiftP d (x + 1, y) 0 1) - 0 * (2 * d) - 1 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_right_even_i1_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x + 1, y) 1 (-1))) :
+    valPlus d (shiftP d (x + 1, y) 1 (-1)) - 1 * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_right_even_i1_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x + 1, y) 1 0)) :
+    valPlus d (shiftP d (x + 1, y) 1 0) - 1 * (2 * d) - 0 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_right_even_i1_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x + 1, y) 1 1)) :
+    valPlus d (shiftP d (x + 1, y) 1 1) - 1 * (2 * d) - 1 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_right_even_i2_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x + 1, y) 2 (-1))) :
+    valPlus d (shiftP d (x + 1, y) 2 (-1)) - 2 * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_right_even_i2_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x + 1, y) 2 0)) :
+    valPlus d (shiftP d (x + 1, y) 2 0) - 2 * (2 * d) - 0 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_right_even_i2_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x + 1, y) 2 1)) :
+    valPlus d (shiftP d (x + 1, y) 2 1) - 2 * (2 * d) - 1 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_right_even (d x y : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (hn : NativeP d (x, y)) (hf : ¬ IsFreeP d (x, y)) (hy : y ≤ d) (hx1 : 1 ≤ x) (hpar : (x + y) % 2 = 0) (r : ℤ) (hr : RankOfP d (x + 1, y) r) :
+    r < valPlus d (x, y) := by
+  rw [valPlus_int_right d x y hf hx1]
+  have hb : 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2 := by
+    unfold NativeP at hn
+    unfold IsFreeP IsHc IsVc at hf
+    simp only [Prod.mk.injEq] at hn hf
+    omega
+  obtain ⟨hb1, hb2, hb3, hb4, hb5⟩ := hb
+  clear hn hf
+  obtain ⟨i, j, hi, hrep, rfl⟩ := hr
+  obtain ⟨hi1, hi2, hj1, hj2⟩ := hi
+  interval_cases i <;> interval_cases j
+  · exact gateP_int_right_even_im2_jm1 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_right_even_im2_j0 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_right_even_im2_j1 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_right_even_im1_jm1 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_right_even_im1_j0 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_right_even_im1_j1 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_right_even_i0_jm1 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_right_even_i0_j0 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_right_even_i0_j1 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_right_even_i1_jm1 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_right_even_i1_j0 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_right_even_i1_j1 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_right_even_i2_jm1 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_right_even_i2_j0 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_right_even_i2_j1 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_one_left_im2_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x = 1 ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) (-2) (-1))) :
+    valPlus d (shiftP d (x - 1, y) (-2) (-1)) - (-2) * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_one_left_im2_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x = 1 ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) (-2) 0)) :
+    valPlus d (shiftP d (x - 1, y) (-2) 0) - (-2) * (2 * d) - 0 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_one_left_im2_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x = 1 ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) (-2) 1)) :
+    valPlus d (shiftP d (x - 1, y) (-2) 1) - (-2) * (2 * d) - 1 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_one_left_im1_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x = 1 ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) (-1) (-1))) :
+    valPlus d (shiftP d (x - 1, y) (-1) (-1)) - (-1) * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_one_left_im1_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x = 1 ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) (-1) 0)) :
+    valPlus d (shiftP d (x - 1, y) (-1) 0) - (-1) * (2 * d) - 0 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_one_left_im1_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x = 1 ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) (-1) 1)) :
+    valPlus d (shiftP d (x - 1, y) (-1) 1) - (-1) * (2 * d) - 1 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_one_left_i0_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x = 1 ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) 0 (-1))) :
+    valPlus d (shiftP d (x - 1, y) 0 (-1)) - 0 * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_one_left_i0_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x = 1 ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) 0 0)) :
+    valPlus d (shiftP d (x - 1, y) 0 0) - 0 * (2 * d) - 0 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_one_left_i0_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x = 1 ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) 0 1)) :
+    valPlus d (shiftP d (x - 1, y) 0 1) - 0 * (2 * d) - 1 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_one_left_i1_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x = 1 ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) 1 (-1))) :
+    valPlus d (shiftP d (x - 1, y) 1 (-1)) - 1 * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_one_left_i1_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x = 1 ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) 1 0)) :
+    valPlus d (shiftP d (x - 1, y) 1 0) - 1 * (2 * d) - 0 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_one_left_i1_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x = 1 ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) 1 1)) :
+    valPlus d (shiftP d (x - 1, y) 1 1) - 1 * (2 * d) - 1 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_one_left_i2_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x = 1 ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) 2 (-1))) :
+    valPlus d (shiftP d (x - 1, y) 2 (-1)) - 2 * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_one_left_i2_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x = 1 ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) 2 0)) :
+    valPlus d (shiftP d (x - 1, y) 2 0) - 2 * (2 * d) - 0 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_one_left_i2_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x = 1 ∧ (x + y) % 2 = 0 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x - 1, y) 2 1)) :
+    valPlus d (shiftP d (x - 1, y) 2 1) - 2 * (2 * d) - 1 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_one_left (d x y : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (hn : NativeP d (x, y)) (hf : ¬ IsFreeP d (x, y)) (hy : y ≤ d) (hx1 : x = 1) (hpar : (x + y) % 2 = 0) (r : ℤ) (hr : RankOfP d (x - 1, y) r) :
+    r < valPlus d (x, y) := by
+  rw [valPlus_int_right d x y hf (by omega)]
+  have hb : 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2 := by
+    unfold NativeP at hn
+    unfold IsFreeP IsHc IsVc at hf
+    simp only [Prod.mk.injEq] at hn hf
+    omega
+  obtain ⟨hb1, hb2, hb3, hb4, hb5⟩ := hb
+  clear hn hf
+  obtain ⟨i, j, hi, hrep, rfl⟩ := hr
+  obtain ⟨hi1, hi2, hj1, hj2⟩ := hi
+  interval_cases i <;> interval_cases j
+  · exact gateP_int_one_left_im2_jm1 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_one_left_im2_j0 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_one_left_im2_j1 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_one_left_im1_jm1 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_one_left_im1_j0 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_one_left_im1_j1 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_one_left_i0_jm1 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_one_left_i0_j0 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_one_left_i0_j1 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_one_left_i1_jm1 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_one_left_i1_j0 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_one_left_i1_j1 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_one_left_i2_jm1 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_one_left_i2_j0 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_one_left_i2_j1 d x y ⟨hd, hdodd, hy, hx1, hpar, hb1, hb2, hb3, hb4, hb5⟩ hrep
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_down_im2_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) (-2) (-1))) :
+    valPlus d (shiftP d (x, y - 1) (-2) (-1)) - (-2) * (2 * d) - (-1) * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_down_im2_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) (-2) 0)) :
+    valPlus d (shiftP d (x, y - 1) (-2) 0) - (-2) * (2 * d) - 0 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_down_im2_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) (-2) 1)) :
+    valPlus d (shiftP d (x, y - 1) (-2) 1) - (-2) * (2 * d) - 1 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_down_im1_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) (-1) (-1))) :
+    valPlus d (shiftP d (x, y - 1) (-1) (-1)) - (-1) * (2 * d) - (-1) * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_down_im1_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) (-1) 0)) :
+    valPlus d (shiftP d (x, y - 1) (-1) 0) - (-1) * (2 * d) - 0 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_down_im1_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) (-1) 1)) :
+    valPlus d (shiftP d (x, y - 1) (-1) 1) - (-1) * (2 * d) - 1 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_down_i0_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) 0 (-1))) :
+    valPlus d (shiftP d (x, y - 1) 0 (-1)) - 0 * (2 * d) - (-1) * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_down_i0_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) 0 0)) :
+    valPlus d (shiftP d (x, y - 1) 0 0) - 0 * (2 * d) - 0 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_down_i0_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) 0 1)) :
+    valPlus d (shiftP d (x, y - 1) 0 1) - 0 * (2 * d) - 1 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_down_i1_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) 1 (-1))) :
+    valPlus d (shiftP d (x, y - 1) 1 (-1)) - 1 * (2 * d) - (-1) * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_down_i1_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) 1 0)) :
+    valPlus d (shiftP d (x, y - 1) 1 0) - 1 * (2 * d) - 0 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_down_i1_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) 1 1)) :
+    valPlus d (shiftP d (x, y - 1) 1 1) - 1 * (2 * d) - 1 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_down_i2_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) 2 (-1))) :
+    valPlus d (shiftP d (x, y - 1) 2 (-1)) - 2 * (2 * d) - (-1) * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_down_i2_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) 2 0)) :
+    valPlus d (shiftP d (x, y - 1) 2 0) - 2 * (2 * d) - 0 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_down_i2_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) 2 1)) :
+    valPlus d (shiftP d (x, y - 1) 2 1) - 2 * (2 * d) - 1 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_down (d x y : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (hn : NativeP d (x, y)) (hf : ¬ IsFreeP d (x, y)) (hy : y ≤ d) (hx0 : x ≤ 0) (hodd : (x + y) % 2 = 1) (r : ℤ) (hr : RankOfP d (x, y - 1) r) :
+    r < valPlus d (x, y) := by
+  rw [valPlus_int_left d x y hf hx0 (by omega)]
+  have hb : 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2 := by
+    unfold NativeP at hn
+    unfold IsFreeP IsHc IsVc at hf
+    simp only [Prod.mk.injEq] at hn hf
+    omega
+  obtain ⟨hb1, hb2, hb3, hb4, hb5⟩ := hb
+  have hnV : ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) := by
+    unfold IsFreeP IsHc IsVc at hf
+    simp only [Prod.mk.injEq] at hf
+    omega
+  clear hn hf
+  obtain ⟨i, j, hi, hrep, rfl⟩ := hr
+  obtain ⟨hi1, hi2, hj1, hj2⟩ := hi
+  interval_cases i <;> interval_cases j
+  · exact gateP_int_odd_left_down_im2_jm1 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_left_down_im2_j0 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_left_down_im2_j1 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_left_down_im1_jm1 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_left_down_im1_j0 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_left_down_im1_j1 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_left_down_i0_jm1 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_left_down_i0_j0 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_left_down_i0_j1 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_left_down_i1_jm1 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_left_down_i1_j0 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_left_down_i1_j1 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_left_down_i2_jm1 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_left_down_i2_j0 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_left_down_i2_j1 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_up_im2_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) (-2) (-1))) :
+    valPlus d (shiftP d (x, y + 1) (-2) (-1)) - (-2) * (2 * d) - (-1) * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_up_im2_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) (-2) 0)) :
+    valPlus d (shiftP d (x, y + 1) (-2) 0) - (-2) * (2 * d) - 0 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_up_im2_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) (-2) 1)) :
+    valPlus d (shiftP d (x, y + 1) (-2) 1) - (-2) * (2 * d) - 1 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_up_im1_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) (-1) (-1))) :
+    valPlus d (shiftP d (x, y + 1) (-1) (-1)) - (-1) * (2 * d) - (-1) * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_up_im1_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) (-1) 0)) :
+    valPlus d (shiftP d (x, y + 1) (-1) 0) - (-1) * (2 * d) - 0 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_up_im1_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) (-1) 1)) :
+    valPlus d (shiftP d (x, y + 1) (-1) 1) - (-1) * (2 * d) - 1 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_up_i0_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) 0 (-1))) :
+    valPlus d (shiftP d (x, y + 1) 0 (-1)) - 0 * (2 * d) - (-1) * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_up_i0_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) 0 0)) :
+    valPlus d (shiftP d (x, y + 1) 0 0) - 0 * (2 * d) - 0 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_up_i0_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) 0 1)) :
+    valPlus d (shiftP d (x, y + 1) 0 1) - 0 * (2 * d) - 1 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_up_i1_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) 1 (-1))) :
+    valPlus d (shiftP d (x, y + 1) 1 (-1)) - 1 * (2 * d) - (-1) * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_up_i1_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) 1 0)) :
+    valPlus d (shiftP d (x, y + 1) 1 0) - 1 * (2 * d) - 0 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_up_i1_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) 1 1)) :
+    valPlus d (shiftP d (x, y + 1) 1 1) - 1 * (2 * d) - 1 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_up_i2_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) 2 (-1))) :
+    valPlus d (shiftP d (x, y + 1) 2 (-1)) - 2 * (2 * d) - (-1) * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_up_i2_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) 2 0)) :
+    valPlus d (shiftP d (x, y + 1) 2 0) - 2 * (2 * d) - 0 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_up_i2_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ x ≤ 0 ∧ (x + y) % 2 = 1 ∧ ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) 2 1)) :
+    valPlus d (shiftP d (x, y + 1) 2 1) - 2 * (2 * d) - 1 * (2 * (d + 1)) < 2 * x + 4 * d - 4 + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_left_up (d x y : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (hn : NativeP d (x, y)) (hf : ¬ IsFreeP d (x, y)) (hy : y ≤ d) (hx0 : x ≤ 0) (hodd : (x + y) % 2 = 1) (r : ℤ) (hr : RankOfP d (x, y + 1) r) :
+    r < valPlus d (x, y) := by
+  rw [valPlus_int_left d x y hf hx0 (by omega)]
+  have hb : 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2 := by
+    unfold NativeP at hn
+    unfold IsFreeP IsHc IsVc at hf
+    simp only [Prod.mk.injEq] at hn hf
+    omega
+  obtain ⟨hb1, hb2, hb3, hb4, hb5⟩ := hb
+  have hnV : ¬ (x + y = 1 ∧ 1 ≤ y ∧ y < d) := by
+    unfold IsFreeP IsHc IsVc at hf
+    simp only [Prod.mk.injEq] at hf
+    omega
+  clear hn hf
+  obtain ⟨i, j, hi, hrep, rfl⟩ := hr
+  obtain ⟨hi1, hi2, hj1, hj2⟩ := hi
+  interval_cases i <;> interval_cases j
+  · exact gateP_int_odd_left_up_im2_jm1 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_left_up_im2_j0 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_left_up_im2_j1 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_left_up_im1_jm1 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_left_up_im1_j0 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_left_up_im1_j1 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_left_up_i0_jm1 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_left_up_i0_j0 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_left_up_i0_j1 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_left_up_i1_jm1 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_left_up_i1_j0 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_left_up_i1_j1 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_left_up_i2_jm1 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_left_up_i2_j0 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_left_up_i2_j1 d x y ⟨hd, hdodd, hy, hx0, hodd, hnV, hb1, hb2, hb3, hb4, hb5⟩ hrep
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_down_im2_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) (-2) (-1))) :
+    valPlus d (shiftP d (x, y - 1) (-2) (-1)) - (-2) * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_down_im2_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) (-2) 0)) :
+    valPlus d (shiftP d (x, y - 1) (-2) 0) - (-2) * (2 * d) - 0 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_down_im2_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) (-2) 1)) :
+    valPlus d (shiftP d (x, y - 1) (-2) 1) - (-2) * (2 * d) - 1 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_down_im1_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) (-1) (-1))) :
+    valPlus d (shiftP d (x, y - 1) (-1) (-1)) - (-1) * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_down_im1_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) (-1) 0)) :
+    valPlus d (shiftP d (x, y - 1) (-1) 0) - (-1) * (2 * d) - 0 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_down_im1_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) (-1) 1)) :
+    valPlus d (shiftP d (x, y - 1) (-1) 1) - (-1) * (2 * d) - 1 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_down_i0_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) 0 (-1))) :
+    valPlus d (shiftP d (x, y - 1) 0 (-1)) - 0 * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_down_i0_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) 0 0)) :
+    valPlus d (shiftP d (x, y - 1) 0 0) - 0 * (2 * d) - 0 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_down_i0_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) 0 1)) :
+    valPlus d (shiftP d (x, y - 1) 0 1) - 0 * (2 * d) - 1 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_down_i1_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) 1 (-1))) :
+    valPlus d (shiftP d (x, y - 1) 1 (-1)) - 1 * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_down_i1_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) 1 0)) :
+    valPlus d (shiftP d (x, y - 1) 1 0) - 1 * (2 * d) - 0 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_down_i1_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) 1 1)) :
+    valPlus d (shiftP d (x, y - 1) 1 1) - 1 * (2 * d) - 1 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_down_i2_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) 2 (-1))) :
+    valPlus d (shiftP d (x, y - 1) 2 (-1)) - 2 * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_down_i2_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) 2 0)) :
+    valPlus d (shiftP d (x, y - 1) 2 0) - 2 * (2 * d) - 0 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_down_i2_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y - 1) 2 1)) :
+    valPlus d (shiftP d (x, y - 1) 2 1) - 2 * (2 * d) - 1 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_down (d x y : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (hn : NativeP d (x, y)) (hf : ¬ IsFreeP d (x, y)) (hy : y ≤ d) (h4 : x + y ≠ d + 2) (hx1 : 1 ≤ x) (hodd : (x + y) % 2 = 1) (r : ℤ) (hr : RankOfP d (x, y - 1) r) :
+    r < valPlus d (x, y) := by
+  rw [valPlus_int_right d x y hf hx1]
+  have hb : 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2 := by
+    unfold NativeP at hn
+    unfold IsFreeP IsHc IsVc at hf
+    simp only [Prod.mk.injEq] at hn hf
+    omega
+  obtain ⟨hb1, hb2, hb3, hb4, hb5⟩ := hb
+  clear hn hf
+  obtain ⟨i, j, hi, hrep, rfl⟩ := hr
+  obtain ⟨hi1, hi2, hj1, hj2⟩ := hi
+  interval_cases i <;> interval_cases j
+  · exact gateP_int_odd_right_down_im2_jm1 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_right_down_im2_j0 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_right_down_im2_j1 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_right_down_im1_jm1 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_right_down_im1_j0 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_right_down_im1_j1 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_right_down_i0_jm1 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_right_down_i0_j0 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_right_down_i0_j1 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_right_down_i1_jm1 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_right_down_i1_j0 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_right_down_i1_j1 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_right_down_i2_jm1 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_right_down_i2_j0 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_right_down_i2_j1 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_up_im2_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) (-2) (-1))) :
+    valPlus d (shiftP d (x, y + 1) (-2) (-1)) - (-2) * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_up_im2_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) (-2) 0)) :
+    valPlus d (shiftP d (x, y + 1) (-2) 0) - (-2) * (2 * d) - 0 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_up_im2_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) (-2) 1)) :
+    valPlus d (shiftP d (x, y + 1) (-2) 1) - (-2) * (2 * d) - 1 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_up_im1_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) (-1) (-1))) :
+    valPlus d (shiftP d (x, y + 1) (-1) (-1)) - (-1) * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_up_im1_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) (-1) 0)) :
+    valPlus d (shiftP d (x, y + 1) (-1) 0) - (-1) * (2 * d) - 0 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_up_im1_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) (-1) 1)) :
+    valPlus d (shiftP d (x, y + 1) (-1) 1) - (-1) * (2 * d) - 1 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_up_i0_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) 0 (-1))) :
+    valPlus d (shiftP d (x, y + 1) 0 (-1)) - 0 * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_up_i0_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) 0 0)) :
+    valPlus d (shiftP d (x, y + 1) 0 0) - 0 * (2 * d) - 0 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_up_i0_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) 0 1)) :
+    valPlus d (shiftP d (x, y + 1) 0 1) - 0 * (2 * d) - 1 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_up_i1_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) 1 (-1))) :
+    valPlus d (shiftP d (x, y + 1) 1 (-1)) - 1 * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_up_i1_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) 1 0)) :
+    valPlus d (shiftP d (x, y + 1) 1 0) - 1 * (2 * d) - 0 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_up_i1_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) 1 1)) :
+    valPlus d (shiftP d (x, y + 1) 1 1) - 1 * (2 * d) - 1 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_up_i2_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) 2 (-1))) :
+    valPlus d (shiftP d (x, y + 1) 2 (-1)) - 2 * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_up_i2_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) 2 0)) :
+    valPlus d (shiftP d (x, y + 1) 2 0) - 2 * (2 * d) - 0 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_up_i2_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ y ≤ d ∧ 1 ≤ x ∧ (x + y) % 2 = 1 ∧ x + y ≠ d + 2 ∧ 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2) (hrep : IsRepP d (shiftP d (x, y + 1) 2 1)) :
+    valPlus d (shiftP d (x, y + 1) 2 1) - 2 * (2 * d) - 1 * (2 * (d + 1)) < 4 * d - 2 * x + (x + y) % 2 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_int_odd_right_up (d x y : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (hn : NativeP d (x, y)) (hf : ¬ IsFreeP d (x, y)) (hy : y ≤ d) (h4 : x + y ≠ d + 2) (hx1 : 1 ≤ x) (hodd : (x + y) % 2 = 1) (r : ℤ) (hr : RankOfP d (x, y + 1) r) :
+    r < valPlus d (x, y) := by
+  rw [valPlus_int_right d x y hf hx1]
+  have hb : 2 - d ≤ x ∧ x ≤ d ∧ 1 ≤ y ∧ 1 ≤ x + y ∧ x + y ≤ d + 2 := by
+    unfold NativeP at hn
+    unfold IsFreeP IsHc IsVc at hf
+    simp only [Prod.mk.injEq] at hn hf
+    omega
+  obtain ⟨hb1, hb2, hb3, hb4, hb5⟩ := hb
+  clear hn hf
+  obtain ⟨i, j, hi, hrep, rfl⟩ := hr
+  obtain ⟨hi1, hi2, hj1, hj2⟩ := hi
+  interval_cases i <;> interval_cases j
+  · exact gateP_int_odd_right_up_im2_jm1 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_right_up_im2_j0 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_right_up_im2_j1 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_right_up_im1_jm1 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_right_up_im1_j0 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_right_up_im1_j1 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_right_up_i0_jm1 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_right_up_i0_j0 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_right_up_i0_j1 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_right_up_i1_jm1 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_right_up_i1_j0 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_right_up_i1_j1 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_right_up_i2_jm1 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_right_up_i2_j0 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+  · exact gateP_int_odd_right_up_i2_j1 d x y ⟨hd, hdodd, hy, hx1, hodd, h4, hb1, hb2, hb3, hb4, hb5⟩ hrep
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_even_im2_jm1 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 0) (hrep : IsRepP d (shiftP d (x - 1, d + 1) (-2) (-1))) :
+    valPlus d (shiftP d (x - 1, d + 1) (-2) (-1)) - (-2) * (2 * d) - (-1) * (2 * (d + 1)) < 2 * x + 4 * d - 4 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_even_im2_j0 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 0) (hrep : IsRepP d (shiftP d (x - 1, d + 1) (-2) 0)) :
+    valPlus d (shiftP d (x - 1, d + 1) (-2) 0) - (-2) * (2 * d) - 0 * (2 * (d + 1)) < 2 * x + 4 * d - 4 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_even_im2_j1 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 0) (hrep : IsRepP d (shiftP d (x - 1, d + 1) (-2) 1)) :
+    valPlus d (shiftP d (x - 1, d + 1) (-2) 1) - (-2) * (2 * d) - 1 * (2 * (d + 1)) < 2 * x + 4 * d - 4 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_even_im1_jm1 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 0) (hrep : IsRepP d (shiftP d (x - 1, d + 1) (-1) (-1))) :
+    valPlus d (shiftP d (x - 1, d + 1) (-1) (-1)) - (-1) * (2 * d) - (-1) * (2 * (d + 1)) < 2 * x + 4 * d - 4 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_even_im1_j0 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 0) (hrep : IsRepP d (shiftP d (x - 1, d + 1) (-1) 0)) :
+    valPlus d (shiftP d (x - 1, d + 1) (-1) 0) - (-1) * (2 * d) - 0 * (2 * (d + 1)) < 2 * x + 4 * d - 4 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_even_im1_j1 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 0) (hrep : IsRepP d (shiftP d (x - 1, d + 1) (-1) 1)) :
+    valPlus d (shiftP d (x - 1, d + 1) (-1) 1) - (-1) * (2 * d) - 1 * (2 * (d + 1)) < 2 * x + 4 * d - 4 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_even_i0_jm1 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 0) (hrep : IsRepP d (shiftP d (x - 1, d + 1) 0 (-1))) :
+    valPlus d (shiftP d (x - 1, d + 1) 0 (-1)) - 0 * (2 * d) - (-1) * (2 * (d + 1)) < 2 * x + 4 * d - 4 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_even_i0_j0 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 0) (hrep : IsRepP d (shiftP d (x - 1, d + 1) 0 0)) :
+    valPlus d (shiftP d (x - 1, d + 1) 0 0) - 0 * (2 * d) - 0 * (2 * (d + 1)) < 2 * x + 4 * d - 4 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_even_i0_j1 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 0) (hrep : IsRepP d (shiftP d (x - 1, d + 1) 0 1)) :
+    valPlus d (shiftP d (x - 1, d + 1) 0 1) - 0 * (2 * d) - 1 * (2 * (d + 1)) < 2 * x + 4 * d - 4 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_even_i1_jm1 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 0) (hrep : IsRepP d (shiftP d (x - 1, d + 1) 1 (-1))) :
+    valPlus d (shiftP d (x - 1, d + 1) 1 (-1)) - 1 * (2 * d) - (-1) * (2 * (d + 1)) < 2 * x + 4 * d - 4 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_even_i1_j0 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 0) (hrep : IsRepP d (shiftP d (x - 1, d + 1) 1 0)) :
+    valPlus d (shiftP d (x - 1, d + 1) 1 0) - 1 * (2 * d) - 0 * (2 * (d + 1)) < 2 * x + 4 * d - 4 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_even_i1_j1 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 0) (hrep : IsRepP d (shiftP d (x - 1, d + 1) 1 1)) :
+    valPlus d (shiftP d (x - 1, d + 1) 1 1) - 1 * (2 * d) - 1 * (2 * (d + 1)) < 2 * x + 4 * d - 4 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_even_i2_jm1 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 0) (hrep : IsRepP d (shiftP d (x - 1, d + 1) 2 (-1))) :
+    valPlus d (shiftP d (x - 1, d + 1) 2 (-1)) - 2 * (2 * d) - (-1) * (2 * (d + 1)) < 2 * x + 4 * d - 4 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_even_i2_j0 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 0) (hrep : IsRepP d (shiftP d (x - 1, d + 1) 2 0)) :
+    valPlus d (shiftP d (x - 1, d + 1) 2 0) - 2 * (2 * d) - 0 * (2 * (d + 1)) < 2 * x + 4 * d - 4 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_even_i2_j1 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 0) (hrep : IsRepP d (shiftP d (x - 1, d + 1) 2 1)) :
+    valPlus d (shiftP d (x - 1, d + 1) 2 1) - 2 * (2 * d) - 1 * (2 * (d + 1)) < 2 * x + 4 * d - 4 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_even (d x : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (hx1 : 2 - d ≤ x) (hx2 : x ≤ 0) (hev : x % 2 = 0) (r : ℤ) (hr : RankOfP d (x - 1, d + 1) r) :
+    r < 2 * x + 4 * d - 4 := by
+  obtain ⟨i, j, hi, hrep, rfl⟩ := hr
+  obtain ⟨hi1, hi2, hj1, hj2⟩ := hi
+  interval_cases i <;> interval_cases j
+  · exact gateP_top_even_im2_jm1 d x ⟨hd, hdodd, hx1, hx2, hev⟩ hrep
+  · exact gateP_top_even_im2_j0 d x ⟨hd, hdodd, hx1, hx2, hev⟩ hrep
+  · exact gateP_top_even_im2_j1 d x ⟨hd, hdodd, hx1, hx2, hev⟩ hrep
+  · exact gateP_top_even_im1_jm1 d x ⟨hd, hdodd, hx1, hx2, hev⟩ hrep
+  · exact gateP_top_even_im1_j0 d x ⟨hd, hdodd, hx1, hx2, hev⟩ hrep
+  · exact gateP_top_even_im1_j1 d x ⟨hd, hdodd, hx1, hx2, hev⟩ hrep
+  · exact gateP_top_even_i0_jm1 d x ⟨hd, hdodd, hx1, hx2, hev⟩ hrep
+  · exact gateP_top_even_i0_j0 d x ⟨hd, hdodd, hx1, hx2, hev⟩ hrep
+  · exact gateP_top_even_i0_j1 d x ⟨hd, hdodd, hx1, hx2, hev⟩ hrep
+  · exact gateP_top_even_i1_jm1 d x ⟨hd, hdodd, hx1, hx2, hev⟩ hrep
+  · exact gateP_top_even_i1_j0 d x ⟨hd, hdodd, hx1, hx2, hev⟩ hrep
+  · exact gateP_top_even_i1_j1 d x ⟨hd, hdodd, hx1, hx2, hev⟩ hrep
+  · exact gateP_top_even_i2_jm1 d x ⟨hd, hdodd, hx1, hx2, hev⟩ hrep
+  · exact gateP_top_even_i2_j0 d x ⟨hd, hdodd, hx1, hx2, hev⟩ hrep
+  · exact gateP_top_even_i2_j1 d x ⟨hd, hdodd, hx1, hx2, hev⟩ hrep
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_odd_im2_jm1 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 1) (hrep : IsRepP d (shiftP d (x, d) (-2) (-1))) :
+    valPlus d (shiftP d (x, d) (-2) (-1)) - (-2) * (2 * d) - (-1) * (2 * (d + 1)) < 2 * x + 4 * d - 3 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_odd_im2_j0 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 1) (hrep : IsRepP d (shiftP d (x, d) (-2) 0)) :
+    valPlus d (shiftP d (x, d) (-2) 0) - (-2) * (2 * d) - 0 * (2 * (d + 1)) < 2 * x + 4 * d - 3 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_odd_im2_j1 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 1) (hrep : IsRepP d (shiftP d (x, d) (-2) 1)) :
+    valPlus d (shiftP d (x, d) (-2) 1) - (-2) * (2 * d) - 1 * (2 * (d + 1)) < 2 * x + 4 * d - 3 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_odd_im1_jm1 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 1) (hrep : IsRepP d (shiftP d (x, d) (-1) (-1))) :
+    valPlus d (shiftP d (x, d) (-1) (-1)) - (-1) * (2 * d) - (-1) * (2 * (d + 1)) < 2 * x + 4 * d - 3 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_odd_im1_j0 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 1) (hrep : IsRepP d (shiftP d (x, d) (-1) 0)) :
+    valPlus d (shiftP d (x, d) (-1) 0) - (-1) * (2 * d) - 0 * (2 * (d + 1)) < 2 * x + 4 * d - 3 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_odd_im1_j1 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 1) (hrep : IsRepP d (shiftP d (x, d) (-1) 1)) :
+    valPlus d (shiftP d (x, d) (-1) 1) - (-1) * (2 * d) - 1 * (2 * (d + 1)) < 2 * x + 4 * d - 3 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_odd_i0_jm1 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 1) (hrep : IsRepP d (shiftP d (x, d) 0 (-1))) :
+    valPlus d (shiftP d (x, d) 0 (-1)) - 0 * (2 * d) - (-1) * (2 * (d + 1)) < 2 * x + 4 * d - 3 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_odd_i0_j0 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 1) (hrep : IsRepP d (shiftP d (x, d) 0 0)) :
+    valPlus d (shiftP d (x, d) 0 0) - 0 * (2 * d) - 0 * (2 * (d + 1)) < 2 * x + 4 * d - 3 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_odd_i0_j1 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 1) (hrep : IsRepP d (shiftP d (x, d) 0 1)) :
+    valPlus d (shiftP d (x, d) 0 1) - 0 * (2 * d) - 1 * (2 * (d + 1)) < 2 * x + 4 * d - 3 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_odd_i1_jm1 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 1) (hrep : IsRepP d (shiftP d (x, d) 1 (-1))) :
+    valPlus d (shiftP d (x, d) 1 (-1)) - 1 * (2 * d) - (-1) * (2 * (d + 1)) < 2 * x + 4 * d - 3 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_odd_i1_j0 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 1) (hrep : IsRepP d (shiftP d (x, d) 1 0)) :
+    valPlus d (shiftP d (x, d) 1 0) - 1 * (2 * d) - 0 * (2 * (d + 1)) < 2 * x + 4 * d - 3 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_odd_i1_j1 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 1) (hrep : IsRepP d (shiftP d (x, d) 1 1)) :
+    valPlus d (shiftP d (x, d) 1 1) - 1 * (2 * d) - 1 * (2 * (d + 1)) < 2 * x + 4 * d - 3 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_odd_i2_jm1 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 1) (hrep : IsRepP d (shiftP d (x, d) 2 (-1))) :
+    valPlus d (shiftP d (x, d) 2 (-1)) - 2 * (2 * d) - (-1) * (2 * (d + 1)) < 2 * x + 4 * d - 3 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_odd_i2_j0 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 1) (hrep : IsRepP d (shiftP d (x, d) 2 0)) :
+    valPlus d (shiftP d (x, d) 2 0) - 2 * (2 * d) - 0 * (2 * (d + 1)) < 2 * x + 4 * d - 3 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_odd_i2_j1 (d x : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ 2 - d ≤ x ∧ x ≤ 0 ∧ x % 2 = 1) (hrep : IsRepP d (shiftP d (x, d) 2 1)) :
+    valPlus d (shiftP d (x, d) 2 1) - 2 * (2 * d) - 1 * (2 * (d + 1)) < 2 * x + 4 * d - 3 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_odd (d x : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (hx1 : 2 - d ≤ x) (hx2 : x ≤ 0) (hod : x % 2 = 1) (r : ℤ) (hr : RankOfP d (x, d) r) :
+    r < 2 * x + 4 * d - 3 := by
+  obtain ⟨i, j, hi, hrep, rfl⟩ := hr
+  obtain ⟨hi1, hi2, hj1, hj2⟩ := hi
+  interval_cases i <;> interval_cases j
+  · exact gateP_top_odd_im2_jm1 d x ⟨hd, hdodd, hx1, hx2, hod⟩ hrep
+  · exact gateP_top_odd_im2_j0 d x ⟨hd, hdodd, hx1, hx2, hod⟩ hrep
+  · exact gateP_top_odd_im2_j1 d x ⟨hd, hdodd, hx1, hx2, hod⟩ hrep
+  · exact gateP_top_odd_im1_jm1 d x ⟨hd, hdodd, hx1, hx2, hod⟩ hrep
+  · exact gateP_top_odd_im1_j0 d x ⟨hd, hdodd, hx1, hx2, hod⟩ hrep
+  · exact gateP_top_odd_im1_j1 d x ⟨hd, hdodd, hx1, hx2, hod⟩ hrep
+  · exact gateP_top_odd_i0_jm1 d x ⟨hd, hdodd, hx1, hx2, hod⟩ hrep
+  · exact gateP_top_odd_i0_j0 d x ⟨hd, hdodd, hx1, hx2, hod⟩ hrep
+  · exact gateP_top_odd_i0_j1 d x ⟨hd, hdodd, hx1, hx2, hod⟩ hrep
+  · exact gateP_top_odd_i1_jm1 d x ⟨hd, hdodd, hx1, hx2, hod⟩ hrep
+  · exact gateP_top_odd_i1_j0 d x ⟨hd, hdodd, hx1, hx2, hod⟩ hrep
+  · exact gateP_top_odd_i1_j1 d x ⟨hd, hdodd, hx1, hx2, hod⟩ hrep
+  · exact gateP_top_odd_i2_jm1 d x ⟨hd, hdodd, hx1, hx2, hod⟩ hrep
+  · exact gateP_top_odd_i2_j0 d x ⟨hd, hdodd, hx1, hx2, hod⟩ hrep
+  · exact gateP_top_odd_i2_j1 d x ⟨hd, hdodd, hx1, hx2, hod⟩ hrep
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_one_im2_jm1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d) (-2) (-1))) :
+    valPlus d (shiftP d (1, d) (-2) (-1)) - (-2) * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d - 1 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_one_im2_j0 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d) (-2) 0)) :
+    valPlus d (shiftP d (1, d) (-2) 0) - (-2) * (2 * d) - 0 * (2 * (d + 1)) < 4 * d - 1 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_one_im2_j1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d) (-2) 1)) :
+    valPlus d (shiftP d (1, d) (-2) 1) - (-2) * (2 * d) - 1 * (2 * (d + 1)) < 4 * d - 1 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_one_im1_jm1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d) (-1) (-1))) :
+    valPlus d (shiftP d (1, d) (-1) (-1)) - (-1) * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d - 1 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_one_im1_j0 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d) (-1) 0)) :
+    valPlus d (shiftP d (1, d) (-1) 0) - (-1) * (2 * d) - 0 * (2 * (d + 1)) < 4 * d - 1 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_one_im1_j1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d) (-1) 1)) :
+    valPlus d (shiftP d (1, d) (-1) 1) - (-1) * (2 * d) - 1 * (2 * (d + 1)) < 4 * d - 1 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_one_i0_jm1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d) 0 (-1))) :
+    valPlus d (shiftP d (1, d) 0 (-1)) - 0 * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d - 1 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_one_i0_j0 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d) 0 0)) :
+    valPlus d (shiftP d (1, d) 0 0) - 0 * (2 * d) - 0 * (2 * (d + 1)) < 4 * d - 1 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_one_i0_j1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d) 0 1)) :
+    valPlus d (shiftP d (1, d) 0 1) - 0 * (2 * d) - 1 * (2 * (d + 1)) < 4 * d - 1 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_one_i1_jm1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d) 1 (-1))) :
+    valPlus d (shiftP d (1, d) 1 (-1)) - 1 * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d - 1 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_one_i1_j0 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d) 1 0)) :
+    valPlus d (shiftP d (1, d) 1 0) - 1 * (2 * d) - 0 * (2 * (d + 1)) < 4 * d - 1 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_one_i1_j1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d) 1 1)) :
+    valPlus d (shiftP d (1, d) 1 1) - 1 * (2 * d) - 1 * (2 * (d + 1)) < 4 * d - 1 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_one_i2_jm1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d) 2 (-1))) :
+    valPlus d (shiftP d (1, d) 2 (-1)) - 2 * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d - 1 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_one_i2_j0 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d) 2 0)) :
+    valPlus d (shiftP d (1, d) 2 0) - 2 * (2 * d) - 0 * (2 * (d + 1)) < 4 * d - 1 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_one_i2_j1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d) 2 1)) :
+    valPlus d (shiftP d (1, d) 2 1) - 2 * (2 * d) - 1 * (2 * (d + 1)) < 4 * d - 1 := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_top_one (d : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (r : ℤ) (hr : RankOfP d (1, d) r) :
+    r < 4 * d - 1 := by
+  obtain ⟨i, j, hi, hrep, rfl⟩ := hr
+  obtain ⟨hi1, hi2, hj1, hj2⟩ := hi
+  interval_cases i <;> interval_cases j
+  · exact gateP_top_one_im2_jm1 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_top_one_im2_j0 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_top_one_im2_j1 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_top_one_im1_jm1 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_top_one_im1_j0 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_top_one_im1_j1 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_top_one_i0_jm1 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_top_one_i0_j0 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_top_one_i0_j1 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_top_one_i1_jm1 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_top_one_i1_j0 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_top_one_i1_j1 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_top_one_i2_jm1 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_top_one_i2_j0 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_top_one_i2_j1 d ⟨hd, hdodd⟩ hrep
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_corner_im2_jm1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d + 1) (-2) (-1))) :
+    valPlus d (shiftP d (1, d + 1) (-2) (-1)) - (-2) * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_corner_im2_j0 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d + 1) (-2) 0)) :
+    valPlus d (shiftP d (1, d + 1) (-2) 0) - (-2) * (2 * d) - 0 * (2 * (d + 1)) < 4 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_corner_im2_j1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d + 1) (-2) 1)) :
+    valPlus d (shiftP d (1, d + 1) (-2) 1) - (-2) * (2 * d) - 1 * (2 * (d + 1)) < 4 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_corner_im1_jm1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d + 1) (-1) (-1))) :
+    valPlus d (shiftP d (1, d + 1) (-1) (-1)) - (-1) * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_corner_im1_j0 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d + 1) (-1) 0)) :
+    valPlus d (shiftP d (1, d + 1) (-1) 0) - (-1) * (2 * d) - 0 * (2 * (d + 1)) < 4 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_corner_im1_j1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d + 1) (-1) 1)) :
+    valPlus d (shiftP d (1, d + 1) (-1) 1) - (-1) * (2 * d) - 1 * (2 * (d + 1)) < 4 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_corner_i0_jm1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d + 1) 0 (-1))) :
+    valPlus d (shiftP d (1, d + 1) 0 (-1)) - 0 * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_corner_i0_j0 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d + 1) 0 0)) :
+    valPlus d (shiftP d (1, d + 1) 0 0) - 0 * (2 * d) - 0 * (2 * (d + 1)) < 4 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_corner_i0_j1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d + 1) 0 1)) :
+    valPlus d (shiftP d (1, d + 1) 0 1) - 0 * (2 * d) - 1 * (2 * (d + 1)) < 4 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_corner_i1_jm1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d + 1) 1 (-1))) :
+    valPlus d (shiftP d (1, d + 1) 1 (-1)) - 1 * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_corner_i1_j0 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d + 1) 1 0)) :
+    valPlus d (shiftP d (1, d + 1) 1 0) - 1 * (2 * d) - 0 * (2 * (d + 1)) < 4 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_corner_i1_j1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d + 1) 1 1)) :
+    valPlus d (shiftP d (1, d + 1) 1 1) - 1 * (2 * d) - 1 * (2 * (d + 1)) < 4 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_corner_i2_jm1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d + 1) 2 (-1))) :
+    valPlus d (shiftP d (1, d + 1) 2 (-1)) - 2 * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_corner_i2_j0 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d + 1) 2 0)) :
+    valPlus d (shiftP d (1, d + 1) 2 0) - 2 * (2 * d) - 0 * (2 * (d + 1)) < 4 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_corner_i2_j1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (1, d + 1) 2 1)) :
+    valPlus d (shiftP d (1, d + 1) 2 1) - 2 * (2 * d) - 1 * (2 * (d + 1)) < 4 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_corner (d : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (r : ℤ) (hr : RankOfP d (1, d + 1) r) :
+    r < 4 * d := by
+  obtain ⟨i, j, hi, hrep, rfl⟩ := hr
+  obtain ⟨hi1, hi2, hj1, hj2⟩ := hi
+  interval_cases i <;> interval_cases j
+  · exact gateP_corner_im2_jm1 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_corner_im2_j0 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_corner_im2_j1 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_corner_im1_jm1 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_corner_im1_j0 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_corner_im1_j1 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_corner_i0_jm1 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_corner_i0_j0 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_corner_i0_j1 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_corner_i1_jm1 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_corner_i1_j0 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_corner_i1_j1 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_corner_i2_jm1 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_corner_i2_j0 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_corner_i2_j1 d ⟨hd, hdodd⟩ hrep
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_anti_im2_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ x + y = d + 2 ∧ 2 ≤ x ∧ x ≤ d ∧ y ≤ d) (hrep : IsRepP d (shiftP d (x, y - 1) (-2) (-1))) :
+    valPlus d (shiftP d (x, y - 1) (-2) (-1)) - (-2) * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d + 1 - 2 * x := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_anti_im2_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ x + y = d + 2 ∧ 2 ≤ x ∧ x ≤ d ∧ y ≤ d) (hrep : IsRepP d (shiftP d (x, y - 1) (-2) 0)) :
+    valPlus d (shiftP d (x, y - 1) (-2) 0) - (-2) * (2 * d) - 0 * (2 * (d + 1)) < 4 * d + 1 - 2 * x := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_anti_im2_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ x + y = d + 2 ∧ 2 ≤ x ∧ x ≤ d ∧ y ≤ d) (hrep : IsRepP d (shiftP d (x, y - 1) (-2) 1)) :
+    valPlus d (shiftP d (x, y - 1) (-2) 1) - (-2) * (2 * d) - 1 * (2 * (d + 1)) < 4 * d + 1 - 2 * x := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_anti_im1_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ x + y = d + 2 ∧ 2 ≤ x ∧ x ≤ d ∧ y ≤ d) (hrep : IsRepP d (shiftP d (x, y - 1) (-1) (-1))) :
+    valPlus d (shiftP d (x, y - 1) (-1) (-1)) - (-1) * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d + 1 - 2 * x := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_anti_im1_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ x + y = d + 2 ∧ 2 ≤ x ∧ x ≤ d ∧ y ≤ d) (hrep : IsRepP d (shiftP d (x, y - 1) (-1) 0)) :
+    valPlus d (shiftP d (x, y - 1) (-1) 0) - (-1) * (2 * d) - 0 * (2 * (d + 1)) < 4 * d + 1 - 2 * x := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_anti_im1_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ x + y = d + 2 ∧ 2 ≤ x ∧ x ≤ d ∧ y ≤ d) (hrep : IsRepP d (shiftP d (x, y - 1) (-1) 1)) :
+    valPlus d (shiftP d (x, y - 1) (-1) 1) - (-1) * (2 * d) - 1 * (2 * (d + 1)) < 4 * d + 1 - 2 * x := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_anti_i0_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ x + y = d + 2 ∧ 2 ≤ x ∧ x ≤ d ∧ y ≤ d) (hrep : IsRepP d (shiftP d (x, y - 1) 0 (-1))) :
+    valPlus d (shiftP d (x, y - 1) 0 (-1)) - 0 * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d + 1 - 2 * x := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_anti_i0_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ x + y = d + 2 ∧ 2 ≤ x ∧ x ≤ d ∧ y ≤ d) (hrep : IsRepP d (shiftP d (x, y - 1) 0 0)) :
+    valPlus d (shiftP d (x, y - 1) 0 0) - 0 * (2 * d) - 0 * (2 * (d + 1)) < 4 * d + 1 - 2 * x := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_anti_i0_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ x + y = d + 2 ∧ 2 ≤ x ∧ x ≤ d ∧ y ≤ d) (hrep : IsRepP d (shiftP d (x, y - 1) 0 1)) :
+    valPlus d (shiftP d (x, y - 1) 0 1) - 0 * (2 * d) - 1 * (2 * (d + 1)) < 4 * d + 1 - 2 * x := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_anti_i1_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ x + y = d + 2 ∧ 2 ≤ x ∧ x ≤ d ∧ y ≤ d) (hrep : IsRepP d (shiftP d (x, y - 1) 1 (-1))) :
+    valPlus d (shiftP d (x, y - 1) 1 (-1)) - 1 * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d + 1 - 2 * x := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_anti_i1_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ x + y = d + 2 ∧ 2 ≤ x ∧ x ≤ d ∧ y ≤ d) (hrep : IsRepP d (shiftP d (x, y - 1) 1 0)) :
+    valPlus d (shiftP d (x, y - 1) 1 0) - 1 * (2 * d) - 0 * (2 * (d + 1)) < 4 * d + 1 - 2 * x := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_anti_i1_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ x + y = d + 2 ∧ 2 ≤ x ∧ x ≤ d ∧ y ≤ d) (hrep : IsRepP d (shiftP d (x, y - 1) 1 1)) :
+    valPlus d (shiftP d (x, y - 1) 1 1) - 1 * (2 * d) - 1 * (2 * (d + 1)) < 4 * d + 1 - 2 * x := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_anti_i2_jm1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ x + y = d + 2 ∧ 2 ≤ x ∧ x ≤ d ∧ y ≤ d) (hrep : IsRepP d (shiftP d (x, y - 1) 2 (-1))) :
+    valPlus d (shiftP d (x, y - 1) 2 (-1)) - 2 * (2 * d) - (-1) * (2 * (d + 1)) < 4 * d + 1 - 2 * x := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_anti_i2_j0 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ x + y = d + 2 ∧ 2 ≤ x ∧ x ≤ d ∧ y ≤ d) (hrep : IsRepP d (shiftP d (x, y - 1) 2 0)) :
+    valPlus d (shiftP d (x, y - 1) 2 0) - 2 * (2 * d) - 0 * (2 * (d + 1)) < 4 * d + 1 - 2 * x := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_anti_i2_j1 (d x y : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1 ∧ x + y = d + 2 ∧ 2 ≤ x ∧ x ≤ d ∧ y ≤ d) (hrep : IsRepP d (shiftP d (x, y - 1) 2 1)) :
+    valPlus d (shiftP d (x, y - 1) 2 1) - 2 * (2 * d) - 1 * (2 * (d + 1)) < 4 * d + 1 - 2 * x := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_anti (d x y : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (hs : x + y = d + 2) (hx2 : 2 ≤ x) (hxd : x ≤ d) (hyd : y ≤ d) (r : ℤ) (hr : RankOfP d (x, y - 1) r) :
+    r < 4 * d + 1 - 2 * x := by
+  obtain ⟨i, j, hi, hrep, rfl⟩ := hr
+  obtain ⟨hi1, hi2, hj1, hj2⟩ := hi
+  interval_cases i <;> interval_cases j
+  · exact gateP_anti_im2_jm1 d x y ⟨hd, hdodd, hs, hx2, hxd, hyd⟩ hrep
+  · exact gateP_anti_im2_j0 d x y ⟨hd, hdodd, hs, hx2, hxd, hyd⟩ hrep
+  · exact gateP_anti_im2_j1 d x y ⟨hd, hdodd, hs, hx2, hxd, hyd⟩ hrep
+  · exact gateP_anti_im1_jm1 d x y ⟨hd, hdodd, hs, hx2, hxd, hyd⟩ hrep
+  · exact gateP_anti_im1_j0 d x y ⟨hd, hdodd, hs, hx2, hxd, hyd⟩ hrep
+  · exact gateP_anti_im1_j1 d x y ⟨hd, hdodd, hs, hx2, hxd, hyd⟩ hrep
+  · exact gateP_anti_i0_jm1 d x y ⟨hd, hdodd, hs, hx2, hxd, hyd⟩ hrep
+  · exact gateP_anti_i0_j0 d x y ⟨hd, hdodd, hs, hx2, hxd, hyd⟩ hrep
+  · exact gateP_anti_i0_j1 d x y ⟨hd, hdodd, hs, hx2, hxd, hyd⟩ hrep
+  · exact gateP_anti_i1_jm1 d x y ⟨hd, hdodd, hs, hx2, hxd, hyd⟩ hrep
+  · exact gateP_anti_i1_j0 d x y ⟨hd, hdodd, hs, hx2, hxd, hyd⟩ hrep
+  · exact gateP_anti_i1_j1 d x y ⟨hd, hdodd, hs, hx2, hxd, hyd⟩ hrep
+  · exact gateP_anti_i2_jm1 d x y ⟨hd, hdodd, hs, hx2, hxd, hyd⟩ hrep
+  · exact gateP_anti_i2_j0 d x y ⟨hd, hdodd, hs, hx2, hxd, hyd⟩ hrep
+  · exact gateP_anti_i2_j1 d x y ⟨hd, hdodd, hs, hx2, hxd, hyd⟩ hrep
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_fifth_im2_jm1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (d + 1, 1) (-2) (-1))) :
+    valPlus d (shiftP d (d + 1, 1) (-2) (-1)) - (-2) * (2 * d) - (-1) * (2 * (d + 1)) < 2 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_fifth_im2_j0 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (d + 1, 1) (-2) 0)) :
+    valPlus d (shiftP d (d + 1, 1) (-2) 0) - (-2) * (2 * d) - 0 * (2 * (d + 1)) < 2 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_fifth_im2_j1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (d + 1, 1) (-2) 1)) :
+    valPlus d (shiftP d (d + 1, 1) (-2) 1) - (-2) * (2 * d) - 1 * (2 * (d + 1)) < 2 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_fifth_im1_jm1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (d + 1, 1) (-1) (-1))) :
+    valPlus d (shiftP d (d + 1, 1) (-1) (-1)) - (-1) * (2 * d) - (-1) * (2 * (d + 1)) < 2 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_fifth_im1_j0 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (d + 1, 1) (-1) 0)) :
+    valPlus d (shiftP d (d + 1, 1) (-1) 0) - (-1) * (2 * d) - 0 * (2 * (d + 1)) < 2 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_fifth_im1_j1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (d + 1, 1) (-1) 1)) :
+    valPlus d (shiftP d (d + 1, 1) (-1) 1) - (-1) * (2 * d) - 1 * (2 * (d + 1)) < 2 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_fifth_i0_jm1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (d + 1, 1) 0 (-1))) :
+    valPlus d (shiftP d (d + 1, 1) 0 (-1)) - 0 * (2 * d) - (-1) * (2 * (d + 1)) < 2 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_fifth_i0_j0 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (d + 1, 1) 0 0)) :
+    valPlus d (shiftP d (d + 1, 1) 0 0) - 0 * (2 * d) - 0 * (2 * (d + 1)) < 2 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_fifth_i0_j1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (d + 1, 1) 0 1)) :
+    valPlus d (shiftP d (d + 1, 1) 0 1) - 0 * (2 * d) - 1 * (2 * (d + 1)) < 2 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_fifth_i1_jm1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (d + 1, 1) 1 (-1))) :
+    valPlus d (shiftP d (d + 1, 1) 1 (-1)) - 1 * (2 * d) - (-1) * (2 * (d + 1)) < 2 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_fifth_i1_j0 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (d + 1, 1) 1 0)) :
+    valPlus d (shiftP d (d + 1, 1) 1 0) - 1 * (2 * d) - 0 * (2 * (d + 1)) < 2 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_fifth_i1_j1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (d + 1, 1) 1 1)) :
+    valPlus d (shiftP d (d + 1, 1) 1 1) - 1 * (2 * d) - 1 * (2 * (d + 1)) < 2 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_fifth_i2_jm1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (d + 1, 1) 2 (-1))) :
+    valPlus d (shiftP d (d + 1, 1) 2 (-1)) - 2 * (2 * d) - (-1) * (2 * (d + 1)) < 2 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_fifth_i2_j0 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (d + 1, 1) 2 0)) :
+    valPlus d (shiftP d (d + 1, 1) 2 0) - 2 * (2 * d) - 0 * (2 * (d + 1)) < 2 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_fifth_i2_j1 (d : ℤ) (hB : 3 ≤ d ∧ d % 2 = 1) (hrep : IsRepP d (shiftP d (d + 1, 1) 2 1)) :
+    valPlus d (shiftP d (d + 1, 1) 2 1) - 2 * (2 * d) - 1 * (2 * (d + 1)) < 2 * d := by
+  rcases rep_cases d _ hrep with hF | hR
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, IsFreeP, Prod.mk.injEq] at hF ⊢
+    split_ifs <;> omega
+  · unfold valPlus
+    simp only [shiftP, IsHc, IsVc, NativeP, Prod.mk.injEq] at hR ⊢
+    split_ifs <;> omega
+
+
+set_option maxHeartbeats 400000 in
+theorem gateP_fifth (d : ℤ) (hd : 3 ≤ d) (hdodd : d % 2 = 1) (r : ℤ) (hr : RankOfP d (d + 1, 1) r) :
+    r < 2 * d := by
+  obtain ⟨i, j, hi, hrep, rfl⟩ := hr
+  obtain ⟨hi1, hi2, hj1, hj2⟩ := hi
+  interval_cases i <;> interval_cases j
+  · exact gateP_fifth_im2_jm1 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_fifth_im2_j0 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_fifth_im2_j1 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_fifth_im1_jm1 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_fifth_im1_j0 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_fifth_im1_j1 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_fifth_i0_jm1 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_fifth_i0_j0 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_fifth_i0_j1 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_fifth_i1_jm1 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_fifth_i1_j0 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_fifth_i1_j1 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_fifth_i2_jm1 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_fifth_i2_j0 d ⟨hd, hdodd⟩ hrep
+  · exact gateP_fifth_i2_j1 d ⟨hd, hdodd⟩ hrep
+
+
 end FLatticePaper.PureRank
