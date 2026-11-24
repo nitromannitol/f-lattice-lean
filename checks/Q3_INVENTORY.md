@@ -831,3 +831,15 @@ Scope to confirm with the lead: §1's star containment needs `c = d − n ≥ 3`
 - Checks: checks/TwosPriceRange.lean (axioms standard for the two lemmas; the price range is conditional on hbd).
 - NOT yet: hbd, zeroEvenLine (its seed sGrade = 2−3d+n lies outside E), F1_unitPrice and F1_noPriceSaddle (unitPrice_and_noSaddle needs
   StarClassified, which has no twos producer), BaseSlip.
+
+### Task 72 / twos base (the native tile of standardField (2^(k+1)) and the three-shift cover of the closed polygon): TwosTileCover.lean
+- PROVED: `standardField_twos_eq_tile`: the standard field of 2^(k+1) equals the near-one closed form `paperNearLadderValue (2k+4)` at
+  every site `w` whose point `(w₁, w₂+1)` lies in `paperNearLadderTile (2k+4)`, not only on the closed polygon (from
+  `rotate_tile_identity` and `twos_standardField_eq_rotate`).
+- PROVED: `twos_shift_cover`: for `z` in the closed polygon one of `(z₁−1, z₂+d)`, `(z₁+1, z₂−d)`, `(z₁+d, z₂+2d−1)` (d = 2k+4) lies in
+  the tile: the three shifts are `z − parentShift + (0,1)`, `+ (−V)` and `+ U` (kernel U = (d+1, d−1), transverse V = (−2, 2d)).
+  Proof: `twos_E_arith` gives linear conditions on (z₁, z₂−z₁), and `twos_cover_tree` chooses the shift: `(z₁−1, z₂+d)` if
+  `0 ≤ z₁ ∧ z₂−z₁ ≤ d ∧ z₂ ≤ 2d−1`, else `(z₁+1, z₂−d)` when that is the shift, and `(z₁+d, z₂+2d−1)` on `(z₁=−1, z₂−z₁=d+1)` or `(z₁=0, z₂−z₁≤1)`.
+  The rule was checked numerically for k = 0..4 (no bad leaves on E).
+- Checks: checks/TwosTileCover.lean (axioms standard).
+- The price range of 2^(k+1) on E follows from these (explicit values, cV = 1−d²−3d, cutPrice = k²+5k+5) with no boundary bound.
