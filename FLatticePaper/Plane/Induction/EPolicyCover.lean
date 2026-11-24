@@ -1232,4 +1232,76 @@ theorem cover_ge2 (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ 
                       exact cov_bottom k hk η hη x e hr (by omega) (by omega) hc
                     · exact cov_top k η hη x y e hr (by omega) (by omega) (by omega) hc
 
+/-- The laplacian of the reciprocal field takes the values `0` and `-1`. -/
+theorem lap_cases (k : ℕ) (p : Site) :
+    laplacian (reciprocalField k) p = 0 ∨ laplacian (reciprocalField k) p = -1 := by
+  rw [laplacian_reciprocal_rep k p]
+  obtain ⟨hN, -⟩ := nativeRep_spec (stairEven_valid_reciprocal k) p
+  rw [laplacian_reciprocal_native k hN]
+  split_ifs <;> simp
+
+/-- A policy edge at any centre is covered at its native representative, with the same step. -/
+theorem ecover_of_ePolicy (k : ℕ) (η : ℤ) (hη : η = 1 ∨ η = -1) (c i : Site)
+    (h : ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) c i) :
+    ECover k η (nativeRep (2 * (k : ℤ) + 3) c) (i - c) := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  obtain ⟨l, hl, hcl⟩ := ePolicy_rep hd (stairEven_valid_reciprocal k) c
+  have hlap : laplacian (reciprocalField k) (nativeRep (2 * (k : ℤ) + 3) c) = laplacian (reciprocalField k) c :=
+    (laplacian_reciprocal_rep k c).symm
+  rcases lap_cases k c with h0 | h1
+  · left
+    refine ⟨by rw [hlap]; exact h0, ?_⟩
+    exact (ePolicy_white k η hη c i h0).mp h
+  · right
+    refine ⟨by rw [hlap]; exact h1, ?_⟩
+    have hE := retNat_edge hl hcl h
+    set r := nativeRep (2 * (k : ℤ) + 3) c with hr
+    rcases hE with rfl | rfl
+    · left
+      rw [hcl, incomingNeg_add hl]
+      abel
+    · right
+      rw [hcl, incomingPos_add hl]
+      abel
+
+/-- The slip field of the policy at `k >= 2`: the slip does not increase along a policy edge. -/
+theorem slip_field_ge2 (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (c i : Site)
+    (h : ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) c i) :
+    slipPermits (reciprocalField k) (fun z => reciprocalField k (z + η • (reciprocalFrame k).shortShift)) c i := by
+  have hE := ecover_of_ePolicy k η hη c i h
+  obtain ⟨hN, i0, j0, hcr⟩ := nativeRep_spec (stairEven_valid_reciprocal k) c
+  have hT := cov_shift k η (nativeRep (2 * (k : ℤ) + 3) c) c (i - c) i0 j0 hcr (cover_ge2 k hk η hη _ hN (i - c) hE)
+  have hs := slip_of_SE k η c (i - c) hT.1
+  have e1 : c + (i - c) = i := by abel
+  rw [e1] at hs
+  unfold slipPermits slipIncrement
+  dsimp only
+  unfold ChildFrame.slip at hs
+  linarith
+
+/-- The price field of the policy at `k >= 2`. -/
+theorem price_field_ge2 (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (c i : Site)
+    (h : ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) c i) :
+    (reciprocalFrame k).price (reciprocalField k) i ≤ (reciprocalFrame k).price (reciprocalField k) c := by
+  have hE := ecover_of_ePolicy k η hη c i h
+  obtain ⟨hN, i0, j0, hcr⟩ := nativeRep_spec (stairEven_valid_reciprocal k) c
+  have hT := cov_shift k η (nativeRep (2 * (k : ℤ) + 3) c) c (i - c) i0 j0 hcr (cover_ge2 k hk η hη _ hN (i - c) hE)
+  have hp := price_of_PE k c (i - c) hT.2.1
+  have e1 : c + (i - c) = i := by abel
+  rw [e1] at hp
+  exact hp
+
+/-- The chain field of the policy at `k >= 2`. -/
+theorem chain_field_ge2 (k : ℕ) (hk : 2 ≤ (k : ℤ)) (η : ℤ) (hη : η = 1 ∨ η = -1) (c i : Site)
+    (h : ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) c i) :
+    (reciprocalFrame k).chainPotential (reciprocalField k) η i ≤
+      (reciprocalFrame k).chainPotential (reciprocalField k) η c := by
+  have hE := ecover_of_ePolicy k η hη c i h
+  obtain ⟨hN, i0, j0, hcr⟩ := nativeRep_spec (stairEven_valid_reciprocal k) c
+  have hT := cov_shift k η (nativeRep (2 * (k : ℤ) + 3) c) c (i - c) i0 j0 hcr (cover_ge2 k hk η hη _ hN (i - c) hE)
+  have hch := chain_of_CE k η c (i - c) hT.2.2
+  have e1 : c + (i - c) = i := by abel
+  rw [e1] at hch
+  exact hch
+
 end FLatticePaper.EPolicy

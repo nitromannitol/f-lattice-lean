@@ -1,8 +1,7 @@
 import FLatticePaper.Plane.Induction.EPolicyCover
 
-#print axioms FLatticePaper.EPolicy.cover_ge2
-#print axioms FLatticePaper.EPolicy.cov_aliasB0
-#print axioms FLatticePaper.EPolicy.cov_aliasB2
-#print axioms FLatticePaper.EPolicy.cov_toprow
-#print axioms FLatticePaper.EPolicy.cov_P19
-#print axioms FLatticePaper.EPolicy.cov_P17
+#print axioms FLatticePaper.EPolicy.slip_field_ge2
+#print axioms FLatticePaper.EPolicy.price_field_ge2
+#print axioms FLatticePaper.EPolicy.chain_field_ge2
+#print axioms FLatticePaper.EPolicy.lap_cases
+#print axioms FLatticePaper.EPolicy.ecover_of_ePolicy
