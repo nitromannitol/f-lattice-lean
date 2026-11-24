@@ -533,5 +533,7 @@ import FLatticePaper.Construction.PureRankPlusWhite
 import FLatticePaper.Construction.EPolicy
 import FLatticePaper.Plane.Induction.EPolicyLap
 import FLatticePaper.Plane.Induction.EPolicyFields
+import FLatticePaper.Plane.Induction.EPolicyFreeV
+import FLatticePaper.Plane.Induction.EPolicyPrescribed
 
 /-! Root import for the corrected F-lattice paper. -/
