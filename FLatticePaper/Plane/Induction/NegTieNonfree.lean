@@ -27,7 +27,7 @@ theorem negTie_drop_of_nonfree {word : Word} (h : ∃ x ∈ word, x ≠ Digit.th
     (hcu : c + (frameAt word).uq ∈ (frameAt word).closedPolygon)
     (hiu : i + (frameAt word).uq ∈ (frameAt word).closedPolygon)
     (hΨc : sheetDiffW word c = 0) (hj : FLatticePaper.Edge j c) (hjΨ : sheetDiffW word j ≤ -1)
-    (hΨi : 1 ≤ sheetDiffW word i)
+    (hΨi : 0 ≤ sheetDiffW word i)
     (hnf : Nonfree (frameAt (conjWord word)) (zTurn (c - (frameAt word).sheetShift))) : False := by
   have hij : i ≠ j := by
     intro e
@@ -42,7 +42,7 @@ theorem negTie_drop_of_nonfree {word : Word} (h : ∃ x ∈ word, x ≠ Digit.th
     standardField_eq_sheetMin_of_strong h hSE hz
   have hΨc' : (frameAt word).sheetC (quarterTurnField (standardField (conjWord word))) c -
       (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) c = 0 := hΨc
-  have hΨi' : 1 ≤ (frameAt word).sheetC (quarterTurnField (standardField (conjWord word))) i -
+  have hΨi' : 0 ≤ (frameAt word).sheetC (quarterTurnField (standardField (conjWord word))) i -
       (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) i := hΨi
   have hFc : standardField word c =
       (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) c := by

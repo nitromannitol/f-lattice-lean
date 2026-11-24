@@ -1,12 +1,13 @@
 import FLatticePaper.Plane.Induction.HResPWire
 
-/-! Task 72 (hResN, the case reduction to the negative tie and the tied target).
+/-! Task 72 (hResN, the case reduction to the negative tie).
 
-`hResN_of_cases`: the negative tied rising pair `hResN` (`−σ`, tied centre, an input `j` with `Ψ j = −1`), by target sign:
-* `Ψ i ≥ 1`: the negative tie `hNeg` (the configuration of `hNegTie`, reduced to Q21 by `hNegTie_of_Q21`);
-* `Ψ i = 0`: the named tied-target case `hTie0`;
-* `Ψ i ≤ −1`: reflect about the centre to a `σ` pair with target `Ψ ≥ 1`. If the other input has `Ψ ≥ 1`, the positive adjacent
-  chart excludes it (`adjacent_chart_excluded`); otherwise the star is nonnegative and `plus_adjacent_target_excluded` excludes it. -/
+`hResN_of_cases`: the negative tied rising pair `hResN` (`−σ`, tied centre, an input `j` with `Ψ j = −1`), by the sign of the target:
+* `Ψ i ≥ 0` (strict or tied target): the negative tie `hNeg` (the configuration of `hNegTie`, target allowed to tie; reduced to the
+  V-block input Q21 by `hNegTie_of_Q21`);
+* `Ψ i ≤ −1`: reflect about the centre to a `σ` pair with target `Ψ ≥ 1`. If the other input has `Ψ > 0`, the positive adjacent chart
+  excludes it (`adjacent_chart_excluded`); otherwise every input of the reflected centre is nonnegative and
+  `plus_adjacent_target_excluded` applies. -/
 
 namespace FLatticePaper.Induction
 
@@ -19,11 +20,7 @@ theorem hResN_of_cases {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hNeg : ∀ c i, RisingBlackPair (standardField word) (-(frameAt word).shortShift) c i →
       c ∈ (frameAt word).closedPolygon → i ∈ (frameAt word).closedPolygon →
       c + (frameAt word).uq ∈ (frameAt word).closedPolygon → i + (frameAt word).uq ∈ (frameAt word).closedPolygon →
-      sheetDiffW word c = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j ≤ -1) → 1 ≤ sheetDiffW word i → False)
-    (hTie0 : ∀ c i, RisingBlackPair (standardField word) (-(frameAt word).shortShift) c i →
-      c ∈ (frameAt word).closedPolygon →
-      c + (frameAt word).uq ∈ (frameAt word).closedPolygon → i + (frameAt word).uq ∈ (frameAt word).closedPolygon →
-      sheetDiffW word c = 0 → sheetDiffW word i = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j = -1) → False)
+      sheetDiffW word c = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j ≤ -1) → 0 ≤ sheetDiffW word i → False)
     {c i : Site} (hr : RisingBlackPair (standardField word) (-(frameAt word).shortShift) c i)
     (hcE : c ∈ (frameAt word).closedPolygon)
     (hcu : c + (frameAt word).uq ∈ (frameAt word).closedPolygon)
@@ -31,7 +28,7 @@ theorem hResN_of_cases {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hΨc : sheetDiffW word c = 0) (hj : ∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j = -1) : False := by
   obtain ⟨j, hjE, hjΨ⟩ := hj
   have hiE := (frameAt word).black_input_mem hpk hcE hr.2.1 hr.1
-  rcases lt_trichotomy (sheetDiffW word i) 0 with hneg | hzero | hpos
+  by_cases hneg : sheetDiffW word i < 0
   · -- the target is negative: reflect the configuration about the centre
     have hrr := (frameAt word).rising_reflect_neg hpk hr
     have hcE' := (frameAt word).reflect_mem_closedPolygon hcE
@@ -79,7 +76,6 @@ theorem hResN_of_cases {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
         · rw [h1] at hsym
           omega
       exact plus_adjacent_target_excluded h hSE hpk P hrr hcE' hiE' hcq hiq (le_of_eq hΨ'c.symm) hΨ'i hstar
-  · exact hTie0 c i hr hcE hcu hiu hΨc hzero ⟨j, hjE, hjΨ⟩
   · exact hNeg c i hr hcE hiE hcu hiu hΨc ⟨j, hjE, by omega⟩ (by omega)
 
 end FLatticePaper.Induction

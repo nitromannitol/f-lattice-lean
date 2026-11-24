@@ -28,7 +28,7 @@ theorem negTie_jumps {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hcu : c + (frameAt word).uq ∈ (frameAt word).closedPolygon)
     (hiu : i + (frameAt word).uq ∈ (frameAt word).closedPolygon)
     (hΨc : sheetDiffW word c = 0) (hj : FLatticePaper.Edge j c) (hjΨ : sheetDiffW word j ≤ -1)
-    (hΨi : 1 ≤ sheetDiffW word i) :
+    (hΨi : 0 ≤ sheetDiffW word i) :
     jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) (c - (frameAt word).sheetShift) = 1 ∧
       jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) (i - (frameAt word).sheetShift) = 0 := by
   have hij : i ≠ j := by
@@ -44,7 +44,7 @@ theorem negTie_jumps {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     standardField_eq_sheetMin_of_strong h hSE hz
   have hΨc' : (frameAt word).sheetC (quarterTurnField (standardField (conjWord word))) c -
       (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) c = 0 := hΨc
-  have hΨi' : 1 ≤ (frameAt word).sheetC (quarterTurnField (standardField (conjWord word))) i -
+  have hΨi' : 0 ≤ (frameAt word).sheetC (quarterTurnField (standardField (conjWord word))) i -
       (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) i := hΨi
   have hFc : standardField word c =
       (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) c := by
@@ -141,7 +141,7 @@ theorem negTie_drop_of_freeV {word : Word} (h : ∃ x ∈ word, x ≠ Digit.thre
     (hcu : c + (frameAt word).uq ∈ (frameAt word).closedPolygon)
     (hiu : i + (frameAt word).uq ∈ (frameAt word).closedPolygon)
     (hΨc : sheetDiffW word c = 0) (hj : FLatticePaper.Edge j c) (hjΨ : sheetDiffW word j ≤ -1)
-    (hΨi : 1 ≤ sheetDiffW word i)
+    (hΨi : 0 ≤ sheetDiffW word i)
     (hfV : zTurn (c - (frameAt word).sheetShift) ∈ (frameAt (conjWord word)).freeV) : False :=
   jumpA_ne_one_of_freeV h hSE hfV
     (negTie_jumps h hSE hpk P hslip hr hcE hiE hcu hiu hΨc hj hjΨ hΨi).1
