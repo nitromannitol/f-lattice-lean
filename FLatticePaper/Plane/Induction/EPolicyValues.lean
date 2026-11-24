@@ -905,4 +905,146 @@ theorem chain_low1_v (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1)
   rw [e2]
   exact diagLow1_Phi_vert k η x y s hη hsgn hsum hy hx
 
+/-- The vertical increment at a site whose `(-U)`-translate carries the vertical step: `vG (b - 1) s`. -/
+theorem incr_vert_negU (k : ℕ) (s a b : ℤ) (hs : s = 1 ∨ s = -1)
+    (h0 : (a - (2 * (k : ℤ) + 3), b - 1) ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites)
+    (h1 : (a - (2 * (k : ℤ) + 3), b - 1 + s) ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites)
+    (c0 : ¬ ((a - (2 * (k : ℤ) + 3) = 0 ∧ b - 1 = 0) ∨ (a - (2 * (k : ℤ) + 3) = 2 ∧ b - 1 = (2 * (k : ℤ) + 3) + 1)))
+    (c1 : ¬ ((a - (2 * (k : ℤ) + 3) = 0 ∧ b - 1 + s = 0) ∨ (a - (2 * (k : ℤ) + 3) = 2 ∧ b - 1 + s = (2 * (k : ℤ) + 3) + 1))) :
+    incr (reciprocalField k) (0, s) (a, b) = vG (b - 1) s := by
+  have key := incr_vert k s (a - (2 * (k : ℤ) + 3)) (b - 1) hs h0 h1 c0 c1
+  have eA : (a - (2 * (k : ℤ) + 3), b - 1) + ((2 * (k : ℤ) + 3), 1) = (a, b) := by ext <;> (simp; try ring)
+  have eB : (a - (2 * (k : ℤ) + 3), b - 1) + (0, s) + ((2 * (k : ℤ) + 3), 1) = (a, b) + (0, s) := by ext <;> (simp; try ring)
+  have hA := reciprocalField_add_U k (a - (2 * (k : ℤ) + 3), b - 1)
+  have hB := reciprocalField_add_U k ((a - (2 * (k : ℤ) + 3), b - 1) + (0, s))
+  rw [eA] at hA
+  rw [eB] at hB
+  unfold incr at key ⊢
+  rw [hA, hB]
+  exact key
+
+/-- Retained vertical steps on the sum-`d + 2` centres (the odd down step `OddDown`): `s = -eta`. -/
+theorem retention_top (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1)
+    (hN : NativeP (2 * (k : ℤ) + 3) (x, y)) (hsum : x + y = (2 * (k : ℤ) + 3) + 2) (hx : 2 ≤ x) (hxd : x ≤ (2 * (k : ℤ) + 3))
+    (hpol : ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) (x, y) ((x, y) + (0, s))) :
+    s = -η := by
+  have hE : ¬ EvenSite (x, y) := by unfold EvenSite; dsimp only; omega
+  have hw : laplacian (reciprocalField k) (x, y) = 0 := by
+    rw [laplacian_reciprocal_native k hN, if_neg hE]
+    dsimp only
+    rw [if_neg]
+    omega
+  rw [ePolicy_white k η hη (x, y) ((x, y) + (0, s)) hw, selDisp_nativeRep k η hη hN] at hpol
+  have e : (x, y) + (0, s) - (x, y) = (0, s) := by ext <;> (simp; try ring)
+  rw [e] at hpol
+  unfold selDisp at hpol
+  rw [if_neg hE] at hpol
+  split_ifs at hpol with hO <;> (try simp only [Prod.mk.injEq] at hpol) <;> (try dsimp only at hO) <;> omega
+
+/-- **Upper-right diagonal, vertical slip (sum d + 2).** -/
+theorem top_D_vert (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1) (hsgn : s = -η)
+    (hsum : x + y = (2 * (k : ℤ) + 3) + 2) (hx : 3 ≤ x) (hxd : x ≤ (2 * (k : ℤ) + 3)) :
+    incr (reciprocalField k) (0, s) (x, y) ≤ incr (reciprocalField k) (0, s) (x - 2 * η, y) := by
+  rcases hη with rfl | rfl
+  · have hs' : s = -1 := by omega
+    subst hs'
+    have i1 := incr_vert k (-1) x y (by norm_num) (mem_raw_of_box k x y (by omega))
+      (mem_raw_of_box k x (y + -1) (by omega)) (by omega) (by omega)
+    have i2 := incr_vert k (-1) (x - 2 * 1) y (by norm_num) (mem_raw_of_box k (x - 2 * 1) y (by omega))
+      (mem_raw_of_box k (x - 2 * 1) (y + -1) (by omega)) (by omega) (by omega)
+    linarith [vG_neg_one y]
+  · have hs' : s = 1 := by omega
+    subst hs'
+    have i1 := incr_vert_negU k 1 x y (by norm_num) (mem_raw_of_box k (x - (2 * (k : ℤ) + 3)) (y - 1) (by omega))
+      (mem_raw_of_box k (x - (2 * (k : ℤ) + 3)) (y - 1 + 1) (by omega)) (by omega) (by omega)
+    have i2 := incr_vert_negU k 1 (x - 2 * -1) y (by norm_num)
+      (mem_raw_of_box k (x - 2 * -1 - (2 * (k : ℤ) + 3)) (y - 1) (by omega))
+      (mem_raw_of_box k (x - 2 * -1 - (2 * (k : ℤ) + 3)) (y - 1 + 1) (by omega)) (by omega) (by omega)
+    linarith [vG_one (y - 1)]
+
+/-- **Upper-right diagonal, vertical price (sum d + 2).** -/
+theorem top_P_vert (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1) (hsgn : s = -η)
+    (hsum : x + y = (2 * (k : ℤ) + 3) + 2) (hx : 3 ≤ x) (hxd : x ≤ (2 * (k : ℤ) + 3)) :
+    incr (reciprocalField k) (0, s) (x, y) - incr (reciprocalField k) (0, s) (x - 1, y + 1) ≤ s := by
+  rcases hη with rfl | rfl
+  · have hs' : s = -1 := by omega
+    subst hs'
+    have i1 := incr_vert k (-1) x y (by norm_num) (mem_raw_of_box k x y (by omega))
+      (mem_raw_of_box k x (y + -1) (by omega)) (by omega) (by omega)
+    have i3 := incr_vert k (-1) (x - 1) (y + 1) (by norm_num) (mem_raw_of_box k (x - 1) (y + 1) (by omega))
+      (mem_raw_of_box k (x - 1) (y + 1 + -1) (by omega)) (by omega) (by omega)
+    linarith [vG_neg_one y, vG_neg_one (y + 1)]
+  · have hs' : s = 1 := by omega
+    subst hs'
+    have i1 := incr_vert_negU k 1 x y (by norm_num) (mem_raw_of_box k (x - (2 * (k : ℤ) + 3)) (y - 1) (by omega))
+      (mem_raw_of_box k (x - (2 * (k : ℤ) + 3)) (y - 1 + 1) (by omega)) (by omega) (by omega)
+    have i3 := incr_vert_negU k 1 (x - 1) (y + 1) (by norm_num)
+      (mem_raw_of_box k (x - 1 - (2 * (k : ℤ) + 3)) (y + 1 - 1) (by omega))
+      (mem_raw_of_box k (x - 1 - (2 * (k : ℤ) + 3)) (y + 1 - 1 + 1) (by omega)) (by omega) (by omega)
+    linarith [vG_one (y - 1), vG_one (y + 1 - 1), vG_one y]
+
+/-- **Upper-right diagonal, vertical chain (sum d + 2).** -/
+theorem top_Phi_vert (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1) (hsgn : s = -η)
+    (hsum : x + y = (2 * (k : ℤ) + 3) + 2) (hx : 3 ≤ x) (hxd : x ≤ (2 * (k : ℤ) + 3)) :
+    incr (reciprocalField k) (0, s) (x, y) - incr (reciprocalField k) (0, s) (x - 2 * η - 1, y + 1) ≤ s := by
+  rcases hη with rfl | rfl
+  · have hs' : s = -1 := by omega
+    subst hs'
+    have i1 := incr_vert k (-1) x y (by norm_num) (mem_raw_of_box k x y (by omega))
+      (mem_raw_of_box k x (y + -1) (by omega)) (by omega) (by omega)
+    have i4 := incr_vert k (-1) (x - 2 * 1 - 1) (y + 1) (by norm_num)
+      (mem_raw_of_box k (x - 2 * 1 - 1) (y + 1) (by omega))
+      (mem_raw_of_box k (x - 2 * 1 - 1) (y + 1 + -1) (by omega)) (by omega) (by omega)
+    linarith [vG_neg_one y, vG_neg_one (y + 1)]
+  · have hs' : s = 1 := by omega
+    subst hs'
+    have i1 := incr_vert_negU k 1 x y (by norm_num) (mem_raw_of_box k (x - (2 * (k : ℤ) + 3)) (y - 1) (by omega))
+      (mem_raw_of_box k (x - (2 * (k : ℤ) + 3)) (y - 1 + 1) (by omega)) (by omega) (by omega)
+    have i4 := incr_vert_negU k 1 (x - 2 * -1 - 1) (y + 1) (by norm_num)
+      (mem_raw_of_box k (x - 2 * -1 - 1 - (2 * (k : ℤ) + 3)) (y + 1 - 1) (by omega))
+      (mem_raw_of_box k (x - 2 * -1 - 1 - (2 * (k : ℤ) + 3)) (y + 1 - 1 + 1) (by omega)) (by omega) (by omega)
+    linarith [vG_one (y - 1), vG_one (y + 1 - 1), vG_one y]
+
+/-- **Upper-right diagonal (sum d + 2), slip on the policy edge.** -/
+theorem slip_top_v (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1)
+    (hsum : x + y = (2 * (k : ℤ) + 3) + 2) (hx : 3 ≤ x) (hxd : x ≤ (2 * (k : ℤ) + 3))
+    (hpol : ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) (x, y) ((x, y) + (0, s))) :
+    (reciprocalFrame k).slip (reciprocalField k) η ((x, y) + (0, s)) ≤ (reciprocalFrame k).slip (reciprocalField k) η (x, y) := by
+  have hN : NativeP (2 * (k : ℤ) + 3) (x, y) := by
+    unfold NativeP; left; dsimp only; omega
+  have hsgn := retention_top k η x y s hη hN hsum (by omega) hxd hpol
+  apply slip_edge_le (reciprocalField k) (reciprocalFrame k) η (x, y) (0, s)
+  rw [smul_shortShift_recip k η]
+  have e1 : (x, y) + (-2 * η, 0) = (x - 2 * η, y) := by ext <;> (simp; try ring)
+  rw [e1]
+  exact top_D_vert k η x y s hη hsgn hsum hx hxd
+
+/-- **Upper-right diagonal (sum d + 2), price on the policy edge.** -/
+theorem price_top_v (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1)
+    (hsum : x + y = (2 * (k : ℤ) + 3) + 2) (hx : 3 ≤ x) (hxd : x ≤ (2 * (k : ℤ) + 3))
+    (hpol : ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) (x, y) ((x, y) + (0, s))) :
+    (reciprocalFrame k).price (reciprocalField k) ((x, y) + (0, s)) ≤ (reciprocalFrame k).price (reciprocalField k) (x, y) := by
+  have hN : NativeP (2 * (k : ℤ) + 3) (x, y) := by
+    unfold NativeP; left; dsimp only; omega
+  have hsgn := retention_top k η x y s hη hN hsum (by omega) hxd hpol
+  apply price_edge_le k (reciprocalField k) (x, y) (0, s)
+  have e1 : (x, y) - (1, -1) = (x - 1, y + 1) := by ext <;> (simp; try ring)
+  rw [e1]
+  exact top_P_vert k η x y s hη hsgn hsum hx hxd
+
+/-- **Upper-right diagonal (sum d + 2), chain on the policy edge.** -/
+theorem chain_top_v (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1)
+    (hsum : x + y = (2 * (k : ℤ) + 3) + 2) (hx : 3 ≤ x) (hxd : x ≤ (2 * (k : ℤ) + 3))
+    (hpol : ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) (x, y) ((x, y) + (0, s))) :
+    (reciprocalFrame k).chainPotential (reciprocalField k) η ((x, y) + (0, s)) ≤
+      (reciprocalFrame k).chainPotential (reciprocalField k) η (x, y) := by
+  have hN : NativeP (2 * (k : ℤ) + 3) (x, y) := by
+    unfold NativeP; left; dsimp only; omega
+  have hsgn := retention_top k η x y s hη hN hsum (by omega) hxd hpol
+  apply chain_edge_le k (reciprocalField k) η (x, y) (0, s)
+  rw [smul_shortShift_recip k η]
+  have e2 : (x, y) + (-2 * η, 0) - (1, -1) = (x - 2 * η - 1, y + 1) := by ext <;> (simp; try ring)
+  rw [e2]
+  exact top_Phi_vert k η x y s hη hsgn hsum hx hxd
+
 end FLatticePaper.EPolicy
