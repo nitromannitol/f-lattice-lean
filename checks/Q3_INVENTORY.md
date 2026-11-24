@@ -871,3 +871,15 @@ Scope to confirm with the lead: §1's star containment needs `c = d − n ≥ 3`
   (`twos_seed_value` through `w₀ + U + V`, in the tile; `twos_harm_seed`).
 - Checks: checks/TwosZeroEven.lean (axioms standard). Root build: 0 warnings, 0 errors (sandbox log).
 - Still open for StrongResidual (2^(k+1)): F1_unitPrice, F1_noPriceSaddle, BaseSlip.
+
+## Twos signed policy e(-1,eta) (task 72, w3)
+- Numerics (scripts/twos_signed_e.py, word 2^K, K = 1..4): quota, P / J / D / Phi monotone on selected edges, square clauses,
+  prescription, field periodicity: 0 failures; mutation control trips every check (`mutation` mode).
+- Native cover (scripts/twos_archive_rank.py): the doubled native classes and the uncovered whites are all free (H/V) classes;
+  the archive field agrees with pl.standard on native points (the two added corners carry the one difference).
+- Strict rank (scripts/twos_periodic_rank.py): R = (2d+3) Phi + rho with rho the archive deckrank at the lexicographically
+  smallest native copy of each key class; strict on every selected edge (K = 1..4, both signs). Characters of P, J, Phi
+  match w2's rankWithIncrements_of_strict_hull hypotheses (P: -1, 0; J: 0, eta; Phi: -1, 2 eta).
+- Lean definitions: FLatticePaper/Plane/Induction/TwosEPolicy.lean (NativeT, CandGuard, candDisp, FreeSite, freeDisp, AliasOf,
+  FreeClass, TwosSel). Root module build: 0 warnings, 0 errors (sandbox log). No Lean theorems yet.
+- Still open: the Lean lemmas (quota, squares, prices, prescription) and the Lean rank (lexmin native copy, M = 2d+3).
