@@ -6,6 +6,7 @@ import FLatticePaper.Plane.Induction.StrongSeedInduction
 import FLatticePaper.Plane.Induction.GamesPolicy
 import FLatticePaper.Plane.Induction.TwosResidual
 import FLatticePaper.Plane.Induction.HResPWire
+import FLatticePaper.Plane.Induction.HResNCases
 
 /-! Task 71: the odometers headline with the canonical signed games at every proper word.
 
@@ -68,11 +69,11 @@ theorem odometersTheorem_of_canonical
         sheetDiffW word c = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j ≤ -1) → 1 ≤ sheetDiffW word i →
         ∀ v ∈ (frameAt (conjWord word)).child.modifiedDeck.span,
           zTurn (c - (frameAt word).sheetShift) + v ∈ (frameAt (conjWord word)).freeH → False)
-    (hResN : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+    (hTie0 : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       ∀ c i, RisingBlackPair (standardField word) (-(frameAt word).shortShift) c i →
         c ∈ (frameAt word).closedPolygon →
-        (c + (frameAt word).uq ∈ (frameAt word).closedPolygon ∧ i + (frameAt word).uq ∈ (frameAt word).closedPolygon) →
-        sheetDiffW word c = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j = -1) → False)
+        c + (frameAt word).uq ∈ (frameAt word).closedPolygon → i + (frameAt word).uq ∈ (frameAt word).closedPolygon →
+        sheetDiffW word c = 0 → sheetDiffW word i = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j = -1) → False)
     (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       Induction.S3NoFortInputs (frameAt word) (standardField word)) :
     OdometersTheorem := by
@@ -112,6 +113,21 @@ theorem odometersTheorem_of_canonical
       (Induction.oldPolicyData_of_canonical (standardField_reflectI_conj word (hE (conjWord word)))
         (hcan word hw hn).some (frameAt word).eps (frameAt word).eps_unit)
       (hW1 word hw hn) (hQ21 word hw hn)
+  -- the tied negative rising pair hResN, from the negative tie (hNegTie_of_Q21) and the tied-target case hTie0
+  have hResN : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      ∀ c i, RisingBlackPair (standardField word) (-(frameAt word).shortShift) c i →
+        c ∈ (frameAt word).closedPolygon →
+        (c + (frameAt word).uq ∈ (frameAt word).closedPolygon ∧ i + (frameAt word).uq ∈ (frameAt word).closedPolygon) →
+        sheetDiffW word c = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j = -1) → False :=
+    fun word hw hn c i hr hcE hpair hΨc hj =>
+      Induction.hResN_of_cases hw (hE (conjWord word)) (hE word).packet
+        (Induction.oldPolicyData_of_canonical (standardField_reflectI_conj word (hE (conjWord word)))
+          (hcan word hw hn).some (frameAt word).eps (frameAt word).eps_unit)
+        (Induction.hNegTie_of_Q21 hw (hE word) (hE (conjWord word)) ((hJ (conjWord word)).2)
+          (Induction.oldPolicyData_of_canonical (standardField_reflectI_conj word (hE (conjWord word)))
+            (hcan word hw hn).some (frameAt word).eps (frameAt word).eps_unit)
+          (hW1 word hw hn) (hQ21 word hw hn))
+        (hTie0 word hw hn) hr hcE hpair.1 hpair.2 hΨc hj
   exact odometersTheorem_of_policy hpureSlip hpureRes htwoSlip htwoRes hres
     (fun word hw hn => ⟨fun _ _ => False, ⟨Induction.oldPolicyData_of_canonical
       (standardField_reflectI_conj word (hE (conjWord word))) (hcan word hw hn).some (frameAt word).eps
@@ -121,7 +137,7 @@ theorem odometersTheorem_of_canonical
 /-- **The odometers theorem with the pure threes inputs discharged (task 71).** The pure threes inputs `BaseSlip` and `StrongResidual`
 come from `pure_threes_final`. The named inputs are `htwoGames` (the twos games with a deck rank; the twos base slip and the twos residual
 follow from it), `hgames` (the proper non-two-power words), `hbd` (Q22), `hW1` (the conjugate `W1Forced`), `hQ21` (the V-block input),
-`hResN` and `hbulk`. -/
+`hTie0` (the tied-target case of the negative tied rising pair) and `hbulk`. -/
 theorem odometersTheorem_of_canonical_pure
     (htwoGames : ∀ k : ℕ, Induction.GamesWithRank (List.replicate (k + 1) Digit.two))
     (hgames : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word → Induction.GamesWithRank word)
@@ -137,15 +153,15 @@ theorem odometersTheorem_of_canonical_pure
         sheetDiffW word c = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j ≤ -1) → 1 ≤ sheetDiffW word i →
         ∀ v ∈ (frameAt (conjWord word)).child.modifiedDeck.span,
           zTurn (c - (frameAt word).sheetShift) + v ∈ (frameAt (conjWord word)).freeH → False)
-    (hResN : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+    (hTie0 : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       ∀ c i, RisingBlackPair (standardField word) (-(frameAt word).shortShift) c i →
         c ∈ (frameAt word).closedPolygon →
-        (c + (frameAt word).uq ∈ (frameAt word).closedPolygon ∧ i + (frameAt word).uq ∈ (frameAt word).closedPolygon) →
-        sheetDiffW word c = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j = -1) → False)
+        c + (frameAt word).uq ∈ (frameAt word).closedPolygon → i + (frameAt word).uq ∈ (frameAt word).closedPolygon →
+        sheetDiffW word c = 0 → sheetDiffW word i = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j = -1) → False)
     (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       Induction.S3NoFortInputs (frameAt word) (standardField word)) :
     OdometersTheorem :=
   odometersTheorem_of_canonical FLatticePaper.EPolicy.pure_threes_inputs.1 FLatticePaper.EPolicy.pure_threes_inputs.2
-    htwoGames hgames hbd hW1 hQ21 hResN hbulk
+    htwoGames hgames hbd hW1 hQ21 hTie0 hbulk
 
 end FLatticePaper

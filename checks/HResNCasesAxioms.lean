@@ -1,0 +1,4 @@
+import FLatticePaper.CanonicalHeadline
+
+#print axioms FLatticePaper.Induction.hResN_of_cases
+#print axioms FLatticePaper.odometersTheorem_of_canonical
