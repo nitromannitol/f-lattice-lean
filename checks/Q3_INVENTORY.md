@@ -807,8 +807,14 @@ Scope to confirm with the lead: §1's star containment needs `c = d − n ≥ 3`
   `twos_parentSlope_explicit`, `twos_kernel_explicit`, `twos_transverse_explicit`, `twos_transverseGrade_explicit`).
 - Periods: `twos_standardField_hasPeriods k : HasGeneratorPeriods (frameAt (2^(k+1))).child (standardField (2^(k+1))) 0 (ladderEvenConstantV (2k+4))`.
 - Checks: checks/TwosDrifts.lean (axioms standard). Root build: 0 warnings, 0 linter notes, 0 errors.
-- Zero strip (quarterTurnField) checked numerically, not yet in Lean: F(Z x) = harmonicGrid(Z x) on the whole zone (k = 0,1,2),
-  but the set where F equals harmonicGrid is not a grade strip, so the zero strip needs the explicit window representatives (sewnField)
-  rather than the period lemmas alone.
-- Price range [cutPrice−1, cutPrice] on E checked numerically (k = 0..3); z − parentShift leaves E for about 40% of E, so it needs
-  representatives too. NOT yet in Lean: zero strips, zero even line, price range, the increments, BaseSlip and StrongResidual minus policy.
+- Zero strip: see the TwosZeroStrip entry below (it is free from the packet).
+- Price range [cutPrice−1, cutPrice] on E checked numerically (k = 0..3); z − parentShift leaves E for about 40% of E. NOT yet in Lean:
+  the price range, the increments, BaseSlip and StrongResidual minus the policy field.
+
+### Task 72 / twos base (the zero strip field of StrongResidual at 2^(k+1)): TwosZeroStrip.lean
+- PROVED: `twos_zeroStripInterval k`, the `zeroStripInterval` field of `StrongResidual (2^(k+1))`, from `twos_packet_standard`
+  (with `twos_zero_strip` and `twos_harm_strip`) and `W1ZeroStrip.zeroStripInterval_of_packet`. No new arithmetic.
+- Checks: checks/TwosZeroStrip.lean (axioms standard).
+- Corrects the drift entry above: the zero strip does not need the piecewise representatives; it is free from the packet.
+- Still open for StrongResidual (2^(k+1)): zeroEvenLine (needs priceRange, the drifts, and an odd seed F w = harmonicGrid w on
+  sGrade = 2−3d+n), priceRange, F1_unitPrice, F1_noPriceSaddle; and BaseSlip (F1_unitSlip, F1_noSlipSaddle, slipRange).
