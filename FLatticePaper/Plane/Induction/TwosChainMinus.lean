@@ -827,4 +827,2947 @@ theorem chainM_black_evenL_one (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ
   rw [psi_U_shift, psi_U_shift] at key
   linarith
 
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s1_c00 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s1_c01 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s1_c02 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s1_c10 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s1_c11 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s1_c12 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s1_c20 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s1_c21 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s1_c22 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) (_hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hqK : TwosKey (2 * (k : ℤ) + 4) (x - 2) (y - 1))
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  rw [twosKey_pos] at _hpK _hqK
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem chainM_strip_C_s1 (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 0) (hx0 : x ≠ 0) (hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) (hs : x = 1) :
+    twosPsi k (x - 2) (y - 1) ≤ twosPsi k (x - 1) (y - 1) := by
+  have hnb := hn
+  unfold NativeT at hnb
+  have hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  have hq : TwosKey (2 * (k : ℤ) + 4) (x - 2) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  apply psi_le_of_band k hpK hq
+  have hv := twos_slip_value k hpK
+  have hw := twos_slip_value k hq
+  rcases hv with hv | hv | hv <;> rcases hw with hw | hw | hw
+  · exact chainM_cell_C_s1_c00 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s1_c01 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s1_c02 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s1_c10 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s1_c11 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s1_c12 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s1_c20 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s1_c21 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s1_c22 k hs hp hx0 hx1 n1 n2 n4 n8 hpK hq hv hw
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s2_c00 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s2_c01 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s2_c02 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s2_c10 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s2_c11 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s2_c12 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s2_c20 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s2_c21 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s2_c22 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem chainM_strip_C_s2 (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 0) (hx0 : x ≠ 0) (hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) (hs : x = 2) :
+    twosPsi k (x - 2) (y - 1) ≤ twosPsi k (x - 1) (y - 1) := by
+  have hnb := hn
+  unfold NativeT at hnb
+  have hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  have hq : TwosKey (2 * (k : ℤ) + 4) (x - 2) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  apply psi_le_of_band k hpK hq
+  have hv := twos_slip_value k hpK
+  have hw := twos_slip_value k hq
+  rcases hv with hv | hv | hv <;> rcases hw with hw | hw | hw
+  · exact chainM_cell_C_s2_c00 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s2_c01 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s2_c02 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s2_c10 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s2_c11 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s2_c12 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s2_c20 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s2_c21 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s2_c22 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s3_c00 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) (_hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hqK : TwosKey (2 * (k : ℤ) + 4) (x - 2) (y - 1))
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  rw [twosKey_pos] at _hpK _hqK
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s3_c01 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s3_c02 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s3_c10 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s3_c11 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s3_c12 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s3_c20 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s3_c21 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s3_c22 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem chainM_strip_C_s3 (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 0) (hx0 : x ≠ 0) (hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) (hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) :
+    twosPsi k (x - 2) (y - 1) ≤ twosPsi k (x - 1) (y - 1) := by
+  have hnb := hn
+  unfold NativeT at hnb
+  have hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  have hq : TwosKey (2 * (k : ℤ) + 4) (x - 2) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  apply psi_le_of_band k hpK hq
+  have hv := twos_slip_value k hpK
+  have hw := twos_slip_value k hq
+  rcases hv with hv | hv | hv <;> rcases hw with hw | hw | hw
+  · exact chainM_cell_C_s3_c00 k hs hp hx0 hx1 n1 n2 n4 n8 hpK hq hv hw
+  · exact chainM_cell_C_s3_c01 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s3_c02 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s3_c10 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s3_c11 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s3_c12 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s3_c20 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s3_c21 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s3_c22 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s4_c00 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s4_c01 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s4_c02 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s4_c10 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s4_c11 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s4_c12 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s4_c20 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s4_c21 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s4_c22 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem chainM_strip_C_s4 (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 0) (hx0 : x ≠ 0) (hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) (hs : x = 2 * (k : ℤ) + 4) :
+    twosPsi k (x - 2) (y - 1) ≤ twosPsi k (x - 1) (y - 1) := by
+  have hnb := hn
+  unfold NativeT at hnb
+  have hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  have hq : TwosKey (2 * (k : ℤ) + 4) (x - 2) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  apply psi_le_of_band k hpK hq
+  have hv := twos_slip_value k hpK
+  have hw := twos_slip_value k hq
+  rcases hv with hv | hv | hv <;> rcases hw with hw | hw | hw
+  · exact chainM_cell_C_s4_c00 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s4_c01 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s4_c02 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s4_c10 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s4_c11 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s4_c12 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s4_c20 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s4_c21 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s4_c22 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s5_c00 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s5_c01 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s5_c02 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s5_c10 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s5_c11 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s5_c12 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s5_c20 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s5_c21 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 2) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_C_s5_c22 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 0) (_hx0 : x ≠ 0) (_hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (_n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 2, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 2) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 2) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 2), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem chainM_strip_C_s5 (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 0) (hx0 : x ≠ 0) (hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) (n1 : ¬ (y - x = 2 * (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (n8 : ¬ (y - x = (2 * (k : ℤ) + 4) - 2 ∧ 2 ≤ x ∧ x ≤ (2 * (k : ℤ) + 4))) (hs : x = 2 * (k : ℤ) + 5) :
+    twosPsi k (x - 2) (y - 1) ≤ twosPsi k (x - 1) (y - 1) := by
+  have hnb := hn
+  unfold NativeT at hnb
+  have hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  have hq : TwosKey (2 * (k : ℤ) + 4) (x - 2) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  apply psi_le_of_band k hpK hq
+  have hv := twos_slip_value k hpK
+  have hw := twos_slip_value k hq
+  rcases hv with hv | hv | hv <;> rcases hw with hw | hw | hw
+  · exact chainM_cell_C_s5_c00 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s5_c01 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s5_c02 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s5_c10 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s5_c11 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s5_c12 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s5_c20 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s5_c21 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+  · exact chainM_cell_C_s5_c22 k hs hp hx0 hx1 n1 n2 n4 n8 hv hw
+
+set_option maxHeartbeats 400000 in
+/-- **Even native centre, west input, the other sites:** split by the x-strips. -/
+theorem chainM_black_evenL_gen (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 0) (hW : ¬ LadderOddOddWhite (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) (hx0 : x ≠ 0) (hx1 : ¬ (x = 1 ∧ y ≤ 2 * (k : ℤ) + 3)) :
+    twosPsi k (x - 2) (y - 1) ≤ twosPsi k (x - 1) (y - 1) := by
+  obtain ⟨n1, n2, n3, n4, n5, n6, n7, n8, n9, n10⟩ := even_black_negs k hW
+  have hs : (x = 1) ∨ (x = 2) ∨ (3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) ∨ (x = 2 * (k : ℤ) + 4) ∨ (x = 2 * (k : ℤ) + 5) := by
+    have hnb := hn
+    unfold NativeT at hnb
+    clear n3 n5 n6 n7 n9 n10 n1 n4 n8 hW
+    omega
+  rcases hs with h | h | h | h | h
+  · exact chainM_strip_C_s1 k hn hp hx0 hx1 n1 n2 n4 n8 h
+  · exact chainM_strip_C_s2 k hn hp hx0 hx1 n1 n2 n4 n8 h
+  · exact chainM_strip_C_s3 k hn hp hx0 hx1 n1 n2 n4 n8 h
+  · exact chainM_strip_C_s4 k hn hp hx0 hx1 n1 n2 n4 n8 h
+  · exact chainM_strip_C_s5 k hn hp hx0 hx1 n1 n2 n4 n8 h
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_z0_c00 (k : ℕ) {x y : ℤ} (_hs : x = 0) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_z0_c01 (k : ℕ) {x y : ℤ} (_hs : x = 0) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_z0_c02 (k : ℕ) {x y : ℤ} (_hs : x = 0) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_z0_c10 (k : ℕ) {x y : ℤ} (_hs : x = 0) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_z0_c11 (k : ℕ) {x y : ℤ} (_hs : x = 0) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_z0_c12 (k : ℕ) {x y : ℤ} (_hs : x = 0) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_z0_c20 (k : ℕ) {x y : ℤ} (_hs : x = 0) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_z0_c21 (k : ℕ) {x y : ℤ} (_hs : x = 0) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_z0_c22 (k : ℕ) {x y : ℤ} (_hs : x = 0) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem chainM_strip_D_z0 (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 0) (n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) (hs : x = 0) :
+    twosPsi k x (y - 1) ≤ twosPsi k (x - 1) (y - 1) := by
+  have hnb := hn
+  unfold NativeT at hnb
+  have hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  have hq : TwosKey (2 * (k : ℤ) + 4) (x) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  apply psi_le_of_band k hpK hq
+  have hv := twos_slip_value k hpK
+  have hw := twos_slip_value k hq
+  rcases hv with hv | hv | hv <;> rcases hw with hw | hw | hw
+  · exact chainM_cell_D_z0_c00 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_z0_c01 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_z0_c02 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_z0_c10 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_z0_c11 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_z0_c12 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_z0_c20 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_z0_c21 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_z0_c22 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s1_c00 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s1_c01 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s1_c02 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s1_c10 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s1_c11 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s1_c12 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s1_c20 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s1_c21 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s1_c22 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem chainM_strip_D_s1 (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 0) (n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) (hs : x = 1) :
+    twosPsi k x (y - 1) ≤ twosPsi k (x - 1) (y - 1) := by
+  have hnb := hn
+  unfold NativeT at hnb
+  have hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  have hq : TwosKey (2 * (k : ℤ) + 4) (x) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  apply psi_le_of_band k hpK hq
+  have hv := twos_slip_value k hpK
+  have hw := twos_slip_value k hq
+  rcases hv with hv | hv | hv <;> rcases hw with hw | hw | hw
+  · exact chainM_cell_D_s1_c00 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s1_c01 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s1_c02 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s1_c10 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s1_c11 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s1_c12 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s1_c20 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s1_c21 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s1_c22 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s2_c00 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s2_c01 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s2_c02 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s2_c10 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s2_c11 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s2_c12 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s2_c20 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s2_c21 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s2_c22 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem chainM_strip_D_s2 (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 0) (n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) (hs : x = 2) :
+    twosPsi k x (y - 1) ≤ twosPsi k (x - 1) (y - 1) := by
+  have hnb := hn
+  unfold NativeT at hnb
+  have hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  have hq : TwosKey (2 * (k : ℤ) + 4) (x) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  apply psi_le_of_band k hpK hq
+  have hv := twos_slip_value k hpK
+  have hw := twos_slip_value k hq
+  rcases hv with hv | hv | hv <;> rcases hw with hw | hw | hw
+  · exact chainM_cell_D_s2_c00 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s2_c01 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s2_c02 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s2_c10 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s2_c11 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s2_c12 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s2_c20 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s2_c21 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s2_c22 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s3_c00 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s3_c01 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s3_c02 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s3_c10 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s3_c11 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s3_c12 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s3_c20 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s3_c21 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s3_c22 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem chainM_strip_D_s3 (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 0) (n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) (hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) :
+    twosPsi k x (y - 1) ≤ twosPsi k (x - 1) (y - 1) := by
+  have hnb := hn
+  unfold NativeT at hnb
+  have hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  have hq : TwosKey (2 * (k : ℤ) + 4) (x) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  apply psi_le_of_band k hpK hq
+  have hv := twos_slip_value k hpK
+  have hw := twos_slip_value k hq
+  rcases hv with hv | hv | hv <;> rcases hw with hw | hw | hw
+  · exact chainM_cell_D_s3_c00 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s3_c01 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s3_c02 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s3_c10 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s3_c11 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s3_c12 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s3_c20 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s3_c21 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s3_c22 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s4_c00 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s4_c01 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s4_c02 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s4_c10 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s4_c11 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s4_c12 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s4_c20 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s4_c21 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s4_c22 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem chainM_strip_D_s4 (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 0) (n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) (hs : x = 2 * (k : ℤ) + 4) :
+    twosPsi k x (y - 1) ≤ twosPsi k (x - 1) (y - 1) := by
+  have hnb := hn
+  unfold NativeT at hnb
+  have hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  have hq : TwosKey (2 * (k : ℤ) + 4) (x) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  apply psi_le_of_band k hpK hq
+  have hv := twos_slip_value k hpK
+  have hw := twos_slip_value k hq
+  rcases hv with hv | hv | hv <;> rcases hw with hw | hw | hw
+  · exact chainM_cell_D_s4_c00 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s4_c01 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s4_c02 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s4_c10 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s4_c11 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s4_c12 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s4_c20 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s4_c21 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s4_c22 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s5_c00 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s5_c01 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s5_c02 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s5_c10 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) (_hn : NativeT (2 * (k : ℤ) + 4) x y)
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  unfold NativeT at _hn
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s5_c11 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s5_c12 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s5_c20 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) (_hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hqK : TwosKey (2 * (k : ℤ) + 4) (x) (y - 1))
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  rw [twosKey_pos] at _hpK _hqK
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s5_c21 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_D_s5_c22 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 0) (_n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (_n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (_n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (_n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (_n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (_n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x) (y - 1)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x), (y - 1)) := by
+  subst _hs
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem chainM_strip_D_s5 (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 0) (n2 : ¬ (x = -1 ∧ (2 * (k : ℤ) + 4) + 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 1)) (n3 : ¬ (x = 0 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4))) (n4 : ¬ (y - x = -2 ∧ 0 ≤ y ∧ y ≤ (2 * (k : ℤ) + 4) - 3)) (n5 : ¬ (x = (2 * (k : ℤ) + 4) + 1 ∧ (2 * (k : ℤ) + 4) - 1 ≤ y ∧ y ≤ 2 * (2 * (k : ℤ) + 4) - 3)) (n6 : ¬ (x = (2 * (k : ℤ) + 4) ∧ 2 * (2 * (k : ℤ) + 4) - 2 ≤ y ∧ y ≤ 3 * (2 * (k : ℤ) + 4) - 2)) (n10 : ¬ (x = (2 * (k : ℤ) + 4) ∧ y = (2 * (k : ℤ) + 4) - 2)) (hs : x = 2 * (k : ℤ) + 5) :
+    twosPsi k x (y - 1) ≤ twosPsi k (x - 1) (y - 1) := by
+  have hnb := hn
+  unfold NativeT at hnb
+  have hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  have hq : TwosKey (2 * (k : ℤ) + 4) (x) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  apply psi_le_of_band k hpK hq
+  have hv := twos_slip_value k hpK
+  have hw := twos_slip_value k hq
+  rcases hv with hv | hv | hv <;> rcases hw with hw | hw | hw
+  · exact chainM_cell_D_s5_c00 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s5_c01 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s5_c02 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s5_c10 k hs hp n2 n3 n4 n5 n6 n10 hn hv hw
+  · exact chainM_cell_D_s5_c11 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s5_c12 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s5_c20 k hs hp n2 n3 n4 n5 n6 n10 hpK hq hv hw
+  · exact chainM_cell_D_s5_c21 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+  · exact chainM_cell_D_s5_c22 k hs hp n2 n3 n4 n5 n6 n10 hv hw
+
+set_option maxHeartbeats 400000 in
+/-- **Even native centre, east input:** split by the x-strips. -/
+theorem chainM_black_evenR_gen (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 0) (hW : ¬ LadderOddOddWhite (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) :
+    twosPsi k x (y - 1) ≤ twosPsi k (x - 1) (y - 1) := by
+  obtain ⟨n1, n2, n3, n4, n5, n6, n7, n8, n9, n10⟩ := even_black_negs k hW
+  have hs : (x = 0) ∨ (x = 1) ∨ (x = 2) ∨ (3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) ∨ (x = 2 * (k : ℤ) + 4) ∨ (x = 2 * (k : ℤ) + 5) := by
+    have hnb := hn
+    unfold NativeT at hnb
+    clear n1 n3 n4 n5 n6 n7 n8 n9 n10 hW
+    omega
+  rcases hs with h | h | h | h | h | h
+  · exact chainM_strip_D_z0 k hn hp n2 n3 n4 n5 n6 n10 h
+  · exact chainM_strip_D_s1 k hn hp n2 n3 n4 n5 n6 n10 h
+  · exact chainM_strip_D_s2 k hn hp n2 n3 n4 n5 n6 n10 h
+  · exact chainM_strip_D_s3 k hn hp n2 n3 n4 n5 n6 n10 h
+  · exact chainM_strip_D_s4 k hn hp n2 n3 n4 n5 n6 n10 h
+  · exact chainM_strip_D_s5 k hn hp n2 n3 n4 n5 n6 n10 h
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_z0_c00 (k : ℕ) {x y : ℤ} (_hs : x = 0) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_z0_c01 (k : ℕ) {x y : ℤ} (_hs : x = 0) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_z0_c02 (k : ℕ) {x y : ℤ} (_hs : x = 0) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_z0_c10 (k : ℕ) {x y : ℤ} (_hs : x = 0) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_z0_c11 (k : ℕ) {x y : ℤ} (_hs : x = 0) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_z0_c12 (k : ℕ) {x y : ℤ} (_hs : x = 0) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_z0_c20 (k : ℕ) {x y : ℤ} (_hs : x = 0) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_z0_c21 (k : ℕ) {x y : ℤ} (_hs : x = 0) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_z0_c22 (k : ℕ) {x y : ℤ} (_hs : x = 0) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem chainM_strip_oN_z0 (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 1) (hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) (hs : x = 0) :
+    twosPsi k (x - 1) (y - 2) ≤ twosPsi k (x - 1) (y - 1) := by
+  have hnb := hn
+  unfold NativeT at hnb
+  have hBb := hB
+  unfold LadderOddEvenBlack at hBb
+  have hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  have hq : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 2) := by
+    rw [twosKey_pos]
+    omega
+  apply psi_le_of_band k hpK hq
+  have hv := twos_slip_value k hpK
+  have hw := twos_slip_value k hq
+  rcases hv with hv | hv | hv <;> rcases hw with hw | hw | hw
+  · exact chainM_cell_oN_z0_c00 k hs hp hB hv hw
+  · exact chainM_cell_oN_z0_c01 k hs hp hB hv hw
+  · exact chainM_cell_oN_z0_c02 k hs hp hB hv hw
+  · exact chainM_cell_oN_z0_c10 k hs hp hB hv hw
+  · exact chainM_cell_oN_z0_c11 k hs hp hB hv hw
+  · exact chainM_cell_oN_z0_c12 k hs hp hB hv hw
+  · exact chainM_cell_oN_z0_c20 k hs hp hB hv hw
+  · exact chainM_cell_oN_z0_c21 k hs hp hB hv hw
+  · exact chainM_cell_oN_z0_c22 k hs hp hB hv hw
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s1_c00 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s1_c01 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s1_c02 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s1_c10 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s1_c11 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s1_c12 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s1_c20 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s1_c21 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s1_c22 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem chainM_strip_oN_s1 (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 1) (hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) (hs : x = 1) :
+    twosPsi k (x - 1) (y - 2) ≤ twosPsi k (x - 1) (y - 1) := by
+  have hnb := hn
+  unfold NativeT at hnb
+  have hBb := hB
+  unfold LadderOddEvenBlack at hBb
+  have hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  have hq : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 2) := by
+    rw [twosKey_pos]
+    omega
+  apply psi_le_of_band k hpK hq
+  have hv := twos_slip_value k hpK
+  have hw := twos_slip_value k hq
+  rcases hv with hv | hv | hv <;> rcases hw with hw | hw | hw
+  · exact chainM_cell_oN_s1_c00 k hs hp hB hv hw
+  · exact chainM_cell_oN_s1_c01 k hs hp hB hv hw
+  · exact chainM_cell_oN_s1_c02 k hs hp hB hv hw
+  · exact chainM_cell_oN_s1_c10 k hs hp hB hv hw
+  · exact chainM_cell_oN_s1_c11 k hs hp hB hv hw
+  · exact chainM_cell_oN_s1_c12 k hs hp hB hv hw
+  · exact chainM_cell_oN_s1_c20 k hs hp hB hv hw
+  · exact chainM_cell_oN_s1_c21 k hs hp hB hv hw
+  · exact chainM_cell_oN_s1_c22 k hs hp hB hv hw
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s2_c00 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s2_c01 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s2_c02 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s2_c10 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s2_c11 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s2_c12 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s2_c20 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s2_c21 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s2_c22 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem chainM_strip_oN_s2 (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 1) (hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) (hs : x = 2) :
+    twosPsi k (x - 1) (y - 2) ≤ twosPsi k (x - 1) (y - 1) := by
+  have hnb := hn
+  unfold NativeT at hnb
+  have hBb := hB
+  unfold LadderOddEvenBlack at hBb
+  have hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  have hq : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 2) := by
+    rw [twosKey_pos]
+    omega
+  apply psi_le_of_band k hpK hq
+  have hv := twos_slip_value k hpK
+  have hw := twos_slip_value k hq
+  rcases hv with hv | hv | hv <;> rcases hw with hw | hw | hw
+  · exact chainM_cell_oN_s2_c00 k hs hp hB hv hw
+  · exact chainM_cell_oN_s2_c01 k hs hp hB hv hw
+  · exact chainM_cell_oN_s2_c02 k hs hp hB hv hw
+  · exact chainM_cell_oN_s2_c10 k hs hp hB hv hw
+  · exact chainM_cell_oN_s2_c11 k hs hp hB hv hw
+  · exact chainM_cell_oN_s2_c12 k hs hp hB hv hw
+  · exact chainM_cell_oN_s2_c20 k hs hp hB hv hw
+  · exact chainM_cell_oN_s2_c21 k hs hp hB hv hw
+  · exact chainM_cell_oN_s2_c22 k hs hp hB hv hw
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s3_c00 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s3_c01 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s3_c02 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s3_c10 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s3_c11 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s3_c12 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s3_c20 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s3_c21 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s3_c22 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem chainM_strip_oN_s3 (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 1) (hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) (hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) :
+    twosPsi k (x - 1) (y - 2) ≤ twosPsi k (x - 1) (y - 1) := by
+  have hnb := hn
+  unfold NativeT at hnb
+  have hBb := hB
+  unfold LadderOddEvenBlack at hBb
+  have hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  have hq : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 2) := by
+    rw [twosKey_pos]
+    omega
+  apply psi_le_of_band k hpK hq
+  have hv := twos_slip_value k hpK
+  have hw := twos_slip_value k hq
+  rcases hv with hv | hv | hv <;> rcases hw with hw | hw | hw
+  · exact chainM_cell_oN_s3_c00 k hs hp hB hv hw
+  · exact chainM_cell_oN_s3_c01 k hs hp hB hv hw
+  · exact chainM_cell_oN_s3_c02 k hs hp hB hv hw
+  · exact chainM_cell_oN_s3_c10 k hs hp hB hv hw
+  · exact chainM_cell_oN_s3_c11 k hs hp hB hv hw
+  · exact chainM_cell_oN_s3_c12 k hs hp hB hv hw
+  · exact chainM_cell_oN_s3_c20 k hs hp hB hv hw
+  · exact chainM_cell_oN_s3_c21 k hs hp hB hv hw
+  · exact chainM_cell_oN_s3_c22 k hs hp hB hv hw
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s4_c00 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s4_c01 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s4_c02 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s4_c10 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s4_c11 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s4_c12 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s4_c20 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s4_c21 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s4_c22 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem chainM_strip_oN_s4 (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 1) (hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) (hs : x = 2 * (k : ℤ) + 4) :
+    twosPsi k (x - 1) (y - 2) ≤ twosPsi k (x - 1) (y - 1) := by
+  have hnb := hn
+  unfold NativeT at hnb
+  have hBb := hB
+  unfold LadderOddEvenBlack at hBb
+  have hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  have hq : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 2) := by
+    rw [twosKey_pos]
+    omega
+  apply psi_le_of_band k hpK hq
+  have hv := twos_slip_value k hpK
+  have hw := twos_slip_value k hq
+  rcases hv with hv | hv | hv <;> rcases hw with hw | hw | hw
+  · exact chainM_cell_oN_s4_c00 k hs hp hB hv hw
+  · exact chainM_cell_oN_s4_c01 k hs hp hB hv hw
+  · exact chainM_cell_oN_s4_c02 k hs hp hB hv hw
+  · exact chainM_cell_oN_s4_c10 k hs hp hB hv hw
+  · exact chainM_cell_oN_s4_c11 k hs hp hB hv hw
+  · exact chainM_cell_oN_s4_c12 k hs hp hB hv hw
+  · exact chainM_cell_oN_s4_c20 k hs hp hB hv hw
+  · exact chainM_cell_oN_s4_c21 k hs hp hB hv hw
+  · exact chainM_cell_oN_s4_c22 k hs hp hB hv hw
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s5_c00 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s5_c01 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s5_c02 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s5_c10 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s5_c11 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s5_c12 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s5_c20 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s5_c21 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 2) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oN_s5_c22 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y - 2) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 2)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y - 2) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 2)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem chainM_strip_oN_s5 (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 1) (hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) (hs : x = 2 * (k : ℤ) + 5) :
+    twosPsi k (x - 1) (y - 2) ≤ twosPsi k (x - 1) (y - 1) := by
+  have hnb := hn
+  unfold NativeT at hnb
+  have hBb := hB
+  unfold LadderOddEvenBlack at hBb
+  have hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  have hq : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 2) := by
+    rw [twosKey_pos]
+    omega
+  apply psi_le_of_band k hpK hq
+  have hv := twos_slip_value k hpK
+  have hw := twos_slip_value k hq
+  rcases hv with hv | hv | hv <;> rcases hw with hw | hw | hw
+  · exact chainM_cell_oN_s5_c00 k hs hp hB hv hw
+  · exact chainM_cell_oN_s5_c01 k hs hp hB hv hw
+  · exact chainM_cell_oN_s5_c02 k hs hp hB hv hw
+  · exact chainM_cell_oN_s5_c10 k hs hp hB hv hw
+  · exact chainM_cell_oN_s5_c11 k hs hp hB hv hw
+  · exact chainM_cell_oN_s5_c12 k hs hp hB hv hw
+  · exact chainM_cell_oN_s5_c20 k hs hp hB hv hw
+  · exact chainM_cell_oN_s5_c21 k hs hp hB hv hw
+  · exact chainM_cell_oN_s5_c22 k hs hp hB hv hw
+
+set_option maxHeartbeats 400000 in
+/-- **Odd native centre, south input:** split by the x-strips. -/
+theorem chainM_black_oddN_gen (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 1) (hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) :
+    twosPsi k (x - 1) (y - 2) ≤ twosPsi k (x - 1) (y - 1) := by
+  have hs : (x = 0) ∨ (x = 1) ∨ (x = 2) ∨ (3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) ∨ (x = 2 * (k : ℤ) + 4) ∨ (x = 2 * (k : ℤ) + 5) := by
+    have hnb := hn
+    unfold NativeT at hnb
+    have hBb := hB
+    unfold LadderOddEvenBlack at hBb
+    omega
+  rcases hs with h | h | h | h | h | h
+  · exact chainM_strip_oN_z0 k hn hp hB h
+  · exact chainM_strip_oN_s1 k hn hp hB h
+  · exact chainM_strip_oN_s2 k hn hp hB h
+  · exact chainM_strip_oN_s3 k hn hp hB h
+  · exact chainM_strip_oN_s4 k hn hp hB h
+  · exact chainM_strip_oN_s5 k hn hp hB h
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_z0_c00 (k : ℕ) {x y : ℤ} (_hs : x = 0) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_z0_c01 (k : ℕ) {x y : ℤ} (_hs : x = 0) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_z0_c02 (k : ℕ) {x y : ℤ} (_hs : x = 0) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_z0_c10 (k : ℕ) {x y : ℤ} (_hs : x = 0) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_z0_c11 (k : ℕ) {x y : ℤ} (_hs : x = 0) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_z0_c12 (k : ℕ) {x y : ℤ} (_hs : x = 0) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_z0_c20 (k : ℕ) {x y : ℤ} (_hs : x = 0) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_z0_c21 (k : ℕ) {x y : ℤ} (_hs : x = 0) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_z0_c22 (k : ℕ) {x y : ℤ} (_hs : x = 0) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem chainM_strip_oP_z0 (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 1) (hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) (hs : x = 0) :
+    twosPsi k (x - 1) y ≤ twosPsi k (x - 1) (y - 1) := by
+  have hnb := hn
+  unfold NativeT at hnb
+  have hBb := hB
+  unfold LadderOddEvenBlack at hBb
+  have hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  have hq : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y) := by
+    rw [twosKey_pos]
+    omega
+  apply psi_le_of_band k hpK hq
+  have hv := twos_slip_value k hpK
+  have hw := twos_slip_value k hq
+  rcases hv with hv | hv | hv <;> rcases hw with hw | hw | hw
+  · exact chainM_cell_oP_z0_c00 k hs hp hB hv hw
+  · exact chainM_cell_oP_z0_c01 k hs hp hB hv hw
+  · exact chainM_cell_oP_z0_c02 k hs hp hB hv hw
+  · exact chainM_cell_oP_z0_c10 k hs hp hB hv hw
+  · exact chainM_cell_oP_z0_c11 k hs hp hB hv hw
+  · exact chainM_cell_oP_z0_c12 k hs hp hB hv hw
+  · exact chainM_cell_oP_z0_c20 k hs hp hB hv hw
+  · exact chainM_cell_oP_z0_c21 k hs hp hB hv hw
+  · exact chainM_cell_oP_z0_c22 k hs hp hB hv hw
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s1_c00 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s1_c01 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s1_c02 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s1_c10 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s1_c11 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s1_c12 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s1_c20 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s1_c21 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s1_c22 (k : ℕ) {x y : ℤ} (_hs : x = 1) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem chainM_strip_oP_s1 (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 1) (hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) (hs : x = 1) :
+    twosPsi k (x - 1) y ≤ twosPsi k (x - 1) (y - 1) := by
+  have hnb := hn
+  unfold NativeT at hnb
+  have hBb := hB
+  unfold LadderOddEvenBlack at hBb
+  have hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  have hq : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y) := by
+    rw [twosKey_pos]
+    omega
+  apply psi_le_of_band k hpK hq
+  have hv := twos_slip_value k hpK
+  have hw := twos_slip_value k hq
+  rcases hv with hv | hv | hv <;> rcases hw with hw | hw | hw
+  · exact chainM_cell_oP_s1_c00 k hs hp hB hv hw
+  · exact chainM_cell_oP_s1_c01 k hs hp hB hv hw
+  · exact chainM_cell_oP_s1_c02 k hs hp hB hv hw
+  · exact chainM_cell_oP_s1_c10 k hs hp hB hv hw
+  · exact chainM_cell_oP_s1_c11 k hs hp hB hv hw
+  · exact chainM_cell_oP_s1_c12 k hs hp hB hv hw
+  · exact chainM_cell_oP_s1_c20 k hs hp hB hv hw
+  · exact chainM_cell_oP_s1_c21 k hs hp hB hv hw
+  · exact chainM_cell_oP_s1_c22 k hs hp hB hv hw
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s2_c00 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s2_c01 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s2_c02 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s2_c10 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s2_c11 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s2_c12 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s2_c20 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s2_c21 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s2_c22 (k : ℕ) {x y : ℤ} (_hs : x = 2) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem chainM_strip_oP_s2 (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 1) (hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) (hs : x = 2) :
+    twosPsi k (x - 1) y ≤ twosPsi k (x - 1) (y - 1) := by
+  have hnb := hn
+  unfold NativeT at hnb
+  have hBb := hB
+  unfold LadderOddEvenBlack at hBb
+  have hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  have hq : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y) := by
+    rw [twosKey_pos]
+    omega
+  apply psi_le_of_band k hpK hq
+  have hv := twos_slip_value k hpK
+  have hw := twos_slip_value k hq
+  rcases hv with hv | hv | hv <;> rcases hw with hw | hw | hw
+  · exact chainM_cell_oP_s2_c00 k hs hp hB hv hw
+  · exact chainM_cell_oP_s2_c01 k hs hp hB hv hw
+  · exact chainM_cell_oP_s2_c02 k hs hp hB hv hw
+  · exact chainM_cell_oP_s2_c10 k hs hp hB hv hw
+  · exact chainM_cell_oP_s2_c11 k hs hp hB hv hw
+  · exact chainM_cell_oP_s2_c12 k hs hp hB hv hw
+  · exact chainM_cell_oP_s2_c20 k hs hp hB hv hw
+  · exact chainM_cell_oP_s2_c21 k hs hp hB hv hw
+  · exact chainM_cell_oP_s2_c22 k hs hp hB hv hw
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s3_c00 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s3_c01 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s3_c02 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s3_c10 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s3_c11 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s3_c12 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s3_c20 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s3_c21 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s3_c22 (k : ℕ) {x y : ℤ} (_hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem chainM_strip_oP_s3 (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 1) (hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) (hs : 3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) :
+    twosPsi k (x - 1) y ≤ twosPsi k (x - 1) (y - 1) := by
+  have hnb := hn
+  unfold NativeT at hnb
+  have hBb := hB
+  unfold LadderOddEvenBlack at hBb
+  have hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  have hq : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y) := by
+    rw [twosKey_pos]
+    omega
+  apply psi_le_of_band k hpK hq
+  have hv := twos_slip_value k hpK
+  have hw := twos_slip_value k hq
+  rcases hv with hv | hv | hv <;> rcases hw with hw | hw | hw
+  · exact chainM_cell_oP_s3_c00 k hs hp hB hv hw
+  · exact chainM_cell_oP_s3_c01 k hs hp hB hv hw
+  · exact chainM_cell_oP_s3_c02 k hs hp hB hv hw
+  · exact chainM_cell_oP_s3_c10 k hs hp hB hv hw
+  · exact chainM_cell_oP_s3_c11 k hs hp hB hv hw
+  · exact chainM_cell_oP_s3_c12 k hs hp hB hv hw
+  · exact chainM_cell_oP_s3_c20 k hs hp hB hv hw
+  · exact chainM_cell_oP_s3_c21 k hs hp hB hv hw
+  · exact chainM_cell_oP_s3_c22 k hs hp hB hv hw
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s4_c00 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s4_c01 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s4_c02 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s4_c10 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s4_c11 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s4_c12 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s4_c20 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s4_c21 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s4_c22 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 4) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem chainM_strip_oP_s4 (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 1) (hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) (hs : x = 2 * (k : ℤ) + 4) :
+    twosPsi k (x - 1) y ≤ twosPsi k (x - 1) (y - 1) := by
+  have hnb := hn
+  unfold NativeT at hnb
+  have hBb := hB
+  unfold LadderOddEvenBlack at hBb
+  have hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  have hq : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y) := by
+    rw [twosKey_pos]
+    omega
+  apply psi_le_of_band k hpK hq
+  have hv := twos_slip_value k hpK
+  have hw := twos_slip_value k hq
+  rcases hv with hv | hv | hv <;> rcases hw with hw | hw | hw
+  · exact chainM_cell_oP_s4_c00 k hs hp hB hv hw
+  · exact chainM_cell_oP_s4_c01 k hs hp hB hv hw
+  · exact chainM_cell_oP_s4_c02 k hs hp hB hv hw
+  · exact chainM_cell_oP_s4_c10 k hs hp hB hv hw
+  · exact chainM_cell_oP_s4_c11 k hs hp hB hv hw
+  · exact chainM_cell_oP_s4_c12 k hs hp hB hv hw
+  · exact chainM_cell_oP_s4_c20 k hs hp hB hv hw
+  · exact chainM_cell_oP_s4_c21 k hs hp hB hv hw
+  · exact chainM_cell_oP_s4_c22 k hs hp hB hv hw
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s5_c00 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s5_c01 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s5_c02 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s5_c10 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s5_c11 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s5_c12 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y - 1) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s5_c20 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 0 ∧ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s5_c21 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 1 ∧ ¬ TwosSlipZ0 (2 * (k : ℤ) + 4) (x - 1) (y) ∧ ¬ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+open Classical in
+theorem chainM_cell_oP_s5_c22 (k : ℕ) {x y : ℤ} (_hs : x = 2 * (k : ℤ) + 5) (_hp : (x + y) % 2 = 1) (_hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) 
+    (_hv : twosSlip k (x - 1, y - 1) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y - 1)) (_hw : twosSlip k (x - 1, y) = 2 ∧ TwosSlipZ2 (2 * (k : ℤ) + 4) (x - 1) (y)) :
+    (if TwosDelta k (x - 1) (y - 1) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y - 1)) ≤ (if TwosDelta k (x - 1) (y) then (1 : ℤ) else 0) + twosSlip k ((x - 1), (y)) := by
+  subst _hs
+  unfold LadderOddEvenBlack at _hB
+  try unfold TwosSlipZ0 at *
+  try unfold TwosSlipZ2 at *
+  split_ifs <;> (try unfold TwosDelta at *) <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem chainM_strip_oP_s5 (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 1) (hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) (hs : x = 2 * (k : ℤ) + 5) :
+    twosPsi k (x - 1) y ≤ twosPsi k (x - 1) (y - 1) := by
+  have hnb := hn
+  unfold NativeT at hnb
+  have hBb := hB
+  unfold LadderOddEvenBlack at hBb
+  have hpK : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y - 1) := by
+    rw [twosKey_pos]
+    omega
+  have hq : TwosKey (2 * (k : ℤ) + 4) (x - 1) (y) := by
+    rw [twosKey_pos]
+    omega
+  apply psi_le_of_band k hpK hq
+  have hv := twos_slip_value k hpK
+  have hw := twos_slip_value k hq
+  rcases hv with hv | hv | hv <;> rcases hw with hw | hw | hw
+  · exact chainM_cell_oP_s5_c00 k hs hp hB hv hw
+  · exact chainM_cell_oP_s5_c01 k hs hp hB hv hw
+  · exact chainM_cell_oP_s5_c02 k hs hp hB hv hw
+  · exact chainM_cell_oP_s5_c10 k hs hp hB hv hw
+  · exact chainM_cell_oP_s5_c11 k hs hp hB hv hw
+  · exact chainM_cell_oP_s5_c12 k hs hp hB hv hw
+  · exact chainM_cell_oP_s5_c20 k hs hp hB hv hw
+  · exact chainM_cell_oP_s5_c21 k hs hp hB hv hw
+  · exact chainM_cell_oP_s5_c22 k hs hp hB hv hw
+
+set_option maxHeartbeats 400000 in
+/-- **Odd native centre, north input:** split by the x-strips. -/
+theorem chainM_black_oddP_gen (k : ℕ) {x y : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y) (hp : (x + y) % 2 = 1) (hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1)) :
+    twosPsi k (x - 1) y ≤ twosPsi k (x - 1) (y - 1) := by
+  have hs : (x = 0) ∨ (x = 1) ∨ (x = 2) ∨ (3 ≤ x ∧ x ≤ 2 * (k : ℤ) + 3) ∨ (x = 2 * (k : ℤ) + 4) ∨ (x = 2 * (k : ℤ) + 5) := by
+    have hnb := hn
+    unfold NativeT at hnb
+    have hBb := hB
+    unfold LadderOddEvenBlack at hBb
+    omega
+  rcases hs with h | h | h | h | h | h
+  · exact chainM_strip_oP_z0 k hn hp hB h
+  · exact chainM_strip_oP_s1 k hn hp hB h
+  · exact chainM_strip_oP_s2 k hn hp hB h
+  · exact chainM_strip_oP_s3 k hn hp hB h
+  · exact chainM_strip_oP_s4 k hn hp hB h
+  · exact chainM_strip_oP_s5 k hn hp hB h
+
+/-- A lattice shift `(−p)U + (−q)V` of the pair `(a, b)` raises `Ψ` by `p + 2q`. -/
+theorem psi_alias_shift (k : ℕ) (a b p q : ℤ) :
+    twosPsi k (a - p * (2 * (k : ℤ) + 5) + 2 * q) (b - p * (2 * (k : ℤ) + 3) - 2 * (2 * (k : ℤ) + 4) * q) =
+      twosPsi k a b + p + 2 * q := by
+  have h := twosPsi_lattice k a b (-p) (-q)
+  have e1 : a - p * (2 * (k : ℤ) + 5) + 2 * q = a + ((-p) * (2 * (k : ℤ) + 5) + (-q) * (-2)) := by ring
+  have e2 : b - p * (2 * (k : ℤ) + 3) - 2 * (2 * (k : ℤ) + 4) * q =
+      b + ((-p) * (2 * (k : ℤ) + 3) + (-q) * (4 * (k : ℤ) + 8)) := by ring
+  rw [e1, e2, h]
+  ring
+
+set_option maxHeartbeats 400000 in
+/-- **The black branch at a native centre:** the input of a native black centre of charge `-1` does not raise `Ψ`. -/
+theorem chainM_black_native (k : ℕ) {S : Field}
+    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees S 0)
+    (hperiod : HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4)) S 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
+    {x y j1 j2 : ℤ} (hn : NativeT (2 * (k : ℤ) + 4) x y)
+    (hl : laplacian (standardField (List.replicate (k + 1) Digit.two)) (x, y) = -1)
+    (he : Edge (j1, j2) (x, y)) :
+    twosPsi k (j1 - 1) (j2 - 1) ≤ twosPsi k (x - 1) (y - 1) := by
+  have hR := black_region_of_lap k hagree hperiod hn hl
+  by_cases hp : EvenSite (x, y)
+  · have hW : ¬ LadderOddOddWhite (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1) := by
+      rcases hR with ⟨hE, _⟩ | ⟨_, hW⟩
+      · exact absurd ((evenSite_rot (2 * (k : ℤ) + 4) x y).mp hE) (not_not.mpr hp)
+      · exact hW
+    have hpar : (x + y) % 2 = 0 := hp
+    rcases edge_even_cases x y j1 j2 hp he with ⟨h1, h2⟩ | ⟨h1, h2⟩
+    · subst j1 j2
+      rw [show x - 1 - 1 = x - 2 by ring]
+      by_cases hx0 : x = 0
+      · exact chainM_black_evenL_zero k hn hpar hW hx0
+      · by_cases hx1 : x = 1 ∧ y ≤ 2 * (k : ℤ) + 3
+        · exact chainM_black_evenL_one k hn hpar hx1.1 hx1.2
+        · exact chainM_black_evenL_gen k hn hpar hW hx0 hx1
+    · subst j1 j2
+      rw [show x + 1 - 1 = x by ring]
+      exact chainM_black_evenR_gen k hn hpar hW
+  · have hB : LadderOddEvenBlack (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - y, x + 1) := by
+      rcases hR with ⟨_, hB⟩ | ⟨hNE, _⟩
+      · exact hB
+      · exact absurd ((evenSite_rot (2 * (k : ℤ) + 4) x y).mpr hp) hNE
+    have hpar : (x + y) % 2 = 1 := by
+      have hq := hp
+      unfold EvenSite at hq
+      dsimp only at hq
+      omega
+    rcases edge_odd_cases x y j1 j2 hp he with ⟨h1, h2⟩ | ⟨h1, h2⟩
+    · subst j1 j2
+      rw [show y - 1 - 1 = y - 2 by ring]
+      exact chainM_black_oddN_gen k hn hpar hB
+    · subst j1 j2
+      rw [show y + 1 - 1 = y by ring]
+      exact chainM_black_oddP_gen k hn hpar hB
+
+set_option maxHeartbeats 400000 in
+/-- **The black branch of the chain claim:** the native copy of a black centre is black, and the lattice shift transfers the claim. -/
+theorem chainM_black (k : ℕ) {S : Field}
+    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees S 0)
+    (hperiod : HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4)) S 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
+    {c i : Site}
+    (hl : laplacian (standardField (List.replicate (k + 1) Digit.two)) c = -1) (he : Edge i c) :
+    (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) (-1) i ≤
+      (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) (-1) c := by
+  obtain ⟨c1, c2⟩ := c
+  obtain ⟨i1, i2⟩ := i
+  have ha2 : (2 * (k : ℤ) + 4) % 2 = 0 := by omega
+  have hvalid := ladderOdd_valid_twos k
+  obtain ⟨u, hA, hn⟩ := native_copy_exists ha2 hvalid (c1, c2)
+  have hlu := laplacian_twos_alias hagree hperiod hA
+  obtain ⟨u1, u2⟩ := u
+  obtain ⟨p, q, hpq⟩ := hA
+  have hu1 : u1 = c1 - p * (2 * (k : ℤ) + 4 + 1) + 2 * q := congrArg Prod.fst hpq
+  have hu2 : u2 = c2 - p * (2 * (k : ℤ) + 4 - 1) - 2 * (2 * (k : ℤ) + 4) * q := congrArg Prod.snd hpq
+  have hlu' : laplacian (standardField (List.replicate (k + 1) Digit.two)) (u1, u2) = -1 := by
+    rw [hlu]
+    exact hl
+  obtain ⟨j1, hj1⟩ : ∃ j : ℤ, j = i1 - p * (2 * (k : ℤ) + 4 + 1) + 2 * q := ⟨_, rfl⟩
+  obtain ⟨j2, hj2⟩ : ∃ j : ℤ, j = i2 - p * (2 * (k : ℤ) + 4 - 1) - 2 * (2 * (k : ℤ) + 4) * q := ⟨_, rfl⟩
+  have hμ : (-p * (2 * (k : ℤ) + 4 + 1) + 2 * q + (-p * (2 * (k : ℤ) + 4 - 1) - 2 * (2 * (k : ℤ) + 4) * q)) % 2 = 0 := by
+    have e : -p * (2 * (k : ℤ) + 4 + 1) + 2 * q + (-p * (2 * (k : ℤ) + 4 - 1) - 2 * (2 * (k : ℤ) + 4) * q) =
+        2 * (-p * (2 * (k : ℤ) + 4) + q - (2 * (k : ℤ) + 4) * q) := by ring
+    rw [e]
+    exact Int.mul_emod_right _ _
+  have hE := (edge_add (i1, i2) (c1, c2) (-p * (2 * (k : ℤ) + 4 + 1) + 2 * q)
+    (-p * (2 * (k : ℤ) + 4 - 1) - 2 * (2 * (k : ℤ) + 4) * q) hμ).mpr he
+  dsimp only at hE
+  have hE' : Edge (j1, j2) (u1, u2) := by
+    rw [hj1, hj2, hu1, hu2]
+    rw [show i1 + (-p * (2 * (k : ℤ) + 4 + 1) + 2 * q) = i1 - p * (2 * (k : ℤ) + 4 + 1) + 2 * q by ring,
+      show i2 + (-p * (2 * (k : ℤ) + 4 - 1) - 2 * (2 * (k : ℤ) + 4) * q) =
+        i2 - p * (2 * (k : ℤ) + 4 - 1) - 2 * (2 * (k : ℤ) + 4) * q by ring,
+      show c1 + (-p * (2 * (k : ℤ) + 4 + 1) + 2 * q) = c1 - p * (2 * (k : ℤ) + 4 + 1) + 2 * q by ring,
+      show c2 + (-p * (2 * (k : ℤ) + 4 - 1) - 2 * (2 * (k : ℤ) + 4) * q) =
+        c2 - p * (2 * (k : ℤ) + 4 - 1) - 2 * (2 * (k : ℤ) + 4) * q by ring] at hE
+    exact hE
+  have hb := chainM_black_native k hagree hperiod hn hlu' hE'
+  have e1 : j1 - 1 = (i1 - 1) - p * (2 * (k : ℤ) + 5) + 2 * q := by
+    rw [hj1]
+    ring
+  have e2 : j2 - 1 = (i2 - 1) - p * (2 * (k : ℤ) + 3) - 2 * (2 * (k : ℤ) + 4) * q := by
+    rw [hj2]
+    ring
+  have f1 : u1 - 1 = (c1 - 1) - p * (2 * (k : ℤ) + 5) + 2 * q := by
+    rw [hu1]
+    ring
+  have f2 : u2 - 1 = (c2 - 1) - p * (2 * (k : ℤ) + 3) - 2 * (2 * (k : ℤ) + 4) * q := by
+    rw [hu2]
+    ring
+  rw [e1, e2, f1, f2, psi_alias_shift, psi_alias_shift] at hb
+  rw [chainM_eq, chainM_eq]
+  dsimp only
+  linarith
+
+/-- **The chain potential of sign `−1` does not increase along the selected inputs** (`TwosSel` at `η = −1`). -/
+theorem twosChainM_nonincreasing (k : ℕ) {S : Field}
+    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees S 0)
+    (hperiod : HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4)) S 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
+    {c i : Site}
+    (hT : TwosSel (2 * (k : ℤ) + 4) (-1) (standardField (List.replicate (k + 1) Digit.two)) c i) :
+    (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) (-1) i ≤
+      (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) (-1) c := by
+  rcases hT with ⟨hl, he⟩ | ⟨hl, ⟨u, hu, hF, hi⟩ | ⟨hnf, u, hu, hn, hg, hi⟩⟩
+  · exact chainM_black k hagree hperiod hl he
+  · exact chainM_free k ⟨u, hu, hF, hi⟩
+  · exact chainM_cand k ⟨u, hu, hn, hg, hi⟩
+
 end FLatticePaper.TwosEPolicy
