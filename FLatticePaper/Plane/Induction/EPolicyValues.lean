@@ -1760,4 +1760,110 @@ theorem chain_bot2 (k : ℕ) (η s : ℤ) (hη : η = 1 ∨ η = -1) (hk : 1 ≤
   rw [e2]
   exact bot2_Phi k η hη hk
 
+/-- The vertical increment at `(d + 2, 0)` vanishes: by the transverse law it is the increment at `(3, d + 1)` plus `d`. -/
+theorem incr_oddR2 (k : ℕ) : incr (reciprocalField k) (0, 1) ((2 * (k : ℤ) + 3) + 2, 0) = 0 := by
+  have h1 := incr_T k (0, 1) ((2 * (k : ℤ) + 3) + 2, 0)
+  have hT : ((2 * (k : ℤ) + 3) + 2, 0) + (1 - (2 * (k : ℤ) + 3), 1 + (2 * (k : ℤ) + 3)) = (3, (2 * (k : ℤ) + 3) + 1) := by ext <;> (simp; try ring)
+  rw [hT] at h1
+  have h2 := incr_U_inv k (0, 1) (3 - (2 * (k : ℤ) + 3), (2 * (k : ℤ) + 3))
+  have hU : (3 - (2 * (k : ℤ) + 3), (2 * (k : ℤ) + 3)) + ((2 * (k : ℤ) + 3), 1) = (3, (2 * (k : ℤ) + 3) + 1) := by ext <;> (simp; try ring)
+  rw [hU] at h2
+  have h3 := incr_vert k 1 (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by norm_num) (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) (2 * (k : ℤ) + 3) (by omega))
+    (mem_raw_of_box k (3 - (2 * (k : ℤ) + 3)) ((2 * (k : ℤ) + 3) + 1) (by omega)) (by omega) (by omega)
+  rw [vG_one] at h3
+  norm_num at h1
+  linarith
+
+/-- The vertical increment at `(d + 1, 1)` vanishes: it is the increment at `(1, 0)`. -/
+theorem incr_oddR3 (k : ℕ) : incr (reciprocalField k) (0, 1) ((2 * (k : ℤ) + 3) + 1, 1) = 0 := by
+  have h2 := incr_U_inv k (0, 1) (1, 0)
+  have hU : ((1 : ℤ), (0 : ℤ)) + ((2 * (k : ℤ) + 3), 1) = ((2 * (k : ℤ) + 3) + 1, 1) := by ext <;> (simp; try ring)
+  rw [hU] at h2
+  rw [h2]
+  have h3 := incr_vert k 1 1 0 (by norm_num) (mem_raw_of_box k 1 0 (by omega)) (mem_raw_of_box k 1 (0 + 1) (by omega))
+    (by omega) (by omega)
+  rw [h3]
+  simp [vG_one]
+
+/-- **Bottom row, the odd right end (centre `(d, 0)`), slip.** -/
+theorem bot_OR_D (k : ℕ) (η : ℤ) (hη : η = 1 ∨ η = -1) (hk : 1 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) ((2 * (k : ℤ) + 3), 0) ≤ incr (reciprocalField k) (0, 1) ((2 * (k : ℤ) + 3) - 2 * η, 0) := by
+  have i1 := incr_vert k 1 (2 * (k : ℤ) + 3) 0 (by norm_num) (mem_raw_of_box k (2 * (k : ℤ) + 3) 0 (by omega))
+    (mem_raw_of_box k (2 * (k : ℤ) + 3) (0 + 1) (by omega)) (by omega) (by omega)
+  rw [i1, vG_one]
+  rcases hη with rfl | rfl
+  · have i2 := incr_vert k 1 ((2 * (k : ℤ) + 3) - 2 * 1) 0 (by norm_num) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2 * 1) 0 (by omega))
+      (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2 * 1) (0 + 1) (by omega)) (by omega) (by omega)
+    rw [i2, vG_one]
+  · rw [show (2 * (k : ℤ) + 3) - 2 * -1 = (2 * (k : ℤ) + 3) + 2 from by ring, incr_oddR2 k]
+    norm_num
+
+/-- **Bottom row, the odd right end, price.** -/
+theorem bot_OR_P (k : ℕ) (hk : 1 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) ((2 * (k : ℤ) + 3), 0) - incr (reciprocalField k) (0, 1) ((2 * (k : ℤ) + 3) - 1, 1) ≤ 1 := by
+  have i1 := incr_vert k 1 (2 * (k : ℤ) + 3) 0 (by norm_num) (mem_raw_of_box k (2 * (k : ℤ) + 3) 0 (by omega))
+    (mem_raw_of_box k (2 * (k : ℤ) + 3) (0 + 1) (by omega)) (by omega) (by omega)
+  have i3 := incr_vert k 1 ((2 * (k : ℤ) + 3) - 1) 1 (by norm_num) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) 1 (by omega))
+    (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 1) (1 + 1) (by omega)) (by omega) (by omega)
+  rw [i1, i3, vG_one, vG_one]
+  norm_num
+
+/-- **Bottom row, the odd right end, chain.** -/
+theorem bot_OR_Phi (k : ℕ) (η : ℤ) (hη : η = 1 ∨ η = -1) (hk : 1 ≤ (k : ℤ)) :
+    incr (reciprocalField k) (0, 1) ((2 * (k : ℤ) + 3), 0) - incr (reciprocalField k) (0, 1) ((2 * (k : ℤ) + 3) - 2 * η - 1, 1) ≤ 1 := by
+  have i1 := incr_vert k 1 (2 * (k : ℤ) + 3) 0 (by norm_num) (mem_raw_of_box k (2 * (k : ℤ) + 3) 0 (by omega))
+    (mem_raw_of_box k (2 * (k : ℤ) + 3) (0 + 1) (by omega)) (by omega) (by omega)
+  rw [i1, vG_one]
+  rcases hη with rfl | rfl
+  · have i4 := incr_vert k 1 ((2 * (k : ℤ) + 3) - 2 * 1 - 1) 1 (by norm_num) (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2 * 1 - 1) 1 (by omega))
+      (mem_raw_of_box k ((2 * (k : ℤ) + 3) - 2 * 1 - 1) (1 + 1) (by omega)) (by omega) (by omega)
+    rw [i4, vG_one]
+    norm_num
+  · rw [show (2 * (k : ℤ) + 3) - 2 * -1 - 1 = (2 * (k : ℤ) + 3) + 1 from by ring, incr_oddR3 k]
+    norm_num
+
+/-- **Bottom row, the odd right end, slip on the policy edge.** -/
+theorem slip_bot_OR (k : ℕ) (η s : ℤ) (hη : η = 1 ∨ η = -1) (hk : 1 ≤ (k : ℤ))
+    (hpol : ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) ((2 * (k : ℤ) + 3), 0) (((2 * (k : ℤ) + 3), 0) + (0, s))) :
+    (reciprocalFrame k).slip (reciprocalField k) η (((2 * (k : ℤ) + 3), 0) + (0, s)) ≤ (reciprocalFrame k).slip (reciprocalField k) η ((2 * (k : ℤ) + 3), 0) := by
+  have hN : NativeP (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3), 0) := by
+    unfold NativeP; left; dsimp only; omega
+  have hsgn := retention_bot_odd k η (2 * (k : ℤ) + 3) s hη hN (by omega) (by omega) hpol
+  subst hsgn
+  apply slip_edge_le (reciprocalField k) (reciprocalFrame k) η ((2 * (k : ℤ) + 3), 0) (0, 1)
+  have e1 : ((2 * (k : ℤ) + 3), 0) + η • (reciprocalFrame k).shortShift = ((2 * (k : ℤ) + 3) - 2 * η, 0) := by
+    rw [smul_shortShift_recip k η]
+    ext <;> (simp; try ring)
+  rw [e1]
+  exact bot_OR_D k η hη hk
+
+/-- **Bottom row, the odd right end, price on the policy edge.** -/
+theorem price_bot_OR (k : ℕ) (η s : ℤ) (hη : η = 1 ∨ η = -1) (hk : 1 ≤ (k : ℤ))
+    (hpol : ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) ((2 * (k : ℤ) + 3), 0) (((2 * (k : ℤ) + 3), 0) + (0, s))) :
+    (reciprocalFrame k).price (reciprocalField k) (((2 * (k : ℤ) + 3), 0) + (0, s)) ≤ (reciprocalFrame k).price (reciprocalField k) ((2 * (k : ℤ) + 3), 0) := by
+  have hN : NativeP (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3), 0) := by
+    unfold NativeP; left; dsimp only; omega
+  have hsgn := retention_bot_odd k η (2 * (k : ℤ) + 3) s hη hN (by omega) (by omega) hpol
+  subst hsgn
+  apply price_edge_le k (reciprocalField k) ((2 * (k : ℤ) + 3), 0) (0, 1)
+  have e1 : ((2 * (k : ℤ) + 3), 0) - (1, -1) = ((2 * (k : ℤ) + 3) - 1, 1) := by ext <;> (simp; try ring)
+  rw [e1]
+  exact bot_OR_P k hk
+
+/-- **Bottom row, the odd right end, chain on the policy edge.** -/
+theorem chain_bot_OR (k : ℕ) (η s : ℤ) (hη : η = 1 ∨ η = -1) (hk : 1 ≤ (k : ℤ))
+    (hpol : ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) ((2 * (k : ℤ) + 3), 0) (((2 * (k : ℤ) + 3), 0) + (0, s))) :
+    (reciprocalFrame k).chainPotential (reciprocalField k) η (((2 * (k : ℤ) + 3), 0) + (0, s)) ≤
+      (reciprocalFrame k).chainPotential (reciprocalField k) η ((2 * (k : ℤ) + 3), 0) := by
+  have hN : NativeP (2 * (k : ℤ) + 3) ((2 * (k : ℤ) + 3), 0) := by
+    unfold NativeP; left; dsimp only; omega
+  have hsgn := retention_bot_odd k η (2 * (k : ℤ) + 3) s hη hN (by omega) (by omega) hpol
+  subst hsgn
+  apply chain_edge_le k (reciprocalField k) η ((2 * (k : ℤ) + 3), 0) (0, 1)
+  have e2 : ((2 * (k : ℤ) + 3), 0) + η • (reciprocalFrame k).shortShift - (1, -1) = ((2 * (k : ℤ) + 3) - 2 * η - 1, 1) := by
+    rw [smul_shortShift_recip k η]
+    ext <;> (simp; try ring)
+  rw [e2]
+  exact bot_OR_Phi k η hη hk
+
 end FLatticePaper.EPolicy
