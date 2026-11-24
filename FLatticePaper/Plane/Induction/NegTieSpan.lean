@@ -29,7 +29,7 @@ theorem negTie_false_of_V_block {word : Word} (h : ∃ x ∈ word, x ≠ Digit.t
     (hcu : c + (frameAt word).uq ∈ (frameAt word).closedPolygon)
     (hiu : i + (frameAt word).uq ∈ (frameAt word).closedPolygon)
     (hΨc : sheetDiffW word c = 0) (hj : FLatticePaper.Edge j c) (hjΨ : sheetDiffW word j ≤ -1)
-    (hΨi : 1 ≤ sheetDiffW word i)
+    (hΨi : 0 ≤ sheetDiffW word i)
     (hQ21 : ∀ v ∈ (frameAt (conjWord word)).child.modifiedDeck.span,
       zTurn (c - (frameAt word).sheetShift) + v ∈ (frameAt (conjWord word)).freeH → False) : False := by
   by_cases hnf : Nonfree (frameAt (conjWord word)) (zTurn (c - (frameAt word).sheetShift))
