@@ -140,6 +140,8 @@ import FLatticePaper.Plane.Induction.TwosReciprocal
 import FLatticePaper.Plane.Induction.ReciprocalIncrements
 import FLatticePaper.Plane.Induction.PureBasePrice
 import FLatticePaper.Plane.Induction.PureBaseUnitPrice
+import FLatticePaper.Plane.Induction.PolygonRaw
+import FLatticePaper.Plane.Induction.PriceRange
 import FLatticePaper.Plane.Induction.ThreesMidpoint
 import FLatticePaper.Plane.Induction.ThreesLeaves
 import FLatticePaper.Plane.Induction.TwosLeaves
