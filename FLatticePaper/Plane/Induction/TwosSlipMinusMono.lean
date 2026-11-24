@@ -583,4 +583,17 @@ theorem twosSlipM_nonincreasing (k : ℕ) {S : Field}
     exact slipM_le_of_alias k hu hi (twosSlip_free_minus k hF')
   · exact twosSlipM_cand k ⟨u, hu, hn, hg, hi⟩
 
+
+/-- **The rounded slip `J₋₁` does not increase along the selected inputs of sign `−1`.** -/
+theorem twos_roundedSlipM_nonincreasing (k : ℕ) {S : Field}
+    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees S 0)
+    (hperiod : HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4)) S 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
+    {c i : Site}
+    (hT : TwosSel (2 * (k : ℤ) + 4) (-1) (standardField (List.replicate (k + 1) Digit.two)) c i) :
+    (frameAt (List.replicate (k + 1) Digit.two)).roundedSlip (standardField (List.replicate (k + 1) Digit.two)) (-1) i ≤
+      (frameAt (List.replicate (k + 1) Digit.two)).roundedSlip (standardField (List.replicate (k + 1) Digit.two)) (-1) c := by
+  have h := twosSlipM_nonincreasing k hagree hperiod hT
+  unfold ChildFrame.roundedSlip
+  omega
+
 end FLatticePaper.Induction

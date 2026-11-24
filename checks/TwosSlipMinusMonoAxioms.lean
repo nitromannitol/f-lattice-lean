@@ -1,3 +1,3 @@
 import FLatticePaper.Plane.Induction.TwosSlipMinusMono
 
-#print axioms FLatticePaper.Induction.twosSlipM_nonincreasing
+#print axioms FLatticePaper.Induction.twos_roundedSlipM_nonincreasing
