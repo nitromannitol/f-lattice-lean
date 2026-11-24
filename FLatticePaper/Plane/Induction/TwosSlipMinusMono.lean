@@ -389,4 +389,211 @@ theorem twosSlip_famV1e (k : ℕ) {y : ℤ} (hy1 : 2 * (k : ℤ) + 4 ≤ y) (hy2
     omega
 
 
+
+set_option maxHeartbeats 400000 in
+/-- The odd vertical class `V_{−1,y}` with `y−1` odd: the slip at `(0, 2a−2−y)` is at most that at `(0, 2a−1−y)`. -/
+theorem twosSlip_famV1o (k : ℕ) {y : ℤ} (hy1 : 2 * (k : ℤ) + 4 ≤ y) (hy2 : y < 2 * (2 * (k : ℤ) + 4))
+    (hp : (y - 1) % 2 = 1) :
+    twosSlip k (0, 2 * (2 * (k : ℤ) + 4) - 2 - y) ≤ twosSlip k (0, 2 * (2 * (k : ℤ) + 4) - 1 - y) := by
+  apply twosSlip_le_of_bands k
+  · rw [twosKey_pos]
+    omega
+  · rw [twosKey_pos]
+    omega
+  · intro h
+    unfold TwosSlipZ2 at h ⊢
+    omega
+  · intro h
+    unfold TwosSlipZ0 at h ⊢
+    omega
+
+
+set_option maxHeartbeats 400000 in
+theorem twosSlipM_free_H0 (k : ℕ) {u1 u2 : ℤ} (h1 : u1 = 1) (h2 : u2 = 0) :
+    twosSlip k (1 - u1 - (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).1, -1 - u2 - (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).2) ≤
+      twosSlip k (1 - u1, -1 - u2) := by
+  subst h1 h2
+  rw [freeDisp_H0 ⟨rfl, rfl⟩]
+  dsimp only
+  have eH01 := twosSlip_shift_eq k (1 - 1 - 0, -1 - 0 - -(-1)) (2 * (k : ℤ) + 4 - 1, 3 * (2 * (k : ℤ) + 4) - 3) 1 1
+    (Prod.ext (by simp only [Prod.fst_add]; ring) (by simp only [Prod.snd_add]; ring))
+  have eH02 := twosSlip_shift_eq k (1 - 1, -1 - 0) (2 * (k : ℤ) + 4 - 1, 3 * (2 * (k : ℤ) + 4) - 2) 1 1
+    (Prod.ext (by simp only [Prod.fst_add]; ring) (by simp only [Prod.snd_add]; ring))
+  linarith [twosSlip_famH0 k, eH01, eH02]
+
+set_option maxHeartbeats 400000 in
+theorem twosSlipM_free_Ha1 (k : ℕ) {u1 u2 : ℤ} (h1 : u1 = 2 * (k : ℤ) + 4 + 1) (h2 : u2 = 2 * (k : ℤ) + 4 - 2) :
+    twosSlip k (1 - u1 - (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).1, -1 - u2 - (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).2) ≤
+      twosSlip k (1 - u1, -1 - u2) := by
+  subst h1 h2
+  rw [freeDisp_Hodd (η := -1) (Or.inr (Or.inr ⟨rfl, rfl⟩)) (by omega) (by show ¬ ((2 * (k : ℤ) + 4 + 1) + (2 * (k : ℤ) + 4 - 2)) % 2 = 0; omega)]
+  dsimp only
+  have eHa1 := twosSlip_shift_eq k (1 - (2 * (k : ℤ) + 4 + 1) - 0, -1 - (2 * (k : ℤ) + 4 - 2) - 1) (-1, 2 * (2 * (k : ℤ) + 4) - 1) 1 1
+    (Prod.ext (by simp only [Prod.fst_add]; ring) (by simp only [Prod.snd_add]; ring))
+  have eHa2 := twosSlip_shift_eq k (1 - (2 * (k : ℤ) + 4 + 1), -1 - (2 * (k : ℤ) + 4 - 2)) (-1, 2 * (2 * (k : ℤ) + 4)) 1 1
+    (Prod.ext (by simp only [Prod.fst_add]; ring) (by simp only [Prod.snd_add]; ring))
+  linarith [twosSlip_famHa1 k, eHa1, eHa2]
+
+set_option maxHeartbeats 400000 in
+theorem twosSlipM_free_V0 (k : ℕ) {u1 u2 : ℤ} (h1 : u1 = 0) (h2 : u2 = 0) :
+    twosSlip k (1 - u1 - (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).1, -1 - u2 - (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).2) ≤
+      twosSlip k (1 - u1, -1 - u2) := by
+  subst h1 h2
+  rw [freeDisp_V0 ⟨rfl, rfl⟩]
+  dsimp only
+  have eV01 := twosSlip_shift_eq k (1 - 0 - 1, -1 - 0 - 0) (2 * (k : ℤ) + 4 - 1, 3 * (2 * (k : ℤ) + 4) - 2) 1 1
+    (Prod.ext (by simp only [Prod.fst_add]; ring) (by simp only [Prod.snd_add]; ring))
+  have eV02 := twosSlip_shift_eq k (1 - 0, -1 - 0) (2 * (k : ℤ) + 4, 3 * (2 * (k : ℤ) + 4) - 2) 1 1
+    (Prod.ext (by simp only [Prod.fst_add]; ring) (by simp only [Prod.snd_add]; ring))
+  linarith [twosSlip_famV0 k, eV01, eV02]
+
+set_option maxHeartbeats 400000 in
+theorem twosSlipM_free_H (k : ℕ) {u1 u2 : ℤ} (hx1 : 2 ≤ u1) (hx2 : u1 ≤ 2 * (k : ℤ) + 4) (h2 : u2 = u1 - 2) :
+    twosSlip k (1 - u1 - (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).1, -1 - u2 - (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).2) ≤
+      twosSlip k (1 - u1, -1 - u2) := by
+  subst h2
+  rw [freeDisp_Heven (η := -1) (Or.inr (Or.inl ⟨hx1, hx2, rfl⟩)) (by omega) (by show (u1 + (u1 - 2)) % 2 = 0; omega)]
+  dsimp only
+  have eH1 := twosSlip_shift_eq k (1 - u1 - 1, -1 - (u1 - 2) - 0) (2 * (k : ℤ) + 4 + 1 - u1, 2 * (k : ℤ) + 4 - u1) 1 0
+    (Prod.ext (by simp only [Prod.fst_add]; ring) (by simp only [Prod.snd_add]; ring))
+  have eH2 := twosSlip_shift_eq k (1 - u1, -1 - (u1 - 2)) (2 * (k : ℤ) + 4 + 2 - u1, 2 * (k : ℤ) + 4 - u1) 1 0
+    (Prod.ext (by simp only [Prod.fst_add]; ring) (by simp only [Prod.snd_add]; ring))
+  linarith [twosSlip_famH k hx1 hx2, eH1, eH2]
+
+set_option maxHeartbeats 400000 in
+theorem twosSlipM_free_Ve (k : ℕ) {u1 u2 : ℤ} (h1 : u1 = 0) (hy1 : 1 ≤ u2) (hy2 : u2 ≤ 2 * (k : ℤ) + 4 - 1) (hp : u2 % 2 = 0) :
+    twosSlip k (1 - u1 - (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).1, -1 - u2 - (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).2) ≤
+      twosSlip k (1 - u1, -1 - u2) := by
+  subst h1
+  rw [freeDisp_Veven (η := -1) (Or.inl ⟨rfl, by omega, by omega⟩) (by omega) (by show (0 + u2) % 2 = 0; omega)]
+  dsimp only
+  have eVe1 := twosSlip_shift_eq k (1 - 0 - -1, -1 - u2 - 0) (0, 2 * (2 * (k : ℤ) + 4) - 1 - u2) 0 1
+    (Prod.ext (by simp only [Prod.fst_add]; ring) (by simp only [Prod.snd_add]; ring))
+  have eVe2 := twosSlip_shift_eq k (1 - 0, -1 - u2) (-1, 2 * (2 * (k : ℤ) + 4) - 1 - u2) 0 1
+    (Prod.ext (by simp only [Prod.fst_add]; ring) (by simp only [Prod.snd_add]; ring))
+  linarith [twosSlip_famVe k hy1 hy2 hp, eVe1, eVe2]
+
+set_option maxHeartbeats 400000 in
+theorem twosSlipM_free_Vo (k : ℕ) {u1 u2 : ℤ} (h1 : u1 = 0) (hy1 : 1 ≤ u2) (hy2 : u2 ≤ 2 * (k : ℤ) + 4 - 1) (hp : u2 % 2 = 1) :
+    twosSlip k (1 - u1 - (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).1, -1 - u2 - (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).2) ≤
+      twosSlip k (1 - u1, -1 - u2) := by
+  subst h1
+  rw [freeDisp_Vodd (η := -1) (Or.inl ⟨rfl, by omega, by omega⟩) (by omega) (by show ¬ (0 + u2) % 2 = 0; omega)]
+  dsimp only
+  have eVo1 := twosSlip_shift_eq k (1 - 0 - 0, -1 - u2 - - -1) (2 * (k : ℤ) + 4, 3 * (2 * (k : ℤ) + 4) - 3 - u2) 1 1
+    (Prod.ext (by simp only [Prod.fst_add]; ring) (by simp only [Prod.snd_add]; ring))
+  have eVo2 := twosSlip_shift_eq k (1 - 0, -1 - u2) (2 * (k : ℤ) + 4, 3 * (2 * (k : ℤ) + 4) - 2 - u2) 1 1
+    (Prod.ext (by simp only [Prod.fst_add]; ring) (by simp only [Prod.snd_add]; ring))
+  linarith [twosSlip_famVo k hy1 hy2 hp, eVo1, eVo2]
+
+set_option maxHeartbeats 400000 in
+theorem twosSlipM_free_V1e (k : ℕ) {u1 u2 : ℤ} (h1 : u1 = -1) (hy1 : 2 * (k : ℤ) + 4 ≤ u2) (hy2 : u2 < 2 * (2 * (k : ℤ) + 4)) (hp : (u2 - 1) % 2 = 0) :
+    twosSlip k (1 - u1 - (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).1, -1 - u2 - (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).2) ≤
+      twosSlip k (1 - u1, -1 - u2) := by
+  subst h1
+  rw [freeDisp_Veven (η := -1) (Or.inr ⟨rfl, by omega, by omega⟩) (by omega) (by show ((-1) + u2) % 2 = 0; omega)]
+  dsimp only
+  have eV1e1 := twosSlip_shift_eq k (1 - -1 - -1, -1 - u2 - 0) (1, 2 * (2 * (k : ℤ) + 4) - 1 - u2) 0 1
+    (Prod.ext (by simp only [Prod.fst_add]; ring) (by simp only [Prod.snd_add]; ring))
+  have eV1e2 := twosSlip_shift_eq k (1 - -1, -1 - u2) (0, 2 * (2 * (k : ℤ) + 4) - 1 - u2) 0 1
+    (Prod.ext (by simp only [Prod.fst_add]; ring) (by simp only [Prod.snd_add]; ring))
+  linarith [twosSlip_famV1e k hy1 hy2 hp, eV1e1, eV1e2]
+
+set_option maxHeartbeats 400000 in
+theorem twosSlipM_free_V1o (k : ℕ) {u1 u2 : ℤ} (h1 : u1 = -1) (hy1 : 2 * (k : ℤ) + 4 ≤ u2) (hy2 : u2 < 2 * (2 * (k : ℤ) + 4)) (hp : (u2 - 1) % 2 = 1) :
+    twosSlip k (1 - u1 - (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).1, -1 - u2 - (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).2) ≤
+      twosSlip k (1 - u1, -1 - u2) := by
+  subst h1
+  rw [freeDisp_Vodd (η := -1) (Or.inr ⟨rfl, by omega, by omega⟩) (by omega) (by show ¬ ((-1) + u2) % 2 = 0; omega)]
+  dsimp only
+  have eV1o1 := twosSlip_shift_eq k (1 - -1 - 0, -1 - u2 - - -1) (0, 2 * (2 * (k : ℤ) + 4) - 2 - u2) 0 1
+    (Prod.ext (by simp only [Prod.fst_add]; ring) (by simp only [Prod.snd_add]; ring))
+  have eV1o2 := twosSlip_shift_eq k (1 - -1, -1 - u2) (0, 2 * (2 * (k : ℤ) + 4) - 1 - u2) 0 1
+    (Prod.ext (by simp only [Prod.fst_add]; ring) (by simp only [Prod.snd_add]; ring))
+  linarith [twosSlip_famV1o k hy1 hy2 hp, eV1o1, eV1o2]
+
+
+set_option maxHeartbeats 400000 in
+/-- **The free branch of the sign `−1` slip:** the free displacement `freeDisp (−1)` does not raise the reflected slip. -/
+theorem twosSlip_free_minus (k : ℕ) {u1 u2 : ℤ} (hF : FreeSite (2 * (k : ℤ) + 4) u1 u2) :
+    twosSlip k (1 - u1 - (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).1, -1 - u2 - (freeDisp (2 * (k : ℤ) + 4) (-1) u1 u2).2) ≤
+      twosSlip k (1 - u1, -1 - u2) := by
+  rcases hF with hH | hV
+  · rcases hH with ⟨h1, h2⟩ | ⟨hx1, hx2, h2⟩ | ⟨h1, h2⟩
+    · exact twosSlipM_free_H0 k h1 h2
+    · exact twosSlipM_free_H k hx1 hx2 h2
+    · exact twosSlipM_free_Ha1 k h1 h2
+  · rcases hV with ⟨h1, hy1, hy2⟩ | ⟨h1, hy1, hy2⟩
+    · rcases eq_or_lt_of_le hy1 with h0 | hpos
+      · exact twosSlipM_free_V0 k h1 h0.symm
+      · by_cases hp : u2 % 2 = 0
+        · exact twosSlipM_free_Ve k h1 (by omega) (by omega) hp
+        · exact twosSlipM_free_Vo k h1 (by omega) (by omega) (by omega)
+    · by_cases hp : (u2 - 1) % 2 = 0
+      · exact twosSlipM_free_V1e k h1 hy1 hy2 hp
+      · exact twosSlipM_free_V1o k h1 hy1 hy2 (by omega)
+
+
+/-- The alias bookkeeping: a difference of the reflected slips at `u` and `u − δ` transfers to the sign `−1` slips at `c` and
+`c + δ`, when `u` is a lattice translate of `c`. -/
+theorem slipM_le_of_alias (k : ℕ) {c i : Site} {u1 u2 δ1 δ2 : ℤ}
+    (hu : AliasOf (2 * (k : ℤ) + 4) c (u1, u2)) (hi : i = (c.1 + δ1, c.2 + δ2))
+    (h : twosSlip k (1 - u1 - δ1, -1 - u2 - δ2) ≤ twosSlip k (1 - u1, -1 - u2)) :
+    (frameAt (List.replicate (k + 1) Digit.two)).slip (standardField (List.replicate (k + 1) Digit.two)) (-1) i ≤
+      (frameAt (List.replicate (k + 1) Digit.two)).slip (standardField (List.replicate (k + 1) Digit.two)) (-1) c := by
+  obtain ⟨i', l, hu⟩ := hu
+  have hu1 : u1 = c.1 - i' * (2 * (k : ℤ) + 4 + 1) + 2 * l := congrArg Prod.fst hu
+  have hu2 : u2 = c.2 - i' * (2 * (k : ℤ) + 4 - 1) - 2 * (2 * (k : ℤ) + 4) * l := congrArg Prod.snd hu
+  rw [slip_minus_eq_iRefl, slip_minus_eq_iRefl]
+  have hL1 : ((1 : ℤ), (-1 : ℤ)) - c = (1 - u1, -1 - u2) +
+      ((-i') * (2 * (k : ℤ) + 5) + (-l) * (-2), (-i') * (2 * (k : ℤ) + 3) + (-l) * (4 * (k : ℤ) + 8)) := by
+    apply Prod.ext
+    · simp only [Prod.fst_add, Prod.fst_sub]
+      rw [hu1]
+      ring
+    · simp only [Prod.snd_add, Prod.snd_sub]
+      rw [hu2]
+      ring
+  have hL2 : ((1 : ℤ), (-1 : ℤ)) - i = (1 - u1 - δ1, -1 - u2 - δ2) +
+      ((-i') * (2 * (k : ℤ) + 5) + (-l) * (-2), (-i') * (2 * (k : ℤ) + 3) + (-l) * (4 * (k : ℤ) + 8)) := by
+    rw [hi]
+    apply Prod.ext
+    · simp only [Prod.fst_add, Prod.fst_sub]
+      rw [hu1]
+      ring
+    · simp only [Prod.snd_add, Prod.snd_sub]
+      rw [hu2]
+      ring
+  rw [hL1, hL2, twosSlip_lattice, twosSlip_lattice]
+  linarith [h]
+
+set_option maxHeartbeats 400000 in
+/-- **The slip of sign `−1` does not increase along the selected inputs of the twos signed policy.** -/
+theorem twosSlipM_nonincreasing (k : ℕ) {S : Field}
+    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees S 0)
+    (hperiod : HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4)) S 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
+    {c i : Site}
+    (hT : TwosSel (2 * (k : ℤ) + 4) (-1) (standardField (List.replicate (k + 1) Digit.two)) c i) :
+    (frameAt (List.replicate (k + 1) Digit.two)).slip (standardField (List.replicate (k + 1) Digit.two)) (-1) i ≤
+      (frameAt (List.replicate (k + 1) Digit.two)).slip (standardField (List.replicate (k + 1) Digit.two)) (-1) c := by
+  rcases hT with ⟨hl, he⟩ | ⟨hl, ⟨u, hu, hF, hi⟩ | ⟨hnf, u, hu, hn, hg, hi⟩⟩
+  · exact twosSlipM_black k hagree hperiod hl he
+  · obtain ⟨u1, u2⟩ := u
+    have hF' : FreeSite (2 * (k : ℤ) + 4) u1 u2 := hF
+    exact slipM_le_of_alias k hu hi (twosSlip_free_minus k hF')
+  · exact twosSlipM_cand k ⟨u, hu, hn, hg, hi⟩
+
+
+/-- **The rounded slip `J₋₁` does not increase along the selected inputs of sign `−1`.** -/
+theorem twos_roundedSlipM_nonincreasing (k : ℕ) {S : Field}
+    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees S 0)
+    (hperiod : HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4)) S 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
+    {c i : Site}
+    (hT : TwosSel (2 * (k : ℤ) + 4) (-1) (standardField (List.replicate (k + 1) Digit.two)) c i) :
+    (frameAt (List.replicate (k + 1) Digit.two)).roundedSlip (standardField (List.replicate (k + 1) Digit.two)) (-1) i ≤
+      (frameAt (List.replicate (k + 1) Digit.two)).roundedSlip (standardField (List.replicate (k + 1) Digit.two)) (-1) c := by
+  have h := twosSlipM_nonincreasing k hagree hperiod hT
+  unfold ChildFrame.roundedSlip
+  omega
+
 end FLatticePaper.Induction
