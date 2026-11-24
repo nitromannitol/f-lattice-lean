@@ -40,3 +40,4 @@ import FLatticePaper.Plane.Induction.EPolicyFields
 #print axioms FLatticePaper.EPolicy.retainQuota_e
 #print axioms FLatticePaper.EPolicy.freePrescribed_e
 #print axioms FLatticePaper.EPolicy.prescribedH_reciprocal
+#print axioms FLatticePaper.EPolicy.reciprocal_eps

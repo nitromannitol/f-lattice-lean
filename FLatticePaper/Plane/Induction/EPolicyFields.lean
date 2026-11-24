@@ -1,6 +1,7 @@
 import FLatticePaper.Plane.Induction.EPolicyLap
 import FLatticePaper.Plane.Induction.S3FreeBoundary
 import FLatticePaper.Plane.Induction.SignedPolicy
+import FLatticePaper.Tiles.BottomEdges
 
 /-!
 # The white structure of the signed policy e(-1, eta) on the reciprocal field (task 118, W1 base)
@@ -1088,5 +1089,14 @@ theorem prescribedH_reciprocal (k : ℕ) (η : ℤ) (_hη : η = 1 ∨ η = -1) 
           simp only [Prod.mk.injEq] at h
           omega
         simp [hne1, hneL, hO]
+
+/-- The sign of the reciprocal frame: `eps = -1` at `3^k`, so the exceptional west input of the canonical policy is vacuous. -/
+theorem reciprocal_eps (k : ℕ) : (reciprocalFrame k).eps = -1 := by
+  unfold ChildFrame.eps
+  have h := FLatticePaper.Tiles.parentsAt_replicate_three k
+  show Fraction.det (parentsAt (List.replicate k Digit.three)).odd (parentsAt (List.replicate k Digit.three)).even = -1
+  rw [h]
+  unfold Fraction.det
+  ring
 
 end FLatticePaper.EPolicy
