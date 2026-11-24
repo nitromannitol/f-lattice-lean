@@ -764,3 +764,19 @@ Scope to confirm with the lead: §1's star containment needs `c = d − n ≥ 3`
   so `sGrade ≥ 0`, and its horizontal inputs are `s ∓ L`; an odd centre has `s ≥ 2 − c`, and its vertical inputs are `s ∓ c`).
 - `both_free_rise_false` and `chain_nonincreasing_of_free_roots` no longer take `hwin`; they take `3 ≤ c` and derive the window.
 - Checks: `checks/BothFreeRise.lean`. Root build: 0 warnings, 0 linter notes.
+
+### Task 72 / Q20 (the acyclic minimum policy, as a proof): MinPolicy.lean
+
+- PROVED `lapM_binary`: the minimum `m = min(F, g + k)` has Laplacian `−1` or `0` at every centre. Hypotheses: `laplacian F` binary
+  (`∈ {−1, 0}`, the packet's `Packet.binary`), the unit slip of `D_η` on the edges (`unit_slip_sign`, from the packet's `HasUnitSlip` at
+  `η = 1`, and by translation at `η = −1`). No value binarity is used (`F` need not take the values 0, 1). Proof: strict winners give
+  `lap m = lap F` (`D < k`) or `lap m = lap g` (`D > k`); a tie is `tie_arith` (pure integer arithmetic, omega).
+- PROVED `black_lt`, `white_sel`: a black centre has both inputs of strictly smaller key; a white centre selects an input of strictly
+  smaller key. The key is `keyK = (Q, X)` with `Q = −|D − k|`, `X` the F-game key on `D < k` and the translated opposite-game key on
+  `D ≥ k`; the tie uses the opposite game (`key_lt_of_G`). The selection is `msel` (F-selection on `D < k`, translated O-selection
+  otherwise).
+- PROVED `msel_squareClauses`: `SquareClauseSat (mF …) (msel …) a b` for all `a b`, from `squareClauses_of_burning`.
+- NOT in this module: the forced transfer (the `ForcedEdge` induction) and the removal of `hfree` from `chain_nonincreasing_of_free_roots`.
+- Checks: `checks/MinPolicy.lean` (axioms: `[propext, Classical.choice, Quot.sound]`).
+- Note: `MinAdmission.lean` (min_lap_local, laplacian_min_local, min_field_binary) assumes the values `F, g ∈ {0, 1}`, which the packet
+  does not give (only the Laplacian is binary); `MinPolicy.lapM_binary` supersedes it for the chain argument.

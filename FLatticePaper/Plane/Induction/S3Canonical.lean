@@ -35,11 +35,11 @@ structure CanonicalPolicy (frame : ChildFrame) (F : Field) (η : ℤ) where
   /-- The primitive price `P` does not increase along selected inputs. -/
   nonincreasingP : ∀ c i, policy c i → frame.cutGrade F 1 0 1 i ≤ frame.cutGrade F 1 0 1 c
   /-- The rounded slip `J` does not increase along selected inputs. -/
-  nonincreasingJ : ∀ c i, policy c i → frame.cutGrade F 0 1 1 i ≤ frame.cutGrade F 0 1 1 c
+  nonincreasingJ : ∀ c i, policy c i → frame.cutGrade F 0 1 η i ≤ frame.cutGrade F 0 1 η c
   /-- The strict rank: it decreases along selected inputs with the same pair `(P, J)` (the only case the orders need). -/
   rank : Site → ℤ
   strictRank : ∀ c i, policy c i → frame.cutGrade F 1 0 1 i = frame.cutGrade F 1 0 1 c →
-    frame.cutGrade F 0 1 1 i = frame.cutGrade F 0 1 1 c → rank i < rank c
+    frame.cutGrade F 0 1 η i = frame.cutGrade F 0 1 η c → rank i < rank c
   /-- At a free white the selected input is the prescribed signed H/V direction. -/
   freePrescribed : ∀ c, free c → laplacian F c = 0 →
     ∃ i, (i = incomingNeg c ∨ i = incomingPos c) ∧ ∀ j, policy c j ↔ j = i
@@ -273,8 +273,8 @@ theorem permitted_one {frame : ChildFrame} {F : Field} (C : CanonicalPolicy fram
   exact this
 
 /-- A restricted fort has, at each of its sites, a selected input in the fort. -/
-theorem exists_input_in_fort {η : ℤ} (C : CanonicalPolicy frame F η) {fort : Set Site}
-    (hfort : IsRestrictedFort F (slipPermits F (fun z => F (z + η • frame.shortShift))) fort) {z : Site} (hz : z ∈ fort) :
+theorem exists_input_in_fort (C : CanonicalPolicy frame F 1) {fort : Set Site}
+    (hfort : IsRestrictedFort F (slipPermits F (fun z => F (z + (1 : ℤ) • frame.shortShift))) fort) {z : Site} (hz : z ∈ fort) :
     ∃ i, (i = incomingNeg z ∨ i = incomingPos z) ∧ C.policy z i ∧ i ∈ fort := by
   rcases hfort z hz with ⟨hB, hcase⟩ | ⟨hW, hcaseN, hcaseP⟩
   · obtain ⟨hpn, hpp⟩ := C.quota.1 z hB
@@ -291,8 +291,8 @@ theorem exists_input_in_fort {η : ℤ} (C : CanonicalPolicy frame F η) {fort :
 
 /-- The chain of the gate: from a fort site at the level `(c0, j0)`, follow selected inputs in the fort; a strict componentwise
 drop ends the chain, a constant pair strictly lowers the count, and a free site ends the chain. -/
-theorem gate_chain {η : ℤ} (C : CanonicalPolicy frame F η) {cU cV : ℤ} (hper : HasGeneratorPeriods frame.child F cU cV)
-    {fort : Set Site} (hfort : IsRestrictedFort F (slipPermits F (fun z => F (z + η • frame.shortShift))) fort)
+theorem gate_chain (C : CanonicalPolicy frame F 1) {cU cV : ℤ} (hper : HasGeneratorPeriods frame.child F cU cV)
+    {fort : Set Site} (hfort : IsRestrictedFort F (slipPermits F (fun z => F (z + (1 : ℤ) • frame.shortShift))) fort)
     (c0 j0 : ℤ) : ∀ n : ℕ, ∀ z : Site, bulkCount frame F C.rank z = n → z ∈ fort →
       frame.cutGrade F 1 0 1 z = c0 → frame.cutGrade F 0 1 1 z = j0 →
       (∃ t ∈ fort, frame.cutGrade F 1 0 1 t ≤ c0 ∧ frame.cutGrade F 0 1 1 t ≤ j0 ∧
@@ -329,8 +329,8 @@ theorem gate_chain {η : ℤ} (C : CanonicalPolicy frame F η) {cU cV : ℤ} (hp
 
 /-- The gate of `S3NoFortInputs` at a free site of a fort at the levels `(c0, j0)`: the start has a selected input in the fort,
 and either it is a strict drop or the chain reaches a free site of strictly smaller count. -/
-theorem gate_from_free {η : ℤ} (C : CanonicalPolicy frame F η) {cU cV : ℤ} (hper : HasGeneratorPeriods frame.child F cU cV)
-    {fort : Set Site} (hfort : IsRestrictedFort F (slipPermits F (fun z => F (z + η • frame.shortShift))) fort)
+theorem gate_from_free (C : CanonicalPolicy frame F 1) {cU cV : ℤ} (hper : HasGeneratorPeriods frame.child F cU cV)
+    {fort : Set Site} (hfort : IsRestrictedFort F (slipPermits F (fun z => F (z + (1 : ℤ) • frame.shortShift))) fort)
     {site : Site} (hsite : site ∈ fort) (c0 j0 : ℤ)
     (hP : frame.cutGrade F 1 0 1 site = c0) (hJ : frame.cutGrade F 0 1 1 site = j0) :
     ∃ target ∈ fort, (frame.cutGrade F 1 0 1 target ≤ c0 ∧ frame.cutGrade F 0 1 1 target ≤ j0 ∧
