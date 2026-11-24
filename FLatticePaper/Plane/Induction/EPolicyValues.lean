@@ -28,7 +28,7 @@ open FLatticePaper.Farey
 
 /-- The value inequalities of the signed policy e(-1, eta) on the reciprocal field `reciprocalField k` (the items 4 and the
 strict rank of the note): the raw slip and the price do not increase along the policy, the chain potential does not increase
-along the policy, and a strict rank decreases along it. -/
+along the policy. The strict rank is derived from these values in `RankWithValues`. -/
 structure ReciprocalValues (k : ℕ) : Prop where
   slip : ∀ η : ℤ, (η = 1 ∨ η = -1) → ∀ c i,
     ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) c i →
@@ -36,8 +36,6 @@ structure ReciprocalValues (k : ℕ) : Prop where
   price : ∀ η : ℤ, (η = 1 ∨ η = -1) → ∀ c i,
     ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) c i →
       (reciprocalFrame k).price (reciprocalField k) i ≤ (reciprocalFrame k).price (reciprocalField k) c
-  rank : ∀ η : ℤ, (η = 1 ∨ η = -1) → ∃ R : Site → ℤ, ∀ c i,
-    ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) c i → R i < R c
   chain : ∀ η : ℤ, (η = 1 ∨ η = -1) →
     NonincreasingAlong ((reciprocalFrame k).chainPotential (reciprocalField k) η)
       (ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)))
@@ -56,7 +54,10 @@ theorem roundedSlip_nonincreasing_of_slip (k : ℕ) (V : ReciprocalValues k) (η
 /-- The canonical signed policy of the sign `η` on the reciprocal field, from the value hypotheses `V`: every field of
 `CanonicalSignedPolicy` is the lemma of the e-policy (quota, selection, squares, prescription, free set), except the value
 inequalities, which are the fields of `V`. -/
-noncomputable def canonicalSignedPolicy_reciprocal (k : ℕ) (V : ReciprocalValues k) (η : ℤ) (hη : η = 1 ∨ η = -1) :
+noncomputable def canonicalSignedPolicy_reciprocal (k : ℕ) (V : ReciprocalValues k)
+    (rank : ∀ η : ℤ, (η = 1 ∨ η = -1) → ∃ R : Site → ℤ, ∀ c i,
+      ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) c i → R i < R c)
+    (η : ℤ) (hη : η = 1 ∨ η = -1) :
     CanonicalSignedPolicy (reciprocalFrame k) (reciprocalField k) η where
   policy := ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k))
   free := FreeGlobal (2 * (k : ℤ) + 3)
@@ -70,8 +71,8 @@ noncomputable def canonicalSignedPolicy_reciprocal (k : ℕ) (V : ReciprocalValu
     rw [cutGrade_one_zero_one, cutGrade_one_zero_one]
     exact V.price η hη c i h
   nonincreasingJ := fun c i h => roundedSlip_nonincreasing_of_slip k V η hη c i h
-  rank := Classical.choose (V.rank η hη)
-  strictRank := fun c i h _ _ => Classical.choose_spec (V.rank η hη) c i h
+  rank := Classical.choose (rank η hη)
+  strictRank := fun c i h _ _ => Classical.choose_spec (rank η hη) c i h
   freePrescribed := fun c _ hw => freePrescribed_e k η hη c hw
   sel := selF k η
   sel_input := fun c _ => selF_input k η hη c
@@ -83,9 +84,11 @@ noncomputable def canonicalSignedPolicy_reciprocal (k : ℕ) (V : ReciprocalValu
 
 /-- **The canonical signed games of the reciprocal field**, assembled from the value hypotheses `V`: the two signs
 `game η` (`η = ±1`) and the chain claim `chainNonincreasing` (the value field `V.chain`). -/
-noncomputable def canonicalSignedGames_reciprocal (k : ℕ) (V : ReciprocalValues k) :
+noncomputable def canonicalSignedGames_reciprocal (k : ℕ) (V : ReciprocalValues k)
+    (rank : ∀ η : ℤ, (η = 1 ∨ η = -1) → ∃ R : Site → ℤ, ∀ c i,
+      ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) c i → R i < R c) :
     CanonicalSignedGames (reciprocalFrame k) (reciprocalField k) where
-  game := fun η hη => canonicalSignedPolicy_reciprocal k V η hη
+  game := fun η hη => canonicalSignedPolicy_reciprocal k V rank η hη
   chainNonincreasing := fun η hη => V.chain η hη
 
 /-- The unit increment of a field along `e` at `z`. -/

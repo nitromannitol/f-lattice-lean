@@ -1,6 +1,7 @@
-import FLatticePaper.Plane.Induction.EPolicyCover
+import FLatticePaper.Plane.Induction.EPolicyFinal
 
-#print axioms FLatticePaper.EPolicy.cover_small0
-#print axioms FLatticePaper.EPolicy.cover_small1
-#print axioms FLatticePaper.EPolicy.cov1_3_1_p
-#print axioms FLatticePaper.EPolicy.tr1_3_1_p_px
+#print axioms FLatticePaper.EPolicy.pure_threes_final
+#print axioms FLatticePaper.EPolicy.pure_threes_inputs
+#print axioms FLatticePaper.EPolicy.valuesAll
+#print axioms FLatticePaper.EPolicy.canonicalGames
+#print axioms FLatticePaper.EPolicy.rank_field
