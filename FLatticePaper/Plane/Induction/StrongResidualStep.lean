@@ -5,6 +5,7 @@ import FLatticePaper.Plane.Induction.F2F3Pure
 import FLatticePaper.Plane.Induction.StrongResidual
 import FLatticePaper.Plane.Induction.TieReduce
 import FLatticePaper.Plane.Induction.StarClassify
+import FLatticePaper.Plane.Induction.SeedTransverse
 import FLatticePaper.Farey.Numerators
 
 /-!
@@ -29,26 +30,26 @@ namespace FLatticePaper.Induction
 open Farey FLatticePaper
 
 /-- **The strong residual of a proper word from the conjugate's strong estimates.** The named inputs are the boundary price bound
-`hbd`, the even seed `hseed`, and the policy with a strict rank `hpol` (the star classification is derived; it needs a digit other than `two` too).
+`hbd`, the even seed check `hseed0`, and the policy with a strict rank `hpol` (the star classification is derived; it needs a digit other than `two` too).
 
 `hcls` is no longer an input: the star classification is derived (`StarClassified`, from `starClassified_of_grades`) for every word with
 a digit other than `three` and a digit other than `two` (the proper, non-two-power words), from the strips of the packet. The derivation
 uses the arithmetic of the Farey recursion: `3 ≤ child.num` (`current_even_num_ge_three`) and `4 ≤ child.den − child.num`
 (`current_even_diff_ge_four`). The grade covering that proves it is `StarCover.box_cover`.
 
-`hseed` is named. Its reduction: `standardField word − harmonicGrid` is invariant under the transverse vector (the kernel constant of
-the standard field is `0`, and its transverse constant equals that of `harmonicGrid`; checked on the proper words of length at most
-three), and the odd seed line is a union of transverse orbits. So `hseed` follows from one check, `standardField = harmonicGrid`, at one
-odd representative of each transverse class on the seed line. The seed line lies below the strip `HasStrips`, so the strip does not
-supply it. Checked numerically on the proper words of length at most four (350 seed points, no disagreement). -/
+`hseed0` is one check (SeedTransverse): the difference `standardField word − harmonicGrid` is invariant under the transverse vector
+(proved: the packet's transverse constant is `−(T + L)/2`, the harmonic constant), and the odd seed line is one transverse class `z0 + Z·V`
+(proved from the coprimality of the child fraction). So the seed holds on the whole odd seed line once it holds at one odd seed site `z0`.
+That single check is the named input.
+-/
 theorem strongResidual_of_conj {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (h2 : ∃ x ∈ word, x ≠ Digit.two)
     (hSE : StrongEstimates (conjWord word))
     (hbd : ∀ z, OnBoundary (frameAt word).closedPolygon z →
       (frameAt word).price (standardField word) z ≤ (frameAt word).cutPrice)
-    (hseed : ∀ w : Site, ¬ EvenSite w →
-      (frameAt word).sGrade w = 2 - 3 * (frameAt word).child.den + (frameAt word).child.num →
-        standardField word w = harmonicGrid w)
+    (hseed0 : ∃ z0 : Site, ¬ EvenSite z0 ∧
+      (frameAt word).sGrade z0 = 2 - 3 * (frameAt word).child.den + (frameAt word).child.num ∧
+        standardField word z0 = harmonicGrid z0)
     (hpol : ∀ η : ℤ, (η = 1 ∨ η = -1) → ∃ (policy : Site → Site → Prop) (R : Site → ℤ) (cU cV : ℤ),
       RetainQuota (standardField word) policy ∧
       NonincreasingAlong ((frameAt word).chainPotential (standardField word) η) policy ∧
@@ -59,6 +60,11 @@ theorem strongResidual_of_conj {word : Word} (h : ∃ x ∈ word, x ≠ Digit.th
       (∀ x i, policy x i → R i < R x)) :
     StrongResidual word := by
   have hpk : (frameAt word).Packet (standardField word) := FLatticePaper.Induction.packet_of_strong h hSE
+  obtain ⟨z0, hz0o, hz0s, hz0c⟩ := hseed0
+  obtain ⟨a, b, ha, hb⟩ := FLatticePaper.PriceDeck.child_odd_witness (frameAt word)
+  have hTe := FLatticePaper.StrongUnitPrice.periodDenominator_even_of (frameAt word) a b ha hb
+  have hseed := FLatticePaper.Induction.SeedTransverse.seed_of_check (frameAt word) (standardField word) hpk a ha z0
+    hz0s hz0o hz0c (by omega) (by omega) (by omega) hTe
   have hPR := FLatticePaper.StrongPriceInputs.priceRange_of_conjugate h hSE hbd
   have hPU : ∀ z, (frameAt word).price (standardField word) (z + (frameAt word).child.modifiedDeck.kernel) =
       (frameAt word).price (standardField word) z - 1 :=
