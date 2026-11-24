@@ -33,7 +33,6 @@ local macro "alternate_staircase_mem" : tactic => `(tactic|
    simp only [Prod.fst_add, Prod.snd_add, Prod.fst_sub, Prod.snd_sub]
    omega))
 
-set_option maxHeartbeats 800000 in
 private theorem stairEvenAlt_rankCorrection_add_kernel {den : ℤ} (hden : BaseMask.stairEvenAlt.Valid den)
     {point : Site} (hp : point ∈ (BaseMask.stairEvenAlt.raw den).sites)
     (hq : point + (den, 1) ∈ (BaseMask.stairEvenAlt.raw den).sites) :

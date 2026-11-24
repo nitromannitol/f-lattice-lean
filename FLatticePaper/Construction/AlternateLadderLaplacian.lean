@@ -282,7 +282,6 @@ local macro "alternate_ladder_charge" : tactic => `(tactic|
      simp only [true_and, and_true, true_or, or_true, false_and, and_false, false_or, or_false,
        not_true_eq_false, not_false_eq_true] at hclause)))
 
-set_option maxHeartbeats 650000 in
 theorem ladderOddAlt_laplacian_on_even_raw {den : ℤ} (hden : BaseMask.ladderOddAlt.Valid den)
     {field : Field} (hagree : (BaseMask.ladderOddAlt.raw den).Agrees field 0)
     (hperiod : HasGeneratorPeriods (Fraction.mk 1 den) field (-1) (ladderOddAltConstantV den))
@@ -317,7 +316,6 @@ theorem ladderOddAlt_laplacian_on_even_raw {den : ℤ} (hden : BaseMask.ladderOd
         · by_cases hyFirst : y = -1 <;> alternate_ladder_charge
         · alternate_ladder_charge
 
-set_option maxHeartbeats 650000 in
 theorem ladderOddAlt_laplacian_on_odd_raw {den : ℤ} (hden : BaseMask.ladderOddAlt.Valid den)
     {field : Field} (hagree : (BaseMask.ladderOddAlt.raw den).Agrees field 0)
     (hperiod : HasGeneratorPeriods (Fraction.mk 1 den) field (-1) (ladderOddAltConstantV den))
