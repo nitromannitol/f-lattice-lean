@@ -436,6 +436,7 @@ lake env lean checks/SiteSourcesAllAxioms.lean
 lake env lean checks/SiteJunctionAxioms.lean
 lake env lean checks/BlockFactsAxioms.lean
 lake env lean checks/HorizontalAxioms.lean
+lake env lean checks/BaseFamiliesAxioms.lean
 lake env lean checks/VArcLongitudinal.lean
 lake env lean checks/VArcOffers.lean
 lake env lean checks/ParentStepDischarge.lean
