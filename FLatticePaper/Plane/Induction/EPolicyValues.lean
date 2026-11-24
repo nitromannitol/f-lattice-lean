@@ -1,6 +1,7 @@
 import FLatticePaper.Plane.Induction.EPolicySquares
 import FLatticePaper.Plane.Induction.CanonicalSigned
 import FLatticePaper.Plane.Induction.ReciprocalIncrements
+import FLatticePaper.Plane.Induction.PureBasePrice
 
 /-!
 # The value inequalities of the signed policy e(-1, eta) on the reciprocal field (task 118, W1 base)
@@ -440,5 +441,100 @@ theorem retention_horiz (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1)
     have e : (x, y) + (s, 0) - (x, y) = (s, 0) := by ext <;> (simp; try ring)
     rw [e] at hpol
     exact hpol
+
+/-- A raw site has the stair value as its reciprocal field value. -/
+theorem reciprocalField_eq_stair (k : ℕ) {p : Site}
+    (hp : p ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites) :
+    reciprocalField k p = BaseMask.stairEvenValue (2 * (k : ℤ) + 3) p := by
+  have hd : (2 * (k : ℤ) + 3) % 2 = 1 := by omega
+  have h := reciprocalField_reduction k (z := p) (y := p) (i := 0) (j := 0) hp
+    (by simp [combine_mk_one hd])
+  omega
+
+/-- The unit deck vector `U = (d, 1)` shifts the reciprocal field by nothing. -/
+theorem reciprocalField_add_U (k : ℕ) (p : Site) :
+    reciprocalField k (p + (2 * (k : ℤ) + 3, 1)) = reciprocalField k p := by
+  have h := reciprocalField_period_kernel k p
+  rw [kernel_threes] at h
+  exact h
+
+/-- A site whose `U`-translate is raw has the stair value of the translate. -/
+theorem reciprocalField_eq_stair_U (k : ℕ) {p : Site}
+    (hp : p + (2 * (k : ℤ) + 3, 1) ∈ (BaseMask.stairEven.raw (2 * (k : ℤ) + 3)).sites) :
+    reciprocalField k p = BaseMask.stairEvenValue (2 * (k : ℤ) + 3) (p + (2 * (k : ℤ) + 3, 1)) := by
+  rw [← reciprocalField_add_U k p, reciprocalField_eq_stair k hp]
+
+/-- The value of the reciprocal field at a raw site of the box. -/
+theorem F_raw_pt (k : ℕ) (a b : ℤ)
+    (h : 2 - (2 * (k : ℤ) + 3) ≤ a ∧ a ≤ 2 * (k : ℤ) + 3 ∧ 0 ≤ b ∧ b ≤ 2 * (k : ℤ) + 3 + 1 ∧
+      1 ≤ a + b ∧ a + b ≤ 2 * (k : ℤ) + 3 + 2) :
+    reciprocalField k (a, b) = BaseMask.stairEvenValue (2 * (k : ℤ) + 3) (a, b) :=
+  reciprocalField_eq_stair k (mem_raw_of_box k a b h)
+
+/-- The value at `(a, b)` through its `U`-translate `(a + d, b + 1)`, which is raw. -/
+theorem F_U_pt (k : ℕ) (a b : ℤ)
+    (h : 2 - (2 * (k : ℤ) + 3) ≤ a + (2 * (k : ℤ) + 3) ∧ a + (2 * (k : ℤ) + 3) ≤ 2 * (k : ℤ) + 3 ∧
+      0 ≤ b + 1 ∧ b + 1 ≤ 2 * (k : ℤ) + 3 + 1 ∧
+      1 ≤ a + (2 * (k : ℤ) + 3) + (b + 1) ∧ a + (2 * (k : ℤ) + 3) + (b + 1) ≤ 2 * (k : ℤ) + 3 + 2) :
+    reciprocalField k (a, b) = BaseMask.stairEvenValue (2 * (k : ℤ) + 3) (a + (2 * (k : ℤ) + 3), b + 1) :=
+  reciprocalField_eq_stair_U k (mem_raw_of_box k (a + (2 * (k : ℤ) + 3)) (b + 1) h)
+
+/-- The retained horizontal steps on the sum-2 segment: black at `x = 1`, otherwise the selection, `-1` for `x ≤ 0`
+and `+1` for `x ≥ 1`. -/
+theorem retained_sign_sum2 (k : ℕ) (η x y s : ℤ) (hsum : x + y = 2) (hy : 1 ≤ y)
+    (hx : 6 - (2 * (k : ℤ) + 3) ≤ x)
+    (hret : x = 1 ∨ (s, 0) = selDisp (2 * (k : ℤ) + 3) η (x, y)) :
+    x = 1 ∨ (x ≤ 0 ∧ s = -1) ∨ (1 ≤ x ∧ s = 1) := by
+  rcases hret with h | h
+  · exact Or.inl h
+  · have hE : EvenSite (x, y) := by unfold EvenSite; dsimp only; omega
+    unfold selDisp at h
+    rw [if_pos hE] at h
+    split_ifs at h <;> (try simp only [Prod.mk.injEq] at h) <;> (try simp only [Prod.mk.injEq] at *) <;> omega
+
+/-- **Lower-left diagonal, horizontal slip (sum 2).** For the centre `(x, y)` on `x + y = 2` (`y ≥ 1`), the increment
+of the reciprocal field along a retained horizontal step at the centre does not exceed the increment at the shifted centre.
+The shifted sites outside the raw domain are read through their `U`-translates. -/
+theorem diagLow_D_horiz (k : ℕ) (η x y s : ℤ) (hη : η = 1 ∨ η = -1)
+    (hs : s = 1 ∨ s = -1) (hsum : x + y = 2) (hy : 1 ≤ y) (hx : 6 - (2 * (k : ℤ) + 3) ≤ x)
+    (hsign : x = 1 ∨ (x ≤ 0 ∧ s = -1) ∨ (1 ≤ x ∧ s = 1)) :
+    incr (reciprocalField k) (s, 0) (x, y) ≤ incr (reciprocalField k) (s, 0) (x - 2 * η, y) := by
+  have e1 : ∀ a b : ℤ, (a, b) + (s, 0) = (a + s, b) := fun a b => by ext <;> simp
+  unfold incr
+  rw [e1 x y, e1 (x - 2 * η) y]
+  have htri := tri_up y
+  rcases hη with rfl | rfl <;> rcases hs with rfl | rfl
+  · rw [F_raw_pt k (x + 1) y (by omega), F_raw_pt k x y (by omega), F_U_pt k (x - 2 * 1) y (by omega),
+      F_raw_pt k (x - 2 * 1 + 1) y (by omega)]
+    unfold BaseMask.stairEvenValue
+    dsimp only
+    rw [if_neg (not_stairCorner _ (x + 1) y (by omega)), if_neg (not_stairCorner _ x y (by omega)),
+      if_neg (not_stairCorner _ (x - 2 * 1 + (2 * (k : ℤ) + 3)) (y + 1) (by omega)),
+      if_neg (not_stairCorner _ (x - 2 * 1 + 1) y (by omega))]
+    omega
+  · rw [F_raw_pt k (x + -1) y (by omega), F_raw_pt k x y (by omega), F_U_pt k (x - 2 * 1) y (by omega),
+      F_U_pt k (x - 2 * 1 + -1) y (by omega)]
+    unfold BaseMask.stairEvenValue
+    dsimp only
+    rw [if_neg (not_stairCorner _ (x + -1) y (by omega)), if_neg (not_stairCorner _ x y (by omega)),
+      if_neg (not_stairCorner _ (x - 2 * 1 + (2 * (k : ℤ) + 3)) (y + 1) (by omega)),
+      if_neg (not_stairCorner _ (x - 2 * 1 + -1 + (2 * (k : ℤ) + 3)) (y + 1) (by omega))]
+    omega
+  · rw [F_raw_pt k (x + 1) y (by omega), F_raw_pt k x y (by omega), F_raw_pt k (x - 2 * -1) y (by omega),
+      F_raw_pt k (x - 2 * -1 + 1) y (by omega)]
+    unfold BaseMask.stairEvenValue
+    dsimp only
+    rw [if_neg (not_stairCorner _ (x + 1) y (by omega)), if_neg (not_stairCorner _ x y (by omega)),
+      if_neg (not_stairCorner _ (x - 2 * -1) y (by omega)),
+      if_neg (not_stairCorner _ (x - 2 * -1 + 1) y (by omega))]
+    omega
+  · rw [F_raw_pt k (x + -1) y (by omega), F_raw_pt k x y (by omega), F_raw_pt k (x - 2 * -1) y (by omega),
+      F_raw_pt k (x - 2 * -1 + -1) y (by omega)]
+    unfold BaseMask.stairEvenValue
+    dsimp only
+    rw [if_neg (not_stairCorner _ (x + -1) y (by omega)), if_neg (not_stairCorner _ x y (by omega)),
+      if_neg (not_stairCorner _ (x - 2 * -1) y (by omega)),
+      if_neg (not_stairCorner _ (x - 2 * -1 + -1) y (by omega))]
+    omega
 
 end FLatticePaper.EPolicy
