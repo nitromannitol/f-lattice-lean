@@ -783,3 +783,18 @@ Scope to confirm with the lead: §1's star containment needs `c = d − n ≥ 3`
   drifts of `P` and `D_η` (fields of `StrongEstimates`), not yet derived here.
 - Checks: `checks/BothFreeRise.lean` (axioms unchanged).
 
+### Task 72 / twos base (the closed form and the deck reduction of standardField (2^(k+1))): TwosValues.lean
+
+- PROVED `standardField_twos_eq_paperNear`: for z in the closed polygon of 2^(k+1), `standardField (2^(k+1)) z =
+  paperNearLadderValue (2k+4) (z.1, z.2 + 1)` (no hypothesis: `twos_standardField_eq_rotate`, `rotate_eq_on_E`, and the ladder
+  extension of `ladderOdd_exists_extension`). The archive's native domain of the doubled ladder lies in this polygon, and its chart is
+  the identity.
+- PROVED `standardField_twos_reduction`: `2 F(z) = 2 P(y) + 2 j (−t(y) + cV) − T j (j−1)` for `z = y + combine i j`, `y` in the closed
+  polygon, with the period constants of `twos_standardField_periods`.
+- Numerics (scripts route in scratchpad twos_base_numerics.py), k = 0..4: slip range [0,2] on E, unit slip, no even slip saddle, unit
+  price, no price saddle, price range [cutPrice−1, cutPrice], price drifts (−1, 0), slip drifts (0, 2η), zero strip and zero even line of
+  quarterTurnField: all hold.
+- Checks: checks/TwosValues.lean (axioms standard). Root build: 0 warnings, 0 linter notes, 0 errors.
+- NOT yet: the increments (HasUnitSlip, HasUnitPrice), NoEvenSlipSaddle, NoPriceSaddle, the drifts, the zero strips and the price range
+  as Lean theorems; BaseSlip and StrongResidual minus the policy field at 2^(k+1).
+
