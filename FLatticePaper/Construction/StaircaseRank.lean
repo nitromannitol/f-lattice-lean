@@ -119,16 +119,17 @@ local macro "staircase_mem" : tactic => `(tactic|
    simp only [BaseMask.StairEvenCorner, Prod.fst_add, Prod.snd_add, Prod.fst_sub, Prod.snd_sub]
    omega))
 
-set_option maxHeartbeats 1000000 in
-private theorem stairEven_rank_on_raw {den : ℤ} (hden : BaseMask.stairEven.Valid den) {field correction : Field}
+private theorem stairEven_rank_on_raw_even {den : ℤ} (hden : BaseMask.stairEven.Valid den) {field correction : Field}
     (hagree : (BaseMask.stairEven.raw den).Agrees field 0)
     (hperiod : HasGeneratorPeriods (Fraction.mk 1 den) field 0 (stairEvenConstantV den))
     (hcorrect : ∀ point ∈ (BaseMask.stairEven.raw den).sites, correction point = stairEvenRankCorrection den point)
     (hperiodic : ∀ step ∈ (reciprocalEvenDeck den).span, Function.Periodic correction step)
-    (point : Site) (hpoint : point ∈ (BaseMask.stairEven.raw den).sites) :
+    (point : Site) (hpoint : point ∈ (BaseMask.stairEven.raw den).sites)
+    (heven : EvenSite point) :
     let rank : Field := fun site => 6 * site.1 + correction site
     (laplacian field point = -1 ∧ rank (incomingNeg point) < rank point ∧ rank (incomingPos point) < rank point) ∨
-      (laplacian field point = 0 ∧ (rank (incomingNeg point) < rank point ∨ rank (incomingPos point) < rank point)) := by
+      (laplacian field point = 0 ∧ (rank (incomingNeg point) < rank point ∨ rank (incomingPos point) < rank point))
+  := by
   have hmin := hden.1
   have hodd := hden.2
   have hspanU : (den, 1) ∈ (reciprocalEvenDeck den).span := by
@@ -153,92 +154,185 @@ private theorem stairEven_rank_on_raw {den : ℤ} (hden : BaseMask.stairEven.Val
   have hlap := stairEven_laplacian_on_raw hden hagree hperiod (x, y) hpoint
   dsimp only
   rw [hcorrect _ hpoint]
-  by_cases heven : EvenSite (x, y)
-  · have he : (x + y) % 2 = 0 := heven
-    simp only [incomingNeg, incomingPos, if_pos heven] at hlap ⊢
-    by_cases hblack : x = 1
-    · subst x
-      left
-      refine ⟨by simpa using hlap, ?_, ?_⟩
-      · have hmem : (1 - 1, y) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
-        rw [hcorrect _ hmem]
-        by_cases hyLast : y = den <;> staircase_rank
-      · have hmem : (1 + 1, y) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
-        rw [hcorrect _ hmem]
-        by_cases hyLast : y = den <;> staircase_rank
-    · right
-      refine ⟨by simpa only [if_neg hblack] using hlap, ?_⟩
-      by_cases hleft : x ≤ 0
-      · left
-        by_cases hcorner : x = 0 ∧ y = 0
+  have he : (x + y) % 2 = 0 := heven
+  simp only [incomingNeg, incomingPos, if_pos heven] at hlap ⊢
+  by_cases hblack : x = 1
+  · subst x
+    left
+    refine ⟨by simpa using hlap, ?_, ?_⟩
+    · have hmem : (1 - 1, y) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
+      rw [hcorrect _ hmem]
+      by_cases hyLast : y = den <;> staircase_rank
+    · have hmem : (1 + 1, y) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
+      rw [hcorrect _ hmem]
+      by_cases hyLast : y = den <;> staircase_rank
+  · right
+    refine ⟨by simpa only [if_neg hblack] using hlap, ?_⟩
+    by_cases hleft : x ≤ 0
+    · left
+      by_cases hcorner : x = 0 ∧ y = 0
+      · have hmem : ((x - 1, y) : Site) + (den, 1) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
+        rw [hplus hspanU _ hmem]
+        staircase_rank
+      · by_cases hboundary : x = 2 - den ∧ y = den
         · have hmem : ((x - 1, y) : Site) + (den, 1) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
           rw [hplus hspanU _ hmem]
           staircase_rank
-        · by_cases hboundary : x = 2 - den ∧ y = den
-          · have hmem : ((x - 1, y) : Site) + (den, 1) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
-            rw [hplus hspanU _ hmem]
-            staircase_rank
-          · have hmem : (x - 1, y) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
-            rw [hcorrect _ hmem]
-            staircase_rank
-      · by_cases hend : y = 0 ∨ y = den + 1 ∨ (x = den ∧ y = 1)
-        · left
-          have hmem : (x - 1, y) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
-          rw [hcorrect _ hmem]
-          rcases hend with hb | ht | hd <;> staircase_rank
-        · right
-          have hmem : (x + 1, y) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
-          rw [hcorrect _ hmem]
-          by_cases hdiag : x + y = den + 1 <;> staircase_rank
-  · have he : (x + y) % 2 ≠ 0 := heven
-    simp only [incomingNeg, incomingPos, if_neg heven] at hlap ⊢
-    by_cases hblack : 0 < y ∧ y < den + 1 ∧ 1 < x + y ∧ x + y < den + 2
-    · left
-      refine ⟨by simpa only [if_pos hblack] using hlap, ?_, ?_⟩
-      · have hmem : (x, y - 1) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
-        rw [hcorrect _ hmem]
-        by_cases hcol : x ≤ 0
-        · staircase_rank
-        · by_cases hrow : y = 1 <;> staircase_rank
-      · have hmem : (x, y + 1) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
-        rw [hcorrect _ hmem]
-        by_cases hcol : x ≤ 0
-        · staircase_rank
-        · by_cases hdiag : x + y = den <;> staircase_rank
-    · right
-      refine ⟨by simpa only [if_neg hblack] using hlap, ?_⟩
-      by_cases hbottom : y = 0
-      · by_cases hend : x = den
-        · right
-          have hmem : (x, y + 1) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
+        · have hmem : (x - 1, y) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
           rw [hcorrect _ hmem]
           staircase_rank
-        · left
-          have hmem : ((x, y - 1) : Site) + (1 - den, den + 1) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
-          rw [hplus hspanV _ hmem]
-          staircase_rank
-      · by_cases htop : y = den + 1
-        · by_cases hend : x = 1
-          · right
-            have hmem : ((x, y + 1) : Site) - (1 - den, den + 1) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
-            rw [hminus hspanV _ hmem]
-            staircase_rank
-          · left
-            have hmem : (x, y - 1) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
-            rw [hcorrect _ hmem]
-            staircase_rank
+    · by_cases hend : y = 0 ∨ y = den + 1 ∨ (x = den ∧ y = 1)
+      · left
+        have hmem : (x - 1, y) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
+        rw [hcorrect _ hmem]
+        rcases hend with hb | ht | hd <;> staircase_rank
+      · right
+        have hmem : (x + 1, y) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
+        rw [hcorrect _ hmem]
+        by_cases hdiag : x + y = den + 1 <;> staircase_rank
+
+
+private theorem stairEven_rank_on_raw_odd_black {den : ℤ} (hden : BaseMask.stairEven.Valid den) {field correction : Field}
+    (hagree : (BaseMask.stairEven.raw den).Agrees field 0)
+    (hperiod : HasGeneratorPeriods (Fraction.mk 1 den) field 0 (stairEvenConstantV den))
+    (hcorrect : ∀ point ∈ (BaseMask.stairEven.raw den).sites, correction point = stairEvenRankCorrection den point)
+    (hperiodic : ∀ step ∈ (reciprocalEvenDeck den).span, Function.Periodic correction step)
+    (point : Site) (hpoint : point ∈ (BaseMask.stairEven.raw den).sites)
+    (heven : ¬ EvenSite point)
+    (hb : 0 < point.2 ∧ point.2 < den + 1 ∧ 1 < point.1 + point.2 ∧ point.1 + point.2 < den + 2) :
+    let rank : Field := fun site => 6 * site.1 + correction site
+    (laplacian field point = -1 ∧ rank (incomingNeg point) < rank point ∧ rank (incomingPos point) < rank point) ∨
+      (laplacian field point = 0 ∧ (rank (incomingNeg point) < rank point ∨ rank (incomingPos point) < rank point))
+  := by
+  have hmin := hden.1
+  have hodd := hden.2
+  have hspanU : (den, 1) ∈ (reciprocalEvenDeck den).span := by
+    rw [reciprocalEvenDeck_eq hodd]
+    exact ⟨1, 0, by apply Prod.ext <;> simp [PeriodDeck.combine]⟩
+  have hspanV : (1 - den, den + 1) ∈ (reciprocalEvenDeck den).span := by
+    rw [reciprocalEvenDeck_eq hodd]
+    exact ⟨0, 1, by apply Prod.ext <;> simp [PeriodDeck.combine, add_comm 1 den]⟩
+  have hplus {step : Site} (hspan : step ∈ (reciprocalEvenDeck den).span) (site : Site)
+      (hmem : site + step ∈ (BaseMask.stairEven.raw den).sites) :
+      correction site = stairEvenRankCorrection den (site + step) :=
+    (hperiodic step hspan site).symm.trans (hcorrect _ hmem)
+  have hminus {step : Site} (hspan : step ∈ (reciprocalEvenDeck den).span) (site : Site)
+      (hmem : site - step ∈ (BaseMask.stairEven.raw den).sites) :
+      correction site = stairEvenRankCorrection den (site - step) := by
+    have h := hperiodic step hspan (site - step)
+    rw [sub_add_cancel] at h
+    exact h.trans (hcorrect _ hmem)
+  obtain ⟨x, y⟩ := point
+  obtain ⟨hx, hy, hband⟩ := BaseMask.mem_stairEven_raw_iff.mp hpoint
+  simp only [BaseMask.StairEvenCorner] at hband
+  have hlap := stairEven_laplacian_on_raw hden hagree hperiod (x, y) hpoint
+  dsimp only
+  rw [hcorrect _ hpoint]
+  have he : (x + y) % 2 ≠ 0 := heven
+  simp only [incomingNeg, incomingPos, if_neg heven] at hlap ⊢
+  have hblack : 0 < y ∧ y < den + 1 ∧ 1 < x + y ∧ x + y < den + 2 := hb
+  · left
+    refine ⟨by simpa only [if_pos hblack] using hlap, ?_, ?_⟩
+    · have hmem : (x, y - 1) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
+      rw [hcorrect _ hmem]
+      by_cases hcol : x ≤ 0
+      · staircase_rank
+      · by_cases hrow : y = 1 <;> staircase_rank
+    · have hmem : (x, y + 1) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
+      rw [hcorrect _ hmem]
+      by_cases hcol : x ≤ 0
+      · staircase_rank
+      · by_cases hdiag : x + y = den <;> staircase_rank
+
+private theorem stairEven_rank_on_raw_odd_white {den : ℤ} (hden : BaseMask.stairEven.Valid den) {field correction : Field}
+    (hagree : (BaseMask.stairEven.raw den).Agrees field 0)
+    (hperiod : HasGeneratorPeriods (Fraction.mk 1 den) field 0 (stairEvenConstantV den))
+    (hcorrect : ∀ point ∈ (BaseMask.stairEven.raw den).sites, correction point = stairEvenRankCorrection den point)
+    (hperiodic : ∀ step ∈ (reciprocalEvenDeck den).span, Function.Periodic correction step)
+    (point : Site) (hpoint : point ∈ (BaseMask.stairEven.raw den).sites)
+    (heven : ¬ EvenSite point)
+    (hw : ¬ (0 < point.2 ∧ point.2 < den + 1 ∧ 1 < point.1 + point.2 ∧ point.1 + point.2 < den + 2)) :
+    let rank : Field := fun site => 6 * site.1 + correction site
+    (laplacian field point = -1 ∧ rank (incomingNeg point) < rank point ∧ rank (incomingPos point) < rank point) ∨
+      (laplacian field point = 0 ∧ (rank (incomingNeg point) < rank point ∨ rank (incomingPos point) < rank point))
+  := by
+  have hmin := hden.1
+  have hodd := hden.2
+  have hspanU : (den, 1) ∈ (reciprocalEvenDeck den).span := by
+    rw [reciprocalEvenDeck_eq hodd]
+    exact ⟨1, 0, by apply Prod.ext <;> simp [PeriodDeck.combine]⟩
+  have hspanV : (1 - den, den + 1) ∈ (reciprocalEvenDeck den).span := by
+    rw [reciprocalEvenDeck_eq hodd]
+    exact ⟨0, 1, by apply Prod.ext <;> simp [PeriodDeck.combine, add_comm 1 den]⟩
+  have hplus {step : Site} (hspan : step ∈ (reciprocalEvenDeck den).span) (site : Site)
+      (hmem : site + step ∈ (BaseMask.stairEven.raw den).sites) :
+      correction site = stairEvenRankCorrection den (site + step) :=
+    (hperiodic step hspan site).symm.trans (hcorrect _ hmem)
+  have hminus {step : Site} (hspan : step ∈ (reciprocalEvenDeck den).span) (site : Site)
+      (hmem : site - step ∈ (BaseMask.stairEven.raw den).sites) :
+      correction site = stairEvenRankCorrection den (site - step) := by
+    have h := hperiodic step hspan (site - step)
+    rw [sub_add_cancel] at h
+    exact h.trans (hcorrect _ hmem)
+  obtain ⟨x, y⟩ := point
+  obtain ⟨hx, hy, hband⟩ := BaseMask.mem_stairEven_raw_iff.mp hpoint
+  simp only [BaseMask.StairEvenCorner] at hband
+  have hlap := stairEven_laplacian_on_raw hden hagree hperiod (x, y) hpoint
+  dsimp only
+  rw [hcorrect _ hpoint]
+  have he : (x + y) % 2 ≠ 0 := heven
+  simp only [incomingNeg, incomingPos, if_neg heven] at hlap ⊢
+  have hblack : ¬ (0 < y ∧ y < den + 1 ∧ 1 < x + y ∧ x + y < den + 2) := hw
+  · right
+    refine ⟨by simpa only [if_neg hblack] using hlap, ?_⟩
+    by_cases hbottom : y = 0
+    · by_cases hend : x = den
+      · right
+        have hmem : (x, y + 1) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
+        rw [hcorrect _ hmem]
+        staircase_rank
+      · left
+        have hmem : ((x, y - 1) : Site) + (1 - den, den + 1) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
+        rw [hplus hspanV _ hmem]
+        staircase_rank
+    · by_cases htop : y = den + 1
+      · by_cases hend : x = 1
         · right
-          by_cases hlower : x + y = 1
+          have hmem : ((x, y + 1) : Site) - (1 - den, den + 1) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
+          rw [hminus hspanV _ hmem]
+          staircase_rank
+        · left
+          have hmem : (x, y - 1) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
+          rw [hcorrect _ hmem]
+          staircase_rank
+      · right
+        by_cases hlower : x + y = 1
+        · have hmem : (x, y + 1) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
+          rw [hcorrect _ hmem]
+          staircase_rank
+        · by_cases hend : y = den
           · have hmem : (x, y + 1) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
             rw [hcorrect _ hmem]
             staircase_rank
-          · by_cases hend : y = den
-            · have hmem : (x, y + 1) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
-              rw [hcorrect _ hmem]
-              staircase_rank
-            · have hmem : ((x, y + 1) : Site) - (den, 1) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
-              rw [hminus hspanU _ hmem]
-              staircase_rank
+          · have hmem : ((x, y + 1) : Site) - (den, 1) ∈ (BaseMask.stairEven.raw den).sites := by staircase_mem
+            rw [hminus hspanU _ hmem]
+            staircase_rank
+
+private theorem stairEven_rank_on_raw {den : ℤ} (hden : BaseMask.stairEven.Valid den) {field correction : Field}
+    (hagree : (BaseMask.stairEven.raw den).Agrees field 0)
+    (hperiod : HasGeneratorPeriods (Fraction.mk 1 den) field 0 (stairEvenConstantV den))
+    (hcorrect : ∀ point ∈ (BaseMask.stairEven.raw den).sites, correction point = stairEvenRankCorrection den point)
+    (hperiodic : ∀ step ∈ (reciprocalEvenDeck den).span, Function.Periodic correction step)
+    (point : Site) (hpoint : point ∈ (BaseMask.stairEven.raw den).sites) :
+    let rank : Field := fun site => 6 * site.1 + correction site
+    (laplacian field point = -1 ∧ rank (incomingNeg point) < rank point ∧ rank (incomingPos point) < rank point) ∨
+      (laplacian field point = 0 ∧ (rank (incomingNeg point) < rank point ∨ rank (incomingPos point) < rank point)) := by
+  by_cases heven : EvenSite point
+  · exact stairEven_rank_on_raw_even hden hagree hperiod hcorrect hperiodic point hpoint heven
+  · by_cases hb : 0 < point.2 ∧ point.2 < den + 1 ∧ 1 < point.1 + point.2 ∧ point.1 + point.2 < den + 2
+    · exact stairEven_rank_on_raw_odd_black hden hagree hperiod hcorrect hperiodic point hpoint heven hb
+    · exact stairEven_rank_on_raw_odd_white hden hagree hperiod hcorrect hperiodic point hpoint heven hb
+
 
 /-- The explicit B1 rank from the replacement recurrence proof works at every
 site of the compatible literal height extension, including both seams. -/
