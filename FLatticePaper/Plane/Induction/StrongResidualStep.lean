@@ -27,7 +27,16 @@ namespace FLatticePaper.Induction
 open Farey FLatticePaper
 
 /-- **The strong residual of a proper word from the conjugate's strong estimates.** The named inputs are the boundary price bound
-`hbd`, the even seed `hseed`, the star classification `hcls`, and the policy with a strict rank `hpol`. -/
+`hbd`, the even seed `hseed`, the star classification `hcls`, and the policy with a strict rank `hpol`.
+
+`hcls` is `StarClassified` (STRONG_PRICE_AND_ALTERNATE_STEP §3): for each centre, one deck translate common to its star classifies the
+star (each site in the closed polygon, the H-band, or a V source). Checked numerically on the proper words of length at most four.
+
+`hseed` is named. Its reduction: `standardField word − harmonicGrid` is invariant under the transverse vector (the kernel constant of
+the standard field is `0`, and its transverse constant equals that of `harmonicGrid`; checked on the proper words of length at most
+three), and the odd seed line is a union of transverse orbits. So `hseed` follows from one check, `standardField = harmonicGrid`, at one
+odd representative of each transverse class on the seed line. The seed line lies below the strip `HasStrips`, so the strip does not
+supply it. Checked numerically on the proper words of length at most four (350 seed points, no disagreement). -/
 theorem strongResidual_of_conj {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word))
     (hbd : ∀ z, OnBoundary (frameAt word).closedPolygon z →
@@ -60,7 +69,7 @@ theorem strongResidual_of_conj {word : Word} (h : ∃ x ∈ word, x ≠ Digit.th
       (z + (frameAt word).child.modifiedDeck.transverse) = (frameAt word).slip (standardField word) η z + 2 * η :=
     fun η z => (frameAt word).slip_transverse (standardField word) hpk.periods η z
   have hZE := FLatticePaper.W1ZeroStrip.zeroEvenLine_field word hpk hPR hPU hPV hseed
-  have hU := FLatticePaper.StrongUnitPrice.unitPrice_and_noSaddle (frameAt word) (standardField word) hPR hPV hcls
+  have hU := FLatticePaper.StrongUnitPrice.unitPrice_and_noSaddle (frameAt word) (standardField word) hPR hPU hPV hcls
   refine
     { priceRange := hPR
       priceDrift := fun z => ⟨by linarith [hPU z], by linarith [hPV z]⟩
