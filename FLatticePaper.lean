@@ -243,6 +243,7 @@ import FLatticePaper.Tiles.CheckerFree
 import FLatticePaper.Tiles.SeamFinal
 import FLatticePaper.Tiles.SeamBase
 import FLatticePaper.Tiles.InterfaceStacked
+import FLatticePaper.Tiles.StringCorners
 import FLatticePaper.Tiles.SeamSymm
 import FLatticePaper.Tiles.RightSub
 import FLatticePaper.Tiles.OriginCell
