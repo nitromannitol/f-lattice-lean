@@ -574,6 +574,5 @@ import FLatticePaper.Plane.Induction.EPolicyPrescribed
 import FLatticePaper.Plane.Induction.EPolicySquares
 import FLatticePaper.Plane.Induction.EPolicyValues
 import FLatticePaper.Plane.Induction.EPolicyCover
-import FLatticePaper.Plane.Induction.TwosLaplacianTile
 
 /-! Root import for the corrected F-lattice paper. -/
