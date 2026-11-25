@@ -34,13 +34,13 @@ theorem canon_of_forced_W {frame : ChildFrame} {G : Field} {seed : Site → Site
 theorem hcanon_of_deriv {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} {η δ : ℤ}
     (C : CanonicalSignedPolicy frame G η) (W : FLatticePaper.W1Witness.OldPolicyWitness frame G seed η) (hW : W.retained = C.policy)
     (hderiv : ∀ z ∈ frame.freeV, EvenSite z → z ≠ FLatticePaper.Induction.vFirst →
-      (η = -1 ∨ z ≠ frame.vLast) → laplacian G z = 0 →
+      (η = -1 ∨ z ≠ frame.vLast) → laplacian G z = 0 → laplacian G (z.1 + δ, z.2) = 0 →
       ForcedEdge G (fun _ _ => False) (z.1 + δ, z.2) (z.1 + δ, z.2 - δ)) :
     ∀ z ∈ frame.freeV, EvenSite z → z ≠ FLatticePaper.Induction.vFirst →
       (η = -1 ∨ z ≠ frame.vLast) → laplacian G z = 0 →
       laplacian G (z.1 + δ, z.2) = 0 → laplacian G (z.1 + δ, z.2 - δ) = -1 →
       W.retained (z.1 + δ, z.2) (z.1 + δ, z.2 - δ) := by
   intro z hz hev hF hsc hw h1 _
-  exact canon_of_forced_W C W hW h1 (hderiv z hz hev hF hsc hw)
+  exact canon_of_forced_W C W hW h1 (hderiv z hz hev hF hsc hw h1)
 
 end FLatticePaper.CanonForced
