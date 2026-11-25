@@ -3,6 +3,7 @@ import FLatticePaper.Plane.Induction.TraceFromPsi
 import FLatticePaper.Plane.Induction.PsiCalibration
 import FLatticePaper.Plane.Induction.ArcPsi
 import FLatticePaper.Plane.Induction.QueryClassMain
+import FLatticePaper.Plane.Induction.CutRowsAll
 
 /-! Task w3, steps 3 and 4 composed: from the named earlier-trace inputs to the word's own freeH trace `TraceAt word`.
 
@@ -13,12 +14,18 @@ earlier values `hVal`, `hHval`, the step `hstep` (2c), and the phase-one endpoin
 
 namespace FLatticePaper.PsiArc
 
+
 open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.W1MSheet W1Step
+
+/-- **The labelling of the conjugate's free V cut** exists for every word (`CutRowsAll`, `FreeEnum.exists_base`). -/
+theorem conj_base_exists (word : Word) :
+    ∃ base : ℤ → Site, ∀ r : ℤ, 0 ≤ r → r < FreeEnum.period (frameAt (conjWord word)) →
+      base r ∈ (frameAt (conjWord word)).freeV ∧ (base r).2 = r :=
+  FreeEnum.exists_base _ (CutRowsAll.cut_one_per_ordinate_all _)
 
 /-- **Phase zero: `TraceAt` from the named inputs.** The transport classification is proved; the earlier trace is named. -/
 theorem traceAt_W0_of_named {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
     (hW0 : (frameAt word).eps = -1)
-    (hcutC : FreeEnum.CutOnePerOrdinate (frameAt (conjWord word)))
     (base : ℤ → Site)
     (hbase : ∀ r : ℤ, 0 ≤ r → r < FreeEnum.period (frameAt (conjWord word)) →
       base r ∈ (frameAt (conjWord word)).freeV ∧ (base r).2 = r)
@@ -33,6 +40,7 @@ theorem traceAt_W0_of_named {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three
     (hcover : ∀ z ∈ (frameAt word).freeH, ∃ j : ℕ, j < N ∧ z = H j)
     (hH0 : H 0 = ((1 : ℤ), (0 : ℤ))) (hH1 : H 1 = ((2 : ℤ), (0 : ℤ))) :
     TraceFromPsi.TraceAt word := by
+  have hcutC := CutRowsAll.cut_one_per_ordinate_all (frameAt (conjWord word))
   have hClass : ∀ j : ℕ, 1 ≤ j → j < N →
       (PsiMonoReal.qry word (H j) = FreeEnum.vAt (frameAt (conjWord word)) base (PsiMonoReal.qry word (H j)).2 ∧
         (PsiMonoReal.qry word (H j)).2 % FreeEnum.period (frameAt (conjWord word)) ≠ 0) ∨
@@ -65,7 +73,6 @@ theorem traceAt_W0_of_named {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three
 /-- **Phase one: `TraceAt` from the named inputs.** The query is `reflH (H j)`, a free H point with abscissa `d − j ≠ d`. -/
 theorem traceAt_W1_of_named {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
     (hW1 : (frameAt word).eps = 1)
-    (hcutC : FreeEnum.CutOnePerOrdinate (frameAt (conjWord word)))
     (base : ℤ → Site)
     (hbase : ∀ r : ℤ, 0 ≤ r → r < FreeEnum.period (frameAt (conjWord word)) →
       base r ∈ (frameAt (conjWord word)).freeV ∧ (base r).2 = r)
@@ -84,6 +91,7 @@ theorem traceAt_W1_of_named {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three
     (hcover : ∀ z ∈ (frameAt word).freeH, ∃ j : ℕ, j < N ∧ z = H j)
     (hH0 : H 0 = ((1 : ℤ), (0 : ℤ))) (hH1 : H 1 = ((2 : ℤ), (0 : ℤ))) :
     TraceFromPsi.TraceAt word := by
+  have hcutC := CutRowsAll.cut_one_per_ordinate_all (frameAt (conjWord word))
   have hClass : ∀ j : ℕ, 1 ≤ j → j < N →
       (PsiMonoReal.qry word (ArcPsi.reflH word (H j)) = FreeEnum.vAt (frameAt (conjWord word)) base
           (PsiMonoReal.qry word (ArcPsi.reflH word (H j))).2 ∧
