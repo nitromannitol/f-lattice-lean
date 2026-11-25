@@ -524,6 +524,9 @@ import FLatticePaper.Plane.Induction.VWindow
 import FLatticePaper.Plane.Induction.EarlierValues
 import FLatticePaper.Plane.Induction.EndpointDeck
 import FLatticePaper.Plane.Induction.StepTwoC
+import FLatticePaper.Plane.Induction.CutReflect
+import FLatticePaper.Plane.Induction.RowMinus
+import FLatticePaper.Plane.Induction.NominalValues
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame
 import FLatticePaper.Plane.Induction.BaseMembership
