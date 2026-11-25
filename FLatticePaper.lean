@@ -709,6 +709,7 @@ import FLatticePaper.Plane.Induction.LowerMem
 import FLatticePaper.Plane.Induction.HderivEasy
 import FLatticePaper.Plane.Induction.CentralForced
 import FLatticePaper.Plane.Induction.WestEast
+import FLatticePaper.Plane.Induction.HardEast
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame
 import FLatticePaper.Plane.Induction.BaseMembership
