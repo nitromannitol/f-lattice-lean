@@ -335,6 +335,7 @@ import FLatticePaper.Plane.GlobalOdometersAll
 import FLatticePaper.Plane.Induction.TwosFlatReduce
 import FLatticePaper.Plane.Induction.TwosNativeCover
 import FLatticePaper.Plane.Induction.TwosTileLevel
+import FLatticePaper.Plane.Induction.TwosTileRep
 import FLatticePaper.Plane.Induction.CornerPositive
 import FLatticePaper.Tiles.InterfaceStacked
 import FLatticePaper.Tiles.StringCorners
