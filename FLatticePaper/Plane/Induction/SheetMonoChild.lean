@@ -290,4 +290,105 @@ theorem sheetMono_odd_of_signed {F : Field} (frame : ChildFrame) (hP : frame.Pac
   intro u v hu hv h1 h2
   exact sheet_mono_signed frame hP hsig u v (by unfold EvenSite at hu hv; omega) h1 h2
 
+/-- The slip difference `F x − F (x + σ)` rises by `2` under one `V` (`t σ = −2`). -/
+theorem slip1_V {F : Field} (frame : ChildFrame) (hP : frame.Packet F) (x : Site) :
+    F (x + vPt frame 1) - F (x + vPt frame 1 + frame.shortShift)
+      = (F x - F (x + frame.shortShift)) + 2 := by
+  have e : x + vPt frame 1 + frame.shortShift = (x + frame.shortShift) + vPt frame 1 := by abel
+  rw [e, F_V frame hP x, F_V frame hP (x + frame.shortShift)]
+  have h1 := sm_tG_add frame x frame.shortShift
+  have h2 := FLatticePaper.W1Strips.tGrade_shortShift frame
+  linarith
+
+/-- The slip difference after `n ≥ 0` vertical steps. -/
+theorem slip1_nat {F : Field} (frame : ChildFrame) (hP : frame.Packet F) :
+    ∀ (n : ℕ) (y : Site),
+      F (y + vPt frame (n : ℤ)) - F (y + vPt frame (n : ℤ) + frame.shortShift)
+        = (F y - F (y + frame.shortShift)) + 2 * (n : ℤ) := by
+  intro n
+  induction n with
+  | zero =>
+    intro y
+    have e : vPt frame ((0 : ℕ) : ℤ) = 0 := by ext <;> simp [vPt]
+    rw [e]
+    simp
+  | succ k ih =>
+    intro y
+    have e : vPt frame ((k + 1 : ℕ) : ℤ) = vPt frame (k : ℤ) + vPt frame 1 := by
+      ext <;> simp [vPt] <;> ring
+    have e2 : y + vPt frame ((k + 1 : ℕ) : ℤ) = (y + vPt frame (k : ℤ)) + vPt frame 1 := by
+      rw [e]; abel
+    rw [e2, slip1_V frame hP (y + vPt frame (k : ℤ)), ih y]
+    push_cast
+    ring
+
+/-- **Step two for the slip** (Q26 (3), the other sign): `F z − F (z + σ) ≥ 0` for every `z` with `t z ≤ 0`, from the slip range on
+the closed polygon. The slip range is `StrongEstimates.slipRange` of the word (`slipRange_of_strong`). -/
+theorem slip1_nonneg_of_tGrade_le {F : Field} (frame : ChildFrame) (hP : frame.Packet F)
+    (hslip : ∀ w ∈ frame.closedPolygon, 0 ≤ F w - F (w + frame.shortShift) ∧ F w - F (w + frame.shortShift) ≤ 2)
+    (z : Site) (hz : frame.tGrade z ≤ 0) :
+    0 ≤ F z - F (z + frame.shortShift) := by
+  obtain ⟨y, hy, i, j, hzeq⟩ := frame.closedPolygon_covers z
+  obtain ⟨-, -, -, -, hT⟩ := frame.child_facts
+  obtain ⟨h1, h2, -⟩ := frame.child_facts
+  have hTpos : 0 < frame.child.periodDenominator := by
+    rw [hT]
+    nlinarith
+  have ht : frame.tGrade (kPt frame i + vPt frame j) = -(j * frame.child.periodDenominator) := by
+    simp only [ChildFrame.tGrade, Prod.fst_add, Prod.snd_add, kPt, vPt]
+    rw [hT]
+    ring
+  have htz : frame.tGrade z = frame.tGrade y - j * frame.child.periodDenominator := by
+    rw [hzeq, combine_eq frame, sm_tG_add, ht]
+    ring
+  have hy' := tGrade_gt_of_mem frame hy
+  have hj : 0 ≤ j := by
+    by_contra hneg
+    have hneg' : j < 0 := not_le.mp hneg
+    nlinarith [mul_nonneg (show (0 : ℤ) ≤ -1 - j by omega) hTpos.le]
+  obtain ⟨n, rfl⟩ : ∃ n : ℕ, j = (n : ℤ) := ⟨j.toNat, (Int.toNat_of_nonneg hj).symm⟩
+  have hz2 : z = (y + vPt frame (n : ℤ)) + kPt frame i := by
+    rw [hzeq, combine_eq frame]
+    abel
+  rw [hz2]
+  have e2 : (y + vPt frame (n : ℤ)) + kPt frame i + frame.shortShift
+      = (y + vPt frame (n : ℤ) + frame.shortShift) + kPt frame i := by abel
+  rw [e2, F_Kpt frame hP i, F_Kpt frame hP i, slip1_nat frame hP n y]
+  have hw := hslip y hy
+  have hn0 : (0 : ℤ) ≤ (n : ℤ) := Nat.cast_nonneg n
+  linarith [hw.1]
+
+/-- **The signed comparison from the slip range** (Q26 (1)): `F w − F (w − σ) ≤ 0` on the closed polygon. Two cases: on the zero
+strip (`t w ≥ 1 − D`), both `F w` and `F (w − σ)` vanish; below it (`t w ≤ −D`), `t (w − σ) ≤ 0` and the slip step applies to `w − σ`. -/
+theorem hsig_of_slip {F : Field} (frame : ChildFrame) (hP : frame.Packet F)
+    (hslip : ∀ w ∈ frame.closedPolygon, 0 ≤ F w - F (w + frame.shortShift) ∧ F w - F (w + frame.shortShift) ≤ 2) :
+    ∀ w ∈ frame.closedPolygon, F w - F (w - frame.shortShift) ≤ 0 := by
+  intro w hw
+  obtain ⟨h1, h2, h3⟩ := frame.child_facts
+  have hσ := FLatticePaper.W1Strips.tGrade_shortShift frame
+  have hsub : frame.tGrade (w - frame.shortShift) = frame.tGrade w + 2 := by
+    rw [sm_tG_sub frame, hσ]
+    ring
+  have hpoly := hw
+  unfold ChildFrame.closedPolygon at hpoly
+  simp only [Set.mem_setOf_eq] at hpoly
+  by_cases hcase : 1 - frame.child.den ≤ frame.tGrade w
+  · -- the zero strip at `w` and at `w − σ`
+    have hup : frame.tGrade w + 2 ≤ frame.child.num + 2 * frame.child.den - 1 := by
+      split_ifs at hpoly with he
+      · omega
+      · omega
+    have hF0 : F w = 0 := hP.strips.1 w hcase (by omega)
+    have hF1 : F (w - frame.shortShift) = 0 :=
+      hP.strips.1 (w - frame.shortShift) (by rw [hsub]; omega) (by rw [hsub]; omega)
+    rw [hF0, hF1]
+    norm_num
+  · -- `t (w − σ) ≤ 0`: the slip step at `w − σ` gives `F (w − σ) − F w ≥ 0`
+    have hz : frame.tGrade (w - frame.shortShift) ≤ 0 := by
+      rw [hsub]
+      omega
+    have hs := slip1_nonneg_of_tGrade_le frame hP hslip (w - frame.shortShift) hz
+    rw [sub_add_cancel] at hs
+    linarith
+
 end FLatticePaper.SheetMonoChild
