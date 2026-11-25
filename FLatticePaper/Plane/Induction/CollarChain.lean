@@ -441,11 +441,16 @@ theorem W1Forced_end_to_end {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.thre
       laplacian (standardField (conjWord word)) (z.1 + δ, z.2 - δ) = -1 →
       P.retained (z.1 + δ, z.2) (z.1 + δ, z.2 - δ))
     (hTop : TopStrictHyp word (standardField (conjWord word)) (frameAt word).sheetShift)
-    (hRow : RowStrictHyp word (standardField (conjWord word)) P.retained)
-    (hfree : ∀ c : Site, 0 ≤ sheetPsi word c → laplacian (MW word) c = 0 →
-      ¬ Nonfree (frameAt (conjWord word)) (zTurn (c - (frameAt word).sheetShift)) →
-      ParentSquareOut (standardField (conjWord word)) P.retained (zTurn (c - (frameAt word).sheetShift))) :
+    (hRow : RowStrictHyp word (standardField (conjWord word)) P.retained) :
     FLatticePaper.W1.W1Forced (frameAt word).child.num (frameAt word).child.den (MW word) := by
+  have hdeck := deck_of_games G (frameAt word).eps_unit P.toOldPolicyWitness hW
+  have hfree : ∀ c : Site, 0 ≤ sheetPsi word c → laplacian (MW word) c = 0 →
+      ¬ Nonfree (frameAt (conjWord word)) (zTurn (c - (frameAt word).sheetShift)) →
+      ParentSquareOut (standardField (conjWord word)) P.retained (zTurn (c - (frameAt word).sheetShift)) :=
+    fun c h0 hM hnf =>
+      hfree_of_classes hη hδ hSE.packet hW1 (G.game (frameAt word).eps (frameAt word).eps_unit)
+        P.toOldPolicyWitness hW hdeck hH hVodd hX3 hX1 hX2 hcanon hnf
+        (FLatticePaper.W1NonfreeHsqC.lapG_zero_of_nonneg hw hSE h0 hM)
   have hcollar : ∀ c : Site, FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c →
       laplacian (MW word) c = 0 → FLatticePaper.W1CollarFrame.CollarFrame (frameAt word) c → HsqAt word P c := by
     intro c hcS hM hcoll
