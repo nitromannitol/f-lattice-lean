@@ -520,4 +520,139 @@ theorem rotated_fan_start_W1 {fr : ChildFrame} {G : Field} (hP : fr.Packet G)
   exact ⟨o, hmono, rotated_fan_start_D hP hprice hdrU hdrV N D (FLatticePaper.W1.w1T fr.child.num fr.child.den) hN2 hD2
     hN0 hNDlt hodd K hK2 hKs hKr b start hb hstart heven hmono⟩
 
+/-! ## The box of an odd free V root and the start in the residual region
+
+For an odd site `z` of the closed polygon with `s(z)` in the V spectrum, the grades satisfy `n − T < t(z) < 2n − d` and `s(z) ≤ d + n − 2`
+(`freeV_box_core`, integer arithmetic on `T y = n s − L t`). The start of the rotated fan is `(z.2, 1 − z.1)`, whose residual region is the
+strict interior of `E − U` at `z + (−1, −1) + U`; that point is in the strict interior because of the box. -/
+
+/-- Integer core of the V box: `n − T < t`, `t < 2n − d` and `s ≤ d + n − 2` for an odd point of the V spectrum on the closed polygon. -/
+theorem freeV_box_core (n d T t s x y : ℤ) (hn : 1 ≤ n) (hnd : n + 2 ≤ d)
+    (hT : T = d * d + 2 * d * n - n * n) (ht : t = n * x - d * y) (hs : s = (d + n) * x + (d - n) * y)
+    (hodd : (x + y) % 2 = 1) (hE1 : n - T ≤ t) (hE2 : t ≤ d) (hE3 : 2 - d + n ≤ s)
+    (hV : (0 ≤ s ∧ s ≤ 2 * n) ∨ (2 - d + n ≤ s ∧ s ≤ d + n - 2)) :
+    n - T < t ∧ t < 2 * n - d ∧ s ≤ d + n - 2 := by
+  have hy : T * y = n * s - (d + n) * t := by
+    subst ht hs hT
+    ring
+  have hL : 0 < d + n := by omega
+  have hdn : 0 < d * n := mul_pos (by omega) (by omega)
+  have hsL : s ≤ d + n - 2 := by
+    rcases hV with h | h <;> omega
+  have hTpos : 0 < T := by
+    rw [hT]
+    nlinarith [mul_pos (show (0:ℤ) < d by omega) (show (0:ℤ) < d by omega),
+      mul_pos (show (0:ℤ) < n by omega) (show (0:ℤ) < n by omega), hdn]
+  have hlow : n - T + 2 ≤ t := by
+    by_contra hc
+    have hk0 : 0 ≤ t - (n - T) := by linarith
+    have hk1 : t - (n - T) ≤ 1 := by omega
+    have key : T * (y - (d + n)) = n * (s - (d + n)) - (d + n) * (t - (n - T)) := by
+      linear_combination hy
+    have hA : n * (s - (d + n)) ≤ n * (-2) :=
+      mul_le_mul_of_nonneg_left (show s - (d + n) ≤ -2 by omega) (show (0:ℤ) ≤ n by omega)
+    have hB : n * (2 - 2 * d) ≤ n * (s - (d + n)) :=
+      mul_le_mul_of_nonneg_left (show 2 - 2 * d ≤ s - (d + n) by omega) (show (0:ℤ) ≤ n by omega)
+    have hk1' : (d + n) * (t - (n - T)) ≤ (d + n) * 1 := mul_le_mul_of_nonneg_left hk1 hL.le
+    have hk0' : 0 ≤ (d + n) * (t - (n - T)) := mul_nonneg hL.le hk0
+    have hpos : 0 < (d - n) * (d + n - 1) := mul_pos (by omega) (by omega)
+    have hR1 : n * (s - (d + n)) - (d + n) * (t - (n - T)) < 0 := by linarith
+    have hR2 : -T < n * (s - (d + n)) - (d + n) * (t - (n - T)) := by linarith
+    rcases le_or_gt 0 (y - (d + n)) with hy0 | hy0
+    · have h1 : 0 ≤ T * (y - (d + n)) := mul_nonneg hTpos.le hy0
+      linarith
+    · have hy1 : 0 ≤ -(y - (d + n)) - 1 := by omega
+      have h1 : 0 ≤ T * (-(y - (d + n)) - 1) := mul_nonneg hTpos.le hy1
+      linarith
+  have hup : t < 2 * n - d := by
+    by_contra hc
+    have hc' : 2 * n - d ≤ t := by linarith
+    have hyb1 : n * s ≤ n * (d + n - 2) := mul_le_mul_of_nonneg_left hsL (show (0:ℤ) ≤ n by omega)
+    have hyb1' : (d + n) * (2 * n - d) ≤ (d + n) * t := mul_le_mul_of_nonneg_left hc' hL.le
+    have hyb2 : n * (2 - d + n) ≤ n * s := mul_le_mul_of_nonneg_left hE3 (show (0:ℤ) ≤ n by omega)
+    have hyb2' : (d + n) * t ≤ (d + n) * d := mul_le_mul_of_nonneg_left hE2 hL.le
+    have hy_lt : T * y < T := by linarith
+    have hy_gt : -T < T * y := by linarith
+    have hy0 : y = 0 := by
+      rcases lt_trichotomy y 0 with h | h | h
+      · have h1 : y ≤ -1 := by omega
+        have h2 : T * y ≤ T * (-1) := mul_le_mul_of_nonneg_left h1 hTpos.le
+        linarith
+      · exact h
+      · have h1 : 1 ≤ y := by omega
+        have h2 : T * 1 ≤ T * y := mul_le_mul_of_nonneg_left h1 hTpos.le
+        linarith
+    subst hy0
+    have ht' : t = n * x := by rw [ht]; ring
+    have hs' : s = (d + n) * x := by rw [hs]; ring
+    have hx0 : x ≤ 0 := by
+      by_contra hx
+      have h1 : 1 ≤ x := by omega
+      have h2 : (d + n) * 1 ≤ (d + n) * x := mul_le_mul_of_nonneg_left h1 hL.le
+      linarith
+    have hx1 : 0 ≤ x := by
+      by_contra hx
+      have h1 : x ≤ -1 := by omega
+      have h2 : (d + n) * x ≤ (d + n) * (-1) := mul_le_mul_of_nonneg_left h1 hL.le
+      linarith
+    have hx : x = 0 := by omega
+    subst hx
+    omega
+  exact ⟨by omega, hup, hsL⟩
+
+/-- **The start of the rotated fan lies in the residual region.** For an odd site `z` of the closed polygon with `s(z)` in the V spectrum,
+the residual start `(z.2, 1 − z.1)` (the image of `z + (−1, −1)`) lies in `resRegion`: the strict interior of `E − U` at `z + (−1, −1) + U`. -/
+theorem resRegion_start_of_box (frame : ChildFrame) {z : Site} (hodd : ¬ EvenSite z)
+    (hE : frame.child.num - frame.child.periodDenominator ≤ frame.tGrade z ∧ frame.tGrade z ≤ frame.child.den ∧
+      2 - frame.child.den + frame.child.num ≤ frame.sGrade z ∧
+      frame.sGrade z ≤ frame.child.periodDenominator + frame.child.den + frame.child.num - 2)
+    (hS : frame.sGrade z % 2 = 0 ∧
+      ((0 ≤ frame.sGrade z ∧ frame.sGrade z ≤ 2 * frame.child.num) ∨
+        (2 - frame.child.den + frame.child.num ≤ frame.sGrade z ∧
+          frame.sGrade z ≤ frame.child.den + frame.child.num - 2))) :
+    resRegion frame.child.num frame.child.den (z.2, 1 - z.1) := by
+  obtain ⟨hn0, hnd, hdn, hd3, hPT⟩ := frame.child_facts
+  have hev : (frame.child.num + frame.child.den) % 2 = 0 := by
+    have h := frame.child_even
+    unfold FLatticePaper.Farey.Fraction.Even at h
+    omega
+  have hT' : frame.child.periodDenominator
+      = frame.child.den * frame.child.den + 2 * frame.child.den * frame.child.num - frame.child.num * frame.child.num := by
+    rw [hPT]
+    ring
+  have ht : frame.tGrade z = frame.child.num * z.1 - frame.child.den * z.2 := rfl
+  have hs : frame.sGrade z = (frame.child.den + frame.child.num) * z.1 + (frame.child.den - frame.child.num) * z.2 := rfl
+  have hodd' : (z.1 + z.2) % 2 = 1 := by
+    unfold EvenSite at hodd
+    omega
+  have hcore := freeV_box_core frame.child.num frame.child.den frame.child.periodDenominator (frame.tGrade z)
+    (frame.sGrade z) z.1 z.2 hn0 (by omega) hT' ht hs hodd' hE.1 hE.2.1 hE.2.2.1
+    (by
+      rcases hS.2 with h | h
+      · exact Or.inl h
+      · exact Or.inr h)
+  obtain ⟨hlo, hup, hsL⟩ := hcore
+  have hP : ¬ EvenSite (-(1 - z.1) + frame.child.den, z.2 - 1 + frame.child.num) := by
+    unfold EvenSite
+    dsimp only
+    omega
+  have hT4 : 4 * frame.child.den - 4 < frame.child.periodDenominator := by
+    have h1 : 0 ≤ (frame.child.den - frame.child.num - 2) * (frame.child.den + frame.child.num) :=
+      mul_nonneg (by omega) (by omega)
+    have h2 : 0 ≤ frame.child.den * (frame.child.num - 1) := mul_nonneg (by omega) (by omega)
+    nlinarith [hT']
+  unfold resRegion FLatticePaper.W1.StrictInterior FLatticePaper.W1.w1b FLatticePaper.W1.w1T
+    FLatticePaper.W1.w1t FLatticePaper.W1.w1a FLatticePaper.W1.w1s FLatticePaper.W1.w1h
+    FLatticePaper.W1.w1c
+  dsimp only
+  simp only [if_neg hP]
+  rw [ht] at hlo hup
+  rw [hs] at hsL
+  rw [hs] at hE
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · linarith [hT', hlo]
+  · linarith [hup]
+  · linarith [hT', hT4, hE.2.2.1]
+  · linarith [hsL, hT']
+
 end FLatticePaper.RotatedForced
