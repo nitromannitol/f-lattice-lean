@@ -341,4 +341,48 @@ theorem cone_window {F : Field} (frame : ChildFrame) (hP : frame.Packet F)
   exact cone_input frame hP hsig hs K hcap b hb i (cone_input_of_root b K x hR i hi)
     (FLatticePaper.W1Exit.rectInputs frame x hopen i hi)
 
+/-- **One fan step keeps the cone** (ALL_SLOPE_STEP, "Propagation"). An even root moves east (`fan_step`), which keeps the cone. An odd
+root moves north or south: north keeps the cone when the height is at most `K−2`, south when it is at least `2`. These two boundary
+facts are the hypotheses `hdown`, `hup`; they are the lower and upper arcs of the fan, not yet proved here. -/
+theorem cone_next_root (b : Site) (K : ℕ) (x w : Site) (hR : ConeRoot b K x)
+    (hw : w = incomingNeg x ∨ w = incomingPos x)
+    (hEven : EvenSite x → w = incomingPos x)
+    (hdown : ¬ EvenSite x → w = incomingNeg x → 2 ≤ x.2 - b.2)
+    (hup : ¬ EvenSite x → w = incomingPos x → x.2 - b.2 ≤ (K : ℤ) - 2) :
+    ConeRoot b K w := by
+  obtain ⟨h1, h2, hev, hodd⟩ := hR
+  by_cases hx : EvenSite x
+  · have hwp := hEven hx
+    subst hwp
+    have hp : incomingPos x = (x.1 + 1, x.2) := by unfold incomingPos; rw [if_pos hx]
+    rw [hp]
+    have hxu : (x.1 + x.2) % 2 = 0 := hx
+    have hl := hev hx
+    refine ⟨by dsimp only; omega, by dsimp only; omega, fun h => ?_, fun _ => ?_⟩
+    · exfalso
+      unfold EvenSite at h
+      dsimp only at h
+      omega
+    · dsimp only
+      omega
+  · have hxo : ¬ (x.1 + x.2) % 2 = 0 := hx
+    have hl := hodd hx
+    rcases hw with hw | hw
+    · have hn : incomingNeg x = (x.1, x.2 - 1) := by unfold incomingNeg; rw [if_neg hx]
+      have hd := hdown hx hw
+      rw [hw, hn]
+      refine ⟨by dsimp only; omega, by dsimp only; omega, fun _ => ?_, fun h => ?_⟩
+      · dsimp only
+        omega
+      · exfalso
+        exact h (by unfold EvenSite; dsimp only; omega)
+    · have hp : incomingPos x = (x.1, x.2 + 1) := by unfold incomingPos; rw [if_neg hx]
+      have hu := hup hx hw
+      rw [hw, hp]
+      refine ⟨by dsimp only; omega, by dsimp only; omega, fun _ => ?_, fun h => ?_⟩
+      · dsimp only
+        omega
+      · exfalso
+        exact h (by unfold EvenSite; dsimp only; omega)
+
 end FLatticePaper.CapRay
