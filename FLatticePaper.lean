@@ -543,6 +543,7 @@ import FLatticePaper.Plane.Induction.CapRecursion
 import FLatticePaper.Plane.Induction.CapAnchors
 import FLatticePaper.Plane.Induction.SheetMonoChild
 import FLatticePaper.Plane.Induction.CapRay
+import FLatticePaper.Plane.Induction.ConeTerminal
 import FLatticePaper.Plane.Induction.StrongPriceInputs
 import FLatticePaper.Plane.Induction.StrongDeckSpan
 import FLatticePaper.Plane.Induction.StrongSourceRep
