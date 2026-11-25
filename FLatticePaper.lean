@@ -577,6 +577,7 @@ import FLatticePaper.Plane.Induction.AuxRank
 import FLatticePaper.Plane.Induction.FreeVPrice
 import FLatticePaper.Plane.Induction.FreeVCover
 import FLatticePaper.Plane.Induction.FirstOfferGrade
+import FLatticePaper.Plane.Induction.FreeHPrice
 import FLatticePaper.TraceHeadline
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame
