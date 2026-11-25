@@ -522,6 +522,8 @@ import FLatticePaper.Plane.Induction.LeftVWebProof
 import FLatticePaper.Plane.Induction.LeftVNegProof
 import FLatticePaper.Plane.Induction.LeftVNegGrade
 import FLatticePaper.Plane.Induction.BoundarySpectrum
+import FLatticePaper.Plane.Induction.CollarTie
+import FLatticePaper.Plane.Induction.Lattice
 import FLatticePaper.Plane.Induction.ConjFreeRoot
 import FLatticePaper.Plane.Induction.EvenWindow
 import FLatticePaper.Plane.Induction.NeighbourDrop
@@ -680,6 +682,7 @@ import FLatticePaper.Plane.Induction.TwosMinusRhoCases
 import FLatticePaper.Plane.Induction.TwosMinusEvenExcl
 import FLatticePaper.Plane.Induction.TwosMinusEvenBlack
 import FLatticePaper.Plane.Induction.TwosMinusOddWhite
+import FLatticePaper.Plane.Induction.TwosMinusEvenWhite
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame
 import FLatticePaper.Plane.Induction.BaseMembership
