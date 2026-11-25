@@ -97,4 +97,70 @@ theorem even_strip {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : 
       rw [hy]
       rcases hε1 with h1 | h1 <;> rw [h1] <;> linarith
 
+/-- **P4, odd roots.** For an odd native V site `z = (x, j)` with `0 ≤ j ≤ L − 2` and the odd window `2 − c ≤ s(z) ≤ L − 2`,
+both `Fp z = h0 z` and `Fp (z − V_q) = h0 (z − V_q)`. -/
+theorem odd_strip {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
+    (z : Site) (hOd : ¬ EvenSite z) (hj0 : 0 ≤ z.2)
+    (hjL : z.2 ≤ (frameAt word).child.den + (frameAt word).child.num - 2)
+    (hs0 : 2 - ((frameAt word).child.den - (frameAt word).child.num) ≤ (frameAt word).sGrade z)
+    (hs1 : (frameAt word).sGrade z ≤ (frameAt word).child.den + (frameAt word).child.num - 2) :
+    FqW word z = harmonicGrid z ∧
+      FqW word (z - ((frameAt word).parents.even.num - (frameAt word).parents.even.den,
+          (frameAt word).parents.even.num + (frameAt word).parents.even.den)) =
+        harmonicGrid (z - ((frameAt word).parents.even.num - (frameAt word).parents.even.den,
+          (frameAt word).parents.even.num + (frameAt word).parents.even.den)) := by
+  have hpos : 0 < (frameAt word).parents.odd.num := frameAt_odd_num_pos h
+  have hodd0 : ((frameAt word).parents.odd.num + (frameAt word).parents.odd.den) % 2 = 1 :=
+    (frameAt word).valid.odd_parity
+  obtain ⟨hDpos, hN0', hNle'⟩ := (frameAt word).valid.odd_bounds
+  obtain ⟨hnn, hnd, -, hd3, -⟩ := (frameAt word).child_facts
+  have hεdet : (frameAt word).eps = (frameAt word).parents.odd.num * (frameAt word).parents.even.den
+      - (frameAt word).parents.odd.den * (frameAt word).parents.even.num :=
+    SheetOffsets.eps_eq_det
+  have hεd : (frameAt word).eps = (frameAt word).parents.odd.num * (frameAt word).child.den
+      - (frameAt word).parents.odd.den * (frameAt word).child.num := by
+    rw [hεdet, ZoneI1.child_den_eq (frameAt word), ZoneI1.child_num_eq (frameAt word)]
+    ring
+  have hε1 : (frameAt word).eps = 1 ∨ (frameAt word).eps = -1 := (frameAt word).eps_unit
+  have hpar : (z.1 + z.2) % 2 = 1 := by
+    unfold EvenSite at hOd
+    omega
+  have hs0' : 2 - ((frameAt word).child.den - (frameAt word).child.num) ≤
+      ((frameAt word).child.den + (frameAt word).child.num) * z.1
+      + ((frameAt word).child.den - (frameAt word).child.num) * z.2 := by
+    have := hs0
+    unfold ChildFrame.sGrade at this
+    exact this
+  have hs1' : ((frameAt word).child.den + (frameAt word).child.num) * z.1
+      + ((frameAt word).child.den - (frameAt word).child.num) * z.2
+      ≤ (frameAt word).child.den + (frameAt word).child.num - 2 := by
+    have := hs1
+    unfold ChildFrame.sGrade at this
+    exact this
+  have hodd : ((frameAt word).parents.odd.den + (frameAt word).parents.odd.num) % 2 = 1 := by omega
+  have hodd' : ((frameAt word).parents.odd.den - (frameAt word).parents.odd.num) % 2 = 1 := by omega
+  have hL : 0 < (frameAt word).child.den + (frameAt word).child.num := by omega
+  obtain ⟨hlo, hhi⟩ := RootClassify.odd_sp_range (frameAt word).parents.odd.num (frameAt word).parents.odd.den
+    (frameAt word).child.num (frameAt word).child.den (frameAt word).eps z.1 z.2 hεd hε1 hN0' hDpos
+    hodd hodd' hL hj0 hjL hs0' hs1' hpar
+  have hD2 : 2 ≤ (frameAt word).parents.odd.den := by omega
+  have hy : ((frameAt word).parents.odd.den + (frameAt word).parents.odd.num) * (z.1 - ((frameAt word).parents.even.num - (frameAt word).parents.even.den))
+      + ((frameAt word).parents.odd.den - (frameAt word).parents.odd.num) * (z.2 - ((frameAt word).parents.even.num + (frameAt word).parents.even.den))
+      = ((frameAt word).parents.odd.den + (frameAt word).parents.odd.num) * z.1
+        + ((frameAt word).parents.odd.den - (frameAt word).parents.odd.num) * z.2 + 2 * (frameAt word).eps := by
+    have E := ClippedCore.sp_Vq (frameAt word).parents.odd.num (frameAt word).parents.odd.den
+      (frameAt word).parents.even.num (frameAt word).parents.even.den
+    linear_combination (-1 : ℤ) * E + (-2 : ℤ) * hεdet
+  constructor
+  · apply FqW_eq_h0 h hSE
+    · linarith
+    · linarith
+  · apply FqW_eq_h0 h hSE
+    · simp only [Prod.fst_sub, Prod.snd_sub]
+      rw [hy]
+      rcases hε1 with h1 | h1 <;> rw [h1] <;> linarith
+    · simp only [Prod.fst_sub, Prod.snd_sub]
+      rw [hy]
+      rcases hε1 with h1 | h1 <;> rw [h1] <;> linarith
+
 end FLatticePaper.ParentStrip

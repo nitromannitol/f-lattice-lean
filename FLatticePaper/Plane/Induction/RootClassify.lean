@@ -81,4 +81,48 @@ theorem even_sp_range (N D n d ε x j : ℤ) (hε : ε = N * d - D * n) (hε1 : 
     · exact hp0
     · omega
 
+/-- **The odd window of the native V spectrum.** For an odd native site `(x, j)` with `0 ≤ j ≤ L − 2` and the odd window
+`2 − c ≤ s ≤ L − 2` (`c = d − n`): `N − D ≤ s_p ≤ D + N` (coarse; the table values are `2 − c_p ≤ s_p ≤ r` for ε = −1 and
+`−c_p ≤ s_p ≤ r − 2` for ε = 1). -/
+theorem odd_sp_range (N D n d ε x j : ℤ) (hε : ε = N * d - D * n) (hε1 : ε = 1 ∨ ε = -1)
+    (hN : 0 ≤ N) (hD : 0 < D) (hodd : (D + N) % 2 = 1) (hodd' : (D - N) % 2 = 1)
+    (hL : 0 < d + n) (hj0 : 0 ≤ j) (hjL : j ≤ d + n - 2)
+    (hs0 : 2 - (d - n) ≤ (d + n) * x + (d - n) * j) (hs1 : (d + n) * x + (d - n) * j ≤ d + n - 2)
+    (hpar : (x + j) % 2 = 1) :
+    N - D ≤ (D + N) * x + (D - N) * j ∧ (D + N) * x + (D - N) * j ≤ D + N := by
+  set L := d + n with hLdef
+  set s := (d + n) * x + (d - n) * j with hsdef
+  set p := (D + N) * x + (D - N) * j with hpdef
+  have hr0 : 0 < D + N := by omega
+  have hid : L * p = (D + N) * s - 2 * ε * j := by
+    rw [hpdef, hsdef, hLdef]
+    exact ordinate_identity N D n d ε x j hε
+  have hcdet : (D + N) * (d - n) = (D - N) * (d + n) + 2 * ε := rc_identity N D n d ε hε
+  have hpar' : p % 2 = 1 := by
+    rw [hpdef, sp_parity (D + N) (D - N) x j hodd hodd', hpar]
+  have hLpos : (0 : ℤ) < L := by rw [hLdef]; exact hL
+  have hsl : (2 - (d - n)) ≤ s := hs0
+  have hsu : s ≤ L - 2 := by rw [hLdef, hsdef] at *; exact hs1
+  have hrs_lo : (D + N) * (2 - (d - n)) ≤ (D + N) * s := mul_le_mul_of_nonneg_left hsl hr0.le
+  have hrs_hi : (D + N) * s ≤ (D + N) * (L - 2) := mul_le_mul_of_nonneg_left hsu hr0.le
+  rcases hε1 with h1 | h1
+  · -- ε = 1: L p = r s − 2 j,  r c = c_p L + 2
+    rw [h1] at hid hcdet
+    constructor
+    · have h2 : L * (N - D - 2) < L * p := by nlinarith
+      have h3 : N - D - 2 < p := lt_of_mul_lt_mul_left h2 hLpos.le
+      omega
+    · have h2 : L * p < L * (D + N + 1) := by nlinarith
+      have h3 : p < D + N + 1 := lt_of_mul_lt_mul_left h2 hLpos.le
+      omega
+  · -- ε = −1: L p = r s + 2 j,  r c = c_p L − 2
+    rw [h1] at hid hcdet
+    constructor
+    · have h2 : L * (N - D - 1) < L * p := by nlinarith
+      have h3 : N - D - 1 < p := lt_of_mul_lt_mul_left h2 hLpos.le
+      omega
+    · have h2 : L * p < L * (D + N + 2) := by nlinarith
+      have h3 : p < D + N + 2 := lt_of_mul_lt_mul_left h2 hLpos.le
+      omega
+
 end FLatticePaper.RootClassify

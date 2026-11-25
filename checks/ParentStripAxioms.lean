@@ -1,3 +1,4 @@
 import FLatticePaper.Plane.Induction.ParentStrip
 
-#print axioms FLatticePaper.ParentStrip.even_strip
+#print axioms FLatticePaper.ParentStrip.odd_strip
+#print axioms FLatticePaper.RootClassify.odd_sp_range
