@@ -619,6 +619,8 @@ import FLatticePaper.Plane.Induction.ExitFree
 import FLatticePaper.Plane.Induction.RowCovariance
 import FLatticePaper.Plane.Induction.SheetLowerBound
 import FLatticePaper.Plane.Induction.ThreeEdgeSquare
+import FLatticePaper.Plane.Induction.DeckParentSquare
+import FLatticePaper.Plane.Induction.WestArrows
 import FLatticePaper.Plane.Induction.GameFort
 import FLatticePaper.Plane.Induction.RetainedCore
 import FLatticePaper.Plane.Induction.H0Core
