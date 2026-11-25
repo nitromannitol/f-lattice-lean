@@ -115,4 +115,58 @@ noncomputable def NoRiseForced (word : Word) : Prop :=
     laplacian (standardField word) c = 0 → FLatticePaper.Induction.Nonfree (frameAt word) c →
     1 ≤ aJump word c → aJump word i = 0 → 1 ≤ BOffer word c → False
 
+/-- **The rounded monotonicity on forced edges (named input `RoundedMonoForced`).** The statement of
+`jminus_nonincrease_forced_of_sat` (ComparisonEmpty.lean:183): for a forced white `c` with forced input `o` in the polygon,
+`roundedSlip(−1)(o) ≤ roundedSlip(−1)(c)`, with `roundedSlip(η)(z) = (slip η z + 1)/2`. Its hypotheses are `HasSatSelection`
+(the Q1 no-fort item) and `hT` of the source lemma. -/
+noncomputable def RoundedMonoForced (word : Word) : Prop :=
+  ∀ c o : Site, c ∈ (frameAt word).closedPolygon → o ∈ (frameAt word).closedPolygon →
+    laplacian (standardField word) c = 0 → SquareClauses.ForcedEdge (standardField word) (fun _ _ => False) c o →
+    (standardField word o - standardField word (o + -(frameAt word).shortShift) + 1) / 2 ≤
+      (standardField word c - standardField word (c + -(frameAt word).shortShift) + 1) / 2
+
+/-- **The sign `−1` permit at a forced nonfree white, from the rise form and the rounding.** The cap `D₋ ∈ [−2, 0]` on the
+polygon (`slip_minus_range`) leaves the drops `2 → 1` (excluded by the rounding) and `1 → 0` (excluded by `NoRiseForced`). -/
+theorem slip_minus_forced_adjacent_rise {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
+    (hW : StrongEstimates word) (hSE : StrongEstimates (conjWord word))
+    (hpk : (frameAt word).Packet (standardField word))
+    {seed : Site → Site → Prop}
+    (P : FLatticePaper.W1Phase.OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
+    (hrise : NoRiseForced word) (hround : RoundedMonoForced word) {c i : Site}
+    (hc : c ∈ (frameAt word).closedPolygon) (hi : i ∈ (frameAt word).closedPolygon)
+    (hcu : c + (frameAt word).uq ∈ (frameAt word).closedPolygon)
+    (hiu : i + (frameAt word).uq ∈ (frameAt word).closedPolygon)
+    (hΨc : 0 ≤ sheetPsi word c) (hΨi : 0 ≤ sheetPsi word i) (hEdge : Edge i c)
+    (hfor : SquareClauses.ForcedEdge (standardField word) (fun _ _ => False) c i)
+    (hlap : laplacian (standardField word) c = 0) (hnf : FLatticePaper.Induction.Nonfree (frameAt word) c)
+    (hout : FLatticePaper.W1Step.sheetOut P (frameAt word).sheetShift (frameAt word).centre (sheetPsi word) c = i) :
+    (frameAt word).slip (standardField word) (-1) i ≤ (frameAt word).slip (standardField word) (-1) c := by
+  have hret := hret_of_sheetOut hSE P hΨc hout
+  have hB := hbmono_of_raw h hSE P.toOldPolicyWitness.toOldPolicyData c i hret
+  have hkey : ¬ (1 ≤ aJump word c ∧ aJump word i = 0 ∧ 1 ≤ BOffer word c) :=
+    fun hh => hrise c i hc hi hcu hiu hΨc hΨi hEdge hfor hlap hnf hh.1 hh.2.1 hh.2.2
+  have hr := hround c i hc hi hlap hfor
+  have hr' : ((frameAt word).slip (standardField word) (-1) i + 1) / 2 ≤
+      ((frameAt word).slip (standardField word) (-1) c + 1) / 2 := by
+    unfold ChildFrame.slip
+    rw [neg_one_smul]
+    exact hr
+  have hDc := slip_minus_range h hSE hpk c hc
+  have hDi := slip_minus_range h hSE hpk i hi
+  have hDc' : -2 ≤ (frameAt word).slip (standardField word) (-1) c ∧
+      (frameAt word).slip (standardField word) (-1) c ≤ 0 := by
+    unfold ChildFrame.slip
+    rw [neg_one_smul, ← sub_eq_add_neg]
+    exact hDc
+  have hDi' : -2 ≤ (frameAt word).slip (standardField word) (-1) i ∧
+      (frameAt word).slip (standardField word) (-1) i ≤ 0 := by
+    unfold ChildFrame.slip
+    rw [neg_one_smul, ← sub_eq_add_neg]
+    exact hDi
+  rw [SignMinusAdjacent.slip_minus_adj_eq h hW hSE hi hiu hΨi] at hr' hDi' ⊢
+  rw [SignMinusAdjacent.slip_minus_adj_eq h hW hSE hc hcu hΨc] at hr' hDc' ⊢
+  unfold aJump BOffer at hkey
+  simp only [FqW] at *
+  omega
+
 end FLatticePaper.W4Reduction
