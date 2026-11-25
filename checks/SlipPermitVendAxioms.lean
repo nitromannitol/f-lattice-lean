@@ -1,0 +1,4 @@
+import FLatticePaper.Plane.Induction.SlipPermitVend
+
+#print axioms FLatticePaper.SlipPermitVend.vLast_add_mem_closedPolygon
+#print axioms FLatticePaper.SlipPermitVend.slip_permit_Vend

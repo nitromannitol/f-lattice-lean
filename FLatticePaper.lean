@@ -594,6 +594,8 @@ import FLatticePaper.Plane.Induction.H0Price1
 import FLatticePaper.Plane.Induction.SlipPermitH
 import FLatticePaper.Plane.Induction.SlipPermitH2
 import FLatticePaper.Plane.Induction.SlipReflectMinus
+import FLatticePaper.Plane.Induction.SlipPermitVend
+import FLatticePaper.Plane.Induction.Sec3Shift
 import FLatticePaper.TraceHeadline
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame
