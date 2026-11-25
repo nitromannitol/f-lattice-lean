@@ -1,5 +1,6 @@
 import FLatticePaper.Plane.Induction.W1Constructor
 import FLatticePaper.Plane.Induction.EPolicyLap
+import FLatticePaper.Plane.Induction.W1OffCollar
 
 /-! # The W1 forcing at the pure-threes children (task 72, W1 base; lead's option (a))
 
@@ -448,5 +449,118 @@ inside the strict interior, with no seeds. -/
 theorem w1Forced_reciprocal (k : ℕ) : W1Forced 1 (2 * (k : ℤ) + 3) (reciprocalField k) := by
   intro z hz hw
   exact ⟨wInside z, forced_claim k _ z rfl hz hw⟩
+
+
+/-! ## The closure (lead item 3): a free H or V vertex is never forced inside the strict interior. -/
+
+open FLatticePaper.W1OffCollar
+
+theorem t_parity (k : ℕ) (x y : ℤ) : (1 * x - (2 * (k : ℤ) + 3) * y) % 2 = (x + y) % 2 := by
+  have e : (2 * (k : ℤ) + 3) * y = 2 * ((k : ℤ) * y) + 3 * y := by ring
+  rw [e]
+  omega
+
+theorem s_parity (k : ℕ) (x y : ℤ) : ((2 * (k : ℤ) + 3 + 1) * x + (2 * (k : ℤ) + 3 - 1) * y) % 2 = 0 := by
+  have e : (2 * (k : ℤ) + 3 + 1) * x + (2 * (k : ℤ) + 3 - 1) * y = 2 * (((k : ℤ) + 2) * x + ((k : ℤ) + 1) * y) := by
+    ring
+  rw [e]
+  omega
+
+theorem si_not_freeHn {k : ℕ} {x y : ℤ} (hS : StrictInterior 1 (2 * (k : ℤ) + 3) (x, y)) :
+    ¬ freeHn 1 (2 * (k : ℤ) + 3) (x, y) := by
+  rintro ⟨-, -, hsp⟩
+  obtain ⟨-, ht, -, -⟩ := hS
+  have hp := t_parity k x y
+  unfold hSp w1t at hsp
+  unfold w1t w1a at ht
+  dsimp only at hsp ht
+  split_ifs at ht with he
+  · have he' : (x + y) % 2 = 0 := he
+    omega
+  · have he' : ¬ (x + y) % 2 = 0 := he
+    omega
+
+theorem closedRect_shift_of_si {k : ℕ} {x y : ℤ} (hS : StrictInterior 1 (2 * (k : ℤ) + 3) (x, y)) :
+    closedRect 1 (2 * (k : ℤ) + 3) (x - 1, y) := by
+  have hsp := s_parity k x y
+  unfold StrictInterior w1b w1T w1t w1a w1s w1h w1c at hS
+  obtain ⟨hA, hB, hC, hD⟩ := hS
+  rw [closedRect_iff]
+  by_cases hp : (x + y) % 2 = 0
+  · have he : EvenSite (x, y) := hp
+    rw [if_pos he] at hA hB hC hD
+    have hne : ¬ EvenSite (x - 1, y) := by
+      unfold EvenSite
+      dsimp only
+      omega
+    right
+    refine ⟨hne, ?_, ?_, ?_, ?_⟩
+    · try unfold w1T
+      try unfold w1t
+      try unfold w1s
+      dsimp only at hA hB hC hD ⊢
+      linarith
+    · try unfold w1T
+      try unfold w1t
+      try unfold w1s
+      dsimp only at hA hB hC hD ⊢
+      linarith
+    · try unfold w1T
+      try unfold w1t
+      try unfold w1s
+      dsimp only at hA hB hC hD hsp ⊢
+      have hs4 : 4 ≤ (2 * (k : ℤ) + 3 + 1) * x + (2 * (k : ℤ) + 3 - 1) * y := by omega
+      linarith
+    · try unfold w1T
+      try unfold w1t
+      try unfold w1s
+      dsimp only at hA hB hC hD ⊢
+      linarith
+  · have he : ¬ EvenSite (x, y) := hp
+    rw [if_neg he] at hA hB hC hD
+    have hse : EvenSite (x - 1, y) := by
+      unfold EvenSite
+      dsimp only
+      omega
+    left
+    refine ⟨hse, ?_, ?_, ?_, ?_⟩
+    · try unfold w1T
+      try unfold w1t
+      try unfold w1s
+      dsimp only at hA hB hC hD ⊢
+      linarith
+    · try unfold w1T
+      try unfold w1t
+      try unfold w1s
+      dsimp only at hA hB hC hD ⊢
+      linarith
+    · try unfold w1T
+      try unfold w1t
+      try unfold w1s
+      dsimp only at hA hB hC hD hsp ⊢
+      have hs1 : 2 * (k : ℤ) + 3 + 1 ≤ (2 * (k : ℤ) + 3 + 1) * x + (2 * (k : ℤ) + 3 - 1) * y := by omega
+      linarith
+    · try unfold w1T
+      try unfold w1t
+      try unfold w1s
+      dsimp only at hA hB hC hD ⊢
+      linarith
+
+theorem not_freeVn_of_si {k : ℕ} {x y : ℤ} (hS : StrictInterior 1 (2 * (k : ℤ) + 3) (x, y)) :
+    ¬ freeVn 1 (2 * (k : ℤ) + 3) (x, y) := by
+  rintro ⟨-, hnot, -⟩
+  exact hnot (closedRect_shift_of_si hS)
+
+/-- The closure: a free H or V vertex is never forced inside the strict interior. -/
+theorem free_not_forced (k : ℕ) (x y : ℤ) (hv : freeHn 1 (2 * (k : ℤ) + 3) (x, y) ∨ freeVn 1 (2 * (k : ℤ) + 3) (x, y))
+    (o : Site) : ¬ ForcedEdgeIn (reciprocalField k) (StrictInterior 1 (2 * (k : ℤ) + 3)) (fun _ _ => False) (x, y) o := by
+  intro h
+  cases h with
+  | seed hs => exact hs
+  | unit inside hR hc hw ho hout hin hforced =>
+    have hS := hR (x, y) hc
+    rcases hv with h | h
+    · exact si_not_freeHn hS h
+    · exact not_freeVn_of_si hS h
 
 end FLatticePaper.W1Reciprocal
