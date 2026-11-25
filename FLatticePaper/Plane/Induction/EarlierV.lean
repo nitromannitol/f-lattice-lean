@@ -8,6 +8,7 @@ import FLatticePaper.Plane.Induction.NonfreeBridge
 import FLatticePaper.Plane.Induction.OddFreeH
 import FLatticePaper.Plane.Induction.StandardField
 import FLatticePaper.Plane.Induction.WordInduction
+import FLatticePaper.Plane.Induction.I3Application
 import FLatticePaper.Plane.Induction.NativeGrade
 import FLatticePaper.Plane.Induction.SheetFacts
 
@@ -26,17 +27,19 @@ namespace FLatticePaper.EarlierV
 open Farey FLatticePaper FLatticePaper.Induction
 
 /-- **E1: the chain identity.** With the orientation of the earlier birth prefix equal to the conjugate's orientation. -/
-theorem earlierP_eq_price_add {word : Word} (hEps : (frameAt (oddBirthPrefix word)).eps = (frameAt (conjWord word)).eps)
-    (z : Site) :
+theorem eps_old_eq_conj (word : Word) : (frameAt (oddBirthPrefix word)).eps = (frameAt (conjWord word)).eps :=
+  (i3_eps_swap (oddBirthPrefix word)).symm
+
+theorem earlierP_eq_price_add {word : Word} (z : Site) :
     FLatticePaper.earlierChainPrice (standardField (conjWord word)) (frameAt (conjWord word)).parents.odd
         (frameAt (oddBirthPrefix word)).eps (frameAt word).eps z =
       (frameAt (conjWord word)).price (standardField (conjWord word)) z +
         (standardField (conjWord word) ((z - (frameAt (conjWord word)).parentShift)) -
           standardField (conjWord word) ((z - (frameAt (conjWord word)).parentShift) +
             (frameAt word).eps • (frameAt (conjWord word)).shortShift)) := by
-  rw [hEps]
   unfold FLatticePaper.earlierChainPrice Farey.earlierChainShift ChildFrame.price ChildFrame.parentSlope
   unfold ChildFrame.parentShift ChildFrame.shortShift Fraction.transverseGrade
+  rw [eps_old_eq_conj word]
   set e' := (frameAt (conjWord word)).eps with he'
   set η := (frameAt word).eps with hη
   set D' := (frameAt (conjWord word)).parents.odd.den with hD'
