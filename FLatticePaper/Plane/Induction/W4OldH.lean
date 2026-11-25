@@ -330,6 +330,73 @@ theorem oldH_star_jumpA (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEst
     rw [hxw, ForcedArrows.incomingPos_add_even hw, jumpA_add_span h hSE, hHP]
     ring
 
+/-- The conjugate `s`-grade of `q` in terms of the native grade: `s'(q) = 2 t_p(ζ⁻¹q) − 2N`. -/
+theorem sGrade_conj_eq (h : ∃ x ∈ word, x ≠ Digit.three) (q : Site) :
+    (frameAt (conjWord word)).sGrade q =
+      2 * (frameAt word).parentTGrade (W1Phase.zTurnInv q) - 2 * (frameAt word).parents.odd.num := by
+  have e := UnitBound.sGrade_conj_zTurn h (W1Phase.zTurnInv q)
+  rw [zTurn_zTurnInv] at e
+  rw [e]
+  unfold ChildFrame.parentTGrade
+  ring
+
+/-- The parity of the native point is the opposite of the parity of `q`: `ζ⁻¹q` is odd exactly when `q` is even. -/
+theorem evenSite_of_not_zTurnInv {q : Site} (ho : ¬ EvenSite (W1Phase.zTurnInv q)) : EvenSite q := by
+  unfold EvenSite W1Phase.zTurnInv at *
+  simp only at *
+  omega
+
+/-- **hRef, proved.** For an odd native point `H = ζ⁻¹q` (so `q` is even), the conjugate window `0 ≤ s' ≤ 2 n'` (`freeV_even_window`)
+with `n' = D − N` gives `t_p(H) ≤ D`. -/
+theorem tp_le_den_of_freeV (h : ∃ x ∈ word, x ≠ Digit.three) {q : Site}
+    (hq : q ∈ (frameAt (conjWord word)).freeV) (ho : ¬ EvenSite (W1Phase.zTurnInv q)) :
+    (frameAt word).parentTGrade (W1Phase.zTurnInv q) ≤ (frameAt word).parents.odd.den := by
+  obtain ⟨h1, h2⟩ := UnitBound.conj_child_sums h
+  obtain ⟨hs0, hs1⟩ := FreeVWindow.freeV_even_window (frameAt (conjWord word)) hq (evenSite_of_not_zTurnInv ho)
+  rw [h2] at hs1
+  have e := sGrade_conj_eq h q
+  omega
+
+/-- The parent `N`, `D` of the conjugate word (from `parentN_conjWord`, `parentD_conjWord`). -/
+theorem parent_of_conj (h : ∃ x ∈ word, x ≠ Digit.three) :
+    parentN (conjWord word) = (frameAt word).parents.odd.num ∧
+      parentD (conjWord word) = (frameAt word).parents.odd.den :=
+  ⟨parentN_conjWord h, parentD_conjWord h⟩
+
+/-- **hTop, proved for every `N`.** The even line `t_p = N + 2D` is the mirror of the even zero line `t_p = −D` (`zeroEvenLine`)
+under `z ↦ I − z`, which sends `t_p` to `N + D − t_p` and keeps the parity; the reflection `F_p(I − z) = F_p(z)` is
+`quarterTurn_I_sub` (from the packet). -/
+theorem quarterTurn_zero_top (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
+    (w : Site) (hw : EvenSite w)
+    (ht : (frameAt word).parentTGrade w = (frameAt word).parents.odd.num + 2 * (frameAt word).parents.odd.den) :
+    quarterTurnField (standardField (conjWord word)) w = 0 := by
+  obtain ⟨hN, hD⟩ := parent_of_conj h
+  have hz : quarterTurnField (standardField (conjWord word)) ((1, -1) - w) = 0 := by
+    apply hSE.zeroEvenLine
+    · unfold EvenSite at hw
+      simp only [Prod.fst_sub, Prod.snd_sub]
+      omega
+    · rw [hN, hD]
+      unfold ChildFrame.parentTGrade at ht
+      simp only [Prod.fst_sub, Prod.snd_sub]
+      linear_combination (-1 : ℤ) * ht
+  rw [← quarterTurn_I_sub (frameAt (conjWord word)) hSE.packet w]
+  exact hz
+
+/-- **The old H star, unconditional (Q35, 50 turned-V roots).** The odd root grade bound `hRef` and the even top line `hTop` are proved
+here (`tp_le_den_of_freeV`, `quarterTurn_zero_top`). -/
+theorem oldH_star_jumpA' (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
+    {q : Site} (hq : q ∈ (frameAt (conjWord word)).freeV) (c1 c2 : ℤ) (x : Site)
+    (hx : zTurn x = q + (c1 * ((frameAt word).parents.odd.den + (frameAt word).parents.odd.num) +
+        c2 * (-2 * (frameAt word).parents.odd.num),
+      c1 * ((frameAt word).parents.odd.den - (frameAt word).parents.odd.num) +
+        c2 * (2 * (frameAt word).parents.odd.den)))
+    (x' : Site) (hx' : x' = FLatticePaper.incomingNeg x ∨ x' = FLatticePaper.incomingPos x) :
+    jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x = -c1 ∧
+      jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x' = -c1 :=
+  oldH_star_jumpA h hSE (fun _ hq ho => tp_le_den_of_freeV h hq ho)
+    (fun _ w hw ht => quarterTurn_zero_top h hSE w hw ht) hq c1 c2 x hx x' hx'
+
 end OldH
 
 end FLatticePaper.W4OldH
