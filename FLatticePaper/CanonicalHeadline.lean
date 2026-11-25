@@ -71,9 +71,7 @@ theorem odometersTheorem_of_canonical
         c + (frameAt word).uq ∈ (frameAt word).closedPolygon → i + (frameAt word).uq ∈ (frameAt word).closedPolygon →
         sheetDiffW word c = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j ≤ -1) → 0 ≤ sheetDiffW word i →
         ∀ v ∈ (frameAt (conjWord word)).child.modifiedDeck.span,
-          zTurn (c - (frameAt word).sheetShift) + v ∈ (frameAt (conjWord word)).freeH → False)
-    (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
-      Induction.S3NoFortInputs (frameAt word) (standardField word)) :
+          zTurn (c - (frameAt word).sheetShift) + v ∈ (frameAt (conjWord word)).freeH → False) :
     OdometersTheorem := by
   -- the twos base inputs: the base slip is proved (twos_baseSlip); the residual comes from the twos games with rank
   have htwoSlip : ∀ k : ℕ, Induction.BaseSlip (List.replicate (k + 1) Digit.two) := fun k => Induction.twos_baseSlip k
@@ -126,6 +124,12 @@ theorem odometersTheorem_of_canonical
             (hcan word hw hn).some (frameAt word).eps (frameAt word).eps_unit)
           (hW1 word hw hn) (hQ21 word hw hn))
         hr hcE hpair.1 hpair.2 hΨc hj
+  -- the S3 no-fort inputs of each proper word: the sign-one canonical policy of its game, with the packet periods
+  have hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      Induction.S3NoFortInputs (frameAt word) (standardField word) :=
+    fun word hw hn => Induction.S3NoFortInputs_of_canonical
+      ((Induction.games_of_gamesWithRank (hgames word hw hn)).some.game 1 (Or.inl rfl)).toCanonicalPolicy
+      (hE word).packet.periods
   exact odometersTheorem_of_policy hpureSlip hpureRes htwoSlip htwoRes hres
     (fun word hw hn => ⟨fun _ _ => False, ⟨Induction.oldPolicyData_of_canonical
       (standardField_reflectI_conj word (hE (conjWord word))) (hcan word hw hn).some (frameAt word).eps
@@ -134,8 +138,7 @@ theorem odometersTheorem_of_canonical
 
 /-- **The odometers theorem with the pure threes inputs discharged (task 71).** The pure threes inputs `BaseSlip` and `StrongResidual`
 come from `pure_threes_final`. The named inputs are `htwoGames` (the twos games with a deck rank; the twos base slip and the twos residual
-follow from it), `hgames` (the proper non-two-power words), `hbd` (Q22), `hW1` (the conjugate `W1Forced`), `hQ21` (the V-block input),
-`hbulk`. -/
+follow from it), `hgames` (the proper non-two-power words), `hbd` (Q22), `hW1` (the conjugate `W1Forced`), `hQ21` (the V-block input). The S3 no-fort inputs are derived from the sign-one games. -/
 theorem odometersTheorem_of_canonical_pure
     (htwoGames : ∀ k : ℕ, Induction.GamesWithRank (List.replicate (k + 1) Digit.two))
     (hgames : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word → Induction.GamesWithRank word)
@@ -150,11 +153,9 @@ theorem odometersTheorem_of_canonical_pure
         c + (frameAt word).uq ∈ (frameAt word).closedPolygon → i + (frameAt word).uq ∈ (frameAt word).closedPolygon →
         sheetDiffW word c = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j ≤ -1) → 0 ≤ sheetDiffW word i →
         ∀ v ∈ (frameAt (conjWord word)).child.modifiedDeck.span,
-          zTurn (c - (frameAt word).sheetShift) + v ∈ (frameAt (conjWord word)).freeH → False)
-    (hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
-      Induction.S3NoFortInputs (frameAt word) (standardField word)) :
+          zTurn (c - (frameAt word).sheetShift) + v ∈ (frameAt (conjWord word)).freeH → False) :
     OdometersTheorem :=
   odometersTheorem_of_canonical FLatticePaper.EPolicy.pure_threes_inputs.1 FLatticePaper.EPolicy.pure_threes_inputs.2
-    htwoGames hgames hbd hW1 hQ21 hbulk
+    htwoGames hgames hbd hW1 hQ21
 
 end FLatticePaper
