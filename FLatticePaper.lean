@@ -651,6 +651,7 @@ import FLatticePaper.Plane.Induction.WestArrows
 import FLatticePaper.Plane.Induction.WestForced
 import FLatticePaper.Plane.Induction.RegionalCompat
 import FLatticePaper.Plane.Induction.WestSelect
+import FLatticePaper.Plane.Induction.ReflectedFan
 import FLatticePaper.Plane.Induction.GameFort
 import FLatticePaper.Plane.Induction.RetainedCore
 import FLatticePaper.Plane.Induction.H0Core
