@@ -3,6 +3,8 @@ import FLatticePaper.Plane.Induction.PriceAtI
 import FLatticePaper.Plane.Induction.StrongPriceInputs
 import FLatticePaper.Plane.Induction.W1Lower
 import FLatticePaper.Plane.Induction.MatchedPolicy
+import FLatticePaper.Plane.Induction.TraceFromPsi
+import FLatticePaper.Plane.Induction.ReflectedFan
 
 /-! # W4 (Q35): the old V star, the bottom case `j = 0`, in the conjugate frame
 
@@ -312,6 +314,122 @@ theorem oldV_bottom_jumpA_policy (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : 
   have hE := east_of_prescription word h P hPres c1 c2 x x' hx' hwhite hpol
   rw [hE]
   exact oldV_bottom_jumpA h hSE c1 c2 x hx
+
+/-! ### Q35, every H label: the trace price, the reflection identity, and the shift bounds -/
+
+/-- **The H-trace price on the conjugate (the trace input, `TraceAt (conjWord word)`).** `P'(z) = c'₀` at `z = (1,0) = H'_0` and
+`P'(z) = c'₀ − 1` at every other conjugate free H point. For `j > 0` the label `H'_j` has first coordinate `j + 1 ≠ 1`. -/
+theorem conj_price_freeH (hTr : TraceFromPsi.TraceAt (conjWord word)) {z : Site}
+    (hz : z ∈ (frameAt (conjWord word)).freeH) :
+    (frameAt (conjWord word)).price (standardField (conjWord word)) z =
+      (frameAt (conjWord word)).cutPrice - (if z = ((1 : ℤ), (0 : ℤ)) then 0 else 1) :=
+  hTr z hz
+
+/-- The reflection of a conjugate free H label: `I − reflH g = g − U'` with `U' = (D+N, D−N)` (`reflH g = U' + I − g`). -/
+theorem reflectionI_sub_reflH (h : ∃ x ∈ word, x ≠ Digit.three) (g : Site) :
+    reflectionI - FLatticePaper.ReflectedFan.reflH (frameAt (conjWord word)) g =
+      g - ((frameAt word).parents.odd.den + (frameAt word).parents.odd.num,
+        (frameAt word).parents.odd.den - (frameAt word).parents.odd.num) := by
+  obtain ⟨h1, h2⟩ := UnitBound.conj_child_sums h
+  unfold FLatticePaper.ReflectedFan.reflH reflectionI
+  rw [h1, h2]
+  refine Prod.ext ?_ ?_ <;> simp <;> ring
+
+/-- **The old V star at every H label (Q35, `a = [g ≠ H'_0] − c₁ − 1`).** Let `g` be a conjugate free H point and let the root be
+`ζx = reflH g + c₁U' + c₂V'`; the reflection `reflH g = U' + I − g` is the label `H'_{r−1−j}` of the old V root. Then
+`a(x) = [g ≠ (1,0)] − c₁ − 1`, which is Q35's `a = m + [j > 0]` with `m = −c₁ − 1`. The trace `TraceAt (conjWord word)` supplies
+`P'(g)`. -/
+theorem oldV_jumpA_of_trace (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
+    (hTr : TraceFromPsi.TraceAt (conjWord word)) (c1 c2 : ℤ) (x : Site) {g : Site}
+    (hg : g ∈ (frameAt (conjWord word)).freeH)
+    (hx : zTurn x = FLatticePaper.ReflectedFan.reflH (frameAt (conjWord word)) g +
+      (c1 * (frameAt (conjWord word)).child.modifiedDeck.kernel.1 +
+          c2 * (frameAt (conjWord word)).child.modifiedDeck.transverse.1,
+        c1 * (frameAt (conjWord word)).child.modifiedDeck.kernel.2 +
+          c2 * (frameAt (conjWord word)).child.modifiedDeck.transverse.2)) :
+    jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x =
+      (if g = ((1 : ℤ), (0 : ℤ)) then 0 else 1) - c1 - 1 := by
+  rw [W4OldH.conj_kernel_eq h, W4OldH.conj_transverse_eq h] at hx
+  have hj : jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x =
+      (frameAt (conjWord word)).cutPrice -
+        (frameAt (conjWord word)).price (standardField (conjWord word)) (reflectionI - zTurn x) := by
+    rw [jumpA_eq_cutPrice h hSE, zTurn_reflect]
+  have hW : reflectionI - zTurn x =
+      (g + ((-c1 - 1) * ((frameAt word).parents.odd.den + (frameAt word).parents.odd.num),
+          (-c1 - 1) * ((frameAt word).parents.odd.den - (frameAt word).parents.odd.num))) +
+        ((-c2) * (-2 * (frameAt word).parents.odd.num), (-c2) * (2 * (frameAt word).parents.odd.den)) := by
+    rw [hx]
+    have h1 := (UnitBound.conj_child_sums h).1
+    have h2 := (UnitBound.conj_child_sums h).2
+    unfold FLatticePaper.ReflectedFan.reflH reflectionI
+    rw [h1, h2]
+    refine Prod.ext ?_ ?_ <;> simp <;> ring
+  have hP : (frameAt (conjWord word)).price (standardField (conjWord word)) (reflectionI - zTurn x) =
+      (frameAt (conjWord word)).price (standardField (conjWord word)) g + c1 + 1 := by
+    rw [hW, priceV_add_smul h hSE _ (-c2), priceU_add_smul h hSE g (-c1 - 1)]
+    ring
+  rw [hj, hP, conj_price_freeH hTr hg]
+  ring
+
+/-- The `j = 0` case (`g = H'_0 = (1,0)`): `a = −c₁ − 1`, as in `oldV_bottom_jumpA`. -/
+theorem oldV_jumpA_zero (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
+    (hTr : TraceFromPsi.TraceAt (conjWord word)) (c1 c2 : ℤ) (x : Site) {g : Site}
+    (hg : g ∈ (frameAt (conjWord word)).freeH) (hg0 : g = ((1 : ℤ), (0 : ℤ)))
+    (hx : zTurn x = FLatticePaper.ReflectedFan.reflH (frameAt (conjWord word)) g +
+      (c1 * (frameAt (conjWord word)).child.modifiedDeck.kernel.1 +
+          c2 * (frameAt (conjWord word)).child.modifiedDeck.transverse.1,
+        c1 * (frameAt (conjWord word)).child.modifiedDeck.kernel.2 +
+          c2 * (frameAt (conjWord word)).child.modifiedDeck.transverse.2)) :
+    jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x = -c1 - 1 := by
+  rw [oldV_jumpA_of_trace h hSE hTr c1 c2 x hg hx, if_pos hg0]
+  ring
+
+/-- The `j > 0` case (`g.1 ≠ 1`, so `g = H'_j ≠ H'_0`): `a = −c₁`, which is `m + 1` with `m = −c₁ − 1` (Q35). -/
+theorem oldV_jumpA_pos (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
+    (hTr : TraceFromPsi.TraceAt (conjWord word)) (c1 c2 : ℤ) (x : Site) {g : Site}
+    (hg : g ∈ (frameAt (conjWord word)).freeH) (hg1 : g.1 ≠ 1)
+    (hx : zTurn x = FLatticePaper.ReflectedFan.reflH (frameAt (conjWord word)) g +
+      (c1 * (frameAt (conjWord word)).child.modifiedDeck.kernel.1 +
+          c2 * (frameAt (conjWord word)).child.modifiedDeck.transverse.1,
+        c1 * (frameAt (conjWord word)).child.modifiedDeck.kernel.2 +
+          c2 * (frameAt (conjWord word)).child.modifiedDeck.transverse.2)) :
+    jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x = -c1 := by
+  have hne : ¬ g = ((1 : ℤ), (0 : ℤ)) := by
+    intro e
+    apply hg1
+    simp [e]
+  rw [oldV_jumpA_of_trace h hSE hTr c1 c2 x hg hx, if_neg hne]
+  ring
+
+/-- **The old V shift bounds (Q35: `k ∈ {0, 1}`).** With `s ∈ [α, β]`, `β − α < K`, and the two polygon inequalities
+`α − s ≤ kK ≤ K + β − s` (at `x = v + kU_p` and `x + U_q`), the shift `k` is `0` or `1`. -/
+theorem k_mem_zero_one (k K α β s : ℤ) (hK : 0 < K) (hαβ : β - α < K) (hs1 : α ≤ s) (hs2 : s ≤ β)
+    (hlo : α - s ≤ k * K) (hhi : k * K ≤ K + β - s) : 0 ≤ k ∧ k ≤ 1 := by
+  constructor
+  · by_contra hneg
+    have hk : k ≤ -1 := by omega
+    have : k * K ≤ -K := by nlinarith
+    linarith
+  · by_contra hbig
+    have hk : 2 ≤ k := by omega
+    have : 2 * K ≤ k * K := by nlinarith
+    linarith
+
+/-- **The offer `B` fixes the shift (Q35, display (1)).** With `ε = 2W − 1` (so `W = 1 ↔ ε = 1`), `k ∈ {0,1}` and `B = 2W − 2εk ≥ 1`:
+`W = 1` forces `k = 0` and `W = 0` forces `k = 1`. -/
+theorem B_forces_k (W ε k : ℤ) (hW : W = 0 ∨ W = 1) (hε : ε = 2 * W - 1) (hk : 0 ≤ k ∧ k ≤ 1)
+    (hB : 1 ≤ 2 * W - 2 * ε * k) : (W = 1 → k = 0) ∧ (W = 0 → k = 1) := by
+  rcases hW with rfl | rfl
+  · have hε' : ε = -1 := by omega
+    subst hε'
+    constructor
+    · intro h; norm_num at h
+    · intro _; nlinarith [hk.1, hk.2]
+  · have hε' : ε = 1 := by omega
+    subst hε'
+    constructor
+    · intro _; nlinarith [hk.1, hk.2]
+    · intro h; norm_num at h
 
 end OldV
 

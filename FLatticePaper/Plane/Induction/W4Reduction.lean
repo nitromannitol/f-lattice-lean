@@ -105,7 +105,9 @@ theorem slip_minus_forced_adjacent_sheetOut {word : Word} (h : ∃ x ∈ word, x
 
 /-- **The rise form of the a-fall exclusion (the named input `hnofall_forced`, rise form).** A rise `a(x) ≥ 1`, `a(x') = 0`,
 `B(x) ≥ 1` on a forced nonfree `A`-edge does not occur. Numerically the rise population is empty (no pair among 1378). The reduction
-`slip_minus_forced_adjacent` still uses `NoAFallForced`: a fall `2 → 1` with `B ≥ 2` is not a rise and needs the rounding argument. -/
+`slip_minus_forced_adjacent` still uses `NoAFallForced`: a fall `2 → 1` with `B ≥ 2` is not a rise and needs the rounding argument.
+
+**Strictness `hSI` is an input of the caller.** A forced edge `ForcedEdge` has no region, so the reduction does not derive `StrictInterior` at `c`. The supply (the lead's argument, not formalised here): every nonfree white has a deck translate in the closed polygon (`PeriodDeck.exists_square_representative`, quotient coverage); a closed nonfree site is strict, since `BoundarySpectrum.spectrum_even` and `spectrum_odd` put every closed site with an outside 4-neighbour in `freeH`, `freeV`, `freeV + K` or `freeH + V`; and the deck invariance of the permit transfers nonfreeness to the translate. With that, `hSI` is supplied. -/
 noncomputable def NoRiseForced {word : Word} {seed : Site → Site → Prop}
     (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps) : Prop :=
   ∀ c i : Site,
@@ -129,7 +131,9 @@ noncomputable def RoundedMonoForced (word : Word) : Prop :=
       (standardField word c - standardField word (c + -(frameAt word).shortShift) + 1) / 2
 
 /-- **The sign `−1` permit at a forced nonfree white, from the rise form and the rounding.** The cap `D₋ ∈ [−2, 0]` on the
-polygon (`slip_minus_range`) leaves the drops `2 → 1` (excluded by the rounding) and `1 → 0` (excluded by `NoRiseForced`). -/
+polygon (`slip_minus_range`) leaves the drops `2 → 1` (excluded by the rounding) and `1 → 0` (excluded by `NoRiseForced`).
+
+**Strictness `hSI` is an input of the caller.** A forced edge `ForcedEdge` has no region, so the reduction does not derive `StrictInterior` at `c`. The supply (the lead's argument, not formalised here): every nonfree white has a deck translate in the closed polygon (`PeriodDeck.exists_square_representative`, quotient coverage); a closed nonfree site is strict, since `BoundarySpectrum.spectrum_even` and `spectrum_odd` put every closed site with an outside 4-neighbour in `freeH`, `freeV`, `freeV + K` or `freeH + V`; and the deck invariance of the permit transfers nonfreeness to the translate. With that, `hSI` is supplied. -/
 theorem slip_minus_forced_adjacent_rise {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hW : StrongEstimates word) (hSE : StrongEstimates (conjWord word))
     (hpk : (frameAt word).Packet (standardField word))
