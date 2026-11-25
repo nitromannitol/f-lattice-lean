@@ -2,17 +2,19 @@ import FLatticePaper.Plane.Induction.CapRecursion
 import FLatticePaper.Plane.Induction.CapAnchors
 import FLatticePaper.Plane.Induction.PriceDeck
 import FLatticePaper.Plane.Induction.Packet
+import FLatticePaper.Plane.Induction.SheetMonoChild
 
 /-! The diagonal ray of the all-slope cap on a frame's packet (ALL_SLOPE_STEP, "The uniform quadratic cap", the high-slope case `d > 3n`
 with `(N, D, a) = (n, d, 2)`).
 
 Start: integers `p, q` with `N p − D q = 2 − N` (possible since `N, D` are coprime). The ray sites `(p+k, q+k)` are odd, with t-grade
 `2 − N − kC`, `C = D − N`; the even sites `(p+j+1, q+j)` have t-grade `2 − jC`. The strips and anchors come from the packet
-(`zero_value`, `anchor_value`, `anchor_value_odd`); the sheet monotonicities are the named inputs `SheetMono`, `SheetMonoOdd` (Q26). -/
+(`zero_value`, `anchor_value`, `anchor_value_odd`); the sheet monotonicities are derived from the signed comparison `hsig` (Q26). -/
 
 namespace FLatticePaper.CapRay
 
 open FLatticePaper FLatticePaper.Induction FLatticePaper.CapAnchors FLatticePaper.CapRecursion
+open FLatticePaper.SheetMonoChild
 
 /-- The numerator and denominator of a proper child are odd (the child is even: `n + d` even, and coprime). -/
 theorem child_num_den_odd (frame : ChildFrame) :
@@ -36,10 +38,10 @@ theorem start_parity (frame : ChildFrame) {p q : ℤ} (hs : frame.child.num * p 
 
 /-- **The diagonal cap of the high-slope ray.** With `p, q` the start (`ray_start`), the even ray sites, the odd ray sites and their anchors
 satisfy `m(k) ≤ F(p+k, q+k)` for all `k ≤ K`. The zero strip and the harmonic anchors come from `frame.Packet` (`hP`); the sheet
-monotonicities are named (`SheetMono`, `SheetMonoOdd`, Q26). The bounds `J, K` are the integer ranges of the anchors:
+monotonicities come from `hsig` (Q26). The bounds `J, K` are the integer ranges of the anchors:
 `2N J ≤ N + D − 2 < 2N (J+1)` and `2N K ≤ 3D + 3N − 1`. Hypotheses `3 ≤ N`, `4 ≤ D − N` are the proper nonbase conditions. -/
 theorem ray_cap (frame : ChildFrame) {F : Field} (hP : frame.Packet F)
-    (hodd : SheetMonoOdd frame F) (heven : SheetMono frame F)
+    (hsig : ∀ w ∈ frame.closedPolygon, F w - F (w - frame.shortShift) ≤ 0)
     (hN3 : 3 ≤ frame.child.num) (hND : 4 ≤ frame.child.den - frame.child.num)
     {p q : ℤ} (hs : frame.child.num * p - frame.child.den * q = 2 - frame.child.num)
     (J K : ℕ)
@@ -47,6 +49,8 @@ theorem ray_cap (frame : ChildFrame) {F : Field} (hP : frame.Packet F)
     (hJ2 : frame.child.num + frame.child.den - 2 < 2 * frame.child.num * ((J : ℤ) + 1))
     (hK : 2 * frame.child.num * (K : ℤ) ≤ 3 * frame.child.den + 3 * frame.child.num - 1) :
     ∀ k : ℕ, k ≤ K → FLatticePaper.QuadraticCap.capMin k ≤ F (p + (k : ℤ), q + (k : ℤ)) := by
+  have hodd := sheetMono_odd_of_signed frame hP hsig
+  have heven := sheetMono_even_of_signed frame hP hsig
   obtain ⟨N, hN⟩ : ∃ N, frame.child.num = N := ⟨_, rfl⟩
   obtain ⟨D, hD⟩ : ∃ D, frame.child.den = D := ⟨_, rfl⟩
   have tg : ∀ x y : ℤ, frame.tGrade (x, y) = N * x - D * y := fun x y => by
@@ -56,7 +60,7 @@ theorem ray_cap (frame : ChildFrame) {F : Field} (hP : frame.Packet F)
   have hbin := hP.binary
   have hN0 : 0 < N := by omega
   have hND' : N < D := by omega
-  -- the diagonal monotonicity of the odd sheet on the ray (named input `SheetMonoOdd`)
+  -- the diagonal monotonicity of the odd sheet on the ray (from `hsig`)
   have hmono : ∀ n : ℕ, n ≤ J → F (p + (n : ℤ), q + ((n : ℤ) + 2)) ≤ F (p + ((n : ℤ) + 2), q + ((n : ℤ) + 2)) := by
     intro n hn
     have hn0 : (0 : ℤ) ≤ (n : ℤ) := by positivity
@@ -117,16 +121,17 @@ theorem ray_cap (frame : ChildFrame) {F : Field} (hP : frame.Packet F)
 
 /-- **The odd halo cap** (ALL_SLOPE_STEP, "Why this scalar cap kills all long forks", the odd inputs of the fan): an odd site `z` whose
 t'-grade is at least the odd threshold `2 − N − kC` (the grade of the ray point of height `k`) and at most the top of the zero strip
-satisfies `m(k) ≤ F z`. Negative grades: the odd sheet monotonicity (`SheetMonoOdd`, Q26) against the ray point, whose cap is the
+satisfies `m(k) ≤ F z`. Negative grades: the odd sheet monotonicity (`hsig`, Q26) against the ray point, whose cap is the
 hypothesis `hcap` (`ray_cap`). Nonnegative grades: the zero strip, and `m(k) ≤ 0`. -/
 theorem odd_halo (frame : ChildFrame) {F : Field} (hP : frame.Packet F)
-    (hodd : SheetMonoOdd frame F)
+    (hsig : ∀ w ∈ frame.closedPolygon, F w - F (w - frame.shortShift) ≤ 0)
     {p q : ℤ} (hs : frame.child.num * p - frame.child.den * q = 2 - frame.child.num) (K : ℕ)
     (hcap : ∀ k : ℕ, k ≤ K → FLatticePaper.QuadraticCap.capMin k ≤ F (p + (k : ℤ), q + (k : ℤ)))
     (k : ℕ) (hk : k ≤ K) (z : Site) (hz : ¬ EvenSite z)
     (hlo : 2 - frame.child.num - (k : ℤ) * (frame.child.den - frame.child.num) ≤ frame.tGrade z)
     (hup : frame.tGrade z ≤ frame.child.num + 2 * frame.child.den - 1) :
     FLatticePaper.QuadraticCap.capMin k ≤ F z := by
+  have hodd := sheetMono_odd_of_signed frame hP hsig
   have hpq := start_parity frame hs
   have hr : ¬ EvenSite (p + (k : ℤ), q + (k : ℤ)) := by unfold EvenSite; simp only; omega
   have hrt : frame.tGrade (p + (k : ℤ), q + (k : ℤ))
@@ -157,7 +162,7 @@ theorem kC_nonneg (frame : ChildFrame) (k : ℕ) : 0 ≤ (k : ℤ) * (frame.chil
 /-- **The even ray value** (ALL_SLOPE_STEP, the even centres `B_k`: "both odd inputs have heights at least `A_k`, admission gives
 `B_k ≥ m(k)`"). The even ray point `(p+k+1, q+k)` has the odd west input `(p+k, q+k)` (on the ray, `ray_cap`) and the odd east input of
 grade `2+N−kC`, which the odd halo (`odd_halo`) bounds below by `m(k)`. The binary laplacian gives `2 F c ≥ F(west) + F(east)`. -/
-theorem even_ray_lower (frame : ChildFrame) {F : Field} (hP : frame.Packet F) (hodd : SheetMonoOdd frame F)
+theorem even_ray_lower (frame : ChildFrame) {F : Field} (hP : frame.Packet F) (hsig : ∀ w ∈ frame.closedPolygon, F w - F (w - frame.shortShift) ≤ 0)
     {p q : ℤ} (hs : frame.child.num * p - frame.child.den * q = 2 - frame.child.num) (K : ℕ)
     (hcap : ∀ k : ℕ, k ≤ K → FLatticePaper.QuadraticCap.capMin k ≤ F (p + (k : ℤ), q + (k : ℤ)))
     (k : ℕ) (hk : k ≤ K) :
@@ -178,28 +183,29 @@ theorem even_ray_lower (frame : ChildFrame) {F : Field} (hP : frame.Packet F) (h
   have hrtE : frame.tGrade (p + (k : ℤ) + 2, q + (k : ℤ))
       = 2 + frame.child.num - (k : ℤ) * (frame.child.den - frame.child.num) := by
     simp only [ChildFrame.tGrade]; linear_combination hs
-  have hE := odd_halo frame hP hodd hs K hcap k hk (p + (k : ℤ) + 2, q + (k : ℤ)) hzo
+  have hE := odd_halo frame hP hsig hs K hcap k hk (p + (k : ℤ) + 2, q + (k : ℤ)) hzo
     (by rw [hrtE]; linarith)
     (by rw [hrtE]; nlinarith)
   rcases hb with h | h <;> linarith
 
 /-- **The even halo cap** (ALL_SLOPE_STEP, the even inputs of the fan): an even site `z` whose t'-grade is at least `2 − kC` (the grade of
 the even ray point of height `k`) and at most the top of the zero strip satisfies `m(k) ≤ F z`. Negative grades: the even sheet
-monotonicity (`SheetMono`, Q26) against the even ray point, whose value is `even_ray_lower`. Nonnegative grades: the zero strip. -/
+monotonicity (`hsig`, Q26) against the even ray point, whose value is `even_ray_lower`. Nonnegative grades: the zero strip. -/
 theorem even_halo (frame : ChildFrame) {F : Field} (hP : frame.Packet F)
-    (hodd : SheetMonoOdd frame F) (heven : SheetMono frame F)
+    (hsig : ∀ w ∈ frame.closedPolygon, F w - F (w - frame.shortShift) ≤ 0)
     {p q : ℤ} (hs : frame.child.num * p - frame.child.den * q = 2 - frame.child.num) (K : ℕ)
     (hcap : ∀ k : ℕ, k ≤ K → FLatticePaper.QuadraticCap.capMin k ≤ F (p + (k : ℤ), q + (k : ℤ)))
     (k : ℕ) (hk : k ≤ K) (z : Site) (hz : EvenSite z)
     (hlo : 2 - (k : ℤ) * (frame.child.den - frame.child.num) ≤ frame.tGrade z)
     (hup : frame.tGrade z ≤ frame.child.num + 2 * frame.child.den - 1) :
     FLatticePaper.QuadraticCap.capMin k ≤ F z := by
+  have heven := sheetMono_even_of_signed frame hP hsig
   have hpq := start_parity frame hs
   have hr : EvenSite (p + (k : ℤ) + 1, q + (k : ℤ)) := by unfold EvenSite; simp only; omega
   have hrt : frame.tGrade (p + (k : ℤ) + 1, q + (k : ℤ))
       = 2 - (k : ℤ) * (frame.child.den - frame.child.num) := by
     simp only [ChildFrame.tGrade]; linear_combination hs
-  have hR := even_ray_lower frame hP hodd hs K hcap k hk
+  have hR := even_ray_lower frame hP hsig hs K hcap k hk
   by_cases hz0 : frame.tGrade z ≤ 0
   · have hF := heven (p + (k : ℤ) + 1, q + (k : ℤ)) z hr hz (by rw [hrt]; exact hlo) hz0
     exact hR.trans hF
