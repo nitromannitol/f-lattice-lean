@@ -103,4 +103,16 @@ theorem slip_minus_forced_adjacent_sheetOut {word : Word} (h : ∃ x ∈ word, x
   slip_minus_forced_adjacent h hW hSE P.toOldPolicyWitness.toOldPolicyData hnofall hc hi hcu hiu hΨc hΨi hEdge hfor hlap hnf
     (hret_of_sheetOut hSE P hΨc hout)
 
+/-- **The rise form of the a-fall exclusion (the named input `hnofall_forced`, rise form).** A rise `a(x) ≥ 1`, `a(x') = 0`,
+`B(x) ≥ 1` on a forced nonfree `A`-edge does not occur. Numerically the rise population is empty (no pair among 1378). The reduction
+`slip_minus_forced_adjacent` still uses `NoAFallForced`: a fall `2 → 1` with `B ≥ 2` is not a rise and needs the rounding argument. -/
+noncomputable def NoRiseForced (word : Word) : Prop :=
+  ∀ c i : Site,
+    c ∈ (frameAt word).closedPolygon → i ∈ (frameAt word).closedPolygon →
+    c + (frameAt word).uq ∈ (frameAt word).closedPolygon → i + (frameAt word).uq ∈ (frameAt word).closedPolygon →
+    0 ≤ sheetPsi word c → 0 ≤ sheetPsi word i → Edge i c →
+    SquareClauses.ForcedEdge (standardField word) (fun _ _ => False) c i →
+    laplacian (standardField word) c = 0 → FLatticePaper.Induction.Nonfree (frameAt word) c →
+    1 ≤ aJump word c → aJump word i = 0 → 1 ≤ BOffer word c → False
+
 end FLatticePaper.W4Reduction
