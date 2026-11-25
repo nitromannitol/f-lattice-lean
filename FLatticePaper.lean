@@ -313,6 +313,12 @@ import FLatticePaper.Tiles.SubWalkOddCrit
 import FLatticePaper.Tiles.SubWalkOddBlocks
 import FLatticePaper.Tiles.SubWalkOddBound
 import FLatticePaper.Tiles.SubOddCopy
+import FLatticePaper.Tiles.CellFourEven
+import FLatticePaper.Tiles.SubBlockEven
+import FLatticePaper.Tiles.SubCeilEven
+import FLatticePaper.Tiles.SubWalkEven
+import FLatticePaper.Tiles.SubEvenCopy
+import FLatticePaper.Tiles.SeamSub
 import FLatticePaper.Plane.Induction.CornerPositive
 import FLatticePaper.Tiles.InterfaceStacked
 import FLatticePaper.Tiles.StringCorners
