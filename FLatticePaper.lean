@@ -298,6 +298,13 @@ import FLatticePaper.Tiles.ArcInequality
 import FLatticePaper.Tiles.CheckerFree
 import FLatticePaper.Tiles.SeamFinal
 import FLatticePaper.Tiles.SeamBase
+import FLatticePaper.Tiles.CellFourTests
+import FLatticePaper.Tiles.PairRule
+import FLatticePaper.Tiles.GHJoin
+import FLatticePaper.Tiles.RegisterLink
+import FLatticePaper.Tiles.RegisterIdentity
+import FLatticePaper.Tiles.RegisterStep
+import FLatticePaper.Plane.Induction.CornerPositive
 import FLatticePaper.Tiles.InterfaceStacked
 import FLatticePaper.Tiles.StringCorners
 import FLatticePaper.Tiles.SeamSymm
@@ -523,6 +530,10 @@ import FLatticePaper.Plane.Induction.FreeHWhite
 import FLatticePaper.Plane.Induction.NegTieFreeV
 import FLatticePaper.Plane.Induction.NegTieTranslate
 import FLatticePaper.Plane.Induction.NegTieSpan
+import FLatticePaper.Plane.Induction.FreeHBox
+import FLatticePaper.Plane.Induction.NegTieHCut
+import FLatticePaper.Plane.Induction.FreeVReverse
+import FLatticePaper.Plane.Induction.NegTieHCutFinal
 import FLatticePaper.Plane.Induction.HResPWire
 import FLatticePaper.Plane.Induction.HResNCases
 import FLatticePaper.Plane.Induction.TwosRank
@@ -541,6 +552,12 @@ import FLatticePaper.Plane.Induction.TwosTileColour
 import FLatticePaper.Plane.Induction.TwosTileSel
 import FLatticePaper.Plane.Induction.TwosPriceBand
 import FLatticePaper.Plane.Induction.CapRecursion
+import FLatticePaper.Plane.Induction.CapAnchors
+import FLatticePaper.Plane.Induction.SheetMonoChild
+import FLatticePaper.Plane.Induction.CapRay
+import FLatticePaper.Plane.Induction.ConeTerminal
+import FLatticePaper.Plane.Induction.ShortRoute
+import FLatticePaper.Plane.Induction.H0Core
 import FLatticePaper.Plane.Induction.StrongPriceInputs
 import FLatticePaper.Plane.Induction.StrongDeckSpan
 import FLatticePaper.Plane.Induction.StrongSourceRep
