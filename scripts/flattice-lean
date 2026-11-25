@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-set -eu
-campaign_root=/home/nitro/flattice-lean
-if ! tmux has-session -t '=flattice-lean' 2>/dev/null; then
-    tmux new-session -d -s flattice-lean -c "$campaign_root" -x 128 -y 40 "$campaign_root/scripts/open_sandbox.sh" || tmux has-session -t '=flattice-lean'
-fi
-if test -n "$TMUX"; then exec tmux switch-client -t '=flattice-lean'; fi
-exec tmux attach-session -t '=flattice-lean'
