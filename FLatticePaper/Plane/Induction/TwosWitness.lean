@@ -801,4 +801,188 @@ theorem twos_sub_US_0 (k m : ℕ)
           omega
       · exact Or.inl h1
 
+
+/-- The sub-case `US` with `h = a + 1` and `x ≠ 0`: the witness square has the centre as its south-east corner, `(x-1,y)` (index 1). -/
+theorem twos_sub_US_h (k m : ℕ)
+    (ih : ∀ m' < m, ∀ c : Site, (twGrade (2 * (k : ℤ) + 4) c).toNat = m' →
+      StrictInterior (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 5) c → laplacian (twF k) c = 0 →
+      ForcedEdgeIn (twF k) (StrictInterior (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 5)) (fun _ _ => False) c
+        (twArrow (2 * (k : ℤ) + 4) c))
+    {x y : ℤ} (hm : (twGrade (2 * (k : ℤ) + 4) (x, y)).toNat = m)
+    (hcl : TwosClUS (2 * (k : ℤ) + 4) x y) (hh : y - x = 2 * (k : ℤ) + 5) (hx0 : x ≠ 0)
+    (hS : StrictInterior (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 5) (x, y)) :
+    ForcedEdgeIn (twF k) (StrictInterior (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 5)) (fun _ _ => False) (x, y)
+      (twArrow (2 * (k : ℤ) + 4) (x, y)) := by
+  obtain ⟨d1, d2, d3, d4, d5, d6, d7⟩ := hcl
+  have hcl' : TwosClUS (2 * (k : ℤ) + 4) x y := ⟨d1, d2, d3, d4, d5, d6, d7⟩
+  have hw : laplacian (twF k) (x, y) = 0 := (twos_lap_odd_iff hS d1).2 (Or.inr (Or.inr (Or.inl hcl')))
+  have hk0 : (0 : ℤ) ≤ (k : ℤ) := by positivity
+  have hx1 : 1 ≤ x := by omega
+  have hax : (2 * (k : ℤ) + 4) * 1 ≤ (2 * (k : ℤ) + 4) * x := mul_le_mul_of_nonneg_left hx1 (by omega)
+  have hax' : (2 * (k : ℤ) + 4) * x ≤ (2 * (k : ℤ) + 4) * (2 * (k : ℤ) + 3) :=
+    mul_le_mul_of_nonneg_left (by omega) (by omega)
+  obtain ⟨⟨hu1, hu2⟩, -, hOd⟩ := (strictInterior_twos_iff (a := 2 * (k : ℤ) + 4) (by ring) (by ring) x y).1 hS
+  -- the corners of the square with south-east corner (x, y): (x-1, y), (x-1, y+1), (x, y+1)
+  have s1 : StrictInterior (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 5) (x - 1, y) :=
+    (strictInterior_twos_iff (a := 2 * (k : ℤ) + 4) (by ring) (by ring) (x - 1) y).2
+      ⟨⟨by nlinarith [hax, hax', hu1, hu2], by nlinarith [hax, hax', hu1, hu2]⟩,
+        fun _ => ⟨by nlinarith [hax, hax', hu1, hu2, hh], by nlinarith [hax, hax', hu1, hu2, hh]⟩,
+        fun h => absurd (by omega) h⟩
+  have s2 : StrictInterior (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 5) (x - 1, y + 1) :=
+    (strictInterior_twos_iff (a := 2 * (k : ℤ) + 4) (by ring) (by ring) (x - 1) (y + 1)).2
+      ⟨⟨by nlinarith [hax, hax', hu1, hu2], by nlinarith [hax, hax', hu1, hu2]⟩,
+        fun h => absurd h (by omega), fun _ => ⟨by nlinarith [hax, hax', hu1, hu2, hh], by nlinarith [hax, hax', hu1, hu2, hh]⟩⟩
+  have s3 : StrictInterior (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 5) (x, y + 1) :=
+    (strictInterior_twos_iff (a := 2 * (k : ℤ) + 4) (by ring) (by ring) x (y + 1)).2
+      ⟨⟨by nlinarith [hax, hax', hu1, hu2], by nlinarith [hax, hax', hu1, hu2]⟩,
+        fun _ => ⟨by nlinarith [hax, hax', hu1, hu2, hh], by nlinarith [hax, hax', hu1, hu2, hh]⟩,
+        fun h => absurd (by omega) h⟩
+  refine twForced_of_square k m ih hm (p := x - 1) (q := y) (by simp [squareCorners]) hw ?_ ?_ ?_
+  · intro c' hc'
+    simp only [squareCorners, Finset.mem_insert, Finset.mem_singleton] at hc'
+    rcases hc' with rfl | rfl | rfl | rfl <;> try simp only [sub_add_cancel]
+    · exact s1
+    · exact hS
+    · exact s2
+    · exact s3
+  · rw [twArrow_US hcl']
+    simp only [squareCorners, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq]
+    omega
+  · intro c' hc' hne
+    simp only [squareCorners, Finset.mem_insert, Finset.mem_singleton] at hc'
+    rcases hc' with rfl | rfl | rfl | rfl <;> try simp only [sub_add_cancel] at hne ⊢
+    · -- the corner (x-1, y): even, black (its class would need h = a-2 or a, but h = a+2)
+      have hpc : (x - 1 + y) % 2 = 0 := by omega
+      rcases twos_lap_zero_or_neg s1 with h0 | h1
+      · rcases (twos_lap_even_iff s1 hpc).1 h0 with hc | hc
+        · obtain ⟨e1, e2, e3, e4⟩ := hc
+          exfalso
+          omega
+        · obtain ⟨e1, e2, e3, e4⟩ := hc
+          exfalso
+          omega
+      · exact Or.inl h1
+    · exact absurd rfl hne
+    · -- the corner (x-1, y+1): odd, white `US` (arrow south, to (x-1, y) in the square) or black
+      have hpc : ¬ (x - 1 + (y + 1)) % 2 = 0 := by omega
+      rcases twos_lap_zero_or_neg s2 with h0 | h1
+      · rcases (twos_lap_odd_iff s2 hpc).1 h0 with hc | hc | hc | hc
+        · obtain ⟨e1, e2, e3, e4, e5, e6, e7⟩ := hc
+          exfalso
+          omega
+        · obtain ⟨e1, e2, e3, e4, e5, e6, e7⟩ := hc
+          exfalso
+          omega
+        · obtain ⟨e1, e2, e3, e4, e5, e6, e7⟩ := hc
+          right
+          refine ⟨h0, ?_, ?_, ?_⟩
+          · rw [twArrow_US ⟨e1, e2, e3, e4, e5, e6, e7⟩]
+            simp [squareCorners]
+          · rw [twGrade_US ⟨e1, e2, e3, e4, e5, e6, e7⟩]
+            split_ifs <;> omega
+          · rw [twGrade_US ⟨e1, e2, e3, e4, e5, e6, e7⟩, twGrade_US hcl']
+            split_ifs <;> omega
+        · obtain ⟨e1, e2, e3, e4, e5, e6, e7⟩ := hc
+          exfalso
+          omega
+      · exact Or.inl h1
+    · -- the corner (x, y+1): even, black (h = a+2)
+      have hpc : (x + (y + 1)) % 2 = 0 := by omega
+      rcases twos_lap_zero_or_neg s3 with h0 | h1
+      · rcases (twos_lap_even_iff s3 hpc).1 h0 with hc | hc
+        · obtain ⟨e1, e2, e3, e4⟩ := hc
+          exfalso
+          omega
+        · obtain ⟨e1, e2, e3, e4⟩ := hc
+          exfalso
+          omega
+      · exact Or.inl h1
+/-- The generic sub-case `US` (`x ≠ 0`, `h ≠ a + 1`): the witness square has the centre as its south-west corner (index 0). -/
+theorem twos_sub_US (k m : ℕ)
+    (ih : ∀ m' < m, ∀ c : Site, (twGrade (2 * (k : ℤ) + 4) c).toNat = m' →
+      StrictInterior (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 5) c → laplacian (twF k) c = 0 →
+      ForcedEdgeIn (twF k) (StrictInterior (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 5)) (fun _ _ => False) c
+        (twArrow (2 * (k : ℤ) + 4) c))
+    {x y : ℤ} (hm : (twGrade (2 * (k : ℤ) + 4) (x, y)).toNat = m)
+    (hcl : TwosClUS (2 * (k : ℤ) + 4) x y) (hh : y - x ≠ 2 * (k : ℤ) + 5)
+    (hS : StrictInterior (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 5) (x, y)) :
+    ForcedEdgeIn (twF k) (StrictInterior (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 5)) (fun _ _ => False) (x, y)
+      (twArrow (2 * (k : ℤ) + 4) (x, y)) := by
+  obtain ⟨d1, d2, d3, d4, d5, d6, d7⟩ := hcl
+  have hcl' : TwosClUS (2 * (k : ℤ) + 4) x y := ⟨d1, d2, d3, d4, d5, d6, d7⟩
+  have hw : laplacian (twF k) (x, y) = 0 := (twos_lap_odd_iff hS d1).2 (Or.inr (Or.inr (Or.inl hcl')))
+  obtain ⟨⟨hu1, hu2⟩, -, hOd⟩ := (strictInterior_twos_iff (a := 2 * (k : ℤ) + 4) (by ring) (by ring) x y).1 hS
+  obtain ⟨ht1, ht2⟩ := hOd d1
+  have s1 : StrictInterior (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 5) (x + 1, y) :=
+    (strictInterior_twos_iff (a := 2 * (k : ℤ) + 4) (by ring) (by ring) (x + 1) y).2
+      ⟨⟨by nlinarith, by nlinarith⟩, fun _ => ⟨by nlinarith, by nlinarith⟩, fun h => absurd (by omega) h⟩
+  have s2 : StrictInterior (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 5) (x, y + 1) :=
+    (strictInterior_twos_iff (a := 2 * (k : ℤ) + 4) (by ring) (by ring) x (y + 1)).2
+      ⟨⟨by nlinarith, by nlinarith⟩, fun _ => ⟨by nlinarith, by nlinarith⟩, fun h => absurd (by omega) h⟩
+  have s3 : StrictInterior (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 5) (x + 1, y + 1) :=
+    (strictInterior_twos_iff (a := 2 * (k : ℤ) + 4) (by ring) (by ring) (x + 1) (y + 1)).2
+      ⟨⟨by nlinarith, by nlinarith⟩, fun h => absurd h (by omega), fun _ => ⟨by nlinarith, by nlinarith⟩⟩
+  refine twForced_of_square k m ih hm (p := x) (q := y) (by simp [squareCorners]) hw ?_ ?_ ?_
+  · intro c' hc'
+    simp only [squareCorners, Finset.mem_insert, Finset.mem_singleton] at hc'
+    rcases hc' with rfl | rfl | rfl | rfl <;> try simp only [sub_add_cancel]
+    · exact hS
+    · exact s1
+    · exact s2
+    · exact s3
+  · rw [twArrow_US hcl']
+    simp only [squareCorners, Finset.mem_insert, Finset.mem_singleton, Prod.mk.injEq]
+    omega
+  · intro c' hc' hne
+    simp only [squareCorners, Finset.mem_insert, Finset.mem_singleton] at hc'
+    rcases hc' with rfl | rfl | rfl | rfl <;> try simp only [sub_add_cancel] at hne ⊢
+    · exact absurd rfl hne
+    · -- the corner (x+1, y): even, white `W` (arrow west, into the square) when y = a+1
+      have hpc : (x + 1 + y) % 2 = 0 := by omega
+      rcases twos_lap_zero_or_neg s1 with h0 | h1
+      · rcases (twos_lap_even_iff s1 hpc).1 h0 with hc | hc
+        · obtain ⟨e1, e2, e3, e4⟩ := hc
+          exfalso
+          omega
+        · obtain ⟨e1, e2, e3, e4⟩ := hc
+          exfalso
+          omega
+      · exact Or.inl h1
+    · -- the corner (x, y+1): even, black
+      have hpc : (x + (y + 1)) % 2 = 0 := by omega
+      rcases twos_lap_zero_or_neg s2 with h0 | h1
+      · rcases (twos_lap_even_iff s2 hpc).1 h0 with hc | hc
+        · obtain ⟨e1, e2, e3, e4⟩ := hc
+          exfalso
+          omega
+        · obtain ⟨e1, e2, e3, e4⟩ := hc
+          exfalso
+          omega
+      · exact Or.inl h1
+    · -- the corner (x+1, y+1): odd, white `US` (arrow south, to (x+1, y) in the square)
+      have hpc : ¬ (x + 1 + (y + 1)) % 2 = 0 := by omega
+      rcases twos_lap_zero_or_neg s3 with h0 | h1
+      · rcases (twos_lap_odd_iff s3 hpc).1 h0 with hc | hc | hc | hc
+        · obtain ⟨e1, e2, e3, e4, e5, e6, e7⟩ := hc
+          exfalso
+          omega
+        · obtain ⟨e1, e2, e3, e4, e5, e6, e7⟩ := hc
+          exfalso
+          omega
+        · obtain ⟨e1, e2, e3, e4, e5, e6, e7⟩ := hc
+          right
+          refine ⟨h0, ?_, ?_, ?_⟩
+          · rw [twArrow_US ⟨e1, e2, e3, e4, e5, e6, e7⟩]
+            simp [squareCorners]
+          · rw [twGrade_US ⟨e1, e2, e3, e4, e5, e6, e7⟩]
+            split_ifs <;> omega
+          · rw [twGrade_US ⟨e1, e2, e3, e4, e5, e6, e7⟩, twGrade_US hcl']
+            split_ifs <;> omega
+        · obtain ⟨e1, e2, e3, e4, e5, e6, e7⟩ := hc
+          exfalso
+          omega
+      · exact Or.inl h1
+
+
+
 end FLatticePaper.W1Twos
