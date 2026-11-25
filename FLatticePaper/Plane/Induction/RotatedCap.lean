@@ -62,13 +62,14 @@ theorem laplacian_quarterTurnField (G : Field) (x : Site) :
 the two sheet monotonicities of the residual in the `(N, D)`-grades are the named inputs `hodd`, `heven` (Q26). -/
 theorem rotated_ray_cap {frame : ChildFrame} {G : Field} (hS : frame.HasStrips G)
     (hbin : ∀ x : Site, laplacian G x = -1 ∨ laplacian G x = 0)
-    (N D : ℤ) (hN2 : 2 * N = frame.child.den - frame.child.num) (hD2 : 2 * D = frame.child.den + frame.child.num)
+    (N D a : ℤ) (ha1 : 1 ≤ a) (ha2 : a ≤ 2)
+    (hN2 : 2 * N = frame.child.den - frame.child.num) (hD2 : 2 * D = frame.child.den + frame.child.num)
     (hN0 : 0 < N) (hNDlt : N < D)
     (hodd : ∀ u v : Site, ¬ EvenSite u → ¬ EvenSite v → N * u.1 - D * u.2 ≤ N * v.1 - D * v.2 →
       N * v.1 - D * v.2 ≤ 0 → quarterTurnField G u ≤ quarterTurnField G v)
     (heven : ∀ u v : Site, EvenSite u → EvenSite v → N * u.1 - D * u.2 ≤ N * v.1 - D * v.2 →
       N * v.1 - D * v.2 ≤ 0 → quarterTurnField G u ≤ quarterTurnField G v)
-    {p q : ℤ} (hs : N * p - D * q = 2 - N) (hpq : (p + q) % 2 = 1)
+    {p q : ℤ} (hs : N * p - D * q = a - N) (hpq : (p + q) % 2 = 1)
     (J K : ℕ)
     (hJ1 : 2 * N * (J : ℤ) ≤ N + D - 2)
     (hJ2 : N + D - 2 < 2 * N * ((J : ℤ) + 1))
@@ -76,7 +77,7 @@ theorem rotated_ray_cap {frame : ChildFrame} {G : Field} (hS : frame.HasStrips G
     ∀ k : ℕ, k ≤ K → FLatticePaper.QuadraticCap.capMin k ≤ quarterTurnField G (p + (k : ℤ), q + (k : ℤ)) := by
   have hden : frame.child.den = N + D := by omega
   have hnum : frame.child.num = D - N := by omega
-  apply CapRayGrades.ray_cap_NDgrades N D hN0 hNDlt
+  apply CapRayGrades.ray_cap_NDgrades N D a ha1 ha2 hN0 hNDlt
   · intro x
     rw [laplacian_quarterTurnField]
     exact hbin _
