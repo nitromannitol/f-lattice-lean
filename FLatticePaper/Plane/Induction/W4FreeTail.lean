@@ -15,7 +15,11 @@ import FLatticePaper.Plane.Induction.W4Cases
   conjugate free point as the prescribed input. It is not a theorem here: at a free tail the root condition of the reflection
   fails, so the reflection of the retained edge is not available from `hpol` alone (Q35 files the gap).
 
-`noRiseForced_of_free_tail` proves `NoRiseForced P` from `FreeTailRise P` and the proved class (i). -/
+`noRiseForced_of_free_tail` proves `NoRiseForced P` from `FreeTailRise P` and the proved class (i).
+
+**Superseded:** `FreeTailRise` is no longer needed. `W4Guard.noRiseForced_proved` proves `NoRiseForced` from the unit price bound
+(`aJump_sub_le_one`, so `a(c) = 1`), the class (i) (`rise_excluded_nonfree`) and the free-tail theorem `W4Guard.freeTail_a1` (the old H star,
+the old V with `j = 0`, `j > 0` by the guard, and the exceptional endpoint). -/
 
 namespace FLatticePaper.W4FreeTail
 

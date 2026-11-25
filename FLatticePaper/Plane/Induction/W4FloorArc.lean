@@ -227,7 +227,8 @@ open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.W1
 /-- **The native V arc of the child (Q35, the floor step).** For a native free H label `g` of the conjugate with `g ≠ hLast`, the
 child's V-path vertex `v = Z g = (−g₂, g₁ − 1)` lies on the initial left V arc: `w1c ≤ s(v) ≤ w1h`. -/
 theorem native_V_arc {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) {g : Site}
-    (hg : g ∈ (frameAt (conjWord word)).freeH) (hne : g ≠ (frameAt (conjWord word)).hLast) :
+    (hg : g ∈ (frameAt (conjWord word)).freeH)
+    (hne : g ≠ (frameAt (conjWord word)).hLast ∨ (frameAt word).eps = -1) :
     w1c (frameAt word).child.num (frameAt word).child.den (-g.2, g.1 - 1) ≤
         w1s (frameAt word).child.num (frameAt word).child.den (-g.2, g.1 - 1) ∧
       w1s (frameAt word).child.num (frameAt word).child.den (-g.2, g.1 - 1) ≤
@@ -306,14 +307,17 @@ theorem native_V_arc {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) {g : 
     by_cases hexc : (frameAt word).eps = 1 ∧ (D - N) * l - D * g.2 = N
     · exfalso
       obtain ⟨hl_eq, hy_eq⟩ := odd_exception (hε.trans hexc.1) hD0 hl1 hl2 hexc.2
-      apply hne
-      unfold ChildFrame.hLast
-      rw [hC1, hC2]
-      refine Prod.ext ?_ ?_
-      · simp only
-        omega
-      · simp only
-        omega
+      rcases hne with hne | hne
+      · apply hne
+        unfold ChildFrame.hLast
+        rw [hC1, hC2]
+        refine Prod.ext ?_ ?_
+        · simp only
+          omega
+        · simp only
+          omega
+      · rw [hexc.1] at hne
+        norm_num at hne
     · exact child_odd_arc hN0 hND hD0 hd2 hε hεu hl hl1 hl2 hr0 hrN hexc
 
 end FLatticePaper.W4FloorArc
