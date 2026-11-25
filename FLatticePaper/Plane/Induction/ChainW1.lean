@@ -18,21 +18,21 @@ namespace FLatticePaper.ChainW1
 open FLatticePaper FLatticePaper.Induction FLatticePaper.BothFreeRise FLatticePaper.Q24Instances FLatticePaper.ChainDeck
   FLatticePaper.BothFreeNative
 
-/-- **The chain monotonicity from the W1 classification (Q28, with the packet).** `Φ_η` does not increase along the sign-`η` game, given the
-packet of the field, the W1 forcing of the word's frame, and the deck equivariance of both signs (`hdeck`, `hdeckOpp`) and the chain drift
-`hdrift`. -/
-theorem chain_nonincreasing_of_W1 (frame : ChildFrame) {F : Field} (G : CanonicalSignedGames frame F)
-    (hpk : frame.Packet F) {η : ℤ} (hη : η = 1 ∨ η = -1)
+/-- **The chain monotonicity from the W1 classification (Q28, with the packet), for two canonical signed policies.** `Φ_η` does not
+increase along the sign-`η` policy `C`, given the packet of the field, the W1 forcing of the word's frame, and the deck equivariance of
+both policies (`hdeck` for `C`, `hdeckOpp` for the opposite `O`) and the chain drift `hdrift`. The body uses the policies only through their
+fields (`policy`, `policyEdge`, `prescribed`, `quota`, and the raw slip and price of `O`). -/
+theorem chain_nonincreasing_of_pair (frame : ChildFrame) {F : Field} {η : ℤ} (C : CanonicalSignedPolicy frame F η)
+    (O : CanonicalSignedPolicy frame F (-η)) (hpk : frame.Packet F) (hη : η = 1 ∨ η = -1)
     (hc : 3 ≤ frame.child.den - frame.child.num) (hU : HasUnitPrice frame F)
     (hW1word : FLatticePaper.W1.W1Forced frame.child.num frame.child.den F)
-    (hdeck : ∀ z u (i j : ℤ), (G.game η hη).policy z u →
-      (G.game η hη).policy (z - frame.child.modifiedDeck.combine i j) (u - frame.child.modifiedDeck.combine i j))
-    (hdeckOpp : ∀ z u (i j : ℤ), (G.game (-η) (neg_unit hη)).policy z u →
-      (G.game (-η) (neg_unit hη)).policy (z - frame.child.modifiedDeck.combine i j)
-        (u - frame.child.modifiedDeck.combine i j))
+    (hdeck : ∀ z u (i j : ℤ), C.policy z u →
+      C.policy (z - frame.child.modifiedDeck.combine i j) (u - frame.child.modifiedDeck.combine i j))
+    (hdeckOpp : ∀ z u (i j : ℤ), O.policy z u →
+      O.policy (z - frame.child.modifiedDeck.combine i j) (u - frame.child.modifiedDeck.combine i j))
     (hdrift : ∀ i j : ℤ, ∃ c : ℤ, ∀ x,
       frame.chainPotential F η (x - frame.child.modifiedDeck.combine i j) = frame.chainPotential F η x + c) :
-    NonincreasingAlong (frame.chainPotential F η) (G.game η hη).policy := by
+    NonincreasingAlong (frame.chainPotential F η) C.policy := by
   intro z u hu
   by_contra hnot
   rw [not_le] at hnot
@@ -42,8 +42,6 @@ theorem chain_nonincreasing_of_W1 (frame : ChildFrame) {F : Field} (G : Canonica
     obtain ⟨k, hk⟩ : (2 : ℤ) ∣ frame.shortShift.1 + frame.shortShift.2 :=
       Int.dvd_of_emod_eq_zero (FLatticePaper.BothFreeGrades.shortShift_even frame)
     rcases hη with h | h <;> simp only [h, Prod.smul_fst, Prod.smul_snd, smul_eq_mul] <;> omega
-  set C := G.game η hη with hCdef
-  set O := G.game (-η) (neg_unit hη) with hOdef
   have hin : u = incomingNeg z ∨ u = incomingPos z := C.policyEdge z u hu
   have hunit : ∀ a b, C.policy a b →
       frame.price F (b + η • frame.shortShift) ≤ frame.price F (a + η • frame.shortShift) + 1 := by
@@ -185,5 +183,20 @@ theorem chain_nonincreasing_of_W1 (frame : ChildFrame) {F : Field} (G : Canonica
     omega
   exact both_free_rise_native frame hS hη hc C.prescribed O.prescribed (c0i - c1i + a1) (c0j - c1j + b1) a0 b0
     hw0mem hw1mem hlw0 hlw1 hPw hQw hu''' hrise hcong hpar
+
+/-- **The chain monotonicity along the game `η` of a family `G`:** the pair theorem for `G.game η` and `G.game (−η)`. -/
+theorem chain_nonincreasing_of_W1 (frame : ChildFrame) {F : Field} (G : CanonicalSignedGames frame F)
+    (hpk : frame.Packet F) {η : ℤ} (hη : η = 1 ∨ η = -1)
+    (hc : 3 ≤ frame.child.den - frame.child.num) (hU : HasUnitPrice frame F)
+    (hW1word : FLatticePaper.W1.W1Forced frame.child.num frame.child.den F)
+    (hdeck : ∀ z u (i j : ℤ), (G.game η hη).policy z u →
+      (G.game η hη).policy (z - frame.child.modifiedDeck.combine i j) (u - frame.child.modifiedDeck.combine i j))
+    (hdeckOpp : ∀ z u (i j : ℤ), (G.game (-η) (neg_unit hη)).policy z u →
+      (G.game (-η) (neg_unit hη)).policy (z - frame.child.modifiedDeck.combine i j)
+        (u - frame.child.modifiedDeck.combine i j))
+    (hdrift : ∀ i j : ℤ, ∃ c : ℤ, ∀ x,
+      frame.chainPotential F η (x - frame.child.modifiedDeck.combine i j) = frame.chainPotential F η x + c) :
+    NonincreasingAlong (frame.chainPotential F η) (G.game η hη).policy :=
+  chain_nonincreasing_of_pair frame (G.game η hη) (G.game (-η) (neg_unit hη)) hpk hη hc hU hW1word hdeck hdeckOpp hdrift
 
 end FLatticePaper.ChainW1
