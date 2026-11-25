@@ -115,4 +115,38 @@ theorem ray_cap (frame : ChildFrame) {F : Field} (hP : frame.Packet F)
     exact hle
   exact diag_cap F p q hpq hbin J K hmono hA0 hA1 hB hanchor
 
+/-- **The odd halo cap** (ALL_SLOPE_STEP, "Why this scalar cap kills all long forks", the odd inputs of the fan): an odd site `z` whose
+t'-grade is at least the odd threshold `2 − N − kC` (the grade of the ray point of height `k`) and at most the top of the zero strip
+satisfies `m(k) ≤ F z`. Negative grades: the odd sheet monotonicity (`SheetMonoOdd`, Q26) against the ray point, whose cap is the
+hypothesis `hcap` (`ray_cap`). Nonnegative grades: the zero strip, and `m(k) ≤ 0`. -/
+theorem odd_halo (frame : ChildFrame) {F : Field} (hP : frame.Packet F)
+    (hodd : SheetMonoOdd frame F)
+    {p q : ℤ} (hs : frame.child.num * p - frame.child.den * q = 2 - frame.child.num) (K : ℕ)
+    (hcap : ∀ k : ℕ, k ≤ K → FLatticePaper.QuadraticCap.capMin k ≤ F (p + (k : ℤ), q + (k : ℤ)))
+    (k : ℕ) (hk : k ≤ K) (z : Site) (hz : ¬ EvenSite z)
+    (hlo : 2 - frame.child.num - (k : ℤ) * (frame.child.den - frame.child.num) ≤ frame.tGrade z)
+    (hup : frame.tGrade z ≤ frame.child.num + 2 * frame.child.den - 1) :
+    FLatticePaper.QuadraticCap.capMin k ≤ F z := by
+  have hpq := start_parity frame hs
+  have hr : ¬ EvenSite (p + (k : ℤ), q + (k : ℤ)) := by unfold EvenSite; simp only; omega
+  have hrt : frame.tGrade (p + (k : ℤ), q + (k : ℤ))
+      = 2 - frame.child.num - (k : ℤ) * (frame.child.den - frame.child.num) := by
+    simp only [ChildFrame.tGrade]; linear_combination hs
+  have hcapk := hcap k hk
+  by_cases hz0 : frame.tGrade z ≤ 0
+  · have hF := hodd (p + (k : ℤ), q + (k : ℤ)) z hr hz (by rw [hrt]; exact hlo) hz0
+    exact hcapk.trans hF
+  · have hz0' : 0 < frame.tGrade z := lt_of_not_ge hz0
+    obtain ⟨hn1, hn2, -⟩ := frame.child_facts
+    have hF0 : F z = 0 := zero_value hP.strips (by omega) hup
+    rw [hF0]
+    have hk1 : (0 : ℤ) ≤ (k : ℤ) * ((k : ℤ) - 1) := by
+      rcases Nat.eq_zero_or_pos k with h | h
+      · subst h; simp
+      · have h1 : (1 : ℤ) ≤ (k : ℤ) := by exact_mod_cast h
+        nlinarith
+    have h2 : 0 ≤ (k : ℤ) * ((k : ℤ) - 1) / 2 := Int.ediv_nonneg hk1 (by norm_num)
+    unfold FLatticePaper.QuadraticCap.capMin
+    linarith
+
 end FLatticePaper.CapRay
