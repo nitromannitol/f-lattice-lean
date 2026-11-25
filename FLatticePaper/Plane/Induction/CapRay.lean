@@ -149,4 +149,71 @@ theorem odd_halo (frame : ChildFrame) {F : Field} (hP : frame.Packet F)
     unfold FLatticePaper.QuadraticCap.capMin
     linarith
 
+/-- The cross term `k (D − N)` is nonnegative (`k ≥ 0`, `N < D`). -/
+theorem kC_nonneg (frame : ChildFrame) (k : ℕ) : 0 ≤ (k : ℤ) * (frame.child.den - frame.child.num) := by
+  obtain ⟨h1, h2, -⟩ := frame.child_facts
+  exact mul_nonneg (by positivity) (by omega)
+
+/-- **The even ray value** (ALL_SLOPE_STEP, the even centres `B_k`: "both odd inputs have heights at least `A_k`, admission gives
+`B_k ≥ m(k)`"). The even ray point `(p+k+1, q+k)` has the odd west input `(p+k, q+k)` (on the ray, `ray_cap`) and the odd east input of
+grade `2+N−kC`, which the odd halo (`odd_halo`) bounds below by `m(k)`. The binary laplacian gives `2 F c ≥ F(west) + F(east)`. -/
+theorem even_ray_lower (frame : ChildFrame) {F : Field} (hP : frame.Packet F) (hodd : SheetMonoOdd frame F)
+    {p q : ℤ} (hs : frame.child.num * p - frame.child.den * q = 2 - frame.child.num) (K : ℕ)
+    (hcap : ∀ k : ℕ, k ≤ K → FLatticePaper.QuadraticCap.capMin k ≤ F (p + (k : ℤ), q + (k : ℤ)))
+    (k : ℕ) (hk : k ≤ K) :
+    FLatticePaper.QuadraticCap.capMin k ≤ F (p + (k : ℤ) + 1, q + (k : ℤ)) := by
+  have hpq := start_parity frame hs
+  obtain ⟨hn1, hn2, -⟩ := frame.child_facts
+  have hkC := kC_nonneg frame k
+  have hev : EvenSite (p + (k : ℤ) + 1, q + (k : ℤ)) := by unfold EvenSite; simp only; omega
+  have hinN : incomingNeg (p + (k : ℤ) + 1, q + (k : ℤ)) = (p + (k : ℤ), q + (k : ℤ)) := by
+    unfold incomingNeg; rw [if_pos hev]; congr 1; ring
+  have hinP : incomingPos (p + (k : ℤ) + 1, q + (k : ℤ)) = (p + (k : ℤ) + 2, q + (k : ℤ)) := by
+    unfold incomingPos; rw [if_pos hev]; congr 1; ring
+  have hb := hP.binary (p + (k : ℤ) + 1, q + (k : ℤ))
+  unfold laplacian at hb
+  rw [hinN, hinP] at hb
+  have hW := hcap k hk
+  have hzo : ¬ EvenSite (p + (k : ℤ) + 2, q + (k : ℤ)) := by unfold EvenSite; simp only; omega
+  have hrtE : frame.tGrade (p + (k : ℤ) + 2, q + (k : ℤ))
+      = 2 + frame.child.num - (k : ℤ) * (frame.child.den - frame.child.num) := by
+    simp only [ChildFrame.tGrade]; linear_combination hs
+  have hE := odd_halo frame hP hodd hs K hcap k hk (p + (k : ℤ) + 2, q + (k : ℤ)) hzo
+    (by rw [hrtE]; linarith)
+    (by rw [hrtE]; nlinarith)
+  rcases hb with h | h <;> linarith
+
+/-- **The even halo cap** (ALL_SLOPE_STEP, the even inputs of the fan): an even site `z` whose t'-grade is at least `2 − kC` (the grade of
+the even ray point of height `k`) and at most the top of the zero strip satisfies `m(k) ≤ F z`. Negative grades: the even sheet
+monotonicity (`SheetMono`, Q26) against the even ray point, whose value is `even_ray_lower`. Nonnegative grades: the zero strip. -/
+theorem even_halo (frame : ChildFrame) {F : Field} (hP : frame.Packet F)
+    (hodd : SheetMonoOdd frame F) (heven : SheetMono frame F)
+    {p q : ℤ} (hs : frame.child.num * p - frame.child.den * q = 2 - frame.child.num) (K : ℕ)
+    (hcap : ∀ k : ℕ, k ≤ K → FLatticePaper.QuadraticCap.capMin k ≤ F (p + (k : ℤ), q + (k : ℤ)))
+    (k : ℕ) (hk : k ≤ K) (z : Site) (hz : EvenSite z)
+    (hlo : 2 - (k : ℤ) * (frame.child.den - frame.child.num) ≤ frame.tGrade z)
+    (hup : frame.tGrade z ≤ frame.child.num + 2 * frame.child.den - 1) :
+    FLatticePaper.QuadraticCap.capMin k ≤ F z := by
+  have hpq := start_parity frame hs
+  have hr : EvenSite (p + (k : ℤ) + 1, q + (k : ℤ)) := by unfold EvenSite; simp only; omega
+  have hrt : frame.tGrade (p + (k : ℤ) + 1, q + (k : ℤ))
+      = 2 - (k : ℤ) * (frame.child.den - frame.child.num) := by
+    simp only [ChildFrame.tGrade]; linear_combination hs
+  have hR := even_ray_lower frame hP hodd hs K hcap k hk
+  by_cases hz0 : frame.tGrade z ≤ 0
+  · have hF := heven (p + (k : ℤ) + 1, q + (k : ℤ)) z hr hz (by rw [hrt]; exact hlo) hz0
+    exact hR.trans hF
+  · have hz0' : 0 < frame.tGrade z := lt_of_not_ge hz0
+    obtain ⟨hn1, hn2, -⟩ := frame.child_facts
+    have hF0 : F z = 0 := zero_value hP.strips (by omega) hup
+    rw [hF0]
+    have hk1 : (0 : ℤ) ≤ (k : ℤ) * ((k : ℤ) - 1) := by
+      rcases Nat.eq_zero_or_pos k with h | h
+      · subst h; simp
+      · have h1 : (1 : ℤ) ≤ (k : ℤ) := by exact_mod_cast h
+        nlinarith
+    have h2 : 0 ≤ (k : ℤ) * ((k : ℤ) - 1) / 2 := Int.ediv_nonneg hk1 (by norm_num)
+    unfold FLatticePaper.QuadraticCap.capMin
+    linarith
+
 end FLatticePaper.CapRay
