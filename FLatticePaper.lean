@@ -586,6 +586,8 @@ import FLatticePaper.Plane.Induction.ReflectedFan
 import FLatticePaper.Plane.Induction.CoveredSW
 import FLatticePaper.Plane.Induction.WestBridge
 import FLatticePaper.Plane.Induction.WiredCovered
+import FLatticePaper.Plane.Induction.ForcedArrows
+import FLatticePaper.Plane.Induction.EvenHSquare
 import FLatticePaper.Plane.Induction.GameFort
 import FLatticePaper.Plane.Induction.RetainedCore
 import FLatticePaper.Plane.Induction.H0Core
