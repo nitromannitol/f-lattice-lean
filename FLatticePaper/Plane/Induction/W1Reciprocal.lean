@@ -563,4 +563,15 @@ theorem free_not_forced (k : ℕ) (x y : ℤ) (hv : freeHn 1 (2 * (k : ℤ) + 3)
     · exact si_not_freeHn hS h
     · exact not_freeVn_of_si hS h
 
+/-! ## The bridge to the frame of `3^k` (the form of the named input `hW1`, at the conjugate of the pure twos words). -/
+
+/-- **W1Forced at the pure-threes word**, in the frame's own grades and standard field: the child of `3^k` is `1/(2k+3)` and its
+standard field is `reciprocalField k`. -/
+theorem w1Forced_threes (k : ℕ) :
+    FLatticePaper.W1.W1Forced (frameAt (List.replicate k FLatticePaper.Farey.Digit.three)).child.num
+      (frameAt (List.replicate k FLatticePaper.Farey.Digit.three)).child.den (standardField (List.replicate k FLatticePaper.Farey.Digit.three)) := by
+  have hc : (frameAt (List.replicate k FLatticePaper.Farey.Digit.three)).child = ⟨1, 2 * (k : ℤ) + 3⟩ := reciprocalFrame_child k
+  rw [hc, standardField_threes]
+  exact w1Forced_reciprocal k
+
 end FLatticePaper.W1Reciprocal
