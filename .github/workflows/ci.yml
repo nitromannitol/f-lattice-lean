@@ -41,6 +41,8 @@ jobs:
       # Lake 4.32 has no job flag; LEAN_NUM_THREADS caps its concurrent elaborations (measured: 2 threads gives a peak of
       # 4 concurrent lean processes, against 10 with the default), which bounds the peak memory on the hosted runner.
       - name: Build the library
+        # A step limit below the apparent hour: a slow build ends as a timed-out step, so the save step still runs.
+        timeout-minutes: 40
         shell: bash
         env:
           LEAN_NUM_THREADS: "2"
