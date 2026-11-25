@@ -1,0 +1,9 @@
+import FLatticePaper.TraceHeadline
+
+#print axioms FLatticePaper.odometersTheorem_no_hbd
+#print axioms FLatticePaper.TraceSeedInduction.traceSeeds_of_all
+#print axioms FLatticePaper.TraceSeedInduction.hbd_of_traceSeeds
+#print axioms FLatticePaper.VWhite.laplacian_V1_zero
+#print axioms FLatticePaper.Induction.policy_of_gamesWithRank_prescribed
+#print axioms FLatticePaper.TraceStep.traceAt_step_row
+#print axioms FLatticePaper.ChainEnd.hEnd_of_chain_row
