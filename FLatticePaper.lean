@@ -332,6 +332,7 @@ import FLatticePaper.Tiles.ArcOKAll
 import FLatticePaper.Tiles.StandardAll
 import FLatticePaper.Tiles.RegisterStepAll
 import FLatticePaper.Plane.GlobalOdometersAll
+import FLatticePaper.Plane.Induction.TwosFlatReduce
 import FLatticePaper.Plane.Induction.CornerPositive
 import FLatticePaper.Tiles.InterfaceStacked
 import FLatticePaper.Tiles.StringCorners
