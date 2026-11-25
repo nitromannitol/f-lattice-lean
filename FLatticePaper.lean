@@ -627,6 +627,7 @@ import FLatticePaper.Plane.Induction.WestException
 import FLatticePaper.Plane.Induction.WestNonfree
 import FLatticePaper.Plane.Induction.TwosEquiv
 import FLatticePaper.Construction.EPolicyIndep
+import FLatticePaper.Plane.Induction.WestSouth
 import FLatticePaper.TraceHeadline
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame

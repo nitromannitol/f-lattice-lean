@@ -1,4 +1,5 @@
 import FLatticePaper.Plane.Induction.TwosFreeSets
+import FLatticePaper.Plane.Induction.TwosEquiv
 import FLatticePaper.Plane.Induction.TwosRank
 import FLatticePaper.Plane.Induction.TwosQuota
 import FLatticePaper.Plane.Induction.TwosSquareShift
@@ -484,6 +485,23 @@ noncomputable def twosCanonicalGames {S : Field} (k : ℕ)
       (standardField (List.replicate (k + 1) Digit.two)) where
   game := fun η hη => twosSignedPolicy k η hη hagree hperiod (twosRankOf k η)
     (twosRankOf_strict k η hη hagree hperiod hvarP hflatP hvarM hflatM)
+  deckEquiv := fun η _ i j x u => by
+    have hper := twos_standardField_periods k hagree hperiod
+    have hcomb : (frameAt (List.replicate (k + 1) Digit.two)).child.modifiedDeck.combine i j =
+        (i * (2 * (k : ℤ) + 4 + 1) - 2 * j, i * (2 * (k : ℤ) + 4 - 1) + 2 * (2 * (k : ℤ) + 4) * j) := by
+      have hc : ((1 : ℤ) + (2 * (k : ℤ) + 4)) % 2 = 1 := by omega
+      rw [ChildFrame.combine_coords, child_replicate_two_succ]
+      unfold Fraction.rotate
+      dsimp only
+      rw [if_pos hc]
+      ext <;> simp <;> ring
+    have hL : ∀ c, laplacian (standardField (List.replicate (k + 1) Digit.two))
+        (c + (frameAt (List.replicate (k + 1) Digit.two)).child.modifiedDeck.combine i j) =
+        laplacian (standardField (List.replicate (k + 1) Digit.two)) c := fun c =>
+      laplacian_add_combine hper c i j
+    exact (FLatticePaper.TwosEquiv.twosSel_shift (2 * (k : ℤ) + 4) η i j
+      (standardField (List.replicate (k + 1) Digit.two))
+      ((frameAt (List.replicate (k + 1) Digit.two)).child.modifiedDeck.combine i j) hcomb hL x u).symm
   chainNonincreasing := fun η hη c i h => by
     rcases hη with rfl | rfl
     · exact twosChain_nonincreasing k hagree hperiod h
