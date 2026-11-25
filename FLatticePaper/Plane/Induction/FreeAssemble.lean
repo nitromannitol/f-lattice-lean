@@ -1,6 +1,7 @@
 import FLatticePaper.Plane.Induction.FreePermittedS
 import FLatticePaper.Plane.Induction.WordPolicy
 import FLatticePaper.Plane.Induction.ForcedPriceSI
+import FLatticePaper.Plane.Induction.HfreePhase1
 
 /-! The `FreeNamedInputs` of the word's free-edge signed policy, for a sign `η ∈ {±1}`.
 
@@ -17,19 +18,25 @@ open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.FreePolicy FLatti
 theorem free_named_inputs {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hWord : StrongEstimates word)
     (hSE : StrongEstimates (conjWord word))
     (G : CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word)))
+    (hG : GamesWithRank (conjWord word))
     (hOdd : OddBlackNoRise (standardField word) (frameAt word).shortShift)
     (hW1 : FLatticePaper.W1.W1Forced (frameAt word).child.num (frameAt word).child.den (standardField word))
     {η : ℤ} (hη : η = 1 ∨ η = -1) {R : Site → ℤ}
     (hstrictR : ∀ c i, auxS (frameAt word) (standardField word) η c i → R i < R c)
-    (hfreeP : ∀ c i, laplacian (standardField word) c = 0 → freeClosure (frameAt word) c →
-      FreePresc (frameAt word) η c i →
-      (frameAt word).price (standardField word) i ≤ (frameAt word).price (standardField word) c)
+    (hcorner : (frameAt word).eps = 1 → η = -1 → (frameAt word).parents.odd.num = 1 →
+      FLatticePaper.W1Step.sheetPsi word (FLatticePaper.ArcPsi.reflH word (FLatticePaper.Induction.hFirst + (0, -η))) = 0 ∧
+        (frameAt word).sheetA (FLatticePaper.W1MSheet.FqW word) (FLatticePaper.ArcPsi.reflH word (FLatticePaper.Induction.hFirst + (0, -η))) = 0)
     (hwest : (frameAt word).eps = 1 → freePolicy (frameAt word) (standardField word) η
       ((frameAt word).parents.odd.num - (frameAt word).parents.odd.den + 1,
         (frameAt word).parents.odd.den + (frameAt word).parents.odd.num - 1)
       (incomingNeg ((frameAt word).parents.odd.num - (frameAt word).parents.odd.den + 1,
         (frameAt word).parents.odd.den + (frameAt word).parents.odd.num - 1))) :
     FreeNamedInputs (frameAt word) (standardField word) η R := by
+  obtain ⟨base, hbase⟩ := HfreePhase1.conj_base (frameAt (conjWord word))
+  have hfreeP : ∀ c i, laplacian (standardField word) c = 0 → freeClosure (frameAt word) c →
+      FreePresc (frameAt word) η c i →
+      (frameAt word).price (standardField word) i ≤ (frameAt word).price (standardField word) c :=
+    fun _ _ _ _ hcp => HfreePhase1.hfreeP_of_phases h hSE hG hbase hη hcorner hcp
   have hsat : HasSatSelection (standardField word) := ForcedPriceSI.hasSat_of_aux η hη hWord hstrictR
   have hslip : ∀ c i, freePolicy (frameAt word) (standardField word) η c i →
       (frameAt word).slip (standardField word) η i ≤ (frameAt word).slip (standardField word) η c := by
