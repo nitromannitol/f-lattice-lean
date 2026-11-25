@@ -1,0 +1,6 @@
+import FLatticePaper.Plane.Induction.W4NativeSlip
+
+#print axioms FLatticePaper.W4NativeSlip.conj_standardField_zero_strip
+#print axioms FLatticePaper.W4NativeSlip.tGrade_add_smul_shortShift
+#print axioms FLatticePaper.W4NativeSlip.freeH_strip_margin
+#print axioms FLatticePaper.W4NativeSlip.conj_slip_zero_native_H

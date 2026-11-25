@@ -673,6 +673,8 @@ import FLatticePaper.Plane.Induction.RestrictedFortShift
 import FLatticePaper.Plane.Induction.FortMinRep
 import FLatticePaper.Plane.Induction.W4OldH
 import FLatticePaper.Plane.Induction.W4OldV
+import FLatticePaper.Plane.Induction.W4NativeSlip
+import FLatticePaper.Plane.Induction.W4Boundary
 import FLatticePaper.TraceHeadline
 import FLatticePaper.FlatPlusHeadline
 import FLatticePaper.Plane.Induction.TwosDeckEta
