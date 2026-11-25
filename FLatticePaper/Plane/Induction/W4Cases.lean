@@ -45,4 +45,22 @@ theorem excluded_of_H_translate {word : Word} (h : ∃ x ∈ word, x ≠ Digit.t
         (frameAt word).parents.odd.num + 2 * (frameAt word).parents.odd.den - 1) : False :=
   H_translate_drop_excluded h hSE hx hy hwx hsy
 
+/-- **Class (i) of the rise exclusion: a conjugate-nonfree old root.** A drop `a(x) = 1 → a(x') = 0` along a retained parent edge
+is impossible when the old root `zTurn x` is nonfree in the conjugate frame: `nonfree_root_forced_nonfree` gives black or the
+forced retained edge, and `nonfree_drop_excluded` excludes the drop. The W1 forcing of the conjugate field `hW1` is the headline
+input (the same as in `W1Forced_chain`), not a new one. -/
+theorem rise_excluded_of_nonfree_root {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
+    (hSE : StrongEstimates (conjWord word))
+    {seed : Site → Site → Prop}
+    (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
+    (hW1 : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
+      (standardField (conjWord word)))
+    {x x' : Site}
+    (hnf : FLatticePaper.Induction.Nonfree (frameAt (conjWord word)) (zTurn x))
+    (hpol : parentPolicy P x x')
+    (h1 : jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x = 1)
+    (h0 : jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x' = 0) : False :=
+  nonfree_drop_excluded h hSE P hpol h1 h0
+    (nonfree_root_forced_nonfree P hSE.packet hW1 hnf hpol)
+
 end FLatticePaper.W4Cases
