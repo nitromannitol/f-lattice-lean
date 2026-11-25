@@ -647,6 +647,7 @@ import FLatticePaper.Plane.Induction.ForcedCentre
 import FLatticePaper.Plane.Induction.NonfreeReflect
 import FLatticePaper.Plane.Induction.NegFromPlus
 import FLatticePaper.Plane.Induction.AdjacentOffers
+import FLatticePaper.Plane.Induction.NativeMinus
 import FLatticePaper.TraceHeadline
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame
