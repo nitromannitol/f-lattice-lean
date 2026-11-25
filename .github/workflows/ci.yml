@@ -28,8 +28,22 @@ jobs:
           build: false
           use-mathlib-cache: true
 
+      # The library build is reused across runs: only the modules whose sources or imports changed are compiled again.
+      # It is saved at the end of every run (see the last step), so an interrupted run still shortens the next one.
+      - name: Restore the library build
+        uses: actions/cache/restore@v4
+        with:
+          path: .lake/build
+          key: lake-build-lean4.32.0-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            lake-build-lean4.32.0-
+
+      # Lake 4.32 has no job flag; LEAN_NUM_THREADS caps its concurrent elaborations (measured: 2 threads gives a peak of
+      # 4 concurrent lean processes, against 10 with the default), which bounds the peak memory on the hosted runner.
       - name: Build the library
         shell: bash
+        env:
+          LEAN_NUM_THREADS: "2"
         run: |
           set -o pipefail
           lake build FLatticePaper 2>&1 | tee build.log
@@ -48,3 +62,11 @@ jobs:
           set -o pipefail
           lake env lean checks/HeadlineAxiomReport.lean 2>&1 | tee axioms.log
           python3 tools/check_axioms.py axioms.log
+
+      # Saved even when the build fails: lake checks each module against its trace, so a partial cache only saves work.
+      - name: Save the library build
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: .lake/build
+          key: lake-build-lean4.32.0-${{ github.run_id }}-${{ github.run_attempt }}
