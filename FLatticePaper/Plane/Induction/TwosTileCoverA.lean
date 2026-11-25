@@ -48,15 +48,15 @@ theorem tc_key_U {a r y n : ℤ} (hid : (a - 1) * r - (a + 1) * y = n) :
 
 /-- A point of `NativeT` is in the tile unless it is a copy `v+U` or `v+V` of a free site `v` (and not free itself). -/
 theorem tc_tile_of_noAlias {a : ℤ} {p : Site} (hN : NativeT a p.1 p.2)
-    (hex : FreeSite a p.1 p.2 ∨ ∀ v : Site, FreeSite a v.1 v.2 →
+    (hex : FreeSite a p.1 p.2 ∨ ∀ v : Site, FreeSite a v.1 v.2 → NativeT a v.1 v.2 →
       p ≠ (v.1 + (a + 1), v.2 + (a - 1)) ∧ p ≠ (v.1 - 2, v.2 + 2 * a)) : TwosTile a p := by
   refine ⟨hN, ?_⟩
-  rintro ⟨⟨v, hvF, -, hp⟩, hnF⟩
+  rintro ⟨⟨v, hvF, hvN, hp⟩, hnF⟩
   rcases hex with h | h
   · exact hnF h
   · rcases hp with hp | hp
-    · exact (h v hvF).1 hp
-    · exact (h v hvF).2 hp
+    · exact (h v hvF hvN).1 hp
+    · exact (h v hvF hvN).2 hp
 
 /-- The family `C0`: the point `(r, y)` is in the tile when `n ≤ (a−1) r` and `n ≤ 2a+2−2r`. -/
 theorem tc_tile_C0 {a r y n : ℤ} (ha : 4 ≤ a) (hr0 : 0 ≤ r) (hra : r ≤ a)
@@ -76,7 +76,7 @@ theorem tc_tile_C0 {a r y n : ℤ} (ha : 4 ≤ a) (hr0 : 0 ≤ r) (hra : r ≤ a
     refine Or.inl ⟨⟨by linarith, by linarith, by linarith, by linarith, by linarith, by linarith⟩, ?_⟩
     rintro (⟨h1, -⟩ | ⟨h1, -⟩) <;> linarith
   refine tc_tile_of_noAlias hN (Or.inr ?_)
-  intro v hv
+  intro v hv _
   obtain ⟨v1, v2⟩ := v
   simp only [FreeSite, FreeHSite, FreeVSite] at hv
   constructor
@@ -124,7 +124,7 @@ theorem tc_tile_V {a r y n : ℤ} (ha : 4 ≤ a) (hr2 : 2 ≤ r) (hra : r ≤ a)
     refine Or.inl ⟨⟨by linarith, by linarith, by linarith, by linarith, by linarith, by linarith⟩, ?_⟩
     rintro (⟨h1, -⟩ | ⟨h1, -⟩) <;> linarith
   refine tc_tile_of_noAlias hN (Or.inr ?_)
-  intro v hv
+  intro v hv _
   obtain ⟨v1, v2⟩ := v
   simp only [FreeSite, FreeHSite, FreeVSite] at hv
   constructor
