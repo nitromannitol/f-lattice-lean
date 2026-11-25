@@ -1180,4 +1180,39 @@ theorem twos_sub_UN_a1 (k m : ℕ)
       · exact Or.inl h1
     · exact absurd rfl hne
 
+/-- **The grade induction.** Every F-white strict-interior centre of the twos field `2^(k+1)` has its archive witness arrow forced, by strong
+induction on the grade: the case split by the classes (`twos_lap_even_iff`, `twos_lap_odd_iff`) and the sub-cases of the witness rule. -/
+theorem twos_claim (k : ℕ) (m : ℕ) : ∀ c : Site, (twGrade (2 * (k : ℤ) + 4) c).toNat = m →
+    StrictInterior (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 5) c → laplacian (twF k) c = 0 →
+    ForcedEdgeIn (twF k) (StrictInterior (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 5)) (fun _ _ => False) c
+      (twArrow (2 * (k : ℤ) + 4) c) := by
+  induction m using Nat.strong_induction_on with
+  | _ m ih =>
+    rintro ⟨x, y⟩ hm hS hw
+    by_cases hp : (x + y) % 2 = 0
+    · rcases (twos_lap_even_iff hS hp).1 hw with hE | hW
+      · exact twos_sub_E k m ih hm hE hS
+      · exact twos_sub_W k m ih hm hW hS
+    · rcases (twos_lap_odd_iff hS hp).1 hw with hLS | hLN | hUS | hUN
+      · by_cases h1 : y - x = -1
+        · exact twos_sub_LS_m1 k m ih hm hLS h1 hS
+        · exact twos_sub_LS k m ih hm hLS h1 hS
+      · by_cases hxa : x = 2 * (k : ℤ) + 4
+        · exact twos_sub_LN_a k m ih hm hLN hxa hS
+        · exact twos_sub_LN k m ih hm hLN hxa hS
+      · by_cases h0 : x = 0
+        · exact twos_sub_US_0 k m ih hm hUS h0 hS
+        · by_cases hh : y - x = 2 * (k : ℤ) + 5
+          · exact twos_sub_US_h k m ih hm hUS hh h0 hS
+          · exact twos_sub_US k m ih hm hUS hh hS
+      · by_cases hxa : x = 2 * (k : ℤ) + 3
+        · exact twos_sub_UN_a1 k m ih hm hUN hxa hS
+        · exact twos_sub_UN k m ih hm hUN hxa hS
+
+/-- **`W1Forced` at the twos field `2^(k+1)`.** Every F-white strict-interior centre is forced (the W1 statement of the twos base frame). -/
+theorem twos_W1Forced (k : ℕ) :
+    FLatticePaper.W1.W1Forced (2 * (k : ℤ) + 3) (2 * (k : ℤ) + 5) (twF k) := by
+  intro z hS hw
+  exact ⟨twArrow (2 * (k : ℤ) + 4) z, twos_claim k _ z rfl hS hw⟩
+
 end FLatticePaper.W1Twos
