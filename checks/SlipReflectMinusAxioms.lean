@@ -1,0 +1,5 @@
+import FLatticePaper.Plane.Induction.SlipReflectMinus
+
+#print axioms FLatticePaper.SlipReflectMinus.slip_minus_reflect
+#print axioms FLatticePaper.SlipReflectMinus.step_match
+#print axioms FLatticePaper.SlipReflectMinus.minus_increment_eq_plus
