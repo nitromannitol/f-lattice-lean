@@ -757,6 +757,7 @@ import FLatticePaper.Plane.Induction.FaceRows
 import FLatticePaper.Plane.Induction.NonfreeHelpers
 import FLatticePaper.Plane.Induction.FaceRowsForced
 import FLatticePaper.Plane.Induction.CollarSquare
+import FLatticePaper.Plane.Induction.CollarChain
 import FLatticePaper.Plane.Induction.FanRegion
 import FLatticePaper.Plane.Induction.EndpointRows
 import FLatticePaper.Plane.Induction.GameFort
