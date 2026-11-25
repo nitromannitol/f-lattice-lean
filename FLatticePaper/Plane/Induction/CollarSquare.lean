@@ -29,7 +29,6 @@ def PSquare (G : Field) (R : Site → Site → Prop) (z q0 q1 q2 o : Site) (a b 
   (laplacian G q2 = -1 ∨ (laplacian G q2 = 0 ∧ ∀ j, R q2 j → j = z))
 
 -- The sheet transport with explicit corners (the proof of `sheet_squareOut_of_parent`, with the witnesses given).
-set_option maxHeartbeats 1000000 in
 theorem sheet_of_psquare {G : Field} {Q : Site → Site → Prop} {lv : Site} (hlv : EvenSite lv) (c : Site)
     {q0 q1 q2 o : Site} {qa qb : ℤ}
     (h : PSquare G Q (zTurn (c - lv)) q0 q1 q2 o qa qb) :
