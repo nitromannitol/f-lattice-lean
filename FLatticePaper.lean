@@ -642,6 +642,7 @@ import FLatticePaper.Plane.Induction.WhiteSheet
 import FLatticePaper.Plane.Induction.WhiteSheetPlus
 import FLatticePaper.Plane.Induction.WhiteNative
 import FLatticePaper.Plane.Induction.WhiteChart
+import FLatticePaper.Plane.Induction.NativeQ34
 import FLatticePaper.TraceHeadline
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame
