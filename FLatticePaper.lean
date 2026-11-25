@@ -599,6 +599,7 @@ import FLatticePaper.Plane.Induction.OddVNWFan
 import FLatticePaper.Plane.Induction.EndpointStrips
 import FLatticePaper.Plane.Induction.CapBaseN1
 import FLatticePaper.Plane.Induction.EvenVSquare
+import FLatticePaper.Plane.Induction.ChainWire
 import FLatticePaper.Plane.Induction.FanRegion
 import FLatticePaper.Plane.Induction.EndpointRows
 import FLatticePaper.Plane.Induction.GameFort
