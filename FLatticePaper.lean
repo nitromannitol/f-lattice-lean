@@ -342,6 +342,11 @@ import FLatticePaper.Plane.Induction.TwosBlackEven
 import FLatticePaper.Plane.Induction.TwosBlackEvenDrop
 import FLatticePaper.Plane.Induction.TwosSpecialPhi
 import FLatticePaper.Plane.Induction.TwosWhiteSel
+import FLatticePaper.Plane.Induction.TwosCandSel
+import FLatticePaper.Plane.Induction.TwosCandAll
+import FLatticePaper.Plane.Induction.TwosFreeAll
+import FLatticePaper.Plane.Induction.TwosHTile
+import FLatticePaper.Plane.Induction.TwosFlatPlus
 import FLatticePaper.Plane.Induction.CornerPositive
 import FLatticePaper.Tiles.InterfaceStacked
 import FLatticePaper.Tiles.StringCorners
@@ -756,6 +761,7 @@ import FLatticePaper.Plane.Induction.CapBaseN1
 import FLatticePaper.Plane.Induction.EvenVSquare
 import FLatticePaper.Plane.Induction.ChainWire
 import FLatticePaper.Plane.Induction.CanonForced
+import FLatticePaper.Plane.Induction.GenericSquare
 import FLatticePaper.Plane.Induction.FanRegion
 import FLatticePaper.Plane.Induction.EndpointRows
 import FLatticePaper.Plane.Induction.GameFort
