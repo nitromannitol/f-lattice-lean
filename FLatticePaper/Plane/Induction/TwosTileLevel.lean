@@ -198,4 +198,112 @@ theorem phi_s0pV (k : ℕ) {x y : ℤ} (hN : NativeT (2 * (k : ℤ) + 4) x y)
   have core := level_s0pV (k : ℤ) (by positivity) x y d1 d2 d3 d4 d5 d6
   linarith [core]
 
+set_option maxHeartbeats 400000 in
+/-- The near-ladder values at the four points of the special point `(a, 2a-3)`. -/
+theorem pnv_sp1 (k : ℤ) (hk0 : 0 ≤ k) :
+    paperNearLadderValue (2 * k + 4) (2 * k + 4, 2 * (2 * k + 4) - 3 + 1) = -((k + 1) ^ 2) - 2 * (k + 1) := by
+  rw [pnv_lin]
+  have hs : (2 * (2 * k + 4) - 3 + 1 - (2 * k + 4)) ^ 2 / 4 = (k + 1) ^ 2 := by
+    have e : 2 * (2 * k + 4) - 3 + 1 - (2 * k + 4) = 2 * (k + 1) := by ring
+    rw [e, show (2 * (k + 1)) ^ 2 = 4 * (k + 1) ^ 2 by ring]
+    omega
+  rw [hs]
+  simp only [min_def, max_def]
+  split_ifs <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem pnv_sp2 (k : ℤ) (hk0 : 0 ≤ k) :
+    paperNearLadderValue (2 * k + 4) (2 * k + 4 - (2 * k + 4), 2 * (2 * k + 4) - 3 - (2 * k + 4) + 3) =
+      -((k + 2) ^ 2) := by
+  rw [pnv_lin]
+  have hs : (2 * (2 * k + 4) - 3 - (2 * k + 4) + 3 - (2 * k + 4 - (2 * k + 4))) ^ 2 / 4 = (k + 2) ^ 2 := by
+    have e : 2 * (2 * k + 4) - 3 - (2 * k + 4) + 3 - (2 * k + 4 - (2 * k + 4)) = 2 * (k + 2) := by ring
+    rw [e, show (2 * (k + 2)) ^ 2 = 4 * (k + 2) ^ 2 by ring]
+    omega
+  rw [hs]
+  simp only [min_def, max_def]
+  split_ifs <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem pnv_sp3 (k : ℤ) (hk0 : 0 ≤ k) :
+    paperNearLadderValue (2 * k + 4) (2 * k + 4 + 1, 2 * (2 * k + 4) - 3 + 1 + 1) =
+      -((k + 1) ^ 2) + (1 - (2 * k + 4)) := by
+  rw [pnv_lin]
+  have hs : (2 * (2 * k + 4) - 3 + 1 + 1 - (2 * k + 4 + 1)) ^ 2 / 4 = (k + 1) ^ 2 := by
+    have e : 2 * (2 * k + 4) - 3 + 1 + 1 - (2 * k + 4 + 1) = 2 * (k + 1) := by ring
+    rw [e, show (2 * (k + 1)) ^ 2 = 4 * (k + 1) ^ 2 by ring]
+    omega
+  rw [hs]
+  simp only [min_def, max_def]
+  split_ifs <;> omega
+
+set_option maxHeartbeats 400000 in
+theorem pnv_sp4 (k : ℤ) (hk0 : 0 ≤ k) :
+    paperNearLadderValue (2 * k + 4) (2 * k + 4 + 1 - 1, 2 * (2 * k + 4) - 3 + 1 + (2 * k + 3) + 1) =
+      -((2 * k + 3) ^ 2) + (2 - 2 * (2 * k + 4)) := by
+  rw [pnv_lin]
+  have hs : (2 * (2 * k + 4) - 3 + 1 + (2 * k + 3) + 1 - (2 * k + 4 + 1 - 1)) ^ 2 / 4 = (2 * k + 3) ^ 2 := by
+    have e : 2 * (2 * k + 4) - 3 + 1 + (2 * k + 3) + 1 - (2 * k + 4 + 1 - 1) = 2 * (2 * k + 3) := by ring
+    rw [e, show (2 * (2 * k + 3)) ^ 2 = 4 * (2 * k + 3) ^ 2 by ring]
+    omega
+  rw [hs]
+  simp only [min_def, max_def]
+  split_ifs <;> omega
+
+set_option maxHeartbeats 400000 in
+/-- The point `(a, 2a-3)` (a = 2k+4) is in no class but the `(sU, p0)` one: its chain potential is `(k+2)(k+3)`. -/
+theorem phi_special (k : ℕ) :
+    twosPhi k 1 (2 * (k : ℤ) + 4, 2 * (2 * (k : ℤ) + 4) - 3) =
+      ((k : ℤ) + 2) * ((k : ℤ) + 3) + twosLev (2 * (k : ℤ) + 4) (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - 3) := by
+  have hk0 : (0 : ℤ) ≤ (k : ℤ) := by positivity
+  have hN : NativeT (2 * (k : ℤ) + 4) (2 * (k : ℤ) + 4) (2 * (2 * (k : ℤ) + 4) - 3) := by
+    unfold NativeT
+    omega
+  have hkU := twosKey_of_native hN
+  have hkW : TwosKey (2 * (k : ℤ) + 4) (2 * (k : ℤ) + 4 + 1) (2 * (2 * (k : ℤ) + 4) - 3 + 1) := by
+    unfold TwosKey
+    omega
+  have hU : (2 * (k : ℤ) + 4 - (2 * (k : ℤ) + 4), 2 * (2 * (k : ℤ) + 4) - 3 - (2 * (k : ℤ) + 4) + 3) ∈
+      paperNearLadderTile (2 * (k : ℤ) + 4) := by
+    apply mem_tile_of
+    · right; right; right
+      omega
+    · omega
+  have h0 : (2 * (k : ℤ) + 4 + 1 - 1, 2 * (2 * (k : ℤ) + 4) - 3 + 1 + (2 * (k : ℤ) + 3) + 1) ∈
+      paperNearLadderTile (2 * (k : ℤ) + 4) := by
+    apply mem_tile_of
+    · right; right; right
+      omega
+    · omega
+  unfold twosPhi
+  rw [chainP_eq]
+  unfold twosP
+  simp only
+  rw [twos_slip_classU k hkU hU, twos_price_class0 k hkW h0]
+  rw [pnv_sp1 (k : ℤ) hk0, pnv_sp2 (k : ℤ) hk0, pnv_sp3 (k : ℤ) hk0, pnv_sp4 (k : ℤ) hk0]
+  unfold twosLev
+  split_ifs <;> first | ring1 | omega
+
+set_option maxHeartbeats 400000 in
+/-- Where the slip class 0 fails at a native-key point, the point is `(a, 2a-3)`. -/
+theorem s0_fail_point (k : ℤ) (x y : ℤ) (hN : NativeT (2 * k + 4) x y) (hk : TwosKey (2 * k + 4) (x + 1) (y + 1))
+    (hs : (x + 1, y + 2) ∉ paperNearLadderTile (2 * k + 4)) :
+    x = 2 * k + 4 ∧ y = 2 * (2 * k + 4) - 3 := by
+  rw [mem_pnTile_iff] at hs
+  unfold NativeT at hN
+  unfold TwosKey at hk
+  constructor <;> omega
+
+set_option maxHeartbeats 400000 in
+/-- The level of the tile in the chain potential, for every native point with `TwosKey (x+1, y+1)`. -/
+theorem chain_level_native (k : ℕ) {x y : ℤ} (hN : NativeT (2 * (k : ℤ) + 4) x y)
+    (hk : TwosKey (2 * (k : ℤ) + 4) (x + 1) (y + 1)) :
+    twosPhi k 1 (x, y) = ((k : ℤ) + 2) * ((k : ℤ) + 3) + twosLev (2 * (k : ℤ) + 4) x y := by
+  by_cases hs : (x + 1, y + 2) ∈ paperNearLadderTile (2 * (k : ℤ) + 4)
+  · rcases price_cover (2 * (k : ℤ) + 4) x y hN hk with hp | hp
+    · exact phi_s0p0 k hN hk hs hp
+    · exact phi_s0pV k hN hk hs hp
+  · obtain ⟨rfl, rfl⟩ := s0_fail_point (k : ℤ) x y hN hk hs
+    exact phi_special k
+
 end FLatticePaper.TwosEPolicy
