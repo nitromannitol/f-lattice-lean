@@ -41,7 +41,7 @@ theorem minK_white_forced_plus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.th
     (hSE : StrongEstimates (conjWord word)) (hPR : PriceRangeOn word)
     (hW : HasSatSelection (standardField word))
     (hW1 : FLatticePaper.W1.W1Forced (frameAt word).child.num (frameAt word).child.den (standardField word))
-    {S : Set Site} (hfort : IsIncomingFort (standardField word) S) {z o : Site} (hzS : z ∈ S)
+    {S : Set Site} (hfort : FortAt (Nonfree (frameAt word)) (standardField word) S) {z o : Site} (hzS : z ∈ S)
     (hzE : z ∈ (frameAt word).closedPolygon) (hNF : Nonfree (frameAt word) z)
     (hw : laplacian (standardField word) z = 0)
     (hf : ForcedEdge (standardField word) (fun _ _ => False) z o) (hoE : o ∈ (frameAt word).closedPolygon)
@@ -49,7 +49,7 @@ theorem minK_white_forced_plus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.th
     o ∈ S ∧ kPlusW word o = kPlusW word z := by
   have hio := forced_input_of_unseeded hf
   have hoS : o ∈ S := by
-    rcases hfort z hzS with ⟨hl, _⟩ | ⟨_, hn, hp⟩
+    rcases hfort z hzS hNF with ⟨hl, _⟩ | ⟨_, hn, hp⟩
     · exfalso
       omega
     · rcases hio with rfl | rfl
@@ -69,7 +69,7 @@ theorem minK_white_forced_minus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.t
     (hSE : StrongEstimates (conjWord word)) (hPR : PriceRangeOn word)
     (hW : HasSatSelection (standardField word))
     (hW1 : FLatticePaper.W1.W1Forced (frameAt word).child.num (frameAt word).child.den (standardField word))
-    {S : Set Site} (hfort : IsIncomingFort (standardField word) S) {z o : Site} (hzS : z ∈ S)
+    {S : Set Site} (hfort : FortAt (Nonfree (frameAt word)) (standardField word) S) {z o : Site} (hzS : z ∈ S)
     (hzE : z ∈ (frameAt word).closedPolygon) (hNF : Nonfree (frameAt word) z)
     (hw : laplacian (standardField word) z = 0)
     (hf : ForcedEdge (standardField word) (fun _ _ => False) z o) (hoE : o ∈ (frameAt word).closedPolygon)
@@ -77,7 +77,7 @@ theorem minK_white_forced_minus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.t
     o ∈ S ∧ kMinusW word o = kMinusW word z := by
   have hio := forced_input_of_unseeded hf
   have hoS : o ∈ S := by
-    rcases hfort z hzS with ⟨hl, _⟩ | ⟨_, hn, hp⟩
+    rcases hfort z hzS hNF with ⟨hl, _⟩ | ⟨_, hn, hp⟩
     · exfalso
       omega
     · rcases hio with rfl | rfl

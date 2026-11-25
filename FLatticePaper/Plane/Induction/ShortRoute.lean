@@ -153,12 +153,12 @@ theorem north_open (frame : ChildFrame) {b : Site} (hb : b ∈ frame.freeH) (hod
 `v` lies in `S`: `v` and `e = east(v)` are white zero contacts, and `s = south(e)` is in `S`. The exit `s` is a contact on the parabola of
 `b` on the closed polygon, outside the open rectangle. The zero values come from the strip, except `F (north e) = 0`, which is the even
 zero extension `hEZ` (its `t`-grade `t(b) + n − 2d` is in `[2 − L, 1 − d]` exactly when `d ≤ 3n`). -/
-theorem short_H_exit {F : Field} (frame : ChildFrame) (hP : frame.Packet F) {S : Set Site}
-    (hfort : IsIncomingFort F S) {b : Site} (hb : b ∈ frame.freeH) (hodd : ¬ EvenSite b) (hne : b ≠ frame.hLast)
+theorem short_H_exit_fortAt {N : Site → Prop} {F : Field} (frame : ChildFrame) (hP : frame.Packet F) {S : Set Site}
+    (hfort : FortAt N F S) {b : Site} (hb : b ∈ frame.freeH) (hodd : ¬ EvenSite b) (hne : b ≠ frame.hLast)
     (hbt : frame.child.num + 2 ≤ frame.tGrade b) (hD : frame.child.den ≤ 3 * frame.child.num)
     (hEZ : ∀ z : Site, EvenSite z → 2 - (frame.child.den + frame.child.num) ≤ frame.tGrade z →
       frame.tGrade z ≤ 1 - frame.child.den → F z = 0)
-    (hvS : (b.1, b.2 + 1) ∈ S) :
+    (hvS : (b.1, b.2 + 1) ∈ S) (hvN : N (b.1, b.2 + 1)) (heN : N (b.1 + 1, b.2 + 1)) :
     ∃ w : Site, w ∈ S ∧ F w = parabolaField b.2 w ∧ w ∈ frame.closedPolygon ∧ ¬ frame.openRect w := by
   have hlt := freeH_tGrade_add_two_le frame hb hodd hne
   obtain ⟨hL, hsT⟩ := freeH_sGrade_bounds frame hb
@@ -205,7 +205,7 @@ theorem short_H_exit {F : Field} (frame : ChildFrame) (hP : frame.Packet F) {S :
     rw [hinV_neg, hinV_pos, Fw, Fe, Fv]
     ring
   have heS : (b.1 + 1, b.2 + 1) ∈ S := by
-    rcases hfort (b.1, b.2 + 1) hvS with ⟨hl, -⟩ | ⟨-, -, hp⟩
+    rcases hfort (b.1, b.2 + 1) hvS hvN with ⟨hl, -⟩ | ⟨-, -, hp⟩
     · omega
     · rw [hinV_pos] at hp
       exact hp
@@ -221,7 +221,7 @@ theorem short_H_exit {F : Field} (frame : ChildFrame) (hP : frame.Packet F) {S :
     rw [hinE_neg, hinE_pos, Fs, Fn2, Fe]
     ring
   have hsS : (b.1 + 1, b.2) ∈ S := by
-    rcases hfort (b.1 + 1, b.2 + 1) heS with ⟨hl, -⟩ | ⟨-, hn, -⟩
+    rcases hfort (b.1 + 1, b.2 + 1) heS heN with ⟨hl, -⟩ | ⟨-, hn, -⟩
     · omega
     · rw [hinE_neg] at hn
       exact hn
@@ -249,8 +249,30 @@ theorem short_H_exit {F : Field} (frame : ChildFrame) (hP : frame.Packet F) {S :
     omega
   exact ⟨(b.1 + 1, b.2), hsS, hsc, hcl, hnot⟩
 
+/-- **The short H exit** (the unrestricted fort). -/
+theorem short_H_exit {F : Field} (frame : ChildFrame) (hP : frame.Packet F) {S : Set Site}
+    (hfort : IsIncomingFort F S) {b : Site} (hb : b ∈ frame.freeH) (hodd : ¬ EvenSite b) (hne : b ≠ frame.hLast)
+    (hbt : frame.child.num + 2 ≤ frame.tGrade b) (hD : frame.child.den ≤ 3 * frame.child.num)
+    (hEZ : ∀ z : Site, EvenSite z → 2 - (frame.child.den + frame.child.num) ≤ frame.tGrade z →
+      frame.tGrade z ≤ 1 - frame.child.den → F z = 0)
+    (hvS : (b.1, b.2 + 1) ∈ S) :
+    ∃ w : Site, w ∈ S ∧ F w = parabolaField b.2 w ∧ w ∈ frame.closedPolygon ∧ ¬ frame.openRect w :=
+  short_H_exit_fortAt frame hP (N := fun _ => True) (fortAt_of_incoming hfort) hb hodd hne hbt hD hEZ hvS trivial trivial
+
 /-- **The short route exit with the even zero extension derived**: `hEZ` is `W1Strips.even_zero_lower`, from the seed
 `F = 0` on the line `t = 2 − L` (`hseed`) and the slip range (`hslip`, the `slipRange` of the word). -/
+theorem short_H_exit_of_seed_fortAt {N : Site → Prop} {F : Field} (frame : ChildFrame) (hP : frame.Packet F) {S : Set Site}
+    (hfort : FortAt N F S) {b : Site} (hb : b ∈ frame.freeH) (hodd : ¬ EvenSite b) (hne : b ≠ frame.hLast)
+    (hbt : frame.child.num + 2 ≤ frame.tGrade b) (hD : frame.child.den ≤ 3 * frame.child.num)
+    (hslip : ∀ z ∈ frame.closedPolygon, 0 ≤ frame.slip F 1 z)
+    (hseed : ∀ z : Site, EvenSite z → frame.tGrade z = 2 - (frame.child.den + frame.child.num) → F z = 0)
+    (hper : HasGeneratorPeriods frame.child F 0 frame.coherentConstantV)
+    (hvS : (b.1, b.2 + 1) ∈ S) (hvN : N (b.1, b.2 + 1)) (heN : N (b.1 + 1, b.2 + 1)) :
+    ∃ w : Site, w ∈ S ∧ F w = parabolaField b.2 w ∧ w ∈ frame.closedPolygon ∧ ¬ frame.openRect w :=
+  short_H_exit_fortAt frame hP hfort hb hodd hne hbt hD
+    (fun z hz h1 h2 => FLatticePaper.W1Strips.even_zero_lower frame hper hP.strips hslip hseed z hz h1 h2) hvS hvN heN
+
+/-- **The short route exit with the even zero extension derived** (the unrestricted fort). -/
 theorem short_H_exit_of_seed {F : Field} (frame : ChildFrame) (hP : frame.Packet F) {S : Set Site}
     (hfort : IsIncomingFort F S) {b : Site} (hb : b ∈ frame.freeH) (hodd : ¬ EvenSite b) (hne : b ≠ frame.hLast)
     (hbt : frame.child.num + 2 ≤ frame.tGrade b) (hD : frame.child.den ≤ 3 * frame.child.num)
@@ -259,7 +281,7 @@ theorem short_H_exit_of_seed {F : Field} (frame : ChildFrame) (hP : frame.Packet
     (hper : HasGeneratorPeriods frame.child F 0 frame.coherentConstantV)
     (hvS : (b.1, b.2 + 1) ∈ S) :
     ∃ w : Site, w ∈ S ∧ F w = parabolaField b.2 w ∧ w ∈ frame.closedPolygon ∧ ¬ frame.openRect w :=
-  short_H_exit frame hP hfort hb hodd hne hbt hD
-    (fun z hz h1 h2 => FLatticePaper.W1Strips.even_zero_lower frame hper hP.strips hslip hseed z hz h1 h2) hvS
+  short_H_exit_of_seed_fortAt frame hP (N := fun _ => True) (fortAt_of_incoming hfort) hb hodd hne hbt hD hslip hseed hper
+    hvS trivial trivial
 
 end FLatticePaper.ShortRoute

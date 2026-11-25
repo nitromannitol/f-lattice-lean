@@ -1,3 +1,4 @@
+import FLatticePaper.Plane.Induction.FortAt
 import FLatticePaper.Plane.Induction.SignedPolicy
 import FLatticePaper.Plane.BellmanRank
 
@@ -24,7 +25,7 @@ theorem interior_empty_of_retained {P : Set Site} {Q : Site → Prop} {M G : Fie
     (hagree : ∀ y ∈ P, M y = G y)
     (hquota : RetainQuota G R)
     (hrank : ∀ c i, R c i → Rk i < Rk c)
-    (hfort : IsIncomingFort M S)
+    (hfort : FortAt Q M S)
     (hsub : ∀ z ∈ S, z ∈ P)
     (hcand : ∀ z ∈ S, z ∈ P → ¬ Q z → C z)
     (hnc : ∀ x, Q x → ∀ k, C k → ¬ (k = incomingNeg x ∨ k = incomingPos x)) :
@@ -43,7 +44,7 @@ theorem interior_empty_of_retained {P : Set Site} {Q : Site → Prop} {M G : Fie
         by_contra hnQ
         exact hnc x hxQ j (hcand j hjS (hQin x hxQ j hj) hnQ) hj
       exact ⟨j, hRj, hjS, hQj⟩
-    rcases hfort x hxS with ⟨hl, hsome⟩ | ⟨hl, hn, hp⟩
+    rcases hfort x hxS hxQ with ⟨hl, hsome⟩ | ⟨hl, hn, hp⟩
     · have hG : laplacian G x = -1 := by rw [← hlap]; exact hl
       obtain ⟨hRn, hRp⟩ := hquota.1 x hG
       rcases hsome with hsn | hsp

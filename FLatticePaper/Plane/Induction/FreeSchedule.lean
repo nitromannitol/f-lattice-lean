@@ -66,7 +66,7 @@ theorem plus_passage_free {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hPR : FLatticePaper.PassagePR.PriceRangeOn word)
     (hW : HasSatSelection (standardField word))
     (hW1 : FLatticePaper.W1.W1Forced (frameAt word).child.num (frameAt word).child.den (standardField word))
-    {S : Set Site} (hfort : IsIncomingFort (standardField word) S) {z₀ : Site} (hz₀S : z₀ ∈ S)
+    {S : Set Site} (hfort : FortAt (Nonfree (frameAt word)) (standardField word) S) {z₀ : Site} (hz₀S : z₀ ∈ S)
     (hz₀E : z₀ ∈ (frameAt word).closedPolygon)
     (hmin : ∀ w ∈ S, kPlusW word z₀ ≤ kPlusW word w)
     (hrank : ∃ ρ : Site → ℕ, ∀ z o, (z ∈ S ∧ z ∈ (frameAt word).closedPolygon ∧ kPlusW word z = kPlusW word z₀) →
@@ -89,7 +89,7 @@ theorem plus_passage_free {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
           rw [hzK]
           exact hmin w hw
         rcases hpk.binary z with hb | hb
-        · obtain ⟨i, hi, hiS, hiK⟩ := minK_black_input_plus h hSE hPR hpk hfort hzS hzE hb hminz
+        · obtain ⟨i, hi, hiS, hiK⟩ := minK_black_input_plus h hSE hPR hpk hfort hzS hnfz hzE hb hminz
           have hiE : i ∈ (frameAt word).closedPolygon := by
             rcases hi with rfl | rfl
             · exact hstar.2.1
@@ -113,7 +113,7 @@ theorem minus_passage_free {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hPR : FLatticePaper.PassagePR.PriceRangeOn word)
     (hW : HasSatSelection (standardField word))
     (hW1 : FLatticePaper.W1.W1Forced (frameAt word).child.num (frameAt word).child.den (standardField word))
-    {S : Set Site} (hfort : IsIncomingFort (standardField word) S) {z₀ : Site} (hz₀S : z₀ ∈ S)
+    {S : Set Site} (hfort : FortAt (Nonfree (frameAt word)) (standardField word) S) {z₀ : Site} (hz₀S : z₀ ∈ S)
     (hz₀E : z₀ ∈ (frameAt word).closedPolygon)
     (hmin : ∀ w ∈ S, kMinusW word z₀ ≤ kMinusW word w)
     (hrank : ∃ ρ : Site → ℕ, ∀ z o, (z ∈ S ∧ z ∈ (frameAt word).closedPolygon ∧ kMinusW word z = kMinusW word z₀) →
@@ -136,7 +136,7 @@ theorem minus_passage_free {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
           rw [hzK]
           exact hmin w hw
         rcases hpk.binary z with hb | hb
-        · obtain ⟨i, hi, hiS, hiK⟩ := minK_black_input_minus h hSE hPR hpk hfort hzS hzE hb hminz
+        · obtain ⟨i, hi, hiS, hiK⟩ := minK_black_input_minus h hSE hPR hpk hfort hzS hnfz hzE hb hminz
           have hiE : i ∈ (frameAt word).closedPolygon := by
             rcases hi with rfl | rfl
             · exact hstar.2.1
