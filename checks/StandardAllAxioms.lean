@@ -1,0 +1,13 @@
+import FLatticePaper.Tiles.StandardAll
+import FLatticePaper.Tiles.RegisterStepAll
+import FLatticePaper.Plane.GlobalOdometersAll
+
+#print axioms FLatticePaper.Tiles.StandardAll.standardBoundaryWord_all
+#print axioms FLatticePaper.Tiles.StandardAll.clauseA_standard_odd_all
+#print axioms FLatticePaper.Tiles.StandardAll.clauseA_standard_even_all
+#print axioms FLatticePaper.Tiles.StandardAll.deck_covers_odd_all
+#print axioms FLatticePaper.Tiles.StandardAll.covers_of_eq_even_all
+#print axioms FLatticePaper.Tiles.RegisterStepAll.S2_every
+#print axioms FLatticePaper.GlobalOdometers.global_odometers_all
+#print axioms FLatticePaper.OddPhaseAlternate.global_odometers_pair_all
+#check @FLatticePaper.OddPhaseAlternate.global_odometers_pair_all
