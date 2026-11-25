@@ -229,3 +229,45 @@ theorem hsq_C_collar_tie {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) 
       exact ⟨⟨fun _ => by rw [psi_reflect hw hSE p2]; omega, fun h => absurd hc0 h⟩, T2'⟩
 
 end FLatticePaper.CollarTie
+
+namespace FLatticePaper.CollarTie
+
+open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.SquareClauses FLatticePaper.AndOrRank
+open FLatticePaper.W1 FLatticePaper.W1Phase FLatticePaper.W1MSheet FLatticePaper.W1SheetSquare
+open FLatticePaper.W1NonfreeOut FLatticePaper.W1NonfreeSheet FLatticePaper.W1NonfreeHsq FLatticePaper.W1Step
+open FLatticePaper.W1Pointers FLatticePaper.W1NonfreeSquare FLatticePaper.W1CollarFrame
+open FLatticePaper.W1NonfreeHsqNonneg FLatticePaper.W1MReflect FLatticePaper.W1NonfreeHsqC
+open FLatticePaper.CollarSquare FLatticePaper.CollarTop FLatticePaper.CollarCReflect
+
+
+/-- **The collar `hsq` for `Ψ c ≤ 0`**: the case split on the sign of `Ψ c`. The strict case is `hsq_C_collar`; the tie case is
+`hsq_C_collar_tie`, which needs the whiteness of the tie centre and the tie agreement `hagree`. -/
+theorem hsq_C_collar_le {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
+    {seed : Site → Site → Prop}
+    (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
+    (hs : seed = fun _ _ => False)
+    (hW1 : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
+      (standardField (conjWord word)))
+    (hfree : ∀ c : Site, 0 ≤ sheetPsi word c → laplacian (MW word) c = 0 →
+      ¬ Nonfree (frameAt (conjWord word)) (zTurn (c - (frameAt word).sheetShift)) →
+      ParentSquareOut (standardField (conjWord word)) P.retained (zTurn (c - (frameAt word).sheetShift)))
+    (hagree : ∀ x, sheetPsi word x = 0 → ∀ y,
+      sheetPolicyA P.toOldPolicyWitness.toOldPolicyData (frameAt word).sheetShift x y ↔
+        sheetPolicyC P.toOldPolicyWitness.toOldPolicyData (frameAt word).sheetShift (frameAt word).centre x y)
+    {c : Site} (hcS : StrictInterior (frameAt word).child.num (frameAt word).child.den c)
+    (hc0 : sheetPsi word c ≤ 0) (hwhite : sheetPsi word c = 0 → laplacian (MW word) c = 0)
+    {q0 q1 q2 o : Site} {qa qb : ℤ}
+    (hpsq : PSquare (standardField (conjWord word)) P.retained
+      (zTurn ((frameAt word).centre - c - (frameAt word).sheetShift)) q0 q1 q2 o qa qb)
+    (hstrict0 : StrictInterior (frameAt word).child.num (frameAt word).child.den
+      ((frameAt word).sheetShift + zTurnInv q0))
+    (hstrict1 : StrictInterior (frameAt word).child.num (frameAt word).child.den
+      ((frameAt word).sheetShift + zTurnInv q1))
+    (hstrict2 : StrictInterior (frameAt word).child.num (frameAt word).child.den
+      ((frameAt word).sheetShift + zTurnInv q2)) :
+    HsqAt word P c := by
+  rcases lt_or_eq_of_le hc0 with h | h
+  · exact hsq_C_collar hw hSE P hs hW1 hfree hcS h hpsq hstrict0 hstrict1 hstrict2
+  · exact hsq_C_collar_tie hw hSE P hs hW1 hfree hagree hcS h (hwhite h) hpsq hstrict0 hstrict1 hstrict2
+
+end FLatticePaper.CollarTie
