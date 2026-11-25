@@ -251,4 +251,69 @@ theorem game_WNE {F : Field} {S : Set Site} (frame : ChildFrame) (hG : IsGameFor
   exact hm_both.2
 
 
+/-- The canonical input of a free site is one of its two actual inputs (`η = ±1`). -/
+theorem canonicalInput_is_input (frame : ChildFrame) (η : ℤ) (hη : η = 1 ∨ η = -1) {z : Site}
+    (hz : z ∈ frame.freeH ∪ frame.freeV) :
+    canonicalInput frame η z = incomingNeg z ∨ canonicalInput frame η z = incomingPos z := by
+  by_cases hH : z ∈ frame.freeH
+  · unfold canonicalInput
+    rw [if_pos hH]
+    by_cases he : EvenSite z
+    · rw [prescribedH_even frame η hH he, incomingPos_of_even _ he]
+      right
+      ext <;> simp
+    · by_cases hF : z = hFirst
+      · subst hF
+        rw [frame.prescribedH_hFirst η]
+        rw [incomingNeg_of_not_even _ he, incomingPos_of_not_even _ he]
+        rcases hη with rfl | rfl
+        · left; ext <;> simp [sub_eq_add_neg]
+        · right; ext <;> simp
+      · by_cases hL : z = frame.hLast
+        · unfold ChildFrame.prescribedH
+          rw [if_neg hF, if_pos hL, incomingPos_of_not_even _ he]
+          right
+          ext <;> simp
+        · unfold ChildFrame.prescribedH
+          rw [if_neg hF, if_neg hL, if_neg he, incomingPos_of_not_even _ he]
+          right
+          ext <;> simp
+  · have hVz : z ∈ frame.freeV := hz.resolve_left hH
+    unfold canonicalInput
+    rw [if_neg hH]
+    by_cases he : EvenSite z
+    · by_cases hF : z = vFirst
+      · subst hF
+        rw [frame.prescribedV_vFirst η, incomingPos_of_even _ he]
+        right
+        ext <;> simp
+      · by_cases hL : z = frame.vLast
+        · unfold ChildFrame.prescribedV
+          rw [if_neg hF, if_pos hL, incomingPos_of_even _ he, incomingNeg_of_even _ he]
+          rcases hη with rfl | rfl
+          · right; ext <;> simp
+          · left; ext <;> simp [sub_eq_add_neg]
+        · rw [prescribedV_even frame η he hF hL, incomingPos_of_even _ he, incomingNeg_of_even _ he]
+          rcases hη with rfl | rfl
+          · right; ext <;> simp
+          · left; ext <;> simp [sub_eq_add_neg]
+    · rw [prescribedV_odd frame η he, incomingPos_of_not_even _ he, incomingNeg_of_not_even _ he]
+      rcases hη with rfl | rfl
+      · left; ext <;> simp [sub_eq_add_neg]
+      · right; ext <;> simp
+
+/-- **The free white rule as a forced input** (the table's content in the game form): a free white root `z` of a game fort `S` has its
+canonical input in `S`, and the canonical input is one of its actual inputs. -/
+theorem free_white_forced_input {F : Field} {S : Set Site} (frame : ChildFrame) (η : ℤ) (hη : η = 1 ∨ η = -1)
+    (hG : IsGameFort frame η F S) {z : Site} (hzS : z ∈ S) (hzf : z ∈ frame.freeH ∪ frame.freeV)
+    (hzW : laplacian F z = 0) :
+    canonicalInput frame η z ∈ S ∧
+      (canonicalInput frame η z = incomingNeg z ∨ canonicalInput frame η z = incomingPos z) := by
+  refine ⟨?_, canonicalInput_is_input frame η hη hzf⟩
+  rcases hG z hzS with ⟨hl, -⟩ | ⟨-, hnf, -, -⟩ | ⟨-, -, hc⟩ | ⟨-, hnfree, -, -⟩
+  · rw [hzW] at hl; norm_num at hl
+  · exact absurd hnf (not_nonfree_of_free frame hzf)
+  · exact hc
+  · exact absurd hzf hnfree
+
 end FLatticePaper.GameFort
