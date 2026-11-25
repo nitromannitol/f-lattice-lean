@@ -385,4 +385,269 @@ theorem cone_next_root (b : Site) (K : ℕ) (x w : Site) (hR : ConeRoot b K x)
       · exfalso
         exact h (by unfold EvenSite; dsimp only; omega)
 
+/-! ### The strict top of the cap (ALL_SLOPE_STEP: "Strictness excludes height K*"; the upper arc of the cone)
+
+The odd anchor `(3−k, k−2)` has harmonic value `m(k−1)` (`h0 = −y(y+1)/2` at `x + y = 1`), which is above `m(k)`. Monotonicity of the
+odd sheet then makes the ray point of height `K` strictly above `m(K)`; the even ray point and every cone input at height `K` follow. A
+fan contact cannot sit at height `K`, which is the upper arc. -/
+
+/-- The harmonic value at the odd anchor `(3−k, k−2)`: `m(k−1)`. -/
+theorem anchor3_value {frame : ChildFrame} {F : Field} (hS : frame.HasStrips F) (k : ℤ)
+    (hlo : 1 - 2 * frame.child.den ≤ frame.child.den + 5 * frame.child.num - 2 * frame.child.num * k)
+    (hhi : frame.child.den + 5 * frame.child.num - 2 * frame.child.num * k ≤ 2 * (frame.child.den + frame.child.num) - 1) :
+    F (3 - k, k - 2) = FLatticePaper.QuadraticCap.capMin (k - 1) := by
+  have hs : 1 - 2 * frame.child.den ≤ frame.sGrade (3 - k, k - 2) ∧
+      frame.sGrade (3 - k, k - 2) ≤ 2 * (frame.child.den + frame.child.num) - 1 := by
+    have e : frame.sGrade (3 - k, k - 2)
+        = frame.child.den + 5 * frame.child.num - 2 * frame.child.num * k := by
+      unfold ChildFrame.sGrade
+      ring
+    rw [e]
+    exact ⟨hlo, hhi⟩
+  rw [hS.2 (3 - k, k - 2) hs.1 hs.2]
+  unfold FLatticePaper.Induction.harmonicGrid FLatticePaper.QuadraticCap.capMin
+  have e : (3 - k) ^ 2 + 2 * (3 - k) * (k - 2) - (k - 2) ^ 2 - 2 * (k - 2) - ((3 - k) + (k - 2)) % 2
+      = -2 * ((k - 1) * (k - 2)) := by
+    have h1 : ((3 - k) + (k - 2)) % 2 = 1 := by omega
+    rw [h1]
+    ring
+  rw [e, show k - 1 - 1 = k - 2 by ring]
+  obtain ⟨t, ht⟩ := Int.even_mul_pred_self (k - 1)
+  rw [show k - 1 - 1 = k - 2 by ring] at ht
+  rw [ht]
+  omega
+
+/-- **The strict ray value at height `K`** (ALL_SLOPE_STEP, "Strictness excludes height K*"): `m(K−1) ≤ F(p+K, q+K)`. The anchor is
+`(3−K, K−2)`, with `t(anchor) ≤ t(ray)` when `NK ≥ D + 2N − 1`; the odd sheet monotonicity (from `hsig`) compares them. -/
+theorem ray_strict {F : Field} (frame : ChildFrame) (hP : frame.Packet F)
+    (hsig : ∀ w ∈ frame.closedPolygon, F w - F (w - frame.shortShift) ≤ 0)
+    {p q : ℤ} (hs : frame.child.num * p - frame.child.den * q = 2 - frame.child.num) (K : ℕ)
+    (hK2 : 2 ≤ K)
+    (hKs : frame.child.den + 2 * frame.child.num - 1 ≤ frame.child.num * (K : ℤ))
+    (hKr : 2 * frame.child.num * (K : ℤ) ≤ 3 * frame.child.den + 5 * frame.child.num - 1) :
+    FLatticePaper.QuadraticCap.capMin ((K : ℤ) - 1) ≤ F (p + (K : ℤ), q + (K : ℤ)) := by
+  have hpq := start_parity frame hs
+  obtain ⟨hn1, hn2, -, hd3, -⟩ := frame.child_facts
+  have hK2' : (2 : ℤ) ≤ (K : ℤ) := by exact_mod_cast hK2
+  have hanc := anchor3_value hP.strips (K : ℤ) (by nlinarith) (by nlinarith)
+  have htA : frame.tGrade (3 - (K : ℤ), (K : ℤ) - 2)
+      = frame.child.num * (3 - (K : ℤ)) - frame.child.den * ((K : ℤ) - 2) := by
+    unfold ChildFrame.tGrade
+    rfl
+  have htR : frame.tGrade (p + (K : ℤ), q + (K : ℤ))
+      = 2 - frame.child.num - (K : ℤ) * (frame.child.den - frame.child.num) := by
+    unfold ChildFrame.tGrade
+    linear_combination hs
+  have hK3 : (0 : ℤ) ≤ (K : ℤ) - 2 := by omega
+  have hD1 : (0 : ℤ) ≤ frame.child.den - frame.child.num - 1 := by omega
+  have hprod := mul_nonneg hK3 hD1
+  have hmono := sheetMono_odd_of_signed frame hP hsig (3 - (K : ℤ), (K : ℤ) - 2) (p + (K : ℤ), q + (K : ℤ))
+    (by unfold EvenSite; simp only; omega) (by unfold EvenSite; simp only; omega)
+    (by rw [htA, htR]; nlinarith) (by rw [htR]; nlinarith)
+  rw [hanc] at hmono
+  exact hmono
+
+/-- The even ray point at height `K` is strictly above `m(K)`: `2 F c ≥ F(west) + F(east)` with `F(west) ≥ m(K−1)`, `F(east) ≥ m(K)`. -/
+theorem even_ray_strict {F : Field} (frame : ChildFrame) (hP : frame.Packet F)
+    (hsig : ∀ w ∈ frame.closedPolygon, F w - F (w - frame.shortShift) ≤ 0)
+    {p q : ℤ} (hs : frame.child.num * p - frame.child.den * q = 2 - frame.child.num) (K : ℕ)
+    (hK2 : 2 ≤ K)
+    (hKs : frame.child.den + 2 * frame.child.num - 1 ≤ frame.child.num * (K : ℤ))
+    (hKr : 2 * frame.child.num * (K : ℤ) ≤ 3 * frame.child.den + 5 * frame.child.num - 1)
+    (hcap : ∀ k : ℕ, k ≤ K → FLatticePaper.QuadraticCap.capMin k ≤ F (p + (k : ℤ), q + (k : ℤ))) :
+    FLatticePaper.QuadraticCap.capMin (K : ℤ) < F (p + (K : ℤ) + 1, q + (K : ℤ)) := by
+  have hpq := start_parity frame hs
+  obtain ⟨hn1, hn2, -, hd3, -⟩ := frame.child_facts
+  have hK2' : (2 : ℤ) ≤ (K : ℤ) := by exact_mod_cast hK2
+  have hW := ray_strict frame hP hsig hs K hK2 hKs hKr
+  have hkC := kC_nonneg frame K
+  have hev : EvenSite (p + (K : ℤ) + 1, q + (K : ℤ)) := by unfold EvenSite; simp only; omega
+  have hinN : incomingNeg (p + (K : ℤ) + 1, q + (K : ℤ)) = (p + (K : ℤ), q + (K : ℤ)) := by
+    unfold incomingNeg; rw [if_pos hev]; congr 1; ring
+  have hinP : incomingPos (p + (K : ℤ) + 1, q + (K : ℤ)) = (p + (K : ℤ) + 2, q + (K : ℤ)) := by
+    unfold incomingPos; rw [if_pos hev]; congr 1; ring
+  have hb := hP.binary (p + (K : ℤ) + 1, q + (K : ℤ))
+  unfold laplacian at hb
+  rw [hinN, hinP] at hb
+  have hzo : ¬ EvenSite (p + (K : ℤ) + 2, q + (K : ℤ)) := by unfold EvenSite; simp only; omega
+  have hrtE : frame.tGrade (p + (K : ℤ) + 2, q + (K : ℤ))
+      = 2 + frame.child.num - (K : ℤ) * (frame.child.den - frame.child.num) := by
+    simp only [ChildFrame.tGrade]; linear_combination hs
+  have hE := odd_halo frame hP hsig hs K hcap K le_rfl (p + (K : ℤ) + 2, q + (K : ℤ)) hzo
+    (by rw [hrtE]; linarith)
+    (by rw [hrtE]; nlinarith)
+  have h2 : FLatticePaper.QuadraticCap.capMin ((K : ℤ) - 1) - FLatticePaper.QuadraticCap.capMin (K : ℤ) = (K : ℤ) - 1 := by
+    have h1 := FLatticePaper.QuadraticCap.two_capMin ((K : ℤ) - 1)
+    have h2' := FLatticePaper.QuadraticCap.two_capMin (K : ℤ)
+    have h3 : 2 * (FLatticePaper.QuadraticCap.capMin ((K : ℤ) - 1) - FLatticePaper.QuadraticCap.capMin (K : ℤ))
+        = 2 * ((K : ℤ) - 1) := by linear_combination h1 - h2'
+    linarith
+  rcases hb with h | h <;> linarith
+
+
+/-- `m(K−1) − m(K) = K − 1`. -/
+theorem capMin_pred_sub (K : ℤ) :
+    FLatticePaper.QuadraticCap.capMin (K - 1) - FLatticePaper.QuadraticCap.capMin K = K - 1 := by
+  have h1 := FLatticePaper.QuadraticCap.two_capMin (K - 1)
+  have h2 := FLatticePaper.QuadraticCap.two_capMin K
+  have h3 : 2 * (FLatticePaper.QuadraticCap.capMin (K - 1) - FLatticePaper.QuadraticCap.capMin K)
+      = 2 * (K - 1) := by linear_combination h1 - h2
+  linarith
+
+/-- **The cone strict top** (the upper arc): every cone input `w` at height `K` lies strictly above `m(K)`. The even case compares with the
+even ray point (`even_ray_strict`), the odd case with the ray point (`ray_strict`); the zero strip covers `t w > 0`. -/
+theorem cone_strict_top {F : Field} (frame : ChildFrame) (hP : frame.Packet F)
+    (hsig : ∀ w ∈ frame.closedPolygon, F w - F (w - frame.shortShift) ≤ 0)
+    {p q : ℤ} (hs : frame.child.num * p - frame.child.den * q = 2 - frame.child.num) (K : ℕ)
+    (hK2 : 2 ≤ K)
+    (hKs : frame.child.den + 2 * frame.child.num - 1 ≤ frame.child.num * (K : ℤ))
+    (hKr : 2 * frame.child.num * (K : ℤ) ≤ 3 * frame.child.den + 5 * frame.child.num - 1)
+    (hcap : ∀ k : ℕ, k ≤ K → FLatticePaper.QuadraticCap.capMin k ≤ F (p + (k : ℤ), q + (k : ℤ)))
+    (b : Site) (hb : frame.child.num + 2 ≤ frame.tGrade b)
+    (w : Site) (hwK : w.2 - b.2 = (K : ℤ))
+    (hevw : EvenSite w → w.1 - b.1 ≥ (K : ℤ) - 1) (hoddw : ¬ EvenSite w → w.1 - b.1 ≥ (K : ℤ) - 2)
+    (hpoly : w ∈ frame.closedPolygon) :
+    FLatticePaper.QuadraticCap.capMin (K : ℤ) < F w := by
+  have hpq := start_parity frame hs
+  obtain ⟨hn1, hn2, -, hd3, -⟩ := frame.child_facts
+  have hK2' : (2 : ℤ) ≤ (K : ℤ) := by exact_mod_cast hK2
+  have htw : frame.tGrade w
+      = frame.tGrade b + frame.child.num * (w.1 - b.1) - frame.child.den * (K : ℤ) := by
+    unfold ChildFrame.tGrade
+    rw [← hwK]
+    ring
+  have hup : frame.tGrade w ≤ frame.child.num + 2 * frame.child.den - 1 := by
+    unfold ChildFrame.closedPolygon at hpoly
+    simp only [Set.mem_setOf_eq] at hpoly
+    split_ifs at hpoly with he
+    · omega
+    · omega
+  have hcapK : FLatticePaper.QuadraticCap.capMin (K : ℤ) ≤ -1 := by
+    have h := FLatticePaper.QuadraticCap.two_capMin (K : ℤ)
+    nlinarith
+  have hpar : frame.tGrade (p + (K : ℤ) + 1, q + (K : ℤ))
+      = 2 - (K : ℤ) * (frame.child.den - frame.child.num) := by
+    unfold ChildFrame.tGrade
+    linear_combination hs
+  have hrayt : frame.tGrade (p + (K : ℤ), q + (K : ℤ))
+      = 2 - frame.child.num - (K : ℤ) * (frame.child.den - frame.child.num) := by
+    unfold ChildFrame.tGrade
+    linear_combination hs
+  by_cases hz : EvenSite w
+  · have hl := hevw hz
+    have hc := even_ray_strict frame hP hsig hs K hK2 hKs hKr hcap
+    have hm := mul_le_mul_of_nonneg_left (show (K : ℤ) - 1 ≤ w.1 - b.1 by linarith)
+      (show (0 : ℤ) ≤ frame.child.num by omega)
+    by_cases ht0 : frame.tGrade w ≤ 0
+    · have hevc : EvenSite (p + (K : ℤ) + 1, q + (K : ℤ)) := by unfold EvenSite; simp only; omega
+      have hF := sheetMono_even_of_signed frame hP hsig (p + (K : ℤ) + 1, q + (K : ℤ)) w hevc hz
+        (by rw [hpar, htw]; nlinarith) ht0
+      linarith
+    · have hF0 : F w = 0 := hP.strips.1 w (by omega) hup
+      rw [hF0]
+      linarith
+  · have hl := hoddw hz
+    have hc := ray_strict frame hP hsig hs K hK2 hKs hKr
+    have hdiff := capMin_pred_sub (K : ℤ)
+    have hm := mul_le_mul_of_nonneg_left (show (K : ℤ) - 2 ≤ w.1 - b.1 by linarith)
+      (show (0 : ℤ) ≤ frame.child.num by omega)
+    by_cases ht0 : frame.tGrade w ≤ 0
+    · have hodr : ¬ EvenSite (p + (K : ℤ), q + (K : ℤ)) := by unfold EvenSite; simp only; omega
+      have hF := sheetMono_odd_of_signed frame hP hsig (p + (K : ℤ), q + (K : ℤ)) w hodr hz
+        (by rw [hrayt, htw]; nlinarith) ht0
+      linarith
+    · have hF0 : F w = 0 := hP.strips.1 w (by omega) hup
+      rw [hF0]
+      linarith
+
+/-- **The lower arc**: a height-`b_y` even site with `x ≥ b_x` is not in the open rectangle (its `t` is at least `N+2 ≥ 2`). -/
+theorem lower_arc (frame : ChildFrame) (b : Site) (hb : frame.child.num + 2 ≤ frame.tGrade b)
+    (w : Site) (hz : EvenSite w) (hh : w.2 = b.2) (hl : b.1 ≤ w.1) : ¬ frame.openRect w := by
+  intro ho
+  unfold ChildFrame.openRect at ho
+  rw [if_pos hz] at ho
+  have htw : frame.tGrade w = frame.tGrade b + frame.child.num * (w.1 - b.1) - frame.child.den * (w.2 - b.2) := by
+    unfold ChildFrame.tGrade
+    ring
+  rw [hh, sub_self, mul_zero, sub_zero] at htw
+  obtain ⟨hn1, -, -, -, -⟩ := frame.child_facts
+  have hm := mul_nonneg (show (0 : ℤ) ≤ frame.child.num by omega) (show (0 : ℤ) ≤ w.1 - b.1 by omega)
+  have ht2 := ho.2.1
+  linarith
+
+/-- **A fan step stays in the window** (the two height bounds of the cone, ALL_SLOPE_STEP "Propagation"). Let `x` be a window root
+(open rectangle and cone) and `w` its fan successor (`fan_step`: east from an even root; north or south from an odd root), with `w`
+open and a contact (`F w = m w`). Then `w` is again a window root. The south step from height `1` lands on the lower arc, which is not
+open (`lower_arc`); the north step to height `K` is a contact strictly above `m(K)` (`cone_strict_top`), so it cannot occur. -/
+theorem fan_next_P {F : Field} (frame : ChildFrame) (hP : frame.Packet F)
+    (hsig : ∀ w ∈ frame.closedPolygon, F w - F (w - frame.shortShift) ≤ 0)
+    {p q : ℤ} (hs : frame.child.num * p - frame.child.den * q = 2 - frame.child.num) (K : ℕ)
+    (hK2 : 2 ≤ K)
+    (hKs : frame.child.den + 2 * frame.child.num - 1 ≤ frame.child.num * (K : ℤ))
+    (hKr : 2 * frame.child.num * (K : ℤ) ≤ 3 * frame.child.den + 5 * frame.child.num - 1)
+    (hcap : ∀ k : ℕ, k ≤ K → FLatticePaper.QuadraticCap.capMin k ≤ F (p + (k : ℤ), q + (k : ℤ)))
+    (b : Site) (hb : frame.child.num + 2 ≤ frame.tGrade b) (x w : Site)
+    (hx : frame.openRect x ∧ ConeRoot b K x)
+    (hw : w = incomingNeg x ∨ w = incomingPos x)
+    (hEven : EvenSite x → w = incomingPos x)
+    (hopen : frame.openRect w)
+    (hcontact : F w = FLatticePaper.QuadraticCap.capMin (w.2 - b.2)) :
+    frame.openRect w ∧ ConeRoot b K w := by
+  refine ⟨hopen, ?_⟩
+  obtain ⟨hxo, hR⟩ := hx
+  obtain ⟨h1, h2, hevx, hoddx⟩ := hR
+  have hpoly : w ∈ frame.closedPolygon := FLatticePaper.W1Exit.rectInputs frame x hxo w hw
+  have hpq := start_parity frame hs
+  obtain ⟨hn1, -, -, hd3, -⟩ := frame.child_facts
+  by_cases hxe : EvenSite x
+  · -- an even root moves east to an odd root of the same height
+    have hwe := hEven hxe
+    subst hwe
+    have hp : incomingPos x = (x.1 + 1, x.2) := by unfold incomingPos; rw [if_pos hxe]
+    rw [hp]
+    have hxu : (x.1 + x.2) % 2 = 0 := hxe
+    unfold ConeRoot
+    refine ⟨?_, ?_, fun h => ?_, fun _ => ?_⟩
+    · dsimp only; omega
+    · dsimp only; omega
+    · exfalso; unfold EvenSite at h; dsimp only at h; omega
+    · dsimp only; have := hevx hxe; omega
+  · have hxo' : ¬ (x.1 + x.2) % 2 = 0 := hxe
+    have hl := hoddx hxe
+    rcases hw with hw | hw
+    · -- south: the even root at height `k − 1`; height `1` is the lower arc
+      have hpw : w = (x.1, x.2 - 1) := by rw [hw]; unfold incomingNeg; rw [if_neg hxe]
+      subst hpw
+      have hk2 : 2 ≤ x.2 - b.2 := by
+        by_contra hc
+        have hk1 : x.2 - b.2 = 1 := by omega
+        exact lower_arc frame b hb (x.1, x.2 - 1) (by unfold EvenSite; dsimp only; omega)
+          (by dsimp only; omega) (by dsimp only; omega) hopen
+      unfold ConeRoot
+      refine ⟨?_, ?_, fun _ => ?_, fun h => ?_⟩
+      · dsimp only; omega
+      · dsimp only; omega
+      · dsimp only; omega
+      · exfalso; exact h (by unfold EvenSite; dsimp only; omega)
+    · -- north: the even root at height `k + 1`; height `K` is a contact strictly above `m(K)`
+      have hpw : w = (x.1, x.2 + 1) := by rw [hw]; unfold incomingPos; rw [if_neg hxe]
+      subst hpw
+      have hne : x.2 - b.2 + 1 ≠ (K : ℤ) := by
+        intro heq
+        have hlt := cone_strict_top frame hP hsig hs K hK2 hKs hKr hcap b hb (x.1, x.2 + 1)
+          (by dsimp only; omega)
+          (fun _ => by dsimp only; omega)
+          (fun h => absurd (by unfold EvenSite; dsimp only; omega) h)
+          hpoly
+        rw [hcontact] at hlt
+        dsimp only at hlt
+        rw [show x.2 + 1 - b.2 = (K : ℤ) by omega] at hlt
+        exact lt_irrefl _ hlt
+      unfold ConeRoot
+      refine ⟨?_, ?_, fun _ => ?_, fun h => ?_⟩
+      · dsimp only; omega
+      · dsimp only; omega
+      · dsimp only; omega
+      · exfalso; exact h (by unfold EvenSite; dsimp only; omega)
+
 end FLatticePaper.CapRay
