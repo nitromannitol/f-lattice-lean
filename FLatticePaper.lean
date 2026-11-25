@@ -325,6 +325,8 @@ import FLatticePaper.Tiles.CellBox
 import FLatticePaper.Tiles.WalkCover
 import FLatticePaper.Tiles.WalkLines
 import FLatticePaper.Tiles.WordCounts
+import FLatticePaper.Tiles.SeamCover
+import FLatticePaper.Tiles.SeamCoverFinal
 import FLatticePaper.Plane.Induction.CornerPositive
 import FLatticePaper.Tiles.InterfaceStacked
 import FLatticePaper.Tiles.StringCorners
