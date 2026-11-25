@@ -507,6 +507,7 @@ import FLatticePaper.Plane.Induction.GradeCollision
 import FLatticePaper.Plane.Induction.LiftTranslate
 import FLatticePaper.Plane.Induction.NativeGrade
 import FLatticePaper.Plane.Induction.LiftPsi
+import FLatticePaper.Plane.Induction.Transport
 import FLatticePaper.Plane.Induction.BaseMembership
 import FLatticePaper.Plane.Induction.BaseSpec
 import FLatticePaper.Plane.Induction.ConjFreeH
