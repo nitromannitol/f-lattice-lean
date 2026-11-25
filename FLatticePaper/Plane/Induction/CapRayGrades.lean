@@ -18,13 +18,13 @@ open FLatticePaper FLatticePaper.Induction FLatticePaper.CapRecursion
 
 /-- **A start of the ray with odd parity.** For coprime `N, D` with `D + N` odd there are `p, q` with `N p − D q = 2 − N` and
 `p + q` odd: shift a solution by `(D, N)`, which keeps `N p − D q` and changes `p + q` by `D + N`. -/
-theorem ray_start_odd (N D : ℤ) (hcop : IsCoprime N D) (hodd : (D + N) % 2 = 1) :
-    ∃ p q : ℤ, N * p - D * q = 2 - N ∧ (p + q) % 2 = 1 := by
+theorem ray_start_odd (N D a : ℤ) (hcop : IsCoprime N D) (hodd : (D + N) % 2 = 1) :
+    ∃ p q : ℤ, N * p - D * q = a - N ∧ (p + q) % 2 = 1 := by
   obtain ⟨u, v, huv⟩ := hcop
-  have h0 : N * ((2 - N) * u) - D * (-((2 - N) * v)) = 2 - N := by linear_combination (2 - N) * huv
-  by_cases hpar : ((2 - N) * u + -((2 - N) * v)) % 2 = 1
-  · exact ⟨(2 - N) * u, -((2 - N) * v), h0, hpar⟩
-  · refine ⟨(2 - N) * u + D, -((2 - N) * v) + N, ?_, ?_⟩
+  have h0 : N * ((a - N) * u) - D * (-((a - N) * v)) = a - N := by linear_combination (a - N) * huv
+  by_cases hpar : ((a - N) * u + -((a - N) * v)) % 2 = 1
+  · exact ⟨(a - N) * u, -((a - N) * v), h0, hpar⟩
+  · refine ⟨(a - N) * u + D, -((a - N) * v) + N, ?_, ?_⟩
     · linear_combination h0
     · omega
 
@@ -32,7 +32,7 @@ theorem ray_start_odd (N D : ℤ) (hcop : IsCoprime N D) (hodd : (D + N) % 2 = 1
 zero strip, the harmonic strip and the two sheet monotonicities in the `(N, D)`-grades, and the anchor ranges `J, K`, the ray
 satisfies `m(k) ≤ F (p+k, q+k)` for `k ≤ K`. Only `0 < N < D` is used: the proper conditions `3 ≤ N`, `4 ≤ D − N` of the H
 frame are not needed here (checked by a probe build; the conclusion also holds numerically at the rotated words with `N ∈ {1,2}`). -/
-theorem ray_cap_NDgrades {F : Field} (N D : ℤ)
+theorem ray_cap_NDgrades {F : Field} (N D a : ℤ) (ha1 : 1 ≤ a) (ha2 : a ≤ 2)
     (hN0 : 0 < N) (hNDlt : N < D)
     (hbin : ∀ x : Site, laplacian F x = -1 ∨ laplacian F x = 0)
     (hzero : ∀ w : Site, 1 - D ≤ N * w.1 - D * w.2 → N * w.1 - D * w.2 ≤ N + 2 * D - 1 → F w = 0)
@@ -42,7 +42,7 @@ theorem ray_cap_NDgrades {F : Field} (N D : ℤ)
       N * v.1 - D * v.2 ≤ 0 → F u ≤ F v)
     (heven : ∀ u v : Site, EvenSite u → EvenSite v → N * u.1 - D * u.2 ≤ N * v.1 - D * v.2 →
       N * v.1 - D * v.2 ≤ 0 → F u ≤ F v)
-    {p q : ℤ} (hs : N * p - D * q = 2 - N) (hpq : (p + q) % 2 = 1)
+    {p q : ℤ} (hs : N * p - D * q = a - N) (hpq : (p + q) % 2 = 1)
     (J K : ℕ)
     (hJ1 : 2 * N * (J : ℤ) ≤ N + D - 2)
     (hJ2 : N + D - 2 < 2 * N * ((J : ℤ) + 1))
