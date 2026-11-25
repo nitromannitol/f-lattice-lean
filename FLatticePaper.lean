@@ -526,6 +526,7 @@ import FLatticePaper.Plane.Induction.TwosRankStrict
 import FLatticePaper.Plane.Induction.TwosTileUnique
 import FLatticePaper.Plane.Induction.TwosDeckTile
 import FLatticePaper.Plane.Induction.TwosLattice
+import FLatticePaper.Plane.Induction.TwosChainLattice
 import FLatticePaper.Plane.Induction.StrongPriceInputs
 import FLatticePaper.Plane.Induction.StrongDeckSpan
 import FLatticePaper.Plane.Induction.StrongSourceRep
