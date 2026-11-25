@@ -94,4 +94,71 @@ theorem tile_alias_native {a x y u1 u2 : ℤ} (ha : 4 ≤ a) (he : a % 2 = 0) (h
   obtain ⟨h1, h2⟩ := tile_unique ha he ht htu (classKey_alias hA)
   exact ⟨h1.symm, h2.symm⟩
 
+/-- The free step of `(−1, a)` (η = 1): the free table gives `(0, −1)`, since `(−1, a)` is odd for even `a`. -/
+theorem freeDisp_neg_one {a : ℤ} (he : a % 2 = 0) : freeDisp a 1 (-1) a = (0, -1) := by
+  have hnH : ¬ FreeHSite a (-1) a := by
+    unfold FreeHSite
+    omega
+  have h00 : ¬ ((-1 : ℤ) = 0 ∧ a = 0) := by omega
+  have hodd : ¬ EvenSite (-1, a) := by
+    unfold EvenSite
+    omega
+  unfold freeDisp
+  rw [if_neg hnH, if_neg h00, if_neg hodd]
+
+/-- **The selected inputs at a tile point (sign `+1`).** Black: an Edge partner. White free: the free table step at the point
+itself, or at the special point `(a, 2a−1)` (where the free alias is `(−1, a)`). White non-free: the candidate step. -/
+theorem tile_twosSel (k : ℕ) {S : Field}
+    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees S 0)
+    (hperiod : HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4)) S 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
+    {x y : ℤ} (ht : TwosTile (2 * (k : ℤ) + 4) (x, y)) {i : Site}
+    (hT : TwosSel (2 * (k : ℤ) + 4) 1 (standardField (List.replicate (k + 1) Digit.two)) (x, y) i) :
+    (TwosBlackP (2 * (k : ℤ) + 4) x y ∧ Edge i (x, y)) ∨
+    (¬ TwosBlackP (2 * (k : ℤ) + 4) x y ∧
+      ((FreeSite (2 * (k : ℤ) + 4) x y ∧
+          i = (x + (freeDisp (2 * (k : ℤ) + 4) 1 x y).1, y + (freeDisp (2 * (k : ℤ) + 4) 1 x y).2)) ∨
+       (x = 2 * (k : ℤ) + 4 ∧ y = 2 * (2 * (k : ℤ) + 4) - 1 ∧ i = (x, y - 1)) ∨
+       (¬ FreeClass (2 * (k : ℤ) + 4) (x, y) ∧ CandGuard (2 * (k : ℤ) + 4) x y ∧
+          i = (x + (candDisp (2 * (k : ℤ) + 4) x y).1, y + (candDisp (2 * (k : ℤ) + 4) x y).2)))) := by
+  have ha : 4 ≤ 2 * (k : ℤ) + 4 := by omega
+  have he : (2 * (k : ℤ) + 4) % 2 = 0 := by omega
+  have hcol := tile_colour k hagree hperiod (show NativeT (2 * (k : ℤ) + 4) x y from ht.1)
+  unfold TwosSel at hT
+  rcases hT with ⟨hb, hE⟩ | ⟨hw, hrest⟩
+  · left
+    refine ⟨?_, hE⟩
+    rw [hcol] at hb
+    by_contra h
+    rw [if_neg h] at hb
+    norm_num at hb
+  · right
+    have hnb : ¬ TwosBlackP (2 * (k : ℤ) + 4) x y := by
+      intro h
+      rw [hcol, if_pos h] at hw
+      norm_num at hw
+    refine ⟨hnb, ?_⟩
+    rcases hrest with ⟨u, hA, hF, hi⟩ | ⟨hnFC, u, hA, hN, hC, hi⟩
+    · obtain ⟨u1, u2⟩ := u
+      rcases tile_alias_free ha he ht hA hF with ⟨h1, h2, hFxy⟩ | ⟨h1, h2, hx, hy⟩
+      · left
+        refine ⟨hFxy, ?_⟩
+        dsimp only at hi
+        rw [h1, h2] at hi
+        exact hi
+      · right
+        left
+        dsimp only at hi
+        rw [h1, h2, freeDisp_neg_one he] at hi
+        refine ⟨hx, hy, ?_⟩
+        rw [hi]
+        exact Prod.ext (by simp) (by simp [sub_eq_add_neg])
+    · obtain ⟨u1, u2⟩ := u
+      obtain ⟨h1, h2⟩ := tile_alias_native ha he ht hnFC hA hN
+      right
+      right
+      dsimp only at hi hC
+      rw [h1, h2] at hi
+      rw [h1, h2] at hC
+      exact ⟨hnFC, hC, hi⟩
+
 end FLatticePaper.TwosEPolicy
