@@ -7,3 +7,4 @@ import FLatticePaper.Plane.Induction.LiftPsi
 #print axioms FLatticePaper.LiftPsi.phase1_top
 #print axioms FLatticePaper.LiftPsi.psi_core
 #print axioms FLatticePaper.LiftPsi.psi_lift
+#print axioms FLatticePaper.LiftPsi.trace_ref
