@@ -583,6 +583,7 @@ import FLatticePaper.Plane.Induction.GamesPolicyNeg
 import FLatticePaper.Plane.Induction.TipReflect
 import FLatticePaper.Plane.Induction.PsiMonoMain
 import FLatticePaper.Plane.Induction.PsiMonoOffset
+import FLatticePaper.Plane.Induction.H0Neigh
 import FLatticePaper.TraceHeadline
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame
