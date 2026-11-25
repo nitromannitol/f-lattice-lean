@@ -2,6 +2,7 @@ import FLatticePaper.Plane.Induction.FreePermittedS
 import FLatticePaper.Plane.Induction.WordPolicy
 import FLatticePaper.Plane.Induction.ForcedPriceSI
 import FLatticePaper.Plane.Induction.HfreePhase1
+import FLatticePaper.Plane.Induction.OddBlackStep
 
 /-! The `FreeNamedInputs` of the word's free-edge signed policy, for a sign `η ∈ {±1}`.
 
@@ -22,7 +23,15 @@ open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.FreePolicy FLatti
 theorem free_named_inputs {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hWord : StrongEstimates word)
     (hSE : StrongEstimates (conjWord word))
     (hG : GamesWithRank (conjWord word))
-    (hOdd : OddBlackNoRise (standardField word) (frameAt word).shortShift)
+    (hpar : FLatticePaper.W1Seeds.SeedFields (conjWord word))
+    (hW1c : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
+      (standardField (conjWord word)))
+    (hQ21 : ∀ c i, RisingBlackPair (standardField word) (-(frameAt word).shortShift) c i →
+      c ∈ (frameAt word).closedPolygon → i ∈ (frameAt word).closedPolygon →
+      c + (frameAt word).uq ∈ (frameAt word).closedPolygon → i + (frameAt word).uq ∈ (frameAt word).closedPolygon →
+      sheetDiffW word c = 0 → (∃ j, FLatticePaper.Edge j c ∧ sheetDiffW word j ≤ -1) → 0 ≤ sheetDiffW word i →
+      ∀ v ∈ (frameAt (conjWord word)).child.modifiedDeck.span,
+        zTurn (c - (frameAt word).sheetShift) + v ∈ (frameAt (conjWord word)).freeH → False)
     (hW1 : FLatticePaper.W1.W1Forced (frameAt word).child.num (frameAt word).child.den (standardField word))
     {η : ℤ} (hη : η = 1 ∨ η = -1) {R : Site → ℤ}
     (hstrictR : ∀ c i, auxS (frameAt word) (standardField word) η c i → R i < R c)
@@ -36,6 +45,8 @@ theorem free_named_inputs {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) 
         (frameAt word).parents.odd.den + (frameAt word).parents.odd.num - 1))) :
     FreeNamedInputs (frameAt word) (standardField word) η R := by
   obtain ⟨G⟩ := games_of_gamesWithRank hG
+  have hOdd : OddBlackNoRise (standardField word) (frameAt word).shortShift :=
+    OddBlackStep.oddBlackNoRise_step h hWord hSE hG hpar hW1c hQ21
   obtain ⟨base, hbase⟩ := HfreePhase1.conj_base (frameAt (conjWord word))
   have hfreeP : ∀ c i, laplacian (standardField word) c = 0 → freeClosure (frameAt word) c →
       FreePresc (frameAt word) η c i →
