@@ -75,9 +75,9 @@ theorem start_contact_zero {frame : ChildFrame} {F : Field} (hstrips : frame.Has
   exact zero_of_tGrade hstrips (by omega) (by omega)
 
 /-- **The depth bounds of the reflected fan from `d ≥ 3n − 2`.** With `K = ⌊(3d+3n−1)/(2n)⌋`: `2 ≤ K`, `d + 2n − 1 ≤ nK`, and
-`2nK ≤ 3d + 5n − 1`. -/
+`2nK ≤ 3d + 3n − 1` (which implies the fan bound `2nK ≤ 3d + 5n − 1`). -/
 theorem K_bounds_of_three_n {n d : ℤ} (hn : 1 ≤ n) (hd : 3 * n - 2 ≤ d) :
-    ∃ K : ℕ, 2 ≤ K ∧ d + 2 * n - 1 ≤ n * (K : ℤ) ∧ 2 * n * (K : ℤ) ≤ 3 * d + 5 * n - 1 := by
+    ∃ K : ℕ, 2 ≤ K ∧ d + 2 * n - 1 ≤ n * (K : ℤ) ∧ 2 * n * (K : ℤ) ≤ 3 * d + 3 * n - 1 := by
   have hmpos : 0 < 2 * n := by omega
   have hXnn : 0 ≤ 3 * d + 3 * n - 1 := by omega
   have hmod := Int.emod_def (3 * d + 3 * n - 1) (2 * n)
@@ -108,7 +108,7 @@ depth `K`), the field symmetry `hsym`, the W1 forcing `hW1`, and the packet and 
 theorem he1_covered {frame : ChildFrame} {G : Field} (hP : frame.Packet G)
     (hsig : ∀ w ∈ frame.closedPolygon, G w - G (w - frame.shortShift) ≤ 0)
     (hAS : ∀ K : ℕ, 2 ≤ K → frame.child.den + 2 * frame.child.num - 1 ≤ frame.child.num * (K : ℤ) →
-      2 * frame.child.num * (K : ℤ) ≤ 3 * frame.child.den + 5 * frame.child.num - 1 →
+      2 * frame.child.num * (K : ℤ) ≤ 3 * frame.child.den + 3 * frame.child.num - 1 →
       ∃ p q : ℤ, frame.child.num * p - frame.child.den * q = 2 - frame.child.num ∧
         ∀ k : ℕ, k ≤ K → FLatticePaper.QuadraticCap.capMin k ≤ G (p + (k : ℤ), q + (k : ℤ)))
     (hsym : ∀ y, G (reflH frame y) = G y)
@@ -130,7 +130,7 @@ theorem he1_covered {frame : ChildFrame} {G : Field} (hP : frame.Packet G)
       exact hSW (sw_white_of_small_d hper hstrips hslip hseed hIsym hz hodd hne hbt (by omega))
     obtain ⟨K, hK2, hKs, hKr⟩ := K_bounds_of_three_n (by omega) hd
     obtain ⟨p, q, hs, hcap⟩ := hAS K hK2 hKs hKr
-    exact forcedEdge_he1 hP hsig hs hK2 hKs hKr hcap hsym hW1 hz hodd hne hbt
+    exact forcedEdge_he1 hP hsig hs hK2 hKs (by linarith) hcap hsym hW1 hz hodd hne hbt
       (start_contact_zero hstrips hz hodd hne hbt)
 
 end FLatticePaper.CoveredSW
