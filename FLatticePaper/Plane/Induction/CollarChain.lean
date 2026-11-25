@@ -262,11 +262,15 @@ theorem psquare_sub_span {frame : ChildFrame} {G : Field} {R : Site → Site →
         exact hk
       exact eq_sub_of_add_eq (u _ hk')
 
-/-- **The forced-case top-square strictness** (the named input `hTopStrict`): for every unit square of a `ForcedEdgeIn` at a strict
-translate `ρ = zTurn(c − lv) + v` of the parent root, its child corners `lv + zTurnInv (q − v)` are strictly interior. -/
+/-- **The forced-case top-square strictness** (the named input `hTop`): for a strict white centre `c` with `Ψ c ≥ 0` (no collar or
+nonfree condition is used), and for every unit square of a `ForcedEdgeIn` at a strict translate `ρ = zTurn(c − lv) + v` of the parent
+root, its child corners `lv + zTurnInv (q − v)` are strictly interior. Numerically checked on the sheet field for words of length at
+most 4 (no violation; without the white or the `Ψ ≥ 0` condition there are violations). -/
 def TopStrictHyp (word : Word) (G : Field)
     (lvAt : Site) : Prop :=
   ∀ (c v ρ o : Site) (a b : ℤ) (inside : Site → Site),
+    FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c →
+    laplacian (MW word) c = 0 → 0 ≤ sheetPsi word c →
     ρ = zTurn (c - lvAt) + v →
     FLatticePaper.W1.StrictInterior (frameAt (conjWord word)).child.num
       (frameAt (conjWord word)).child.den ρ →
@@ -343,7 +347,7 @@ theorem collar_psquare_A {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) 
         hforcedF
       have hPS' := psquare_sub_span hP hdeck hv hPS
       rw [add_sub_cancel_right] at hPS'
-      have hstr := hTop c v (zTurn (c - (frameAt word).sheetShift) + v) o a b inside rfl hSI hR hc hw' ho hout hin hforced
+      have hstr := hTop c v (zTurn (c - (frameAt word).sheetShift) + v) o a b inside hcS hM hc0 rfl hSI hR hc hw' ho hout hin hforced
       exact ⟨q0 - v, q1 - v, q2 - v, o - v, a - v.1, b - v.2, hPS', hstr q0 hPS.2.1, hstr q1 hPS.2.2.1,
         hstr q2 hPS.2.2.2.1⟩
   · exact hRow c hcS hM hc0 hcoll hnf
