@@ -501,6 +501,7 @@ import FLatticePaper.Plane.Induction.BothFreeRise
 import FLatticePaper.Plane.Induction.MinPolicy
 import FLatticePaper.Plane.Induction.Q24Policy
 import FLatticePaper.Plane.Induction.Q24Instances
+import FLatticePaper.Plane.Induction.PsiIdentity
 import FLatticePaper.Plane.Induction.FreeVOrdinate
 import FLatticePaper.Plane.Induction.ClippedFreeV
 import FLatticePaper.Plane.Induction.FreeVWindow
