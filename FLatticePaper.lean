@@ -520,7 +520,9 @@ import FLatticePaper.Plane.Induction.FreeHWhite
 import FLatticePaper.Plane.Induction.NegTieFreeV
 import FLatticePaper.Plane.Induction.NegTieTranslate
 import FLatticePaper.Plane.Induction.NegTieSpan
+import FLatticePaper.Plane.Induction.FreeHBox
 import FLatticePaper.Plane.Induction.NegTieHCut
+import FLatticePaper.Plane.Induction.FreeVReverse
 import FLatticePaper.Plane.Induction.NegTieHCutFinal
 import FLatticePaper.Plane.Induction.HResPWire
 import FLatticePaper.Plane.Induction.HResNCases
