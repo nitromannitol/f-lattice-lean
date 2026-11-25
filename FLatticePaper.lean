@@ -678,6 +678,7 @@ import FLatticePaper.Plane.Induction.W4Boundary
 import FLatticePaper.Plane.Induction.W4Exceptional
 import FLatticePaper.Plane.Induction.W4OfferB
 import FLatticePaper.Plane.Induction.W4FloorArc
+import FLatticePaper.Plane.Induction.W4Guard
 import FLatticePaper.TraceHeadline
 import FLatticePaper.FlatPlusHeadline
 import FLatticePaper.Plane.Induction.TwosDeckEta
