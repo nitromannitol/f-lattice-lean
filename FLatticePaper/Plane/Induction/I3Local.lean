@@ -1,7 +1,7 @@
 import FLatticePaper.Plane.Induction.OpenLocal
 import FLatticePaper.Plane.Induction.LocalPremisesRestricted
 
-/-! Task 38 (I3), session 1: the restricted no-fort conditions from strict ranks.
+/-! Task 38 (I3): the restricted no-fort conditions from strict ranks.
 
 The restricted no-fort condition `RestrictedNoFort field grade permits` says that no nonempty restricted fort lies in a
 half-space `{level ≤ grade}`. Here it is derived from a strict rank on the permitted inputs, provided the rank dominates a

@@ -16,7 +16,7 @@ The prescribed directions are those of `S3FreeBoundary` (`prescribedH η`, `pres
 * §1 (V star): the price is the constant `cutPrice` where the field is harmonic at the site and its parent shift
   (`price_eq_cutPrice_of_harmonic`, StrongPriceValues); the harmonic values on the star are a named input.
 
-Named external inputs of the note, see the inventory in `checks/Q3_INVENTORY.md`: the two-rank reduction (TWO_RANK audit), the
+Named external inputs of the note: the two-rank reduction (TWO_RANK audit), the
 V-arc order of the free V cut (§3, odd V grades), and the harmonic strip on the V star (§1). -/
 
 namespace FLatticePaper.BothFreeGrades
