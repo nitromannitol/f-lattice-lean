@@ -53,7 +53,7 @@ theorem odd_centre_step (F : Field) {c S N W E : Site} (hS : S = incomingNeg c) 
 `2F(c_(n+1)) − 1 − F(south of c_(n+1)) ≤ F(c_(n+2))`, from the binary centres and the western monotonicity. -/
 theorem diag_recursion (F : Field) (p q : ℤ) (hpq : (p + q) % 2 = 1)
     (hbin : ∀ x : Site, laplacian F x = -1 ∨ laplacian F x = 0)
-    (hmono : ∀ n : ℤ, F (p + n, q + (n + 2)) ≤ F (p + (n + 2), q + (n + 2))) (n : ℤ) :
+    (n : ℤ) (hm : F (p + n, q + (n + 2)) ≤ F (p + (n + 2), q + (n + 2))) :
     2 * F (p + (n + 1), q + (n + 1)) - 1 - F (p + (n + 1), q + n) ≤ F (p + (n + 2), q + (n + 2)) := by
   have hc : ¬ EvenSite (p + (n + 1), q + (n + 1)) := by
     unfold EvenSite
@@ -75,16 +75,16 @@ theorem diag_recursion (F : Field) (p q : ℤ) (hpq : (p + q) % 2 = 1)
   have hE : (p + (n + 2), q + (n + 2)) = incomingPos (p + (n + 1), q + (n + 2)) := by
     rw [incomingPos_of_even' _ hNe]
     exact Prod.ext (by ring) rfl
-  exact odd_centre_step F hS hN hW hE (hbin _) (hbin _) (hmono n)
+  exact odd_centre_step F hS hN hW hE (hbin _) (hbin _) hm
 
 /-- The diagonal recursion in the index form of `QuadraticCap.cap_with_anchors`: `A k = F(p+k, q+k)`, `B j = F(p+j+1, q+j)`. -/
 theorem diag_hrec (F : Field) (p q : ℤ) (hpq : (p + q) % 2 = 1)
-    (hbin : ∀ x : Site, laplacian F x = -1 ∨ laplacian F x = 0)
-    (hmono : ∀ n : ℤ, F (p + n, q + (n + 2)) ≤ F (p + (n + 2), q + (n + 2))) :
-    ∀ k : ℕ, 2 ≤ k →
+    (hbin : ∀ x : Site, laplacian F x = -1 ∨ laplacian F x = 0) (J : ℕ)
+    (hmono : ∀ n : ℕ, n ≤ J → F (p + (n : ℤ), q + ((n : ℤ) + 2)) ≤ F (p + ((n : ℤ) + 2), q + ((n : ℤ) + 2))) :
+    ∀ k : ℕ, 2 ≤ k → k ≤ J + 2 →
       2 * F (p + ((k - 1 : ℕ) : ℤ), q + ((k - 1 : ℕ) : ℤ)) - 1 - F (p + ((k - 2 : ℕ) : ℤ) + 1, q + ((k - 2 : ℕ) : ℤ)) ≤
         F (p + (k : ℤ), q + (k : ℤ)) := by
-  intro k hk
+  intro k hk hkJ
   obtain ⟨n, rfl⟩ : ∃ n : ℕ, k = n + 2 := ⟨k - 2, by omega⟩
   have h1 : n + 2 - 1 = n + 1 := by omega
   have h2 : n + 2 - 2 = n := by omega
@@ -92,7 +92,7 @@ theorem diag_hrec (F : Field) (p q : ℤ) (hpq : (p + q) % 2 = 1)
   have e1 : ((n + 1 : ℕ) : ℤ) = (n : ℤ) + 1 := by push_cast; ring
   have e2 : ((n + 2 : ℕ) : ℤ) = (n : ℤ) + 2 := by push_cast; ring
   rw [e1, e2]
-  have key := diag_recursion F p q hpq hbin hmono (n : ℤ)
+  have key := diag_recursion F p q hpq hbin (n : ℤ) (hmono n (by omega))
   have hB : p + (n : ℤ) + 1 = p + ((n : ℤ) + 1) := by ring
   rw [hB]
   linarith [key]
@@ -102,8 +102,9 @@ even harmonic anchors `B_j ≤ m(j)` for `j ≤ J`, and the odd anchors `m(k) �
 for all `k ≤ K`. The recursion is `diag_hrec`; the strips and anchors are the named inputs. -/
 theorem diag_cap (F : Field) (p q : ℤ) (hpq : (p + q) % 2 = 1)
     (hbin : ∀ x : Site, laplacian F x = -1 ∨ laplacian F x = 0)
-    (hmono : ∀ n : ℤ, F (p + n, q + (n + 2)) ≤ F (p + (n + 2), q + (n + 2)))
-    (J K : ℕ) (hA0 : 0 ≤ F (p, q)) (hA1 : 0 ≤ F (p + 1, q + 1))
+    (J K : ℕ)
+    (hmono : ∀ n : ℕ, n ≤ J → F (p + (n : ℤ), q + ((n : ℤ) + 2)) ≤ F (p + ((n : ℤ) + 2), q + ((n : ℤ) + 2)))
+    (hA0 : 0 ≤ F (p, q)) (hA1 : 0 ≤ F (p + 1, q + 1))
     (hB : ∀ j : ℕ, j ≤ J → F (p + (j : ℤ) + 1, q + (j : ℤ)) ≤ FLatticePaper.QuadraticCap.capMin j)
     (hanchor : ∀ k : ℕ, J + 2 < k → k ≤ K → FLatticePaper.QuadraticCap.capMin k ≤ F (p + (k : ℤ), q + (k : ℤ))) :
     ∀ k : ℕ, k ≤ K → FLatticePaper.QuadraticCap.capMin k ≤ F (p + (k : ℤ), q + (k : ℤ)) := by
@@ -114,7 +115,7 @@ theorem diag_cap (F : Field) (p q : ℤ) (hpq : (p + q) % 2 = 1)
     exact hA1
   exact FLatticePaper.QuadraticCap.cap_with_anchors (fun k : ℕ => F (p + (k : ℤ), q + (k : ℤ)))
     (fun j : ℕ => F (p + (j : ℤ) + 1, q + (j : ℤ))) J K hA0' hA1' hB
-    (fun k hk _ => diag_hrec F p q hpq hbin hmono k hk) hanchor
+    (fun k hk hkJ => diag_hrec F p q hpq hbin J hmono k hk hkJ) hanchor
 
 /-- **The even harmonic anchor.** The harmonic grid at `(1−j, j−1)` is the parabola `m(j) = capMin j`: its parity term vanishes, and the
 numerator is `−2j(j−1)`. This is the anchor value `h0 = m(j)` of ALL_SLOPE_STEP, with no hypothesis. -/
