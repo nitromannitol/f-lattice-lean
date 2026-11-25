@@ -7,7 +7,7 @@ Any error or warning line fails the check.
 import re
 import sys
 
-EXPECTED = 5
+EXPECTED = 6
 STANDARD = {"propext", "Classical.choice", "Quot.sound"}
 REPORT = re.compile(r"'([^']+)' depends on axioms: \[([^\]]*)\]")
 
