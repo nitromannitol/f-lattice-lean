@@ -8,7 +8,7 @@ Pins (child coordinates of the conjugate frame; vFirst=(0,0), hFirst=(1,0)):
 Admissibility as in s3_policy_check: a black centre keeps both inputs (permitted and P,J weakly lower); a white centre keeps
 one permitted input with P,J weakly lower, strict preferred. The short shift is (2 eta D, 2 eta N) with eta the sign under test."""
 import sys
-sys.path.insert(0, '/Users/ahmedbou-rabee/lean-work/flattice-wt/w3/scripts')
+sys.path.insert(0, 'scripts')
 from multiprocessing import Pool
 from collections import defaultdict
 import permit_local as pl

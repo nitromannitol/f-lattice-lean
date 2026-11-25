@@ -9,7 +9,7 @@ Lean definitions (W1Constructor, Q3Exit, S3FreeBoundary, Sheets, ChildFrame), fo
   onBoundarySpectrum(z): exists k in {-1,0,1}: hSpectrum(t + kT) or vSpectrum(s + kT).
   freeH: z in E, (x, y-1) not in E, hSpectrum(t(z)).   freeV: z in E, (x-1, y) not in E, vSpectrum(s(z)).
 Candidate A ("nonfree" = no deck translate of z is in E and on a boundary spectrum).
-Candidate B ("nonfree" = no deck translate of z is in freeH or freeV, the lead's wording).
+Candidate B ("nonfree" = no deck translate of z is in freeH or freeV, the wording of the note).
 Bridge claim: nonfree z -> some deck translate of z is in StrictInterior.
 """
 from math import gcd

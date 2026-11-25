@@ -1,4 +1,4 @@
-"""The W1 policy at 3^k as defined from the note (task 118, W1 base; the lead's definition): retained := the Q_minus Retained edges
+"""The W1 policy at 3^k as defined from the note: retained := the Q_minus Retained edges
 (w1_bulk_gate.py) with the selection at a white centre (laplacian 0): the prescribed input at a free centre, otherwise the
 retained input of lower rank (rank of the target, the last representative offer of w1_free_root_gate.ranks). Black centres
 (laplacian -1) retain both inputs. Field of the frame at 3^k: odd parent 0/1, even parent 1/(2k+1), child 1/(2k+3), eps = -1,

@@ -1,4 +1,4 @@
-"""Task 59 paragraph 5, the field identity (lead's instruction; PROVISIONAL): with f = Fp = quarterTurnField(G) =
+"""Paragraph 5, the field identity (provisional): with f = Fp = quarterTurnField(G) =
 pl.standard(w) (the field used by sheetA, sheetA(z) = Fp(z - (1-W) U_q)), and the conjugate field G = pl.standard(u),
 u = swap(odd_birth_prefix(w)):
   A1(x) = f(x - eps U_q) - f(x),      U_q = (d_q, n_q) = the even parent's kernel of w (word's own even parent);

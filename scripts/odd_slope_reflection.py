@@ -1,4 +1,4 @@
-"""Is the odd alternate target the quarter turn of H_- (or of the reflected H_+) with the odd parent slope? (task 46, lead's question)
+"""Is the odd alternate target the quarter turn of H_- (or of the reflected H_+) with the odd parent slope?
 
 For an odd word w (phase one and phase zero), u = swap w, F = standard field of u, sigma = alternateSigma(u) (from the frame of u),
 H_eta(y) = ceil((F(y) + F(y + eta sigma)) / 2), and the quarter turn Q_eta(x) = H_eta(Z x) + h(x), Z(y) = (-y2, y1 - 1), h the harmonic grid.
@@ -7,7 +7,7 @@ The raw odd target is raw(x) = Q_+(x - delta) + J . x with J = (N, -D) the trans
 alternate target (normalised by the lower-left site LL of the output) is alt(z) = raw(z + LL) - J . LL, so with the chart offset
 T = delta - LL one has alt(z) = Q_+(z - T) + J . z.
 
-The lead's claim: alt(z) = Q_-(z - T) + g . z + c with g = J (the gradient of the integer affine correction), so the slope and the chart
+The claim under test: alt(z) = Q_-(z - T) + g . z + c with g = J (the gradient of the integer affine correction), so the slope and the chart
 offset T both come from the reflection. The control Q_+ is constant by construction. Tests run on the copy sites (z = s - LL).
 """
 import ordinary_tile_check as otc

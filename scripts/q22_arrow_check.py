@@ -16,7 +16,7 @@ Conventions (from Lean ChildFrame / Potentials and Q22.md):
   admissible: P(i) <= P(c), D_eta(i) <= D_eta(c), J_eta(i) <= J_eta(c).
 """
 import sys, itertools
-sys.path.insert(0, '/Users/ahmedbou-rabee/lean-work/flattice-wt/w3/scripts')
+sys.path.insert(0, 'scripts')
 import permit_local as pl
 from collections import Counter, defaultdict
 

@@ -1,15 +1,15 @@
-"""Task 56 (step 3 check): the full odd-child offers on the conjugate pair, in the odd child's chart (the lead's identity).
+"""The full odd-child offers on the conjugate pair, in the odd child's chart (the identity under test).
 
 Even parent of X: Q_X = (nQ, dQ) = (D - N, D + N). Its field Fq = standard(swap(oddBirthPrefix w)) (checked in check5).
 With W = W_w (eps_X = eps_w), lv = (1 - W) U_QX, U_QX = (dQ, nQ), e = V_QX + eps U_QX, V_QX = (nQ - dQ, dQ + nQ),
 a(z) = nQ z1 - dQ z2, c = (T_Q - dQ - nQ)/2 + 2W, T_Q = dQ^2 + 2 dQ nQ - nQ^2.
-Lead's identity on E_X:  f_X(x) = min( Fq(x - lv), Fq(x - lv - e) + a(x - lv) + c ),  with f_X the odd field quarterTurn(G_w).
+Identity on E_X:  f_X(x) = min( Fq(x - lv), Fq(x - lv - e) + a(x - lv) + c ),  with f_X the odd field quarterTurn(G_w).
 Seed check: at seeds z (even, t_X(z) = 1 - d, inside E_X): A(z) = Fq(z - lv), B(z) = Fq(z - lv - e) + a(z - lv) + c, min vs odd.
 Also the archive's pure branch values fA = Fq(z - W Up_X), fB_pure = Fq(e - V_X), and the affine piece of B.
 Reported over all of E_X (a grid of sites), not just the seed line, to test the identity itself.
 """
 import itertools, sys
-sys.path.insert(0, '/Users/ahmedbou-rabee/lean-work/flattice-wt/w1/scripts')
+sys.path.insert(0, 'scripts')
 from permit_local import standard, Frame, h0, odd_birth_prefix, swap, parents, win
 
 MAXLEN = int(sys.argv[1]) if len(sys.argv) > 1 else 2

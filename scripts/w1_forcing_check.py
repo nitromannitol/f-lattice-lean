@@ -8,9 +8,9 @@ Relaxation: pointers are not made consistent (Lean uses one global `inside`); a 
 Reports, per word, the strict whites that are NOT forced (ideally none).
 """
 import itertools, sys
-sys.path.insert(0, '/Users/ahmedbou-rabee/lean-work/flattice-wt/w1/scripts')
+sys.path.insert(0, 'scripts')
 import importlib.util
-spec = importlib.util.spec_from_file_location('cc', '/Users/ahmedbou-rabee/lean-work/flattice-wt/w1/scripts/w1_collar_check.py')
+spec = importlib.util.spec_from_file_location('cc', 'scripts/w1_collar_check.py')
 _sv = sys.argv; sys.argv = [_sv[0], '2', '30']
 cc = importlib.util.module_from_spec(spec); spec.loader.exec_module(cc)
 sys.argv = _sv

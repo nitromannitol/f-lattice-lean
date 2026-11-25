@@ -1,4 +1,4 @@
-# The ordered free-site exclusions: the '+' row (task 72, Q1 paragraph 6)
+# The ordered free-site exclusions: the '+' row
 
 Scope: the '+' row of Q1.md l.21–28 only (the '−' row is Q13). This report records what is checked numerically, what reduces to
 lemmas in `main`, and where the remaining steps are. It does not prove the per-entry implications.
@@ -44,7 +44,7 @@ of `S3FreeBoundary`, reproduced in the script). The check is not a proof: it cov
 | free V sites are white | `Q3White.laplacian_eq_zero_of_freeV` | reduces (needs `HasStrips`) |
 | V-block index and membership | `Q3Para10.index_of_freeV`, `block_mem_freeV`, `parent_block_mem_freeV` | reduces (block membership) |
 | `V_p + I` not free in the current frame | `Q3Para10.VpI_not_freeV` | reduces (note: free in the parent frame, see `checks/CanonicalSigned.lean` data) |
-| a translate of a free site is not in the strict interior | `NonfreeBridge.outside_SI_free`, `nonfree_bridge` (task 72) | reduces (the converse direction of the H/V web) |
+| a translate of a free site is not in the strict interior | `NonfreeBridge.outside_SI_free`, `nonfree_bridge` | reduces (the converse direction of the H/V web) |
 | short passages: interior sites nonfree | none | numeric only (section 2) |
 | tip paths | none | not classified |
 | fans, quadratic cap | none | not formalized |

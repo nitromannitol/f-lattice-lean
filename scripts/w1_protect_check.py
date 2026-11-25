@@ -7,10 +7,10 @@ except residue 0 with eps = -1 where f = D; relevant parent sp (left collar s*) 
 Also the H-set tp values (named extreme H_last: tp = D + eps, odd).
 """
 import itertools, sys
-sys.path.insert(0, '/Users/ahmedbou-rabee/lean-work/flattice-wt/w1/scripts')
+sys.path.insert(0, 'scripts')
 sys.argv = [sys.argv[0], '2', '30']
 import importlib.util
-spec = importlib.util.spec_from_file_location('cc', '/Users/ahmedbou-rabee/lean-work/flattice-wt/w1/scripts/w1_collar_check.py')
+spec = importlib.util.spec_from_file_location('cc', 'scripts/w1_collar_check.py')
 cc = importlib.util.module_from_spec(spec); spec.loader.exec_module(cc)
 from permit_local import Frame, parents
 

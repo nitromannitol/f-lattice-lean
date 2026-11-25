@@ -13,7 +13,7 @@ from odd_donor_jet import H_of, Q_of
 from seventh_jet import parents_of, phase
 from alt_jets import alternate_jets, seventh_offset_slope
 
-ODD_DUMP = "/Users/ahmedbou-rabee/lean-work/flattice-wt/w2/scripts/data/alt_copy_odd_dump.log"
+ODD_DUMP = "scripts/data/alt_copy_odd_dump.log"
 copy = acc.parse_dump(ODD_DUMP)
 plane = apc.parse_log(apc.DATA)
 even_reg = {tuple(e["word"]): e["even"] for e in plane}

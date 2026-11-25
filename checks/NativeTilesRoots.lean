@@ -6,7 +6,7 @@ import Mathlib.Data.Finset.Sort
 The evaluator starts a word from its leading run of twos (or threes) as a base run (`splitInitial`), so a word beginning with
 `2^k` or `3^k` is evaluated from the base state of that run, and its remaining letters are stepped from there. The roots are
 therefore the runs `2`, `22`, `222`, `3`, `33`, `333` (the states `evaluateNativeState` gives for them), and the continuations
-start with a letter different from the run digit (a further run digit would extend the run). Output: `/tmp/w2_roots.txt`,
+start with a letter different from the run digit (a further run digit would extend the run). Output: `w2_roots.txt`,
 the same line format as `checks/NativeTiles.lean`; the line `done` ends the run. -/
 
 namespace FLatticePaper.Construction.NativeTilesRootsCheck
@@ -32,7 +32,7 @@ def cellsOf (t : NonemptyTile) : String :=
   let codes : List ℕ := (Finset.image encode t.val.sites).sort (· ≤ ·)
   String.intercalate ";" (codes.map fun n => s!"{(decode n).1},{(decode n).2}")
 
-def outFile : System.FilePath := "/tmp/w2_roots.txt"
+def outFile : System.FilePath := "w2_roots.txt"
 
 def emit (h : IO.FS.Handle) (line : String) : IO Unit := do
   h.putStrLn line

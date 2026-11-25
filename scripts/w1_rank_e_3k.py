@@ -1,4 +1,4 @@
-"""Strict rank with increments (-1, eta') for the policy e(-1,eta) (task 118, W1 base; lead's request).
+"""Strict rank with increments (-1, eta') for the policy e(-1,eta).
 R : Z^2 -> Z with R(z+U) - R(z) = -lam, R(z+V) - R(z) = eta' lam (U=(d,1), V=(1-d,1+d)), and R(i) < R(x) along every policy
 edge x -> i of e(-1,eta) (the select set of w1_signed_e_3k.py). Lattice Lambda = {z : D | d z2 - z1}, D = d^2+2d-1 (the deck lattice),
 with the classes c = (d z2 - z1) mod D and representatives r_c = (-c, 0). Write z = r_c + a U + b V (integers a, b). Then

@@ -2,7 +2,7 @@ import FLatticePaper.Construction.Native
 
 /-! Probe for task 42: dump the native output tiles `standard.currentOdd` and `standard.currentEven` after each word
 of length at most three, with their sites in sorted order and their heights. Run with `flb w3 env lean` from the
-repository; the output is in the sandbox log. -/
+repository; the output is in the build log. -/
 
 open FLatticePaper.Farey FLatticePaper.Construction HeightTile FLatticePaper
 

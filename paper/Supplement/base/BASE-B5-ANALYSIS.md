@@ -595,8 +595,7 @@ and the harmonic rotation proves B6 L22.
 
 The tiny authorized independent check at \(d=4\) verified periodic
 consistency and all 57 tile in-stars, with zero rank failures.
-After the uniform proof was complete and the shared-machine memory
-recovered, `scripts/base_b5_explicit_rank.py` independently checked
+After the uniform proof was complete, `scripts/base_b5_explicit_rank.py` independently checked
 all 52 even parameters \(d=4,6,\ldots,100,128,200,502\). It checked
 983658 tile in-stars, all overlap equalities of \(\rho\), and all
 1463794 specified decreasing incoming edges, using the actual global

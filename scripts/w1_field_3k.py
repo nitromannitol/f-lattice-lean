@@ -1,4 +1,4 @@
-"""Explicit extension of reciprocalField k = standardField(3^k) (task 118, W1 base; lead's option (b)).
+"""Explicit extension of reciprocalField k = standardField(3^k) (option (b)).
 Transcribes, from the Lean definitions: BaseMask.stairEven (raw sites: mem_stairEven_raw_iff; values: stairEvenValue, StairEvenCorner),
 Fraction.mk 1 d (periodDenominator = d^2+2d-1, modifiedDeck = ((d,1), (1-d,1+d)) for d odd, transverseGrade = d*y - x),
 stairEvenConstantV d = -chooseTwo(d+1) - d, periodIncrement (constantU = 0, constantV = stairEvenConstantV), chooseTwo n = n(n-1)/2.

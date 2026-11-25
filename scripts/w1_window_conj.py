@@ -2,7 +2,7 @@
 Same statement as w1_window_check.py: for v0 with openRect v0 and G v0 = capMin(0) = 0 and every i in the closed polygon of the
 conjugate child: capMin(i.2 - v0.2) <= G i."""
 import sys
-sys.path.insert(0, 'scripts'); sys.path.insert(0, '/Users/ahmedbou-rabee/lean-work/flattice-wt/w3/scripts')
+sys.path.insert(0, 'scripts'); sys.path.insert(0, 'scripts')
 from multiprocessing import Pool
 from collections import Counter
 import permit_local as pl

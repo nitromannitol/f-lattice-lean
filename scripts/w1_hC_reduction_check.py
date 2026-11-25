@@ -8,7 +8,7 @@ For every proper word w of length <= MAXLEN (child Frame(w), odd parent (D,N), e
  (c) C(z0) = Fp(y*) + A_aff = 1 (generic), 0 (exception).
 """
 import itertools, sys
-sys.path.insert(0, '/Users/ahmedbou-rabee/lean-work/flattice-wt/w1/scripts')
+sys.path.insert(0, 'scripts')
 from permit_local import standard, Frame, h0, odd_birth_prefix, swap
 MAXLEN = int(sys.argv[1]) if len(sys.argv) > 1 else 3
 

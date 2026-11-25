@@ -8,7 +8,7 @@ For every proper word w (length <= MAXLEN), with the child Frame(w) (n, d, odd p
   Fp(y)                             and the difference Fp(w) - Fp(y) against h0(w) - h0(y)  (the deck identity)
 """
 import itertools, sys
-sys.path.insert(0, '/Users/ahmedbou-rabee/lean-work/flattice-wt/w1/scripts')
+sys.path.insert(0, 'scripts')
 from permit_local import standard, Frame, h0, odd_birth_prefix, swap
 
 MAXLEN = int(sys.argv[1]) if len(sys.argv) > 1 else 3

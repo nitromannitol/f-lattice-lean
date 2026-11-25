@@ -4,7 +4,7 @@ a_p = (N, -D), c_p = -(T_p + L_p)/2 (W0), Vp = (N-D, N+D). Claims checked on eve
   W1: E(w) = F_u(w+Vp) - a_p.w - c_p = min(0, Psi(w) - 1) with c_p solved at the point Psi = 0 (H_last).
 Plus F_u(z) = 0 on the trace (P = c0 - E needs it) and Psi(z+Vp) = Psi(z) - 1 (w1_price_check.py)."""
 import sys
-sys.path.insert(0, 'scripts'); sys.path.insert(0, '/Users/ahmedbou-rabee/lean-work/flattice-wt/w3/scripts')
+sys.path.insert(0, 'scripts'); sys.path.insert(0, 'scripts')
 from multiprocessing import Pool
 from collections import Counter
 import permit_local as pl
