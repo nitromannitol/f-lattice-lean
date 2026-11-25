@@ -611,6 +611,7 @@ import FLatticePaper.Plane.Induction.FreePermitted
 import FLatticePaper.Plane.Induction.AuxRankSign
 import FLatticePaper.Plane.Induction.FreePermittedS
 import FLatticePaper.Plane.Induction.FreeAssemble
+import FLatticePaper.Plane.Induction.ForcedPriceSI
 import FLatticePaper.TraceHeadline
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame

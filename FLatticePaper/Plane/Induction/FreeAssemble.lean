@@ -1,5 +1,6 @@
 import FLatticePaper.Plane.Induction.FreePermittedS
 import FLatticePaper.Plane.Induction.WordPolicy
+import FLatticePaper.Plane.Induction.ForcedPriceSI
 
 /-! The `FreeNamedInputs` of the word's free-edge signed policy, for a sign `η ∈ {±1}`.
 
@@ -18,11 +19,6 @@ theorem free_named_inputs {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) 
     (G : CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word)))
     (hOdd : OddBlackNoRise (standardField word) (frameAt word).shortShift)
     (hW1 : FLatticePaper.W1.W1Forced (frameAt word).child.num (frameAt word).child.den (standardField word))
-    (EC : Field → Prop)
-    (hT : ∀ m, IsCmpField word m → ∀ c o, laplacian (standardField word) c = 0 → standardField word c = m c →
-      ForcedEdge (standardField word) (fun _ _ => False) c o →
-      o ∈ (frameAt word).closedPolygon → m o < standardField word o → EC m)
-    (hW : ∀ m, IsCmpField word m → ¬ EC m)
     {η : ℤ} (hη : η = 1 ∨ η = -1) {R : Site → ℤ}
     (hstrictR : ∀ c i, auxS (frameAt word) (standardField word) η c i → R i < R c)
     (hfreeP : ∀ c i, laplacian (standardField word) c = 0 → freeClosure (frameAt word) c →
@@ -34,16 +30,24 @@ theorem free_named_inputs {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) 
       (incomingNeg ((frameAt word).parents.odd.num - (frameAt word).parents.odd.den + 1,
         (frameAt word).parents.odd.den + (frameAt word).parents.odd.num - 1))) :
     FreeNamedInputs (frameAt word) (standardField word) η R := by
+  have hsat : HasSatSelection (standardField word) := ForcedPriceSI.hasSat_of_aux η hη hWord hstrictR
   have hslip : ∀ c i, freePolicy (frameAt word) (standardField word) η c i →
       (frameAt word).slip (standardField word) η i ≤ (frameAt word).slip (standardField word) η c := by
     intro c i hci
-    exact (FreePermittedS.permitted_S h hWord hSE G hOdd hW1 hη hstrictR c i hci |> fun k =>
-      (FreePermitted.slipPermits_iff_slip η c i).mp k)
+    exact (FreePermitted.slipPermits_iff_slip η c i).mp (FreePermittedS.permitted_S h hWord hSE G hOdd hW1 hη hstrictR c i hci)
+  have hex := forcedExists_of (frameAt word) hWord.packet hW1
   have hstrict : ∀ c i, freePolicy (frameAt word) (standardField word) η c i → R i < R c := by
     intro c i hci
-    have hex := forcedExists_of (frameAt word) hWord.packet hW1
     exact hstrictR c i (freePolicy_aux η hη hex (evenSite_shortShift (frameAt word)) hWord.packet.binary
       hWord.F1_unitSlip (CanonicalPermit.standardField_reflect hWord) hstrictR hci)
-  exact word_named_inputs word h hSE hWord hW1 EC hT hW η R hfreeP hslip hstrict hwest
+  exact
+    { permitted := FreePermittedS.permitted_S h hWord hSE G hOdd hW1 hη hstrictR
+      nonincreasingP := fun c i hci => by
+        have hm := ForcedPriceSI.word_price_nonincreasing_SI word h hSE hWord hW1 hsat η hfreeP c i hci
+        rw [cutGrade_one_zero_one, cutGrade_one_zero_one]
+        exact hm
+      nonincreasingJ := WordPolicy.word_J_nonincreasing word η hslip
+      strictRank := hstrict
+      westAtException := hwest }
 
 end FLatticePaper.FreeAssemble
