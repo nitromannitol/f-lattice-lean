@@ -516,6 +516,7 @@ import FLatticePaper.Plane.Induction.LeftVGrade
 import FLatticePaper.Plane.Induction.LeftVWebProof
 import FLatticePaper.Plane.Induction.LeftVNegProof
 import FLatticePaper.Plane.Induction.LeftVNegGrade
+import FLatticePaper.Plane.Induction.BoundarySpectrum
 import FLatticePaper.Plane.Induction.ConjFreeRoot
 import FLatticePaper.Plane.Induction.EvenWindow
 import FLatticePaper.Plane.Induction.NeighbourDrop
