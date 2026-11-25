@@ -1,7 +1,21 @@
-# Lean formalization of the corrected F-lattice paper
+# Integer superharmonic matrices on the F-lattice: Lean formalization
 
-The pinned manuscript, its Julia constructor and the proof archives are in [paper](paper/README.md). The two main targets are the classification of integer superharmonic matrices and the standard and alternate recurrent odometers. [Campaign brief](CAMPAIGN.md) · [Formalization status](STATUS.md)
+A Lean 4 formalization of
 
-The sandbox repository is at /home/nitro/flattice-lean. Run flattice-lean on sandbox to open its agent. The active formalizer uses GPT-6.2 Sol at xhigh. The remote and local repositories store checkpoints on main. The older helper library is preserved in previous/ for comparison.
+> Ahmed Bou-Rabee, *Integer superharmonic matrices on the F-lattice*, arXiv:2110.07556,
 
-The toolchain is Lean 4.32.0. Run lake build from the repository root. Verify the manuscript snapshot with sha256sum -c paper.sha256.
+in its corrected edition, which is pinned in [`paper/`](paper/README.md). The two headline results are the classification of the integer superharmonic matrices and the standard and alternate recurrent odometers.
+
+## Status
+
+The formalization is in progress. [`STATUS.md`](STATUS.md) lists what is proved and the named inputs that the headline theorems still take as hypotheses.
+
+## Building
+
+The toolchain is Lean 4.32.0. Run `lake build` from the repository root, and check the manuscript snapshot with `sha256sum -c paper.sha256`.
+
+The Julia code that produces the tile odometers is in [f-lattice-recursion](https://github.com/nitromannitol/f-lattice-recursion).
+
+## AI disclosure
+
+The Lean code was written with AI assistance, using models from Anthropic (Claude) and OpenAI (GPT), under the direction of the author. Every proof is checked by the Lean kernel.
