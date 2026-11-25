@@ -1,0 +1,5 @@
+import FLatticePaper.CanonicalHeadline
+
+#print axioms FLatticePaper.TwosEPolicy.tr_hvarM
+#print axioms FLatticePaper.TwosEPolicy.twos_gamesWithRank
+#print axioms FLatticePaper.odometersTheorem_of_canonical_pure

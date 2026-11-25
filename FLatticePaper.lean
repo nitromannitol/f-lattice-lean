@@ -523,6 +523,7 @@ import FLatticePaper.Plane.Induction.HResNCases
 import FLatticePaper.Plane.Induction.TwosRank
 import FLatticePaper.Plane.Induction.TwosFreeSets
 import FLatticePaper.Plane.Induction.TwosGames
+import FLatticePaper.Plane.Induction.TwosTileRangeM
 import FLatticePaper.Plane.Induction.TwosTileCoverA
 import FLatticePaper.Plane.Induction.TwosTileCoverB
 import FLatticePaper.Plane.Induction.TwosTileRange
