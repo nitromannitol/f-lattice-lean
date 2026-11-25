@@ -20,10 +20,12 @@ theorem traceAt_W0_of_named {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three
     (f : ℤ → ℤ) (hstep : ∀ k, f (k + 1) ≤ f k)
     (hIdx : ∀ j : ℕ, 1 ≤ j → j < N → (PsiMonoReal.qry word (H j)).2 = (j : ℤ) - (frameAt word).parents.even.den)
     (hClass : ∀ j : ℕ, 1 ≤ j → j < N →
-      PsiMonoReal.qry word (H j) = FreeEnum.vAt (frameAt (conjWord word)) base (PsiMonoReal.qry word (H j)).2 ∨
+      (PsiMonoReal.qry word (H j) = FreeEnum.vAt (frameAt (conjWord word)) base (PsiMonoReal.qry word (H j)).2 ∧
+        (PsiMonoReal.qry word (H j)).2 % FreeEnum.period (frameAt (conjWord word)) ≠ 0) ∨
       ∃ m : ℤ, PsiMonoReal.qry word (H j) = ((1 : ℤ), (0 : ℤ)) + m • Vdeck (frameAt (conjWord word)) ∧
         (PsiMonoReal.qry word (H j)).2 = m * FreeEnum.period (frameAt (conjWord word)))
-    (hVal : ∀ k : ℤ, PsiMonoReal.earlierP word (FreeEnum.vAt (frameAt (conjWord word)) base k) = f k)
+    (hVal : ∀ k : ℤ, k % FreeEnum.period (frameAt (conjWord word)) ≠ 0 →
+      PsiMonoReal.earlierP word (FreeEnum.vAt (frameAt (conjWord word)) base k) = f k)
     (hHval : ∀ m : ℤ, PsiMonoReal.earlierP word (((1 : ℤ), (0 : ℤ)) + m • Vdeck (frameAt (conjWord word))) =
       f (m * FreeEnum.period (frameAt (conjWord word))))
     (hcover : ∀ z ∈ (frameAt word).freeH, ∃ j : ℕ, j < N ∧ z = H j)
@@ -46,21 +48,26 @@ theorem traceAt_W0_of_named {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three
 theorem traceAt_W1_of_named {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
     (hW1 : (frameAt word).eps = 1)
     (base : ℤ → Site) (H : ℕ → Site) (N : ℕ)
-    (f : ℤ → ℤ) (hstep : ∀ k, f k ≤ f (k + 1))
+    (f : ℤ → ℤ) (hstep : ∀ k, f k ≤ f (k + 1)) (hN : (N : ℤ) ≤ (frameAt word).child.den)
     (hIdx : ∀ j : ℕ, 1 ≤ j → j < N →
       (PsiMonoReal.qry word (ArcPsi.reflH word (H j))).2 = (frameAt word).child.den - 1 - (j : ℤ))
     (hClass : ∀ j : ℕ, 1 ≤ j → j < N →
-      PsiMonoReal.qry word (ArcPsi.reflH word (H j)) = FreeEnum.vAt (frameAt (conjWord word)) base
-        (PsiMonoReal.qry word (ArcPsi.reflH word (H j))).2 ∨
+      (PsiMonoReal.qry word (ArcPsi.reflH word (H j)) = FreeEnum.vAt (frameAt (conjWord word)) base
+          (PsiMonoReal.qry word (ArcPsi.reflH word (H j))).2 ∧
+        ((PsiMonoReal.qry word (ArcPsi.reflH word (H j))).2 % FreeEnum.period (frameAt (conjWord word)) ≠ 0 ∨
+          (PsiMonoReal.qry word (ArcPsi.reflH word (H j))).2 = 0)) ∨
       ∃ m : ℤ, PsiMonoReal.qry word (ArcPsi.reflH word (H j)) = ((1 : ℤ), (0 : ℤ)) + m • Vdeck (frameAt (conjWord word)) ∧
         (PsiMonoReal.qry word (ArcPsi.reflH word (H j))).2 = m * FreeEnum.period (frameAt (conjWord word)))
-    (hVal : ∀ k : ℤ, PsiMonoReal.earlierP word (FreeEnum.vAt (frameAt (conjWord word)) base k) = f k)
+    (hVal : ∀ k : ℤ, k % FreeEnum.period (frameAt (conjWord word)) ≠ 0 →
+      PsiMonoReal.earlierP word (FreeEnum.vAt (frameAt (conjWord word)) base k) = f k)
     (hHval : ∀ m : ℤ, PsiMonoReal.earlierP word (((1 : ℤ), (0 : ℤ)) + m • Vdeck (frameAt (conjWord word))) =
       f (m * FreeEnum.period (frameAt (conjWord word))))
+    (hEnd : ∀ j : ℕ, 1 ≤ j → j < N → (PsiMonoReal.qry word (ArcPsi.reflH word (H j))).2 = 0 →
+      PsiMonoReal.earlierP word (PsiMonoReal.qry word (ArcPsi.reflH word (H j))) ≤ f 1)
     (hcover : ∀ z ∈ (frameAt word).freeH, ∃ j : ℕ, j < N ∧ z = H j)
     (hH0 : H 0 = ((1 : ℤ), (0 : ℤ))) (hH1 : H 1 = ((2 : ℤ), (0 : ℤ))) :
     TraceFromPsi.TraceAt word := by
-  have hmono := PsiMonoReal.psi_mono_W1 h hSE base H N f hstep hIdx hClass hVal hHval
+  have hmono := PsiMonoReal.psi_mono_W1 h hSE base H N f hstep hN hIdx hClass hVal hHval hEnd
   have hPSI : ∀ z ∈ (frameAt word).freeH, z ≠ ((1 : ℤ), (0 : ℤ)) → 1 ≤ sheetPsi word (ArcPsi.reflH word z) := by
     intro z hz hz1
     obtain ⟨j, hjN, rfl⟩ := hcover z hz
