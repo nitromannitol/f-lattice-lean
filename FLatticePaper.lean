@@ -615,6 +615,7 @@ import FLatticePaper.Plane.Induction.ForcedPriceSI
 import FLatticePaper.Plane.Induction.HfreePhase1
 import FLatticePaper.Plane.Induction.OddBlackStep
 import FLatticePaper.Plane.Induction.WestException
+import FLatticePaper.Plane.Induction.WestNonfree
 import FLatticePaper.TraceHeadline
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame
