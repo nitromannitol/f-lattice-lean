@@ -106,6 +106,36 @@ theorem sheetParent_rank_bound {word : Word} (h : ∃ x ∈ word, x ≠ Digit.th
   unfold chainPot
   linarith
 
+/-- **The rank of the policy bounded on the psi set** (`sheetPsiSet`): the same bound as `sheetParent_rank_bound`, using only `0 ≤ Ψ` at the
+chain point (the whiteness of `M` is not used). -/
+theorem sheetPsi_rank_bound {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
+    {seed : Site → Site → Prop} (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps) :
+    ∃ R : Site → ℤ, (∀ c i : Site, P.retained c i → R i < R c) ∧ ∃ B : ℤ, ∀ x ∈ sheetPsiSet word, R x ≤ B := by
+  obtain ⟨K, hK⟩ := tie_iff_chain word h hSE.packet
+  obtain ⟨r, lam, hlam, hstrict, hU, hV⟩ :=
+    FLatticePaper.W1Inherited.rankIncr_two_of_ranked P (child_det_ne_zero (conjWord word)) hSE.priceDrift
+      hSE.slipDrift (frameAt word).eps_unit
+  have hRU : ∀ x : Site, r (x + (frameAt (conjWord word)).child.modifiedDeck.kernel) = r x - lam :=
+    fun x => by linarith [hU x]
+  have hRV : ∀ x : Site, r (x + (frameAt (conjWord word)).child.modifiedDeck.transverse) =
+      r x + 2 * (frameAt word).eps * lam :=
+    fun x => by linarith [hV x]
+  obtain ⟨hΦU, hΦV⟩ := chainPotential_drift (frame := frameAt (conjWord word)) (G := standardField (conjWord word))
+    (η := (frameAt word).eps) hSE.priceDrift (hSE.slipDrift _ (frameAt word).eps_unit)
+  obtain ⟨B, hB⟩ := rank_bound_le (child_det_ne_zero (conjWord word)) (Φ := chainPot word (standardField (conjWord word)))
+    (R := r) (η := (frameAt word).eps) (lam := lam) (K := K) hlam (fun x => hΦU x) (fun x => hΦV x) hRU hRV
+  refine ⟨r, hstrict, B, ?_⟩
+  rintro x ⟨c, h0, rfl⟩
+  apply hB
+  have hc : (frameAt word).sheetC (quarterTurnField (standardField (conjWord word))) c -
+      (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) c +
+      (frameAt (conjWord word)).chainPotential (standardField (conjWord word)) (frameAt word).eps
+        (zTurn (c - (frameAt word).sheetShift)) = K := hK c
+  have h0' : 0 ≤ (frameAt word).sheetC (quarterTurnField (standardField (conjWord word))) c -
+      (frameAt word).sheetA (quarterTurnField (standardField (conjWord word))) c := h0
+  unfold chainPot
+  linarith
+
 theorem free_forced_of_descent_rk {η : ℤ} {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
     (P : FLatticePaper.W1Phase.OldPolicyRanked frame G seed η) (hP : frame.Packet G)
     (hW1 : FLatticePaper.W1.W1Forced frame.child.num frame.child.den G)
@@ -251,14 +281,14 @@ theorem hfree_sheet_rk {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (h
     (hs : seed = fun _ _ => False)
     (hW1 : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
       (standardField (conjWord word)))
-    (hTab : ∀ z ∈ sheetParentSet word, ¬ Nonfree (frameAt (conjWord word)) z →
-      laplacian (standardField (conjWord word)) z = 0 → TableShape P.retained (sheetParentSet word) z) :
+    (hTab : ∀ z ∈ sheetPsiSet word, ¬ Nonfree (frameAt (conjWord word)) z →
+      laplacian (standardField (conjWord word)) z = 0 → TableShape P.retained (sheetPsiSet word) z) :
     ∀ c : Site, 0 ≤ sheetPsi word c → laplacian (MW word) c = 0 →
       ¬ Nonfree (frameAt (conjWord word)) (zTurn (c - (frameAt word).sheetShift)) →
       ParentSquareOut (standardField (conjWord word)) P.retained (zTurn (c - (frameAt word).sheetShift)) := by
-  obtain ⟨R, hdec, B, hB⟩ := sheetParent_rank_bound hw hSE P
+  obtain ⟨R, hdec, B, hB⟩ := sheetPsi_rank_bound hw hSE P
   intro c h0 hM hnf
-  exact parentSquareOut_of_table_rk P hs hSE.packet hW1 (sheetParentSet word) B R hdec hB hTab ⟨c, h0, hM, rfl⟩ hnf
+  exact parentSquareOut_of_table_rk P hs hSE.packet hW1 (sheetPsiSet word) B R hdec hB hTab ⟨c, h0, rfl⟩ hnf
     (FLatticePaper.W1NonfreeHsqC.lapG_zero_of_nonneg hw hSE h0 hM)
 
 /-- **W1Forced of the sheet minimum from the table and the collar input** (task 96): the rank bound is now derived, not named. -/
@@ -268,8 +298,8 @@ theorem W1Forced_of_tables_rk {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.th
     (hW1 : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
       (standardField (conjWord word)))
     (hn3 : 3 ≤ (frameAt word).child.num)
-    (hTab : ∀ z ∈ sheetParentSet word, ¬ Nonfree (frameAt (conjWord word)) z →
-      laplacian (standardField (conjWord word)) z = 0 → TableShape P.retained (sheetParentSet word) z)
+    (hTab : ∀ z ∈ sheetPsiSet word, ¬ Nonfree (frameAt (conjWord word)) z →
+      laplacian (standardField (conjWord word)) z = 0 → TableShape P.retained (sheetPsiSet word) z)
     (hcollar : ∀ c : Site, FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c →
       laplacian (MW word) c = 0 → FLatticePaper.W1CollarFrame.CollarFrame (frameAt word) c →
       HsqAt word P c) :

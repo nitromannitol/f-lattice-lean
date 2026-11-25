@@ -181,6 +181,11 @@ open FLatticePaper.W1Step FLatticePaper.W1MSheet FLatticePaper.W1NonfreeHsqNonne
 def sheetParentSet (word : Word) : Set Site :=
   {z | ∃ c : Site, 0 ≤ sheetPsi word c ∧ laplacian (MW word) c = 0 ∧ z = zTurn (c - (frameAt word).sheetShift)}
 
+/-- The chain set of the table (no whiteness): the parent points of the sheet's nonnegative sites, `{zTurn (c − shift) | 0 ≤ Ψ c}`.
+The descent needs the chain points in this set, and the rank bound on it (`sheetPsi_rank_bound`); whiteness is needed only at the root. -/
+def sheetPsiSet (word : Word) : Set Site :=
+  {z | ∃ c : Site, 0 ≤ sheetPsi word c ∧ z = zTurn (c - (frameAt word).sheetShift)}
+
 /-- **The lead's `hfree` from the table** (task 95): at the sheet's nonnegative `M`-white sites with nonfree-free parents, the parent square
 with output holds. -/
 theorem hfree_sheet {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
@@ -189,14 +194,14 @@ theorem hfree_sheet {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE 
     (hs : seed = fun _ _ => False)
     (hW1 : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
       (standardField (conjWord word)))
-    (B : ℤ) (hB : ∀ x ∈ sheetParentSet word, P.rank x ≤ B)
-    (hTab : ∀ z ∈ sheetParentSet word, ¬ Nonfree (frameAt (conjWord word)) z →
-      laplacian (standardField (conjWord word)) z = 0 → TableShape P.retained (sheetParentSet word) z) :
+    (B : ℤ) (hB : ∀ x ∈ sheetPsiSet word, P.rank x ≤ B)
+    (hTab : ∀ z ∈ sheetPsiSet word, ¬ Nonfree (frameAt (conjWord word)) z →
+      laplacian (standardField (conjWord word)) z = 0 → TableShape P.retained (sheetPsiSet word) z) :
     ∀ c : Site, 0 ≤ sheetPsi word c → laplacian (MW word) c = 0 →
       ¬ Nonfree (frameAt (conjWord word)) (zTurn (c - (frameAt word).sheetShift)) →
       ParentSquareOut (standardField (conjWord word)) P.retained (zTurn (c - (frameAt word).sheetShift)) := by
   intro c h0 hM hnf
-  exact parentSquareOut_of_table P hs hSE.packet hW1 (sheetParentSet word) B hB hTab ⟨c, h0, hM, rfl⟩ hnf
+  exact parentSquareOut_of_table P hs hSE.packet hW1 (sheetPsiSet word) B hB hTab ⟨c, h0, rfl⟩ hnf
     (FLatticePaper.W1NonfreeHsqC.lapG_zero_of_nonneg hw hSE h0 hM)
 
 /-- **W1Forced of the sheet minimum from the table, the rank bound and the collar input** (task 95). -/
@@ -207,9 +212,9 @@ theorem W1Forced_of_tables {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three
     (hW1 : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
       (standardField (conjWord word)))
     (hn3 : 3 ≤ (frameAt word).child.num)
-    (B : ℤ) (hB : ∀ x ∈ sheetParentSet word, P.rank x ≤ B)
-    (hTab : ∀ z ∈ sheetParentSet word, ¬ Nonfree (frameAt (conjWord word)) z →
-      laplacian (standardField (conjWord word)) z = 0 → TableShape P.retained (sheetParentSet word) z)
+    (B : ℤ) (hB : ∀ x ∈ sheetPsiSet word, P.rank x ≤ B)
+    (hTab : ∀ z ∈ sheetPsiSet word, ¬ Nonfree (frameAt (conjWord word)) z →
+      laplacian (standardField (conjWord word)) z = 0 → TableShape P.retained (sheetPsiSet word) z)
     (hcollar : ∀ c : Site, FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c →
       laplacian (MW word) c = 0 → FLatticePaper.W1CollarFrame.CollarFrame (frameAt word) c →
       HsqAt word P c) :
