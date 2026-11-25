@@ -1,0 +1,4 @@
+import FLatticePaper.Plane.Induction.CornerPositive
+
+#print axioms FLatticePaper.Induction.sheetDiffW_corner_ge_one
+#print axioms FLatticePaper.Induction.corner_harmonic_identity
