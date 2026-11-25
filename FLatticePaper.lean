@@ -310,6 +310,8 @@ import FLatticePaper.Tiles.SubBlockOdd
 import FLatticePaper.Tiles.SubCeilOdd
 import FLatticePaper.Tiles.SubWalkOdd
 import FLatticePaper.Tiles.SubWalkOddCrit
+import FLatticePaper.Tiles.SubWalkOddBlocks
+import FLatticePaper.Tiles.SubWalkOddBound
 import FLatticePaper.Plane.Induction.CornerPositive
 import FLatticePaper.Tiles.InterfaceStacked
 import FLatticePaper.Tiles.StringCorners
