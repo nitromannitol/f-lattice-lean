@@ -1,0 +1,6 @@
+import FLatticePaper.Plane.Induction.SecondarySeamEq
+
+#print axioms FLatticePaper.SecondarySeamEq.slipMinus_zero_of_bottom
+#print axioms FLatticePaper.SecondarySeamEq.slipPlus_centre_eq
+#print axioms FLatticePaper.SecondarySeamEq.slipPlus_centre_eq_two
+#print axioms FLatticePaper.SecondarySeamEq.secondary_bottom_top
