@@ -657,6 +657,8 @@ import FLatticePaper.FlatPlusHeadline
 import FLatticePaper.Plane.Induction.TwosDeckEta
 import FLatticePaper.Plane.Induction.TwosDeckMinus
 import FLatticePaper.Plane.Induction.TwosMinusLevel
+import FLatticePaper.Plane.Induction.TwosMinusRank
+import FLatticePaper.Plane.Induction.TwosMinusOddBlack
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame
 import FLatticePaper.Plane.Induction.BaseMembership
