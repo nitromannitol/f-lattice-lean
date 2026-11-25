@@ -230,4 +230,74 @@ theorem rotated_fan_start_G {fr : ChildFrame} {G : Field} (hP : fr.Packet G)
   rotated_fan_start hP hprice hdrU hdrV N D a T hN2 hD2 hN0 hNDlt ha1 ha2 hs hpq J hJ1 hJ2 K hK2 hKs hKr b start hb hstart heven
     (forcedEdgeIn_ropen hG start o rfl rfl)
 
+/-- A multiple of `m` in a window `[lo, hi]` of length at least `m − 1`. -/
+theorem exists_mult_window {m lo hi : ℤ} (hm : 0 < m) (hlo : 0 ≤ lo) (hw : lo + m - 1 ≤ hi) :
+    ∃ K : ℕ, lo ≤ m * (K : ℤ) ∧ m * (K : ℤ) ≤ hi := by
+  have hmod := Int.emod_def (lo + m - 1) m
+  have hmnn := Int.emod_nonneg (lo + m - 1) (ne_of_gt hm)
+  have hmlt := Int.emod_lt_of_pos (lo + m - 1) hm
+  obtain ⟨K0, hK0⟩ : ∃ K0 : ℤ, K0 = (lo + m - 1) / m := ⟨_, rfl⟩
+  have hK0nn : 0 ≤ K0 := by
+    rw [hK0]
+    exact Int.ediv_nonneg (by linarith) (le_of_lt hm)
+  rw [← hK0] at hmod
+  have hcast : ((K0.toNat : ℕ) : ℤ) = K0 := Int.toNat_of_nonneg hK0nn
+  refine ⟨K0.toNat, ?_, ?_⟩
+  · rw [hcast]
+    linarith
+  · rw [hcast]
+    linarith
+
+/-- Integer floor: `m J ≤ X < m (J + 1)` for some natural `J`, when `0 < m` and `0 ≤ X`. -/
+theorem exists_floor_window (m X : ℤ) (hm : 0 < m) (hX : 0 ≤ X) :
+    ∃ J : ℕ, m * (J : ℤ) ≤ X ∧ X < m * ((J : ℤ) + 1) := by
+  have hmod := Int.emod_def X m
+  have hmnn := Int.emod_nonneg X (ne_of_gt hm)
+  have hmlt := Int.emod_lt_of_pos X hm
+  obtain ⟨J0, hJ0⟩ : ∃ J0 : ℤ, J0 = X / m := ⟨_, rfl⟩
+  have hJ0nn : 0 ≤ J0 := by
+    rw [hJ0]
+    exact Int.ediv_nonneg hX (le_of_lt hm)
+  rw [← hJ0] at hmod
+  have hcast : ((J0.toNat : ℕ) : ℤ) = J0 := Int.toNat_of_nonneg hJ0nn
+  refine ⟨J0.toNat, ?_, ?_⟩
+  · rw [hcast]
+    linarith
+  · rw [hcast]
+    linarith
+
+/-- **The fan depths of the residual (a = 1).** For `1 ≤ N` and `3N − 1 ≤ D` there is a depth `K ≥ 2` with
+`4N + 2D − 1 ≤ 2NK ≤ 3D + 3N − 1`: the smallest multiple of `2N` above `4N + 2D − 1` lies below `3D + 3N − 1` exactly when `3N − 1 ≤ D`. -/
+theorem K_bounds_rot {N D : ℤ} (hN : 1 ≤ N) (hD : 3 * N - 1 ≤ D) :
+    ∃ K : ℕ, 2 ≤ K ∧ 4 * N + 2 * D - 1 ≤ 2 * N * (K : ℤ) ∧ 2 * N * (K : ℤ) ≤ 3 * D + 3 * N - 1 := by
+  obtain ⟨K, hK1, hK2⟩ := exists_mult_window (m := 2 * N) (lo := 4 * N + 2 * D - 1) (hi := 3 * D + 3 * N - 1)
+    (by omega) (by omega) (by omega)
+  refine ⟨K, ?_, hK1, hK2⟩
+  by_contra h
+  have hK : K ≤ 1 := by omega
+  have hK' : (K : ℤ) ≤ 1 := by exact_mod_cast hK
+  nlinarith
+
+/-- **The forced east start of the rotated fan, for `a = 1` and `3N − 1 ≤ D`.** The ray start `(p, q)` with `N p − D q = 1 − N` and
+`p + q` odd is that of `CapRayGrades.ray_start_odd` (the coprimality of `(N, D)` is `RotatedMono.coprime_residual`); the cap is
+`rotated_ray_cap_mono` at a floor index `J`; the depth `K` is any depth in the window, which exists by `K_bounds_rot` when
+`3N − 1 ≤ D` (the residual's `D + N` odd excludes `D = 3N − 2`). -/
+theorem rotated_fan_start_D {fr : ChildFrame} {G : Field} (hP : fr.Packet G)
+    (hprice : ∀ z ∈ fr.closedPolygon, fr.cutPrice - 1 ≤ fr.price G z ∧ fr.price G z ≤ fr.cutPrice)
+    (hdrU : ∀ z, fr.price G (z + fr.child.modifiedDeck.kernel) = fr.price G z - 1)
+    (hdrV : ∀ z, fr.price G (z + fr.child.modifiedDeck.transverse) = fr.price G z)
+    (N D T : ℤ) (hN2 : 2 * N = fr.child.den - fr.child.num) (hD2 : 2 * D = fr.child.den + fr.child.num)
+    (hN0 : 0 < N) (hNDlt : N < D) (hodd : (D + N) % 2 = 1)
+    (K : ℕ) (hK2 : 2 ≤ K) (hKs : 4 * N + 2 * D - 1 ≤ 2 * N * (K : ℤ))
+    (hKr : 2 * N * (K : ℤ) ≤ 3 * D + 3 * N - 1)
+    (b start : Site) (hb : N + 1 ≤ N * b.1 - D * b.2)
+    (hstart : start ∈ FLatticePaper.FanRegion.fanSet (CapConeGrades.ropenNL N D T) (quarterTurnField G) b K)
+    (heven : EvenSite start) {o : Site}
+    (ho : W1.ForcedEdgeIn (quarterTurnField G) (CapConeGrades.ropenNL N D T) (fun _ _ => False) start o) :
+    o = incomingPos start := by
+  obtain ⟨p, q, hs, hpq⟩ := CapRayGrades.ray_start_odd N D 1 (RotatedMono.coprime_residual fr N D hN2.symm hD2.symm) hodd
+  obtain ⟨J, hJ1, hJ2⟩ := exists_floor_window (2 * N) (N + D - 2) (by omega) (by omega)
+  exact rotated_fan_start hP hprice hdrU hdrV N D 1 T hN2 hD2 hN0 hNDlt (by norm_num) (by norm_num) hs hpq J hJ1
+    (by linarith) K hK2 hKs (by linarith) b start hb hstart heven ho
+
 end FLatticePaper.RotatedForced
