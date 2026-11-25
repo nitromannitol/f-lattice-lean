@@ -610,6 +610,7 @@ import FLatticePaper.Plane.Induction.FreeVClass
 import FLatticePaper.Plane.Induction.RepClasses
 import FLatticePaper.Plane.Induction.PsiRep
 import FLatticePaper.Plane.Induction.Sec3PermitRep
+import FLatticePaper.Plane.Induction.CanonicalPermit
 import FLatticePaper.TraceHeadline
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame
