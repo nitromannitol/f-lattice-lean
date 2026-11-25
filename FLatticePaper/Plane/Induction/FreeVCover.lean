@@ -2,6 +2,7 @@ import FLatticePaper.Plane.Induction.FreeOrbit
 import FLatticePaper.Plane.Induction.FreeVOrdinate
 import FLatticePaper.Plane.Induction.PriceDeck
 import FLatticePaper.Plane.Induction.StrongPriceValues
+import FLatticePaper.Plane.Induction.ChainDeck
 
 /-! hfreeP, the V case in full (the lead's order: V price first).
 
@@ -163,5 +164,20 @@ theorem freeV_prescribed_price (frame : ChildFrame) {F : Field} (hS : frame.HasS
       harmonicGrid (c + frame.prescribedV η c - frame.parentShift) :=
     hS.2 _ (by rw [hsub]; omega) (by rw [hsub]; omega)
   rw [FLatticePaper.PriceDeck.price_on_freeV frame F hS hc, StrongPriceValues.price_eq_cutPrice_of_harmonic frame F _ hF hF']
+
+/-- **The closure-level V price.** For a free-closure white `c` with a V witness `t` (`c + t` free V), the prescribed input of `c + t`, translated
+back, has the price of `c`: the span drift `P(x + s) = P x − a` cancels between the input and the white. -/
+theorem freePresc_V_price_eq (frame : ChildFrame) {F : Field} (hP : frame.Packet F) {η : ℤ} (hη : η = 1 ∨ η = -1)
+    {c t : Site} (ht : t ∈ frame.child.modifiedDeck.span) (hr : c + t ∈ frame.freeV) :
+    frame.price F (c + frame.prescribedV η (c + t)) = frame.price F c := by
+  obtain ⟨a, b, rfl⟩ := ht
+  have key := freeV_prescribed_price frame hP.strips hr hη
+  have e1 := FLatticePaper.ChainDeck.price_combine frame hP a b (c + frame.prescribedV η (c + frame.child.modifiedDeck.combine a b))
+  have e2 := FLatticePaper.ChainDeck.price_combine frame hP a b c
+  have e3 : c + frame.prescribedV η (c + frame.child.modifiedDeck.combine a b) + frame.child.modifiedDeck.combine a b =
+      c + frame.child.modifiedDeck.combine a b + frame.prescribedV η (c + frame.child.modifiedDeck.combine a b) := by
+    abel
+  rw [e3] at e1
+  linarith
 
 end FLatticePaper.FreeVCover
