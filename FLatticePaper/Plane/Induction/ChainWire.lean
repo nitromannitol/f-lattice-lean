@@ -200,6 +200,19 @@ theorem hfree_of_classes {frame : ChildFrame} {G : Field} {seed : Site → Site 
   parentSquareOut_of_native frame hP hdeck
     (native_of_classes hη hδ hP hW1 C W hW hdeck hH hVodd hX3 hX1 hX2 hcanon) hnf hw
 
+/-- **The deck equivariance of a witness of the canonical game**, from the `deckEquiv` field of `CanonicalSignedGames`: a witness
+`W` with `W.retained = (G.game η hη).policy` is invariant under every deck vector `combine i j`. -/
+theorem deck_of_games {frame : ChildFrame} {F : Field} (G : CanonicalSignedGames frame F) {η : ℤ}
+    (hη : η = 1 ∨ η = -1) {seed : Site → Site → Prop} (W : OldPolicyWitness frame F seed η)
+    (hW : W.retained = (G.game η hη).policy) :
+    ∀ (i j : ℤ) (z u : Site), W.retained z u →
+      W.retained (z - frame.child.modifiedDeck.combine i j) (u - frame.child.modifiedDeck.combine i j) := by
+  intro i j z u h
+  rw [hW] at h ⊢
+  have key := G.deckEquiv η hη i j (z - frame.child.modifiedDeck.combine i j) (u - frame.child.modifiedDeck.combine i j)
+  simp only [sub_add_cancel] at key
+  exact key.mpr h
+
 open FLatticePaper.W1Step FLatticePaper.W1MSheet FLatticePaper.W1NonfreeHsqNonneg
 
 /-- **`W1Forced` of the sheet minimum, end to end from the headline input `hW1`.** The free-root `hfree` of
@@ -215,11 +228,8 @@ theorem W1Forced_chain {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three)
       (standardField (conjWord word)))
     (hn3 : 3 ≤ (frameAt word).child.num)
     (δ : ℤ) (hη : (frameAt word).eps = -δ) (hδ : δ = 1 ∨ δ = -1)
-    (C : CanonicalSignedPolicy (frameAt (conjWord word)) (standardField (conjWord word)) (frameAt word).eps)
-    (hW : P.retained = C.policy)
-    (hdeck : ∀ (i j : ℤ) (z u : Site), P.retained z u →
-      P.retained (z - (frameAt (conjWord word)).child.modifiedDeck.combine i j)
-        (u - (frameAt (conjWord word)).child.modifiedDeck.combine i j))
+    (G : CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word)))
+    (hW : P.retained = (G.game (frameAt word).eps (frameAt word).eps_unit).policy)
     (hH : ∀ z ∈ (frameAt (conjWord word)).freeH, laplacian (standardField (conjWord word)) z = 0 →
       ParentSquareOut (standardField (conjWord word)) P.retained z)
     (hVodd : ∀ z ∈ (frameAt (conjWord word)).freeV, ¬ EvenSite z →
@@ -250,10 +260,12 @@ theorem W1Forced_chain {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three)
     (hcollar : ∀ c : Site, FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c →
       laplacian (MW word) c = 0 → FLatticePaper.W1CollarFrame.CollarFrame (frameAt word) c →
       HsqAt word P c) :
-    FLatticePaper.W1.W1Forced (frameAt word).child.num (frameAt word).child.den (MW word) :=
-  FLatticePaper.W1NonfreeHsqC.W1Forced_of_inputs hw hSE P hs hW1 hn3
+    FLatticePaper.W1.W1Forced (frameAt word).child.num (frameAt word).child.den (MW word) := by
+  have hdeck := deck_of_games G (frameAt word).eps_unit P.toOldPolicyWitness hW
+  exact FLatticePaper.W1NonfreeHsqC.W1Forced_of_inputs hw hSE P hs hW1 hn3
     (fun _ h0 hM hnf =>
-      hfree_of_classes hη hδ hSE.packet hW1 C P.toOldPolicyWitness hW hdeck hH hVodd hX3 hX1 hX2 hcanon hnf
+      hfree_of_classes hη hδ hSE.packet hW1 (G.game (frameAt word).eps (frameAt word).eps_unit)
+        P.toOldPolicyWitness hW hdeck hH hVodd hX3 hX1 hX2 hcanon hnf
         (FLatticePaper.W1NonfreeHsqC.lapG_zero_of_nonneg hw hSE h0 hM))
     hcollar
 
