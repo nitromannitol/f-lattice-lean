@@ -9,6 +9,7 @@ import FLatticePaper.Plane.Induction.PriceDeck
 import FLatticePaper.Plane.Induction.ZoneI1
 import FLatticePaper.Plane.Induction.FreeEnum
 import FLatticePaper.Plane.Induction.SheetFacts
+import FLatticePaper.Plane.Induction.BaseMembership
 
 /-! Task 72 / Q31 psi (i)–(iii): the lift `ψ(z) = ⌈j/r⌉` on the nonfinal native free V cut.
 
@@ -19,14 +20,49 @@ namespace FLatticePaper.LiftPsi
 
 open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.W1MSheet NativeGrade
 
+/-- **The conjugate's freeH trace gives the reference instance.** For a free V point `b` of the word with ordinate
+`b.2 ∈ [0, r − 1]`, the point `(1 + b.2, −b.1)` is in the conjugate's free H arc (`base_mem_freeH`); the trace there is
+`c₀'` at `(1, 0)` and `c₀' − 1` elsewhere, and `(1 + b.2, −b.1) = (1, 0)` exactly when `b.2 = 0`, since the free V point of ordinate
+`0` is the origin (`CutOnePerProper`, uniqueness). -/
+theorem trace_ref {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
+    (hTraceConj : ∀ w ∈ (frameAt (conjWord word)).freeH,
+      (frameAt (conjWord word)).price (standardField (conjWord word)) w =
+        (frameAt (conjWord word)).cutPrice - (if w = ((1 : ℤ), (0 : ℤ)) then 0 else 1))
+    {b : Site} (hb : b ∈ (frameAt word).freeV) (h0 : 0 ≤ b.2)
+    (hr : b.2 ≤ (frameAt word).parents.odd.den + (frameAt word).parents.odd.num - 1)
+    (hph : (frameAt word).eps = -1 ∨ b.2 ≤ (frameAt word).parents.odd.den + (frameAt word).parents.odd.num - 2) :
+    (frameAt (conjWord word)).price (standardField (conjWord word)) ((1 : ℤ) + b.2, -b.1) =
+      (frameAt (conjWord word)).cutPrice - (if b.2 = 0 then 0 else 1) := by
+  have hm := BaseMembership.base_mem_freeH h hb h0 hr hph
+  have ht := hTraceConj _ hm
+  by_cases hb0 : b.2 = 0
+  · have hL : 0 < (frameAt word).child.den + (frameAt word).child.num := by
+      obtain ⟨hn0, hnd, -, -, -⟩ := (frameAt word).child_facts
+      omega
+    obtain ⟨x0, -, huniq⟩ := CutOnePerProper.cutOnePerOrdinate_of_proper h 0 le_rfl (by unfold FreeEnum.period; omega)
+    have hbeq : (b.1, (0 : ℤ)) = b := Prod.ext rfl hb0.symm
+    have e1 : b.1 = x0 := huniq b.1 (by show (b.1, (0 : ℤ)) ∈ (frameAt word).freeV; rw [hbeq]; exact hb)
+    have e2 : (0 : ℤ) = x0 := huniq 0 (origin_mem_freeV (frameAt word))
+    have hb1 : b.1 = 0 := by omega
+    have hw : ((1 : ℤ) + b.2, -b.1) = ((1 : ℤ), (0 : ℤ)) := by
+      rw [hb0, hb1]
+      simp
+    rw [if_pos hw] at ht
+    rw [ht, if_pos hb0]
+  · have hne : ((1 : ℤ) + b.2, -b.1) ≠ ((1 : ℤ), (0 : ℤ)) := by
+      intro e
+      have h1 := congrArg Prod.fst e
+      simp only at h1
+      omega
+    rw [if_neg hne] at ht
+    rw [ht, if_neg hb0]
+
 /-- **The reference value on a free V point.** Under the conjugate's H-arc trace, `ψ(b) = [b.2 ≠ 0]` for the free V points of
 ordinate `b.2 ∈ [0, r − 1]` (with `b.2 ≤ r − 2` in phase `ε = +1`). -/
 theorem psi_ref {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
-    (hTrace : ∀ b ∈ (frameAt word).freeV, 0 ≤ b.2 →
-      b.2 ≤ (frameAt word).parents.odd.den + (frameAt word).parents.odd.num - 1 →
-      ((frameAt word).eps = -1 ∨ b.2 ≤ (frameAt word).parents.odd.den + (frameAt word).parents.odd.num - 2) →
-      (frameAt (conjWord word)).price (standardField (conjWord word)) ((1 : ℤ) + b.2, -b.1) =
-        (frameAt (conjWord word)).cutPrice - (if b.2 = 0 then 0 else 1))
+    (hTraceConj : ∀ w ∈ (frameAt (conjWord word)).freeH,
+      (frameAt (conjWord word)).price (standardField (conjWord word)) w =
+        (frameAt (conjWord word)).cutPrice - (if w = ((1 : ℤ), (0 : ℤ)) then 0 else 1))
     {b : Site} (hb : b ∈ (frameAt word).freeV) (h0 : 0 ≤ b.2)
     (hr : b.2 ≤ (frameAt word).parents.odd.den + (frameAt word).parents.odd.num - 1)
     (hph : (frameAt word).eps = -1 ∨ b.2 ≤ (frameAt word).parents.odd.den + (frameAt word).parents.odd.num - 2) :
@@ -37,7 +73,7 @@ theorem psi_ref {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : Str
     · simp [zTurn, reflectionI]
     · simp [zTurn, reflectionI]
       ring
-  rw [hI, hTrace b hb h0 hr hph]
+  rw [hI, trace_ref h hTraceConj hb h0 hr hph]
   ring
 
 /-- **The jump at `(0, −1)` vanishes:** `ψ((0, −1)) = 0`, since `I − zTurn(0,−1) = 0` and `P'(0) = c₀'` (the origin is a
@@ -145,11 +181,9 @@ theorem phase1_top (frame : ChildFrame) (hN : 0 < frame.parents.odd.num) (hcut :
 /-- **The core of the lift.** For a nonfinal free V point `z = (x, i + r kq)` with `0 ≤ i < r`:
 `ψ(z) = kq + [i ≠ 0]`. -/
 theorem psi_core {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
-    (hTrace : ∀ b ∈ (frameAt word).freeV, 0 ≤ b.2 →
-      b.2 ≤ (frameAt word).parents.odd.den + (frameAt word).parents.odd.num - 1 →
-      ((frameAt word).eps = -1 ∨ b.2 ≤ (frameAt word).parents.odd.den + (frameAt word).parents.odd.num - 2) →
-      (frameAt (conjWord word)).price (standardField (conjWord word)) ((1 : ℤ) + b.2, -b.1) =
-        (frameAt (conjWord word)).cutPrice - (if b.2 = 0 then 0 else 1))
+    (hTraceConj : ∀ w ∈ (frameAt (conjWord word)).freeH,
+      (frameAt (conjWord word)).price (standardField (conjWord word)) w =
+        (frameAt (conjWord word)).cutPrice - (if w = ((1 : ℤ), (0 : ℤ)) then 0 else 1))
     {z : Site} (hz : z ∈ (frameAt word).freeV) (hne : z ≠ (frameAt word).vLast) {i kq : ℤ}
     (hz2 : z.2 = i + ((frameAt word).parents.odd.den + (frameAt word).parents.odd.num) * kq)
     (hi0 : 0 ≤ i) (hi1 : i < (frameAt word).parents.odd.den + (frameAt word).parents.odd.num) :
@@ -192,7 +226,7 @@ theorem psi_core {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : St
             have : i ≠ (frameAt word).parents.odd.den + (frameAt word).parents.odd.num - 1 := fun hi => hed ⟨he, hi⟩
             omega)
         · exact Or.inl he
-      have hr := psi_ref h hSE hTrace hxb (show (0 : ℤ) ≤ i from hi0)
+      have hr := psi_ref h hSE hTraceConj hxb (show (0 : ℤ) ≤ i from hi0)
         (show i ≤ (frameAt word).parents.odd.den + (frameAt word).parents.odd.num - 1 by omega) hph
       rw [hzvp, LiftTranslate.psi_tip_int h hSE kq (xb, i), hr]
       show (if i = 0 then (0 : ℤ) else 1) + kq = kq + (if i = 0 then 0 else 1)
@@ -233,11 +267,9 @@ theorem psi_core {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : St
 
 /-- **The lift.** On the nonfinal native free V cut, `ψ(z) = ⌈z.2 / r⌉`, where `r = D + N`. -/
 theorem psi_lift {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
-    (hTrace : ∀ b ∈ (frameAt word).freeV, 0 ≤ b.2 →
-      b.2 ≤ (frameAt word).parents.odd.den + (frameAt word).parents.odd.num - 1 →
-      ((frameAt word).eps = -1 ∨ b.2 ≤ (frameAt word).parents.odd.den + (frameAt word).parents.odd.num - 2) →
-      (frameAt (conjWord word)).price (standardField (conjWord word)) ((1 : ℤ) + b.2, -b.1) =
-        (frameAt (conjWord word)).cutPrice - (if b.2 = 0 then 0 else 1))
+    (hTraceConj : ∀ w ∈ (frameAt (conjWord word)).freeH,
+      (frameAt (conjWord word)).price (standardField (conjWord word)) w =
+        (frameAt (conjWord word)).cutPrice - (if w = ((1 : ℤ), (0 : ℤ)) then 0 else 1))
     {z : Site} (hz : z ∈ (frameAt word).freeV) (hne : z ≠ (frameAt word).vLast) :
     FqW word (z + (frameAt word).uq) - FqW word z =
       ArcCut.ceilDiv z.2 ((frameAt word).parents.odd.den + (frameAt word).parents.odd.num) := by
@@ -252,7 +284,7 @@ theorem psi_lift {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : St
     by
       rw [Int.emod_def]
       ring
-  rw [psi_core h hSE hTrace hz hne hz2 hi0 hi1]
+  rw [psi_core h hSE hTraceConj hz hne hz2 hi0 hi1]
   have hc := ArcCut.ceilDiv_lift ((frameAt word).parents.odd.den + (frameAt word).parents.odd.num)
     (z.2 / ((frameAt word).parents.odd.den + (frameAt word).parents.odd.num))
     (z.2 % ((frameAt word).parents.odd.den + (frameAt word).parents.odd.num)) hr0 hi0 hi1
