@@ -547,6 +547,7 @@ import FLatticePaper.Plane.Induction.TpFrame
 import FLatticePaper.Plane.Induction.QueryClass
 import FLatticePaper.Plane.Induction.QueryClassFrame
 import FLatticePaper.Plane.Induction.QueryClassMain
+import FLatticePaper.Plane.Induction.CutRowsAll
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame
 import FLatticePaper.Plane.Induction.BaseMembership
