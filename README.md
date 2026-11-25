@@ -1,5 +1,7 @@
 # Integer superharmonic matrices on the F-lattice: Lean formalization
 
+[![CI](https://github.com/nitromannitol/f-lattice-lean/actions/workflows/ci.yml/badge.svg)](https://github.com/nitromannitol/f-lattice-lean/actions/workflows/ci.yml) [![Comparator audit](https://github.com/nitromannitol/f-lattice-lean/actions/workflows/comparator.yml/badge.svg)](https://github.com/nitromannitol/f-lattice-lean/actions/workflows/comparator.yml)
+
 A Lean 4 formalization of
 
 > Ahmed Bou-Rabee, *Integer superharmonic matrices on the F-lattice*, arXiv:2110.07556,
