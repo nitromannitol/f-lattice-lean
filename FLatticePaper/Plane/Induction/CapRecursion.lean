@@ -130,4 +130,17 @@ theorem harmonicGrid_anchor (j : ℤ) :
   rw [e, ht]
   omega
 
+/-- **The odd harmonic anchor.** The harmonic grid at `(2−k, k−1)` (odd, parity term `1`) is `m(k) = capMin k`. -/
+theorem harmonicGrid_anchor_odd (k : ℤ) :
+    FLatticePaper.Induction.harmonicGrid (2 - k, k - 1) = QuadraticCap.capMin k := by
+  unfold FLatticePaper.Induction.harmonicGrid QuadraticCap.capMin
+  obtain ⟨t, ht⟩ := Int.even_mul_pred_self k
+  have e : (2 - k) ^ 2 + 2 * (2 - k) * (k - 1) - (k - 1) ^ 2 - 2 * (k - 1) - ((2 - k) + (k - 1)) % 2 =
+      -2 * (k * (k - 1)) := by
+    have h1 : ((2 - k) + (k - 1)) % 2 = 1 := by omega
+    rw [h1]
+    ring
+  rw [e, ht]
+  omega
+
 end FLatticePaper.CapRecursion
