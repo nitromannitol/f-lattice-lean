@@ -529,6 +529,7 @@ import FLatticePaper.Plane.Induction.RowMinus
 import FLatticePaper.Plane.Induction.NominalValues
 import FLatticePaper.Plane.Induction.HBottom
 import FLatticePaper.Plane.Induction.TraceStep
+import FLatticePaper.Plane.Induction.ChainEnd
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame
 import FLatticePaper.Plane.Induction.BaseMembership
