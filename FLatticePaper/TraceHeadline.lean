@@ -5,8 +5,8 @@ import FLatticePaper.Plane.Induction.ThreesGames
 /-! Task w3, step D end: the odometers headline with the boundary bound `hbd` derived from the trace induction.
 
 `odometersTheorem_no_hbd` is `odometersTheorem_of_canonical` with its `hbd` argument supplied by
-`TraceSeedInduction.hbd_of_traceSeeds`. The named input is the trace at the two-power words (`hTraceTwos`). The trace at the pure words, the all-threes conjugate row and
-the games at the pure words are proved. The existing inputs of the headline (`hflatP`, `hflatM`, `hgames`, `hW1`) are unchanged.
+`TraceSeedInduction.hbd_of_traceSeeds`. No named base input is left: the traces at the pure words, the two-powers, the all-threes conjugate rows and the games at
+the pure words are proved. The existing inputs of the headline (`hflatP`, `hflatM`, `hgames`, `hW1`) are unchanged.
 -/
 
 namespace FLatticePaper
@@ -23,8 +23,6 @@ theorem odometersTheorem_no_hbd
         (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) (-1) c →
       TwosEPolicy.rhoTwos (2 * (k : ℤ) + 4) (-1) i < TwosEPolicy.rhoTwos (2 * (k : ℤ) + 4) (-1) c)
     (hgames : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ IsTwoPow word → GamesWithRank word)
-    (hTraceThrees : ∀ k : ℕ, TraceFromPsi.TraceAt (List.replicate k Digit.three))
-    (hTraceTwos : ∀ k : ℕ, TraceFromPsi.TraceAt (List.replicate (k + 1) Digit.two))
     (hW1 : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ IsTwoPow word →
       ¬ (∃ k : ℕ, conjWord word = List.replicate k Digit.three) →
       ¬ (∃ k : ℕ, conjWord word = List.replicate (k + 1) Digit.two) →
@@ -37,7 +35,7 @@ theorem odometersTheorem_no_hbd
     fun k => StrongEstimates.of_base_pure k (EPolicy.pure_threes_inputs.1 k) (EPolicy.pure_threes_inputs.2 k)
   have htwo : ∀ k : ℕ, StrongEstimates (List.replicate (k + 1) Digit.two) :=
     fun k => StrongEstimates.of_base_two k (twos_baseSlip k) (strongResidual_twos_of_games k (htwoGames k))
-  have hbd := TraceSeedInduction.hbd_of_traceSeeds hpure htwo hTraceThrees hTraceTwos hgames htwoGames
+  have hbd := TraceSeedInduction.hbd_of_traceSeeds hpure htwo hgames htwoGames
   exact odometersTheorem_of_canonical EPolicy.pure_threes_inputs.1 EPolicy.pure_threes_inputs.2 htwoGames hgames hbd hW1
 
 end FLatticePaper
