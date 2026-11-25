@@ -345,6 +345,8 @@ import FLatticePaper.Plane.Induction.TwosWhiteSel
 import FLatticePaper.Plane.Induction.TwosCandSel
 import FLatticePaper.Plane.Induction.TwosCandAll
 import FLatticePaper.Plane.Induction.TwosFreeAll
+import FLatticePaper.Plane.Induction.TwosHTile
+import FLatticePaper.Plane.Induction.TwosFlatPlus
 import FLatticePaper.Plane.Induction.CornerPositive
 import FLatticePaper.Tiles.InterfaceStacked
 import FLatticePaper.Tiles.StringCorners
