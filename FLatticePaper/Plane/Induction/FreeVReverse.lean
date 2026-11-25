@@ -259,4 +259,68 @@ theorem freeV_of_conj_freeH {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three
       rw [hv]
       exact hb
 
+/-- The corner floor for `ε = −1`: with `N d − D n = −1`, the even block at `l = D − 1` has `b = D − N − 1`, and
+`(d − n)(D − 1) − b d ≤ n`. -/
+theorem corner_neg_floor (N D n d : ℤ) (hdet : N * d - D * n = -1) (hN : 0 < N) (hND : N < D)
+    (hd : 2 * D + 1 ≤ d) :
+    (D - N - 1) * d ≤ (d - n) * (D - 1) ∧ (d - n) * (D - 1) < (D - N - 1 + 1) * d ∧
+      (d - n) * (D - 1) - d * (D - N - 1) ≤ n := by
+  have key : 2 * D * ((d - n) * (D - 1) - (D - N - 1) * d) = 2 * N * d - 2 * (D - 1) := by
+    linear_combination (2 * (D - 1)) * hdet
+  have hD : 0 < D := by omega
+  have hX0 : 0 ≤ 2 * N * d - 2 * (D - 1) := by nlinarith
+  have hX1 : 2 * N * d - 2 * (D - 1) < 2 * D * d := by nlinarith
+  have hdiff0 : 0 ≤ (d - n) * (D - 1) - (D - N - 1) * d := by
+    by_contra hc
+    simp only [not_le] at hc
+    nlinarith
+  have hdiff1 : (d - n) * (D - 1) - (D - N - 1) * d < d := by
+    by_contra hc
+    simp only [not_lt] at hc
+    nlinarith
+  have hbound : 2 * D * ((d - n) * (D - 1) - (D - N - 1) * d) ≤ 2 * D * n := by
+    rw [key]
+    nlinarith
+  refine ⟨by linarith, by linarith, ?_⟩
+  by_contra hc
+  simp only [not_le] at hc
+  nlinarith
+
+/-- **The corner for `ε = −1`.** The point `(N − D + 1, N + D − 1) = V_p + I` is in the free V cut of the word when the
+sign is `−1`: it is the even block vertex at `l = D − 1`. -/
+theorem freeV_corner_of_eps_neg {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
+    (he : (frameAt word).eps = -1) :
+    ((frameAt word).parents.odd.num - (frameAt word).parents.odd.den + 1,
+      (frameAt word).parents.odd.num + (frameAt word).parents.odd.den - 1) ∈ (frameAt word).freeV := by
+  have hdet := (frameAt word).odd_det_child
+  rw [he] at hdet
+  obtain ⟨hcdW, hcnW, hDpos, hN0, hND, hqpos, hq0, hqn, hpar2⟩ := (frameAt word).linear_facts
+  have hNpos := frameAt_odd_num_pos h
+  have hodd : ((frameAt word).parents.odd.num + (frameAt word).parents.odd.den) % 2 = 1 :=
+    (frameAt word).valid.odd_parity
+  have hd : 2 * (frameAt word).parents.odd.den + 1 ≤ (frameAt word).child.den := by omega
+  obtain ⟨hf1, hf2, hf3⟩ := corner_neg_floor (frameAt word).parents.odd.num (frameAt word).parents.odd.den
+    (frameAt word).child.num (frameAt word).child.den hdet hNpos hND hd
+  have hdpos : 0 < (frameAt word).child.den := by omega
+  have hfloor : ((frameAt word).child.den - (frameAt word).child.num) * ((frameAt word).parents.odd.den - 1) /
+      (frameAt word).child.den = (frameAt word).parents.odd.den - (frameAt word).parents.odd.num - 1 := by
+    have h1 := (Int.le_ediv_iff_mul_le hdpos).mpr hf1
+    have h2 := (Int.ediv_lt_iff_lt_mul hdpos).mpr hf2
+    exact le_antisymm (Int.lt_add_one_iff.mp h2) h1
+  have hq : ((frameAt word).child.den - (frameAt word).child.num) * ((frameAt word).parents.odd.den - 1) -
+      (frameAt word).child.den * ((((frameAt word).child.den - (frameAt word).child.num) *
+        ((frameAt word).parents.odd.den - 1)) / (frameAt word).child.den) ≤ (frameAt word).child.num := by
+    rw [hfloor]
+    exact hf3
+  have hb := even_block_mem_freeV (frameAt word) ((frameAt word).parents.odd.den - 1) (by omega) (by omega) hq
+  rw [hfloor] at hb
+  have hv : ((frameAt word).parents.odd.num - (frameAt word).parents.odd.den + 1,
+      (frameAt word).parents.odd.num + (frameAt word).parents.odd.den - 1) =
+      (-((frameAt word).parents.odd.den - (frameAt word).parents.odd.num - 1),
+        2 * ((frameAt word).parents.odd.den - 1) -
+          ((frameAt word).parents.odd.den - (frameAt word).parents.odd.num - 1)) :=
+    Prod.ext (by dsimp only; omega) (by dsimp only; omega)
+  rw [hv]
+  exact hb
+
 end FLatticePaper.Induction
