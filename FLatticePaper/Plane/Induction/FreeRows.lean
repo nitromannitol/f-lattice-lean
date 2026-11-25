@@ -131,4 +131,43 @@ theorem free_row_empty (F : Field) (frame : ChildFrame) {S : Set Site}
       obtain ⟨j, hj, hjw⟩ := hpaid k e he v0 b hv0S hv0o hv0c w hwcl hwout hwS hwc
       exact hIH j w hj hjw hwS
 
+
+/-- **`free_row_empty` with `hmin` only for the row entries in `S`.** The proof uses `hmin` only on the branch where `e ∈ S`, so the
+universal form of `hmin` (every row entry is `K`-minimal over `S`) is not needed; only the entries in `S` must be `K`-minimal over `S`. -/
+theorem free_row_empty_inS (F : Field) (frame : ChildFrame) {S : Set Site}
+    (P J K : Site → ℤ) (hK : ∀ z, K z = P z + J z) (Kc : ℕ)
+    (row : List Site)
+    (hmin : ∀ (k : ℕ) (e : Site), row[k]? = some e → e ∈ S → ∀ w ∈ S, K e ≤ K w)
+    (hcone : ∀ v0 b : Site, v0 ∈ S → frame.openRect v0 → F v0 = parabolaField b.2 v0 →
+      frame.child.num + 2 ≤ frame.tGrade b → ConeRoot b Kc v0 →
+      ∃ w : Site, w ∈ S ∧ F w = parabolaField b.2 w ∧ w ∈ frame.closedPolygon ∧ ¬ frame.openRect w)
+    (hshort : ∀ v0 b : Site, v0 ∈ S → frame.openRect v0 → F v0 = parabolaField b.2 v0 →
+      ¬ (frame.child.num + 2 ≤ frame.tGrade b ∧ ConeRoot b Kc v0) →
+      ∃ w : Site, w ∈ S ∧ F w = parabolaField b.2 w ∧ w ∈ frame.closedPolygon ∧ ¬ frame.openRect w)
+    (hpaid : ∀ (k : ℕ) (e : Site), row[k]? = some e → ∀ v0 b : Site, v0 ∈ S → frame.openRect v0 →
+      F v0 = parabolaField b.2 v0 → ∀ w ∈ frame.closedPolygon, ¬ frame.openRect w → w ∈ S →
+      F w = parabolaField b.2 w → ∃ j, j < k ∧ row[j]? = some w)
+    (hforce : ∀ (k : ℕ) (e : Site), row[k]? = some e → e ∈ S →
+      (∃ w ∈ S, P w ≤ P e ∧ J w ≤ J e ∧ (P w < P e ∨ J w < J e)) ∨
+      (∃ j, j < k ∧ ∃ e', row[j]? = some e' ∧ e' ∈ S) ∨
+      (∃ v0 b : Site, v0 ∈ S ∧ frame.openRect v0 ∧ F v0 = parabolaField b.2 v0)) :
+    ∀ (k : ℕ) (e : Site), row[k]? = some e → e ∉ S := by
+  refine ordered_removal_list S row ?_
+  intro k e he hmem hIH
+  rcases hforce k e he hmem with ⟨w, hwS, hwP, hwJ, hwlt⟩ | ⟨j, hj, e', he', he'S⟩ | ⟨v0, b, hv0S, hv0o, hv0c⟩
+  · -- a componentwise lower site of the fort contradicts the minimum of `K`
+    have h1 := hmin k e he hmem w hwS
+    have h2 := hK e
+    have h3 := hK w
+    omega
+  · exact hIH j e' hj he' he'S
+  · -- the fan of the start `(v₀, b)` exits on a boundary contact on the parabola of `b`, which is an earlier entry
+    by_cases hk : frame.child.num + 2 ≤ frame.tGrade b ∧ ConeRoot b Kc v0
+    · obtain ⟨w, hwS, hwc, hwcl, hwout⟩ := hcone v0 b hv0S hv0o hv0c hk.1 hk.2
+      obtain ⟨j, hj, hjw⟩ := hpaid k e he v0 b hv0S hv0o hv0c w hwcl hwout hwS hwc
+      exact hIH j w hj hjw hwS
+    · obtain ⟨w, hwS, hwc, hwcl, hwout⟩ := hshort v0 b hv0S hv0o hv0c hk
+      obtain ⟨j, hj, hjw⟩ := hpaid k e he v0 b hv0S hv0o hv0c w hwcl hwout hwS hwc
+      exact hIH j w hj hjw hwS
+
 end FLatticePaper.FreeRows
