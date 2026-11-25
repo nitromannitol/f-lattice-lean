@@ -319,6 +319,15 @@ import FLatticePaper.Tiles.SubCeilEven
 import FLatticePaper.Tiles.SubWalkEven
 import FLatticePaper.Tiles.SubEvenCopy
 import FLatticePaper.Tiles.SeamSub
+import FLatticePaper.Tiles.CellTestGen
+import FLatticePaper.Tiles.CellIntervals
+import FLatticePaper.Tiles.CellBox
+import FLatticePaper.Tiles.WalkCover
+import FLatticePaper.Tiles.WalkLines
+import FLatticePaper.Tiles.WordCounts
+import FLatticePaper.Tiles.SeamCover
+import FLatticePaper.Tiles.SeamCoverFinal
+import FLatticePaper.Tiles.BottomSeamAll
 import FLatticePaper.Plane.Induction.CornerPositive
 import FLatticePaper.Tiles.InterfaceStacked
 import FLatticePaper.Tiles.StringCorners
