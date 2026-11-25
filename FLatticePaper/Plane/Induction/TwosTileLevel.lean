@@ -118,4 +118,84 @@ theorem phi_s0p0 (k : ℕ) {x y : ℤ} (hN : NativeT (2 * (k : ℤ) + 4) x y)
   unfold twosLev
   exact level_arith (k : ℤ) (by positivity) x y d1 d2 d3 d4 d5 d6
 
+set_option maxHeartbeats 400000 in
+/-- The polygon of the combination `(slip class 0, price class V)`: `-1 ≤ x ≤ a-1`, `a-1 ≤ y - x ≤ 2a`, `a ≤ y+1 ≤ 3a-2`. -/
+theorem dom_s0pV (k : ℤ) (x y : ℤ) (hN : NativeT (2 * k + 4) x y) (hk : TwosKey (2 * k + 4) (x + 1) (y + 1))
+    (hpV : (x + 2, y + 1 - (2 * k + 4)) ∈ paperNearLadderTile (2 * k + 4)) :
+    -1 ≤ x ∧ x ≤ 2 * k + 4 - 1 ∧ (2 * k + 4 ≤ y - x ∨ (x = 2 * k + 4 - 1 ∧ y = 2 * (2 * k + 4) - 2)) ∧
+      y - x ≤ 2 * (2 * k + 4) ∧ 2 * k + 4 ≤ y ∧
+      y ≤ 3 * (2 * k + 4) - 3 := by
+  rw [mem_pnTile_iff] at hpV
+  unfold NativeT at hN
+  unfold TwosKey at hk
+  refine ⟨by omega, by omega, by omega, by omega, by omega, by omega⟩
+
+set_option maxHeartbeats 400000 in
+/-- The arithmetic of the combination `(slip class 0, price class V)` on its polygon. -/
+theorem level_s0pV (k : ℤ) (hk0 : 0 ≤ k) (x y : ℤ) (h1 : -1 ≤ x) (h2 : x ≤ 2 * k + 4 - 1)
+    (h3 : 2 * k + 4 ≤ y - x ∨ (x = 2 * k + 4 - 1 ∧ y = 2 * (2 * k + 4) - 2))
+    (h4 : y - x ≤ 2 * (2 * k + 4)) (h6 : 2 * k + 4 ≤ y)
+    (h5 : y ≤ 3 * (2 * k + 4) - 3) :
+    (-((y + 1 - x) ^ 2 / 4) + min 0 (2 * k + 4 - (y + 1)) + min 0 (2 * (2 * k + 4) - (y + 1)) +
+        max ((y + 1 - x) - (2 * k + 4)) 0 +
+        (if ((x = -1 ∧ y + 1 = 2 * (2 * k + 4) + 1) ∨ (x = 2 * k + 4 + 1 ∧ y + 1 = (2 * k + 4) - 1) ∨
+          (y + 1 - x = 2 * k + 4 ∧ 0 < x ∧ x < 2 * k + 4)) then 1 else 0)) -
+      (-((y + 1 - (2 * k + 4) - (x + 2)) ^ 2 / 4) + min 0 (2 * k + 4 - (y + 1 - (2 * k + 4))) +
+        min 0 (2 * (2 * k + 4) - (y + 1 - (2 * k + 4))) +
+        max ((y + 1 - (2 * k + 4) - (x + 2)) - (2 * k + 4)) 0 +
+        (if ((x + 2 = -1 ∧ y + 1 - (2 * k + 4) = 2 * (2 * k + 4) + 1) ∨
+          (x + 2 = 2 * k + 4 + 1 ∧ y + 1 - (2 * k + 4) = (2 * k + 4) - 1) ∨
+          (y + 1 - (2 * k + 4) - (x + 2) = 2 * k + 4 ∧ 0 < x + 2 ∧ x + 2 < 2 * k + 4)) then 1 else 0)) -
+      (1 - (2 * k + 4) ^ 2 - 3 * (2 * k + 4)) + ((2 * k + 5) * (y + 1 - (2 * k + 4) - 1) - (2 * k + 3) * (x + 2)) +
+      ((k + 1) * (x + 1) - (k + 2) * (y + 1)) + 1 =
+    (k + 2) * (k + 3) + ((if (y - x ≥ 2 * k + 4 ∨ (y - x = 2 * k + 4 - 1 ∧ x ≠ 0)) then 1 else 0) -
+      (if (x - y ≥ 1 ∧ ¬ (x = 2 * k + 4 ∧ y = 2 * k + 4 - 1)) then 1 else 0)) := by
+  have hsq : (y + 1 - (2 * k + 4) - (x + 2)) ^ 2 / 4 =
+      (y + 1 - x) ^ 2 / 4 - (k + 3) * (y + 1 - x) + (k + 3) ^ 2 := by
+    have e : y + 1 - (2 * k + 4) - (x + 2) = (y + 1 - x) - 2 * (k + 3) := by ring
+    rw [e, sq_shift_neg]
+  rw [hsq]
+  have hm1 : min 0 (2 * k + 4 - (y + 1)) = 2 * k + 4 - (y + 1) := min_eq_right (by omega)
+  have hm3 : min 0 (2 * (2 * k + 4) - (y + 1 - (2 * k + 4))) = 0 := min_eq_left (by omega)
+  have hmx1 : max ((y + 1 - x) - (2 * k + 4)) 0 = (y + 1 - x) - (2 * k + 4) := max_eq_left (by omega)
+  have hmx2 : max ((y + 1 - (2 * k + 4) - (x + 2)) - (2 * k + 4)) 0 = 0 := max_eq_right (by omega)
+  rw [hm1, hm3, hmx1, hmx2]
+  rcases le_total (y + 1) (2 * (2 * k + 4)) with hy | hy
+  · rw [min_eq_left (show (0 : ℤ) ≤ 2 * (2 * k + 4) - (y + 1) by omega),
+      min_eq_left (show (0 : ℤ) ≤ 2 * k + 4 - (y + 1 - (2 * k + 4)) by omega)]
+    split_ifs <;> first | ring1 | (ring_nf; done) | (ring_nf; omega)
+  · rw [min_eq_right (show 2 * (2 * k + 4) - (y + 1) ≤ (0 : ℤ) by omega),
+      min_eq_right (show 2 * k + 4 - (y + 1 - (2 * k + 4)) ≤ (0 : ℤ) by omega)]
+    split_ifs <;> first | ring1 | (ring_nf; done) | (ring_nf; omega)
+
+set_option maxHeartbeats 400000 in
+/-- The combination `(slip class 0, price class V)`: on its polygon, `Φ = (k+2)(k+3) + twosLev`. -/
+theorem phi_s0pV (k : ℕ) {x y : ℤ} (hN : NativeT (2 * (k : ℤ) + 4) x y)
+    (hk : TwosKey (2 * (k : ℤ) + 4) (x + 1) (y + 1))
+    (hs : (x + 1, y + 2) ∈ paperNearLadderTile (2 * (k : ℤ) + 4))
+    (hpV : (x + 2, y + 1 - (2 * (k : ℤ) + 4)) ∈ paperNearLadderTile (2 * (k : ℤ) + 4)) :
+    twosPhi k 1 (x, y) = ((k : ℤ) + 2) * ((k : ℤ) + 3) + twosLev (2 * (k : ℤ) + 4) x y := by
+  have hkp := twosKey_of_native hN
+  have hV : (x + 1 + 1, y + 1 - (2 * (k : ℤ) + 4)) ∈ paperNearLadderTile (2 * (k : ℤ) + 4) := by
+    have e1 : x + 1 + 1 = x + 2 := by ring
+    rw [e1]
+    exact hpV
+  unfold twosPhi
+  rw [chainP_eq]
+  unfold twosP
+  simp only
+  rw [twos_slip_class0 k hkp hs, twos_price_classV k hk hV]
+  have eB : (x + 1, y + 1 + 1) = (x + 1, y + 2) := by
+    congr 1
+    ring
+  have eD : (x + 1 + 1, y + 1 - (2 * (k : ℤ) + 4)) = (x + 2, y + 1 - (2 * (k : ℤ) + 4)) := by
+    congr 1
+    ring
+  rw [eB, eD]
+  rw [pnv_lin (2 * (k : ℤ) + 4) x (y + 1), pnv_lin (2 * (k : ℤ) + 4) (x + 2) (y + 1 - (2 * (k : ℤ) + 4))]
+  obtain ⟨d1, d2, d3, d4, d5, d6⟩ := dom_s0pV (k : ℤ) x y hN hk hpV
+  unfold twosLev
+  have core := level_s0pV (k : ℤ) (by positivity) x y d1 d2 d3 d4 d5 d6
+  linarith [core]
+
 end FLatticePaper.TwosEPolicy
