@@ -1,0 +1,4 @@
+import FLatticePaper.Plane.Induction.CanonicalPermit
+
+#print axioms FLatticePaper.CanonicalPermit.slip_permit_freeV_canonical
+#print axioms FLatticePaper.CanonicalPermit.prescribed_of_canonical
