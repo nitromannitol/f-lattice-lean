@@ -588,6 +588,7 @@ import FLatticePaper.Plane.Induction.PhaseOneWindow
 import FLatticePaper.Plane.Induction.PhaseOneA
 import FLatticePaper.Plane.Induction.PhaseOnePrice
 import FLatticePaper.Plane.Induction.PsiMonoPhase1
+import FLatticePaper.Plane.Induction.HfreePhase0
 import FLatticePaper.TraceHeadline
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame
