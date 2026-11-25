@@ -564,6 +564,8 @@ import FLatticePaper.Plane.Induction.ConjBase
 import FLatticePaper.Plane.Induction.TraceSeedInduction
 import FLatticePaper.Plane.Induction.ThreesGames
 import FLatticePaper.Plane.Induction.PureTrace
+import FLatticePaper.Plane.Induction.PureRow
+import FLatticePaper.Plane.Induction.TwosTrace
 import FLatticePaper.TraceHeadline
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame
