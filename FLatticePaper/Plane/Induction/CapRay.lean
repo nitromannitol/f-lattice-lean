@@ -5,6 +5,7 @@ import FLatticePaper.Plane.Induction.Packet
 import FLatticePaper.Plane.Induction.SheetMonoChild
 import FLatticePaper.Plane.Induction.FanPropagation
 import FLatticePaper.Plane.Induction.W1Exit
+import FLatticePaper.Plane.Induction.ConeRoot
 
 /-! The diagonal ray of the all-slope cap on a frame's packet (ALL_SLOPE_STEP, "The uniform quadratic cap", the high-slope case `d > 3n`
 with `(N, D, a) = (n, d, 2)`).
@@ -229,16 +230,6 @@ theorem even_halo (frame : ChildFrame) {F : Field} (hP : frame.Packet F)
 From the start `b` (odd, `t b ≥ N + 2`, the condition `t'(b) ≥ N + a` with `a = 2`), a root `x` of the cone has height `k = x_y − b_y`
 in `[1, K−1]`, with `ℓ = x_x − b_x ≥ k − 1` on even roots and `ℓ ≥ k` on odd roots. Its two inputs are then in `InCone`, and the
 halo bounds (`even_halo`, `odd_halo`) give `m(k) ≤ F` on each input, where `m i = capMin (i_y − b_y)`. -/
-
-/-- A root of the fan cone from `b` (see the section comment). -/
-def ConeRoot (b : Site) (K : ℕ) (x : Site) : Prop :=
-  1 ≤ x.2 - b.2 ∧ x.2 - b.2 ≤ (K : ℤ) - 1 ∧
-    (EvenSite x → x.1 - b.1 ≥ x.2 - b.2 - 1) ∧ (¬ EvenSite x → x.1 - b.1 ≥ x.2 - b.2)
-
-/-- An input of the cone: height in `[0, K]`, `ℓ ≥ k − 1` on even sites, `ℓ ≥ k − 2` on odd sites. -/
-def InCone (b : Site) (K : ℕ) (i : Site) : Prop :=
-  0 ≤ i.2 - b.2 ∧ i.2 - b.2 ≤ (K : ℤ) ∧
-    (EvenSite i → i.1 - b.1 ≥ i.2 - b.2 - 1) ∧ (¬ EvenSite i → i.1 - b.1 ≥ i.2 - b.2 - 2)
 
 /-- The inputs of a cone root are cone inputs. -/
 theorem cone_input_of_root (b : Site) (K : ℕ) (x : Site) (hR : ConeRoot b K x) (i : Site)
