@@ -575,6 +575,7 @@ import FLatticePaper.Plane.Induction.FanAcyclic
 import FLatticePaper.Plane.Induction.FanCompat
 import FLatticePaper.Plane.Induction.Q30White
 import FLatticePaper.Plane.Induction.Q30Strips
+import FLatticePaper.Plane.Induction.ReturnTable
 import FLatticePaper.Plane.Induction.GameFort
 import FLatticePaper.Plane.Induction.RetainedCore
 import FLatticePaper.Plane.Induction.H0Core
