@@ -5,6 +5,7 @@ import FLatticePaper.Plane.Induction.W4FloorArc
 import FLatticePaper.Plane.Induction.W4NativeSlip
 import FLatticePaper.Plane.Induction.W4Boundary
 import FLatticePaper.Plane.Induction.W4OfferB
+import FLatticePaper.Plane.Induction.W4White
 
 /-! # W4 (Q35/Q34): the free-tail case with `a(c) = 1`, and `NoRiseForced`
 
@@ -501,8 +502,9 @@ The caller's hypotheses, with their providers:
 * `hTr : TraceAt (conjWord word)`: the trace induction (`TraceStep.traceAt_step`, the H-trace price on the conjugate's free H points).
 * `hW1`: the conjugate's `W1Forced` (the W1 forcing of the earlier stage, `W1NonfreeHsqC.W1Forced_of_inputs`).
 * `P` (the retained policy of the conjugate, with `sheetPolicyA`): the old policy of the earlier stage (`OldPolicyData`).
-* `hwhite`: the conjugate's laplacian vanishes at `Z(c − lv)` for every white `c` of the word. Numerically 546/546 on the needed
-  roots; not yet derived in Lean (the white condition of the retained edge).
+* `hwhite` is no longer an input: it follows from the strict interior of `c`, `c` white and `0 ≤ Ψ(c)`
+  (`W4White.hwhite_of_strict`: `F = min(A, C)` on the polygon, the inputs of `c` lie in the polygon, `lap A(c) ≥ 0`, and `lap A(c)` is
+  the conjugate's laplacian at `Z(c − lv)`, which is `−1` or `0`).
 * `hPres`: the free policy's prescription at free-closure whites (`FreePolicy.FreePresc`): the closure property of `freePolicy`.
 The strictness `hSI` and the edge `Edge i c` are per-white arguments of `NoRiseForced` itself. -/
 theorem noRiseForced_proved {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
@@ -513,8 +515,6 @@ theorem noRiseForced_proved {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three
       (standardField (conjWord word)))
     {seed : Site → Site → Prop}
     (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
-    (hwhite : ∀ c : Site, laplacian (standardField word) c = 0 →
-      laplacian (standardField (conjWord word)) (zTurn (c - (frameAt word).sheetShift)) = 0)
     (hPres : ∀ c : Site, FreeClosure.freeClosure (frameAt (conjWord word)) c →
       laplacian (standardField (conjWord word)) c = 0 →
       ∀ j : Site, P.retained c j ↔ FreePolicy.FreePresc (frameAt (conjWord word)) (frameAt word).eps c j) :
@@ -535,6 +535,7 @@ theorem noRiseForced_proved {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three
     exact FLatticePaper.W4FreeTail.rise_excluded_nonfree h hSE P hW1 hconj hpol h1' h0'
   · unfold FLatticePaper.Induction.Nonfree at hconj
     push Not at hconj
-    exact freeTail_a1 h hSE hX hSE' hTr P hPres (hwhite c hlap) hSI hc hcu hpol hEdge hconj ha1 h0 hB
+    exact freeTail_a1 h hSE hX hSE' hTr P hPres
+      (FLatticePaper.W4White.hwhite_of_strict h hSE hSI hc hlap hΨc) hSI hc hcu hpol hEdge hconj ha1 h0 hB
 
 end FLatticePaper.W4Guard
