@@ -364,9 +364,7 @@ theorem parentSquareOut_evenH_NW_fan {frame : ChildFrame} {G : Field} {seed : Si
     (hapex : frame.child.num + 2 ≤ frame.tGrade (z.1 - 1, z.2))
     (hzw : laplacian G z = 0)
     (hNB : laplacian G (z.1, z.2 + 1) = -1)
-    (hNW : laplacian G (z.1 - 1, z.2 + 1) = 0)
-    (hSIstart : FLatticePaper.W1.StrictInterior frame.child.num frame.child.den (z.1 - 1, z.2 + 1))
-    (hcontact : G (z.1 - 1, z.2 + 1) = 0) :
+    (hNW : laplacian G (z.1 - 1, z.2 + 1) = 0) :
     ParentSquareOut G W.retained z := by
   have hn : 1 ≤ frame.child.num := by
     obtain ⟨hn1, -, -, -, -⟩ := frame.child_facts
@@ -404,6 +402,69 @@ theorem parentSquareOut_evenH_NW_fan {frame : ChildFrame} {G : Field} {seed : Si
     simp only at hev ⊢
     omega
   have hzfree : ¬ Nonfree frame z := not_nonfree_of_freeH hz
+  -- the apex bound and the height of the start, from the free box and the zero strip
+  have htW : frame.tGrade (z.1 - 1, z.2) = frame.tGrade z - frame.child.num := by
+    unfold ChildFrame.tGrade
+    dsimp only
+    ring
+  have htNW : frame.tGrade (z.1 - 1, z.2 + 1) = frame.tGrade z - frame.child.num - frame.child.den := by
+    unfold ChildFrame.tGrade
+    dsimp only
+    ring
+  have hsW : frame.sGrade (z.1 - 1, z.2 + 1) = frame.sGrade z - 2 * frame.child.num := by
+    unfold ChildFrame.sGrade
+    dsimp only
+    ring
+  obtain ⟨hx1, hxd, hy0, hyn⟩ := FLatticePaper.Induction.FreeTraceBox.freeH_box frame hz
+  obtain ⟨hsA, hsB⟩ := FLatticePaper.ShortRoute.freeH_sGrade_bounds frame hz
+  obtain ⟨hn1, hnd, hdn2, hd3, hPT⟩ := frame.child_facts
+  have hTbig : 2 * (frame.child.num + frame.child.den) < frame.child.periodDenominator := by
+    rw [hPT]
+    nlinarith [mul_nonneg (show (0 : ℤ) ≤ frame.child.den - frame.child.num - 2 by omega)
+      (show (0 : ℤ) ≤ frame.child.den + frame.child.num by omega),
+      mul_nonneg (show (0 : ℤ) ≤ frame.child.num by omega) (show (0 : ℤ) ≤ frame.child.den by omega)]
+  have hspec : frame.hSpectrum (frame.tGrade z) := hz.2.2
+  have htpar := FLatticePaper.Induction.tGrade_parity frame z
+  have htle : frame.tGrade z ≤ frame.child.den + frame.child.num - 2 := by
+    unfold ChildFrame.hSpectrum at hspec
+    unfold EvenSite at hev
+    try simp only at hev
+    rcases hspec with ⟨h1, h2, h3⟩ | ⟨h1, h2, h3⟩
+    · omega
+    · omega
+  have htz : 2 * frame.child.num + 2 ≤ frame.tGrade z := by omega
+  have hz3 : 3 ≤ z.1 := by
+    by_contra hc
+    have hc2 : z.1 ≤ 2 := by omega
+    have htz' : frame.tGrade z = frame.child.num * z.1 - frame.child.den * z.2 := rfl
+    nlinarith [mul_nonneg (show (0 : ℤ) ≤ frame.child.num by omega) (show (0 : ℤ) ≤ 2 - z.1 by omega),
+      mul_nonneg (show (0 : ℤ) ≤ frame.child.den by omega) (show (0 : ℤ) ≤ z.2 by omega)]
+  have hs3 : 3 * (frame.child.den + frame.child.num) ≤ frame.sGrade z := by
+    have hsz : frame.sGrade z = (frame.child.den + frame.child.num) * z.1 + (frame.child.den - frame.child.num) * z.2 := rfl
+    rw [hsz]
+    nlinarith [mul_nonneg (show (0 : ℤ) ≤ frame.child.den + frame.child.num by omega)
+      (show (0 : ℤ) ≤ z.1 - 3 by omega),
+      mul_nonneg (show (0 : ℤ) ≤ frame.child.den - frame.child.num by omega) (show (0 : ℤ) ≤ z.2 by omega)]
+  have hcontact : G (z.1 - 1, z.2 + 1) = 0 := by
+    apply FLatticePaper.ShapeOneGeom.zero_of_tGrade hP.strips
+    · omega
+    · omega
+  have hSIstart : FLatticePaper.W1.StrictInterior frame.child.num frame.child.den (z.1 - 1, z.2 + 1) := by
+    unfold FLatticePaper.W1.StrictInterior
+    simp only [FLatticePaper.W1.w1b, FLatticePaper.W1.w1a, FLatticePaper.W1.w1h, FLatticePaper.W1.w1c, if_pos hq1e]
+    have hTw : FLatticePaper.W1.w1T frame.child.num frame.child.den = frame.child.periodDenominator := by
+      rw [hPT]
+      rfl
+    have htw : FLatticePaper.W1.w1t frame.child.num frame.child.den (z.1 - 1, z.2 + 1) =
+        frame.tGrade (z.1 - 1, z.2 + 1) := rfl
+    have hsw : FLatticePaper.W1.w1s frame.child.num frame.child.den (z.1 - 1, z.2 + 1) =
+        frame.sGrade (z.1 - 1, z.2 + 1) := rfl
+    rw [htw, hsw, hTw, htNW, hsW]
+    refine ⟨?_, ?_, ?_, ?_⟩
+    · omega
+    · omega
+    · omega
+    · omega
   -- the fan start: the forced east edge of `z+NW`, apex `z+W`
   obtain ⟨K, hK2, hKs, hKr⟩ := CoveredSW.K_bounds_of_three_n hn hdn
   obtain ⟨p, q, hs, hcap⟩ := hAS K hK2 hKs hKr
