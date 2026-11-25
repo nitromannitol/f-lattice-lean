@@ -106,13 +106,15 @@ theorem slip_minus_forced_adjacent_sheetOut {word : Word} (h : ∃ x ∈ word, x
 /-- **The rise form of the a-fall exclusion (the named input `hnofall_forced`, rise form).** A rise `a(x) ≥ 1`, `a(x') = 0`,
 `B(x) ≥ 1` on a forced nonfree `A`-edge does not occur. Numerically the rise population is empty (no pair among 1378). The reduction
 `slip_minus_forced_adjacent` still uses `NoAFallForced`: a fall `2 → 1` with `B ≥ 2` is not a rise and needs the rounding argument. -/
-noncomputable def NoRiseForced (word : Word) : Prop :=
+noncomputable def NoRiseForced {word : Word} {seed : Site → Site → Prop}
+    (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps) : Prop :=
   ∀ c i : Site,
     c ∈ (frameAt word).closedPolygon → i ∈ (frameAt word).closedPolygon →
     c + (frameAt word).uq ∈ (frameAt word).closedPolygon → i + (frameAt word).uq ∈ (frameAt word).closedPolygon →
     0 ≤ sheetPsi word c → 0 ≤ sheetPsi word i → Edge i c →
     SquareClauses.ForcedEdge (standardField word) (fun _ _ => False) c i →
     laplacian (standardField word) c = 0 → FLatticePaper.Induction.Nonfree (frameAt word) c →
+    sheetPolicyA P (frameAt word).sheetShift c i →
     1 ≤ aJump word c → aJump word i = 0 → 1 ≤ BOffer word c → False
 
 /-- **The rounded monotonicity on forced edges (named input `RoundedMonoForced`).** The statement of
@@ -132,7 +134,7 @@ theorem slip_minus_forced_adjacent_rise {word : Word} (h : ∃ x ∈ word, x ≠
     (hpk : (frameAt word).Packet (standardField word))
     {seed : Site → Site → Prop}
     (P : FLatticePaper.W1Phase.OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
-    (hrise : NoRiseForced word) (hround : RoundedMonoForced word) {c i : Site}
+    (hrise : NoRiseForced P.toOldPolicyWitness.toOldPolicyData) (hround : RoundedMonoForced word) {c i : Site}
     (hc : c ∈ (frameAt word).closedPolygon) (hi : i ∈ (frameAt word).closedPolygon)
     (hcu : c + (frameAt word).uq ∈ (frameAt word).closedPolygon)
     (hiu : i + (frameAt word).uq ∈ (frameAt word).closedPolygon)
@@ -144,7 +146,7 @@ theorem slip_minus_forced_adjacent_rise {word : Word} (h : ∃ x ∈ word, x ≠
   have hret := hret_of_sheetOut hSE P hΨc hout
   have hB := hbmono_of_raw h hSE P.toOldPolicyWitness.toOldPolicyData c i hret
   have hkey : ¬ (1 ≤ aJump word c ∧ aJump word i = 0 ∧ 1 ≤ BOffer word c) :=
-    fun hh => hrise c i hc hi hcu hiu hΨc hΨi hEdge hfor hlap hnf hh.1 hh.2.1 hh.2.2
+    fun hh => hrise c i hc hi hcu hiu hΨc hΨi hEdge hfor hlap hnf hret hh.1 hh.2.1 hh.2.2
   have hr := hround c i hc hi hlap hfor
   have hr' : ((frameAt word).slip (standardField word) (-1) i + 1) / 2 ≤
       ((frameAt word).slip (standardField word) (-1) c + 1) / 2 := by
