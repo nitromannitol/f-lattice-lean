@@ -1,0 +1,4 @@
+import FLatticePaper.Plane.Induction.NativeMinus
+
+#print axioms FLatticePaper.NativeMinus.slip_native_identity_minus
+#print axioms FLatticePaper.NativeMinus.native_sign_minus_of_nonneg
