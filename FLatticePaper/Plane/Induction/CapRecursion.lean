@@ -1,5 +1,6 @@
 import FLatticePaper.Graph
 import FLatticePaper.Plane.Induction.QuadraticCap
+import FLatticePaper.Plane.Induction.ChildFrame
 
 /-! The binary-centre step of the all-slope cap (ALL_SLOPE_STEP, the recursion `A_k ≥ 2A_(k−1) − 1 − B_(k−2)`).
 
@@ -114,5 +115,19 @@ theorem diag_cap (F : Field) (p q : ℤ) (hpq : (p + q) % 2 = 1)
   exact FLatticePaper.QuadraticCap.cap_with_anchors (fun k : ℕ => F (p + (k : ℤ), q + (k : ℤ)))
     (fun j : ℕ => F (p + (j : ℤ) + 1, q + (j : ℤ))) J K hA0' hA1' hB
     (fun k hk _ => diag_hrec F p q hpq hbin hmono k hk) hanchor
+
+/-- **The even harmonic anchor.** The harmonic grid at `(1−j, j−1)` is the parabola `m(j) = capMin j`: its parity term vanishes, and the
+numerator is `−2j(j−1)`. This is the anchor value `h0 = m(j)` of ALL_SLOPE_STEP, with no hypothesis. -/
+theorem harmonicGrid_anchor (j : ℤ) :
+    FLatticePaper.Induction.harmonicGrid (1 - j, j - 1) = QuadraticCap.capMin j := by
+  unfold FLatticePaper.Induction.harmonicGrid QuadraticCap.capMin
+  obtain ⟨t, ht⟩ := Int.even_mul_pred_self j
+  have e : (1 - j) ^ 2 + 2 * (1 - j) * (j - 1) - (j - 1) ^ 2 - 2 * (j - 1) - ((1 - j) + (j - 1)) % 2 =
+      -2 * (j * (j - 1)) := by
+    have h0 : ((1 - j) + (j - 1)) % 2 = 0 := by omega
+    rw [h0]
+    ring
+  rw [e, ht]
+  omega
 
 end FLatticePaper.CapRecursion
