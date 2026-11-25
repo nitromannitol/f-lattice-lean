@@ -1,4 +1,5 @@
-import Mathlib
+import Mathlib.Order.MinMax
+import Mathlib.Algebra.Order.Group.Int
 
 /-! Task Q25 (2): the east-step inequality of the bottom walk, as integer arithmetic.
 
