@@ -1,5 +1,6 @@
 import FLatticePaper.Plane.Induction.CapRayGrades
 import FLatticePaper.Plane.Induction.SheetRegions
+import FLatticePaper.Plane.Induction.ParentStepDischarge
 
 /-! # The diagonal cap of the rotated residual (the long V case, `(N, D) = ((d−n)/2, (d+n)/2)`)
 
@@ -112,5 +113,17 @@ theorem rotated_ray_cap {frame : ChildFrame} {G : Field} (hS : frame.HasStrips G
   · exact hJ1
   · exact hJ2
   · exact hK
+
+/-- **The signed comparison of the residual on the parent polygon.** The price identity `quarterTurnField_sub_shift` and the price range
+`c0 − 1 ≤ P ≤ c0` on the closed polygon give `f(y) ≤ f(y + σ)` for the parent shift `σ` of the residual whenever `Z y` lies in the closed
+polygon. The grade of `σ` in the residual `(N, D)`-grades is `−1` (checked at the V-regime words). -/
+theorem residual_signed {conj : ChildFrame} {G : Field}
+    (hprice : ∀ z ∈ conj.closedPolygon, conj.cutPrice - 1 ≤ conj.price G z ∧ conj.price G z ≤ conj.cutPrice)
+    (y : Site) (hy : (-y.2, y.1 - 1) ∈ conj.closedPolygon) :
+    quarterTurnField G y ≤ quarterTurnField G (y + (-conj.eps * (conj.parents.odd.num + conj.parents.odd.den),
+        conj.eps * (conj.parents.odd.num - conj.parents.odd.den))) := by
+  have h := FLatticePaper.Induction.quarterTurnField_sub_shift (conj := conj) (G := G) y
+  have hp := hprice _ hy
+  linarith [hp.2]
 
 end FLatticePaper.RotatedCap
