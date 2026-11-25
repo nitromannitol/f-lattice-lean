@@ -1,20 +1,26 @@
 import FLatticePaper.Plane.Induction.FreeOrbit
 import FLatticePaper.Plane.Induction.DeckSelection
 import FLatticePaper.Plane.Induction.CanonicalSigned
+import FLatticePaper.Plane.Induction.DeckForced
+import FLatticePaper.Plane.Induction.NonfreeBridge
+import FLatticePaper.Plane.Induction.W1Constructor
+import FLatticePaper.Plane.Induction.SquareClauses
 
-/-! hgames, the policy with the free prescription built in (Q1: at a free white the signed H/V direction is prescribed).
+/-! hgames: the rank-independent policy graph (the lead's design point).
 
-For a rank `R` (with deck characters) and a sign `η = ±1`, `freePolicy` keeps, at a black centre, both inputs; at a white centre `c` in the
-deck closure `freeClosure`, the prescribed input of its free representative `c + t` (`Presc`, transported by `−t`); at any other white
-centre, the selection `selectR R`.
+* blacks keep both inputs;
+* a white in the deck closure `freeClosure` keeps its prescribed input (the signed H/V direction at its free representative, `FreePresc`);
+* a nonfree white keeps its W1-forced input `forcedSel` (the output of a forcing derivation, `ForcedEdge`).
 
-The prescription is well defined on the closure because the free set meets each deck orbit at most once (`FreeOrbit`): the witness `t` is
-unique, so `Presc` is a single input. Its span covariance is the reindexing `t ↦ s + t`. -/
+The graph does not depend on a rank. At a nonfree white the forced output exists (`forcedExists_of`: W1 at a strict-interior translate,
+moved back by the span, `forcedEdge_add`). Its uniqueness and span equivariance follow from the squares of the policy, and the squares of
+the policy follow from a strict rank on the retained edges (`squares_of_strict`: the corner of least rank has a retained input in the square
+of smaller rank). So the only rank input is `strictRank`, named. -/
 
 namespace FLatticePaper.FreePolicy
 
 open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.DeckSelection FLatticePaper.FreeClosure FLatticePaper.FreeOrbit
-open FLatticePaper.SquareClauses
+open FLatticePaper.SquareClauses FLatticePaper.AndOrRank
 
 /-- The prescribed input of the closure: `i = c + prescribed(c + t)` at a free representative `c + t`, `t` in the span. -/
 def FreePresc (frame : ChildFrame) (η : ℤ) (c i : Site) : Prop :=
@@ -22,11 +28,20 @@ def FreePresc (frame : ChildFrame) (η : ℤ) (c i : Site) : Prop :=
     (c + t ∈ frame.freeH ∧ i = c + frame.prescribedH η (c + t)) ∨
       (c + t ∈ frame.freeV ∧ i = c + frame.prescribedV η (c + t))
 
-/-- The policy of a rank `R` with the free prescription. -/
-def freePolicy (frame : ChildFrame) (F : Field) (η : ℤ) (R : Site → ℤ) : Site → Site → Prop :=
+/-- The forced input of a nonfree white: an arbitrary forced output (unique once the squares hold, `forced_sound`). -/
+noncomputable def forcedSel (F : Field) (c : Site) : Site :=
+  Classical.epsilon (fun o => ForcedEdge F (fun _ _ => False) c o)
+
+/-- The forced outputs exist at the nonfree whites. -/
+def ForcedExists (frame : ChildFrame) (F : Field) : Prop :=
+  ∀ c, ¬ freeClosure frame c → laplacian F c = 0 → ∃ o, ForcedEdge F (fun _ _ => False) c o
+
+/-- The rank-independent policy: black keeps both inputs; a white in the closure keeps its prescribed input; another white keeps its
+forced input. -/
+def freePolicy (frame : ChildFrame) (F : Field) (η : ℤ) : Site → Site → Prop :=
   fun c i => (laplacian F c = -1 ∧ Edge i c) ∨
     (laplacian F c = 0 ∧
-      ((freeClosure frame c ∧ FreePresc frame η c i) ∨ (¬ freeClosure frame c ∧ i = selectR R c)))
+      ((freeClosure frame c ∧ FreePresc frame η c i) ∨ (¬ freeClosure frame c ∧ i = forcedSel F c)))
 
 theorem zero_span_mem (frame : ChildFrame) : (0 : Site) ∈ frame.child.modifiedDeck.span :=
   ⟨0, 0, by ext <;> simp [PeriodDeck.combine]⟩
@@ -35,6 +50,43 @@ theorem span_even (frame : ChildFrame) {t : Site} (ht : t ∈ frame.child.modifi
   obtain ⟨i, j, rfl⟩ := ht
   rw [combine_eq frame i j]
   exact evenSite_span frame i j
+
+/-! ### The forced inputs at the nonfree whites -/
+
+/-- The forced outputs exist at each nonfree white: `W1Forced` at a strict-interior translate, moved back by the span. -/
+theorem forcedExists_of (frame : ChildFrame) {F : Field} (hP : frame.Packet F)
+    (hW1 : FLatticePaper.W1.W1Forced frame.child.num frame.child.den F) : ForcedExists frame F := by
+  intro c hnc hl
+  have hnf : Nonfree frame c := by
+    intro v hv hmem
+    exact hnc ⟨v, hv, (Set.mem_union _ _ _).mp hmem⟩
+  obtain ⟨v, hv, hSI⟩ := nonfree_bridge frame c hnf
+  have hwv : laplacian F (c + v) = 0 := by
+    rw [laplacian_span_inv frame F hP hv c]
+    exact hl
+  obtain ⟨o, ho⟩ := hW1 (c + v) hSI hwv
+  have hf : ForcedEdge F (fun _ _ => False) (c + v) o := FLatticePaper.W1.forcedEdgeIn_forced ho
+  have hnv : -v ∈ frame.child.modifiedDeck.span := span_neg_mem hv
+  have hfz := forcedEdge_add F (evenSite_of_span frame hnv) (fun y => laplacian_span_inv frame F hP hnv y) hf
+  rw [add_neg_cancel_right] at hfz
+  exact ⟨o + -v, hfz⟩
+
+/-- A forced edge points to an incoming input of its centre. -/
+theorem forcedEdge_input {F : Field} {c o : Site} (h : ForcedEdge F (fun _ _ => False) c o) :
+    o = incomingNeg c ∨ o = incomingPos c := by
+  cases h with
+  | seed hs => exact False.elim hs
+  | @unit a b c' o' inside hc hw ho hout hin hforced => exact ho
+
+theorem forcedSel_spec {F : Field} {c : Site} (hex : ∃ o, ForcedEdge F (fun _ _ => False) c o) :
+    ForcedEdge F (fun _ _ => False) c (forcedSel F c) :=
+  Classical.epsilon_spec hex
+
+theorem forcedSel_input {F : Field} {c : Site} (hex : ∃ o, ForcedEdge F (fun _ _ => False) c o) :
+    forcedSel F c = incomingNeg c ∨ forcedSel F c = incomingPos c :=
+  forcedEdge_input (forcedSel_spec hex)
+
+/-! ### The prescribed inputs: incoming edges, uniqueness, equivariance -/
 
 theorem inNeg_even {r : Site} (h : EvenSite r) : incomingNeg r = (r.1 - 1, r.2) := by
   unfold incomingNeg
@@ -170,7 +222,7 @@ theorem freePresc_input (frame : ChildFrame) (η : ℤ) (hη : η = 1 ∨ η = -
   · rw [hi]
     exact inp_shift hev (prescribedV_input frame η hη (c + t))
 
-/-- At a free H centre the prescription is exactly the H direction at the centre (the representative is the centre). -/
+/-- At a free H centre the prescription is exactly the H direction at the centre. -/
 theorem freePresc_iff_H (frame : ChildFrame) (η : ℤ) {c : Site} (hc : c ∈ frame.freeH) (i : Site) :
     FreePresc frame η c i ↔ i = c + frame.prescribedH η c := by
   constructor
@@ -203,9 +255,7 @@ theorem freePresc_single (frame : ChildFrame) (η : ℤ) {c i j : Site}
   have hsp : t' - t ∈ frame.child.modifiedDeck.span := span_sub ht' ht
   have e : c + t + (t' - t) = c + t' := by abel
   rcases hi with ⟨hH, hi⟩ | ⟨hV, hi⟩ <;> rcases hj with ⟨hH', hj⟩ | ⟨hV', hj⟩
-  · have h0 : t' - t = 0 := by
-      have := freeH_rep_zero frame hsp hH (by rw [e]; exact hH')
-      exact this
+  · have h0 : t' - t = 0 := freeH_rep_zero frame hsp hH (by rw [e]; exact hH')
     have htt : t' = t := sub_eq_zero.mp h0
     subst htt
     rw [hi, hj]
@@ -215,9 +265,7 @@ theorem freePresc_single (frame : ChildFrame) (η : ℤ) {c i j : Site}
   · have hc' : c + t' ∈ frame.freeH := hH'
     rw [← e] at hc'
     exact absurd hc' (freeV_not_freeH_shift frame hsp hV)
-  · have h0 : t' - t = 0 := by
-      have := freeV_rep_zero frame hsp hV (by rw [e]; exact hV')
-      exact this
+  · have h0 : t' - t = 0 := freeV_rep_zero frame hsp hV (by rw [e]; exact hV')
     have htt : t' = t := sub_eq_zero.mp h0
     subst htt
     rw [hi, hj]
@@ -261,9 +309,11 @@ theorem freePresc_add_span (frame : ChildFrame) (η : ℤ) {s : Site} (hs : s �
       rw [hi]
       abel
 
-theorem freePolicy_closure_iff {frame : ChildFrame} {F : Field} {η : ℤ} {R : Site → ℤ} {c i : Site}
+/-! ### The policy: its pieces at each kind of white -/
+
+theorem freePolicy_closure_iff {frame : ChildFrame} {F : Field} {η : ℤ} {c i : Site}
     (hl : laplacian F c = 0) (hc : freeClosure frame c) :
-    freePolicy frame F η R c i ↔ FreePresc frame η c i := by
+    freePolicy frame F η c i ↔ FreePresc frame η c i := by
   unfold freePolicy
   constructor
   · rintro (⟨h, -⟩ | ⟨-, ⟨-, h⟩ | ⟨hn, -⟩⟩)
@@ -273,9 +323,9 @@ theorem freePolicy_closure_iff {frame : ChildFrame} {F : Field} {η : ℤ} {R : 
   · intro h
     exact Or.inr ⟨hl, Or.inl ⟨hc, h⟩⟩
 
-theorem freePolicy_out_iff {frame : ChildFrame} {F : Field} {η : ℤ} {R : Site → ℤ} {c i : Site}
+theorem freePolicy_out_iff {frame : ChildFrame} {F : Field} {η : ℤ} {c i : Site}
     (hl : laplacian F c = 0) (hn : ¬ freeClosure frame c) :
-    freePolicy frame F η R c i ↔ i = selectR R c := by
+    freePolicy frame F η c i ↔ i = forcedSel F c := by
   unfold freePolicy
   constructor
   · rintro (⟨h, -⟩ | ⟨-, ⟨hc, -⟩ | ⟨-, h⟩⟩)
@@ -285,81 +335,42 @@ theorem freePolicy_out_iff {frame : ChildFrame} {F : Field} {η : ℤ} {R : Site
   · intro h
     exact Or.inr ⟨hl, Or.inr ⟨hn, h⟩⟩
 
-/-- The policy is equivariant under a span translate (the Laplacian, the closure, the prescription and the selection all shift). -/
-theorem freePolicy_add_span (frame : ChildFrame) {F : Field} {cU cV : ℤ} (hF : HasGeneratorPeriods frame.child F cU cV)
-    {η : ℤ} {R : Site → ℤ} {cRU cRV : ℤ}
-    (hRU : ∀ z, R (z + frame.child.modifiedDeck.kernel) = R z + cRU)
-    (hRV : ∀ z, R (z + frame.child.modifiedDeck.transverse) = R z + cRV) (i j : ℤ) (z u : Site) :
-    freePolicy frame F η R (z + frame.child.modifiedDeck.combine i j) (u + frame.child.modifiedDeck.combine i j) ↔
-      freePolicy frame F η R z u := by
-  have hev : EvenSite (frame.child.modifiedDeck.combine i j) := span_even frame ⟨i, j, rfl⟩
-  have hlap : laplacian F (z + frame.child.modifiedDeck.combine i j) = laplacian F z := by
-    rw [combine_eq frame i j]
-    exact laplacian_add_span frame hF i j z
-  have hEdge : Edge (u + frame.child.modifiedDeck.combine i j) (z + frame.child.modifiedDeck.combine i j) ↔ Edge u z := by
-    unfold Edge
-    rw [incomingNeg_add_even hev, incomingPos_add_even hev]
-    simp
-  have hcl : freeClosure frame (z + frame.child.modifiedDeck.combine i j) ↔ freeClosure frame z :=
-    freeClosure_add_span frame ⟨i, j, rfl⟩ z
-  have hPr := freePresc_add_span frame η (⟨i, j, rfl⟩ : frame.child.modifiedDeck.combine i j ∈ frame.child.modifiedDeck.span) z u
-  have hSel : (u + frame.child.modifiedDeck.combine i j = selectR R (z + frame.child.modifiedDeck.combine i j)) ↔
-      (u = selectR R z) := by
-    rw [combine_eq frame i j, selectR_add_span frame hRU hRV i j z]
-    simp
-  unfold freePolicy
-  simp only [hlap, hEdge, hcl, hPr, hSel]
-
-/-- The deck form: the policy is invariant under every deck translate `−(iU + jV)`. -/
-theorem freePolicy_deck (frame : ChildFrame) {F : Field} {cU cV : ℤ} (hF : HasGeneratorPeriods frame.child F cU cV)
-    {η : ℤ} {R : Site → ℤ} {cRU cRV : ℤ}
-    (hRU : ∀ z, R (z + frame.child.modifiedDeck.kernel) = R z + cRU)
-    (hRV : ∀ z, R (z + frame.child.modifiedDeck.transverse) = R z + cRV) (i j : ℤ) (z u : Site)
-    (h : freePolicy frame F η R z u) :
-    freePolicy frame F η R (z - frame.child.modifiedDeck.combine i j) (u - frame.child.modifiedDeck.combine i j) := by
-  have e : ∀ x : Site, x - frame.child.modifiedDeck.combine i j = x + frame.child.modifiedDeck.combine (-i) (-j) := by
-    intro x
-    rw [combine_eq frame i j, combine_eq frame (-i) (-j)]
-    ext <;> simp <;> ring
-  rw [e z, e u]
-  exact (freePolicy_add_span frame hF hRU hRV (-i) (-j) z u).mpr h
-
-/-- The quota of the free policy. -/
-theorem freePolicy_quota (frame : ChildFrame) (F : Field) (η : ℤ) (hη : η = 1 ∨ η = -1) (R : Site → ℤ) :
-    RetainQuota F (freePolicy frame F η R) := by
+/-- The quota of the policy: blacks keep both inputs; a white keeps the prescribed or the forced input. -/
+theorem freePolicy_quota (frame : ChildFrame) (F : Field) (η : ℤ) (hη : η = 1 ∨ η = -1)
+    (hex : ForcedExists frame F) : RetainQuota F (freePolicy frame F η) := by
   constructor
   · intro c hc
     exact ⟨Or.inl ⟨hc, Or.inl rfl⟩, Or.inl ⟨hc, Or.inr rfl⟩⟩
   · intro c hc
     by_cases hcl : freeClosure frame c
     · obtain ⟨i, hi⟩ := freePresc_exists frame η hcl
-      have hin := freePresc_input frame η hη hi
-      rcases hin with h | h
+      rcases freePresc_input frame η hη hi with h | h
       · left
         rw [h] at hi
         exact (freePolicy_closure_iff hc hcl).mpr hi
       · right
         rw [h] at hi
         exact (freePolicy_closure_iff hc hcl).mpr hi
-    · rcases selectR_input R c with h | h
+    · obtain ⟨o, ho⟩ := hex c hcl hc
+      rcases forcedSel_input ⟨o, ho⟩ with h | h
       · left
         exact (freePolicy_out_iff hc hcl).mpr h.symm
       · right
         exact (freePolicy_out_iff hc hcl).mpr h.symm
 
-theorem freePolicy_edge (frame : ChildFrame) (F : Field) (η : ℤ) (hη : η = 1 ∨ η = -1) (R : Site → ℤ) {c i : Site}
-    (h : freePolicy frame F η R c i) : Edge i c := by
+theorem freePolicy_edge (frame : ChildFrame) (F : Field) (η : ℤ) (hη : η = 1 ∨ η = -1)
+    (hex : ForcedExists frame F) {c i : Site} (h : freePolicy frame F η c i) : Edge i c := by
   unfold freePolicy at h
-  rcases h with ⟨-, he⟩ | ⟨-, ⟨-, hp⟩ | ⟨hn, hs⟩⟩
+  rcases h with ⟨-, he⟩ | ⟨hl, ⟨hcl, hp⟩ | ⟨hn, hs⟩⟩
   · exact he
   · exact freePresc_input frame η hη hp
-  · rw [hs]
-    unfold Edge
-    exact selectR_input R c
+  · obtain ⟨o, ho⟩ := hex c hn hl
+    rw [hs]
+    exact forcedSel_input ⟨o, ho⟩
 
 /-- The free policy carries the prescription at both free kinds of centre. -/
-theorem freePolicy_prescribed (frame : ChildFrame) (F : Field) (η : ℤ) (R : Site → ℤ) :
-    PrescribedAt frame F η (freePolicy frame F η R) := by
+theorem freePolicy_prescribed (frame : ChildFrame) (F : Field) (η : ℤ) :
+    PrescribedAt frame F η (freePolicy frame F η) := by
   constructor
   · intro c hc hl j
     exact (freePolicy_closure_iff hl (mem_freeClosure_of_freeH frame hc)).trans (freePresc_iff_H frame η hc j)
@@ -368,15 +379,15 @@ theorem freePolicy_prescribed (frame : ChildFrame) (F : Field) (η : ℤ) (R : S
     exact (freePolicy_closure_iff hl hcl).trans (freePresc_iff_V frame η hc j)
 
 /-- At a white the policy keeps at most one input. -/
-theorem freePolicy_white_single (frame : ChildFrame) (F : Field) (η : ℤ) (R : Site → ℤ) {c i j : Site}
-    (hl : laplacian F c = 0) (hi : freePolicy frame F η R c i) (hj : freePolicy frame F η R c j) : i = j := by
+theorem freePolicy_white_single (frame : ChildFrame) (F : Field) (η : ℤ) {c i j : Site}
+    (hl : laplacian F c = 0) (hi : freePolicy frame F η c i) (hj : freePolicy frame F η c j) : i = j := by
   by_cases hcl : freeClosure frame c
   · exact freePresc_single frame η ((freePolicy_closure_iff hl hcl).mp hi) ((freePolicy_closure_iff hl hcl).mp hj)
-  · exact (freePolicy_out_iff hl hcl).mp hi |>.trans ((freePolicy_out_iff hl hcl).mp hj).symm
+  · exact ((freePolicy_out_iff hl hcl).mp hi).trans ((freePolicy_out_iff hl hcl).mp hj).symm
 
-theorem freePolicy_freePrescribed (frame : ChildFrame) (F : Field) (η : ℤ) (hη : η = 1 ∨ η = -1) (R : Site → ℤ) :
+theorem freePolicy_freePrescribed (frame : ChildFrame) (F : Field) (η : ℤ) (hη : η = 1 ∨ η = -1) :
     ∀ c, freeClosure frame c → laplacian F c = 0 →
-      ∃ i, (i = incomingNeg c ∨ i = incomingPos c) ∧ ∀ j, freePolicy frame F η R c j ↔ j = i := by
+      ∃ i, (i = incomingNeg c ∨ i = incomingPos c) ∧ ∀ j, freePolicy frame F η c j ↔ j = i := by
   intro c hc hl
   obtain ⟨i, hi⟩ := freePresc_exists frame η hc
   refine ⟨i, freePresc_input frame η hη hi, fun j => ?_⟩
@@ -388,54 +399,142 @@ theorem freePolicy_freePrescribed (frame : ChildFrame) (F : Field) (η : ℤ) (h
     rw [hj]
     exact hi
 
-/-- The selection of the free policy: a chosen retained input at each white. -/
-noncomputable def freeSel (frame : ChildFrame) (F : Field) (η : ℤ) (R : Site → ℤ) (c : Site) : Site :=
-  Classical.epsilon (freePolicy frame F η R c)
+/-- The selection of the policy: a retained input at each white (the unique one, `freePolicy_white_single`). -/
+noncomputable def freeSel (frame : ChildFrame) (F : Field) (η : ℤ) (c : Site) : Site :=
+  Classical.epsilon (freePolicy frame F η c)
 
-theorem freeSel_spec (frame : ChildFrame) (F : Field) (η : ℤ) (R : Site → ℤ) {c : Site}
-    (hl : laplacian F c = 0) : freePolicy frame F η R c (freeSel frame F η R c) := by
-  have hex : ∃ j, freePolicy frame F η R c j := by
+theorem freeSel_spec (frame : ChildFrame) (F : Field) (η : ℤ) {c : Site} (hl : laplacian F c = 0) :
+    freePolicy frame F η c (freeSel frame F η c) := by
+  have hex' : ∃ j, freePolicy frame F η c j := by
     by_cases hcl : freeClosure frame c
     · obtain ⟨i, hi⟩ := freePresc_exists frame η hcl
       exact ⟨i, (freePolicy_closure_iff hl hcl).mpr hi⟩
-    · exact ⟨selectR R c, (freePolicy_out_iff hl hcl).mpr rfl⟩
-  exact Classical.epsilon_spec hex
+    · exact ⟨forcedSel F c, (freePolicy_out_iff hl hcl).mpr rfl⟩
+  exact Classical.epsilon_spec hex'
 
-/-- The named inputs of the signed policy (the open §4 fields, not yet proved for the free policy). -/
+theorem freeSel_input (frame : ChildFrame) (F : Field) (η : ℤ) (hη : η = 1 ∨ η = -1) (hex : ForcedExists frame F)
+    {c : Site} (hl : laplacian F c = 0) :
+    freeSel frame F η c = incomingNeg c ∨ freeSel frame F η c = incomingPos c :=
+  freePolicy_edge frame F η hη hex (freeSel_spec frame F η hl)
+
+/-! ### Equivariance, the squares, and the deck form -/
+
+/-- The forced input is equivariant under the span: its translate is a forced output of the translate, and the squares make it unique. -/
+theorem forcedSel_add_span (frame : ChildFrame) {F : Field} {η : ℤ} (hP : frame.Packet F) (hex : ForcedExists frame F)
+    (hη : η = 1 ∨ η = -1) (hsq : ∀ a b : ℤ, SquareClauseSat F (freeSel frame F η) a b)
+    {s : Site} (hs : s ∈ frame.child.modifiedDeck.span) (z : Site) (hn : ¬ freeClosure frame z)
+    (hl : laplacian F z = 0) : forcedSel F (z + s) = forcedSel F z + s := by
+  have hnc' : ¬ freeClosure frame (z + s) := fun h => hn ((freeClosure_add_span frame hs z).mp h)
+  have hl' : laplacian F (z + s) = 0 := (laplacian_span_inv frame F hP hs z).trans hl
+  have hz : ForcedEdge F (fun _ _ => False) (z + s) (forcedSel F z + s) :=
+    forcedEdge_add F (evenSite_of_span frame hs) (fun y => laplacian_span_inv frame F hP hs y)
+      (forcedSel_spec (hex z hn hl))
+  have hsel : freeSel frame F η (z + s) = forcedSel F z + s :=
+    forced_sound F (fun _ _ => False) (freeSel frame F η)
+      (fun c hc => freeSel_input frame F η hη hex hc) (fun _ _ h => False.elim h) hsq (z + s) (forcedSel F z + s) hz
+  have hfs : forcedSel F (z + s) = freeSel frame F η (z + s) :=
+    ((freePolicy_out_iff hl' hnc').mp (freeSel_spec frame F η hl')).symm
+  rw [hfs, hsel]
+
+/-- The policy is equivariant under a span translate: the Laplacian and the closure are invariant, the prescription is reindexed, and the
+forced input is equivariant (`forcedSel_add_span`). -/
+theorem freePolicy_add_span (frame : ChildFrame) {F : Field} {η : ℤ} (hP : frame.Packet F) (hex : ForcedExists frame F)
+    (hη : η = 1 ∨ η = -1) (hsq : ∀ a b : ℤ, SquareClauseSat F (freeSel frame F η) a b)
+    {s : Site} (hs : s ∈ frame.child.modifiedDeck.span) (z u : Site) :
+    freePolicy frame F η (z + s) (u + s) ↔ freePolicy frame F η z u := by
+  have hz := laplacian_span_inv frame F hP hs z
+  have hc := freeClosure_add_span frame hs z
+  have he : Edge (u + s) (z + s) ↔ Edge u z := by
+    unfold Edge
+    rw [incomingNeg_add_even (span_even frame hs), incomingPos_add_even (span_even frame hs)]
+    simp
+  have hp := freePresc_add_span frame η hs z u
+  have hf : ¬ freeClosure frame z → laplacian F z = 0 → (u + s = forcedSel F (z + s) ↔ u = forcedSel F z) := by
+    intro hn hl
+    rw [forcedSel_add_span frame hP hex hη hsq hs z hn hl]
+    constructor
+    · intro h
+      exact add_right_cancel h
+    · intro h
+      rw [h]
+  unfold freePolicy
+  rw [hz, hc, he, hp]
+  exact or_congr Iff.rfl (and_congr_right fun hl => or_congr Iff.rfl (and_congr_right fun hn => hf hn hl))
+
+/-- The deck form: the policy is invariant under every deck translate `−(iU + jV)`. -/
+theorem freePolicy_deck (frame : ChildFrame) {F : Field} {η : ℤ} (hP : frame.Packet F) (hex : ForcedExists frame F)
+    (hη : η = 1 ∨ η = -1) (hsq : ∀ a b : ℤ, SquareClauseSat F (freeSel frame F η) a b) (i j : ℤ) (z u : Site)
+    (h : freePolicy frame F η z u) :
+    freePolicy frame F η (z - frame.child.modifiedDeck.combine i j) (u - frame.child.modifiedDeck.combine i j) := by
+  have e : ∀ x : Site, x - frame.child.modifiedDeck.combine i j = x + frame.child.modifiedDeck.combine (-i) (-j) := by
+    intro x
+    rw [combine_eq frame i j, combine_eq frame (-i) (-j)]
+    ext <;> simp <;> ring
+  rw [e z, e u]
+  exact (freePolicy_add_span frame hP hex hη hsq ⟨-i, -j, rfl⟩ z u).mpr h
+
+/-- **The squares from a strict rank.** On the retained edges of the policy, a strict rank excludes every square whose corners all keep an
+input inside the square: the corner of least rank has a retained input of smaller rank in the square. -/
+theorem squares_of_strict (frame : ChildFrame) {F : Field} {η : ℤ} (hP : frame.Packet F)
+    {R : Site → ℤ} (hstrict : ∀ c i, freePolicy frame F η c i → R i < R c) :
+    ∀ a b : ℤ, SquareClauseSat F (freeSel frame F η) a b := by
+  intro a b
+  unfold SquareClauseSat
+  intro hall
+  obtain ⟨c0, hc0, hmin⟩ := Finset.exists_min_image (squareCorners a b) R ⟨(a, b), by simp [squareCorners]⟩
+  have hk := hall c0 hc0
+  unfold keptInside at hk
+  by_cases hb : laplacian F c0 = -1
+  · rw [if_pos hb] at hk
+    rcases hk with hk | hk
+    · have h1 := hstrict c0 (incomingNeg c0) (Or.inl ⟨hb, Or.inl rfl⟩)
+      have h2 := hmin _ hk
+      linarith
+    · have h1 := hstrict c0 (incomingPos c0) (Or.inl ⟨hb, Or.inr rfl⟩)
+      have h2 := hmin _ hk
+      linarith
+  · rw [if_neg hb] at hk
+    have hl : laplacian F c0 = 0 := (hP.binary c0).resolve_left hb
+    have h1 := hstrict c0 _ (freeSel_spec frame F η hl)
+    have h2 := hmin _ hk
+    linarith
+
+/-! ### The named inputs and the canonical signed policy -/
+
+/-- The named inputs of the signed policy of a sign and a rank: the permits, the monotonicity of `P` and `J`, the strict rank along all
+retained edges (the rank is built over this fixed graph), and the exceptional west input. -/
 structure FreeNamedInputs (frame : ChildFrame) (F : Field) (η : ℤ) (R : Site → ℤ) : Prop where
-  permitted : ∀ c i, freePolicy frame F η R c i → slipPermits F (fun z => F (z + η • frame.shortShift)) c i
-  nonincreasingP : ∀ c i, freePolicy frame F η R c i → frame.cutGrade F 1 0 1 i ≤ frame.cutGrade F 1 0 1 c
-  nonincreasingJ : ∀ c i, freePolicy frame F η R c i → frame.cutGrade F 0 1 η i ≤ frame.cutGrade F 0 1 η c
-  strictRank : ∀ c i, freePolicy frame F η R c i → R i < R c
-  squares : ∀ a b : ℤ, SquareClauseSat F (freeSel frame F η R) a b
+  permitted : ∀ c i, freePolicy frame F η c i → slipPermits F (fun z => F (z + η • frame.shortShift)) c i
+  nonincreasingP : ∀ c i, freePolicy frame F η c i → frame.cutGrade F 1 0 1 i ≤ frame.cutGrade F 1 0 1 c
+  nonincreasingJ : ∀ c i, freePolicy frame F η c i → frame.cutGrade F 0 1 η i ≤ frame.cutGrade F 0 1 η c
+  strictRank : ∀ c i, freePolicy frame F η c i → R i < R c
   westAtException : frame.eps = 1 →
-    freePolicy frame F η R
+    freePolicy frame F η
       (frame.parents.odd.num - frame.parents.odd.den + 1, frame.parents.odd.den + frame.parents.odd.num - 1)
       (incomingNeg (frame.parents.odd.num - frame.parents.odd.den + 1, frame.parents.odd.den + frame.parents.odd.num - 1))
 
-/-- The canonical signed policy of the free policy, given the rank characters and the named inputs. -/
-noncomputable def canonicalSigned_of_free (frame : ChildFrame) {F : Field} {η : ℤ} (hη : η = 1 ∨ η = -1) {R : Site → ℤ}
-    (N : FreeNamedInputs frame F η R) : CanonicalSignedPolicy frame F η where
-  policy := freePolicy frame F η R
+/-- The canonical signed policy of the free policy: the squares come from the strict rank, the rest of the fields are the proved ones. -/
+noncomputable def canonicalSigned_of_free (frame : ChildFrame) {F : Field} {η : ℤ} (hP : frame.Packet F)
+    (hex : ForcedExists frame F) (hη : η = 1 ∨ η = -1) {R : Site → ℤ} (N : FreeNamedInputs frame F η R) :
+    CanonicalSignedPolicy frame F η where
+  policy := freePolicy frame F η
   free := freeClosure frame
   freeInvariant := fun step hstep site => freeClosure_add_span frame hstep site
-  quota := freePolicy_quota frame F η hη R
+  quota := freePolicy_quota frame F η hη hex
   permitted := N.permitted
   nonincreasingP := N.nonincreasingP
   nonincreasingJ := N.nonincreasingJ
   rank := R
   strictRank := fun c i h _ _ => N.strictRank c i h
-  freePrescribed := freePolicy_freePrescribed frame F η hη R
-  sel := freeSel frame F η R
-  sel_input := fun c hl => by
-    have := freeSel_spec frame F η R hl
-    exact freePolicy_edge frame F η hη R this |> fun h => by unfold Edge at h; exact h
+  freePrescribed := freePolicy_freePrescribed frame F η hη
+  sel := freeSel frame F η
+  sel_input := fun c hl => freeSel_input frame F η hη hex hl
   white_policy := fun c hl i =>
-    ⟨fun h => freePolicy_white_single frame F η R hl h (freeSel_spec frame F η R hl),
-      fun h => by rw [h]; exact freeSel_spec frame F η R hl⟩
-  squares := N.squares
-  prescribed := freePolicy_prescribed frame F η R
-  policyEdge := fun c i h => freePolicy_edge frame F η hη R h
+    ⟨fun h => freePolicy_white_single frame F η hl h (freeSel_spec frame F η hl),
+      fun h => by rw [h]; exact freeSel_spec frame F η hl⟩
+  squares := squares_of_strict frame hP N.strictRank
+  prescribed := freePolicy_prescribed frame F η
+  policyEdge := fun c i h => freePolicy_edge frame F η hη hex h
   westAtException := N.westAtException
 
 end FLatticePaper.FreePolicy

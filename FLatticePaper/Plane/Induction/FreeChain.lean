@@ -8,12 +8,12 @@ import FLatticePaper.Plane.Induction.DeckSelection
 
 * `chain_drift_of_periods`: the chain potential `Φ_η` drifts by a constant under every deck translate (`Φ(x+U) = Φ x − 1`, `Φ(x+V) = Φ x + 2η`
   from `W1TieBand.chainPotential_drift`, whose slip hypothesis is proved here from the generator periods and `tg(σ) = 2`).
-* `chain_free`: `Φ_η` does not increase along `freePolicy F η R`, given the packet, the W1 forcing of the frame, and the named §4 inputs of the
-  two signs (`FreeNamedInputs`, the open items 4, 8, 11, 12, 14 and the strict rank). The deck equivariance premises are `freePolicy_deck`. -/
+* `chain_free`: `Φ_η` does not increase along `freePolicy F η` (rank-independent), given the packet, the W1 forcing of the frame, and the named
+  inputs of the two signs (`FreeNamedInputs`: the permits, `P` and `J` monotone, the strict rank). -/
 
 namespace FLatticePaper.FreeChain
 
-open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.DeckSelection FLatticePaper.FreePolicy
+open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.DeckSelection FLatticePaper.FreePolicy FLatticePaper.SquareClauses
 
 /-- Translation by `i` kernels and `j` transverse vectors shifts a function with constant increments by `i·c_U + j·c_V`. -/
 theorem iter_add {G : Site → ℤ} {v : Site} {c : ℤ} (hG : ∀ x, G (x + v) = G x + c) (i : ℤ) :
@@ -105,23 +105,24 @@ theorem chain_drift_of_periods (frame : ChildFrame) {F : Field} {cU cV : ℤ}
   rw [e, hcomb]
   ring
 
-/-- **The chain monotonicity of the free policy.** `Φ_η` does not increase along `freePolicy F η R`, given the packet, the W1 forcing,
-the deck periods of `F`, the ranks of both signs (their characters) and the named inputs of the two signs. -/
+/-- **The chain monotonicity of the free policy.** `Φ_η` does not increase along `freePolicy F η` (the rank-independent graph), given the
+packet, the W1 forcing, and the named inputs of the two signs (the permits, the monotonicity of `P` and `J`, and the strict rank along the
+retained edges). The squares and the deck equivariance are derived from the strict ranks. -/
 theorem chain_free (frame : ChildFrame) {F : Field} {cU cV : ℤ} (hF : HasGeneratorPeriods frame.child F cU cV)
     (hpk : frame.Packet F) {η : ℤ} (hη : η = 1 ∨ η = -1)
     (hc : 3 ≤ frame.child.den - frame.child.num) (hU : HasUnitPrice frame F)
     (hW1word : FLatticePaper.W1.W1Forced frame.child.num frame.child.den F)
-    {R Rm : Site → ℤ} {cRU cRV cmU cmV : ℤ}
-    (hRU : ∀ z, R (z + frame.child.modifiedDeck.kernel) = R z + cRU)
-    (hRV : ∀ z, R (z + frame.child.modifiedDeck.transverse) = R z + cRV)
-    (hmU : ∀ z, Rm (z + frame.child.modifiedDeck.kernel) = Rm z + cmU)
-    (hmV : ∀ z, Rm (z + frame.child.modifiedDeck.transverse) = Rm z + cmV)
-    (N : FreeNamedInputs frame F η R) (N' : FreeNamedInputs frame F (-η) Rm) :
-    NonincreasingAlong (frame.chainPotential F η) (freePolicy frame F η R) :=
-  ChainW1.chain_nonincreasing_of_pair frame (canonicalSigned_of_free frame hη N)
-    (canonicalSigned_of_free frame (neg_unit hη) N') hpk hη hc hU hW1word
-    (fun z u i j h => freePolicy_deck frame hF hRU hRV i j z u h)
-    (fun z u i j h => freePolicy_deck frame hF hmU hmV i j z u h)
+    {R Rm : Site → ℤ} (N : FreeNamedInputs frame F η R) (N' : FreeNamedInputs frame F (-η) Rm) :
+    NonincreasingAlong (frame.chainPotential F η) (freePolicy frame F η) := by
+  have hex : ForcedExists frame F := forcedExists_of frame hpk hW1word
+  have hsq : ∀ a b : ℤ, SquareClauseSat F (freeSel frame F η) a b :=
+    squares_of_strict frame hpk N.strictRank
+  have hsq' : ∀ a b : ℤ, SquareClauseSat F (freeSel frame F (-η)) a b :=
+    squares_of_strict frame hpk N'.strictRank
+  exact ChainW1.chain_nonincreasing_of_pair frame (canonicalSigned_of_free frame hpk hex hη N)
+    (canonicalSigned_of_free frame hpk hex (neg_unit hη) N') hpk hη hc hU hW1word
+    (fun z u i j h => freePolicy_deck frame hpk hex hη hsq i j z u h)
+    (fun z u i j h => freePolicy_deck frame hpk hex (neg_unit hη) hsq' i j z u h)
     (chain_drift_of_periods frame hF hpk η)
 
 end FLatticePaper.FreeChain
