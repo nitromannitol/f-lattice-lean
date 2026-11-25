@@ -319,6 +319,9 @@ import FLatticePaper.Tiles.SubCeilEven
 import FLatticePaper.Tiles.SubWalkEven
 import FLatticePaper.Tiles.SubEvenCopy
 import FLatticePaper.Tiles.SeamSub
+import FLatticePaper.Tiles.CellTestGen
+import FLatticePaper.Tiles.CellIntervals
+import FLatticePaper.Tiles.CellBox
 import FLatticePaper.Plane.Induction.CornerPositive
 import FLatticePaper.Tiles.InterfaceStacked
 import FLatticePaper.Tiles.StringCorners
