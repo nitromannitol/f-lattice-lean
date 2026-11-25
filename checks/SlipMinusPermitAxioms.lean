@@ -1,0 +1,4 @@
+import FLatticePaper.Plane.Induction.SlipMinusPermit
+
+#print axioms FLatticePaper.FreeVReflect.freeV_reflect_word
+#print axioms FLatticePaper.SlipMinusPermit.slip_permit_freeV_minus
