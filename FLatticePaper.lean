@@ -700,6 +700,8 @@ import FLatticePaper.Plane.Induction.LowerBand
 import FLatticePaper.Plane.Induction.LowerBandStrong
 import FLatticePaper.Plane.Induction.HX1Residue
 import FLatticePaper.Plane.Induction.HX2Diag
+import FLatticePaper.Plane.Induction.HX12Strong
+import FLatticePaper.Plane.Induction.LowerMem
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame
 import FLatticePaper.Plane.Induction.BaseMembership
