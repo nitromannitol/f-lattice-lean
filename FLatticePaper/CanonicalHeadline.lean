@@ -7,6 +7,7 @@ import FLatticePaper.Plane.Induction.GamesPolicy
 import FLatticePaper.Plane.Induction.TwosResidual
 import FLatticePaper.Plane.Induction.HResPWire
 import FLatticePaper.Plane.Induction.HResNCases
+import FLatticePaper.Plane.Induction.TwosGames
 
 /-! Task 71: the odometers headline with the canonical signed games at every proper word.
 
@@ -140,7 +141,16 @@ theorem odometersTheorem_of_canonical
 come from `pure_threes_final`. The named inputs are `htwoGames` (the twos games with a deck rank; the twos base slip and the twos residual
 follow from it), `hgames` (the proper non-two-power words), `hbd` (Q22), `hW1` (the conjugate `W1Forced`), `hQ21` (the V-block input). The S3 no-fort inputs are derived from the sign-one games. -/
 theorem odometersTheorem_of_canonical_pure
-    (htwoGames : ∀ k : ℕ, Induction.GamesWithRank (List.replicate (k + 1) Digit.two))
+    (hflatP : ∀ k : ℕ, ∀ c i : Site, TwosEPolicy.TwosSel (2 * (k : ℤ) + 4) 1 (standardField (List.replicate (k + 1) Digit.two)) c i →
+      (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) 1 i =
+        (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) 1 c →
+      TwosEPolicy.rhoTwos (2 * (k : ℤ) + 4) 1 i < TwosEPolicy.rhoTwos (2 * (k : ℤ) + 4) 1 c)
+    (hvarM : ∀ k : ℕ, ∀ z w : Site,
+      TwosEPolicy.rhoTwos (2 * (k : ℤ) + 4) (-1) z - TwosEPolicy.rhoTwos (2 * (k : ℤ) + 4) (-1) w < 2 * (2 * (k : ℤ) + 5) + 3)
+    (hflatM : ∀ k : ℕ, ∀ c i : Site, TwosEPolicy.TwosSel (2 * (k : ℤ) + 4) (-1) (standardField (List.replicate (k + 1) Digit.two)) c i →
+      (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) (-1) i =
+        (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) (-1) c →
+      TwosEPolicy.rhoTwos (2 * (k : ℤ) + 4) (-1) i < TwosEPolicy.rhoTwos (2 * (k : ℤ) + 4) (-1) c)
     (hgames : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word → Induction.GamesWithRank word)
     (hbd : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       ∀ z, OnBoundary (frameAt word).closedPolygon z → (frameAt word).price (standardField word) z ≤ (frameAt word).cutPrice)
@@ -156,6 +166,7 @@ theorem odometersTheorem_of_canonical_pure
           zTurn (c - (frameAt word).sheetShift) + v ∈ (frameAt (conjWord word)).freeH → False) :
     OdometersTheorem :=
   odometersTheorem_of_canonical FLatticePaper.EPolicy.pure_threes_inputs.1 FLatticePaper.EPolicy.pure_threes_inputs.2
-    htwoGames hgames hbd hW1 hQ21
+    (fun k => FLatticePaper.TwosEPolicy.twos_gamesWithRank k (hflatP k) (hvarM k) (hflatM k))
+    hgames hbd hW1 hQ21
 
 end FLatticePaper
