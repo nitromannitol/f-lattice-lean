@@ -307,6 +307,7 @@ import FLatticePaper.Tiles.RegisterStep
 import FLatticePaper.Tiles.SubCriteria
 import FLatticePaper.Tiles.SeamFieldsLowSymm
 import FLatticePaper.Tiles.SubBlockOdd
+import FLatticePaper.Tiles.SubCeilOdd
 import FLatticePaper.Plane.Induction.CornerPositive
 import FLatticePaper.Tiles.InterfaceStacked
 import FLatticePaper.Tiles.StringCorners
