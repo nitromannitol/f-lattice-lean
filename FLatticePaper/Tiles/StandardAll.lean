@@ -6,7 +6,14 @@ import FLatticePaper.Tiles.DeckCoverage
 /-! Task Q25, assembly: `StandardBoundaryWord u` for every word `u` (`standardBoundaryWord_all`, from the two seams of
 `BottomSeamAll`), and the statements that took it as an input, now without it: the simplicity and packing fields of clause (a),
 clause (a) for the odd and even tiles and its edge clause for the odd tile, and the covering of the odd and even standard tiles
-by their modified decks. -/
+by their modified decks.
+
+What `StandardBoundaryWord u` carries: only the decomposition, that the cell tile of each tile has the boundary word
+`boundaryWordOf w1 w2` from `(0, 0)` (`StandardBoundaryOdd`, `StandardBoundaryEven`). The other inputs of `almost_square_tiling`
+(simplicity, the admissibility of `w1` and of `w2.map mulNegI`, the two packing inequalities) and the two sums
+(`almostV₁ w1 = texV1`, `almostV₂ w2 = texV2`, with `almostV₁ w = F2Word.sum w + gI` and `almostV₂ w = F2Word.sum w − gOne`)
+are separate theorems. `boundaryTilingOdd_all` and `boundaryTilingEven_all` bundle all of them, for every word, so the full
+boundary-tiling clause (2723 part 2) is `boundaryTilingOdd_all` and `boundaryTilingEven_all`. -/
 
 namespace FLatticePaper.Tiles.StandardAll
 
@@ -73,5 +80,26 @@ theorem covers_of_eq_odd_all {P : Finset Site} {w : Word} (h : P = oddTile w) :
 theorem covers_of_eq_even_all {P : Finset Site} {w : Word} (h : P = evenTile w) :
     (fracEven w).modifiedDeck.Covers P :=
   covers_of_eq_even (fun v => (standardBoundaryWord_all v).2) simpleEven_all h
+
+/-- **Boundary tiling, odd tile, for every word (2723 part 2).** The boundary word `w1 w2 hat(rev w1) hat(rev w2)` of the cell
+tile, the hypotheses of `almost_square_tiling` for `w1 = oddBottom w`, `w2 = oddRight w`, and the two sums. -/
+theorem boundaryTilingOdd_all (w : Word) :
+    StandardBoundaryOdd w ∧ IsSimpleTile (cellTileOf (oddTile w)) ∧
+      (Admissible (oddBottom w) ∧ Admissible ((oddRight w).map Unit4.mulNegI)) ∧
+      (NoFirstCrossing (cellTileOf (oddTile w)) (almostV₁ (oddBottom w)) (almostV₂ (oddRight w)) ∧
+        NoFarAdjacency (cellTileOf (oddTile w)) (almostV₁ (oddBottom w)) (almostV₂ (oddRight w))) ∧
+      almostV₁ (oddBottom w) = texV1Odd (fracOdd w) ∧ almostV₂ (oddRight w) = texV2 (fracOdd w) :=
+  ⟨(standardBoundaryWord_all w).1, simpleOdd_all w, StandardBoundary.admissible_oddStandard w, packOdd_all w,
+    StandardBoundary.sum_oddBottom w, StandardBoundary.sum_oddRight w⟩
+
+/-- **Boundary tiling, even tile, for every word (2723 part 2).** -/
+theorem boundaryTilingEven_all (w : Word) :
+    StandardBoundaryEven w ∧ IsSimpleTile (cellTileOf (evenTile w)) ∧
+      (Admissible (evenBottom w) ∧ Admissible ((evenRight w).map Unit4.mulNegI)) ∧
+      (NoFirstCrossing (cellTileOf (evenTile w)) (almostV₁ (evenBottom w)) (almostV₂ (evenRight w)) ∧
+        NoFarAdjacency (cellTileOf (evenTile w)) (almostV₁ (evenBottom w)) (almostV₂ (evenRight w))) ∧
+      almostV₁ (evenBottom w) = texV1Even (fracEven w) ∧ almostV₂ (evenRight w) = texV2 (fracEven w) :=
+  ⟨(standardBoundaryWord_all w).2, simpleEven_all w, StandardBoundary.admissible_evenStandard w, packEven_all w,
+    StandardBoundary.sum_evenBottom w, StandardBoundary.sum_evenRight w⟩
 
 end FLatticePaper.Tiles.StandardAll
