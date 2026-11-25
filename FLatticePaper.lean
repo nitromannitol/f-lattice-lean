@@ -340,6 +340,7 @@ import FLatticePaper.Plane.Induction.TwosTileRho
 import FLatticePaper.Plane.Induction.TwosBlackDrop
 import FLatticePaper.Plane.Induction.TwosBlackEven
 import FLatticePaper.Plane.Induction.TwosBlackEvenDrop
+import FLatticePaper.Plane.Induction.TwosSpecialPhi
 import FLatticePaper.Plane.Induction.CornerPositive
 import FLatticePaper.Tiles.InterfaceStacked
 import FLatticePaper.Tiles.StringCorners
