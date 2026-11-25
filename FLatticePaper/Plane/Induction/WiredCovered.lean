@@ -61,7 +61,6 @@ theorem covered_H_wired {frame : FLatticePaper.Induction.ChildFrame} {G : Field}
     (hrefl : ∀ z : Site, G (reflectionI - z) = G z)
     (hIs : ∀ z : Site, G (FLatticePaper.W1Strips.iRefl z) = G z)
     (hk : frame.child.modifiedDeck.kernel = (frame.child.den, frame.child.num))
-    (hproper : (3 ≤ frame.child.num ∧ 4 ≤ frame.child.den - frame.child.num) ∨ frame.child.num = 1)
     (hcapBase : frame.child.num = 1 → ∀ K : ℕ, 2 ≤ K → frame.child.den + 2 * frame.child.num - 1 ≤ frame.child.num * (K : ℤ) →
       2 * frame.child.num * (K : ℤ) ≤ 3 * frame.child.den + 3 * frame.child.num - 1 →
       ∃ p q : ℤ, frame.child.num * p - frame.child.den * q = 2 - frame.child.num ∧
@@ -75,6 +74,11 @@ theorem covered_H_wired {frame : FLatticePaper.Induction.ChildFrame} {G : Field}
     (hbt : frame.child.num + 2 ≤ frame.tGrade z) (hzw : laplacian G z = 0)
     (hzS : laplacian G (z.1, z.2 - 1) = 0) :
     ParentSquareOut G W.retained z := by
+  have hproper : (3 ≤ frame.child.num ∧ 4 ≤ frame.child.den - frame.child.num) ∨ frame.child.num = 1 := by
+    have ht := FLatticePaper.ShortRoute.freeH_tGrade_add_two_le frame hz hodd hne
+    obtain ⟨α, β, hα, hβ⟩ := FLatticePaper.PriceDeck.child_odd_witness frame
+    obtain ⟨hn1, hnd, hdn, hd3, hP⟩ := frame.child_facts
+    omega
   have hslip : ∀ z ∈ frame.closedPolygon, 0 ≤ frame.slip G 1 z := fun z hz' => (hslipR z hz').1
   have hsig2 : ∀ w ∈ frame.closedPolygon, 0 ≤ G w - G (w + frame.shortShift) ∧
       G w - G (w + frame.shortShift) ≤ 2 := by
@@ -113,8 +117,6 @@ theorem covered_H_wired {frame : FLatticePaper.Induction.ChildFrame} {G : Field}
 the base cap at `n = 1`, the conjugate `W1Forced`, the even seed, and the canonical witness. -/
 theorem covered_H_of_strong (word : FLatticePaper.Farey.Word) (hS : Induction.StrongEstimates (conjWord word))
     {seed : Site → Site → Prop} {η : ℤ}
-    (hproper : (3 ≤ (frameAt (conjWord word)).child.num ∧ 4 ≤ (frameAt (conjWord word)).child.den -
-        (frameAt (conjWord word)).child.num) ∨ (frameAt (conjWord word)).child.num = 1)
     (hcapBase : (frameAt (conjWord word)).child.num = 1 → ∀ K : ℕ, 2 ≤ K →
       (frameAt (conjWord word)).child.den + 2 * (frameAt (conjWord word)).child.num - 1 ≤
         (frameAt (conjWord word)).child.num * (K : ℤ) →
@@ -126,9 +128,7 @@ theorem covered_H_of_strong (word : FLatticePaper.Farey.Word) (hS : Induction.St
           standardField (conjWord word) (p + (k : ℤ), q + (k : ℤ)))
     (hW1 : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
       (standardField (conjWord word)))
-    (hseed : ∀ z : Site, EvenSite z → (frameAt (conjWord word)).tGrade z =
-      2 - ((frameAt (conjWord word)).child.den + (frameAt (conjWord word)).child.num) →
-        standardField (conjWord word) z = 0)
+    (hSF : FLatticePaper.W1Seeds.SeedFields (conjWord word))
     (C : CanonicalSignedPolicy (frameAt (conjWord word)) (standardField (conjWord word)) η)
     (W : FLatticePaper.W1Witness.OldPolicyWitness (frameAt (conjWord word)) (standardField (conjWord word)) seed η)
     (hW : W.retained = C.policy) (hs : ∀ y i, ¬ seed y i)
@@ -141,7 +141,7 @@ theorem covered_H_of_strong (word : FLatticePaper.Farey.Word) (hS : Induction.St
   covered_H_wired hS.packet (fun z hz' => hS.slipRange z hz')
     (fun z => FLatticePaper.standardField_reflectI_conj word hS z)
     (fun z => FLatticePaper.W1Strips.standardField_iRefl hS z)
-    (FLatticePaper.Construction.child_modifiedDeck_kernel_eq (conjWord word)) hproper hcapBase hW1 hseed C W hW hs
+    (FLatticePaper.Construction.child_modifiedDeck_kernel_eq (conjWord word)) hcapBase hW1 hSF.even_zero C W hW hs
     hz hodd hne hbt hzw hzS
 
 end FLatticePaper.WiredCovered
