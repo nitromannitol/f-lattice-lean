@@ -65,6 +65,7 @@ reflected old edge*, with the intrinsic input read at a conjugate free point as 
 def FreeTailRise {word : Word} {seed : Site → Site → Prop}
     (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps) : Prop :=
   ∀ c i : Site,
+    FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c →
     c ∈ (frameAt word).closedPolygon → i ∈ (frameAt word).closedPolygon →
     c + (frameAt word).uq ∈ (frameAt word).closedPolygon → i + (frameAt word).uq ∈ (frameAt word).closedPolygon →
     0 ≤ sheetPsi word c → 0 ≤ sheetPsi word i → Edge i c →
@@ -93,7 +94,7 @@ theorem noRiseForced_of_free_tail {word : Word} (h : ∃ x ∈ word, x ≠ Digit
     (hW1 : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
       (standardField (conjWord word)))
     (hFree : FreeTailRise P) : NoRiseForced P := by
-  intro c i hc hi hcu hiu hΨc hΨi hEdge hfor hlap hnf hret h1 h0 hB
+  intro c i hSI hc hi hcu hiu hΨc hΨi hEdge hfor hlap hnf hret h1 h0 hB
   by_cases hconj : FLatticePaper.Induction.Nonfree (frameAt (conjWord word))
       (zTurn (c - (frameAt word).sheetShift))
   · rw [aJump_eq_jumpA] at h1 h0
@@ -105,7 +106,7 @@ theorem noRiseForced_of_free_tail {word : Word} (h : ∃ x ∈ word, x ≠ Digit
       push Not at hconj
       obtain ⟨v, hv, hmem⟩ := hconj
       exact ⟨v, hv, hmem⟩
-    have hle := hFree c i hc hi hcu hiu hΨc hΨi hEdge hfor hlap hnf hret hfree h1 hB
+    have hle := hFree c i hSI hc hi hcu hiu hΨc hΨi hEdge hfor hlap hnf hret hfree h1 hB
     omega
 
 end FLatticePaper.W4FreeTail

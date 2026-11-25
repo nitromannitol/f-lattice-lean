@@ -188,6 +188,132 @@ theorem oldV_bottom_jumpA (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongE
   · rw [hj (x + (1, 0)), hP2]
     ring
 
+/-- The last H label `hLast = (d, n − 1)` is a free H point of any child frame (`child_odd`, `child_even`). -/
+theorem hLast_mem_freeH (frame : ChildFrame) : frame.hLast ∈ frame.freeH := by
+  obtain ⟨hn0, hnd, hd2, hd3, hT⟩ := frame.child_facts
+  have hcodd := frame.child_odd
+  have hev := frame.child_even
+  have hTpos : 2 ≤ frame.child.periodDenominator := by rw [hT]; nlinarith
+  have hodd : ¬ EvenSite frame.hLast := by
+    unfold EvenSite ChildFrame.hLast
+    simp only
+    omega
+  have heven2 : EvenSite (frame.hLast.1, frame.hLast.2 - 1) := by
+    unfold EvenSite ChildFrame.hLast
+    simp only
+    omega
+  refine ⟨?_, ?_, ?_⟩
+  · rw [FreeVWindow.mem_closedPolygon_odd frame hodd]
+    have ht : frame.tGrade frame.hLast = frame.child.den := by
+      unfold ChildFrame.tGrade ChildFrame.hLast; ring
+    have hs : frame.sGrade frame.hLast = frame.child.periodDenominator - (frame.child.den - frame.child.num) := by
+      unfold ChildFrame.sGrade ChildFrame.hLast
+      rw [hT]
+      ring
+    rw [ht, hs]
+    omega
+  · intro hmem
+    rw [FreeVWindow.mem_closedPolygon_even frame heven2] at hmem
+    have ht : frame.tGrade (frame.hLast.1, frame.hLast.2 - 1) = 2 * frame.child.den := by
+      unfold ChildFrame.tGrade ChildFrame.hLast
+      ring
+    rw [ht] at hmem
+    omega
+  · unfold ChildFrame.hSpectrum
+    have ht : frame.tGrade frame.hLast = frame.child.den := by
+      unfold ChildFrame.tGrade ChildFrame.hLast; ring
+    rw [ht]
+    right
+    exact ⟨hcodd.right, by omega, le_refl _⟩
+
+/-- `prescribedH η hLast = (0,1)` (the north direction at the last H label). -/
+theorem prescribedH_hLast (frame : ChildFrame) (η : ℤ) : frame.prescribedH η frame.hLast = (0, 1) := by
+  have hne : frame.hLast ≠ hFirst := by
+    obtain ⟨-, -, -, hd3, -⟩ := frame.child_facts
+    intro h
+    unfold ChildFrame.hLast FLatticePaper.Induction.hFirst at h
+    have := congrArg Prod.fst h
+    simp only at this
+    omega
+  unfold ChildFrame.prescribedH
+  rw [if_neg hne, if_pos rfl]
+
+/-- **The east target from the free policy's prescription (Q35 bottom case).** If the retained inputs at free-closure whites are the
+prescribed ones (`FreePresc`, the canonical policy), and `ζx` is a conjugate free-closure white with `ζx = hLast + c₁U' + c₂V'`, then
+the retained target `x'` is the east input `x + (1,0)`: `ζx' = ζx + (0,1)`, the prescription at `hLast`. The uniqueness of the
+prescribed input is `FreePolicy.freePresc_single`. -/
+theorem east_of_prescription (word : Word) (_h : ∃ x ∈ word, x ≠ Digit.three)
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
+    (hPres : ∀ c : Site, FreeClosure.freeClosure (frameAt (conjWord word)) c →
+      laplacian (standardField (conjWord word)) c = 0 →
+      ∀ j : Site, P.retained c j ↔ FreePolicy.FreePresc (frameAt (conjWord word)) (frameAt word).eps c j)
+    (c1 c2 : ℤ) (x x' : Site)
+    (hx : zTurn x = (frameAt (conjWord word)).hLast +
+      (c1 * (frameAt (conjWord word)).child.modifiedDeck.kernel.1 + c2 * (frameAt (conjWord word)).child.modifiedDeck.transverse.1,
+        c1 * (frameAt (conjWord word)).child.modifiedDeck.kernel.2 + c2 * (frameAt (conjWord word)).child.modifiedDeck.transverse.2))
+    (hwhite : laplacian (standardField (conjWord word)) (zTurn x) = 0)
+    (hpol : parentPolicy P x x') :
+    x' = x + (1, 0) := by
+  set C := frameAt (conjWord word) with hC
+  set η := (frameAt word).eps with hη
+  have hlast : zTurn x + C.child.modifiedDeck.combine (-c1) (-c2) = C.hLast := by
+    rw [hx]
+    unfold PeriodDeck.combine
+    refine Prod.ext ?_ ?_ <;> simp <;> ring
+  have hfree : C.hLast ∈ C.freeH := hLast_mem_freeH C
+  have hfc : FreeClosure.freeClosure C (zTurn x) :=
+    ⟨C.child.modifiedDeck.combine (-c1) (-c2), ⟨-c1, -c2, rfl⟩, Or.inl (by rw [hlast]; exact hfree)⟩
+  have hpres1 : FreePolicy.FreePresc C η (zTurn x) (zTurn x + (0, 1)) :=
+    ⟨C.child.modifiedDeck.combine (-c1) (-c2), ⟨-c1, -c2, rfl⟩,
+      Or.inl ⟨by rw [hlast]; exact hfree, by rw [hlast, prescribedH_hLast]⟩⟩
+  have hPf := (hPres (zTurn x) hfc hwhite (zTurn x')).mp hpol
+  have heq : zTurn x' = zTurn x + (0, 1) := FreePolicy.freePresc_single C η hPf hpres1
+  have hz1 : zTurn (x + (1, 0)) = zTurn x + (0, 1) := by
+    unfold zTurn
+    refine Prod.ext ?_ ?_ <;> simp
+  apply W4OldH.zTurn_injective
+  rw [heq, hz1]
+
+/-- The conjugate `hLast` and the kernel/transverse in explicit coordinates. -/
+theorem conj_hLast_eq (h : ∃ x ∈ word, x ≠ Digit.three) :
+    (frameAt (conjWord word)).hLast =
+      ((frameAt word).parents.odd.den + (frameAt word).parents.odd.num,
+        (frameAt word).parents.odd.den - (frameAt word).parents.odd.num - 1) := by
+  obtain ⟨h1, h2⟩ := UnitBound.conj_child_sums h
+  unfold ChildFrame.hLast
+  rw [h1, h2]
+
+/-- **The bottom case `j = 0` of the old V star, with the east target from the free policy.** The retained target is the east input
+`x + (1, 0)` by `east_of_prescription` (the canonical policy takes the prescription at free-closure whites, `hPres`), and then
+`oldV_bottom_jumpA` gives `a(x) = a(x') = −c₁ − 1`. The hypothesis `hwhite` (the conjugate laplacian at `ζx` is zero) is the
+white condition of the retained edge. -/
+theorem oldV_bottom_jumpA_policy (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
+    {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
+    (hPres : ∀ c : Site, FreeClosure.freeClosure (frameAt (conjWord word)) c →
+      laplacian (standardField (conjWord word)) c = 0 →
+      ∀ j : Site, P.retained c j ↔ FreePolicy.FreePresc (frameAt (conjWord word)) (frameAt word).eps c j)
+    (c1 c2 : ℤ) (x x' : Site)
+    (hx : zTurn x = ((frameAt word).parents.odd.den + (frameAt word).parents.odd.num,
+        (frameAt word).parents.odd.den - (frameAt word).parents.odd.num - 1) +
+      (c1 * ((frameAt word).parents.odd.den + (frameAt word).parents.odd.num) +
+          c2 * (-2 * (frameAt word).parents.odd.num),
+        c1 * ((frameAt word).parents.odd.den - (frameAt word).parents.odd.num) +
+          c2 * (2 * (frameAt word).parents.odd.den)))
+    (hwhite : laplacian (standardField (conjWord word)) (zTurn x) = 0)
+    (hpol : parentPolicy P x x') :
+    jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x = -c1 - 1 ∧
+      jumpA (frameAt word) (quarterTurnField (standardField (conjWord word))) x' = -c1 - 1 := by
+  have hx' : zTurn x = (frameAt (conjWord word)).hLast +
+      (c1 * (frameAt (conjWord word)).child.modifiedDeck.kernel.1 +
+          c2 * (frameAt (conjWord word)).child.modifiedDeck.transverse.1,
+        c1 * (frameAt (conjWord word)).child.modifiedDeck.kernel.2 +
+          c2 * (frameAt (conjWord word)).child.modifiedDeck.transverse.2) := by
+    rw [hx, conj_hLast_eq h, W4OldH.conj_kernel_eq h, W4OldH.conj_transverse_eq h]
+  have hE := east_of_prescription word h P hPres c1 c2 x x' hx' hwhite hpol
+  rw [hE]
+  exact oldV_bottom_jumpA h hSE c1 c2 x hx
+
 end OldV
+
 
 end FLatticePaper.W4OldV
