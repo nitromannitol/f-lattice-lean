@@ -669,6 +669,9 @@ import FLatticePaper.Plane.Induction.TwosDeckMinus
 import FLatticePaper.Plane.Induction.TwosMinusLevel
 import FLatticePaper.Plane.Induction.TwosMinusRank
 import FLatticePaper.Plane.Induction.TwosMinusOddBlack
+import FLatticePaper.Plane.Induction.TwosMinusRhoCases
+import FLatticePaper.Plane.Induction.TwosMinusEvenExcl
+import FLatticePaper.Plane.Induction.TwosMinusEvenBlack
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame
 import FLatticePaper.Plane.Induction.BaseMembership
