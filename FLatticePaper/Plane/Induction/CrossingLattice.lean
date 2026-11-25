@@ -89,7 +89,68 @@ theorem cR_odd {n d : ℤ} {z : Site} (h : ¬ EvenSite z) :
   unfold closedRect
   rw [if_neg h]
 
-set_option maxHeartbeats 4000000 in
+/-- The crossing for an even centre `a` (corners `a`, `a + (1,0)`, `a + (0,1)`, `a + (1,1)`). -/
+theorem crossing_even {n d : ℤ} (hn1 : 1 ≤ n) (hnd : n + 2 ≤ d) (hTL : 2 * (d + n) < w1T n d)
+    (hn : n % 2 = 1) (hd : d % 2 = 1) (a : Site) (ha : EvenSite a)
+    (hS : StrictInterior n d a ∨ StrictInterior n d (a.1 + 1, a.2) ∨
+      StrictInterior n d (a.1, a.2 + 1) ∨ StrictInterior n d (a.1 + 1, a.2 + 1)) :
+    (StrictInterior n d a ∧ StrictInterior n d (a.1 + 1, a.2) ∧
+        StrictInterior n d (a.1, a.2 + 1) ∧ StrictInterior n d (a.1 + 1, a.2 + 1)) ∨
+      (closedRect n d a ∧ ¬ StrictInterior n d a) ∨
+      (closedRect n d (a.1 + 1, a.2) ∧ ¬ StrictInterior n d (a.1 + 1, a.2)) ∨
+      (closedRect n d (a.1, a.2 + 1) ∧ ¬ StrictInterior n d (a.1, a.2 + 1)) ∨
+      (closedRect n d (a.1 + 1, a.2 + 1) ∧ ¬ StrictInterior n d (a.1 + 1, a.2 + 1)) := by
+  have hpar := parity_w1t hn hd a
+  have hpS := parity_w1s hn hd a
+  have hT := parity_w1T hn hd
+  have hE1 : ¬ EvenSite (a.1 + 1, a.2) := by
+    simp only [EvenSite] at ha ⊢; omega
+  have hE2 : ¬ EvenSite (a.1, a.2 + 1) := by
+    simp only [EvenSite] at ha ⊢; omega
+  have hE3 : EvenSite (a.1 + 1, a.2 + 1) := by
+    simp only [EvenSite] at ha ⊢; omega
+  simp only [sI_even, sI_odd, cR_even, cR_odd, hE1, hE2, hE3, ha, not_false_eq_true,
+    w1t_right, w1s_right, w1t_up, w1s_up, w1t_diag, w1s_diag] at hS ⊢
+  simp only [EvenSite] at ha
+  clear hE1 hE2 hE3
+  generalize w1t n d a = t at *
+  generalize w1s n d a = s at *
+  generalize w1T n d = T at *
+  have ht : t % 2 = 0 := by omega
+  clear hpar ha
+  omega
+
+/-- The crossing for an odd centre `a`. -/
+theorem crossing_odd {n d : ℤ} (hn1 : 1 ≤ n) (hnd : n + 2 ≤ d) (hTL : 2 * (d + n) < w1T n d)
+    (hn : n % 2 = 1) (hd : d % 2 = 1) (a : Site) (ha : ¬ EvenSite a)
+    (hS : StrictInterior n d a ∨ StrictInterior n d (a.1 + 1, a.2) ∨
+      StrictInterior n d (a.1, a.2 + 1) ∨ StrictInterior n d (a.1 + 1, a.2 + 1)) :
+    (StrictInterior n d a ∧ StrictInterior n d (a.1 + 1, a.2) ∧
+        StrictInterior n d (a.1, a.2 + 1) ∧ StrictInterior n d (a.1 + 1, a.2 + 1)) ∨
+      (closedRect n d a ∧ ¬ StrictInterior n d a) ∨
+      (closedRect n d (a.1 + 1, a.2) ∧ ¬ StrictInterior n d (a.1 + 1, a.2)) ∨
+      (closedRect n d (a.1, a.2 + 1) ∧ ¬ StrictInterior n d (a.1, a.2 + 1)) ∨
+      (closedRect n d (a.1 + 1, a.2 + 1) ∧ ¬ StrictInterior n d (a.1 + 1, a.2 + 1)) := by
+  have hpar := parity_w1t hn hd a
+  have hpS := parity_w1s hn hd a
+  have hT := parity_w1T hn hd
+  have hE1 : EvenSite (a.1 + 1, a.2) := by
+    simp only [EvenSite] at ha ⊢; omega
+  have hE2 : EvenSite (a.1, a.2 + 1) := by
+    simp only [EvenSite] at ha ⊢; omega
+  have hE3 : ¬ EvenSite (a.1 + 1, a.2 + 1) := by
+    simp only [EvenSite] at ha ⊢; omega
+  simp only [sI_even, sI_odd, cR_even, cR_odd, hE1, hE2, hE3, ha, not_false_eq_true,
+    w1t_right, w1s_right, w1t_up, w1s_up, w1t_diag, w1s_diag] at hS ⊢
+  simp only [EvenSite] at ha
+  clear hE1 hE2 hE3
+  generalize w1t n d a = t at *
+  generalize w1s n d a = s at *
+  generalize w1T n d = T at *
+  have ht : t % 2 = 1 := by omega
+  clear hpar ha
+  rcases hS with h | h | h | h <;> omega
+
 /-- **The crossing on a unit square.** If one corner is strict, then all four corners are strict, or some corner is closed and not strict. -/
 theorem crossing_square {n d : ℤ} (hn1 : 1 ≤ n) (hnd : n + 2 ≤ d) (hTL : 2 * (d + n) < w1T n d)
     (hn : n % 2 = 1) (hd : d % 2 = 1) (a : Site)
@@ -101,25 +162,8 @@ theorem crossing_square {n d : ℤ} (hn1 : 1 ≤ n) (hnd : n + 2 ≤ d) (hTL : 2
       (closedRect n d (a.1 + 1, a.2) ∧ ¬ StrictInterior n d (a.1 + 1, a.2)) ∨
       (closedRect n d (a.1, a.2 + 1) ∧ ¬ StrictInterior n d (a.1, a.2 + 1)) ∨
       (closedRect n d (a.1 + 1, a.2 + 1) ∧ ¬ StrictInterior n d (a.1 + 1, a.2 + 1)) := by
-  have hpar := parity_w1t (n := n) (d := d) hn hd a
-  have hpS := parity_w1s (n := n) (d := d) hn hd a
-  have hT := parity_w1T (n := n) (d := d) hn hd
-  have hE1 : EvenSite (a.1 + 1, a.2) ↔ ¬ EvenSite a := by
-    simp only [EvenSite]; omega
-  have hE2 : EvenSite (a.1, a.2 + 1) ↔ ¬ EvenSite a := by
-    simp only [EvenSite]; omega
-  have hE3 : EvenSite (a.1 + 1, a.2 + 1) ↔ EvenSite a := by
-    simp only [EvenSite]; omega
   by_cases e0 : EvenSite a
-  · simp only [sI_even, sI_odd, cR_even, cR_odd, hE1, hE2, hE3, e0, not_true_eq_false,
-      not_false_eq_true, not_not, w1t_right, w1s_right, w1t_up, w1s_up, w1t_diag, w1s_diag,
-      not_and_or, not_lt, not_le] at hS ⊢
-    simp only [EvenSite] at e0
-    omega
-  · simp only [sI_even, sI_odd, cR_even, cR_odd, hE1, hE2, hE3, e0, not_true_eq_false,
-      not_false_eq_true, not_not, w1t_right, w1s_right, w1t_up, w1s_up, w1t_diag, w1s_diag,
-      not_and_or, not_lt, not_le] at hS ⊢
-    simp only [EvenSite] at e0
-    omega
+  · exact crossing_even hn1 hnd hTL hn hd a e0 hS
+  · exact crossing_odd hn1 hnd hTL hn hd a e0 hS
 
 end FLatticePaper.CrossingLattice
