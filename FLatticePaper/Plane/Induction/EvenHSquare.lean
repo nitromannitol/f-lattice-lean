@@ -8,6 +8,7 @@ import FLatticePaper.Plane.Induction.CanonicalSigned
 import FLatticePaper.Plane.Induction.FanCompat
 import FLatticePaper.Plane.Induction.ReflectedFan
 import FLatticePaper.Plane.Induction.CoveredSW
+import FLatticePaper.Plane.Induction.FanInputs
 
 /-! # The even H interior root: the NW square (Q32 even H, the C.2 diagonal)
 
@@ -344,8 +345,9 @@ theorem parentSquareOut_evenH_SW {frame : ChildFrame} {G : Field} {seed : Site �
 
 /-- **The even H interior root with black `z+N`: the NW square with the fan start.** The arrow `z+NW → z+N` is the forced east edge
 of the contact fan of the apex `z+W` (`ReflectedFan.fan_start_forced`, the start `z+NW = (z+W)+N`), and `z+N → z` is the black rule.
-The named inputs are the all-slope cap ray `hAS`, the depth `d ≥ 3n − 2`, the apex height `t(z+W) ≥ n + 2`, the start's strict
-interior membership and contact value; all four are verified at every such root over words of length at most 6. -/
+The named inputs are the all-slope cap ray `hAS` and the strip inputs `hper`, `hslip`, `hseed`, `hIsym`. The depth
+`d ≥ 3n − 2` and the apex `t(z+W) ≥ n + 2` are derived (`FanInputs.depth_of_black_N`, `FanInputs.apex_of_ne_hFirst`), and so are the
+start's strict interior membership and contact value (the box and the zero strip). -/
 theorem parentSquareOut_evenH_NW_fan {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} {η : ℤ}
     (hP : frame.Packet G)
     (hW1 : FLatticePaper.W1.W1Forced frame.child.num frame.child.den G)
@@ -354,18 +356,29 @@ theorem parentSquareOut_evenH_NW_fan {frame : ChildFrame} {G : Field} {seed : Si
       2 * frame.child.num * (K : ℤ) ≤ 3 * frame.child.den + 3 * frame.child.num - 1 →
       ∃ p q : ℤ, frame.child.num * p - frame.child.den * q = 2 - frame.child.num ∧
         ∀ k : ℕ, k ≤ K → FLatticePaper.QuadraticCap.capMin k ≤ G (p + (k : ℤ), q + (k : ℤ)))
-    (hdn : 3 * frame.child.num - 2 ≤ frame.child.den)
+    (hper : HasGeneratorPeriods frame.child G 0 frame.coherentConstantV)
+    (hslip : ∀ z ∈ frame.closedPolygon, 0 ≤ frame.slip G 1 z)
+    (hseed : ∀ z : Site, EvenSite z → frame.tGrade z = 2 - (frame.child.den + frame.child.num) → G z = 0)
+    (hIsym : ∀ z : Site, G (FLatticePaper.W1Strips.iRefl z) = G z)
     (W : OldPolicyWitness frame G seed η)
     (hpres : PrescribedAt frame G η W.retained)
     (hwu : ∀ c j j', laplacian G c = 0 → W.retained c j → W.retained c j' → j = j')
     {z : Site} (hz : z ∈ frame.freeH) (hev : EvenSite z)
     (hWfree : (z.1 - 1, z.2) ∈ frame.freeH) (hWlap : laplacian G (z.1 - 1, z.2) = 0)
     (hWne : (z.1 - 1, z.2) ≠ FLatticePaper.Induction.hFirst)
-    (hapex : frame.child.num + 2 ≤ frame.tGrade (z.1 - 1, z.2))
     (hzw : laplacian G z = 0)
     (hNB : laplacian G (z.1, z.2 + 1) = -1)
     (hNW : laplacian G (z.1 - 1, z.2 + 1) = 0) :
     ParentSquareOut G W.retained z := by
+  -- the depth bound and the apex bound, derived from the black corner `z+N` and the free set
+  have hdn : 3 * frame.child.num - 2 ≤ frame.child.den :=
+    FLatticePaper.FanInputs.depth_of_black_N hper hP.strips hslip hseed hIsym hz hev hWfree hNB
+  have hWodd : ¬ EvenSite (z.1 - 1, z.2) := by
+    unfold EvenSite at hev ⊢
+    dsimp only
+    omega
+  have hapex : frame.child.num + 2 ≤ frame.tGrade (z.1 - 1, z.2) :=
+    FLatticePaper.FanInputs.apex_of_ne_hFirst frame hWfree hWodd hWne
   have hn : 1 ≤ frame.child.num := by
     obtain ⟨hn1, -, -, -, -⟩ := frame.child_facts
     omega
