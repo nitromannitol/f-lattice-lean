@@ -655,4 +655,118 @@ theorem resRegion_start_of_box (frame : ChildFrame) {z : Site} (hodd : ¬ EvenSi
   · linarith [hT', hT4, hE.2.2.1]
   · linarith [hsL, hT']
 
+/-- **The fan regime.** When `d < 2n` (the V NW-fan regime of Q23; for `d ≥ 2n` the non-fan squares cover every root), the depth
+hypothesis `3N − 1 ≤ D` of the fan holds: `d < 2n` is `3N < D`. -/
+theorem fan_regime_depth {N D n d : ℤ} (hn : n = D - N) (hd : d = D + N) (hlt : d < 2 * n) :
+    3 * N - 1 ≤ D := by
+  omega
+
+/-- **The NW-fan start is a fan member.** For an odd V site `z` with `2 ≤ s(z) ≤ L − 2`, the residual start `(z.2, 1 − z.1)` belongs to the
+fan of the apex `b = (z.2, −z.1)` at any depth `K ≥ 2`: it lies in the residual open rectangle, it is a cone root, and its residual value is
+the parabola `capMin 1 = 0` (the zero window of `quarterTurnField G`, since `t'(start) = s(z)/2 − D`). -/
+theorem nw_start_mem {fr : ChildFrame} {G : Field} (hP : fr.Packet G)
+    (hprice : ∀ z ∈ fr.closedPolygon, fr.cutPrice - 1 ≤ fr.price G z ∧ fr.price G z ≤ fr.cutPrice)
+    (hdrU : ∀ z, fr.price G (z + fr.child.modifiedDeck.kernel) = fr.price G z - 1)
+    (hdrV : ∀ z, fr.price G (z + fr.child.modifiedDeck.transverse) = fr.price G z)
+    (N D : ℤ) (hN2 : 2 * N = fr.child.den - fr.child.num) (hD2 : 2 * D = fr.child.den + fr.child.num)
+    (hN0 : 0 < N) (hNDlt : N < D) {z : Site} (hodd : ¬ EvenSite z)
+    (hs2 : 2 ≤ fr.sGrade z) (hsL : fr.sGrade z ≤ fr.child.den + fr.child.num - 2)
+    (hR : resRegion fr.child.num fr.child.den (z.2, 1 - z.1)) (K : ℕ) (hK2 : 2 ≤ K) :
+    (z.2, 1 - z.1) ∈ FLatticePaper.FanRegion.fanSet
+      (CapConeGrades.ropenNL N D (FLatticePaper.W1.w1T fr.child.num fr.child.den)) (quarterTurnField G)
+      (z.2, -z.1) K := by
+  have hsz : fr.sGrade z = 2 * (N * z.2 + D * z.1) := by
+    have e : fr.sGrade z = (fr.child.den + fr.child.num) * z.1 + (fr.child.den - fr.child.num) * z.2 := rfl
+    have h1 : fr.child.den + fr.child.num = 2 * D := by omega
+    have h2 : fr.child.den - fr.child.num = 2 * N := by omega
+    rw [e, h1, h2]
+    ring
+  have hn' : fr.child.num = D - N := by omega
+  have hd' : fr.child.den = D + N := by omega
+  have hopen : CapConeGrades.ropenNL N D (FLatticePaper.W1.w1T fr.child.num fr.child.den) (z.2, 1 - z.1) :=
+    resRegion_sub_ropen hn' hd' hN0 hNDlt (z.2, 1 - z.1) hR
+  have hev : EvenSite (z.2, 1 - z.1) := by
+    unfold EvenSite at hodd ⊢
+    dsimp only
+    omega
+  have hcone : FLatticePaper.CapRay.ConeRoot (z.2, -z.1) K (z.2, 1 - z.1) := by
+    unfold FLatticePaper.CapRay.ConeRoot
+    refine ⟨?_, ?_, fun _ => ?_, fun h => absurd hev h⟩
+    · dsimp only
+      omega
+    · dsimp only
+      omega
+    · dsimp only
+      omega
+  have hzero : quarterTurnField G (z.2, 1 - z.1) = 0 := by
+    apply (rotated_NL hP hprice hdrU hdrV N D hN2 hD2 hN0 hNDlt).zero
+    · show 1 - D ≤ N * z.2 - D * (1 - z.1)
+      linarith
+    · show N * z.2 - D * (1 - z.1) ≤ N + 2 * D - 1
+      linarith
+  refine ⟨⟨hopen, hcone⟩, ?_⟩
+  unfold FLatticePaper.ContactCone.parabolaField
+  rw [hzero]
+  have e : (z.2, 1 - z.1).2 - (z.2, -z.1).2 = 1 := by
+    dsimp only
+    ring
+  rw [e]
+  norm_num [FLatticePaper.QuadraticCap.capMin]
+
+/-- **The forced arrow of the rotated fan, in `G`.** The forced east start of the residual fan is the arrow `Zs start → Zs (incomingPos start)`
+of the field `G` (the `ForcedEdge` of the minus-square's `R → Q`), and the start is white in `G`. -/
+theorem rotated_fan_arrow_G {fr : ChildFrame} {G : Field} (hP : fr.Packet G)
+    (hprice : ∀ z ∈ fr.closedPolygon, fr.cutPrice - 1 ≤ fr.price G z ∧ fr.price G z ≤ fr.cutPrice)
+    (hdrU : ∀ z, fr.price G (z + fr.child.modifiedDeck.kernel) = fr.price G z - 1)
+    (hdrV : ∀ z, fr.price G (z + fr.child.modifiedDeck.transverse) = fr.price G z)
+    (hW1 : FLatticePaper.W1.W1Forced fr.child.num fr.child.den G)
+    (hper : ∀ z : Site, G (z + (fr.child.den, fr.child.num)) = G z)
+    (N D : ℤ) (hN2 : 2 * N = fr.child.den - fr.child.num) (hD2 : 2 * D = fr.child.den + fr.child.num)
+    (hN0 : 0 < N) (hNDlt : N < D) (hodd : (D + N) % 2 = 1)
+    (K : ℕ) (hK2 : 2 ≤ K) (hKs : 4 * N + 2 * D - 1 ≤ 2 * N * (K : ℤ))
+    (hKr : 2 * N * (K : ℤ) ≤ 3 * D + 3 * N - 1)
+    (b start : Site) (hb : N + 1 ≤ N * b.1 - D * b.2)
+    (hstart : start ∈ FLatticePaper.FanRegion.fanSet
+      (CapConeGrades.ropenNL N D (FLatticePaper.W1.w1T fr.child.num fr.child.den)) (quarterTurnField G) b K)
+    (heven : EvenSite start) (hR : resRegion fr.child.num fr.child.den start) :
+    FLatticePaper.SquareClauses.ForcedEdge G (fun _ _ => False) (Zs start) (Zs (incomingPos start)) ∧
+      laplacian G (Zs start) = 0 := by
+  have hU : EvenSite (fr.child.den, fr.child.num) := by
+    unfold EvenSite
+    dsimp only
+    omega
+  have hn' : fr.child.num = D - N := by omega
+  have hd' : fr.child.den = D + N := by omega
+  have hH := rotated_NL hP hprice hdrU hdrV N D hN2 hD2 hN0 hNDlt
+  obtain ⟨p, q, hs, hpq⟩ :=
+    CapRayGrades.ray_start_odd N D 1 (RotatedMono.coprime_residual fr N D hN2.symm hD2.symm) hodd
+  obtain ⟨J, hJ1, hJ2⟩ := exists_floor_window (2 * N) (N + D - 2) (by omega) (by omega)
+  have hcap := RotatedMono.rotated_ray_cap_mono hP hprice hdrU hdrV N D 1 (by norm_num) (by norm_num) hN2 hD2 hN0 hNDlt
+    hs hpq J K hJ1 hJ2 hKr
+  have hwin := CapConeGrades.cone_window_NL hH (FLatticePaper.W1.w1T fr.child.num fr.child.den) hN0 hNDlt (by norm_num)
+    hs hpq K hcap b hb
+  have hwhite : laplacian (quarterTurnField G) start = 0 :=
+    FLatticePaper.FanRegion.contact_even_white_R (fun c => hH.binary c) hwin hstart heven
+  have hlapG : laplacian G (Zs start) = 0 := by
+    rw [← laplacian_quarterTurnField G start]
+    exact hwhite
+  refine ⟨?_, hlapG⟩
+  have hG0 : laplacian G (Zs start + (fr.child.den, fr.child.num)) = 0 := by
+    rw [laplacian_add_period hU hper]
+    exact hlapG
+  have hzS : FLatticePaper.W1.StrictInterior fr.child.num fr.child.den (Zs start + (fr.child.den, fr.child.num)) := hR
+  obtain ⟨o', hD⟩ := hW1 _ hzS hG0
+  have hT := forcedEdgeIn_translate hU hper hD
+  rw [add_sub_cancel_right] at hT
+  have hres := forcedEdgeIn_Zs hT start (Zinv (o' - (fr.child.den, fr.child.num))) rfl
+    (Zs_Zinv (o' - (fr.child.den, fr.child.num))).symm
+  have hmono := forcedEdgeIn_mono
+    (fun x hx => resRegion_sub_ropen (N := N) (D := D) (n := fr.child.num) (d := fr.child.den) hn' hd' hN0 hNDlt x hx) hres
+  have hout := rotated_fan_start_D hP hprice hdrU hdrV N D (FLatticePaper.W1.w1T fr.child.num fr.child.den) hN2 hD2
+    hN0 hNDlt hodd K hK2 hKs hKr b start hb hstart heven hmono
+  have hfin : o' - (fr.child.den, fr.child.num) = Zs (incomingPos start) := by
+    rw [← hout, Zs_Zinv]
+  rw [hfin] at hT
+  exact FLatticePaper.W1.forcedEdgeIn_forced hT
+
 end FLatticePaper.RotatedForced
