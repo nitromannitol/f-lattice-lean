@@ -1,6 +1,7 @@
 import FLatticePaper.Plane.Induction.CapRayGrades
 import FLatticePaper.Plane.Induction.SheetRegions
 import FLatticePaper.Plane.Induction.ParentStepDischarge
+import FLatticePaper.Plane.Induction.Q3Field
 
 /-! # The diagonal cap of the rotated residual (the long V case, `(N, D) = ((d−n)/2, (d+n)/2)`)
 
@@ -125,5 +126,18 @@ theorem residual_signed {conj : ChildFrame} {G : Field}
   have h := FLatticePaper.Induction.quarterTurnField_sub_shift (conj := conj) (G := G) y
   have hp := hprice _ hy
   linarith [hp.2]
+
+/-- `Z` conjugates the reflection `z ↦ I − z`, `I = (1,−1)`, to itself: `Z(I − y) = I − Z y`. -/
+theorem Zs_I_sub (y : Site) : Zs ((1, -1) - y) = (1, -1) - Zs y := by
+  unfold Zs
+  ext <;> simp <;> ring
+
+/-- **The residual is reflection-symmetric:** `f(I − y) = f(y)` for `f = quarterTurnField G`, from the reflection of the standard field
+(`packet_reflection_I`) and the `I`-symmetry of the harmonic grid (`harmonicGrid_I_sub`), since `Z(I − y) = I − Zy`. -/
+theorem residual_reflect {fr : ChildFrame} {G : Field} (hP : fr.Packet G) (y : Site) :
+    quarterTurnField G ((1, -1) - y) = quarterTurnField G y := by
+  unfold quarterTurnField
+  rw [mapSite_eq_Zs, mapSite_eq_Zs, Zs_I_sub, FLatticePaper.Induction.packet_reflection_I fr hP (Zs y),
+    FLatticePaper.Induction.harmonicGrid_I_sub y]
 
 end FLatticePaper.RotatedCap
