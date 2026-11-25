@@ -55,13 +55,14 @@ theorem even_incomingPos_of_odd (v : Site) (h : ¬ EvenSite v) : EvenSite (incom
 
 /-- **Both inputs of an even contact of a true fort are contacts in the fort** (the zero horizontal deficit of the parabola). The window
 bound `m ≤ F` is needed at the two inputs only. -/
-theorem even_contact_both {F m : Field} {S : Set Site} (hfort : IsIncomingFort F S) {v : Site} (hv : v ∈ S)
+theorem even_contact_both_fortAt {N : Site → Prop} {F m : Field} {S : Set Site} (hfort : FortAt N F S) {v : Site}
+    (hN : N v) (hv : v ∈ S)
     (hc : F v = m v) (he : laplacian m v = 0) (h1 : m (incomingNeg v) ≤ F (incomingNeg v))
     (h2 : m (incomingPos v) ≤ F (incomingPos v)) :
     incomingNeg v ∈ S ∧ incomingPos v ∈ S ∧ F (incomingNeg v) = m (incomingNeg v) ∧
       F (incomingPos v) = m (incomingPos v) := by
   have hsum := excess_sum (F := F) (m := m) hc
-  rcases hfort v hv with ⟨hl, hsome⟩ | ⟨hl, hn, hp⟩
+  rcases hfort v hv hN with ⟨hl, hsome⟩ | ⟨hl, hn, hp⟩
   · exfalso
     rw [hl, he] at hsum
     omega
@@ -70,13 +71,22 @@ theorem even_contact_both {F m : Field} {S : Set Site} (hfort : IsIncomingFort F
     · omega
     · omega
 
+/-- **Both inputs of an even contact of a true fort are contacts in the fort** (the unrestricted fort). -/
+theorem even_contact_both {F m : Field} {S : Set Site} (hfort : IsIncomingFort F S) {v : Site} (hv : v ∈ S)
+    (hc : F v = m v) (he : laplacian m v = 0) (h1 : m (incomingNeg v) ≤ F (incomingNeg v))
+    (h2 : m (incomingPos v) ≤ F (incomingPos v)) :
+    incomingNeg v ∈ S ∧ incomingPos v ∈ S ∧ F (incomingNeg v) = m (incomingNeg v) ∧
+      F (incomingPos v) = m (incomingPos v) :=
+  even_contact_both_fortAt (N := fun _ => True) (fortAt_of_incoming hfort) trivial hv hc he h1 h2
+
 /-- The window bound `m ≤ F` at the inputs of every point satisfying the interior predicate `P` (the fan's interior). -/
 def WindowOn (P : Site → Prop) (F m : Field) : Prop :=
   ∀ x, P x → ∀ i : Site, (i = incomingNeg x ∨ i = incomingPos x) → m i ≤ F i
 
 /-- **One fan step**: from a contact of `S` at an interior point, the next point is a contact of `S`: the east input at an even contact,
 a contacting input in `S` at an odd contact. -/
-theorem fan_step {F m : Field} {S : Set Site} {P : Site → Prop} (hfort : IsIncomingFort F S)
+theorem fan_step_fortAt {N : Site → Prop} {F m : Field} {S : Set Site} {P : Site → Prop} (hfort : FortAt N F S)
+    (hPN : ∀ x, P x → N x)
     (hm : ∀ x, laplacian m x = -1 ∨ laplacian m x = 0) (hme : ∀ x, EvenSite x → laplacian m x = 0)
     (hwin : WindowOn P F m) {v : Site} (hP : P v) (hv : v ∈ S) (hc : F v = m v) :
     ∃ w : Site, w ∈ S ∧ F w = m w ∧ (EvenSite v → w = incomingPos v) ∧
@@ -84,10 +94,18 @@ theorem fan_step {F m : Field} {S : Set Site} {P : Site → Prop} (hfort : IsInc
   have h1 := hwin v hP (incomingNeg v) (Or.inl rfl)
   have h2 := hwin v hP (incomingPos v) (Or.inr rfl)
   by_cases he : EvenSite v
-  · obtain ⟨_, hp, _, ep⟩ := even_contact_both hfort hv hc (hme v he) h1 h2
+  · obtain ⟨_, hp, _, ep⟩ := even_contact_both_fortAt hfort (hPN v hP) hv hc (hme v he) h1 h2
     exact ⟨incomingPos v, hp, ep, fun _ => rfl, Or.inr rfl⟩
-  · obtain ⟨i, hi, hiS, hic⟩ := fort_contact_input hfort hv hc hm h1 h2
+  · obtain ⟨i, hi, hiS, hic⟩ := fort_contact_input_fortAt hfort hv (hPN v hP) hc hm h1 h2
     exact ⟨i, hiS, hic, fun h => absurd h he, hi⟩
+
+/-- **One fan step** for the unrestricted fort. -/
+theorem fan_step {F m : Field} {S : Set Site} {P : Site → Prop} (hfort : IsIncomingFort F S)
+    (hm : ∀ x, laplacian m x = -1 ∨ laplacian m x = 0) (hme : ∀ x, EvenSite x → laplacian m x = 0)
+    (hwin : WindowOn P F m) {v : Site} (hP : P v) (hv : v ∈ S) (hc : F v = m v) :
+    ∃ w : Site, w ∈ S ∧ F w = m w ∧ (EvenSite v → w = incomingPos v) ∧
+      (w = incomingNeg v ∨ w = incomingPos v) :=
+  fan_step_fortAt (N := fun _ => True) (fortAt_of_incoming hfort) (fun _ _ => trivial) hm hme hwin hP hv hc
 
 /-- The contacts of `S` for `F` and `m`. -/
 abbrev FanT (F m : Field) (S : Set Site) : Type := {v : Site // v ∈ S ∧ F v = m v}
@@ -97,28 +115,37 @@ def FanRules {F m : Field} {S : Set Site} (next : FanT F m S → FanT F m S) (v 
   (EvenSite v.1 → (next v).1 = incomingPos v.1) ∧ ((next v).1 = incomingNeg v.1 ∨ (next v).1 = incomingPos v.1)
 
 /-- A fan step function obeying the rules at every interior point, from the one-step existence. -/
-theorem fan_path_exists {F m : Field} {S : Set Site} {P : Site → Prop} (hfort : IsIncomingFort F S)
+theorem fan_path_exists_fortAt {N : Site → Prop} {F m : Field} {S : Set Site} {P : Site → Prop} (hfort : FortAt N F S)
+    (hPN : ∀ x, P x → N x)
     (hm : ∀ x, laplacian m x = -1 ∨ laplacian m x = 0) (hme : ∀ x, EvenSite x → laplacian m x = 0)
     (hwin : WindowOn P F m) :
     ∃ next : FanT F m S → FanT F m S, ∀ v : FanT F m S, P v.1 → FanRules next v := by
   have hex : ∀ v : FanT F m S, ∃ w : FanT F m S, (P v.1 → FanRules (fun _ => w) v) := by
     intro v
     by_cases hPv : P v.1
-    · obtain ⟨w, hwS, hwc, hE, hI⟩ := fan_step hfort hm hme hwin hPv v.2.1 v.2.2
+    · obtain ⟨w, hwS, hwc, hE, hI⟩ := fan_step_fortAt hfort hPN hm hme hwin hPv v.2.1 v.2.2
       exact ⟨⟨w, hwS, hwc⟩, fun _ => ⟨hE, hI⟩⟩
     · exact ⟨v, fun h => absurd h hPv⟩
   choose next hnext using hex
   exact ⟨fun v => next v, fun v hPv => hnext v hPv⟩
 
+/-- A fan step function obeying the rules at every interior point (the unrestricted fort). -/
+theorem fan_path_exists {F m : Field} {S : Set Site} {P : Site → Prop} (hfort : IsIncomingFort F S)
+    (hm : ∀ x, laplacian m x = -1 ∨ laplacian m x = 0) (hme : ∀ x, EvenSite x → laplacian m x = 0)
+    (hwin : WindowOn P F m) :
+    ∃ next : FanT F m S → FanT F m S, ∀ v : FanT F m S, P v.1 → FanRules next v :=
+  fan_path_exists_fortAt (N := fun _ => True) (fortAt_of_incoming hfort) (fun _ _ => trivial) hm hme hwin
+
 /-- A step function from a contact of `S` at the start, with the north input at an odd start: the override keeps the rules. -/
-theorem fan_path_exists_north {F m : Field} {S : Set Site} {P : Site → Prop} (hfort : IsIncomingFort F S)
+theorem fan_path_exists_north_fortAt {N : Site → Prop} {F m : Field} {S : Set Site} {P : Site → Prop} (hfort : FortAt N F S)
+    (hPN : ∀ x, P x → N x)
     (hm : ∀ x, laplacian m x = -1 ∨ laplacian m x = 0) (hme : ∀ x, EvenSite x → laplacian m x = 0)
     (hwin : WindowOn P F m) (v0 : Site) (hv0S : v0 ∈ S) (hv0c : F v0 = m v0) (hodd : ¬ EvenSite v0)
     (hnS : incomingPos v0 ∈ S) (hnc : F (incomingPos v0) = m (incomingPos v0)) :
     ∃ next : FanT F m S → FanT F m S, (∀ v : FanT F m S, P v.1 → FanRules next v) ∧
       (next ⟨v0, hv0S, hv0c⟩).1 = incomingPos v0 := by
   classical
-  obtain ⟨next, hnext⟩ := fan_path_exists hfort hm hme hwin
+  obtain ⟨next, hnext⟩ := fan_path_exists_fortAt hfort hPN hm hme hwin
   let start : FanT F m S := ⟨v0, hv0S, hv0c⟩
   let north : FanT F m S := ⟨incomingPos v0, hnS, hnc⟩
   refine ⟨fun v => if v = start then north else next v, fun v hPv => ?_, ?_⟩
@@ -132,6 +159,16 @@ theorem fan_path_exists_north {F m : Field} {S : Set Site} {P : Site → Prop} (
       exact hnext v hPv
   · show (if start = start then north else next start).1 = incomingPos v0
     rw [if_pos rfl]
+
+/-- The north-start step function (the unrestricted fort). -/
+theorem fan_path_exists_north {F m : Field} {S : Set Site} {P : Site → Prop} (hfort : IsIncomingFort F S)
+    (hm : ∀ x, laplacian m x = -1 ∨ laplacian m x = 0) (hme : ∀ x, EvenSite x → laplacian m x = 0)
+    (hwin : WindowOn P F m) (v0 : Site) (hv0S : v0 ∈ S) (hv0c : F v0 = m v0) (hodd : ¬ EvenSite v0)
+    (hnS : incomingPos v0 ∈ S) (hnc : F (incomingPos v0) = m (incomingPos v0)) :
+    ∃ next : FanT F m S → FanT F m S, (∀ v : FanT F m S, P v.1 → FanRules next v) ∧
+      (next ⟨v0, hv0S, hv0c⟩).1 = incomingPos v0 :=
+  fan_path_exists_north_fortAt (N := fun _ => True) (fortAt_of_incoming hfort) (fun _ _ => trivial) hm hme hwin v0 hv0S hv0c
+    hodd hnS hnc
 
 /-- The step rules at a point, read from the fan's rules. -/
 theorem rules_of_fanRules {F m : Field} {S : Set Site} {next : FanT F m S → FanT F m S} {v : FanT F m S}
@@ -215,14 +252,24 @@ theorem fan_first_exit_of {F m : Field} {S : Set Site} {P : Site → Prop} (next
   exact not_not.mp (Nat.find_min hex hj)
 
 /-- **The first exit of a fan from a contact of a fort** (existence of the step function). -/
-theorem fan_first_exit {F m : Field} {S : Set Site} {P : Site → Prop} (hfort : IsIncomingFort F S)
+theorem fan_first_exit_fortAt {N : Site → Prop} {F m : Field} {S : Set Site} {P : Site → Prop} (hfort : FortAt N F S)
+    (hPN : ∀ x, P x → N x)
     (hm : ∀ x, laplacian m x = -1 ∨ laplacian m x = 0) (hme : ∀ x, EvenSite x → laplacian m x = 0)
     (hwin : WindowOn P F m) (hfinP : {c | P c}.Finite) (v0 : Site) (hv0S : v0 ∈ S) (hv0c : F v0 = m v0) :
     ∃ k : ℕ, (∃ next : FanT F m S → FanT F m S, (∀ v : FanT F m S, P v.1 → FanRules next v) ∧
       (next^[k] ⟨v0, hv0S, hv0c⟩).1 ∈ S ∧ F (next^[k] ⟨v0, hv0S, hv0c⟩).1 = m (next^[k] ⟨v0, hv0S, hv0c⟩).1 ∧
       ¬ P (next^[k] ⟨v0, hv0S, hv0c⟩).1 ∧ ∀ j < k, P (next^[j] ⟨v0, hv0S, hv0c⟩).1) := by
-  obtain ⟨next, hr⟩ := fan_path_exists hfort hm hme hwin
+  obtain ⟨next, hr⟩ := fan_path_exists_fortAt hfort hPN hm hme hwin
   obtain ⟨k, hk, hj⟩ := fan_first_exit_of next hr hfinP ⟨v0, hv0S, hv0c⟩
   exact ⟨k, next, hr, (next^[k] ⟨v0, hv0S, hv0c⟩).2.1, (next^[k] ⟨v0, hv0S, hv0c⟩).2.2, hk, hj⟩
+
+/-- **The first exit of a fan from a contact of a fort** (the unrestricted fort). -/
+theorem fan_first_exit {F m : Field} {S : Set Site} {P : Site → Prop} (hfort : IsIncomingFort F S)
+    (hm : ∀ x, laplacian m x = -1 ∨ laplacian m x = 0) (hme : ∀ x, EvenSite x → laplacian m x = 0)
+    (hwin : WindowOn P F m) (hfinP : {c | P c}.Finite) (v0 : Site) (hv0S : v0 ∈ S) (hv0c : F v0 = m v0) :
+    ∃ k : ℕ, (∃ next : FanT F m S → FanT F m S, (∀ v : FanT F m S, P v.1 → FanRules next v) ∧
+      (next^[k] ⟨v0, hv0S, hv0c⟩).1 ∈ S ∧ F (next^[k] ⟨v0, hv0S, hv0c⟩).1 = m (next^[k] ⟨v0, hv0S, hv0c⟩).1 ∧
+      ¬ P (next^[k] ⟨v0, hv0S, hv0c⟩).1 ∧ ∀ j < k, P (next^[j] ⟨v0, hv0S, hv0c⟩).1) :=
+  fan_first_exit_fortAt (N := fun _ => True) (fortAt_of_incoming hfort) (fun _ _ => trivial) hm hme hwin hfinP v0 hv0S hv0c
 
 end FLatticePaper.FanPropagation

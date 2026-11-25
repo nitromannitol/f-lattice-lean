@@ -1,3 +1,4 @@
+import FLatticePaper.Plane.Induction.FortAt
 import FLatticePaper.Plane.Induction.ComparisonTransfer
 import FLatticePaper.Plane.Induction.ComparisonEmpty
 import FLatticePaper.Plane.Induction.PassagePR
@@ -44,13 +45,13 @@ has the same `K₊`. -/
 theorem minK_black_input_plus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hPR : FLatticePaper.PassagePR.PriceRangeOn word)
     (hpk : (frameAt word).Packet (standardField word)) {S : Set Site}
-    (hfort : IsIncomingFort (standardField word) S) {z : Site} (hzS : z ∈ S)
-    (hzE : z ∈ (frameAt word).closedPolygon) (hb : laplacian (standardField word) z = -1)
+    (hfort : FortAt (Nonfree (frameAt word)) (standardField word) S) {z : Site} (hzS : z ∈ S)
+    (hnf : Nonfree (frameAt word) z) (hzE : z ∈ (frameAt word).closedPolygon) (hb : laplacian (standardField word) z = -1)
     (hmin : ∀ w ∈ S, kPlusW word z ≤ kPlusW word w) :
     ∃ i : Site, (i = FLatticePaper.incomingNeg z ∨ i = FLatticePaper.incomingPos z) ∧ i ∈ S ∧
       kPlusW word i = kPlusW word z := by
   have hsome : FLatticePaper.incomingNeg z ∈ S ∨ FLatticePaper.incomingPos z ∈ S := by
-    rcases hfort z hzS with ⟨_, hs⟩ | ⟨hl0, _⟩
+    rcases hfort z hzS hnf with ⟨_, hs⟩ | ⟨hl0, _⟩
     · exact hs
     · exfalso
       omega
@@ -74,13 +75,13 @@ theorem minK_black_input_plus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.thr
 theorem minK_black_input_minus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hPR : FLatticePaper.PassagePR.PriceRangeOn word)
     (hpk : (frameAt word).Packet (standardField word)) {S : Set Site}
-    (hfort : IsIncomingFort (standardField word) S) {z : Site} (hzS : z ∈ S)
-    (hzE : z ∈ (frameAt word).closedPolygon) (hb : laplacian (standardField word) z = -1)
+    (hfort : FortAt (Nonfree (frameAt word)) (standardField word) S) {z : Site} (hzS : z ∈ S)
+    (hnf : Nonfree (frameAt word) z) (hzE : z ∈ (frameAt word).closedPolygon) (hb : laplacian (standardField word) z = -1)
     (hmin : ∀ w ∈ S, kMinusW word z ≤ kMinusW word w) :
     ∃ i : Site, (i = FLatticePaper.incomingNeg z ∨ i = FLatticePaper.incomingPos z) ∧ i ∈ S ∧
       kMinusW word i = kMinusW word z := by
   have hsome : FLatticePaper.incomingNeg z ∈ S ∨ FLatticePaper.incomingPos z ∈ S := by
-    rcases hfort z hzS with ⟨_, hs⟩ | ⟨hl0, _⟩
+    rcases hfort z hzS hnf with ⟨_, hs⟩ | ⟨hl0, _⟩
     · exact hs
     · exfalso
       omega

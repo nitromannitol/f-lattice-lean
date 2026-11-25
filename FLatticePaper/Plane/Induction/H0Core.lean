@@ -115,17 +115,27 @@ theorem incomingPos_of_even (x : Site) (h : EvenSite x) : incomingPos x = (x.1 +
   unfold incomingPos; rw [if_pos h]
 
 /-- A fort point whose south (or north) input is outside the fort has the other input in the fort. -/
-theorem fort_pos_of_neg_not {F : Field} {S : Set Site} {c : Site} (hfort : IsIncomingFort F S) (hc : c ∈ S)
-    (hn : incomingNeg c ∉ S) : incomingPos c ∈ S := by
-  rcases hfort c hc with ⟨-, hsome⟩ | ⟨-, hn', hp⟩
+theorem fort_pos_of_neg_not_fortAt {N : Site → Prop} {F : Field} {S : Set Site} {c : Site} (hfort : FortAt N F S) (hN : N c)
+    (hc : c ∈ S) (hn : incomingNeg c ∉ S) : incomingPos c ∈ S := by
+  rcases hfort c hc hN with ⟨-, hsome⟩ | ⟨-, hn', hp⟩
   · exact hsome.resolve_left hn
   · exact absurd hn' hn
 
-theorem fort_neg_of_pos_not {F : Field} {S : Set Site} {c : Site} (hfort : IsIncomingFort F S) (hc : c ∈ S)
-    (hp : incomingPos c ∉ S) : incomingNeg c ∈ S := by
-  rcases hfort c hc with ⟨-, hsome⟩ | ⟨-, hn', hp'⟩
+/-- A fort point whose south (or north) input is outside the fort has the other input in the fort (the unrestricted fort). -/
+theorem fort_pos_of_neg_not {F : Field} {S : Set Site} {c : Site} (hfort : IsIncomingFort F S) (hc : c ∈ S)
+    (hn : incomingNeg c ∉ S) : incomingPos c ∈ S :=
+  fort_pos_of_neg_not_fortAt (N := fun _ => True) (fortAt_of_incoming hfort) trivial hc hn
+
+theorem fort_neg_of_pos_not_fortAt {N : Site → Prop} {F : Field} {S : Set Site} {c : Site} (hfort : FortAt N F S) (hN : N c)
+    (hc : c ∈ S) (hp : incomingPos c ∉ S) : incomingNeg c ∈ S := by
+  rcases hfort c hc hN with ⟨-, hsome⟩ | ⟨-, hn', hp'⟩
   · exact hsome.resolve_right hp
   · exact absurd hp' hp
+
+/-- The converse of `fort_pos_of_neg_not` (the unrestricted fort). -/
+theorem fort_neg_of_pos_not {F : Field} {S : Set Site} {c : Site} (hfort : IsIncomingFort F S) (hc : c ∈ S)
+    (hp : incomingPos c ∉ S) : incomingNeg c ∈ S :=
+  fort_neg_of_pos_not_fortAt (N := fun _ => True) (fortAt_of_incoming hfort) trivial hc hp
 
 /-- The minus candidates `H_0 = (1,0)`, `V_0 = (0,0)` are not inputs of an open site. -/
 theorem minus_not_called (frame : ChildFrame) (x : Site) (hx : frame.openRect x) (k : Site)
@@ -201,9 +211,10 @@ theorem minus_not_called (frame : ChildFrame) (x : Site) (hx : frame.openRect x)
 
 /-- **The minus `H_0` core.** A fort of the policy field, in the closed polygon, whose boundary points are among `H_0, V_0`, is empty:
 the retained-quota core (`interior_empty_of_retained`) empties the strict interior, and `H_0`, `V_0` force points of it. -/
-theorem h0_core_minus {M G : Field} {R : Site → Site → Prop} {Rk : Site → ℤ} (frame : ChildFrame)
+theorem h0_core_minus_fortAt {M G : Field} {R : Site → Site → Prop} {Rk : Site → ℤ} (frame : ChildFrame)
     (hagree : ∀ y ∈ frame.closedPolygon, M y = G y) (hquota : RetainQuota G R)
-    (hrank : ∀ c i, R c i → Rk i < Rk c) {S : Set Site} (hfort : IsIncomingFort M S)
+    (hrank : ∀ c i, R c i → Rk i < Rk c) {S : Set Site} (hfort : FortAt (fun z => frame.openRect z) M S)
+    (hcW : FortAt (fun z => z = ((1 : ℤ), (0 : ℤ)) ∨ z = ((0 : ℤ), (0 : ℤ))) M S)
     (hsub : ∀ z ∈ S, z ∈ frame.closedPolygon)
     (hcand : ∀ z ∈ S, z ∈ frame.closedPolygon → ¬ frame.openRect z → z = hFirst ∨ z = vFirst) : S = ∅ := by
   have hint := interior_empty_of_retained (P := frame.closedPolygon) (Q := fun z => frame.openRect z)
@@ -221,7 +232,7 @@ theorem h0_core_minus {M G : Field} {R : Site → Site → Prop} {Rk : Site → 
     have hinP : incomingPos ((1 : ℤ), (0 : ℤ)) = ((1 : ℤ), (1 : ℤ)) := by
       rw [incomingPos_of_not_even _ hodd]; simp
     have hmem : ((1 : ℤ), (1 : ℤ)) ∈ S := by
-      have := fort_pos_of_neg_not hfort h (by rw [hinN]; exact hn)
+      have := fort_pos_of_neg_not_fortAt hcW (Or.inl rfl) h (by rw [hinN]; exact hn)
       rw [hinP] at this
       exact this
     exact hint (1, 1) hmem (open_one_one frame)
@@ -236,7 +247,7 @@ theorem h0_core_minus {M G : Field} {R : Site → Site → Prop} {Rk : Site → 
     have hinP : incomingPos ((0 : ℤ), (0 : ℤ)) = ((1 : ℤ), (0 : ℤ)) := by
       rw [incomingPos_of_even _ hev]; simp
     have hH : ((1 : ℤ), (0 : ℤ)) ∈ S := by
-      have := fort_pos_of_neg_not hfort h (by rw [hinN]; exact hn)
+      have := fort_pos_of_neg_not_fortAt hcW (Or.inr rfl) h (by rw [hinN]; exact hn)
       rw [hinP] at this
       exact this
     exact hH0 hH
@@ -252,6 +263,14 @@ theorem h0_core_minus {M G : Field} {R : Site → Site → Prop} {Rk : Site → 
     · exact absurd hz hV0
   · intro hz
     exact absurd hz (Set.notMem_empty z)
+
+/-- **The minus core** (the unrestricted fort): `h0_core_minus_fortAt` with the fort at every site. -/
+theorem h0_core_minus {M G : Field} {R : Site → Site → Prop} {Rk : Site → ℤ} (frame : ChildFrame)
+    (hagree : ∀ y ∈ frame.closedPolygon, M y = G y) (hquota : RetainQuota G R)
+    (hrank : ∀ c i, R c i → Rk i < Rk c) {S : Set Site} (hfort : IsIncomingFort M S)
+    (hsub : ∀ z ∈ S, z ∈ frame.closedPolygon)
+    (hcand : ∀ z ∈ S, z ∈ frame.closedPolygon → ¬ frame.openRect z → z = hFirst ∨ z = vFirst) : S = ∅ :=
+  h0_core_minus_fortAt frame hagree hquota hrank (fortAt_of_incoming hfort) (fortAt_of_incoming hfort) hsub hcand
 
 /-- The translation vector of the plus core: `V = (n − d, n + d)`, of even coordinate sum `2n`. -/
 def plusV (frame : ChildFrame) : Site := (frame.child.num - frame.child.den, frame.child.num + frame.child.den)
@@ -446,10 +465,11 @@ theorem plus_not_called (frame : ChildFrame) (z : Site) (hz : frame.openRect (z 
 /-- **The plus `H_0` core.** A fort `T` of the translated chart `M(· + V)` on `E − V`, whose boundary points are among `H_0`, `V_{−1}`,
 is empty: `H_0 ∈ T` forces `V_{−1} = (1,−1) ∈ T` (its north input `(1,1)` is outside `E − V`), and `V_{−1} ∈ T` forces `(2,−1) ∈ T`
 (its west input `(0,−1)` is outside), which is open in `E − V`. The retained structure `(G, R, Rk)` is the policy's, translated. -/
-theorem plus_core {M G : Field} {R : Site → Site → Prop} {Rk : Site → ℤ} (frame : ChildFrame)
+theorem plus_core_fortAt {M G : Field} {R : Site → Site → Prop} {Rk : Site → ℤ} (frame : ChildFrame)
     (hagree : ∀ y : Site, y + plusV frame ∈ frame.closedPolygon → M (y + plusV frame) = G y)
     (hquota : RetainQuota G R) (hrank : ∀ c i, R c i → Rk i < Rk c)
-    {T : Set Site} (hfort : IsIncomingFort (fun z => M (z + plusV frame)) T)
+    {T : Set Site} (hfort : FortAt (fun z => frame.openRect (z + plusV frame)) (fun z => M (z + plusV frame)) T)
+    (hcW : FortAt (fun z => z = ((1 : ℤ), (0 : ℤ)) ∨ z = ((1 : ℤ), (-1 : ℤ))) (fun z => M (z + plusV frame)) T)
     (hsub : ∀ z ∈ T, z + plusV frame ∈ frame.closedPolygon)
     (hcand : ∀ z ∈ T, z + plusV frame ∈ frame.closedPolygon → ¬ frame.openRect (z + plusV frame) →
       z = ((1 : ℤ), (0 : ℤ)) ∨ z = ((1 : ℤ), (-1 : ℤ))) : T = ∅ := by
@@ -482,7 +502,7 @@ theorem plus_core {M G : Field} {R : Site → Site → Prop} {Rk : Site → ℤ}
     have hinP : incomingPos ((1 : ℤ), (-1 : ℤ)) = ((2 : ℤ), (-1 : ℤ)) := by
       rw [incomingPos_of_even _ hev]; simp
     have h2 : ((2 : ℤ), (-1 : ℤ)) ∈ T :=
-      fort_pos_of_neg_not hfort h (by rw [hinN]; exact fun hm => plus_not_closed_zero_neg_one frame (hsub _ hm))
+      fort_pos_of_neg_not_fortAt hcW (Or.inr rfl) h (by rw [hinN]; exact fun hm => plus_not_closed_zero_neg_one frame (hsub _ hm))
     exact hint' _ h2 (plus_open_two_neg_one frame)
   -- `H_0 ∈ T` forces `V_{−1} ∈ T`
   have hH0 : ((1 : ℤ), (0 : ℤ)) ∉ T := by
@@ -493,7 +513,7 @@ theorem plus_core {M G : Field} {R : Site → Site → Prop} {Rk : Site → ℤ}
     have hinP : incomingPos ((1 : ℤ), (0 : ℤ)) = ((1 : ℤ), (1 : ℤ)) := by
       rw [incomingPos_of_not_even _ hodd]; simp
     have hm1 : ((1 : ℤ), (-1 : ℤ)) ∈ T :=
-      fort_neg_of_pos_not hfort h (by rw [hinP]; exact fun hm => plus_not_closed_one_one frame (hsub _ hm))
+      fort_neg_of_pos_not_fortAt hcW (Or.inl rfl) h (by rw [hinP]; exact fun hm => plus_not_closed_one_one frame (hsub _ hm))
     exact hVm1 hm1
   ext z
   constructor
@@ -503,5 +523,15 @@ theorem plus_core {M G : Field} {R : Site → Site → Prop} {Rk : Site → ℤ}
     · exact absurd hz (fun h => hVm1 h)
   · intro hz
     exact absurd hz (Set.notMem_empty z)
+
+/-- **The plus core** (the unrestricted fort): `plus_core_fortAt` with the fort at every site. -/
+theorem plus_core {M G : Field} {R : Site → Site → Prop} {Rk : Site → ℤ} (frame : ChildFrame)
+    (hagree : ∀ y : Site, y + plusV frame ∈ frame.closedPolygon → M (y + plusV frame) = G y)
+    (hquota : RetainQuota G R) (hrank : ∀ c i, R c i → Rk i < Rk c)
+    {T : Set Site} (hfort : IsIncomingFort (fun z => M (z + plusV frame)) T)
+    (hsub : ∀ z ∈ T, z + plusV frame ∈ frame.closedPolygon)
+    (hcand : ∀ z ∈ T, z + plusV frame ∈ frame.closedPolygon → ¬ frame.openRect (z + plusV frame) →
+      z = ((1 : ℤ), (0 : ℤ)) ∨ z = ((1 : ℤ), (-1 : ℤ))) : T = ∅ :=
+  plus_core_fortAt frame hagree hquota hrank (fortAt_of_incoming hfort) (fortAt_of_incoming hfort) hsub hcand
 
 end FLatticePaper.H0Core

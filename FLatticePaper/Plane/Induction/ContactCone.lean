@@ -1,4 +1,5 @@
 import FLatticePaper.Plane.BellmanRank
+import FLatticePaper.Plane.Induction.FortAt
 import FLatticePaper.Plane.Induction.ComparisonContacts
 import FLatticePaper.Plane.Induction.QuadraticCap
 
@@ -27,12 +28,13 @@ theorem excess_sum {F m : Field} {c : Site} (hc : F c = m c) :
   linarith
 
 /-- **The contact cone step.** A contact of a true fort `S` of `F` has an input which is a contact of `S`. -/
-theorem fort_contact_input {F m : Field} {S : Set Site} (hfort : IsIncomingFort F S) {c : Site} (hcS : c ∈ S)
+theorem fort_contact_input_fortAt {N : Site → Prop} {F m : Field} {S : Set Site} (hfort : FortAt N F S) {c : Site}
+    (hcS : c ∈ S) (hN : N c)
     (hc : F c = m c) (hm : ∀ x, laplacian m x = -1 ∨ laplacian m x = 0)
     (h1 : m (incomingNeg c) ≤ F (incomingNeg c)) (h2 : m (incomingPos c) ≤ F (incomingPos c)) :
     ∃ i : Site, (i = incomingNeg c ∨ i = incomingPos c) ∧ i ∈ S ∧ F i = m i := by
   have hsum := excess_sum (F := F) (m := m) hc
-  rcases hfort c hcS with ⟨hl, hsome⟩ | ⟨hl, hn, hp⟩
+  rcases hfort c hcS hN with ⟨hl, hsome⟩ | ⟨hl, hn, hp⟩
   · -- black: both inputs are contacts (the excess sum is `−1 − lap m ≤ 0`)
     have hmc := hm c
     have hsum0 : (F (incomingNeg c) - m (incomingNeg c)) + (F (incomingPos c) - m (incomingPos c)) ≤ 0 := by
@@ -55,6 +57,13 @@ theorem fort_contact_input {F m : Field} {S : Set Site} (hfort : IsIncomingFort 
     · -- `lap m c = 0`: the excess sum is zero, both inputs are contacts
       rw [hmc] at hsum
       exact ⟨incomingNeg c, Or.inl rfl, hn, by omega⟩
+
+/-- **The contact cone step** for the unrestricted fort. -/
+theorem fort_contact_input {F m : Field} {S : Set Site} (hfort : IsIncomingFort F S) {c : Site} (hcS : c ∈ S)
+    (hc : F c = m c) (hm : ∀ x, laplacian m x = -1 ∨ laplacian m x = 0)
+    (h1 : m (incomingNeg c) ≤ F (incomingNeg c)) (h2 : m (incomingPos c) ≤ F (incomingPos c)) :
+    ∃ i : Site, (i = incomingNeg c ∨ i = incomingPos c) ∧ i ∈ S ∧ F i = m i :=
+  fort_contact_input_fortAt (N := fun _ => True) (fortAt_of_incoming hfort) hcS trivial hc hm h1 h2
 
 /-- **The parabola comparison field** `m(z) = capMin (z.2 − b)` (vertical in `z.2`). -/
 def parabolaField (b : ℤ) : Field := fun z => capMin (z.2 - b)
