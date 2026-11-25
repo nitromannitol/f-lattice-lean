@@ -1,11 +1,14 @@
 import FLatticePaper.Plane.Induction.EndpointDeck
+import FLatticePaper.Plane.Induction.CutReflect
+import FLatticePaper.Plane.Induction.ZoneI1
 
 /-! Task w3, step 2(c): the nominal earlier value steps by `0` or `η`.
 
 With `g i = Dq (vAt i)` (the raw slip at the `i`-th labelled V point of the conjugate) the step is
 `g (i + 1) − g i ∈ {0, η}`. This is arithmetic: the period rule `g (i + L') = g i + 2η` (`EndpointDeck.Dq_transverse`) and the raw
 row on one period. The row is the named input `RawRow` (E4, the clipped identity at `conjWord word`, whose input is the strictly
-earlier trace). The two range conditions `1 ≤ r'` and `r' + 2 ≤ L'` are the conjugate's own parent data (checked on all words). -/
+earlier trace). The plus row is the minus row reflected through `(1,−1)` (`CutReflect`). The range conditions `1 ≤ r'`,
+`r' + 2 ≤ L'` come from the frame's parent bounds and the child identities. -/
 
 namespace FLatticePaper.StepTwoC
 
@@ -76,14 +79,67 @@ theorem step_mem (g : ℤ → ℤ) (η r L : ℤ) (hη : η = 1 ∨ η = -1) (hr
     rw [hg0, hga]
     ring
 
+/-- The row arithmetic under the reflection: `rowVal (−1) (L−1−i) + 2 = rowVal 1 i` on one period. -/
+theorem rowVal_flip (r L i : ℤ) (hr1 : 1 ≤ r) (hiL : i < L) :
+    rowVal (-1) r L (L - 1 - i) + 2 * (-1) * (-1) = rowVal 1 r L i := by
+  simp only [rowVal]
+  norm_num
+  split_ifs <;> omega
+
+/-- **The plus row from the minus row.** `D_+(V_i) = D_−(V_{L'−1−i}) + 2` (`CutReflect`), so the plus row is the minus row
+reflected in the period. -/
+theorem rawRow_plus (C : ChildFrame) {G : Field} (hP : C.Packet G) (hI : ∀ z, G (reflectionI - z) = G z)
+    (base : ℤ → Site)
+    (hbase : ∀ r : ℤ, 0 ≤ r → r < FreeEnum.period C → base r ∈ C.freeV ∧ (base r).2 = r)
+    (hrowM : RawRow (fun i => EndpointDeck.Dq C G (-1) (FreeEnum.vAt C base i)) (-1)
+      (C.parents.odd.den + C.parents.odd.num) (FreeEnum.period C)) :
+    RawRow (fun i => EndpointDeck.Dq C G 1 (FreeEnum.vAt C base i)) 1
+      (C.parents.odd.den + C.parents.odd.num) (FreeEnum.period C) := by
+  obtain ⟨hr1, hr2⟩ : 1 ≤ C.parents.odd.den + C.parents.odd.num ∧
+      C.parents.odd.den + C.parents.odd.num + 2 ≤ FreeEnum.period C := by
+    have hb := C.valid.odd_bounds
+    have he := C.valid.even_bounds
+    unfold Fraction.InUnitInterval at hb he
+    have hd := ZoneI1.child_den_eq C
+    have hn := ZoneI1.child_num_eq C
+    unfold FreeEnum.period
+    omega
+  intro i hi0 hiL
+  have e1 := CutReflect.Dq_reflect C hI (FreeEnum.vAt C base i)
+  have hrefl := CutReflect.refl_cut C base hbase i
+  have e2 : reflectionI - FreeEnum.vAt C base i =
+      FreeEnum.vAt C base (FreeEnum.period C - 1 - i) + (-1 : ℤ) • Vdeck C := by
+    rw [← hrefl]
+    unfold reflectionI
+    ext <;> simp <;> ring
+  have e3 := EndpointDeck.Dq_smul_transverse C hP (-1) (-1) (FreeEnum.vAt C base (FreeEnum.period C - 1 - i))
+  have hm : EndpointDeck.Dq C G (-1) (FreeEnum.vAt C base (FreeEnum.period C - 1 - i)) =
+      rowVal (-1) (C.parents.odd.den + C.parents.odd.num) (FreeEnum.period C) (FreeEnum.period C - 1 - i) :=
+    hrowM _ (by omega) (by omega)
+  show EndpointDeck.Dq C G 1 (FreeEnum.vAt C base i) = _
+  rw [e1, e2, e3, hm]
+  exact rowVal_flip _ _ _ hr1 hiL
+
 /-- **Step 2(c).** For the labelled V points `vAt i` of the frame and the shift `s`, the value `f k = Dq (vAt (k − s))`
-steps by `0` or `η` from `k` to `k + 1`. -/
-theorem step_two_c (C : ChildFrame) {G : Field} (hP : C.Packet G) (η : ℤ) (hη : η = 1 ∨ η = -1)
-    (base : ℤ → Site) (r : ℤ) (hr1 : 1 ≤ r) (hr2 : r + 2 ≤ FreeEnum.period C)
-    (hrow : RawRow (fun i => EndpointDeck.Dq C G η (FreeEnum.vAt C base i)) η r (FreeEnum.period C))
+steps by `0` or `η` from `k` to `k + 1`. Only the minus row is named (E4); the plus row is `rawRow_plus`. -/
+theorem step_two_c (C : ChildFrame) {G : Field} (hP : C.Packet G) (hI : ∀ z, G (reflectionI - z) = G z)
+    (η : ℤ) (hη : η = 1 ∨ η = -1)
+    (base : ℤ → Site)
+    (hbase : ∀ r : ℤ, 0 ≤ r → r < FreeEnum.period C → base r ∈ C.freeV ∧ (base r).2 = r)
+    (hrowM : RawRow (fun i => EndpointDeck.Dq C G (-1) (FreeEnum.vAt C base i)) (-1)
+      (C.parents.odd.den + C.parents.odd.num) (FreeEnum.period C))
     (s k : ℤ) :
     EndpointDeck.Dq C G η (FreeEnum.vAt C base (k + 1 - s)) - EndpointDeck.Dq C G η (FreeEnum.vAt C base (k - s)) = 0 ∨
       EndpointDeck.Dq C G η (FreeEnum.vAt C base (k + 1 - s)) - EndpointDeck.Dq C G η (FreeEnum.vAt C base (k - s)) = η := by
+  obtain ⟨hr1, hr2⟩ : 1 ≤ C.parents.odd.den + C.parents.odd.num ∧
+      C.parents.odd.den + C.parents.odd.num + 2 ≤ FreeEnum.period C := by
+    have hb := C.valid.odd_bounds
+    have he := C.valid.even_bounds
+    unfold Fraction.InUnitInterval at hb he
+    have hd := ZoneI1.child_den_eq C
+    have hn := ZoneI1.child_num_eq C
+    unfold FreeEnum.period
+    omega
   have hper : ∀ i, EndpointDeck.Dq C G η (FreeEnum.vAt C base (i + FreeEnum.period C)) =
       EndpointDeck.Dq C G η (FreeEnum.vAt C base i) + 2 * η := by
     intro i
@@ -91,8 +147,14 @@ theorem step_two_c (C : ChildFrame) {G : Field} (hP : C.Packet G) (η : ℤ) (h�
     rw [one_mul, one_smul] at h
     rw [h]
     exact EndpointDeck.Dq_transverse C hP η _
+  have hrow : RawRow (fun i => EndpointDeck.Dq C G η (FreeEnum.vAt C base i)) η
+      (C.parents.odd.den + C.parents.odd.num) (FreeEnum.period C) := by
+    rcases hη with rfl | rfl
+    · exact rawRow_plus C hP hI base hbase hrowM
+    · exact hrowM
   have e : k + 1 - s = (k - s) + 1 := by ring
   rw [e]
-  exact step_mem (fun i => EndpointDeck.Dq C G η (FreeEnum.vAt C base i)) η r (FreeEnum.period C) hη hr1 hr2 hper hrow (k - s)
+  exact step_mem (fun i => EndpointDeck.Dq C G η (FreeEnum.vAt C base i)) η
+    (C.parents.odd.den + C.parents.odd.num) (FreeEnum.period C) hη hr1 hr2 hper hrow (k - s)
 
 end FLatticePaper.StepTwoC
