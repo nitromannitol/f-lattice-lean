@@ -8,6 +8,7 @@ import FLatticePaper.Plane.Induction.BothFreeGrades
 import FLatticePaper.Plane.Induction.CanonicalDirections
 import FLatticePaper.Plane.Induction.NonfreeBridge
 import FLatticePaper.Plane.Induction.WestSelect
+import FLatticePaper.Plane.Induction.DeckParentSquare
 
 /-! # The endpoint table of the free boundary (Q32, the §D rows of ALL_WHITE_THREE_STEP_RETURNS)
 
@@ -714,5 +715,100 @@ theorem row_Vprev_plus {frame : ChildFrame} {G : Field} {seed : Site → Site �
     (by decide) hn0 (by unfold Edge; decide) (by unfold Edge; decide) (by unfold Edge; decide)
     r01 r12 r20 (by decide) (by decide) ro huq
     (clause_white hwu F.w1m1 r01) (Or.inl F.b2m1) (clause_22 W hwu hsrc2 r20)
+
+/-- Negation keeps the even sites. -/
+theorem evenSite_neg_of_even {x : Site} (h : EvenSite x) : EvenSite (-x) := by
+  unfold EvenSite at *
+  simp only [Prod.fst_neg, Prod.snd_neg]
+  omega
+
+/-- **Transport of a parent square along a deck vector** `τ` (even, in the span): the square at `z` gives the square at `z + τ`
+when the policy is `τ`-equivariant and the laplacian is `τ`-invariant. -/
+theorem parentSquareOut_shift {frame : ChildFrame} {G : Field} {R : Site → Site → Prop} (hP : frame.Packet G) {τ : Site}
+    (hτ : EvenSite τ) (hτs : τ ∈ frame.child.modifiedDeck.span) (hR : ∀ x u, R x u ↔ R (x + τ) (u + τ))
+    {z z' : Site} (e : z + τ = z') (h : ParentSquareOut G R z) : ParentSquareOut G R z' := by
+  have hR' : ∀ x u, R x u ↔ R (x - -τ) (u - -τ) := fun x u => by
+    rw [sub_neg_eq_add, sub_neg_eq_add]
+    exact hR x u
+  have hL' : ∀ w, laplacian G (w - -τ) = laplacian G w := fun w => by
+    rw [sub_neg_eq_add]
+    exact laplacian_span_inv frame G hP hτs w
+  have h2 := FLatticePaper.DeckParentSquare.parentSquareOut_sub (τ := -τ) (evenSite_neg_of_even hτ) hR' hL' h
+  rw [sub_neg_eq_add, e] at h2
+  exact h2
+
+/-- **The native last H root `hLast = (d, n−1)`**, from the shifted row `(0,−1)` by the kernel `Kdeck = (d,n)`. -/
+theorem native_hLast {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} {η : ℤ}
+    (hP : frame.Packet G)
+    (hW1 : FLatticePaper.W1.W1Forced frame.child.num frame.child.den G)
+    (W : OldPolicyWitness frame G seed η)
+    (hwu : ∀ c j j', laplacian G c = 0 → W.retained c j → W.retained c j' → j = j')
+    (hpres : PrescribedAt frame G η W.retained)
+    (hdU : ∀ x u, W.retained x u ↔ W.retained (x + Kdeck frame) (u + Kdeck frame))
+    (F : EndpointFacts frame G)
+    (hsrc : laplacian G (-1, -2) = -1 ∨ (laplacian G (-1, -2) = 0 ∧ Nonfree frame (-1, -2))) :
+    ParentSquareOut G W.retained frame.hLast := by
+  have e : ((0 : ℤ), (-1 : ℤ)) + Kdeck frame = frame.hLast := by
+    rw [kdeck_eq]
+    unfold ChildFrame.hLast
+    simp only [Prod.mk.injEq]
+    constructor <;> ring
+  exact parentSquareOut_shift hP (evenSite_Kdeck frame) (Kdeck_mem_span frame) hdU e
+    (row_Hlast hP hW1 W hwu hpres hdU F hsrc)
+
+/-- **The native last V root `vLast = (n−d+1, n+d−1)`** for `η = +1`, from the shifted row `(1,−1)` by `Vdeck`. -/
+theorem native_vLast_plus {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
+    (W : OldPolicyWitness frame G seed 1)
+    (hwu : ∀ c j j', laplacian G c = 0 → W.retained c j → W.retained c j' → j = j')
+    (hpres : PrescribedAt frame G 1 W.retained)
+    (hdU : ∀ x u, W.retained x u ↔ W.retained (x + Kdeck frame) (u + Kdeck frame))
+    (hdV : ∀ x u, W.retained x u ↔ W.retained (x + Vdeck frame) (u + Vdeck frame))
+    (F : EndpointFacts frame G) (hP : frame.Packet G) :
+    ParentSquareOut G W.retained frame.vLast := by
+  have e : ((1 : ℤ), (-1 : ℤ)) + Vdeck frame = frame.vLast := by
+    rw [vdeck_eq]
+    unfold ChildFrame.vLast
+    simp only [Prod.mk.injEq]
+    constructor <;> ring
+  exact parentSquareOut_shift hP (evenSite_Vdeck frame) (Vdeck_mem_span frame) hdV e
+    (row_Vend_plus W hwu hpres hdU hdV F)
+
+/-- **The native last V root `vLast = (n−d+1, n+d−1)`** for `η = −1`, from the shifted row `(1,−1)` by `Vdeck`. -/
+theorem native_vLast_minus {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
+    (hP : frame.Packet G)
+    (hW1 : FLatticePaper.W1.W1Forced frame.child.num frame.child.den G)
+    (W : OldPolicyWitness frame G seed (-1))
+    (hwu : ∀ c j j', laplacian G c = 0 → W.retained c j → W.retained c j' → j = j')
+    (hpres : PrescribedAt frame G (-1) W.retained)
+    (hdV : ∀ x u, W.retained x u ↔ W.retained (x + Vdeck frame) (u + Vdeck frame))
+    (F : EndpointFacts frame G)
+    (hsrc2 : laplacian G (2, -2) = -1 ∨ (laplacian G (2, -2) = 0 ∧ Nonfree frame (2, -2))) :
+    ParentSquareOut G W.retained frame.vLast := by
+  have e : ((1 : ℤ), (-1 : ℤ)) + Vdeck frame = frame.vLast := by
+    rw [vdeck_eq]
+    unfold ChildFrame.vLast
+    simp only [Prod.mk.injEq]
+    constructor <;> ring
+  exact parentSquareOut_shift hP (evenSite_Vdeck frame) (Vdeck_mem_span frame) hdV e
+    (row_Vend_minus hP hW1 W hwu hpres hdV F hsrc2)
+
+/-- **The native V root `Vprev = (n−d+1, n+d−2)`** for `η = +1`, from the shifted row `(1,−2)` by `Vdeck`. -/
+theorem native_vPrev_plus {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
+    (hP : frame.Packet G)
+    (hW1 : FLatticePaper.W1.W1Forced frame.child.num frame.child.den G)
+    (W : OldPolicyWitness frame G seed 1)
+    (hwu : ∀ c j j', laplacian G c = 0 → W.retained c j → W.retained c j' → j = j')
+    (hpres : PrescribedAt frame G 1 W.retained)
+    (hdV : ∀ x u, W.retained x u ↔ W.retained (x + Vdeck frame) (u + Vdeck frame))
+    (F : EndpointFacts frame G)
+    (hsrc2 : laplacian G (2, -2) = -1 ∨ (laplacian G (2, -2) = 0 ∧ Nonfree frame (2, -2))) :
+    ParentSquareOut G W.retained (frame.child.num - frame.child.den + 1, frame.child.num + frame.child.den - 2) := by
+  have e : ((1 : ℤ), (-2 : ℤ)) + Vdeck frame =
+      (frame.child.num - frame.child.den + 1, frame.child.num + frame.child.den - 2) := by
+    rw [vdeck_eq]
+    simp only [Prod.mk.injEq]
+    constructor <;> ring
+  exact parentSquareOut_shift hP (evenSite_Vdeck frame) (Vdeck_mem_span frame) hdV e
+    (row_Vprev_plus hP hW1 W hwu hpres hdV F hsrc2)
 
 end FLatticePaper.EndpointRows
