@@ -3,3 +3,4 @@ import FLatticePaper.Plane.Induction.W4Reduction
 #print axioms FLatticePaper.W4Reduction.slip_minus_forced_adjacent
 #print axioms FLatticePaper.W4Reduction.hret_of_sheetOut
 #print axioms FLatticePaper.W4Reduction.slip_minus_forced_adjacent_sheetOut
+#print axioms FLatticePaper.W4Reduction.slip_minus_forced_adjacent_rise

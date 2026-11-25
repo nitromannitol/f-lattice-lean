@@ -654,6 +654,9 @@ import FLatticePaper.Plane.Induction.PlusAdjacent
 import FLatticePaper.Plane.Induction.SignMinusAdjacent
 import FLatticePaper.Plane.Induction.W4Reduction
 import FLatticePaper.Plane.Induction.W4Cases
+import FLatticePaper.Plane.Induction.StarPrice
+import FLatticePaper.Plane.Induction.ArcBounds
+import FLatticePaper.Plane.Induction.ArcFrame
 import FLatticePaper.TraceHeadline
 import FLatticePaper.FlatPlusHeadline
 import FLatticePaper.Plane.Induction.TwosDeckEta
