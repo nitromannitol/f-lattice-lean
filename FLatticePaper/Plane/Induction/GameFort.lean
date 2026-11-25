@@ -11,8 +11,9 @@ A game fort for the field `F` and the sign `η` is a set `S` obstructing an acyc
 * black (Laplacian `−1`): at least one actual input is in `S`;
 * nonfree white (Laplacian `0`, `Nonfree`): BOTH actual inputs are in `S`;
 * free white (Laplacian `0`, a free site): its ONE canonical input `z + prescribed` is in `S`;
-* white translate-free (neither nonfree nor free): at least one input (a relaxation of the audit's rule; it only enlarges the class of
-  forts, so an argument using the other three rules applies to the audit's forts).
+* white translate-free (neither nonfree nor free): at least one input. This is a RELAXATION of the audit (it states no rule for these
+  sites). It only enlarges the class of forts, so emptiness of this class is stronger than emptiness of the audit's forts, and an
+  argument that uses only the other three rules applies to the audit's forts (accepted by the lead).
 
 The route lemmas below use only the free-white rule at the root, the nonfree-white rule at the middles, and the whiteness of the middles.
 The whiteness of a middle is a hypothesis unless it follows from zero values (the even H middle does, from the zero strip and the even zero
@@ -315,5 +316,43 @@ theorem free_white_forced_input {F : Field} {S : Set Site} (frame : ChildFrame) 
   · exact absurd hnf (not_nonfree_of_free frame hzf)
   · exact hc
   · exact absurd hzf hnfree
+
+/-- **Q2, the E–N middle range** (FIXED_FREE §3, `L − 2 < s < T + 2 − c` for the middle `z + (1,0)` of an even H root): the middle's `s` is
+`s z + L`; the lower bound is `s z ≥ 0` (the closed polygon) and the upper bound is the root bound `s z < T + 2 − 2d` of
+`H_EN_middle_nonfree`, since `2d − L = c`. -/
+theorem H_EN_middle_s_range (frame : ChildFrame) {z : Site} (hzE : z ∈ frame.closedPolygon) (hev : EvenSite z)
+    (hS : frame.sGrade z < frame.child.periodDenominator + 2 - 2 * frame.child.den) :
+    frame.child.den + frame.child.num - 2 < frame.sGrade (z + (1, 0)) ∧
+      frame.sGrade (z + (1, 0)) < frame.child.periodDenominator + 2 - (frame.child.den - frame.child.num) := by
+  have hc := (FLatticePaper.Induction.mem_closedPolygon_iff frame z).1 hzE
+  rw [if_pos hev] at hc
+  have hs : frame.sGrade (z + (1, 0)) = frame.sGrade z + (frame.child.den + frame.child.num) := by
+    unfold ChildFrame.sGrade; simp only [Prod.fst_add, Prod.snd_add]; ring
+  rw [hs]
+  have hn := (frame.child_facts).1
+  constructor <;> omega
+
+/-- **Q2, the N–E–S middle ranges** (FIXED_FREE §3, `L − 2 < s < T + 2 − c` for the first and second middles `z + (0,1)`, `z + (1,1)` of an
+odd H root): the first is `s z + c`, the second `s z + c + L = s z + 2d`; the root bounds `2n − 2 < s z` (`H_NES_middle1_nonfree`) and
+`s z < T + 2 − 3d + n` (`H_NES_middle2_nonfree`) and the closed polygon's `s z ≥ 2 − d + n` give both bounds. -/
+theorem H_NES_middle_s_range (frame : ChildFrame) {z : Site} (hzE : z ∈ frame.closedPolygon) (hodd : ¬ EvenSite z)
+    (hS1 : 2 * frame.child.num - 2 < frame.sGrade z)
+    (hS2 : frame.sGrade z < frame.child.periodDenominator + 2 - 3 * frame.child.den + frame.child.num) :
+    (frame.child.den + frame.child.num - 2 < frame.sGrade (z + (0, 1)) ∧
+      frame.sGrade (z + (0, 1)) < frame.child.periodDenominator + 2 - (frame.child.den - frame.child.num)) ∧
+    (frame.child.den + frame.child.num - 2 < frame.sGrade (z + (1, 1)) ∧
+      frame.sGrade (z + (1, 1)) < frame.child.periodDenominator + 2 - (frame.child.den - frame.child.num)) := by
+  have hc := (FLatticePaper.Induction.mem_closedPolygon_iff frame z).1 hzE
+  rw [if_neg hodd] at hc
+  have hs1 : frame.sGrade (z + (0, 1)) = frame.sGrade z + (frame.child.den - frame.child.num) := by
+    unfold ChildFrame.sGrade; simp only [Prod.fst_add, Prod.snd_add]; ring
+  have hs2 : frame.sGrade (z + (1, 1)) = frame.sGrade z + (frame.child.den - frame.child.num) + (frame.child.den + frame.child.num) := by
+    unfold ChildFrame.sGrade; simp only [Prod.fst_add, Prod.snd_add]; ring
+  rw [hs1, hs2]
+  have hn := (frame.child_facts).1
+  have hd := (frame.child_facts).2.1
+  constructor
+  · constructor <;> omega
+  · constructor <;> omega
 
 end FLatticePaper.GameFort
