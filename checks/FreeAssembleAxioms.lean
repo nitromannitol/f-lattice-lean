@@ -1,0 +1,6 @@
+import FLatticePaper.Plane.Induction.FreeAssemble
+
+#print axioms FLatticePaper.AuxRankSign.forced_permitted_S
+#print axioms FLatticePaper.AuxRankSign.freePolicy_aux
+#print axioms FLatticePaper.FreePermittedS.permitted_S
+#print axioms FLatticePaper.FreeAssemble.free_named_inputs
