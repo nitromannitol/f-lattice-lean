@@ -57,13 +57,13 @@ theorem laplacian_quarterTurnField (G : Field) (x : Site) :
   rw [hadd, laplacian_comp_Zs, harmonicGrid_harmonic, add_zero]
 
 /-- **The diagonal cap of the rotated residual.** For the rotated grades `(N, D)` of a child frame `(n, d)` (`2N = d − n`,
-`2D = d + n`), with `3 ≤ N`, `4 ≤ D − N`, the residual of the standard field `G` satisfies the cap on the ray `(p+k, q+k)` with
+`2D = d + n`), with `0 < N < D`, the residual of the standard field `G` satisfies the cap on the ray `(p+k, q+k)` with
 `N p − D q = 2 − N`, `p + q` odd, for `k ≤ K`. The strips are those of `G` (`frame.HasStrips G`), the binary laplacian is that of `G`;
 the two sheet monotonicities of the residual in the `(N, D)`-grades are the named inputs `hodd`, `heven` (Q26). -/
 theorem rotated_ray_cap {frame : ChildFrame} {G : Field} (hS : frame.HasStrips G)
     (hbin : ∀ x : Site, laplacian G x = -1 ∨ laplacian G x = 0)
     (N D : ℤ) (hN2 : 2 * N = frame.child.den - frame.child.num) (hD2 : 2 * D = frame.child.den + frame.child.num)
-    (hN3 : 3 ≤ N) (hND : 4 ≤ D - N)
+    (hN0 : 0 < N) (hNDlt : N < D)
     (hodd : ∀ u v : Site, ¬ EvenSite u → ¬ EvenSite v → N * u.1 - D * u.2 ≤ N * v.1 - D * v.2 →
       N * v.1 - D * v.2 ≤ 0 → quarterTurnField G u ≤ quarterTurnField G v)
     (heven : ∀ u v : Site, EvenSite u → EvenSite v → N * u.1 - D * u.2 ≤ N * v.1 - D * v.2 →
@@ -76,7 +76,7 @@ theorem rotated_ray_cap {frame : ChildFrame} {G : Field} (hS : frame.HasStrips G
     ∀ k : ℕ, k ≤ K → FLatticePaper.QuadraticCap.capMin k ≤ quarterTurnField G (p + (k : ℤ), q + (k : ℤ)) := by
   have hden : frame.child.den = N + D := by omega
   have hnum : frame.child.num = D - N := by omega
-  apply CapRayGrades.ray_cap_NDgrades N D hN3 hND
+  apply CapRayGrades.ray_cap_NDgrades N D hN0 hNDlt
   · intro x
     rw [laplacian_quarterTurnField]
     exact hbin _

@@ -30,9 +30,10 @@ theorem ray_start_odd (N D : ℤ) (hcop : IsCoprime N D) (hodd : (D + N) % 2 = 1
 
 /-- **The diagonal cap in `(N, D)`-grades.** For `p, q` with `N p − D q = 2 − N` and `p + q` odd, `N ≥ 3`, `D − N ≥ 4`, the
 zero strip, the harmonic strip and the two sheet monotonicities in the `(N, D)`-grades, and the anchor ranges `J, K`, the ray
-satisfies `m(k) ≤ F (p+k, q+k)` for `k ≤ K`. -/
+satisfies `m(k) ≤ F (p+k, q+k)` for `k ≤ K`. Only `0 < N < D` is used: the proper conditions `3 ≤ N`, `4 ≤ D − N` of the H
+frame are not needed here (checked by a probe build; the conclusion also holds numerically at the rotated words with `N ∈ {1,2}`). -/
 theorem ray_cap_NDgrades {F : Field} (N D : ℤ)
-    (hN3 : 3 ≤ N) (hND : 4 ≤ D - N)
+    (hN0 : 0 < N) (hNDlt : N < D)
     (hbin : ∀ x : Site, laplacian F x = -1 ∨ laplacian F x = 0)
     (hzero : ∀ w : Site, 1 - D ≤ N * w.1 - D * w.2 → N * w.1 - D * w.2 ≤ N + 2 * D - 1 → F w = 0)
     (hharm : ∀ w : Site, 1 - 2 * D ≤ (D + N) * w.1 + (D - N) * w.2 → (D + N) * w.1 + (D - N) * w.2 ≤ 2 * (D + N) - 1 →
@@ -47,8 +48,7 @@ theorem ray_cap_NDgrades {F : Field} (N D : ℤ)
     (hJ2 : N + D - 2 < 2 * N * ((J : ℤ) + 1))
     (hK : 2 * N * (K : ℤ) ≤ 3 * D + 3 * N - 1) :
     ∀ k : ℕ, k ≤ K → FLatticePaper.QuadraticCap.capMin k ≤ F (p + (k : ℤ), q + (k : ℤ)) := by
-  have hN0 : 0 < N := by omega
-  have hND' : N < D := by omega
+  have hND' : N < D := hNDlt
   -- the diagonal monotonicity of the odd sheet on the ray
   have hmono : ∀ n : ℕ, n ≤ J → F (p + (n : ℤ), q + ((n : ℤ) + 2)) ≤ F (p + ((n : ℤ) + 2), q + ((n : ℤ) + 2)) := by
     intro n hn
