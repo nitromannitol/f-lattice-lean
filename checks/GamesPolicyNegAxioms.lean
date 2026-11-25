@@ -1,0 +1,3 @@
+import FLatticePaper.Plane.Induction.GamesPolicyNeg
+
+#print axioms FLatticePaper.Induction.policy_of_gamesWithRank_prescribed_neg
