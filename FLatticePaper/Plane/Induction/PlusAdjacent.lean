@@ -6,6 +6,7 @@ import FLatticePaper.Plane.Induction.W1MSheet
 import FLatticePaper.Plane.Induction.RawB
 import FLatticePaper.Plane.Induction.W1Step
 import FLatticePaper.Plane.Induction.NativeQ34
+import FLatticePaper.Plane.Induction.UnitBound
 
 /-! # W3 of Q34: the sign `+1` permit at a strict `A`-edge in the positive adjacent chart
 
@@ -15,7 +16,7 @@ polygon (`uq = ε U_q` is the adjacent shift):
 * `D₊(v) = F v − F (v − uq)` (kernel periodicity: `F (v + σ) = F (v − uq)`);
 * `D₊(v) = − min(o₁ v, o₂ v)` at an `A`-root, with `o₁ v = ψ₊(v − lv)` and `o₂ v = Ψ v + ψ₊(v − lv − e)` (`AdjacentOffers.offer_plus`);
 * `o₁ z ≤ o₁ u` (`PlusOffer.pJump_mono_sheetA`, the conjugate's price on the sheet-`A` edge);
-* `o₁ u ≤ o₂ u` from `Ψ u ≥ 1` and the unit bound `ψ₊(x) ≤ ψ₊(x − e) + 1` (premise `hunit`, Q34's span argument, not yet formalised).
+* `o₁ u ≤ o₂ u` from `Ψ u ≥ 1` and the unit bound `ψ₊(x) ≤ ψ₊(x − e) + 1` (`UnitBound.unit_bound`).
 
 Hence `D₊(u) = −o₁ u ≤ −min(o₁ z, o₂ z) = D₊(z)`. -/
 
@@ -121,8 +122,8 @@ theorem slip_adj_min {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
   simp only [FqW] at *
   omega
 
-/-- **W3 (Q34): the sign `+1` permit at a strict `A`-edge in the positive adjacent chart.** The unit bound `hunit` is Q34's span
-argument (the increment of `ψ₊` along `e`), a named premise here. -/
+/-- **W3 (Q34): the sign `+1` permit at a strict `A`-edge in the positive adjacent chart.** The unit bound along `e` is
+`UnitBound.unit_bound` (proved from the conjugate's price range and drifts), so no premise beyond the word and the edge. -/
 theorem plus_adjacent_strictA {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hW : StrongEstimates word) (hSE : StrongEstimates (conjWord word))
     {seed : Site → Site → Prop}
@@ -131,10 +132,11 @@ theorem plus_adjacent_strictA {word : Word} (h : ∃ x ∈ word, x ≠ Digit.thr
     (hz : z ∈ (frameAt word).closedPolygon) (hu : u ∈ (frameAt word).closedPolygon)
     (hzA : z - (frameAt word).uq ∈ (frameAt word).closedPolygon) (huA : u - (frameAt word).uq ∈ (frameAt word).closedPolygon)
     (hΨz : 0 ≤ sheetPsi word z) (hΨu : 1 ≤ sheetPsi word u)
-    (hedge : sheetPolicyA P (frameAt word).sheetShift z u)
-    (hunit : pJump (frameAt word) (FqW word) (u - (frameAt word).sheetShift) ≤
-      pJump (frameAt word) (FqW word) (u - (frameAt word).sheetShift - (frameAt word).sheetOffset) + 1) :
+    (hedge : sheetPolicyA P (frameAt word).sheetShift z u) :
     (frameAt word).slip (standardField word) 1 u ≤ (frameAt word).slip (standardField word) 1 z := by
+  have hunit : pJump (frameAt word) (FqW word) (u - (frameAt word).sheetShift) ≤
+      pJump (frameAt word) (FqW word) (u - (frameAt word).sheetShift - (frameAt word).sheetOffset) + 1 :=
+    UnitBound.unit_bound h hSE _
   rw [slip_adj_min h hW hSE hu huA (by omega), slip_adj_min h hW hSE hz hzA hΨz]
   have hmono := PlusOffer.pJump_mono_sheetA h hSE P hedge
   simp only [FqW] at *

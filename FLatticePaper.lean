@@ -649,6 +649,7 @@ import FLatticePaper.Plane.Induction.NegFromPlus
 import FLatticePaper.Plane.Induction.AdjacentOffers
 import FLatticePaper.Plane.Induction.NativeMinus
 import FLatticePaper.Plane.Induction.PlusOffer
+import FLatticePaper.Plane.Induction.UnitBound
 import FLatticePaper.Plane.Induction.PlusAdjacent
 import FLatticePaper.TraceHeadline
 import FLatticePaper.FlatPlusHeadline
