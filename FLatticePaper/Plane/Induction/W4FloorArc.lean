@@ -192,6 +192,36 @@ theorem odd_exception {N D n d y l : ℤ} (hε : N * d - D * n = 1) (hD : 0 < D)
   · omega
   · linarith
 
+/-- **The shift `k` of the old root is `0` or `1` (even `v`).** With `s(x) = sv + 2kC` and `s(x + U_q) = s(x) + (T − 2C)`, both points in
+the even polygon `[0, T + 2n]`, and `C ≥ d + n`, `0 ≤ sv ≤ 2n`. -/
+theorem k_even_bounds {n d C T k sv : ℤ} (hn : 1 ≤ n) (hnd : n + 2 ≤ d) (hC : d + n ≤ C) (hsv0 : 0 ≤ sv) (hsv1 : sv ≤ 2 * n)
+    (hx0 : 0 ≤ sv + 2 * k * C) (hu1 : sv + 2 * k * C + (T - 2 * C) ≤ T + 2 * n) :
+    0 ≤ k ∧ k ≤ 1 := by
+  have hC0 : (0 : ℤ) ≤ C := by linarith
+  constructor
+  · by_contra hneg
+    have hk : k ≤ -1 := by omega
+    have h1 : k * C ≤ -C := by nlinarith
+    linarith
+  · by_contra hbig
+    have hk : 2 ≤ k := by omega
+    have h1 : 2 * C ≤ k * C := by nlinarith
+    linarith
+
+/-- **The shift `k` of the old root is `0` or `1` (odd `v`).** With the odd polygon `[2 − d + n, T + d + n − 2]` for both points. -/
+theorem k_odd_bounds {n d C T k sv : ℤ} (hn : 1 ≤ n) (hnd : n + 2 ≤ d) (hC : d + n ≤ C)
+    (hsv0 : 2 - d + n ≤ sv) (hsv1 : sv ≤ d + n - 2)
+    (hx0 : 2 - d + n ≤ sv + 2 * k * C)
+    (hu1 : sv + 2 * k * C + (T - 2 * C) ≤ T + d + n - 2) :
+    0 ≤ k ∧ k ≤ 1 := by
+  constructor
+  · by_contra hneg
+    have hk : k ≤ -1 := by omega
+    nlinarith
+  · by_contra hbig
+    have hk : 2 ≤ k := by omega
+    nlinarith
+
 open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.W1
 
 /-- **The native V arc of the child (Q35, the floor step).** For a native free H label `g` of the conjugate with `g ≠ hLast`, the

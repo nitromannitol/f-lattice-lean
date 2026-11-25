@@ -8,3 +8,5 @@ import FLatticePaper.Plane.Induction.W4OfferB
 #print axioms FLatticePaper.W4FloorArc.odd_exception
 #print axioms FLatticePaper.W4FloorArc.native_V_arc
 #print axioms FLatticePaper.W4OfferB.BOffer_eq_one_add_eps_sub_slip
+#print axioms FLatticePaper.W4FloorArc.k_even_bounds
+#print axioms FLatticePaper.W4FloorArc.k_odd_bounds
