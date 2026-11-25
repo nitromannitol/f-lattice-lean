@@ -515,6 +515,9 @@ import FLatticePaper.Plane.Induction.PsiArc
 import FLatticePaper.Plane.Induction.QueryGrade
 import FLatticePaper.Plane.Induction.TpRange
 import FLatticePaper.Plane.Induction.TpFrame
+import FLatticePaper.Plane.Induction.QueryClass
+import FLatticePaper.Plane.Induction.QueryClassFrame
+import FLatticePaper.Plane.Induction.QueryClassMain
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame
 import FLatticePaper.Plane.Induction.BaseMembership
