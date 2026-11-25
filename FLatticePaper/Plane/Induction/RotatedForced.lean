@@ -300,4 +300,224 @@ theorem rotated_fan_start_D {fr : ChildFrame} {G : Field} (hP : fr.Packet G)
   exact rotated_fan_start hP hprice hdrU hdrV N D 1 T hN2 hD2 hN0 hNDlt (by norm_num) (by norm_num) hs hpq J hJ1
     (by linarith) K hK2 hKs (by linarith) b start hb hstart heven ho
 
+/-! ## The residual forcing on the strict interior of `E − U`
+
+The residual region is `y ↦ SI(Zs y + U)` with `U = (d, n)` the kernel: the strict interior of `E − U`, pulled back by `Z`. It lies in the
+residual open rectangle `ropenNL` at the grade `T` of `G`, so a derivation in the region is a derivation in `ropenNL`. The forcing comes from
+`W1Forced G` at the translate by `U`. -/
+
+/-- The residual region `y ↦ SI(Zs y + U)`, with `U = (d, n)` the kernel. -/
+def resRegion (n d : ℤ) (y : Site) : Prop :=
+  FLatticePaper.W1.StrictInterior n d (-y.2 + d, y.1 - 1 + n)
+
+/-- **The residual region lies in the residual open rectangle.** With `t(Zs y + U) = d − s'(y)` and `s(Zs y + U) = 2 t'(y) + T − 2N`,
+the strict-interior inequalities of `G` give those of `ropenNL` (`T = w1T n d`). -/
+theorem resRegion_sub_ropen {N D n d : ℤ} (hn : n = D - N) (hd : d = D + N) (hN0 : 0 < N) (hND : N < D) (y : Site)
+    (h : resRegion n d y) : CapConeGrades.ropenNL N D (FLatticePaper.W1.w1T n d) y := by
+  subst hn hd
+  unfold resRegion FLatticePaper.W1.StrictInterior FLatticePaper.W1.w1b FLatticePaper.W1.w1T
+    FLatticePaper.W1.w1t FLatticePaper.W1.w1a FLatticePaper.W1.w1s FLatticePaper.W1.w1h
+    FLatticePaper.W1.w1c at h
+  unfold CapConeGrades.ropenNL FLatticePaper.W1.w1T
+  have hT0 : 2 * N < (D + N) ^ 2 + 2 * (D + N) * (D - N) - (D - N) ^ 2 := by nlinarith
+  by_cases hy : EvenSite y
+  · have hz : ¬ EvenSite (-y.2 + (D + N), y.1 - 1 + (D - N)) := by
+      unfold EvenSite at hy ⊢
+      dsimp only
+      omega
+    rw [if_pos hy]
+    simp only [if_neg hz] at h
+    obtain ⟨h1, h2, h3, h4⟩ := h
+    ring_nf at h1 h2 h3 h4 hT0 ⊢
+    refine ⟨?_, ?_, ?_, ?_⟩ <;> linarith
+  · have hz : EvenSite (-y.2 + (D + N), y.1 - 1 + (D - N)) := by
+      unfold EvenSite at hy ⊢
+      dsimp only
+      omega
+    rw [if_neg hy]
+    simp only [if_pos hz] at h
+    obtain ⟨h1, h2, h3, h4⟩ := h
+    ring_nf at h1 h2 h3 h4 hT0 ⊢
+    refine ⟨?_, ?_, ?_, ?_⟩ <;> linarith
+
+/-- Monotonicity of `ForcedEdgeIn` in the region: a derivation in `R` is one in any `R' ⊇ R`. -/
+theorem forcedEdgeIn_mono {F : Field} {R R' : Site → Prop} (hRR : ∀ x, R x → R' x) {seed : Site → Site → Prop}
+    {c o : Site} (h : W1.ForcedEdgeIn F R seed c o) : W1.ForcedEdgeIn F R' seed c o := by
+  induction h with
+  | seed hs => exact W1.ForcedEdgeIn.seed hs
+  | @unit a b cc oo inside hR hc hw ho hout hin hforced ih =>
+    exact W1.ForcedEdgeIn.unit inside (fun c' hc' => hRR c' (hR c' hc')) hc hw ho hout hin ih
+
+theorem mem_squareCorners_translate (a b : ℤ) (U c : Site) :
+    c ∈ AndOrRank.squareCorners (a - U.1) (b - U.2) ↔ c + U ∈ AndOrRank.squareCorners a b := by
+  rw [FLatticePaper.FanCompat.mem_squareCorners_iff, FLatticePaper.FanCompat.mem_squareCorners_iff]
+  simp only [Prod.fst_add, Prod.snd_add]
+  constructor
+  · rintro ⟨h1, h2⟩
+    constructor <;> omega
+  · rintro ⟨h1, h2⟩
+    constructor <;> omega
+
+theorem incomingNeg_add (z U : Site) (hU : EvenSite U) : incomingNeg (z + U) = incomingNeg z + U := by
+  have hU' : (U.1 + U.2) % 2 = 0 := hU
+  unfold incomingNeg EvenSite
+  by_cases h : (z.1 + z.2) % 2 = 0
+  · have h' : ((z + U).1 + (z + U).2) % 2 = 0 := by
+      simp only [Prod.fst_add, Prod.snd_add]
+      omega
+    rw [if_pos h', if_pos h]
+    refine Prod.ext ?_ ?_
+    all_goals simp only [Prod.fst_add, Prod.snd_add]
+    all_goals omega
+  · have h' : ¬ ((z + U).1 + (z + U).2) % 2 = 0 := by
+      simp only [Prod.fst_add, Prod.snd_add]
+      omega
+    rw [if_neg h', if_neg h]
+    refine Prod.ext ?_ ?_
+    all_goals simp only [Prod.fst_add, Prod.snd_add]
+    all_goals omega
+
+theorem incomingPos_add (z U : Site) (hU : EvenSite U) : incomingPos (z + U) = incomingPos z + U := by
+  have hU' : (U.1 + U.2) % 2 = 0 := hU
+  unfold incomingPos EvenSite
+  by_cases h : (z.1 + z.2) % 2 = 0
+  · have h' : ((z + U).1 + (z + U).2) % 2 = 0 := by
+      simp only [Prod.fst_add, Prod.snd_add]
+      omega
+    rw [if_pos h', if_pos h]
+    refine Prod.ext ?_ ?_
+    all_goals simp only [Prod.fst_add, Prod.snd_add]
+    all_goals omega
+  · have h' : ¬ ((z + U).1 + (z + U).2) % 2 = 0 := by
+      simp only [Prod.fst_add, Prod.snd_add]
+      omega
+    rw [if_neg h', if_neg h]
+    refine Prod.ext ?_ ?_
+    all_goals simp only [Prod.fst_add, Prod.snd_add]
+    all_goals omega
+
+/-- The laplacian is invariant under an even period of the field. -/
+theorem laplacian_add_period {F : Field} {U : Site} (hU : EvenSite U) (hper : ∀ z, F (z + U) = F z) (z : Site) :
+    laplacian F (z + U) = laplacian F z := by
+  unfold laplacian
+  rw [incomingNeg_add z U hU, incomingPos_add z U hU, hper, hper, hper]
+
+/-- **Translation of derivations by a period.** A `ForcedEdgeIn` derivation of `F` in `R` gives one in `R − U` (the region `z ↦ R (z + U)`)
+for an even period `U` of `F`. -/
+theorem forcedEdgeIn_translate {F : Field} {R : Site → Prop} {seed : Site → Site → Prop} {U : Site}
+    (hU : EvenSite U) (hper : ∀ z, F (z + U) = F z) {c o : Site} (h : W1.ForcedEdgeIn F R seed c o) :
+    W1.ForcedEdgeIn F (fun z => R (z + U)) (fun c o => seed (c + U) (o + U)) (c - U) (o - U) := by
+  induction h with
+  | seed hs =>
+    exact W1.ForcedEdgeIn.seed (by simpa using hs)
+  | @unit a b cc oo inside hR hc hw ho hout hin hforced ih =>
+    refine W1.ForcedEdgeIn.unit (a := a - U.1) (b := b - U.2) (c := cc - U) (o := oo - U)
+      (fun z => inside (z + U) - U) ?_ ?_ ?_ ?_ ?_ ?_ ?_
+    · intro c' hc'
+      exact hR (c' + U) ((mem_squareCorners_translate a b U c').mp hc')
+    · exact (mem_squareCorners_translate a b U (cc - U)).mpr (by simpa using hc)
+    · have := laplacian_add_period hU hper (cc - U)
+      rw [sub_add_cancel] at this
+      rw [← this]
+      exact hw
+    · have h1 := incomingNeg_add (cc - U) U hU
+      have h2 := incomingPos_add (cc - U) U hU
+      rw [sub_add_cancel] at h1 h2
+      rcases ho with ho | ho
+      · left
+        rw [ho, h1, add_sub_cancel_right]
+      · right
+        rw [ho, h2, add_sub_cancel_right]
+    · intro hmem
+      exact hout (by simpa using (mem_squareCorners_translate a b U (oo - U)).mp hmem)
+    · intro c' hc' hne
+      have hc'' : c' + U ∈ AndOrRank.squareCorners a b := (mem_squareCorners_translate a b U c').mp hc'
+      have hne' : c' + U ≠ cc := by
+        intro e
+        apply hne
+        rw [← e, add_sub_cancel_right]
+      rcases hin (c' + U) hc'' hne' with h1' | ⟨h0, hi1, hi2⟩
+      · left
+        rw [← laplacian_add_period hU hper c']
+        exact h1'
+      · right
+        refine ⟨by rw [← laplacian_add_period hU hper c']; exact h0, ?_, ?_⟩
+        · exact (mem_squareCorners_translate a b U _).mpr (by simpa using hi1)
+        · have h1 := incomingNeg_add c' U hU
+          have h2 := incomingPos_add c' U hU
+          rcases hi2 with hi2 | hi2
+          · left
+            show inside (c' + U) - U = incomingNeg c'
+            rw [hi2, h1, add_sub_cancel_right]
+          · right
+            show inside (c' + U) - U = incomingPos c'
+            rw [hi2, h2, add_sub_cancel_right]
+    · intro c' hc' hne h0
+      have hc'' : c' + U ∈ AndOrRank.squareCorners a b := (mem_squareCorners_translate a b U c').mp hc'
+      have hne' : c' + U ≠ cc := by
+        intro e
+        apply hne
+        rw [← e, add_sub_cancel_right]
+      have h0' : laplacian F (c' + U) = 0 := by
+        rw [laplacian_add_period hU hper]
+        exact h0
+      have := ih (c' + U) hc'' hne' h0'
+      simpa using this
+
+/-- **The residual forcing on `E − U`.** A residual white point of the region `SI(Zs y + U)` is forced: the `W1Forced` derivation of `G` at
+`Zs y + U` (translated back by `U`) is, by `forcedEdgeIn_Zs`, a derivation of the residual in the region `resRegion`. -/
+theorem resRegion_forced {G : Field} {n d : ℤ} (hW1 : FLatticePaper.W1.W1Forced n d G) (hU : EvenSite (d, n))
+    (hper : ∀ z : Site, G (z + (d, n)) = G z) (y : Site) (hy : resRegion n d y)
+    (hw : laplacian (quarterTurnField G) y = 0) :
+    ∃ o : Site, W1.ForcedEdgeIn (quarterTurnField G) (resRegion n d) (fun _ _ => False) y o := by
+  have hz : FLatticePaper.W1.StrictInterior n d (Zs y + (d, n)) := hy
+  have hG0 : laplacian G (Zs y + (d, n)) = 0 := by
+    rw [laplacian_add_period hU hper, ← laplacian_quarterTurnField G y]
+    exact hw
+  obtain ⟨o', hD⟩ := hW1 _ hz hG0
+  have hT := forcedEdgeIn_translate hU hper hD
+  rw [add_sub_cancel_right] at hT
+  exact ⟨Zinv (o' - (d, n)), forcedEdgeIn_Zs hT y _ rfl (Zs_Zinv (o' - (d, n))).symm⟩
+
+/-- **The forced east start of the rotated fan, from `W1Forced G` on `E − U`.** The start lies in the residual region `SI(Zs · + U)` and is a
+white contact (`hwhite`); its forced derivation is in the residual open rectangle (`resRegion_sub_ropen`), and `rotated_fan_start_D` says
+that it leaves east. -/
+theorem rotated_fan_start_W1 {fr : ChildFrame} {G : Field} (hP : fr.Packet G)
+    (hprice : ∀ z ∈ fr.closedPolygon, fr.cutPrice - 1 ≤ fr.price G z ∧ fr.price G z ≤ fr.cutPrice)
+    (hdrU : ∀ z, fr.price G (z + fr.child.modifiedDeck.kernel) = fr.price G z - 1)
+    (hdrV : ∀ z, fr.price G (z + fr.child.modifiedDeck.transverse) = fr.price G z)
+    (N D : ℤ) (hN2 : 2 * N = fr.child.den - fr.child.num) (hD2 : 2 * D = fr.child.den + fr.child.num)
+    (hN0 : 0 < N) (hNDlt : N < D) (hodd : (D + N) % 2 = 1)
+    (hW1 : FLatticePaper.W1.W1Forced fr.child.num fr.child.den G)
+    (hper : ∀ z : Site, G (z + (fr.child.den, fr.child.num)) = G z)
+    (K : ℕ) (hK2 : 2 ≤ K) (hKs : 4 * N + 2 * D - 1 ≤ 2 * N * (K : ℤ))
+    (hKr : 2 * N * (K : ℤ) ≤ 3 * D + 3 * N - 1)
+    (b start : Site) (hb : N + 1 ≤ N * b.1 - D * b.2)
+    (hstart : start ∈ FLatticePaper.FanRegion.fanSet
+      (CapConeGrades.ropenNL N D (FLatticePaper.W1.w1T fr.child.num fr.child.den)) (quarterTurnField G) b K)
+    (heven : EvenSite start)
+    (hR : resRegion fr.child.num fr.child.den start) :
+    ∃ o : Site, W1.ForcedEdgeIn (quarterTurnField G)
+        (CapConeGrades.ropenNL N D (FLatticePaper.W1.w1T fr.child.num fr.child.den)) (fun _ _ => False) start o ∧
+      o = incomingPos start := by
+  have hU : EvenSite (fr.child.den, fr.child.num) := by
+    unfold EvenSite
+    dsimp only
+    omega
+  -- the start is white: an even contact of the cone window of the residual (the cap of `rotated_ray_cap_mono`)
+  have hH := rotated_NL hP hprice hdrU hdrV N D hN2 hD2 hN0 hNDlt
+  obtain ⟨p, q, hs, hpq⟩ := CapRayGrades.ray_start_odd N D 1 (RotatedMono.coprime_residual fr N D hN2.symm hD2.symm) hodd
+  obtain ⟨J, hJ1, hJ2⟩ := exists_floor_window (2 * N) (N + D - 2) (by omega) (by omega)
+  have hcap := RotatedMono.rotated_ray_cap_mono hP hprice hdrU hdrV N D 1 (by norm_num) (by norm_num) hN2 hD2 hN0 hNDlt
+    hs hpq J K hJ1 hJ2 hKr
+  have hwin := CapConeGrades.cone_window_NL hH (FLatticePaper.W1.w1T fr.child.num fr.child.den) hN0 hNDlt (by norm_num)
+    hs hpq K hcap b hb
+  have hwhite : laplacian (quarterTurnField G) start = 0 :=
+    FLatticePaper.FanRegion.contact_even_white_R (fun c => hH.binary c) hwin hstart heven
+  obtain ⟨o, hD⟩ := resRegion_forced hW1 hU hper start hR hwhite
+  have hmono := forcedEdgeIn_mono (fun x hx => resRegion_sub_ropen (N := N) (D := D) (n := fr.child.num)
+    (d := fr.child.den) (by omega) (by omega) hN0 hNDlt x hx) hD
+  exact ⟨o, hmono, rotated_fan_start_D hP hprice hdrU hdrV N D (FLatticePaper.W1.w1T fr.child.num fr.child.den) hN2 hD2
+    hN0 hNDlt hodd K hK2 hKs hKr b start hb hstart heven hmono⟩
+
 end FLatticePaper.RotatedForced
