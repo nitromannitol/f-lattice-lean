@@ -575,6 +575,7 @@ import FLatticePaper.Plane.Induction.WordPolicy
 import FLatticePaper.Plane.Induction.BlackPermit
 import FLatticePaper.Plane.Induction.AuxRank
 import FLatticePaper.Plane.Induction.FreeVPrice
+import FLatticePaper.Plane.Induction.FreeVCover
 import FLatticePaper.TraceHeadline
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame
