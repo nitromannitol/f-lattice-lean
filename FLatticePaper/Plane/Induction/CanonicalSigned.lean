@@ -69,8 +69,8 @@ structure CanonicalSignedPolicy (frame : ChildFrame) (F : Field) (η : ℤ) exte
 structure CanonicalSignedGames (frame : ChildFrame) (F : Field) where
   /-- The canonical signed policy of the sign `η = ±1`. -/
   game : ∀ η : ℤ, (η = 1 ∨ η = -1) → CanonicalSignedPolicy frame F η
-  /-- The chain potential `Φ_η` does not increase along `game η` (the open §4 claim; the two-rank reduction of
-  `TWO_RANK_RAW_PHI_AUDIT`, `chain_nonincreasing_of_free_roots`). -/
+  /-- The chain potential `Φ_η` does not increase along `game η`: the W1 chain theorem `ChainW1.chain_nonincreasing_of_W1`
+  (Q24/Q28), whose deck equivariance premises are proved for rank policies in `DeckSelection`. -/
   chainNonincreasing : ∀ η : ℤ, (hη : η = 1 ∨ η = -1) →
     NonincreasingAlong (frame.chainPotential F η) (game η hη).policy
 

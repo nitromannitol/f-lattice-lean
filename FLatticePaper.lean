@@ -567,6 +567,7 @@ import FLatticePaper.Plane.Induction.PureTrace
 import FLatticePaper.Plane.Induction.PureRow
 import FLatticePaper.Plane.Induction.TwosTrace
 import FLatticePaper.Plane.Induction.FreeClosure
+import FLatticePaper.Plane.Induction.DeckSelection
 import FLatticePaper.TraceHeadline
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame
