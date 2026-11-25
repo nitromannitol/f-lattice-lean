@@ -8,6 +8,7 @@ import FLatticePaper.Plane.Induction.TwosResidual
 import FLatticePaper.Plane.Induction.HResPWire
 import FLatticePaper.Plane.Induction.HResNCases
 import FLatticePaper.Plane.Induction.TwosGames
+import FLatticePaper.Plane.Induction.W1Reciprocal
 
 /-! Task 71: the odometers headline with the canonical signed games at every proper word.
 
@@ -40,6 +41,14 @@ theorem canonical_at_threes (word : Word) (hp : ∃ k : ℕ, conjWord word = Lis
   rw [hf, hF]
   exact FLatticePaper.EPolicy.pure_threes_final.2.2 k
 
+/-- The conjugate `W1Forced` at a pure threes conjugate, from `w1Forced_threes` (the child of `3^k` is `1/(2k+3)`). -/
+theorem w1Forced_at_threes (word : Word) (hp : ∃ k : ℕ, conjWord word = List.replicate k Digit.three) :
+    FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
+      (standardField (conjWord word)) := by
+  obtain ⟨k, hk⟩ := hp
+  rw [hk]
+  exact FLatticePaper.W1Reciprocal.w1Forced_threes k
+
 /-- A word that is not a pure threes word has a digit other than `three`. -/
 theorem exists_ne_three_of_not_replicate_three (w : Word) (h : ¬ ∃ k : ℕ, w = List.replicate k Digit.three) :
     ∃ x ∈ w, x ≠ Digit.three := by
@@ -52,7 +61,7 @@ theorem exists_ne_three_of_not_replicate_three (w : Word) (h : ¬ ∃ k : ℕ, w
 /-- **The odometers theorem from the canonical signed games (task 71).** The per-word inputs are `hgames` (the games with a deck rank at
 each proper non-two-power word, which give the policy `hpol` and the canonical games of the conjugate `hcan`) and `hbd` (the boundary
 bound, Q22). The tied rising pair `hResP` and the tied negative rising pair `hResN` are derived from the V-block input `hQ21` (the
-conjugate H-cut case of the negative tie, the target allowed to tie: `0 ≤ Ψ i`) and the conjugate `W1Forced` input `hW1`.
+conjugate H-cut case of the negative tie, the target allowed to tie: `0 ≤ Ψ i`) and the conjugate `W1Forced` input `hW1` (at the conjugates that are not pure threes words).
 
 `hW1` is named for now: it is the W1 statement itself at the conjugate word, with no producer yet. It is to be produced by the W1
 induction (`W1(conj)` and the table at the conjugate give `W1(u)`, `W1Forced_of_tables_rk`), with the base at the pure words. -/
@@ -64,6 +73,7 @@ theorem odometersTheorem_of_canonical
     (hbd : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       ∀ z, OnBoundary (frameAt word).closedPolygon z → (frameAt word).price (standardField word) z ≤ (frameAt word).cutPrice)
     (hW1 : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      ¬ (∃ k : ℕ, conjWord word = List.replicate k Digit.three) →
       FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
         (standardField (conjWord word)))
     (hQ21 : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
@@ -100,6 +110,14 @@ theorem odometersTheorem_of_canonical
     fun word hw hn => Induction.strongResidual_of_conj hw (Induction.exists_ne_two_of_not_twoPow hw hn)
       (hE (conjWord word)) (hbd word hw hn) ((hJ (conjWord word)).2)
       (Induction.policy_of_gamesWithRank (hgames word hw hn))
+  -- the conjugate W1Forced at every proper non-two-power word: pure threes conjugates from `w1Forced_threes`, the rest from `hW1`
+  have hW1all : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
+        (standardField (conjWord word)) := by
+    intro word hw hn
+    by_cases hp : ∃ k : ℕ, conjWord word = List.replicate k Digit.three
+    · exact w1Forced_at_threes word hp
+    · exact hW1 word hw hn hp
   -- the tied rising pair hResP, from the V-block input hQ21 and the conjugate W1Forced hW1
   have hResP : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       ∀ c i, RisingBlackPair (standardField word) (frameAt word).shortShift c i →
@@ -109,7 +127,7 @@ theorem odometersTheorem_of_canonical
     fun word hw hn => Induction.hResP_of_Q21 hw (hE word) (hE (conjWord word)) ((hJ (conjWord word)).2)
       (Induction.oldPolicyData_of_canonical (standardField_reflectI_conj word (hE (conjWord word)))
         (hcan word hw hn).some (frameAt word).eps (frameAt word).eps_unit)
-      (hW1 word hw hn) (hQ21 word hw hn)
+      (hW1all word hw hn) (hQ21 word hw hn)
   -- the tied negative rising pair hResN, from the negative tie (hNegTie_of_Q21, target allowed to tie)
   have hResN : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       ∀ c i, RisingBlackPair (standardField word) (-(frameAt word).shortShift) c i →
@@ -123,7 +141,7 @@ theorem odometersTheorem_of_canonical
         (Induction.hNegTie_of_Q21 hw (hE word) (hE (conjWord word)) ((hJ (conjWord word)).2)
           (Induction.oldPolicyData_of_canonical (standardField_reflectI_conj word (hE (conjWord word)))
             (hcan word hw hn).some (frameAt word).eps (frameAt word).eps_unit)
-          (hW1 word hw hn) (hQ21 word hw hn))
+          (hW1all word hw hn) (hQ21 word hw hn))
         hr hcE hpair.1 hpair.2 hΨc hj
   -- the S3 no-fort inputs of each proper word: the sign-one canonical policy of its game, with the packet periods
   have hbulk : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
@@ -153,6 +171,7 @@ theorem odometersTheorem_of_canonical_pure
     (hbd : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       ∀ z, OnBoundary (frameAt word).closedPolygon z → (frameAt word).price (standardField word) z ≤ (frameAt word).cutPrice)
     (hW1 : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
+      ¬ (∃ k : ℕ, conjWord word = List.replicate k Digit.three) →
       FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
         (standardField (conjWord word)))
     (hQ21 : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →

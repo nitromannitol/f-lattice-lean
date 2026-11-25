@@ -204,6 +204,8 @@ import FLatticePaper.Plane.Induction.TwosSquareShift
 import FLatticePaper.Plane.Induction.TwosPriceMono
 import FLatticePaper.Plane.Induction.TwosSlipMono
 import FLatticePaper.Plane.Induction.TwosChainMono
+import FLatticePaper.Plane.Induction.W1Reciprocal
+import FLatticePaper.Plane.Induction.W1Twos
 import FLatticePaper.Construction.NearOneBaseCases
 import FLatticePaper.Construction.BaseCases
 import FLatticePaper.Construction.OffsetTables
@@ -527,6 +529,11 @@ import FLatticePaper.Plane.Induction.TwosTileCoverB
 import FLatticePaper.Plane.Induction.TwosTileRange
 import FLatticePaper.Plane.Induction.TwosRankStrict
 import FLatticePaper.Plane.Induction.TwosTileUnique
+import FLatticePaper.Plane.Induction.TwosDeckTile
+import FLatticePaper.Plane.Induction.TwosLattice
+import FLatticePaper.Plane.Induction.TwosChainLattice
+import FLatticePaper.Plane.Induction.TwosTileColour
+import FLatticePaper.Plane.Induction.TwosTileSel
 import FLatticePaper.Plane.Induction.StrongPriceInputs
 import FLatticePaper.Plane.Induction.StrongDeckSpan
 import FLatticePaper.Plane.Induction.StrongSourceRep
