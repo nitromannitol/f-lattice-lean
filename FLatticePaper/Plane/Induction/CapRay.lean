@@ -3,6 +3,8 @@ import FLatticePaper.Plane.Induction.CapAnchors
 import FLatticePaper.Plane.Induction.PriceDeck
 import FLatticePaper.Plane.Induction.Packet
 import FLatticePaper.Plane.Induction.SheetMonoChild
+import FLatticePaper.Plane.Induction.FanPropagation
+import FLatticePaper.Plane.Induction.W1Exit
 
 /-! The diagonal ray of the all-slope cap on a frame's packet (ALL_SLOPE_STEP, "The uniform quadratic cap", the high-slope case `d > 3n`
 with `(N, D, a) = (n, d, 2)`).
@@ -221,5 +223,122 @@ theorem even_halo (frame : ChildFrame) {F : Field} (hP : frame.Packet F)
     have h2 : 0 ≤ (k : ℤ) * ((k : ℤ) - 1) / 2 := Int.ediv_nonneg hk1 (by norm_num)
     unfold FLatticePaper.QuadraticCap.capMin
     linarith
+
+/-! ### The star-restricted window (ALL_SLOPE_STEP, "Propagation"; the replacement of `hwin`)
+
+From the start `b` (odd, `t b ≥ N + 2`, the condition `t'(b) ≥ N + a` with `a = 2`), a root `x` of the cone has height `k = x_y − b_y`
+in `[1, K−1]`, with `ℓ = x_x − b_x ≥ k − 1` on even roots and `ℓ ≥ k` on odd roots. Its two inputs are then in `InCone`, and the
+halo bounds (`even_halo`, `odd_halo`) give `m(k) ≤ F` on each input, where `m i = capMin (i_y − b_y)`. -/
+
+/-- A root of the fan cone from `b` (see the section comment). -/
+def ConeRoot (b : Site) (K : ℕ) (x : Site) : Prop :=
+  1 ≤ x.2 - b.2 ∧ x.2 - b.2 ≤ (K : ℤ) - 1 ∧
+    (EvenSite x → x.1 - b.1 ≥ x.2 - b.2 - 1) ∧ (¬ EvenSite x → x.1 - b.1 ≥ x.2 - b.2)
+
+/-- An input of the cone: height in `[0, K]`, `ℓ ≥ k − 1` on even sites, `ℓ ≥ k − 2` on odd sites. -/
+def InCone (b : Site) (K : ℕ) (i : Site) : Prop :=
+  0 ≤ i.2 - b.2 ∧ i.2 - b.2 ≤ (K : ℤ) ∧
+    (EvenSite i → i.1 - b.1 ≥ i.2 - b.2 - 1) ∧ (¬ EvenSite i → i.1 - b.1 ≥ i.2 - b.2 - 2)
+
+/-- The inputs of a cone root are cone inputs. -/
+theorem cone_input_of_root (b : Site) (K : ℕ) (x : Site) (hR : ConeRoot b K x) (i : Site)
+    (hi : i = incomingNeg x ∨ i = incomingPos x) : InCone b K i := by
+  obtain ⟨h1, h2, hev, hodd⟩ := hR
+  by_cases hx : EvenSite x
+  · have hn : incomingNeg x = (x.1 - 1, x.2) := by unfold incomingNeg; rw [if_pos hx]
+    have hp : incomingPos x = (x.1 + 1, x.2) := by unfold incomingPos; rw [if_pos hx]
+    have hxu : (x.1 + x.2) % 2 = 0 := hx
+    rcases hi with rfl | rfl
+    · rw [hn]
+      refine ⟨by dsimp only; omega, by dsimp only; omega, fun h => ?_, fun _ => ?_⟩
+      · exfalso
+        unfold EvenSite at h
+        dsimp only at h
+        omega
+      · dsimp only
+        have := hev hx
+        omega
+    · rw [hp]
+      refine ⟨by dsimp only; omega, by dsimp only; omega, fun h => ?_, fun _ => ?_⟩
+      · exfalso
+        unfold EvenSite at h
+        dsimp only at h
+        omega
+      · dsimp only
+        have := hev hx
+        omega
+  · have hn : incomingNeg x = (x.1, x.2 - 1) := by unfold incomingNeg; rw [if_neg hx]
+    have hp : incomingPos x = (x.1, x.2 + 1) := by unfold incomingPos; rw [if_neg hx]
+    have hxo : ¬ (x.1 + x.2) % 2 = 0 := hx
+    have hl := hodd hx
+    rcases hi with rfl | rfl
+    · rw [hn]
+      refine ⟨by dsimp only; omega, by dsimp only; omega, fun _ => ?_, fun h => ?_⟩
+      · dsimp only
+        omega
+      · exfalso
+        exact h (by unfold EvenSite; dsimp only; omega)
+    · rw [hp]
+      refine ⟨by dsimp only; omega, by dsimp only; omega, fun _ => ?_, fun h => ?_⟩
+      · dsimp only
+        omega
+      · exfalso
+        exact h (by unfold EvenSite; dsimp only; omega)
+
+/-- **The cone input bound.** For a cone input `i` of the start `b` (`t b ≥ N + 2`) lying in the closed polygon, `m(k) ≤ F i` with
+`k = i_y − b_y`: the grade of `i` is at least the halo threshold (`even_halo`, `odd_halo`), by the cone inequalities on `ℓ`. -/
+theorem cone_input {F : Field} (frame : ChildFrame) (hP : frame.Packet F)
+    (hsig : ∀ w ∈ frame.closedPolygon, F w - F (w - frame.shortShift) ≤ 0)
+    {p q : ℤ} (hs : frame.child.num * p - frame.child.den * q = 2 - frame.child.num) (K : ℕ)
+    (hcap : ∀ k : ℕ, k ≤ K → FLatticePaper.QuadraticCap.capMin k ≤ F (p + (k : ℤ), q + (k : ℤ)))
+    (b : Site) (hb : frame.child.num + 2 ≤ frame.tGrade b)
+    (i : Site) (hI : InCone b K i) (hpoly : i ∈ frame.closedPolygon) :
+    FLatticePaper.QuadraticCap.capMin (i.2 - b.2) ≤ F i := by
+  obtain ⟨hk0, hkK, hev, hodd⟩ := hI
+  obtain ⟨k, hk⟩ : ∃ k : ℕ, (k : ℤ) = i.2 - b.2 := ⟨(i.2 - b.2).toNat, Int.toNat_of_nonneg hk0⟩
+  have hkK' : k ≤ K := by omega
+  rw [← hk]
+  obtain ⟨hn1, -, -, hd3, -⟩ := frame.child_facts
+  have htb : frame.tGrade i
+      = frame.tGrade b + frame.child.num * (i.1 - b.1) - frame.child.den * (i.2 - b.2) := by
+    unfold ChildFrame.tGrade
+    ring
+  have hup : frame.tGrade i ≤ frame.child.num + 2 * frame.child.den - 1 := by
+    unfold ChildFrame.closedPolygon at hpoly
+    simp only [Set.mem_setOf_eq] at hpoly
+    split_ifs at hpoly with he
+    · omega
+    · omega
+  by_cases hz : EvenSite i
+  · have hl := hev hz
+    have hlo : 2 - (k : ℤ) * (frame.child.den - frame.child.num) ≤ frame.tGrade i := by
+      rw [htb, ← hk]
+      rw [← hk] at hl
+      have hm := mul_le_mul_of_nonneg_left (show (k : ℤ) - 1 ≤ i.1 - b.1 by omega)
+        (show (0 : ℤ) ≤ frame.child.num by omega)
+      nlinarith
+    exact even_halo frame hP hsig hs K hcap k hkK' i hz hlo hup
+  · have hl := hodd hz
+    have hlo : 2 - frame.child.num - (k : ℤ) * (frame.child.den - frame.child.num) ≤ frame.tGrade i := by
+      rw [htb, ← hk]
+      rw [← hk] at hl
+      have hm := mul_le_mul_of_nonneg_left (show (k : ℤ) - 2 ≤ i.1 - b.1 by omega)
+        (show (0 : ℤ) ≤ frame.child.num by omega)
+      nlinarith
+    exact odd_halo frame hP hsig hs K hcap k hkK' i hz hlo hup
+
+/-- **The star-restricted window** (the replacement of `hwin`): the cap `m i = capMin (i_y − b_y)` lies below `F` on the inputs of every
+open-rectangle root of the cone from `b`. The inputs are in the closed polygon by `rectInputs`. -/
+theorem cone_window {F : Field} (frame : ChildFrame) (hP : frame.Packet F)
+    (hsig : ∀ w ∈ frame.closedPolygon, F w - F (w - frame.shortShift) ≤ 0)
+    {p q : ℤ} (hs : frame.child.num * p - frame.child.den * q = 2 - frame.child.num) (K : ℕ)
+    (hcap : ∀ k : ℕ, k ≤ K → FLatticePaper.QuadraticCap.capMin k ≤ F (p + (k : ℤ), q + (k : ℤ)))
+    (b : Site) (hb : frame.child.num + 2 ≤ frame.tGrade b) :
+    FLatticePaper.FanPropagation.WindowOn (fun x => frame.openRect x ∧ ConeRoot b K x) F
+      (fun i => FLatticePaper.QuadraticCap.capMin (i.2 - b.2)) := by
+  intro x hx i hi
+  obtain ⟨hopen, hR⟩ := hx
+  exact cone_input frame hP hsig hs K hcap b hb i (cone_input_of_root b K x hR i hi)
+    (FLatticePaper.W1Exit.rectInputs frame x hopen i hi)
 
 end FLatticePaper.CapRay
