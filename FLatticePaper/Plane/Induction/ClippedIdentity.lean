@@ -130,21 +130,15 @@ theorem clipped_identity {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (
     (hz : z ∈ (frameAt word).freeV)
     (hwin0 : 2 - ((frameAt word).child.den - (frameAt word).child.num) ≤ (frameAt word).sGrade z)
     (hwin1 : (frameAt word).sGrade z ≤ (frameAt word).child.den + (frameAt word).child.num - 2)
-    (hj0 : 0 ≤ z.2)
-    (hjL : z.2 ≤ (frameAt word).child.den + (frameAt word).child.num - 2)
-    (hEv : EvenSite z → 0 ≤ (frameAt word).sGrade z ∧ (frameAt word).sGrade z ≤ 2 * (frameAt word).child.num) :
-    standardField word z - standardField word (z - (frameAt word).shortShift) =
-      -min (FqW word (z + ((frameAt word).eps * (frameAt word).parents.even.den,
-          (frameAt word).eps * (frameAt word).parents.even.num)) - FqW word z) 2 := by
-  have hstrip : FqW word z = harmonicGrid z ∧
+    (hstrip : FqW word z = harmonicGrid z ∧
       FqW word (z - ((frameAt word).parents.even.num - (frameAt word).parents.even.den,
           (frameAt word).parents.even.num + (frameAt word).parents.even.den)) =
         harmonicGrid (z - ((frameAt word).parents.even.num - (frameAt word).parents.even.den,
-          (frameAt word).parents.even.num + (frameAt word).parents.even.den)) := by
-    by_cases he : EvenSite z
-    · obtain ⟨a, b⟩ := hEv he
-      exact ParentStrip.even_strip h hSE z he hj0 hjL a b
-    · exact ParentStrip.odd_strip h hSE z he hj0 hjL hwin0 hwin1
+          (frameAt word).parents.even.num + (frameAt word).parents.even.den))) :
+    standardField word z - standardField word (z - (frameAt word).shortShift) =
+      -min (FqW word (z + ((frameAt word).eps * (frameAt word).parents.even.den,
+          (frameAt word).eps * (frameAt word).parents.even.num)) - FqW word z) 2 := by
+  obtain ⟨hn0, hnd, -, hd3, -⟩ := (frameAt word).child_facts
   have hF0 : standardField word z = harmonicGrid z :=
     ClippedArith.child_strip (frameAt word) hpk z (by omega) (by omega)
   have hsum := ClippedArith.sGrade_sum (frameAt word)
