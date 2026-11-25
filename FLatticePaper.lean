@@ -536,6 +536,7 @@ import FLatticePaper.Plane.Induction.PsiMono
 import FLatticePaper.Plane.Induction.PsiMonoReal
 import FLatticePaper.Plane.Induction.TraceFromPsi
 import FLatticePaper.Plane.Induction.PsiArc
+import FLatticePaper.Plane.Induction.QueryGrade
 import FLatticePaper.Plane.Induction.BaseMembership
 import FLatticePaper.Plane.Induction.BaseSpec
 import FLatticePaper.Plane.Induction.ConjFreeH
