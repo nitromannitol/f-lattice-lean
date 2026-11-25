@@ -302,6 +302,7 @@ import FLatticePaper.Tiles.CellFourTests
 import FLatticePaper.Tiles.PairRule
 import FLatticePaper.Tiles.GHJoin
 import FLatticePaper.Tiles.RegisterLink
+import FLatticePaper.Tiles.RegisterIdentity
 import FLatticePaper.Plane.Induction.CornerPositive
 import FLatticePaper.Tiles.InterfaceStacked
 import FLatticePaper.Tiles.StringCorners
