@@ -82,4 +82,30 @@ theorem psi_reflect_price {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) 
   have hr := price_reflectI (frameAt (conjWord word)) hI (zTurn x)
   linarith
 
+/-- **The parent deck law of the jump.** `ψ(x + V_p) = ψ(x) + 1`, with `V_p = tipVertex = (N − D, N + D)`: the reflected point moves by
+`−K_c` (the conjugate's kernel `(D + N, D − N)`), and `P'` drops by one along the kernel. -/
+theorem psi_tip_shift {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
+    (x : Site) :
+    FqW word (x + TipVertex.tipVertex (frameAt word) + (frameAt word).uq) - FqW word (x + TipVertex.tipVertex (frameAt word)) =
+      FqW word (x + (frameAt word).uq) - FqW word x + 1 := by
+  have hP := hSE.packet
+  obtain ⟨hcn, hcd⟩ := frameAt_conj_num_den h
+  have hK : (frameAt (conjWord word)).child.modifiedDeck.kernel =
+      ((frameAt word).parents.odd.den + (frameAt word).parents.odd.num,
+        (frameAt word).parents.odd.den - (frameAt word).parents.odd.num) := by
+    rw [ClippedCore.kernel_eq_UD, hcn, hcd]
+  have hz : reflectionI - zTurn (x + TipVertex.tipVertex (frameAt word)) =
+      (reflectionI - zTurn x) + (1 : ℤ) • (frameAt (conjWord word)).child.modifiedDeck.kernel := by
+    rw [hK]
+    unfold zTurn TipVertex.tipVertex reflectionI
+    ext <;> simp <;> ring
+  have hk := ChainDeck.price_kernel_mul (frameAt (conjWord word)) hP 1 (reflectionI - zTurn x)
+  rw [psi_reflect_price h hSE (x + TipVertex.tipVertex (frameAt word)), psi_reflect_price h hSE x, hz]
+  have hk' : (frameAt (conjWord word)).price (standardField (conjWord word))
+      (reflectionI - zTurn x + (1 : ℤ) • (frameAt (conjWord word)).child.modifiedDeck.kernel) =
+      (frameAt (conjWord word)).price (standardField (conjWord word)) (reflectionI - zTurn x) - 1 := by
+    simpa using hk
+  rw [hk']
+  ring
+
 end FLatticePaper.PriceReflect
