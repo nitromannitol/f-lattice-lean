@@ -557,6 +557,7 @@ import FLatticePaper.Plane.Induction.SheetMonoChild
 import FLatticePaper.Plane.Induction.CapRay
 import FLatticePaper.Plane.Induction.ConeTerminal
 import FLatticePaper.Plane.Induction.ShortRoute
+import FLatticePaper.Plane.Induction.GameFort
 import FLatticePaper.Plane.Induction.RetainedCore
 import FLatticePaper.Plane.Induction.H0Core
 import FLatticePaper.Plane.Induction.StrongPriceInputs
