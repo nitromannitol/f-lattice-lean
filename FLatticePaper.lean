@@ -328,6 +328,7 @@ import FLatticePaper.Tiles.WordCounts
 import FLatticePaper.Tiles.SeamCover
 import FLatticePaper.Tiles.SeamCoverFinal
 import FLatticePaper.Tiles.BottomSeamAll
+import FLatticePaper.Tiles.ArcOKAll
 import FLatticePaper.Plane.Induction.CornerPositive
 import FLatticePaper.Tiles.InterfaceStacked
 import FLatticePaper.Tiles.StringCorners
