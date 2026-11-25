@@ -68,4 +68,21 @@ theorem fan_terminal_cone_contradiction {F : Field} (frame : ChildFrame) (hP : f
     fan_terminal_cone frame hP hsig hs K hK2 hKs hKr hcap b hb hfort v0 hv0S hv0c hv0P
   exact hpaid w hwcl hwout hwS hwc
 
+/-- **The cone kind of starts** (the hypothesis `hcone` of `FreeRows.free_row_empty`): every window start `(v0, b)` with `t b ≥ N + 2`
+and `ConeRoot b K v0`, touching its parabola, exits on a boundary contact of `S` on that parabola (`fan_terminal_cone`). The base `b`
+is the H midpoint `H_i` in `E` (the note's `H_i − U` on `E − U`; `F (z + U) = F z`). -/
+theorem cone_kind_exit {F : Field} (frame : ChildFrame) (hP : frame.Packet F)
+    (hsig : ∀ w ∈ frame.closedPolygon, F w - F (w - frame.shortShift) ≤ 0)
+    {p q : ℤ} (hs : frame.child.num * p - frame.child.den * q = 2 - frame.child.num) (K : ℕ)
+    (hK2 : 2 ≤ K)
+    (hKs : frame.child.den + 2 * frame.child.num - 1 ≤ frame.child.num * (K : ℤ))
+    (hKr : 2 * frame.child.num * (K : ℤ) ≤ 3 * frame.child.den + 5 * frame.child.num - 1)
+    (hcap : ∀ k : ℕ, k ≤ K → FLatticePaper.QuadraticCap.capMin k ≤ F (p + (k : ℤ), q + (k : ℤ)))
+    {S : Set Site} (hfort : IsIncomingFort F S) :
+    ∀ v0 b : Site, v0 ∈ S → frame.openRect v0 → F v0 = parabolaField b.2 v0 →
+      frame.child.num + 2 ≤ frame.tGrade b → ConeRoot b K v0 →
+      ∃ w : Site, w ∈ S ∧ F w = parabolaField b.2 w ∧ w ∈ frame.closedPolygon ∧ ¬ frame.openRect w :=
+  fun v0 b hv0S hv0o hv0c hb hR =>
+    fan_terminal_cone frame hP hsig hs K hK2 hKs hKr hcap b hb hfort v0 hv0S hv0c ⟨hv0o, hR⟩
+
 end FLatticePaper.ConeTerminal
