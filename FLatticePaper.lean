@@ -601,6 +601,7 @@ import FLatticePaper.Plane.Induction.FreeVH0
 import FLatticePaper.Plane.Induction.SheetStars
 import FLatticePaper.Plane.Induction.Sec3Permit
 import FLatticePaper.Plane.Induction.FreeVClass
+import FLatticePaper.Plane.Induction.RepClasses
 import FLatticePaper.TraceHeadline
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame
