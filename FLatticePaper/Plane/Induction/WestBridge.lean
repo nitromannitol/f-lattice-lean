@@ -23,7 +23,7 @@ theorem parentSquareOut_covered_H {frame : ChildFrame} {G : Field} {seed : Site 
     (hP : frame.Packet G)
     (hsig : ∀ w ∈ frame.closedPolygon, G w - G (w - frame.shortShift) ≤ 0)
     (hAS : ∀ K : ℕ, 2 ≤ K → frame.child.den + 2 * frame.child.num - 1 ≤ frame.child.num * (K : ℤ) →
-      2 * frame.child.num * (K : ℤ) ≤ 3 * frame.child.den + 5 * frame.child.num - 1 →
+      2 * frame.child.num * (K : ℤ) ≤ 3 * frame.child.den + 3 * frame.child.num - 1 →
       ∃ p q : ℤ, frame.child.num * p - frame.child.den * q = 2 - frame.child.num ∧
         ∀ k : ℕ, k ≤ K → FLatticePaper.QuadraticCap.capMin k ≤ G (p + (k : ℤ), q + (k : ℤ)))
     (hsym : ∀ y, G (reflH frame y) = G y)
