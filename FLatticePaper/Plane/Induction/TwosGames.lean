@@ -6,6 +6,9 @@ import FLatticePaper.Plane.Induction.TwosSlipMinusMono
 import FLatticePaper.Plane.Induction.TwosChainMinus
 import FLatticePaper.Plane.Induction.TwosDrifts
 import FLatticePaper.Plane.Induction.GamesPolicy
+import FLatticePaper.Plane.Induction.TwosTileRange
+import FLatticePaper.Plane.Induction.TwosLaplacianTile
+import FLatticePaper.Construction.LadderExtension
 
 /-! The canonical signed games of the twos word `2^(k+1)`: the twos policy `TwosSel` as a `CanonicalSignedPolicy` for each sign,
 with the rank of each sign, and `GamesWithRank` (`twos_gamesWithRank`).
@@ -218,33 +221,30 @@ theorem freeClass_add_span (k : ℕ) {c step : Site}
     exact ⟨u, (aliasOf_add_lattice ⟨ki, ti, hs⟩).mpr hu, hF⟩
 
 /-- At a white centre the selected input of the twos policy exists (the quota). -/
-theorem twosSel_spec {k : ℕ} (η : ℤ)
-    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees
-      (standardField (List.replicate (k + 1) Digit.two)) 0)
+theorem twosSel_spec {S : Field} {k : ℕ} (η : ℤ)
+    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees S 0)
     (hperiod : HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4))
-      (standardField (List.replicate (k + 1) Digit.two)) 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
+      S 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
     {c : Site} (hw : laplacian (standardField (List.replicate (k + 1) Digit.two)) c = 0) :
     TwosSel (2 * (k : ℤ) + 4) η (standardField (List.replicate (k + 1) Digit.two)) c
       (twosSelFun k η (standardField (List.replicate (k + 1) Digit.two)) c) :=
   Classical.epsilon_spec (twos_white_quota k hagree hperiod η c hw).1
 
 /-- At a white centre the selected input is the only selected input of the twos policy (the quota). -/
-theorem twosSel_unique {k : ℕ} (η : ℤ)
-    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees
-      (standardField (List.replicate (k + 1) Digit.two)) 0)
+theorem twosSel_unique {S : Field} {k : ℕ} (η : ℤ)
+    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees S 0)
     (hperiod : HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4))
-      (standardField (List.replicate (k + 1) Digit.two)) 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
+      S 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
     {c i : Site} (hw : laplacian (standardField (List.replicate (k + 1) Digit.two)) c = 0)
     (hi : TwosSel (2 * (k : ℤ) + 4) η (standardField (List.replicate (k + 1) Digit.two)) c i) :
     i = twosSelFun k η (standardField (List.replicate (k + 1) Digit.two)) c :=
   (twos_white_quota k hagree hperiod η c hw).2 i _ hi (twosSel_spec η hagree hperiod hw)
 
 /-- The retained inputs of the twos policy form a quota (both inputs at a black, one at a white). -/
-theorem twosSel_quota {k : ℕ} (η : ℤ) (hη : η = 1 ∨ η = -1)
-    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees
-      (standardField (List.replicate (k + 1) Digit.two)) 0)
+theorem twosSel_quota {S : Field} {k : ℕ} (η : ℤ) (hη : η = 1 ∨ η = -1)
+    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees S 0)
     (hperiod : HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4))
-      (standardField (List.replicate (k + 1) Digit.two)) 0 (stairEvenConstantV (2 * (k : ℤ) + 4))) :
+      S 0 (stairEvenConstantV (2 * (k : ℤ) + 4))) :
     RetainQuota (standardField (List.replicate (k + 1) Digit.two))
       (TwosSel (2 * (k : ℤ) + 4) η (standardField (List.replicate (k + 1) Digit.two))) := by
   refine ⟨fun c hl => ⟨Or.inl ⟨hl, Or.inl rfl⟩, Or.inl ⟨hl, Or.inr rfl⟩⟩, fun c hw => ?_⟩
@@ -254,11 +254,10 @@ theorem twosSel_quota {k : ℕ} (η : ℤ) (hη : η = 1 ∨ η = -1)
   · exact Or.inr (h ▸ hi)
 
 /-- The slip permits of the twos policy: the sign `η` slip does not increase along the selected inputs. -/
-theorem twos_permitted {k : ℕ} (η : ℤ) (hη : η = 1 ∨ η = -1)
-    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees
-      (standardField (List.replicate (k + 1) Digit.two)) 0)
+theorem twos_permitted {S : Field} {k : ℕ} (η : ℤ) (hη : η = 1 ∨ η = -1)
+    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees S 0)
     (hperiod : HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4))
-      (standardField (List.replicate (k + 1) Digit.two)) 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
+      S 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
     {c i : Site}
     (h : TwosSel (2 * (k : ℤ) + 4) η (standardField (List.replicate (k + 1) Digit.two)) c i) :
     slipPermits (standardField (List.replicate (k + 1) Digit.two))
@@ -279,11 +278,10 @@ theorem twos_permitted {k : ℕ} (η : ℤ) (hη : η = 1 ∨ η = -1)
     linarith
 
 /-- The price does not increase along the selected inputs of the twos policy (both signs). -/
-theorem twos_price_signed {k : ℕ} (η : ℤ) (hη : η = 1 ∨ η = -1)
-    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees
-      (standardField (List.replicate (k + 1) Digit.two)) 0)
+theorem twos_price_signed {S : Field} {k : ℕ} (η : ℤ) (hη : η = 1 ∨ η = -1)
+    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees S 0)
     (hperiod : HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4))
-      (standardField (List.replicate (k + 1) Digit.two)) 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
+      S 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
     {c i : Site}
     (h : TwosSel (2 * (k : ℤ) + 4) η (standardField (List.replicate (k + 1) Digit.two)) c i) :
     (frameAt (List.replicate (k + 1) Digit.two)).cutGrade (standardField (List.replicate (k + 1) Digit.two)) 1 0 1 i ≤
@@ -292,11 +290,10 @@ theorem twos_price_signed {k : ℕ} (η : ℤ) (hη : η = 1 ∨ η = -1)
   exact twosP_nonincreasing k hagree hperiod hη h
 
 /-- The rounded slip does not increase along the selected inputs of the twos policy (both signs). -/
-theorem twos_roundedSlip_signed {k : ℕ} (η : ℤ) (hη : η = 1 ∨ η = -1)
-    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees
-      (standardField (List.replicate (k + 1) Digit.two)) 0)
+theorem twos_roundedSlip_signed {S : Field} {k : ℕ} (η : ℤ) (hη : η = 1 ∨ η = -1)
+    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees S 0)
     (hperiod : HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4))
-      (standardField (List.replicate (k + 1) Digit.two)) 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
+      S 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
     {c i : Site}
     (h : TwosSel (2 * (k : ℤ) + 4) η (standardField (List.replicate (k + 1) Digit.two)) c i) :
     (frameAt (List.replicate (k + 1) Digit.two)).cutGrade (standardField (List.replicate (k + 1) Digit.two)) 0 1 η i ≤
@@ -435,11 +432,10 @@ theorem twosRankOf_strict (k : ℕ) (η : ℤ) (hη : η = 1 ∨ η = -1) {S : F
     exact twosRankM_strict k hagree hperiod hvarM hflatM hT
 
 /-- The canonical signed policy of the twos word for the sign `η`, with the strict rank `R` of the sign. -/
-noncomputable def twosSignedPolicy (k : ℕ) (η : ℤ) (hη : η = 1 ∨ η = -1)
-    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees
-      (standardField (List.replicate (k + 1) Digit.two)) 0)
+noncomputable def twosSignedPolicy {S : Field} (k : ℕ) (η : ℤ) (hη : η = 1 ∨ η = -1)
+    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees S 0)
     (hperiod : HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4))
-      (standardField (List.replicate (k + 1) Digit.two)) 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
+      S 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
     (R : Site → ℤ)
     (hR : ∀ c i : Site, TwosSel (2 * (k : ℤ) + 4) η (standardField (List.replicate (k + 1) Digit.two)) c i → R i < R c) :
     CanonicalSignedPolicy (frameAt (List.replicate (k + 1) Digit.two))
@@ -469,11 +465,10 @@ noncomputable def twosSignedPolicy (k : ℕ) (η : ℤ) (hη : η = 1 ∨ η = -
   westAtException := fun h => absurd h (by rw [twos_frame_eps (k + 1)]; norm_num)
 
 /-- **The canonical signed games of the twos word `2^(k+1)`**, from the two tile facts of each sign (`hvar`, `hflat`). -/
-noncomputable def twosCanonicalGames (k : ℕ)
-    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees
-      (standardField (List.replicate (k + 1) Digit.two)) 0)
+noncomputable def twosCanonicalGames {S : Field} (k : ℕ)
+    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees S 0)
     (hperiod : HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4))
-      (standardField (List.replicate (k + 1) Digit.two)) 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
+      S 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
     (hvarP : ∀ z w : Site, rhoTwos (2 * (k : ℤ) + 4) 1 z - rhoTwos (2 * (k : ℤ) + 4) 1 w < 2 * (2 * (k : ℤ) + 5) + 3)
     (hflatP : ∀ c i : Site, TwosSel (2 * (k : ℤ) + 4) 1 (standardField (List.replicate (k + 1) Digit.two)) c i →
       (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) 1 i =
@@ -493,13 +488,10 @@ noncomputable def twosCanonicalGames (k : ℕ)
     · exact twosChain_nonincreasing k hagree hperiod h
     · exact twosChainM_nonincreasing k hagree hperiod h
 
-/-- **The twos word `2^(k+1)` has games with rank** (`GamesWithRank`), from the tile facts `hvar`, `hflat` of both signs. -/
+/-- **The twos word `2^(k+1)` has games with rank** (`GamesWithRank`). The auxiliary field `S` with the agreement and periods
+of the raw ladder mask is an extension (`ladderOdd_exists_extension`); the standard field is its rotation, so the agreement is
+stated for `S`, not for the standard field. The sign `+1` tile fact `hvar` is `tr_hvar`; the other facts are hypotheses. -/
 theorem twos_gamesWithRank (k : ℕ)
-    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees
-      (standardField (List.replicate (k + 1) Digit.two)) 0)
-    (hperiod : HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4))
-      (standardField (List.replicate (k + 1) Digit.two)) 0 (stairEvenConstantV (2 * (k : ℤ) + 4)))
-    (hvarP : ∀ z w : Site, rhoTwos (2 * (k : ℤ) + 4) 1 z - rhoTwos (2 * (k : ℤ) + 4) 1 w < 2 * (2 * (k : ℤ) + 5) + 3)
     (hflatP : ∀ c i : Site, TwosSel (2 * (k : ℤ) + 4) 1 (standardField (List.replicate (k + 1) Digit.two)) c i →
       (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) 1 i =
         (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) 1 c →
@@ -510,10 +502,11 @@ theorem twos_gamesWithRank (k : ℕ)
         (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) (-1) c →
       rhoTwos (2 * (k : ℤ) + 4) (-1) i < rhoTwos (2 * (k : ℤ) + 4) (-1) c) :
     GamesWithRank (List.replicate (k + 1) Digit.two) := by
-  refine ⟨twosCanonicalGames k hagree hperiod hvarP hflatP hvarM hflatM, fun η hη => ⟨twosRankOf k η,
+  obtain ⟨S, hagree, hperiod, -⟩ := ladderOdd_exists_extension (ladderOdd_valid_twos k)
+  refine ⟨twosCanonicalGames k hagree hperiod (fun z w => tr_hvar k z w) hflatP hvarM hflatM, fun η hη => ⟨twosRankOf k η,
     -(2 * (2 * (k : ℤ) + 5) + 3), 2 * η * (2 * (2 * (k : ℤ) + 5) + 3), fun z => ?_, fun z => ?_, fun x i hxi => ?_⟩⟩
   · rw [twosRankOf_kernel k η hη z, sub_eq_add_neg]
   · exact twosRankOf_transverse k η hη z
-  · exact twosRankOf_strict k η hη hagree hperiod hvarP hflatP hvarM hflatM x i hxi
+  · exact twosRankOf_strict k η hη hagree hperiod (fun z w => tr_hvar k z w) hflatP hvarM hflatM x i hxi
 
 end FLatticePaper.TwosEPolicy

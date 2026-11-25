@@ -190,11 +190,10 @@ theorem twos_prescribedV_eq (k : ℕ) (η : ℤ) (x y : ℤ) (h : FreeVSite (2 *
 /-- **The prescriptions of the twos policy (`PrescribedAt`).** At a free H or V white centre the twos policy `TwosSel` of sign `η`
 keeps exactly the prescribed input. The selected input is the free table at the centre itself (`u = c`), and uniqueness of the
 selected input at a white (`twos_white_quota`) gives the converse. -/
-theorem twos_prescribedAt (k : ℕ) (η : ℤ)
-    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees
-      (standardField (List.replicate (k + 1) Digit.two)) 0)
+theorem twos_prescribedAt {S : Field} (k : ℕ) (η : ℤ)
+    (hagree : (BaseMask.ladderOdd.raw (2 * (k : ℤ) + 4)).Agrees S 0)
     (hperiod : HasGeneratorPeriods (Fraction.mk 1 (2 * (k : ℤ) + 4))
-      (standardField (List.replicate (k + 1) Digit.two)) 0 (stairEvenConstantV (2 * (k : ℤ) + 4))) :
+      S 0 (stairEvenConstantV (2 * (k : ℤ) + 4))) :
     PrescribedAt (frameAt (List.replicate (k + 1) Digit.two)) (standardField (List.replicate (k + 1) Digit.two)) η
       (TwosSel (2 * (k : ℤ) + 4) η (standardField (List.replicate (k + 1) Digit.two))) := by
   refine ⟨fun c hcH hw j => ?_, fun c hcV hw j => ?_⟩
