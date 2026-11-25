@@ -660,6 +660,7 @@ import FLatticePaper.Plane.Induction.W4Cases
 import FLatticePaper.Plane.Induction.StarPrice
 import FLatticePaper.Plane.Induction.ArcBounds
 import FLatticePaper.Plane.Induction.ArcFrame
+import FLatticePaper.Plane.Induction.W4CentreChain
 import FLatticePaper.TraceHeadline
 import FLatticePaper.FlatPlusHeadline
 import FLatticePaper.Plane.Induction.TwosDeckEta
