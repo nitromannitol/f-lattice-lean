@@ -1,20 +1,24 @@
-import FLatticePaper.Plane.Induction.SheetFort
+import FLatticePaper.Plane.Induction.RetainedCore
+import FLatticePaper.Plane.Induction.FanTerminal
 import FLatticePaper.Plane.Induction.S3FreeBoundary
+import FLatticePaper.Plane.Induction.W1Exit
 
-/-! # The `H_0` core (Q23 step 4, the minus row)
+/-! # The `H_0` core (Q23 step 4): the minus and the plus candidates
 
-The surviving boundary candidates of the minus row are `H_0 = (1,0)` and `V_0 = (0,0)`. The core argument of ALL_SLOPE_STEP ("Remaining
-entries of the cut", the last paragraph): the candidates are not retained by any strict-interior site, so the strict-interior part of the
-fort is an incoming fort of the recurrent comparison chart `M`; it is finite (`openRect` is finite), hence empty (`no_finite_fort_of_recurrent`).
-Then a fort containing `H_0` or `V_0` has a strict-interior point: `H_0 ∈ S` forces `(1,1) ∈ S` (its south input `(1,−1)` lies outside the
-closed polygon, `hsub`), and `(1,1)` is open; `V_0 ∈ S` forces `(1,0) = H_0 ∈ S` (its west input `(−1,0)` lies outside).
+The core removes the candidates of the last row entries. The strict-interior part of a fort is empty by `RetainedCore.interior_empty_of_retained`
+(the retained-quota fort of the W1 policy, with rank `Rk`; the retained structure `(G, R, Rk)` is supplied by the policy).
 
-The one named input is `hI`: the strict-interior part is an incoming fort, which is the retained-quota statement of the note (the retained
-input of every strict-interior site is not a candidate). Everything else is proved here. -/
+* Minus (`h0_core_minus`): the candidates `H_0 = (1,0)`, `V_0 = (0,0)` in `E`. `H_0 ∈ S` forces `(1,1) ∈ S` (its south input `(1,−1)` is outside
+  `E`), and `(1,1)` is open; `V_0 ∈ S` forces `H_0 ∈ S` (its west input `(−1,0)` is outside `E`).
+* Plus (`plus_core`): the candidates `H_0 = (1,0)`, `V_{−1} = (1,−1)` in `E − V`, with `V = (n−d, n+d)` and the translated chart
+  `M(z + V)`. `H_0 ∈ S` forces `V_{−1} ∈ S` (its north input `(1,1)` is outside `E − V`), and `V_{−1} ∈ S` forces `(2,−1) ∈ S`
+  (its west input `(0,−1)` is outside `E − V`), and `(2,−1)` is open in `E − V`.
+
+The candidates are not called from the strict interior: the geometry of the open rectangle (`minus_not_called`, `plus_not_called`). -/
 
 namespace FLatticePaper.H0Core
 
-open FLatticePaper FLatticePaper.Induction FLatticePaper.SheetFort FLatticePaper.FanTerminal
+open FLatticePaper FLatticePaper.Induction FLatticePaper.FanTerminal FLatticePaper.RetainedCore
 
 /-- `(1, −1)` (the south input of `H_0`) is outside the closed polygon. -/
 theorem not_closed_one_neg (frame : ChildFrame) : (1, -1) ∉ frame.closedPolygon := by
@@ -59,61 +63,444 @@ theorem open_one_one (frame : ChildFrame) : frame.openRect (1, 1) := by
   · omega
   · nlinarith
 
-/-- **The `H_0` core** (minus): a fort `S` of the recurrent chart `M`, lying in the closed polygon, whose boundary points are among
-`H_0, V_0`, and whose strict-interior part is an incoming fort (`hI`), is empty. -/
-theorem h0_core_minus {M : Field} (frame : ChildFrame) (hrec : FLatticePaper.RecurrentField M) {S : Set Site}
-    (hfort : IsIncomingFort M S)
+/-- The minus candidate sites are not open: `(2,0)`, `(0,0)`, `(0,1)`, `(0,−1)`. -/
+theorem not_open_two_zero (frame : ChildFrame) : ¬ frame.openRect (2, 0) := by
+  intro h
+  unfold ChildFrame.openRect at h
+  rw [if_pos (show EvenSite ((2 : ℤ), (0 : ℤ)) by unfold EvenSite; simp)] at h
+  have ht : frame.tGrade ((2 : ℤ), (0 : ℤ)) = 2 * frame.child.num := by unfold ChildFrame.tGrade; ring
+  rw [ht] at h
+  have hn := (frame.child_facts).1
+  omega
+
+theorem not_open_zero_zero (frame : ChildFrame) : ¬ frame.openRect (0, 0) := by
+  intro h
+  unfold ChildFrame.openRect at h
+  rw [if_pos (show EvenSite ((0 : ℤ), (0 : ℤ)) by unfold EvenSite; simp)] at h
+  have hs : frame.sGrade ((0 : ℤ), (0 : ℤ)) = 0 := by unfold ChildFrame.sGrade; ring
+  rw [hs] at h
+  have hn := (frame.child_facts).1
+  omega
+
+theorem not_open_zero_one (frame : ChildFrame) : ¬ frame.openRect (0, 1) := by
+  intro h
+  unfold ChildFrame.openRect at h
+  rw [if_neg (show ¬ EvenSite ((0 : ℤ), (1 : ℤ)) by unfold EvenSite; simp)] at h
+  have hs : frame.sGrade ((0 : ℤ), (1 : ℤ)) = frame.child.den - frame.child.num := by
+    unfold ChildFrame.sGrade; ring
+  rw [hs] at h
+  have hn := (frame.child_facts).1
+  omega
+
+theorem not_open_zero_neg_one (frame : ChildFrame) : ¬ frame.openRect (0, -1) := by
+  intro h
+  unfold ChildFrame.openRect at h
+  rw [if_neg (show ¬ EvenSite ((0 : ℤ), (-1 : ℤ)) by unfold EvenSite; simp)] at h
+  have ht : frame.tGrade ((0 : ℤ), (-1 : ℤ)) = frame.child.den := by unfold ChildFrame.tGrade; ring
+  rw [ht] at h
+  have hnd := (frame.child_facts).2.1
+  omega
+
+/-- The inputs of an odd site are its vertical neighbours. -/
+theorem incomingNeg_of_not_even (x : Site) (h : ¬ EvenSite x) : incomingNeg x = (x.1, x.2 - 1) := by
+  unfold incomingNeg; rw [if_neg h]
+
+theorem incomingPos_of_not_even (x : Site) (h : ¬ EvenSite x) : incomingPos x = (x.1, x.2 + 1) := by
+  unfold incomingPos; rw [if_neg h]
+
+theorem incomingNeg_of_even (x : Site) (h : EvenSite x) : incomingNeg x = (x.1 - 1, x.2) := by
+  unfold incomingNeg; rw [if_pos h]
+
+theorem incomingPos_of_even (x : Site) (h : EvenSite x) : incomingPos x = (x.1 + 1, x.2) := by
+  unfold incomingPos; rw [if_pos h]
+
+/-- A fort point whose south (or north) input is outside the fort has the other input in the fort. -/
+theorem fort_pos_of_neg_not {F : Field} {S : Set Site} {c : Site} (hfort : IsIncomingFort F S) (hc : c ∈ S)
+    (hn : incomingNeg c ∉ S) : incomingPos c ∈ S := by
+  rcases hfort c hc with ⟨-, hsome⟩ | ⟨-, hn', hp⟩
+  · exact hsome.resolve_left hn
+  · exact absurd hn' hn
+
+theorem fort_neg_of_pos_not {F : Field} {S : Set Site} {c : Site} (hfort : IsIncomingFort F S) (hc : c ∈ S)
+    (hp : incomingPos c ∉ S) : incomingNeg c ∈ S := by
+  rcases hfort c hc with ⟨-, hsome⟩ | ⟨-, hn', hp'⟩
+  · exact hsome.resolve_right hp
+  · exact absurd hp' hp
+
+/-- The minus candidates `H_0 = (1,0)`, `V_0 = (0,0)` are not inputs of an open site. -/
+theorem minus_not_called (frame : ChildFrame) (x : Site) (hx : frame.openRect x) (k : Site)
+    (hk : k = hFirst ∨ k = vFirst) : ¬ (k = incomingNeg x ∨ k = incomingPos x) := by
+  obtain ⟨a, b⟩ := x
+  rcases hk with rfl | rfl
+  · rintro (h | h)
+    · unfold hFirst at h
+      by_cases hev : EvenSite (a, b)
+      · rw [incomingNeg_of_even _ hev] at h
+        simp only [Prod.mk.injEq] at h
+        obtain ⟨h1, h2⟩ := h
+        have ha : a = 2 := by omega
+        have hb : b = 0 := by omega
+        subst ha; subst hb
+        exact not_open_two_zero frame hx
+      · rw [incomingNeg_of_not_even _ hev] at h
+        simp only [Prod.mk.injEq] at h
+        obtain ⟨h1, h2⟩ := h
+        apply hev
+        unfold EvenSite
+        simp only
+        omega
+    · unfold hFirst at h
+      by_cases hev : EvenSite (a, b)
+      · rw [incomingPos_of_even _ hev] at h
+        simp only [Prod.mk.injEq] at h
+        obtain ⟨h1, h2⟩ := h
+        have ha : a = 0 := by omega
+        have hb : b = 0 := by omega
+        subst ha; subst hb
+        exact not_open_zero_zero frame hx
+      · rw [incomingPos_of_not_even _ hev] at h
+        simp only [Prod.mk.injEq] at h
+        obtain ⟨h1, h2⟩ := h
+        apply hev
+        unfold EvenSite
+        simp only
+        omega
+  · rintro (h | h)
+    · unfold vFirst at h
+      by_cases hev : EvenSite (a, b)
+      · rw [incomingNeg_of_even _ hev] at h
+        simp only [Prod.mk.injEq] at h
+        obtain ⟨h1, h2⟩ := h
+        exfalso
+        unfold EvenSite at hev
+        simp only at hev
+        omega
+      · rw [incomingNeg_of_not_even _ hev] at h
+        simp only [Prod.mk.injEq] at h
+        obtain ⟨h1, h2⟩ := h
+        have ha : a = 0 := by omega
+        have hb : b = 1 := by omega
+        subst ha; subst hb
+        exact not_open_zero_one frame hx
+    · unfold vFirst at h
+      by_cases hev : EvenSite (a, b)
+      · rw [incomingPos_of_even _ hev] at h
+        simp only [Prod.mk.injEq] at h
+        obtain ⟨h1, h2⟩ := h
+        exfalso
+        unfold EvenSite at hev
+        simp only at hev
+        omega
+      · rw [incomingPos_of_not_even _ hev] at h
+        simp only [Prod.mk.injEq] at h
+        obtain ⟨h1, h2⟩ := h
+        have ha : a = 0 := by omega
+        have hb : b = -1 := by omega
+        subst ha; subst hb
+        exact not_open_zero_neg_one frame hx
+
+/-- **The minus `H_0` core.** A fort of the policy field, in the closed polygon, whose boundary points are among `H_0, V_0`, is empty:
+the retained-quota core (`interior_empty_of_retained`) empties the strict interior, and `H_0`, `V_0` force points of it. -/
+theorem h0_core_minus {M G : Field} {R : Site → Site → Prop} {Rk : Site → ℤ} (frame : ChildFrame)
+    (hagree : ∀ y ∈ frame.closedPolygon, M y = G y) (hquota : RetainQuota G R)
+    (hrank : ∀ c i, R c i → Rk i < Rk c) {S : Set Site} (hfort : IsIncomingFort M S)
     (hsub : ∀ z ∈ S, z ∈ frame.closedPolygon)
-    (hcand : ∀ z ∈ S, z ∈ frame.closedPolygon → ¬ frame.openRect z → z = hFirst ∨ z = vFirst)
-    (hI : IsIncomingFort M {x | x ∈ S ∧ frame.openRect x}) : S = ∅ := by
-  have hfinI : {x | x ∈ S ∧ frame.openRect x}.Finite := (openRect_finite frame).subset (fun x hx => hx.2)
-  have hempty := no_finite_fort_of_recurrent hrec hI hfinI
-  have hnoint : ∀ z, z ∈ S → ¬ frame.openRect z := by
-    intro z hz hopen
-    have hm : z ∈ {x | x ∈ S ∧ frame.openRect x} := ⟨hz, hopen⟩
-    rw [hempty] at hm
-    exact hm
-  have hS : ∀ z ∈ S, z = hFirst ∨ z = vFirst := fun z hz =>
-    hcand z hz (hsub z hz) (hnoint z hz)
-  -- `H_0 ∈ S` forces `(1,1) ∈ S`, an interior point
+    (hcand : ∀ z ∈ S, z ∈ frame.closedPolygon → ¬ frame.openRect z → z = hFirst ∨ z = vFirst) : S = ∅ := by
+  have hint := interior_empty_of_retained (P := frame.closedPolygon) (Q := fun z => frame.openRect z)
+    (C := fun k => k = hFirst ∨ k = vFirst) (openRect_finite frame)
+    (fun x hx i hi => FLatticePaper.W1Exit.rectInputs frame x hx i hi) hagree hquota hrank hfort hsub hcand
+    (fun x hx k hk => minus_not_called frame x hx k hk)
   have hH0 : hFirst ∉ S := by
     intro h
-    have h1 : frame.openRect (1, 1) := open_one_one frame
+    have hfirst : hFirst = (1, 0) := rfl
+    rw [hfirst] at h
+    have hn : ((1 : ℤ), (-1 : ℤ)) ∉ S := fun hm => not_closed_one_neg frame (hsub _ hm)
+    have hodd : ¬ EvenSite ((1 : ℤ), (0 : ℤ)) := by unfold EvenSite; simp
+    have hinN : incomingNeg ((1 : ℤ), (0 : ℤ)) = ((1 : ℤ), (-1 : ℤ)) := by
+      rw [incomingNeg_of_not_even _ hodd]; simp
+    have hinP : incomingPos ((1 : ℤ), (0 : ℤ)) = ((1 : ℤ), (1 : ℤ)) := by
+      rw [incomingPos_of_not_even _ hodd]; simp
     have hmem : ((1 : ℤ), (1 : ℤ)) ∈ S := by
-      have hf := hfort hFirst h
-      have hns : ((1 : ℤ), (-1 : ℤ)) ∉ S := fun hm => not_closed_one_neg frame (hsub _ hm)
-      have hfirst : hFirst = ((1 : ℤ), (0 : ℤ)) := rfl
-      rw [hfirst] at hf
-      unfold incomingNeg incomingPos at hf
-      simp only [EvenSite] at hf
-      norm_num at hf
-      rcases hf with ⟨-, h2 | h2⟩ | ⟨-, h2, h3⟩
-      · exact absurd h2 hns
-      · exact h2
-      · exact h3
-    exact hnoint _ hmem h1
-  -- `V_0 ∈ S` forces `H_0 ∈ S`, which is excluded
+      have := fort_pos_of_neg_not hfort h (by rw [hinN]; exact hn)
+      rw [hinP] at this
+      exact this
+    exact hint (1, 1) hmem (open_one_one frame)
   have hV0 : vFirst ∉ S := by
     intro h
-    have hf := hfort vFirst h
-    have hns : ((-1 : ℤ), (0 : ℤ)) ∉ S := fun hm => not_closed_neg_one_zero frame (hsub _ hm)
-    have hvfirst : vFirst = ((0 : ℤ), (0 : ℤ)) := rfl
-    rw [hvfirst] at hf
-    unfold incomingNeg incomingPos at hf
-    simp only [EvenSite] at hf
-    norm_num at hf
+    have hvfirst : vFirst = (0, 0) := rfl
+    rw [hvfirst] at h
+    have hn : ((-1 : ℤ), (0 : ℤ)) ∉ S := fun hm => not_closed_neg_one_zero frame (hsub _ hm)
+    have hev : EvenSite ((0 : ℤ), (0 : ℤ)) := by unfold EvenSite; simp
+    have hinN : incomingNeg ((0 : ℤ), (0 : ℤ)) = ((-1 : ℤ), (0 : ℤ)) := by
+      rw [incomingNeg_of_even _ hev]; simp
+    have hinP : incomingPos ((0 : ℤ), (0 : ℤ)) = ((1 : ℤ), (0 : ℤ)) := by
+      rw [incomingPos_of_even _ hev]; simp
     have hH : ((1 : ℤ), (0 : ℤ)) ∈ S := by
-      rcases hf with ⟨-, h2 | h2⟩ | ⟨-, h2, h3⟩
-      · exact absurd h2 hns
-      · exact h2
-      · exact h3
+      have := fort_pos_of_neg_not hfort h (by rw [hinN]; exact hn)
+      rw [hinP] at this
+      exact this
     exact hH0 hH
   ext z
   constructor
   · intro hz
-    rcases hS z hz with rfl | rfl
+    have hcz : z = hFirst ∨ z = vFirst := by
+      by_cases hopen : frame.openRect z
+      · exact absurd hopen (fun ho => hint z hz ho)
+      · exact hcand z hz (hsub z hz) hopen
+    rcases hcz with rfl | rfl
     · exact absurd hz hH0
     · exact absurd hz hV0
+  · intro hz
+    exact absurd hz (Set.notMem_empty z)
+
+/-- The translation vector of the plus core: `V = (n − d, n + d)`, of even coordinate sum `2n`. -/
+def plusV (frame : ChildFrame) : Site := (frame.child.num - frame.child.den, frame.child.num + frame.child.den)
+
+theorem plusV_even (frame : ChildFrame) : (plusV frame).1 + (plusV frame).2 = 2 * frame.child.num := by
+  unfold plusV; simp only; ring
+
+theorem incomingNeg_add_even (x v : Site) (hv : (v.1 + v.2) % 2 = 0) : incomingNeg (x + v) = incomingNeg x + v := by
+  have hpar : EvenSite (x + v) ↔ EvenSite x := by
+    unfold EvenSite
+    simp only [Prod.fst_add, Prod.snd_add]
+    omega
+  by_cases hx : EvenSite x
+  · rw [incomingNeg_of_even _ hx, incomingNeg_of_even _ (hpar.2 hx)]
+    refine Prod.ext ?_ ?_
+    · simp only [Prod.fst_add]; try ring
+    · simp only [Prod.snd_add]; try ring
+  · rw [incomingNeg_of_not_even _ hx, incomingNeg_of_not_even _ (fun h => hx (hpar.1 h))]
+    refine Prod.ext ?_ ?_
+    · simp only [Prod.fst_add]; try ring
+    · simp only [Prod.snd_add]; try ring
+
+theorem incomingPos_add_even (x v : Site) (hv : (v.1 + v.2) % 2 = 0) : incomingPos (x + v) = incomingPos x + v := by
+  have hpar : EvenSite (x + v) ↔ EvenSite x := by
+    unfold EvenSite
+    simp only [Prod.fst_add, Prod.snd_add]
+    omega
+  by_cases hx : EvenSite x
+  · rw [incomingPos_of_even _ hx, incomingPos_of_even _ (hpar.2 hx)]
+    refine Prod.ext ?_ ?_
+    · simp only [Prod.fst_add]; try ring
+    · simp only [Prod.snd_add]; try ring
+  · rw [incomingPos_of_not_even _ hx, incomingPos_of_not_even _ (fun h => hx (hpar.1 h))]
+    refine Prod.ext ?_ ?_
+    · simp only [Prod.fst_add]; try ring
+    · simp only [Prod.snd_add]; try ring
+
+theorem plus_site (frame : ChildFrame) (x y : ℤ) :
+    ((x, y) : Site) + plusV frame = (x + (frame.child.num - frame.child.den), y + (frame.child.num + frame.child.den)) := rfl
+
+/-- `(2,0) + V` is not open in `E − V` (`t = 2n − T`, and `d < n + 2` would be needed). -/
+theorem plus_not_open_two_zero (frame : ChildFrame) : ¬ frame.openRect (((2 : ℤ), (0 : ℤ)) + plusV frame) := by
+  obtain ⟨-, -, hd2, -, hT⟩ := frame.child_facts
+  rw [plus_site]
+  intro h
+  unfold ChildFrame.openRect at h
+  rw [if_pos (show EvenSite (2 + (frame.child.num - frame.child.den), 0 + (frame.child.num + frame.child.den)) by
+    unfold EvenSite; simp only; ring_nf; omega)] at h
+  rw [hT] at h
+  simp only [ChildFrame.tGrade] at h
+  nlinarith [h.1]
+
+/-- `(0,0) + V = V` is not open in `E − V`. -/
+theorem plus_not_open_zero_zero (frame : ChildFrame) : ¬ frame.openRect (((0 : ℤ), (0 : ℤ)) + plusV frame) := by
+  obtain ⟨hn, hnd, -, -, hT⟩ := frame.child_facts
+  rw [plus_site]
+  intro h
+  unfold ChildFrame.openRect at h
+  rw [if_pos (show EvenSite (0 + (frame.child.num - frame.child.den), 0 + (frame.child.num + frame.child.den)) by
+    unfold EvenSite; simp only; ring_nf; omega)] at h
+  rw [hT] at h
+  simp only [ChildFrame.tGrade] at h
+  nlinarith [h.1]
+
+/-- `(1,0) + V` is not open in `E − V` (`t = T`-shifted: `t ≥ d` would be needed below `n`). -/
+theorem plus_not_open_one_zero (frame : ChildFrame) : ¬ frame.openRect (((1 : ℤ), (0 : ℤ)) + plusV frame) := by
+  obtain ⟨-, -, hd2, -, hT⟩ := frame.child_facts
+  rw [plus_site]
+  intro h
+  unfold ChildFrame.openRect at h
+  rw [if_neg (show ¬ EvenSite (1 + (frame.child.num - frame.child.den), 0 + (frame.child.num + frame.child.den)) by
+    unfold EvenSite; simp only; ring_nf; omega)] at h
+  rw [hT] at h
+  simp only [ChildFrame.tGrade] at h
+  nlinarith [h.1]
+
+/-- `(1,−2) + V` is not open in `E − V` (its `s = 3n − d` is below `d + n − 2`). -/
+theorem plus_not_open_one_neg_two (frame : ChildFrame) :
+    ¬ frame.openRect (((1 : ℤ), (-2 : ℤ)) + plusV frame) := by
+  obtain ⟨-, -, hd2, -, hT⟩ := frame.child_facts
+  rw [plus_site]
+  intro h
+  unfold ChildFrame.openRect at h
+  rw [if_neg (show ¬ EvenSite (1 + (frame.child.num - frame.child.den), -2 + (frame.child.num + frame.child.den)) by
+    unfold EvenSite; simp only; ring_nf; omega)] at h
+  simp only [ChildFrame.sGrade] at h
+  nlinarith [h.2.2.1]
+
+/-- `(1,1) + V` is outside the closed polygon (`t = −T + n − d < 2 − T`). -/
+theorem plus_not_closed_one_one (frame : ChildFrame) : ((1 : ℤ), (1 : ℤ)) + plusV frame ∉ frame.closedPolygon := by
+  obtain ⟨-, -, hd2, -, hT⟩ := frame.child_facts
+  rw [plus_site]
+  intro h
+  unfold ChildFrame.closedPolygon at h
+  simp only [Set.mem_setOf_eq] at h
+  rw [if_pos (show EvenSite (1 + (frame.child.num - frame.child.den), 1 + (frame.child.num + frame.child.den)) by
+    unfold EvenSite; simp only; ring_nf; omega)] at h
+  rw [hT] at h
+  simp only [ChildFrame.tGrade] at h
+  nlinarith [h.1]
+
+/-- `(0,−1) + V` is outside the closed polygon (`s = n − d < 2 − d + n`). -/
+theorem plus_not_closed_zero_neg_one (frame : ChildFrame) :
+    ((0 : ℤ), (-1 : ℤ)) + plusV frame ∉ frame.closedPolygon := by
+  obtain ⟨-, -, -, -, hT⟩ := frame.child_facts
+  rw [plus_site]
+  intro h
+  unfold ChildFrame.closedPolygon at h
+  simp only [Set.mem_setOf_eq] at h
+  rw [if_neg (show ¬ EvenSite (0 + (frame.child.num - frame.child.den), -1 + (frame.child.num + frame.child.den)) by
+    unfold EvenSite; simp only; ring_nf; omega)] at h
+  simp only [ChildFrame.sGrade] at h
+  nlinarith [h.2.2.1]
+
+/-- `(2,−1) + V` is open in `E − V` (`t = −T + 2n + d` and `s = d + 3n`). -/
+theorem plus_open_two_neg_one (frame : ChildFrame) : frame.openRect (((2 : ℤ), (-1 : ℤ)) + plusV frame) := by
+  obtain ⟨hn, hnd, hd2, -, hT⟩ := frame.child_facts
+  rw [plus_site]
+  unfold ChildFrame.openRect
+  rw [if_neg (show ¬ EvenSite (2 + (frame.child.num - frame.child.den), -1 + (frame.child.num + frame.child.den)) by
+    unfold EvenSite; simp only; ring_nf; omega)]
+  rw [hT]
+  simp only [ChildFrame.tGrade, ChildFrame.sGrade]
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · nlinarith
+  · nlinarith
+  · nlinarith
+  · nlinarith
+
+/-- The plus candidates `H_0 = (1,0)`, `V_{−1} = (1,−1)` (in `E − V`) are not inputs of a strict-interior point of `E − V`. -/
+theorem plus_not_called (frame : ChildFrame) (z : Site) (hz : frame.openRect (z + plusV frame)) (k : Site)
+    (hk : k = ((1 : ℤ), (0 : ℤ)) ∨ k = ((1 : ℤ), (-1 : ℤ))) : ¬ (k = incomingNeg z ∨ k = incomingPos z) := by
+  obtain ⟨a, b⟩ := z
+  rcases hk with rfl | rfl
+  · rintro (h | h)
+    · by_cases hev : EvenSite (a, b)
+      · rw [incomingNeg_of_even _ hev] at h
+        simp only [Prod.mk.injEq] at h
+        obtain ⟨h1, h2⟩ := h
+        have ha : a = 2 := by omega
+        have hb : b = 0 := by omega
+        subst ha; subst hb
+        exact plus_not_open_two_zero frame hz
+      · rw [incomingNeg_of_not_even _ hev] at h
+        simp only [Prod.mk.injEq] at h
+        obtain ⟨h1, h2⟩ := h
+        exact hev (by unfold EvenSite; simp only; omega)
+    · by_cases hev : EvenSite (a, b)
+      · rw [incomingPos_of_even _ hev] at h
+        simp only [Prod.mk.injEq] at h
+        obtain ⟨h1, h2⟩ := h
+        have ha : a = 0 := by omega
+        have hb : b = 0 := by omega
+        subst ha; subst hb
+        exact plus_not_open_zero_zero frame hz
+      · rw [incomingPos_of_not_even _ hev] at h
+        simp only [Prod.mk.injEq] at h
+        obtain ⟨h1, h2⟩ := h
+        exact hev (by unfold EvenSite; simp only; omega)
+  · rintro (h | h)
+    · by_cases hev : EvenSite (a, b)
+      · rw [incomingNeg_of_even _ hev] at h
+        simp only [Prod.mk.injEq] at h
+        obtain ⟨h1, h2⟩ := h
+        exfalso
+        unfold EvenSite at hev
+        simp only at hev
+        omega
+      · rw [incomingNeg_of_not_even _ hev] at h
+        simp only [Prod.mk.injEq] at h
+        obtain ⟨h1, h2⟩ := h
+        have ha : a = 1 := by omega
+        have hb : b = 0 := by omega
+        subst ha; subst hb
+        exact plus_not_open_one_zero frame hz
+    · by_cases hev : EvenSite (a, b)
+      · rw [incomingPos_of_even _ hev] at h
+        simp only [Prod.mk.injEq] at h
+        obtain ⟨h1, h2⟩ := h
+        exfalso
+        unfold EvenSite at hev
+        simp only at hev
+        omega
+      · rw [incomingPos_of_not_even _ hev] at h
+        simp only [Prod.mk.injEq] at h
+        obtain ⟨h1, h2⟩ := h
+        have ha : a = 1 := by omega
+        have hb : b = -2 := by omega
+        subst ha; subst hb
+        exact plus_not_open_one_neg_two frame hz
+
+/-- **The plus `H_0` core.** A fort `T` of the translated chart `M(· + V)` on `E − V`, whose boundary points are among `H_0`, `V_{−1}`,
+is empty: `H_0 ∈ T` forces `V_{−1} = (1,−1) ∈ T` (its north input `(1,1)` is outside `E − V`), and `V_{−1} ∈ T` forces `(2,−1) ∈ T`
+(its west input `(0,−1)` is outside), which is open in `E − V`. The retained structure `(G, R, Rk)` is the policy's, translated. -/
+theorem plus_core {M G : Field} {R : Site → Site → Prop} {Rk : Site → ℤ} (frame : ChildFrame)
+    (hagree : ∀ y : Site, y + plusV frame ∈ frame.closedPolygon → M (y + plusV frame) = G y)
+    (hquota : RetainQuota G R) (hrank : ∀ c i, R c i → Rk i < Rk c)
+    {T : Set Site} (hfort : IsIncomingFort (fun z => M (z + plusV frame)) T)
+    (hsub : ∀ z ∈ T, z + plusV frame ∈ frame.closedPolygon)
+    (hcand : ∀ z ∈ T, z + plusV frame ∈ frame.closedPolygon → ¬ frame.openRect (z + plusV frame) →
+      z = ((1 : ℤ), (0 : ℤ)) ∨ z = ((1 : ℤ), (-1 : ℤ))) : T = ∅ := by
+  have hVe : ((plusV frame).1 + (plusV frame).2) % 2 = 0 := by rw [plusV_even]; omega
+  have hfin : {x | frame.openRect (x + plusV frame)}.Finite :=
+    ((openRect_finite frame).image (fun y => y - plusV frame)).subset
+      (fun x hx => ⟨x + plusV frame, hx, by simp⟩)
+  have hQin : ∀ x, frame.openRect (x + plusV frame) → ∀ i : Site,
+      (i = incomingNeg x ∨ i = incomingPos x) → i + plusV frame ∈ frame.closedPolygon := by
+    intro x hx i hi
+    rcases hi with rfl | rfl
+    · rw [← incomingNeg_add_even x (plusV frame) hVe]
+      exact FLatticePaper.W1Exit.rectInputs frame (x + plusV frame) hx _ (Or.inl rfl)
+    · rw [← incomingPos_add_even x (plusV frame) hVe]
+      exact FLatticePaper.W1Exit.rectInputs frame (x + plusV frame) hx _ (Or.inr rfl)
+  have hint := interior_empty_of_retained (P := {z | z + plusV frame ∈ frame.closedPolygon})
+    (Q := fun z => frame.openRect (z + plusV frame)) (M := fun z => M (z + plusV frame)) (G := G) (R := R)
+    (Rk := Rk) (C := fun k => k = ((1 : ℤ), (0 : ℤ)) ∨ k = ((1 : ℤ), (-1 : ℤ))) (S := T) hfin
+    (fun x hx i hi => hQin x hx i hi)
+    (fun y hy => hagree y hy) hquota hrank hfort hsub
+    (fun z hz hzP hnQ => hcand z hz hzP hnQ)
+    (fun x hx k hk => plus_not_called frame x hx k hk)
+  have hint' : ∀ z ∈ T, ¬ frame.openRect (z + plusV frame) := fun z hz => hint z hz
+  -- `V_{−1} ∈ T` forces `(2,−1) ∈ T`, an open point of `E − V`
+  have hVm1 : ((1 : ℤ), (-1 : ℤ)) ∈ T → False := by
+    intro h
+    have hev : EvenSite ((1 : ℤ), (-1 : ℤ)) := by unfold EvenSite; simp
+    have hinN : incomingNeg ((1 : ℤ), (-1 : ℤ)) = ((0 : ℤ), (-1 : ℤ)) := by
+      rw [incomingNeg_of_even _ hev]; simp
+    have hinP : incomingPos ((1 : ℤ), (-1 : ℤ)) = ((2 : ℤ), (-1 : ℤ)) := by
+      rw [incomingPos_of_even _ hev]; simp
+    have h2 : ((2 : ℤ), (-1 : ℤ)) ∈ T :=
+      fort_pos_of_neg_not hfort h (by rw [hinN]; exact fun hm => plus_not_closed_zero_neg_one frame (hsub _ hm))
+    exact hint' _ h2 (plus_open_two_neg_one frame)
+  -- `H_0 ∈ T` forces `V_{−1} ∈ T`
+  have hH0 : ((1 : ℤ), (0 : ℤ)) ∉ T := by
+    intro h
+    have hodd : ¬ EvenSite ((1 : ℤ), (0 : ℤ)) := by unfold EvenSite; simp
+    have hinN : incomingNeg ((1 : ℤ), (0 : ℤ)) = ((1 : ℤ), (-1 : ℤ)) := by
+      rw [incomingNeg_of_not_even _ hodd]; simp
+    have hinP : incomingPos ((1 : ℤ), (0 : ℤ)) = ((1 : ℤ), (1 : ℤ)) := by
+      rw [incomingPos_of_not_even _ hodd]; simp
+    have hm1 : ((1 : ℤ), (-1 : ℤ)) ∈ T :=
+      fort_neg_of_pos_not hfort h (by rw [hinP]; exact fun hm => plus_not_closed_one_one frame (hsub _ hm))
+    exact hVm1 hm1
+  ext z
+  constructor
+  · intro hz
+    rcases hcand z hz (hsub z hz) (hint' z hz) with rfl | rfl
+    · exact absurd hz hH0
+    · exact absurd hz (fun h => hVm1 h)
   · intro hz
     exact absurd hz (Set.notMem_empty z)
 
