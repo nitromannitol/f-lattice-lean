@@ -593,6 +593,7 @@ import FLatticePaper.Plane.Induction.OddVSquare
 import FLatticePaper.Plane.Induction.CapRayGrades
 import FLatticePaper.Plane.Induction.RotatedCap
 import FLatticePaper.Plane.Induction.RotatedMono
+import FLatticePaper.Plane.Induction.CapConeGrades
 import FLatticePaper.Plane.Induction.FanRegion
 import FLatticePaper.Plane.Induction.EndpointRows
 import FLatticePaper.Plane.Induction.GameFort
