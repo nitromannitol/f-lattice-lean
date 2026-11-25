@@ -1,0 +1,5 @@
+import FLatticePaper.Plane.Induction.RestrictedFortShift
+
+#print axioms FLatticePaper.RestrictedFortShift.isRestrictedFort_shiftSet
+#print axioms FLatticePaper.RestrictedFortShift.restrictedNoFort_grade_shift
+#print axioms FLatticePaper.RestrictedFortShift.restrictedNoFort_grade_shift_permitsQ1
