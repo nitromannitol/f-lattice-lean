@@ -9,3 +9,5 @@ import FLatticePaper.Plane.Induction.FreeAssemble
 #print axioms FLatticePaper.HfreePhase1.hfreeP_of_phases
 #print axioms FLatticePaper.HfreePhase1.conj_base
 #print axioms FLatticePaper.FreeAssemble.free_named_inputs
+#print axioms FLatticePaper.OddBlackStep.oddBlackNoRise_step
+#print axioms FLatticePaper.FreeAssemble.free_named_inputs
