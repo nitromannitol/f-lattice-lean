@@ -516,6 +516,8 @@ import FLatticePaper.Plane.Induction.HResP
 import FLatticePaper.Plane.Induction.NegTieNonfree
 import FLatticePaper.Plane.Induction.StrictNonfree
 import FLatticePaper.Plane.Induction.BottomGrade
+import FLatticePaper.Plane.Induction.BottomGradeNeg
+import FLatticePaper.Plane.Induction.LeftVGrade
 import FLatticePaper.Plane.Induction.ConjFreeRoot
 import FLatticePaper.Plane.Induction.EvenWindow
 import FLatticePaper.Plane.Induction.NeighbourDrop
