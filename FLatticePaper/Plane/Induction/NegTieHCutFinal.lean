@@ -5,6 +5,7 @@ import FLatticePaper.Plane.Induction.NegTieTranslate
 import FLatticePaper.Plane.Induction.NoBlackPair
 import FLatticePaper.Plane.Induction.Q3White
 import FLatticePaper.Plane.Induction.Q3Para10
+import FLatticePaper.Plane.Induction.CornerPositive
 
 /-! Task Q21 (G) and (I): the negative tied target is impossible in the conjugate H cut.
 
@@ -12,8 +13,7 @@ The hypothesis `hQ21` of `negTie_false_of_V_block` is the statement `H_cut_hQ21`
 `a = 1` (`H_cut_a_eq_one`); the reversed root is then `x = v + (−b) U_p` with `v` a point of the word's free V cut
 (`freeV_of_conj_freeH` off the corner, `freeV_corner_of_eps_neg` on the corner for `ε = −1`), and the two black centres
 of the rising pair contradict the free V cut (`black_centres_contradiction`). On the corner for `ε = +1` the index is
-`0` (`exceptional_i_zero`), so the root is `V_p + I` itself, and the tie `sheetDiffW c = 0` is excluded by the named fact
-`hFcorner` (the sheet difference at `V_p + I` is not `0` for `ε = +1`). -/
+`0` (`exceptional_i_zero`), so the root is `V_p + I` itself, and the tie `sheetDiffW c = 0` is excluded by `sheetDiffW_corner_ge_one` (the sheet difference at `V_p + I` is at least `1` for `ε = +1`, Q27). -/
 
 namespace FLatticePaper.Induction
 
@@ -106,8 +106,7 @@ theorem H_cut_black_contra {word : Word} (_h : ∃ x ∈ word, x ≠ Digit.three
   obtain ⟨hxE, hxuE⟩ := root_mem_of_rising hcE hcu
   exact (frameAt word).black_centres_contradiction hpk hv hxv hxE hxuE hb hbu
 
-/-- **The conjugate H-cut translate case (Q21), the input of `negTie_false_of_V_block`.** With the named corner fact
-`hFcorner`, no conjugate free H translate of the negative tied root exists. -/
+/-- **The conjugate H-cut translate case (Q21), the input of `negTie_false_of_V_block`.** With the corner bound `sheetDiffW_corner_ge_one` (Q27), no conjugate free H translate of the negative tied root exists. -/
 theorem H_cut_hQ21 {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hpk : (frameAt word).Packet (standardField word))
     {seed : Site → Site → Prop}
@@ -115,9 +114,6 @@ theorem H_cut_hQ21 {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hslip : ∀ z ∈ (frameAt word).closedPolygon,
       0 ≤ standardField word z - standardField word (z + (frameAt word).shortShift) ∧
         standardField word z - standardField word (z + (frameAt word).shortShift) ≤ 2)
-    (hFcorner : (frameAt word).eps = 1 →
-      sheetDiffW word ((frameAt word).parents.odd.num - (frameAt word).parents.odd.den + 1,
-        (frameAt word).parents.odd.num + (frameAt word).parents.odd.den - 1) ≠ 0)
     {c i : Site} (hr : RisingBlackPair (standardField word) (-(frameAt word).shortShift) c i)
     (hcE : c ∈ (frameAt word).closedPolygon) (hiE : i ∈ (frameAt word).closedPolygon)
     (hcu : c + (frameAt word).uq ∈ (frameAt word).closedPolygon)
@@ -182,7 +178,8 @@ theorem H_cut_hQ21 {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
       have hcx : c = x := by
         rw [hxdef, sheetShift_eps_one (frameAt word) heps, sub_zero]
       rw [hcx, hxeq] at hΨc
-      exact hFcorner heps hΨc
+      have hge := sheetDiffW_corner_ge_one h hSE heps
+      omega
     · have heps' : (frameAt word).eps = -1 := (frameAt word).eps_unit.resolve_left heps
       have hvfree := freeV_corner_of_eps_neg h heps'
       exact H_cut_black_contra h hpk hr hcE hcu hvfree hxv
