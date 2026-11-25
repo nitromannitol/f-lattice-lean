@@ -1,0 +1,5 @@
+import FLatticePaper.Tiles.SubCriteria
+
+#print axioms FLatticePaper.Tiles.SubCriteria.east_mem_boundaryEdges_iff
+#print axioms FLatticePaper.Tiles.SubCriteria.north_mem_boundaryEdges_iff
+#print axioms FLatticePaper.Tiles.SubCriteria.cellCorners_subset_iff_bounds
