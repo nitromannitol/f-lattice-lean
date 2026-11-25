@@ -167,7 +167,8 @@ theorem psi_mono_phase0 {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (h
     {base : ℤ → Site}
     (hbase : ∀ r : ℤ, 0 ≤ r → r < period (frameAt (conjWord word)) →
       base r ∈ (frameAt (conjWord word)).freeV ∧ (base r).2 = r)
-    {r : Site} (hr : r ∈ (frameAt word).freeH) (hr1 : r ≠ hFirst) (η : ℤ) :
+    {r : Site} (hr : r ∈ (frameAt word).freeH) (η : ℤ)
+    (hpH1 : ¬ EvenSite r → (frameAt word).prescribedH η r = (0, 1)) :
     sheetPsi word r ≤ sheetPsi word (r + (frameAt word).prescribedH η r) := by
   have hp := period_pos (frameAt (conjWord word))
   have hcutC := FLatticePaper.CutRowsAll.cut_one_per_ordinate_all (frameAt (conjWord word))
@@ -188,7 +189,19 @@ theorem psi_mono_phase0 {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (h
       unfold FLatticePaper.Induction.vFirst at hb
       simp only at hb
       omega
-    exact psi_mono_main h hSE hW0 hG hbase hr1 η hv hnv
+    exact psi_mono_main h hSE hW0 hG hbase η hpH1 hv hnv
   · exact psi_mono_offset h hSE hW0 hG η ⟨m, hm1⟩
+
+/-- **The H_0 comparison for sign −1.** At `H_0` with `η = −1` the prescribed step is north `(0,1)`, the same as at an odd root, so the
+main-class argument applies; hence `Ψ(H_0) ≤ Ψ(H_0 + prescribedH η H_0)`, and `Ψ(H_0) = 0` (`sheetPsi_H0_W0`). -/
+theorem psi_mono_H0_neg {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
+    (hW0 : (frameAt word).eps = -1) (hG : GamesWithRank (conjWord word))
+    {base : ℤ → Site}
+    (hbase : ∀ r : ℤ, 0 ≤ r → r < period (frameAt (conjWord word)) →
+      base r ∈ (frameAt (conjWord word)).freeV ∧ (base r).2 = r)
+    (η : ℤ) (hη : η = -1) :
+    sheetPsi word hFirst ≤ sheetPsi word (hFirst + (frameAt word).prescribedH η hFirst) :=
+  psi_mono_phase0 h hSE hW0 hG hbase (hFirst_mem_freeH (frameAt word)) η
+    (fun _ => by rw [hη, ChildFrame.prescribedH_hFirst]; norm_num)
 
 end FLatticePaper.PsiMonoOffset

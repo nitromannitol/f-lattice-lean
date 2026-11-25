@@ -28,7 +28,7 @@ theorem psi_mono_main {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE
     {base : ℤ → Site}
     (hbase : ∀ r : ℤ, 0 ≤ r → r < period (frameAt (conjWord word)) →
       base r ∈ (frameAt (conjWord word)).freeV ∧ (base r).2 = r)
-    {r : Site} (hr1 : r ≠ hFirst) (η : ℤ)
+    {r : Site} (η : ℤ) (hpH1 : ¬ EvenSite r → (frameAt word).prescribedH η r = (0, 1))
     (hmain : vAt (frameAt (conjWord word)) base (-(r - (frameAt word).sheetShift).2, (r - (frameAt word).sheetShift).1 - 1).2 =
         (-(r - (frameAt word).sheetShift).2, (r - (frameAt word).sheetShift).1 - 1))
     (hnv : base ((-(r - (frameAt word).sheetShift).2, (r - (frameAt word).sheetShift).1 - 1).2 %
@@ -142,7 +142,7 @@ theorem psi_mono_main {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE
   · have hodd : ¬ EvenSite r := by
       unfold EvenSite
       exact hev
-    have hpH : (frameAt word).prescribedH η r = (0, 1) := pH_odd' (frameAt word) η hodd hr1
+    have hpH : (frameAt word).prescribedH η r = (0, 1) := hpH1 (by unfold EvenSite; exact hodd)
     have hq'eq : q' = (q.1 - 1, q.2) := by
       rw [hq', hpH, hq1, hq2]
       ext
