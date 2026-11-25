@@ -535,6 +535,7 @@ import FLatticePaper.Plane.Induction.TwosTileColour
 import FLatticePaper.Plane.Induction.TwosTileSel
 import FLatticePaper.Plane.Induction.TwosPriceBand
 import FLatticePaper.Plane.Induction.CapRecursion
+import FLatticePaper.Plane.Induction.CapAnchors
 import FLatticePaper.Plane.Induction.StrongPriceInputs
 import FLatticePaper.Plane.Induction.StrongDeckSpan
 import FLatticePaper.Plane.Induction.StrongSourceRep
