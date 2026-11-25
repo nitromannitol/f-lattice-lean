@@ -54,10 +54,17 @@ theorem anchor_value_odd {frame : ChildFrame} {F : Field} (hS : frame.HasStrips 
   rw [hS.2 (2 - k, k - 1) hs.1 hs.2]
   exact FLatticePaper.CapRecursion.harmonicGrid_anchor_odd k
 
-/-- **The sheet monotonicity of the cap** (ALL_SLOPE_STEP, "B_j ≤ m(j)" through the even anchor): on the even sheet, the field does not
-decrease from a site of smaller t-grade to a site of greater t-grade in the negative range. This is the named input of the cap; the zero
-strip values `B_0, B_1, A_0, A_1` are obtained from `zero_value` without it. -/
+/-- **The sheet monotonicity of the cap, even sheet** (ALL_SLOPE_STEP, "B_j ≤ m(j)" through the even harmonic anchor; the note's
+"monotonicity in increasing negative t on each sheet", from the preceding period, strip and signed comparison bounds). Named: no lemma of
+the repository gives it (`W1NonfreeHsq.psi_mono` is the monotonicity of the sheet potential Ψ along retained edges, not of the field in
+t). Numerically true on the replay's scalar field (`scripts/w1_sheet_mono.py`: 0 violations over 14 proper entries). The zero-strip values
+`B_0, B_1, A_0, A_1` are obtained from `zero_value` without it. -/
 def SheetMono (frame : ChildFrame) (F : Field) : Prop :=
   ∀ u v : Site, EvenSite u → EvenSite v → frame.tGrade u ≤ frame.tGrade v → frame.tGrade v ≤ 0 → F u ≤ F v
+
+/-- **The sheet monotonicity, odd sheet** (ALL_SLOPE_STEP, the odd anchors `A_k ≥ m(k)` for `k ≥ ⌈u⌉+1`: the odd anchor has smaller
+t-grade than the ray site). Named for the same reason as `SheetMono`; numerically true on the replay's scalar field (0 violations). -/
+def SheetMonoOdd (frame : ChildFrame) (F : Field) : Prop :=
+  ∀ u v : Site, ¬ EvenSite u → ¬ EvenSite v → frame.tGrade u ≤ frame.tGrade v → frame.tGrade v ≤ 0 → F u ≤ F v
 
 end FLatticePaper.CapAnchors
