@@ -5,8 +5,8 @@ import FLatticePaper.Plane.Induction.Binary
 
 The strips are the packet's (`ChildFrame.HasStrips`): `F = 0` where the t-grade is in the zero strip, and `F = h0` where the s-grade is in
 the harmonic strip. The even harmonic anchor `z_j = (1−j, j−1)` has s-grade `2n(1−j)`, so it lies in the harmonic strip for `2n(j−1) ≤ 2d−1`,
-and there `F z_j = h0 z_j = m(j)` (`harmonicGrid_anchor`). The only named input of the cap is the sheet monotonicity, which compares an even
-site with an anchor of greater t-grade (`SheetMono`). -/
+and there `F z_j = h0 z_j = m(j)` (`harmonicGrid_anchor`). The sheet monotonicities that the cap uses are no longer named: they follow
+from the signed comparison on the closed polygon (`SheetMonoChild.sheetMono_even_of_signed`, `SheetMonoChild.sheetMono_odd_of_signed`, Q26). -/
 
 namespace FLatticePaper.CapAnchors
 
@@ -53,18 +53,5 @@ theorem anchor_value_odd {frame : ChildFrame} {F : Field} (hS : frame.HasStrips 
     exact ⟨hlo, hhi⟩
   rw [hS.2 (2 - k, k - 1) hs.1 hs.2]
   exact FLatticePaper.CapRecursion.harmonicGrid_anchor_odd k
-
-/-- **The sheet monotonicity of the cap, even sheet** (ALL_SLOPE_STEP, "B_j ≤ m(j)" through the even harmonic anchor; the note's
-"monotonicity in increasing negative t on each sheet", from the preceding period, strip and signed comparison bounds). Named: no lemma of
-the repository gives it (`W1NonfreeHsq.psi_mono` is the monotonicity of the sheet potential Ψ along retained edges, not of the field in
-t). Numerically true on the replay's scalar field (`scripts/w1_sheet_mono.py`: 0 violations over 14 proper entries). The zero-strip values
-`B_0, B_1, A_0, A_1` are obtained from `zero_value` without it. -/
-def SheetMono (frame : ChildFrame) (F : Field) : Prop :=
-  ∀ u v : Site, EvenSite u → EvenSite v → frame.tGrade u ≤ frame.tGrade v → frame.tGrade v ≤ 0 → F u ≤ F v
-
-/-- **The sheet monotonicity, odd sheet** (ALL_SLOPE_STEP, the odd anchors `A_k ≥ m(k)` for `k ≥ ⌈u⌉+1`: the odd anchor has smaller
-t-grade than the ray site). Named for the same reason as `SheetMono`; numerically true on the replay's scalar field (0 violations). -/
-def SheetMonoOdd (frame : ChildFrame) (F : Field) : Prop :=
-  ∀ u v : Site, ¬ EvenSite u → ¬ EvenSite v → frame.tGrade u ≤ frame.tGrade v → frame.tGrade v ≤ 0 → F u ≤ F v
 
 end FLatticePaper.CapAnchors
