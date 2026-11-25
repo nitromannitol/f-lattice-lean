@@ -636,6 +636,7 @@ import FLatticePaper.Plane.Induction.WestSouth
 import FLatticePaper.Plane.Induction.AuxRankQ1
 import FLatticePaper.Plane.Induction.SecondarySeamEq
 import FLatticePaper.TraceHeadline
+import FLatticePaper.FlatPlusHeadline
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame
 import FLatticePaper.Plane.Induction.BaseMembership
