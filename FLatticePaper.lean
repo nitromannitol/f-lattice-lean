@@ -603,6 +603,9 @@ import FLatticePaper.Plane.Induction.SlipReflectMinus
 import FLatticePaper.Plane.Induction.SlipPermitVend
 import FLatticePaper.Plane.Induction.Sec3Shift
 import FLatticePaper.Plane.Induction.Sec3Monotone
+import FLatticePaper.Plane.Induction.FreeVH0
+import FLatticePaper.Plane.Induction.SheetStars
+import FLatticePaper.Plane.Induction.Sec3Permit
 import FLatticePaper.TraceHeadline
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame
