@@ -680,6 +680,7 @@ import FLatticePaper.Plane.Induction.W4OfferB
 import FLatticePaper.Plane.Induction.W4FloorArc
 import FLatticePaper.Plane.Induction.W4Guard
 import FLatticePaper.Plane.Induction.W4White
+import FLatticePaper.Plane.Induction.RestrictedPassage
 import FLatticePaper.TraceHeadline
 import FLatticePaper.FlatPlusHeadline
 import FLatticePaper.Plane.Induction.TwosDeckEta
