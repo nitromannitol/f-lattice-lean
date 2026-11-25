@@ -300,6 +300,7 @@ import FLatticePaper.Tiles.SeamFinal
 import FLatticePaper.Tiles.SeamBase
 import FLatticePaper.Tiles.CellFourTests
 import FLatticePaper.Tiles.PairRule
+import FLatticePaper.Tiles.GHJoin
 import FLatticePaper.Tiles.InterfaceStacked
 import FLatticePaper.Tiles.StringCorners
 import FLatticePaper.Tiles.SeamSymm
