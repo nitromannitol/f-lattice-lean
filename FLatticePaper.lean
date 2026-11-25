@@ -506,6 +506,8 @@ import FLatticePaper.Plane.Induction.HSourceBound
 import FLatticePaper.Plane.Induction.TwosWitness
 import FLatticePaper.Plane.Induction.CutOnePerProper
 import FLatticePaper.Plane.Induction.NativeCongruence
+import FLatticePaper.Plane.Induction.NativeCases
+import FLatticePaper.Plane.Induction.BothFreeNative
 import FLatticePaper.Plane.Induction.HWeb
 import FLatticePaper.Plane.Induction.W1Collar
 import FLatticePaper.Plane.Induction.W1CollarBox
