@@ -10,6 +10,8 @@ import FLatticePaper.Plane.Induction.HResNCases
 import FLatticePaper.Plane.Induction.TwosGames
 import FLatticePaper.Plane.Induction.W1Reciprocal
 import FLatticePaper.Plane.Induction.NegTieHCutFinal
+import FLatticePaper.Plane.Induction.TwosPieces
+import FLatticePaper.Plane.Induction.TwosWitness
 
 /-! Task 71: the odometers headline with the canonical signed games at every proper word.
 
@@ -50,6 +52,14 @@ theorem w1Forced_at_threes (word : Word) (hp : ∃ k : ℕ, conjWord word = List
   rw [hk]
   exact FLatticePaper.W1Reciprocal.w1Forced_threes k
 
+/-- The conjugate `W1Forced` at a twos conjugate `2^(k+1)`, from `twos_W1Forced` (the child frame is `(2k+3)/(2k+5)`, `twos_child_num_den`). -/
+theorem w1Forced_at_twos (word : Word) (hp : ∃ k : ℕ, conjWord word = List.replicate (k + 1) Digit.two) :
+    FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
+      (standardField (conjWord word)) := by
+  obtain ⟨k, hk⟩ := hp
+  rw [hk, (Induction.twos_child_num_den k).1, (Induction.twos_child_num_den k).2]
+  exact FLatticePaper.W1Twos.twos_W1Forced k
+
 /-- A word that is not a pure threes word has a digit other than `three`. -/
 theorem exists_ne_three_of_not_replicate_three (w : Word) (h : ¬ ∃ k : ℕ, w = List.replicate k Digit.three) :
     ∃ x ∈ w, x ≠ Digit.three := by
@@ -74,6 +84,7 @@ theorem odometersTheorem_of_canonical
       ∀ z, OnBoundary (frameAt word).closedPolygon z → (frameAt word).price (standardField word) z ≤ (frameAt word).cutPrice)
     (hW1 : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       ¬ (∃ k : ℕ, conjWord word = List.replicate k Digit.three) →
+      ¬ (∃ k : ℕ, conjWord word = List.replicate (k + 1) Digit.two) →
       FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
         (standardField (conjWord word))) :
     OdometersTheorem := by
@@ -110,7 +121,9 @@ theorem odometersTheorem_of_canonical
     intro word hw hn
     by_cases hp : ∃ k : ℕ, conjWord word = List.replicate k Digit.three
     · exact w1Forced_at_threes word hp
-    · exact hW1 word hw hn hp
+    · by_cases hq : ∃ k : ℕ, conjWord word = List.replicate (k + 1) Digit.two
+      · exact w1Forced_at_twos word hq
+      · exact hW1 word hw hn hp hq
   -- the V-block input hQ21: the conjugate H-cut case (`H_cut_hQ21`), with the corner bound `sheetDiffW_corner_ge_one` (Q27)
   have hQ21 : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       ∀ c i, RisingBlackPair (standardField word) (-(frameAt word).shortShift) c i →
@@ -185,6 +198,7 @@ theorem odometersTheorem_of_canonical_pure
       ∀ z, OnBoundary (frameAt word).closedPolygon z → (frameAt word).price (standardField word) z ≤ (frameAt word).cutPrice)
     (hW1 : ∀ word : Word, (∃ x ∈ word, x ≠ .three) → ¬ Induction.IsTwoPow word →
       ¬ (∃ k : ℕ, conjWord word = List.replicate k Digit.three) →
+      ¬ (∃ k : ℕ, conjWord word = List.replicate (k + 1) Digit.two) →
       FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
         (standardField (conjWord word))) :
     OdometersTheorem :=

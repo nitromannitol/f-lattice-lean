@@ -1,0 +1,4 @@
+import FLatticePaper.CanonicalHeadline
+
+#print axioms FLatticePaper.w1Forced_at_twos
+#print axioms FLatticePaper.odometersTheorem_of_canonical_pure
