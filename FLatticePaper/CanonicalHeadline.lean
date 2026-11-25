@@ -145,8 +145,6 @@ theorem odometersTheorem_of_canonical_pure
       (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) 1 i =
         (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) 1 c →
       TwosEPolicy.rhoTwos (2 * (k : ℤ) + 4) 1 i < TwosEPolicy.rhoTwos (2 * (k : ℤ) + 4) 1 c)
-    (hvarM : ∀ k : ℕ, ∀ z w : Site,
-      TwosEPolicy.rhoTwos (2 * (k : ℤ) + 4) (-1) z - TwosEPolicy.rhoTwos (2 * (k : ℤ) + 4) (-1) w < 2 * (2 * (k : ℤ) + 5) + 3)
     (hflatM : ∀ k : ℕ, ∀ c i : Site, TwosEPolicy.TwosSel (2 * (k : ℤ) + 4) (-1) (standardField (List.replicate (k + 1) Digit.two)) c i →
       (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) (-1) i =
         (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) (-1) c →
@@ -166,7 +164,7 @@ theorem odometersTheorem_of_canonical_pure
           zTurn (c - (frameAt word).sheetShift) + v ∈ (frameAt (conjWord word)).freeH → False) :
     OdometersTheorem :=
   odometersTheorem_of_canonical FLatticePaper.EPolicy.pure_threes_inputs.1 FLatticePaper.EPolicy.pure_threes_inputs.2
-    (fun k => FLatticePaper.TwosEPolicy.twos_gamesWithRank k (hflatP k) (hvarM k) (hflatM k))
+    (fun k => FLatticePaper.TwosEPolicy.twos_gamesWithRank k (hflatP k) (hflatM k))
     hgames hbd hW1 hQ21
 
 end FLatticePaper

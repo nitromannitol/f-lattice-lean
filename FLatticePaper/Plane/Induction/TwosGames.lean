@@ -7,6 +7,7 @@ import FLatticePaper.Plane.Induction.TwosChainMinus
 import FLatticePaper.Plane.Induction.TwosDrifts
 import FLatticePaper.Plane.Induction.GamesPolicy
 import FLatticePaper.Plane.Induction.TwosTileRange
+import FLatticePaper.Plane.Induction.TwosTileRangeM
 import FLatticePaper.Plane.Induction.TwosLaplacianTile
 import FLatticePaper.Construction.LadderExtension
 
@@ -496,17 +497,16 @@ theorem twos_gamesWithRank (k : ℕ)
       (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) 1 i =
         (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) 1 c →
       rhoTwos (2 * (k : ℤ) + 4) 1 i < rhoTwos (2 * (k : ℤ) + 4) 1 c)
-    (hvarM : ∀ z w : Site, rhoTwos (2 * (k : ℤ) + 4) (-1) z - rhoTwos (2 * (k : ℤ) + 4) (-1) w < 2 * (2 * (k : ℤ) + 5) + 3)
     (hflatM : ∀ c i : Site, TwosSel (2 * (k : ℤ) + 4) (-1) (standardField (List.replicate (k + 1) Digit.two)) c i →
       (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) (-1) i =
         (frameAt (List.replicate (k + 1) Digit.two)).chainPotential (standardField (List.replicate (k + 1) Digit.two)) (-1) c →
       rhoTwos (2 * (k : ℤ) + 4) (-1) i < rhoTwos (2 * (k : ℤ) + 4) (-1) c) :
     GamesWithRank (List.replicate (k + 1) Digit.two) := by
   obtain ⟨S, hagree, hperiod, -⟩ := ladderOdd_exists_extension (ladderOdd_valid_twos k)
-  refine ⟨twosCanonicalGames k hagree hperiod (fun z w => tr_hvar k z w) hflatP hvarM hflatM, fun η hη => ⟨twosRankOf k η,
+  refine ⟨twosCanonicalGames k hagree hperiod (fun z w => tr_hvar k z w) hflatP (fun z w => tr_hvarM k z w) hflatM, fun η hη => ⟨twosRankOf k η,
     -(2 * (2 * (k : ℤ) + 5) + 3), 2 * η * (2 * (2 * (k : ℤ) + 5) + 3), fun z => ?_, fun z => ?_, fun x i hxi => ?_⟩⟩
   · rw [twosRankOf_kernel k η hη z, sub_eq_add_neg]
   · exact twosRankOf_transverse k η hη z
-  · exact twosRankOf_strict k η hη hagree hperiod (fun z w => tr_hvar k z w) hflatP hvarM hflatM x i hxi
+  · exact twosRankOf_strict k η hη hagree hperiod (fun z w => tr_hvar k z w) hflatP (fun z w => tr_hvarM k z w) hflatM x i hxi
 
 end FLatticePaper.TwosEPolicy
