@@ -688,6 +688,7 @@ import FLatticePaper.Plane.Induction.TwosMinusTile
 import FLatticePaper.Plane.Induction.TwosFlatMinus
 import FLatticePaper.FlatMinusHeadline
 import FLatticePaper.Plane.Induction.NWPerWord
+import FLatticePaper.Plane.Induction.HX1West
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame
 import FLatticePaper.Plane.Induction.BaseMembership
