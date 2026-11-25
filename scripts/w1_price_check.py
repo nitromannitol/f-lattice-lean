@@ -2,7 +2,7 @@
   A(z) = FqW(z - lv) = 0 on the word's free H trace;  Psi(z + Vp) = Psi(z) - 1 for z on the trace, Vp = (N-D, N+D).
 Same sheet formulas as w1_psi_check.py."""
 import sys
-sys.path.insert(0, 'scripts'); sys.path.insert(0, '/Users/ahmedbou-rabee/lean-work/flattice-wt/w3/scripts')
+sys.path.insert(0, 'scripts'); sys.path.insert(0, 'scripts')
 from multiprocessing import Pool
 from collections import Counter
 import permit_local as pl

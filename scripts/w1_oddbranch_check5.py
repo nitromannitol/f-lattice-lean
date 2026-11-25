@@ -12,7 +12,7 @@ Branch B: y = e - V_X, V_X = (N_X - D_X, N_X + D_X) = (-nq, dq); fB = Fq(y); see
 Polygon test: z in closed polygon of the pair-child X' (window rule with (n_X, d_X)); also reported without restriction.
 """
 import itertools, sys
-sys.path.insert(0, '/Users/ahmedbou-rabee/lean-work/flattice-wt/w1/scripts')
+sys.path.insert(0, 'scripts')
 from permit_local import standard, Frame, h0, odd_birth_prefix, swap, parents, win
 
 MAXLEN = int(sys.argv[1]) if len(sys.argv) > 1 else 2

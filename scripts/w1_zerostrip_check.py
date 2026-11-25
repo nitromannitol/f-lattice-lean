@@ -9,7 +9,7 @@ Odd lower extension (hlow): F = h0 on odd sites with s in [2 - 3d + n, 1 - 2d].
 Use with: python3 scripts/w1_zerostrip_check.py   (all counts should be zero failures).
 """
 import itertools, sys
-sys.path.insert(0, '/Users/ahmedbou-rabee/lean-work/flattice-wt/w1/scripts')
+sys.path.insert(0, 'scripts')
 from permit_local import standard, Frame, h0
 
 Z = lambda x: (-x[1], x[0] - 1)

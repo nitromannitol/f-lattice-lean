@@ -2,7 +2,7 @@
 For every site v0 in a box with openRect v0 and F v0 = parabola v0.2 v0 (= capMin 0 = 0), and every i in the closed polygon E:
   capMin(i.2 - v0.2) <= F i, with capMin k = -(k(k-1)/2) (QuadraticCap.lean). openRect is the PROVISIONAL reading (Q3Exit.lean)."""
 import sys
-sys.path.insert(0, 'scripts'); sys.path.insert(0, '/Users/ahmedbou-rabee/lean-work/flattice-wt/w3/scripts')
+sys.path.insert(0, 'scripts'); sys.path.insert(0, 'scripts')
 from multiprocessing import Pool
 from collections import Counter
 import permit_local as pl

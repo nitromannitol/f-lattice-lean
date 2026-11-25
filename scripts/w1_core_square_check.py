@@ -5,10 +5,10 @@ For a bottom root z the archive uses the upper-left unit square {z, z-(1,0), z+(
 containing z); the test counts roots whose upper-left square lies in E° (strict), for each of the four squares containing z.
 """
 import itertools, sys
-sys.path.insert(0, '/Users/ahmedbou-rabee/lean-work/flattice-wt/w1/scripts')
+sys.path.insert(0, 'scripts')
 import importlib.util
 _sv = sys.argv; sys.argv = [_sv[0], '2', '30']
-spec = importlib.util.spec_from_file_location('cc', '/Users/ahmedbou-rabee/lean-work/flattice-wt/w1/scripts/w1_collar_check.py')
+spec = importlib.util.spec_from_file_location('cc', 'scripts/w1_collar_check.py')
 cc = importlib.util.module_from_spec(spec); spec.loader.exec_module(cc)
 sys.argv = _sv
 from permit_local import Frame, parents

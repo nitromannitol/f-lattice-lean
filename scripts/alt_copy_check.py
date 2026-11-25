@@ -16,7 +16,7 @@ from collections import defaultdict
 
 import ordinary_tile_check as otc
 
-DUMP = "/Users/ahmedbou-rabee/lean-work/flattice-wt/w2/scripts/data/alt_copy_dump.log"
+DUMP = "scripts/data/alt_copy_dump.log"
 DIGIT = {"one": 1, "two": 2, "three": 3}
 TAGS = ["first", "seventh", "slot1", "slot2", "slot3", "slot4", "slot5"]
 

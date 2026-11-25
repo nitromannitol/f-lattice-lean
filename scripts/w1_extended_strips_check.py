@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, '/Users/ahmedbou-rabee/lean-work/flattice-wt/w1/scripts')
+sys.path.insert(0, 'scripts')
 from permit_local import standard, Frame, proper_words, h0
 def run(w, B=None):
     F, _ = standard(w)

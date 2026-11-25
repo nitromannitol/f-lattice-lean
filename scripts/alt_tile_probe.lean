@@ -2,7 +2,7 @@ import FLatticePaper.Construction.Native
 
 /-! Probe for task 46 (the alternate side of the plane identification): dump the native alternate output tiles
 `alternate.currentOdd` and `alternate.currentEven` after each word of length at most three, with their sites in sorted order
-and their heights. Run with `flb w2 env lean scripts/alt_tile_probe.lean`; the output is in the sandbox log. -/
+and their heights. Run with `lake env lean scripts/alt_tile_probe.lean`; the output is in the build log. -/
 
 open FLatticePaper.Farey FLatticePaper.Construction HeightTile FLatticePaper
 

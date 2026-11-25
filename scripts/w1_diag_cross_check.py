@@ -3,7 +3,7 @@ A diagonal pair with Ψ = +1 and Ψ = −1 is possible only with both other corn
 Output: counts of diagonal cross pairs, adjacent cross pairs, and diagonal cross pairs whose other corners are not ties (expected 0)."""
 import sys, itertools
 sys.argv = ['x']
-sys.path.insert(0, '/Users/ahmedbou-rabee/lean-work/flattice-wt/w1/scripts')
+sys.path.insert(0, 'scripts')
 import w1_phase_check as pc
 from w1_tie_check import sheets
 from w1_forcing_check import lap

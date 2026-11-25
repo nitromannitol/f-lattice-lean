@@ -1,4 +1,4 @@
-# STRONG_PRICE_AND_ALTERNATE_STEP §§1–3 against Lean (task 66)
+# STRONG_PRICE_AND_ALTERNATE_STEP §§1–3 against Lean
 
 Status key: PROVED (Lean theorem here or in main), NAMED (a structure field or hypothesis that the producer must supply), OPEN (neither).
 

@@ -9,7 +9,7 @@ alternate schedules with both corrections, and the correction schedules themselv
 
 Lines: `H <word> <schedule> <count>` opens a schedule with `count` copies; `Q <index> <cells>` gives copy `index`
 (`0` is the first copy), with cells `x,y;x,y;...` (absolute). `E ...` is an evaluator error (none expected).
-Output file: `/tmp/w2_overlap.txt` on the sandbox; the line `done` ends the run. -/
+Output file: `w2_overlap.txt`; the line `done` ends the run. -/
 
 namespace FLatticePaper.Construction.OverlapNativeCheck
 
@@ -34,7 +34,7 @@ def cellsStr (s : Finset Site) : String :=
   let codes : List ℕ := (Finset.image encode s).sort (· ≤ ·)
   String.intercalate ";" (codes.map fun n => s!"{(decode n).1},{(decode n).2}")
 
-def outFile : System.FilePath := "/tmp/w2_overlap.txt"
+def outFile : System.FilePath := "w2_overlap.txt"
 
 def emit (h : IO.FS.Handle) (line : String) : IO Unit := do
   h.putStrLn line

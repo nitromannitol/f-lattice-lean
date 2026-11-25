@@ -13,7 +13,7 @@ evaluator takes from `splitInitial` and not by stepping from the empty word, so 
 `checks/NativeTilesRoots.lean`.
 The tiles are `stdOdd/stdEven` (`standard.currentOdd/currentEven`, the children of the word) and `altOdd/altEven`.
 Cells are encoded as natural numbers `(x + OFF) * MUL + (y + OFF)` so that the finite set can be sorted (computable).
-The output file is `/tmp/w2_bfs.txt` on the sandbox; the line `done` ends the run. -/
+The output file is `w2_bfs.txt`; the line `done` ends the run. -/
 
 namespace FLatticePaper.Construction.NativeTilesCheck
 
@@ -38,7 +38,7 @@ def cellsOf (t : NonemptyTile) : String :=
   let codes : List ℕ := (Finset.image encode t.val.sites).sort (· ≤ ·)
   String.intercalate ";" (codes.map fun n => s!"{(decode n).1},{(decode n).2}")
 
-def outFile : System.FilePath := "/tmp/w2_bfs.txt"
+def outFile : System.FilePath := "w2_bfs.txt"
 
 def emit (h : IO.FS.Handle) (line : String) : IO Unit := do
   h.putStrLn line

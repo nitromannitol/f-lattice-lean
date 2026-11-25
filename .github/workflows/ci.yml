@@ -1,0 +1,49 @@
+name: CI
+
+# Build the library, then report the axioms of the headline declarations. Mathlib-scale, so the workflow runs on pushes
+# to main and on request.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Lean (Lean 4.32.0) and the Mathlib cache
+        uses: leanprover/lean-action@v1
+        with:
+          build: false
+          use-mathlib-cache: true
+
+      - name: Build the library
+        shell: bash
+        run: |
+          set -o pipefail
+          lake build FLatticePaper 2>&1 | tee build.log
+
+      - name: Fail on any error or warning
+        shell: bash
+        run: |
+          if grep -E '^(error|warning):' build.log; then
+            echo "The library build emitted an error or a warning."
+            exit 1
+          fi
+
+      - name: Axiom report of the headline declarations
+        shell: bash
+        run: |
+          set -o pipefail
+          lake env lean checks/HeadlineAxiomReport.lean 2>&1 | tee axioms.log
+          python3 tools/check_axioms.py axioms.log

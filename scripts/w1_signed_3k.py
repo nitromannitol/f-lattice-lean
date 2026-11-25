@@ -1,4 +1,4 @@
-"""Signed canonical policies e(-1,eta) at 3^k (task 118, W1 base; lead's request, from the notes
+"""Signed canonical policies e(-1,eta) at 3^k (from the notes
 .work/fields/canonical/pure3_initialization/raw/UNIFORM_RECIPROCAL_RAW_PRICE_PROOF.md and clean/CLEAN_PHYSICAL_BAND_AND_ALL_THRESHOLD_BINARY.md).
 Prices (convention check against Lean frame.price / slip / chainPotential at frameAt 3^k, eps = -1):
   P(z) = F(z) - F(z+(-1,1)) - y ;  D_eta(z) = F(z) - F(z+(-2 eta,0)) ;  Phi_eta(z) = F(z) - F(z+(-1-2 eta,1)) - y.

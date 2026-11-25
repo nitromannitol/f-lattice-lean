@@ -7,7 +7,7 @@ For every proper word of length <= MAXLEN (not all-2) with standard field F and 
 Points are found on each line by solving the linear equation for x in a window of y in [-Y, Y].
 """
 import sys
-sys.path.insert(0, '/Users/ahmedbou-rabee/lean-work/flattice-wt/w1/scripts')
+sys.path.insert(0, 'scripts')
 from permit_local import standard, Frame, proper_words, h0
 
 MAXLEN = int(sys.argv[1]) if len(sys.argv) > 1 else 3

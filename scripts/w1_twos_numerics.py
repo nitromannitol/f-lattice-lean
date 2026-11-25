@@ -1,4 +1,4 @@
-# Numerics for W1Forced at the twos children (the child of 2^(k+1) is (2k+3)/(2k+5), a = 2k+4), task 72 (lead item 2).
+# Numerics for W1Forced at the twos children (the child of 2^(k+1) is (2k+3)/(2k+5), a = 2k+4).
 # Checks: the closed form of the strict interior; the native black/white rule (laplacian_twos_native, with the quarter turn
 # rot(u) = (2a-u_2, u_1+1) and the ladder predicates); the unit-square closure inside the strict interior; the archive's
 # four forced classes L/U/E/W in the plane coordinates (x, y) (pure2_initialization/UNIFORM_DOUBLED_LADDER_BULK_DIRECTIONS.md)

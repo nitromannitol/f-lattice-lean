@@ -4,7 +4,7 @@ import FLatticePaper.Construction.Native
 digit `1` or `2`, dump the first copy and the six copies of `ordinaryAlternateSchedule (parents of the prefix) prefix digit .even`
 with their sites and heights. The tags are `first` (the placed standard donor in slot 0), `seventh` (the restored alternate
 piece) and `slotS` (the placed standard donor in slot `S`, in the order of `afterSeventhAlternate .even`). Run with
-`flb w2 env lean scripts/alt_copy_probe.lean`; the output is in the sandbox log. -/
+`lake env lean scripts/alt_copy_probe.lean`; the output is in the build log. -/
 
 open FLatticePaper.Farey FLatticePaper.Construction HeightTile FLatticePaper
 

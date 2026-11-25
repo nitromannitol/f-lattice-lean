@@ -1,4 +1,4 @@
-"""Task 64 orientation check (lead directive): on the canonical S3 policy, which orientation do the forced whites' squares have?
+"""Orientation check: on the canonical S3 policy, which orientation do the forced whites' squares have?
 
 The canonical policy is the construction of s3_policy_check (deck representatives, extended to all sites by the even deck shifts):
 black centres keep both inputs; a white centre keeps one permitted input weakly lower in (P, J), strict drops preferred.
@@ -12,7 +12,7 @@ n1 = p(c), n2 = p(n1), n3 = p(n2) (p(n3) = c) is recorded with the kept-edge pat
   Kc = policy keeps (c, n1)  [root keeps its rejected input]
   Ko = policy keeps (c, o)   [root keeps its pointer]
   K1 = policy keeps (n1, n2), K2 = policy keeps (n2, n3), K3 = policy keeps (n3, c).
-Lead orientation: Kc False, K1 K2 K3 True (corners keep, last keeps the root). Our field: Kc True, K1 True, K2 True.
+Orientation of the reference pattern: Kc False, K1 K2 K3 True (corners keep, last keeps the root). Our field: Kc True, K1 True, K2 True.
 """
 import sys
 from pathlib import Path
@@ -193,7 +193,7 @@ def run(args):
         K3 = pol.keeps(n3, c)
         pats[(Kc, Ko, K1, K2, K3)] += 1
         per_white[c].add((Kc, Ko, K1, K2, K3))
-    # per white: lead pattern (root rejects, corners keep, last keeps root), our pattern (root keeps rejected, corners keep first two),
+    # per white: reference pattern (root rejects, corners keep, last keeps root), our pattern (root keeps rejected, corners keep first two),
     # full kept cycle (all four in-square edges kept)
     cls = Counter()
     for c, ps in per_white.items():

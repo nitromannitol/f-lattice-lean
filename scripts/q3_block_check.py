@@ -1,4 +1,4 @@
-"""Task 60 (lead): the l = D block vertex uses the CHILD floor, b_c = floor((d-n) D / d) = D - N + floor(eps/d).
+"""The l = D block vertex uses the CHILD floor, b_c = floor((d-n) D / d) = D - N + floor(eps/d).
 Block vertex at l: v_l = (-b, 2l - 1 - b) with b = floor((d-n) l / d) (child), for every 1 <= l <= D.
 W = 0 (eps = -1): the block is v_1..v_D; every v_l is a child left V vertex (left boundary of E, parity spectrum).
 W = 1 (eps = +1): the block is v_1..v_{D-1} and V_p + I = (N-D+1, D+N-1) replaces v_D (child floor D-N, v_D = (N-D, D+N-1)).

@@ -1,0 +1,14 @@
+{
+  "challenge_module": "FLatticeAudit.Hyperbola.Challenge",
+  "solution_module": "FLatticeAudit.Hyperbola.Solution",
+  "theorem_names": [
+    "FLatticeAudit.hyperbola"
+  ],
+  "definition_names": [],
+  "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ],
+  "enable_nanoda": true
+}

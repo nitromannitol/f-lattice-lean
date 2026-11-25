@@ -11,7 +11,7 @@ Escape at level m is upward closed in m, so T(r) = inf{m : escape(r, m)} on the 
 T is the least fixpoint, computed from +inf by a worklist.  A node updated more than CAP times has a negative cycle
 and is set to -inf (escape at every level).  A cover site s escapes iff T(s) <= g(s).
 mode 'relaxed' replaces the lap -1 AND by an OR (min over permitted inputs): the reachability-with-negative-cycles
-test of the lead's rule, for comparison.
+test of the rule under study, for comparison.
 """
 import sys, math, time, random
 from collections import deque

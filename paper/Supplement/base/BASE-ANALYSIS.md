@@ -1,6 +1,6 @@
-# Base-family analysis (delegated research, 2026-10-20)
+# Base-family analysis (2026-10-20)
 
-This file uses only the algorithm specification and the proved general lemmas, not the paper's proof. It is a proposed addition to BLUEPRINT §4; the main agent owns that document.
+This file uses only the algorithm specification and the proved general lemmas, not the paper's proof. It is a proposed addition to BLUEPRINT §4.
 
 ## B1: L20, L21, L23 and L24 [PROVED]
 
@@ -168,7 +168,7 @@ Since translation by a lattice vector changes `R` by a constant, the inequalitie
 
 ## Result after the first family
 
-All of L20–L24 hold uniformly for B1. The main agent's separately proved harmonic quarter-turn conjugacy transports these properties to B2. The next section completes B3 as well.
+All of L20–L24 hold uniformly for B1. A separately proved harmonic quarter-turn conjugacy transports these properties to B2. The next section completes B3 as well.
 
 ## B3: reduction to B1 and complete L20–L24 proof [PROVED]
 
@@ -320,4 +320,4 @@ For `v₁`, write the lower endpoint as `(x,y)`. The full overlap list is partit
 
 The row intervals of the B3 domain show that these are exhaustive: the target y-coordinate is one larger; rows -1,0,d produce items 1,2,5; in the middle rows a main-region target forces the source sum at most 1, except for the sole extra target `(3,d)`. This proves all rank overlap equalities, uniformly in d.
 
-**Final status of this file:** complete uniform proofs of L20–L24 for B1 and B3. Together with the main agent's harmonic rotation, these settle B2 and B4 as well. All supporting exact tests passed through the stated adversarial ranges.
+**Final status of this file:** complete uniform proofs of L20–L24 for B1 and B3. Together with the harmonic rotation, these settle B2 and B4 as well. All supporting exact tests passed through the stated adversarial ranges.

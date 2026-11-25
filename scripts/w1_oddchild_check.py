@@ -11,7 +11,7 @@ Claim tested: f_w(x) = min(Abar(x), Cbar(x)) for all x with Z x in the closed po
 Points: y = Z x ranges over the lattice points of E_w (box), x = Z^{-1} y = (y2 + 1, -y1).
 """
 import itertools, sys
-sys.path.insert(0, '/Users/ahmedbou-rabee/lean-work/flattice-wt/w1/scripts')
+sys.path.insert(0, 'scripts')
 from permit_local import standard, Frame, h0, odd_birth_prefix, swap
 
 MAXLEN = int(sys.argv[1]) if len(sys.argv) > 1 else 2

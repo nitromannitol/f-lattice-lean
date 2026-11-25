@@ -6,12 +6,12 @@ E° has the phase property:
   (strict) psi c ≠ 0 : every other white corner c' of Q has psi c' ≠ 0 and sign(psi c') = sign(psi c) (no strict→tie, no cross-phase).
 Reports the whites with no such square (ideally none)."""
 import itertools, sys
-sys.path.insert(0, '/Users/ahmedbou-rabee/lean-work/flattice-wt/w1/scripts')
+sys.path.insert(0, 'scripts')
 from w1_tie_check import sheets
 from w1_forcing_check import inn, inp, lap
 import importlib.util
 _sv = sys.argv; sys.argv = [_sv[0], '2', '30']
-spec = importlib.util.spec_from_file_location('cc', '/Users/ahmedbou-rabee/lean-work/flattice-wt/w1/scripts/w1_collar_check.py')
+spec = importlib.util.spec_from_file_location('cc', 'scripts/w1_collar_check.py')
 cc = importlib.util.module_from_spec(spec); spec.loader.exec_module(cc)
 sys.argv = _sv
 from permit_local import standard, Frame

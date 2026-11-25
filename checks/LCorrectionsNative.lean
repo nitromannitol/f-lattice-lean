@@ -10,7 +10,7 @@ For each nonempty ancestor word `u` of length at most two, the program prints
   `correctionPair` does) for the word `x`, where `x = u ++ 2^k` for the odd parity (`u` ends in 1 or 3) and `x = u ++ 3^k`
   for the even parity (`u` ends in 1 or 2), with `|x| ≤ 3`. `side` is `L` (flip) or `R`; `length` is `long` (elongated) or
   `short`. The saved registers are those of `u`, which are the `savedTwo` (resp. `savedThree`) registers of `x`.
-Output file: `/tmp/w2_lcorr.txt` on the sandbox; the line `done` ends the run. -/
+Output file: `w2_lcorr.txt`; the line `done` ends the run. -/
 
 namespace FLatticePaper.Construction.LCorrectionsNativeCheck
 
@@ -35,7 +35,7 @@ def cellsOf (t : NonemptyTile) : String :=
   let codes : List ℕ := (Finset.image encode t.val.sites).sort (· ≤ ·)
   String.intercalate ";" (codes.map fun n => s!"{(decode n).1},{(decode n).2}")
 
-def outFile : System.FilePath := "/tmp/w2_lcorr.txt"
+def outFile : System.FilePath := "w2_lcorr.txt"
 
 def emit (h : IO.FS.Handle) (line : String) : IO Unit := do
   h.putStrLn line

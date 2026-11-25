@@ -1,4 +1,4 @@
-"""Lead's test: value iteration on the finite deck quotient.
+"""Value iteration on the finite deck quotient.
 r(z) = h(z) - grade(z), h = lowest level a strategy tree from z guarantees. r is deck-periodic and r <= 0.
   r_{n+1}(z) = min(0, op(r_n(a) + D_a, r_n(b) + D_b)),  op = max at charge -1 (both inputs permitted), min at charge 0
   over permitted inputs (+BIG if none), D_a = grade(a) - grade(z).

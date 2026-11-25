@@ -3,7 +3,7 @@ import FLatticePaper.Construction.OrdinaryStandardCover
 
 /-! Probe for task 46 (the odd alternate copies against the standard odd copies): for each word of length at most three ending in
 1 or 3, dump the six copies `ordinaryStandardCopy parents word .odd k` (k = 0..5), with their sites and heights, in raw coordinates.
-Tags `std0` .. `std5`. Run with `flb w2 env lean scripts/std_odd_copy_probe.lean`; the output is in the sandbox log. -/
+Tags `std0` .. `std5`. Run with `lake env lean scripts/std_odd_copy_probe.lean`; the output is in the build log. -/
 
 open FLatticePaper.Farey FLatticePaper.Construction HeightTile FLatticePaper
 

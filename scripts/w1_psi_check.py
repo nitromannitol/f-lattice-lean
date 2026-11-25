@@ -6,7 +6,7 @@
     W0 (eps=-1): Psi(H_0)=0, Psi(H_1)=1, Psi(H_j)>=1 (j>=1), Psi(H_j) nondecreasing in j.
     W1 (eps=+1): w(H_j) = (d+1-x, n-1-y), Psi(w H_0)=Psi(H_last)=0, Psi(w H_1)=1, Psi(w H_j)>=1 (j>=1), nondecreasing in j."""
 import sys
-sys.path.insert(0, 'scripts'); sys.path.insert(0, '/Users/ahmedbou-rabee/lean-work/flattice-wt/w3/scripts')
+sys.path.insert(0, 'scripts'); sys.path.insert(0, 'scripts')
 from multiprocessing import Pool
 from collections import Counter
 import permit_local as pl

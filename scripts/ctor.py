@@ -6,7 +6,7 @@ never matter. Schedules are evaluated as the union of their placed copies, after
 `PlacedSchedule.eval`; a failed contact raises `CtorError` (the Lean evaluator returns an error there).
 
 Fractions are pairs (num, den), words are strings over '1', '2', '3'. The base-run registers are taken from the TeX
-standard and alternate tiles (`alt_tiles`), as the lead's note says they agree with the base tiles; the validation
+standard and alternate tiles (`alt_tiles`), as the note on the constructor says they agree with the base tiles; the validation
 against the native logs for words of length at most three checks this.
 
 Entry points:

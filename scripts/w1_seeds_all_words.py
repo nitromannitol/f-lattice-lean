@@ -8,7 +8,7 @@ Points are sampled on each line in a window of y in [-Y, Y]. Words that fail to 
 """
 import itertools
 import sys
-sys.path.insert(0, '/Users/ahmedbou-rabee/lean-work/flattice-wt/w1/scripts')
+sys.path.insert(0, 'scripts')
 from permit_local import standard, Frame, h0
 
 MAXLEN = int(sys.argv[1]) if len(sys.argv) > 1 else 3

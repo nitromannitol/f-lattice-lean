@@ -1,4 +1,4 @@
-"""Link check at 3^k (task 118, W1 base; the lead's request): the W1 policy of standardField(3^k) against the Retained sets.
+"""Link check at 3^k: the W1 policy of standardField(3^k) against the Retained sets.
 For every native centre c (raw sites of the B1 tile = NativeP), lap(c) = G(incomingNeg c) - G c + G(incomingPos c) - G c with the
 extension of w1_field_3k.py. Quota of the policy: lap = -1 (black) retains both parity-axis inputs; lap = 0 (white) retains at
 least one. The check compares with the retained parity-axis unit directions of the Q_minus rule (w1_bulk_gate.py) and of the

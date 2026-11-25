@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, '/Users/ahmedbou-rabee/lean-work/flattice-wt/w1/scripts')
+sys.path.insert(0, 'scripts')
 from permit_local import standard, Frame, proper_words, win, lap
 def add(z, v): return (z[0] + v[0], z[1] + v[1])
 def sub(z, v): return (z[0] - v[0], z[1] - v[1])

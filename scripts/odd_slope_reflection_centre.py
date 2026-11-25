@@ -1,8 +1,8 @@
-"""The reflected check of the odd alternate target (task 46, lead's question, continued from odd_slope_reflection.py).
+"""The reflected check of the odd alternate target (continued from odd_slope_reflection.py).
 
 For the frame of u = swap w with child (n, d) and centre C = (mu d + (n - d) + 1, mu n + (n + d) - 1), mu = 1 if n + d even else 2:
 1. the standard field has the reflection F(C - y) = F(y) - t(y) + kappa with t(y) = n y1 - d y2 (checked numerically, all sites);
-2. hence H_+(C - p) = H_-(p) + L(p) - (1/2) grad L . sigma with L = -t + const (the lead's identity);
+2. hence H_+(C - p) = H_-(p) + L(p) - (1/2) grad L . sigma with L = -t + const (the identity under test);
 3. the alternate target alt(z) = Q_+(z - T) + J . z is then Q_-(x') + affine(z), where x' = Z^{-1}(C - Z(z - T)), Z(x') = C - Z(z - T).
 
 This script computes the residual R(z) = alt(z) - Q_-(x'(z)) on the copy sites and checks whether it is affine (constant after subtracting a

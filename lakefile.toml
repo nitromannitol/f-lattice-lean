@@ -9,3 +9,14 @@ rev = "81a5d257c8e410db227a6665ed08f64fea08e997"
 
 [[lean_lib]]
 name = "FLatticePaper"
+
+# The comparator audit surface (`FLatticeAudit/*/Challenge.lean` and `Solution.lean`). Not a default target: it builds only
+# on request (`lake build FLatticeAudit`), so the ordinary build of `FLatticePaper` is unchanged.
+[[lean_lib]]
+name = "FLatticeAudit"
+roots = [
+  "FLatticeAudit.Hyperbola.Challenge",
+  "FLatticeAudit.Hyperbola.Solution",
+  "FLatticeAudit.CirclePacking.Challenge",
+  "FLatticeAudit.CirclePacking.Solution",
+]

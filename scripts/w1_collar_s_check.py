@@ -5,10 +5,10 @@ W0 (left, r = z): the archive's parent argument for the C offer is y - Vq (y = z
 Claimed ranges: even s* in [2N, 2Lp-2], odd s* in [Lp, 3D+N-2]. sp(p) = (C s(p) + 2 eps t(p))/T (integral, from w1_collar_check).
 """
 import itertools, sys
-sys.path.insert(0, '/Users/ahmedbou-rabee/lean-work/flattice-wt/w1/scripts')
+sys.path.insert(0, 'scripts')
 sys.argv = [sys.argv[0], '2', '30']
 import importlib.util
-spec = importlib.util.spec_from_file_location('cc', '/Users/ahmedbou-rabee/lean-work/flattice-wt/w1/scripts/w1_collar_check.py')
+spec = importlib.util.spec_from_file_location('cc', 'scripts/w1_collar_check.py')
 cc = importlib.util.module_from_spec(spec); spec.loader.exec_module(cc)
 from permit_local import Frame, parents
 
