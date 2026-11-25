@@ -1,0 +1,3 @@
+import FLatticePaper.Plane.Induction.CutOnePerProper
+
+#print axioms FLatticePaper.CutOnePerProper.cutOnePerOrdinate_of_proper
