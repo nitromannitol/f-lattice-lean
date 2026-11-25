@@ -1,6 +1,8 @@
 import FLatticePaper.Plane.Induction.SignMinusAdjacent
 import FLatticePaper.Plane.Induction.RawB
 import FLatticePaper.Plane.Induction.NonfreeBridge
+import FLatticePaper.Plane.Induction.W1Step
+import FLatticePaper.Plane.Induction.W1HagreeNonfree
 
 /-! # W4 (Q34): the sign `−1` permit at a forced nonfree white, adjacent chart, from one named input
 
@@ -67,5 +69,38 @@ theorem slip_minus_forced_adjacent {word : Word} (h : ∃ x ∈ word, x ≠ Digi
   unfold aJump BOffer at hn
   simp only [FqW] at *
   omega
+
+/-- **The retention from the W1 identification.** At an `A`-root `c` (`Ψ c ≥ 0`) the W1 pointer `sheetOut c` is the `A`-pointer, which
+is a retained `sheetPolicyA` edge (`sheetPolicyA_pointer_retained`). So the forced input `i = sheetOut c` gives `hret`. -/
+theorem hret_of_sheetOut {word : Word} (hSE : StrongEstimates (conjWord word))
+    {seed : Site → Site → Prop}
+    (P : FLatticePaper.W1Phase.OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
+    {c i : Site} (hΨ : 0 ≤ sheetPsi word c)
+    (hout : FLatticePaper.W1Step.sheetOut P (frameAt word).sheetShift (frameAt word).centre (sheetPsi word) c = i) :
+    sheetPolicyA P.toOldPolicyWitness.toOldPolicyData (frameAt word).sheetShift c i := by
+  subst hout
+  unfold FLatticePaper.W1Step.sheetOut
+  rw [if_pos hΨ]
+  exact FLatticePaper.W1HagreeNonfree.sheetPolicyA_pointer_retained P.toOldPolicyWitness.toOldPolicyData
+    hSE.packet.binary (frameAt word).sheetShift (frameAt word).evenSite_sheetShift c
+
+/-- **The sign `−1` permit at a forced nonfree white, through the W1 identification.** The forced input is `sheetOut c`
+(`hout`, the W1 identification from the square data of `sheetOut_forcedIn`); the retention `hret` is then derived by
+`hret_of_sheetOut`. The named input is still `NoAFallForced`. -/
+theorem slip_minus_forced_adjacent_sheetOut {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
+    (hW : StrongEstimates word) (hSE : StrongEstimates (conjWord word))
+    {seed : Site → Site → Prop}
+    (P : FLatticePaper.W1Phase.OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
+    (hnofall : NoAFallForced word) {c i : Site}
+    (hc : c ∈ (frameAt word).closedPolygon) (hi : i ∈ (frameAt word).closedPolygon)
+    (hcu : c + (frameAt word).uq ∈ (frameAt word).closedPolygon)
+    (hiu : i + (frameAt word).uq ∈ (frameAt word).closedPolygon)
+    (hΨc : 0 ≤ sheetPsi word c) (hΨi : 0 ≤ sheetPsi word i) (hEdge : Edge i c)
+    (hfor : SquareClauses.ForcedEdge (standardField word) (fun _ _ => False) c i)
+    (hlap : laplacian (standardField word) c = 0) (hnf : FLatticePaper.Induction.Nonfree (frameAt word) c)
+    (hout : FLatticePaper.W1Step.sheetOut P (frameAt word).sheetShift (frameAt word).centre (sheetPsi word) c = i) :
+    (frameAt word).slip (standardField word) (-1) i ≤ (frameAt word).slip (standardField word) (-1) c :=
+  slip_minus_forced_adjacent h hW hSE P.toOldPolicyWitness.toOldPolicyData hnofall hc hi hcu hiu hΨc hΨi hEdge hfor hlap hnf
+    (hret_of_sheetOut hSE P hΨc hout)
 
 end FLatticePaper.W4Reduction

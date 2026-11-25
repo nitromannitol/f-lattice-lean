@@ -653,6 +653,7 @@ import FLatticePaper.Plane.Induction.UnitBound
 import FLatticePaper.Plane.Induction.PlusAdjacent
 import FLatticePaper.Plane.Induction.SignMinusAdjacent
 import FLatticePaper.Plane.Induction.W4Reduction
+import FLatticePaper.Plane.Induction.W4Cases
 import FLatticePaper.TraceHeadline
 import FLatticePaper.FlatPlusHeadline
 import FLatticePaper.Plane.Induction.TwosDeckEta
