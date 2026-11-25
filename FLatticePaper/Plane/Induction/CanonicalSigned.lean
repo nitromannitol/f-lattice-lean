@@ -73,6 +73,12 @@ structure CanonicalSignedGames (frame : ChildFrame) (F : Field) where
   (Q24/Q28); for the free policies it is `FreeChain.chain_free`, with the deck equivariance from `FreePolicy.freePolicy_deck`. -/
   chainNonincreasing : ∀ η : ℤ, (hη : η = 1 ∨ η = -1) →
     NonincreasingAlong (frame.chainPotential F η) (game η hη).policy
+  /-- The deck equivariance of each sign: the policy is invariant under every deck vector `s` of the child, `policy x u ↔
+  policy (x + s) (u + s)`. For the free policies it is `FreePolicy.freePolicy_add_span`; for the reciprocal and twos games it is
+  `EPolicyIndep.ePolicy_span` and `TwosEquiv.twosSel_shift`. -/
+  deckEquiv : ∀ η : ℤ, (hη : η = 1 ∨ η = -1) → ∀ (i j : ℤ) (x u : Site),
+    (game η hη).policy x u ↔
+      (game η hη).policy (x + frame.child.modifiedDeck.combine i j) (u + frame.child.modifiedDeck.combine i j)
 
 /-- The sign `−η` of a unit sign is a unit sign. -/
 theorem neg_unit {η : ℤ} (hη : η = 1 ∨ η = -1) : -η = 1 ∨ -η = -1 := by

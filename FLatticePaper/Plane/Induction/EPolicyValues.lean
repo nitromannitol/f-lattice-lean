@@ -2,6 +2,7 @@ import FLatticePaper.Plane.Induction.EPolicySquares
 import FLatticePaper.Plane.Induction.CanonicalSigned
 import FLatticePaper.Plane.Induction.ReciprocalIncrements
 import FLatticePaper.Plane.Induction.PureBasePrice
+import FLatticePaper.Construction.EPolicyIndep
 
 /-!
 # The value inequalities of the signed policy e(-1, eta) on the reciprocal field (task 118, W1 base)
@@ -89,6 +90,11 @@ noncomputable def canonicalSignedGames_reciprocal (k : ℕ) (V : ReciprocalValue
       ePolicy (2 * (k : ℤ) + 3) η (laplacian (reciprocalField k)) c i → R i < R c) :
     CanonicalSignedGames (reciprocalFrame k) (reciprocalField k) where
   game := fun η hη => canonicalSignedPolicy_reciprocal k V rank η hη
+  deckEquiv := fun η hη i j x u => by
+    rw [reciprocalFrame_child]
+    exact (FLatticePaper.EPolicyIndep.ePolicy_span (m := (k : ℤ) + 1) (by omega) (by ring)
+      (stairEven_valid_reciprocal k) η (laplacian (reciprocalField k)) i j x u
+      (laplacian_add_combine (reciprocalField_spec k).2 x i j)).symm
   chainNonincreasing := fun η hη => V.chain η hη
 
 /-- The unit increment of a field along `e` at `z`. -/
