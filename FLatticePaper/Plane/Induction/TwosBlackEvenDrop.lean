@@ -1,6 +1,7 @@
 import FLatticePaper.Plane.Induction.TwosBlackEvenNb
 import FLatticePaper.Plane.Induction.TwosFlatClass
 import FLatticePaper.Plane.Induction.TwosRhoCases
+import FLatticePaper.Plane.Induction.TwosSpecialPhi
 
 /-! Twos flatness, the even black drop on the left: for a black even tile point `p` (not special) and its left neighbour
 `i = (x-1, y)` with equal potential, the rank of `i` is one less than the rank of `p`.
@@ -159,9 +160,19 @@ the same potential and is not the special `(a, 2a-1)`, the rank of the neighbour
 theorem even_black_drop_right {a x y : ℤ} {k : ℕ} (hk : a = 2 * (k : ℤ) + 4)
     (hp : TwosTile a (x, y)) (hp1 : ¬ (x = a ∧ y = 2 * a - 2)) (hp2 : ¬ (x = a ∧ y = 2 * a - 1))
     (hp3 : ¬ (x = a + 1 ∧ y = a - 2)) (hB : ¬ EvenWhitePiece a x y) (he : (x + y) % 2 = 0)
-    (hsp : ¬ (x + 1 = a ∧ y = 2 * a - 1))
     (hΦ : twosPhi k 1 (x + 1, y) = twosPhi k 1 (x, y)) :
     rhoTwos a 1 (x + 1, y) < rhoTwos a 1 (x, y) := by
+  by_cases hsp : x + 1 = a ∧ y = 2 * a - 1
+  · exfalso
+    have hx : x = a - 1 := by omega
+    have hy : y = 2 * a - 1 := hsp.2
+    subst hx
+    subst hy
+    have hp' : TwosTile a (a - 1, 2 * a - 1) := hp
+    have hΦ' : twosPhi k 1 (a, 2 * a - 1) = twosPhi k 1 (a - 1, 2 * a - 1) := by
+      rw [show a - 1 + 1 = a by ring] at hΦ
+      exact hΦ
+    exact right_special_nonflat hk hp' hΦ'
   have ha : (4 : ℤ) ≤ a := by omega
   have he2 : a % 2 = 0 := by omega
   have hN_p : NativeT a x y := ((tile_iff_lin _ _ _).mp hp).1
