@@ -510,6 +510,9 @@ import FLatticePaper.Plane.Induction.BothFreeRise
 import FLatticePaper.Plane.Induction.MinPolicy
 import FLatticePaper.Plane.Induction.Q24Policy
 import FLatticePaper.Plane.Induction.Q24Instances
+import FLatticePaper.Plane.Induction.BaseMembership
+import FLatticePaper.Plane.Induction.BaseSpec
+import FLatticePaper.Plane.Induction.ConjFreeH
 import FLatticePaper.Plane.Induction.PriceReflect
 import FLatticePaper.Plane.Induction.PsiIdentity
 import FLatticePaper.Plane.Induction.FreeVOrdinate
