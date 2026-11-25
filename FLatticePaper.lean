@@ -205,6 +205,7 @@ import FLatticePaper.Plane.Induction.TwosPriceMono
 import FLatticePaper.Plane.Induction.TwosSlipMono
 import FLatticePaper.Plane.Induction.TwosChainMono
 import FLatticePaper.Plane.Induction.W1Reciprocal
+import FLatticePaper.Plane.Induction.W1Twos
 import FLatticePaper.Construction.NearOneBaseCases
 import FLatticePaper.Construction.BaseCases
 import FLatticePaper.Construction.OffsetTables
