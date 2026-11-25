@@ -6,9 +6,13 @@ import FLatticePaper.Plane.Induction.HfreePhase1
 /-! The `FreeNamedInputs` of the word's free-edge signed policy, for a sign `η ∈ {±1}`.
 
 The `permitted` field is `FreePermittedS.permitted_S`, `strictRank` is the aux rank of the sign restricted to the policy edges
-(`AuxRankSign.freePolicy_aux`), and the rest is `WordPolicy.word_named_inputs`. The named inputs are the aux rank of sign η, `hwest`,
-`OddBlackNoRise`, `W1Forced` (which gives `ForcedExists` by `forcedExists_of`), and the price premise `hfreeP` (which carries the N = 1
-phase-one corner) together with the comparison data `EC`, `hT`, `hW` of `word_price_nonincreasing`, and the canonical games `G`. -/
+(`AuxRankSign.freePolicy_aux`), `nonincreasingP` is `ForcedPriceSI.word_price_nonincreasing_SI` with `hfreeP` from
+`HfreePhase1.hfreeP_of_phases`, and `nonincreasingJ` is `WordPolicy.word_J_nonincreasing`.
+
+The named inputs are: the aux rank of sign η (`hstrictR`), `hwest`, `OddBlackNoRise` (`hOdd`), the step premises `hW1` (the word's
+`W1Forced`) and `hG` (the conjugate's games, which also give the canonical games `G` by `games_of_gamesWithRank`), and the N = 1 corner
+`hcorner` (phase one, η = −1, N = 1: `Ψ = 0` and `A = 0` at `reflH(H_0 + (0,−η))`). The comparison data is not a premise: the
+forced monotonicity is strict-interior (`ForcedPriceSI`). -/
 
 namespace FLatticePaper.FreeAssemble
 
@@ -17,7 +21,6 @@ open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.FreePolicy FLatti
 
 theorem free_named_inputs {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hWord : StrongEstimates word)
     (hSE : StrongEstimates (conjWord word))
-    (G : CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word)))
     (hG : GamesWithRank (conjWord word))
     (hOdd : OddBlackNoRise (standardField word) (frameAt word).shortShift)
     (hW1 : FLatticePaper.W1.W1Forced (frameAt word).child.num (frameAt word).child.den (standardField word))
@@ -32,6 +35,7 @@ theorem free_named_inputs {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) 
       (incomingNeg ((frameAt word).parents.odd.num - (frameAt word).parents.odd.den + 1,
         (frameAt word).parents.odd.den + (frameAt word).parents.odd.num - 1))) :
     FreeNamedInputs (frameAt word) (standardField word) η R := by
+  obtain ⟨G⟩ := games_of_gamesWithRank hG
   obtain ⟨base, hbase⟩ := HfreePhase1.conj_base (frameAt (conjWord word))
   have hfreeP : ∀ c i, laplacian (standardField word) c = 0 → freeClosure (frameAt word) c →
       FreePresc (frameAt word) η c i →
