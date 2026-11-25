@@ -1,0 +1,6 @@
+import FLatticePaper.Plane.Induction.NegFromPlus
+
+#print axioms FLatticePaper.ForcedCentre.forced_reflect_centre
+#print axioms FLatticePaper.NonfreeReflect.not_freeClosure_centre
+#print axioms FLatticePaper.NegFromPlus.slip_minus_of_plus
+#print axioms FLatticePaper.NegFromPlus.slip_minus_white_of_plus
