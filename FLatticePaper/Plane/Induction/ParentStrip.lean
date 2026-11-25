@@ -163,4 +163,54 @@ theorem odd_strip {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : S
       rw [hy]
       rcases hε1 with h1 | h1 <;> rw [h1] <;> linarith
 
+/-- **P4, the last root `vLast`.** Its parent grade is `s_p(vLast) = 2N − 2ε` (phase 0: `2N + 2`; phase 1: `2N − 2`), and
+`s_p(vLast − V_q) = 2N`. Both lie in the parent strip `[1 − 2D, 2r − 1]`. -/
+theorem even_strip_vLast {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word)) :
+    FqW word (frameAt word).vLast = harmonicGrid (frameAt word).vLast ∧
+      FqW word ((frameAt word).vLast - ((frameAt word).parents.even.num - (frameAt word).parents.even.den,
+          (frameAt word).parents.even.num + (frameAt word).parents.even.den)) =
+        harmonicGrid ((frameAt word).vLast - ((frameAt word).parents.even.num - (frameAt word).parents.even.den,
+          (frameAt word).parents.even.num + (frameAt word).parents.even.den)) := by
+  have hpos : 0 < (frameAt word).parents.odd.num := frameAt_odd_num_pos h
+  have hodd0 : ((frameAt word).parents.odd.num + (frameAt word).parents.odd.den) % 2 = 1 :=
+    (frameAt word).valid.odd_parity
+  obtain ⟨hDpos, hN0', hNle'⟩ := (frameAt word).valid.odd_bounds
+  have hεdet : (frameAt word).eps = (frameAt word).parents.odd.num * (frameAt word).parents.even.den
+      - (frameAt word).parents.odd.den * (frameAt word).parents.even.num :=
+    SheetOffsets.eps_eq_det
+  have hεd : (frameAt word).eps = (frameAt word).parents.odd.num * (frameAt word).child.den
+      - (frameAt word).parents.odd.den * (frameAt word).child.num := by
+    rw [hεdet, ZoneI1.child_den_eq (frameAt word), ZoneI1.child_num_eq (frameAt word)]
+    ring
+  have hε1 : (frameAt word).eps = 1 ∨ (frameAt word).eps = -1 := (frameAt word).eps_unit
+  have hD2 : 2 ≤ (frameAt word).parents.odd.den := by omega
+  have hsp : ((frameAt word).parents.odd.den + (frameAt word).parents.odd.num) * (frameAt word).vLast.1
+      + ((frameAt word).parents.odd.den - (frameAt word).parents.odd.num) * (frameAt word).vLast.2
+      = 2 * (frameAt word).parents.odd.num - 2 * (frameAt word).eps := by
+    unfold ChildFrame.vLast
+    simp only
+    rw [hεd]
+    ring
+  have hy : ((frameAt word).parents.odd.den + (frameAt word).parents.odd.num) *
+        ((frameAt word).vLast.1 - ((frameAt word).parents.even.num - (frameAt word).parents.even.den))
+      + ((frameAt word).parents.odd.den - (frameAt word).parents.odd.num) *
+        ((frameAt word).vLast.2 - ((frameAt word).parents.even.num + (frameAt word).parents.even.den))
+      = 2 * (frameAt word).parents.odd.num := by
+    have E := ClippedCore.sp_Vq (frameAt word).parents.odd.num (frameAt word).parents.odd.den
+      (frameAt word).parents.even.num (frameAt word).parents.even.den
+    linear_combination hsp + (-1 : ℤ) * E + (-2 : ℤ) * hεdet
+  constructor
+  · apply FqW_eq_h0 h hSE
+    · rw [hsp]
+      rcases hε1 with h1 | h1 <;> rw [h1] <;> linarith
+    · rw [hsp]
+      rcases hε1 with h1 | h1 <;> rw [h1] <;> linarith
+  · apply FqW_eq_h0 h hSE
+    · simp only [Prod.fst_sub, Prod.snd_sub]
+      rw [hy]
+      linarith
+    · simp only [Prod.fst_sub, Prod.snd_sub]
+      rw [hy]
+      linarith
+
 end FLatticePaper.ParentStrip
