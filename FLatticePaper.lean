@@ -503,6 +503,8 @@ import FLatticePaper.Plane.Induction.BothFreeRise
 import FLatticePaper.Plane.Induction.MinPolicy
 import FLatticePaper.Plane.Induction.Q24Policy
 import FLatticePaper.Plane.Induction.Q24Instances
+import FLatticePaper.Plane.Induction.FreeHSheetAgree
+import FLatticePaper.Plane.Induction.HFVTip
 import FLatticePaper.Plane.Induction.FinalRootSlip
 import FLatticePaper.Plane.Induction.BottomMatch
 import FLatticePaper.Plane.Induction.VCutSteps
