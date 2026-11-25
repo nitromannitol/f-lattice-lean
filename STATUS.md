@@ -8,7 +8,8 @@ is pinned in [paper/](paper/README.md), and [SOURCE-MAP.md](SOURCE-MAP.md) maps 
 
 | Statement | Declaration | Named hypotheses still taken |
 | --- | --- | --- |
-| Odometers theorem, with the sign $+1$ twos flatness proved | [`odometersTheorem_no_flatP`](FLatticePaper/FlatPlusHeadline.lean) | `hflatM` (sign $-1$ twos flatness), `hgames` (games with a rank at the proper words that are not powers of two), `hW1` (the conjugate `W1Forced` condition) |
+| Odometers theorem, with both twos flatness inputs proved | [`odometersTheorem_no_flat`](FLatticePaper/FlatMinusHeadline.lean) | `hgames` (games with a rank at the proper words that are not powers of two), `hW1` (the conjugate `W1Forced` condition) |
+| Odometers theorem, with the sign $+1$ twos flatness proved | [`odometersTheorem_no_flatP`](FLatticePaper/FlatPlusHeadline.lean) | `hflatM`, `hgames`, `hW1` |
 | Odometers theorem, with the boundary-price input proved | [`odometersTheorem_no_hbd`](FLatticePaper/TraceHeadline.lean) | `hflatP`, `hflatM`, `hgames`, `hW1` |
 | Hyperbola | [`hyperbola_of_odometersTheorem`](FLatticePaper/MainTheorems.lean) | the odometers theorem `OdometersTheorem` |
 | Circle packing | [`circlePacking_of_odometersTheorem`](FLatticePaper/MainTheorems.lean) | the odometers theorem `OdometersTheorem` |
@@ -29,14 +30,15 @@ proved in the form above only after the remaining named hypotheses are supplied.
 - Farey birth and parent registers: [Farey/RationalBirth.lean](FLatticePaper/Farey/RationalBirth.lean).
 - The standard field of $2^{k+1}$ as a sewn minimum: [Plane/Induction/TwosField.lean](FLatticePaper/Plane/Induction/TwosField.lean), `standardField_twos_succ`.
 - Twos flatness of sign $+1$ at every centre: [Plane/Induction/TwosFlatPlus.lean](FLatticePaper/Plane/Induction/TwosFlatPlus.lean), `twos_flat_plus`.
-- Twos flatness of sign $-1$, partial: the chain potential at the native points ([Plane/Induction/TwosMinusLevel.lean](FLatticePaper/Plane/Induction/TwosMinusLevel.lean), `chainM_native_level`), the rank at the tile points ([Plane/Induction/TwosMinusRank.lean](FLatticePaper/Plane/Induction/TwosMinusRank.lean)) and the odd black centres ([Plane/Induction/TwosMinusOddBlack.lean](FLatticePaper/Plane/Induction/TwosMinusOddBlack.lean)).
+- Twos flatness of sign $-1$ at every centre: [Plane/Induction/TwosFlatMinus.lean](FLatticePaper/Plane/Induction/TwosFlatMinus.lean), `twos_flat_minus`, from the tile claim at every centre ([Plane/Induction/TwosMinusTile.lean](FLatticePaper/Plane/Induction/TwosMinusTile.lean), `twos_hTile_minus`).
 - The matrix classification of the `GeneralK` track: [GeneralK/MatrixClassification.lean](FLatticePaper/GeneralK/MatrixClassification.lean), `growthSet_eq_closure_columnCones` for every $k\ge2$.
 
 ## Open
 
-- **Sign $-1$ twos flatness (`hflatM`).** The tile claim is proved for the odd black centres. The even black, odd white,
-  candidate and free centres, and the special centres, are open.
-- **Local premises.** The headline theorems take `LocalPremises` at every word containing a digit $1$ or $2$
+- **Games with a rank (`hgames`).** The canonical signed games at a proper word that is not a power of two: the restricted
+  no-fort condition of the auxiliary game, and the raw slip along the forced edges of the canonical policy.
+- **The conjugate forcing condition (`hW1`).** The face rows and the top squares of the collar, and the chain inputs.
+- **Local premises.** The earlier headline forms in [MainTheorems.lean](FLatticePaper/MainTheorems.lean) take `LocalPremises` at every word containing a digit $1$ or $2$
   (equivalently `Induction.OpenInputs` and `StarEstimates`). The plane induction needs three inequalities for the two
   sheets of the quarter-turned odd parent: $C\ge0$ where $t\ge1-d$; the sheet not equal to $h_0$ is at least $h_0$ where
   $s\le2L-1$; and $\min(A,C)$ has Laplacian in $\{-1,0\}$ on the closed polygon. All three hold for the non-pure words
