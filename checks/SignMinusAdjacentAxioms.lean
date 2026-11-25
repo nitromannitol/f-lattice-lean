@@ -1,0 +1,4 @@
+import FLatticePaper.Plane.Induction.SignMinusAdjacent
+
+#print axioms FLatticePaper.SignMinusAdjacent.slip_minus_one_eq_uq
+#print axioms FLatticePaper.SignMinusAdjacent.slip_minus_adj_eq
