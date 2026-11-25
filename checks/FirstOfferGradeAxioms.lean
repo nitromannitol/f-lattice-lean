@@ -1,0 +1,5 @@
+import FLatticePaper.Plane.Induction.FirstOfferGrade
+
+#print axioms FLatticePaper.FirstOfferGrade.first_offer_neighbour_W1
+#print axioms FLatticePaper.FirstOfferGrade.first_offer_neighbour_W0
+#print axioms FLatticePaper.FirstOfferGrade.neighbour_window_W0
