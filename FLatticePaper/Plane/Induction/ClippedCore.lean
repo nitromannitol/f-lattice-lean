@@ -57,4 +57,9 @@ theorem harmonic_translate_Vq (nq dq : ℤ) (z : Site) (s : ℤ)
   rw [this]
   ring
 
+/-- The parent grade of the transverse vector of the even parent: `s_p(V_q) = −2 ε`, with `ε = N d_q − D n_q`. -/
+theorem sp_Vq (N D nq dq : ℤ) :
+    (D + N) * (nq - dq) + (D - N) * (nq + dq) = -2 * (N * dq - D * nq) := by
+  ring
+
 end FLatticePaper.ClippedCore
