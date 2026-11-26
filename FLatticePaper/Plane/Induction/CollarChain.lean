@@ -302,11 +302,13 @@ def TopStrictHyp (word : Word) (G : Field)
         (lvAt + FLatticePaper.W1Phase.zTurnInv (q - v))
 
 
-/-- **The witness dichotomy** (carried as one premise until its corner pairs are proved): no strict interior centre has a top or
-opposite witness together with a bottom or aligned witness. The pairs (top, bottom) and (left, right) are proved in `WitnessPairs`;
-the corner pairs need the strict interior (on the boundary `s = 2n` of the even polygon they occur). -/
+/-- **The witness dichotomy** (carried as one premise until its corner pairs are proved): no strict interior white centre (`MW`
+Laplacian zero) has a top or opposite witness together with a bottom or aligned witness. The pairs (top, bottom) and (left, right)
+are proved in `WitnessPairs`; the corner pairs need the white condition and the strict interior (e.g. `c = (0,7)` for `(n,d) = (3,5)`
+has a top and a left witness, but `laplacian (MW) c = -1`). -/
 def WitnessDichotomy (word : Word) : Prop :=
   ∀ c : Site, FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c →
+    laplacian (MW word) c = 0 →
     ¬ ((FLatticePaper.FaceWitness.TopWit (frameAt word) c ∨
       FLatticePaper.FaceWitness.OppositeWit (frameAt word) c) ∧
     (FLatticePaper.FaceWitness.BottomWit (frameAt word) c ∨ FLatticePaper.FaceWitness.AlignedWit (frameAt word) c))
@@ -435,7 +437,7 @@ theorem hC_tie {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE : Str
     · exact Or.inr (FLatticePaper.FaceReflect.oppositeWit_alignedWit (frameAt word) h)
   obtain ⟨q0, q1, q2, o, qa, qb, hPS, h0, h1, h2⟩ :=
     collar_psquare_A hw hSE P hs hW1 G hW hTop hRow hcS' hM' hψ' hcoll' hWit'
-      (fun h => hDich ((frameAt word).centre - c) hcS' ⟨h, hWit'⟩)
+      (fun h => hDich ((frameAt word).centre - c) hcS' hM' ⟨h, hWit'⟩)
   have hPE : ∀ c i, P.retained c i → Edge i c := fun c i h =>
     (G.game (frameAt word).eps (frameAt word).eps_unit).policyEdge c i (by rw [← hW]; exact h)
   have hEdgeS := FLatticePaper.TieChainStep.sheetEdge_of_parent P.toOldPolicyWitness.toOldPolicyData hPE
@@ -522,7 +524,7 @@ theorem hC_of_inputs {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE
     · exact absurd ((hPsi _ hcS' hM' hcoll').2 (Or.inr hO)) (not_le.mpr hpos')
   obtain ⟨q0, q1, q2, o, qa, qb, hPS, h0, h1, h2⟩ :=
     collar_psquare_A hw hSE P hs hW1 G hW hTop hRow hcS' hM' hpos hcoll' hWit'
-      (fun h => hDich ((frameAt word).centre - c) hcS' ⟨h, hWit'⟩)
+      (fun h => hDich ((frameAt word).centre - c) hcS' hM' ⟨h, hWit'⟩)
   exact FLatticePaper.CollarCReflect.hsq_C_collar hw hSE P hs hW1 hfree hcS hc0 hPS h0 h1 h2
 
 /-- **W1Forced of the sheet minimum, end to end**: `hcollar` is derived from `hcollar_A` (the `Ψ ≥ 0` chart, from the named `hTop`, `hRow`)
