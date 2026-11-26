@@ -24,10 +24,11 @@ open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.SquareClauses FLa
 open FLatticePaper.KMinBridge FLatticePaper.MinPassage FLatticePaper.TransferW1
 
 /-- **A passage step.** From a nonfree site `z` the bulk passage moves to `o` either by a black edge (`laplacian = −1`, `o` an input)
-or by the unseeded W1-forced edge of a white site (`laplacian = 0`, `ForcedEdge`). This is the step of the acyclic passage (Q36). -/
-abbrev PassageStep (F : Field) (z o : Site) : Prop :=
+or by a W1-forced edge of a white site inside the strict interior (`laplacian = 0`, `ForcedEdgeIn` on `E°`, as supplied by `W1At`).
+This is the step of the acyclic passage (Q36). -/
+abbrev PassageStep (n d : ℤ) (F : Field) (z o : Site) : Prop :=
   (laplacian F z = -1 ∧ (o = incomingNeg z ∨ o = incomingPos z)) ∨
-    (laplacian F z = 0 ∧ ForcedEdge F (fun _ _ => False) z o)
+    (laplacian F z = 0 ∧ FLatticePaper.W1.ForcedEdgeIn F (FLatticePaper.W1.StrictInterior n d) (fun _ _ => False) z o)
 
 /-- **Ordered removal.** If each entry `ent k` (`k < N`) that lies in `S` forces an earlier entry in `S`, or is excluded by its own step,
 then no entry of the row lies in `S`. -/
@@ -76,7 +77,7 @@ theorem plus_passage_free {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hz₀E : z₀ ∈ (frameAt word).closedPolygon)
     (hmin : ∀ w ∈ S, kPlusW word z₀ ≤ kPlusW word w)
     (hrank : ∃ ρ : Site → ℕ, ∀ z o, (z ∈ S ∧ z ∈ (frameAt word).closedPolygon ∧ kPlusW word z = kPlusW word z₀) →
-      Nonfree (frameAt word) z → PassageStep (standardField word) z o →
+      Nonfree (frameAt word) z → PassageStep (frameAt word).child.num (frameAt word).child.den (standardField word) z o →
       (o ∈ S ∧ o ∈ (frameAt word).closedPolygon ∧ kPlusW word o = kPlusW word z₀) → Nonfree (frameAt word) o →
       ρ o < ρ z) :
     ∃ f, f ∈ S ∧ f ∈ (frameAt word).closedPolygon ∧ kPlusW word f = kPlusW word z₀ ∧ ¬ Nonfree (frameAt word) f := by
@@ -85,7 +86,7 @@ theorem plus_passage_free {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     obtain ⟨f, ⟨hfS, hfE, hfK⟩, hfn⟩ := reach_nonfree
       (fun z => z ∈ S ∧ z ∈ (frameAt word).closedPolygon ∧ kPlusW word z = kPlusW word z₀)
       (fun z => Nonfree (frameAt word) z)
-      (PassageStep (standardField word))
+      (PassageStep (frameAt word).child.num (frameAt word).child.den (standardField word))
       (by
         intro z hv hnfz
         obtain ⟨hzS, hzE, hzK⟩ := hv
@@ -109,7 +110,7 @@ theorem plus_passage_free {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
             · exact hstar.2.1
             · exact hstar.2.2
           obtain ⟨hoS, hoK⟩ := minK_white_forced_plus h hSE hPR hW hW1 hfort hzS hzE hnfz hb hf hoE hminz
-          exact ⟨o', Or.inr ⟨hb, hf⟩, ⟨hoS, hoE, by rw [hoK, hzK]⟩⟩)
+          exact ⟨o', Or.inr ⟨hb, hf'⟩, ⟨hoS, hoE, by rw [hoK, hzK]⟩⟩)
       hrank z₀ ⟨hz₀S, hz₀E, rfl⟩ hnf₀
     exact ⟨f, hfS, hfE, hfK, hfn⟩
   · exact ⟨z₀, hz₀S, hz₀E, rfl, hnf₀⟩
@@ -123,7 +124,7 @@ theorem minus_passage_free {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hz₀E : z₀ ∈ (frameAt word).closedPolygon)
     (hmin : ∀ w ∈ S, kMinusW word z₀ ≤ kMinusW word w)
     (hrank : ∃ ρ : Site → ℕ, ∀ z o, (z ∈ S ∧ z ∈ (frameAt word).closedPolygon ∧ kMinusW word z = kMinusW word z₀) →
-      Nonfree (frameAt word) z → PassageStep (standardField word) z o →
+      Nonfree (frameAt word) z → PassageStep (frameAt word).child.num (frameAt word).child.den (standardField word) z o →
       (o ∈ S ∧ o ∈ (frameAt word).closedPolygon ∧ kMinusW word o = kMinusW word z₀) → Nonfree (frameAt word) o →
       ρ o < ρ z) :
     ∃ f, f ∈ S ∧ f ∈ (frameAt word).closedPolygon ∧ kMinusW word f = kMinusW word z₀ ∧ ¬ Nonfree (frameAt word) f := by
@@ -132,7 +133,7 @@ theorem minus_passage_free {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     obtain ⟨f, ⟨hfS, hfE, hfK⟩, hfn⟩ := reach_nonfree
       (fun z => z ∈ S ∧ z ∈ (frameAt word).closedPolygon ∧ kMinusW word z = kMinusW word z₀)
       (fun z => Nonfree (frameAt word) z)
-      (PassageStep (standardField word))
+      (PassageStep (frameAt word).child.num (frameAt word).child.den (standardField word))
       (by
         intro z hv hnfz
         obtain ⟨hzS, hzE, hzK⟩ := hv
@@ -156,7 +157,7 @@ theorem minus_passage_free {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
             · exact hstar.2.1
             · exact hstar.2.2
           obtain ⟨hoS, hoK⟩ := minK_white_forced_minus h hSE hPR hW hW1 hfort hzS hzE hnfz hb hf hoE hminz
-          exact ⟨o', Or.inr ⟨hb, hf⟩, ⟨hoS, hoE, by rw [hoK, hzK]⟩⟩)
+          exact ⟨o', Or.inr ⟨hb, hf'⟩, ⟨hoS, hoE, by rw [hoK, hzK]⟩⟩)
       hrank z₀ ⟨hz₀S, hz₀E, rfl⟩ hnf₀
     exact ⟨f, hfS, hfE, hfK, hfn⟩
   · exact ⟨z₀, hz₀S, hz₀E, rfl, hnf₀⟩

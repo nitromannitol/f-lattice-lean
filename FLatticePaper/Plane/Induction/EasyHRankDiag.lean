@@ -281,4 +281,152 @@ theorem refuted_even_H_diag (frame : ChildFrame) (F : Field) (hP : frame.Packet 
     Refuted.white hcolq hpermq (Refuted.earlier hE)
   exact Refuted.white hcol hperm hRq
 
+/-! ## The odd axial step: an odd free H point before `hLast` has a free east neighbour -/
+
+/-- The parity of `t` at any site: `t ≡ x + y` (mod 2), since `n` and `d` are odd. -/
+theorem tGrade_parity (frame : ChildFrame) (z : Site) : frame.tGrade z % 2 = (z.1 + z.2) % 2 := by
+  obtain ⟨hnodd, hdodd⟩ := frame.child_odd
+  obtain ⟨a, ha⟩ : ∃ a, frame.child.num = 2 * a + 1 := ⟨frame.child.num / 2, by omega⟩
+  obtain ⟨b, hb⟩ : ∃ b, frame.child.den = 2 * b + 1 := ⟨frame.child.den / 2, by omega⟩
+  have e : frame.tGrade z = (z.1 - z.2) + 2 * (a * z.1 - b * z.2) := by
+    unfold ChildFrame.tGrade
+    rw [ha, hb]
+    ring
+  rw [e]
+  generalize a * z.1 - b * z.2 = X
+  omega
+
+/-- **The odd s-gap.** An odd closed-polygon point with `n ≤ t ≤ d − 2` has `s < T + n − d`. The identity `T·z₂ = n s − L t`
+and the bounds `T·z₂ ≥ (n−1)T + 2d + 2n` and `T·z₂ ≤ nT − 2n` leave no integer `z₂`. -/
+theorem odd_gap (frame : ChildFrame) {z : Site} (hz : z ∈ frame.closedPolygon) (hodd : ¬ EvenSite z)
+    (ht1 : frame.child.num ≤ frame.tGrade z) (ht2 : frame.tGrade z ≤ frame.child.den - 2) :
+    frame.sGrade z < frame.child.periodDenominator + frame.child.num - frame.child.den := by
+  obtain ⟨hn0, hnd, hd2', hd3, hTd⟩ := frame.child_facts
+  have hT0 : 0 < frame.child.periodDenominator := by
+    rw [hTd]
+    nlinarith
+  have hcl := hz
+  unfold ChildFrame.closedPolygon at hcl
+  simp only [Set.mem_setOf_eq] at hcl
+  rw [if_neg hodd] at hcl
+  obtain ⟨-, -, -, hsh⟩ := hcl
+  have hid : frame.child.periodDenominator * z.2 =
+      frame.child.num * frame.sGrade z - (frame.child.den + frame.child.num) * frame.tGrade z := by
+    rw [hTd]
+    unfold ChildFrame.sGrade ChildFrame.tGrade
+    ring
+  by_contra hcon
+  push Not at hcon
+  have hA1 : frame.child.num * (frame.child.periodDenominator + frame.child.num - frame.child.den)
+      ≤ frame.child.num * frame.sGrade z :=
+    mul_le_mul_of_nonneg_left hcon (by omega)
+  have hA2 : (frame.child.den + frame.child.num) * frame.tGrade z
+      ≤ (frame.child.den + frame.child.num) * (frame.child.den - 2) :=
+    mul_le_mul_of_nonneg_left ht2 (by omega)
+  have hB1 : frame.child.num * frame.sGrade z
+      ≤ frame.child.num * (frame.child.periodDenominator + frame.child.den + frame.child.num - 2) :=
+    mul_le_mul_of_nonneg_left hsh (by omega)
+  have hB2 : (frame.child.den + frame.child.num) * frame.child.num
+      ≤ (frame.child.den + frame.child.num) * frame.tGrade z :=
+    mul_le_mul_of_nonneg_left ht1 (by omega)
+  have e1 : frame.child.num * (frame.child.periodDenominator + frame.child.num - frame.child.den)
+      - (frame.child.den + frame.child.num) * (frame.child.den - 2)
+      = (frame.child.num - 1) * frame.child.periodDenominator + 2 * frame.child.den + 2 * frame.child.num := by
+    rw [hTd]
+    ring
+  have e2 : frame.child.num * (frame.child.periodDenominator + frame.child.den + frame.child.num - 2)
+      - (frame.child.den + frame.child.num) * frame.child.num
+      = frame.child.num * frame.child.periodDenominator - 2 * frame.child.num := by
+    ring
+  have hA : (frame.child.num - 1) * frame.child.periodDenominator + 2 * frame.child.den + 2 * frame.child.num
+      ≤ frame.child.periodDenominator * z.2 := by
+    linarith
+  have hB : frame.child.periodDenominator * z.2
+      ≤ frame.child.num * frame.child.periodDenominator - 2 * frame.child.num := by
+    linarith
+  have hy1 : frame.child.num - 1 < z.2 := by
+    by_contra h
+    push Not at h
+    have := mul_le_mul_of_nonneg_left h hT0.le
+    linarith
+  have hy2 : frame.child.num ≤ z.2 := by omega
+  have hy3 := mul_le_mul_of_nonneg_left hy2 hT0.le
+  linarith
+
+/-- **The odd axial step.** An odd free H point `z` with `1 ≤ z.1 < d` (a chain point before `hLast`) has a free east neighbour:
+its east neighbour is even with `t + n ≤ d + n − 2` (since `t ≠ d` by the coprimality of `d` and `n`), and its `s + L ≤ T + 2n`
+by the odd gap `odd_gap`. -/
+theorem east_freeH_of_odd (frame : ChildFrame) {z : Site} (hz : z ∈ frame.freeH) (hodd : ¬ EvenSite z)
+    (hx1 : 1 ≤ z.1) (hxd : z.1 < frame.child.den) :
+    (z.1 + 1, z.2) ∈ frame.freeH := by
+  obtain ⟨hn0, hnd, hd2', hd3, hTd⟩ := frame.child_facts
+  obtain ⟨hnodd, hdodd⟩ := frame.child_odd
+  simp only [ChildFrame.freeH, Set.mem_setOf_eq] at hz
+  obtain ⟨hcl0, -, hsp⟩ := hz
+  have hpar : frame.tGrade z % 2 = 1 := by
+    rw [tGrade_parity frame z]
+    have : (z.1 + z.2) % 2 = 1 := by
+      unfold EvenSite at hodd
+      omega
+    exact this
+  have hodd' : ¬ EvenSite z := hodd
+  unfold ChildFrame.hSpectrum at hsp
+  have hsp' : frame.child.num ≤ frame.tGrade z ∧ frame.tGrade z ≤ frame.child.den := by
+    rcases hsp with ⟨h0, -⟩ | ⟨-, h2, h3⟩
+    · omega
+    · exact ⟨h2, h3⟩
+  obtain ⟨hsp1, hsp2⟩ := hsp'
+  -- `t(z) ≠ d`: otherwise `d ∣ n z₁`, so `d ∣ z₁`, impossible for `1 ≤ z₁ < d`
+  have hne : frame.tGrade z ≠ frame.child.den := by
+    intro hteq
+    have hdv : frame.child.den ∣ frame.child.num * z.1 := ⟨z.2 + 1, by
+      unfold ChildFrame.tGrade at hteq
+      linear_combination hteq⟩
+    obtain ⟨c, hc⟩ := (frame.child_reduced.symm).dvd_of_dvd_mul_left hdv
+    rcases le_or_gt c 0 with h | h
+    · nlinarith
+    · nlinarith
+  have ht_le : frame.tGrade z ≤ frame.child.den - 2 := by omega
+  have hs := odd_gap frame hcl0 hodd' hsp1 ht_le
+  have hqeven : EvenSite (z.1 + 1, z.2) := by
+    unfold EvenSite at hodd ⊢
+    dsimp only
+    omega
+  have hbodd : ¬ EvenSite (z.1 + 1, z.2 - 1) := by
+    unfold EvenSite at hodd ⊢
+    dsimp only
+    omega
+  have eTq : frame.tGrade (z.1 + 1, z.2) = frame.tGrade z + frame.child.num := by
+    unfold ChildFrame.tGrade
+    dsimp only
+    ring
+  have eSq : frame.sGrade (z.1 + 1, z.2) = frame.sGrade z + (frame.child.den + frame.child.num) := by
+    unfold ChildFrame.sGrade
+    dsimp only
+    ring
+  have eTb : frame.tGrade (z.1 + 1, z.2 - 1) = frame.tGrade z + frame.child.num + frame.child.den := by
+    unfold ChildFrame.tGrade
+    dsimp only
+    ring
+  have hsl : 2 - frame.child.den + frame.child.num ≤ frame.sGrade z := by
+    unfold ChildFrame.closedPolygon at hcl0
+    simp only [Set.mem_setOf_eq] at hcl0
+    rw [if_neg hodd'] at hcl0
+    exact hcl0.2.2.1
+  simp only [ChildFrame.freeH, Set.mem_setOf_eq]
+  refine ⟨?_, ?_, ?_⟩
+  · unfold ChildFrame.closedPolygon
+    simp only [Set.mem_setOf_eq]
+    rw [if_pos hqeven, eTq, eSq]
+    refine ⟨?_, ?_, ?_, ?_⟩ <;> linarith
+  · intro hc
+    unfold ChildFrame.closedPolygon at hc
+    simp only [Set.mem_setOf_eq] at hc
+    rw [if_neg hbodd, eTb] at hc
+    linarith [hc.2.1]
+  · unfold ChildFrame.hSpectrum
+    left
+    rw [eTq]
+    refine ⟨by omega, by linarith, by linarith⟩
+
 end FLatticePaper.EasyHRankDiag

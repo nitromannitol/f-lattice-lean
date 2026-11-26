@@ -14,16 +14,16 @@ import FLatticePaper.Plane.Induction.EndpointDeck
 
 /-! # The acyclic passage (Q36, reading (a)): a natural-number rank of the nonfree passage
 
-The passage of `FreeSchedule.plus_passage_free` / `minus_passage_free` moves along `PassageStep F`: a black site to one of its inputs,
-a white site to its W1-forced input. Its nonfree-to-nonfree steps lift to the finite strict interior `E° = StrictInterior n d`:
+The passage of `FreeSchedule.plus_passage_free` / `minus_passage_free` moves along `PassageStep n d F`: a black site to one of its
+inputs, a white site to a W1-forced input inside the strict interior `E° = StrictInterior n d` (the forced edges supplied by `W1At`).
+A nonfree site of the closed polygon is strict-interior, so every step is an edge inside `E°`:
 
-* every nonfree `z` has a deck translate `z + vr z ∈ E°` (`nonfree_bridge`), unique in its class (`strictInterior_unique`);
-* a passage step `z → o` between nonfree sites lifts to `z + vr z → o + vr z`, an edge of the sheet minimum `M` inside `E°`;
-* `M`'s burning rank `R` strictly decreases along it: at a black edge both inputs, at a white edge the selected input
-  (`burning_sel`, `TransferSat.forced_sound_R`).
+* `M` (the sheet minimum, `F = M` on the closed polygon) has a global burning rank `R`, which strictly decreases along every black
+  edge (both inputs) and along every forced white edge (the selected input, `burning_sel`, `TransferSat.forced_sound_R`, with the
+  forced edge transported from `F` to `M` by `W1Bridge.forcedEdgeIn_congr`);
+* the counting rank `ρ z = #{u ∈ E° | R u < R z}` (`nat_rank_of_key`) decreases along every such step.
 
-The white lift of the forced edge to `M` inside `E°` is the Protected Web Lemma (Q39), taken here as the named hypothesis `Q39Hyp`.
-The counting rank `ρ z = #{u ∈ E° | R u < R (rep z)}` is then a `ℕ`-valued rank of the passage (`nat_rank_of_key`). -/
+No Protected Web hypothesis is needed: the passage only uses forced edges inside `E°`. -/
 
 namespace FLatticePaper.PassageRank
 
@@ -77,122 +77,6 @@ theorem burning_sel {β : Type*} [LinearOrder β] {F : Field} {R : Site → β} 
   choose sel hsel using hwhite
   exact ⟨sel, hsel, fun a b => W1MRank.squareClauses_of_burning hbin hblack hsel a b⟩
 
-/-! ## Arithmetic of the strict interior modulo the deck -/
-
-/-- The parity of a deck combination: `d + n` is even for odd `n`, `d`. -/
-theorem combine_even {n d : ℤ} (hnodd : n % 2 = 1) (hdodd : d % 2 = 1) (i j : ℤ) :
-    ((i * d + j * (n - d)) + (i * n + j * (n + d))) % 2 = 0 := by
-  obtain ⟨k, hk⟩ : ∃ k, d + n = 2 * k := ⟨(d + n) / 2, by omega⟩
-  have e : (i * d + j * (n - d)) + (i * n + j * (n + d)) = 2 * (k * i + n * j) := by
-    linear_combination i * hk
-  rw [e]
-  generalize k * i + n * j = m
-  omega
-
-/-- **Uniqueness of the strict interior in a deck class (arithmetic).** A translate `b = a + (i d + j (n − d), i n + j (n + d))` of a
-strict-interior point by the deck `(d, n)`, `(n − d, n + d)` is strict-interior only if the translate is trivial: the grades `t` and `s`
-shift by `−jT` and `iT`, and the four open intervals have width below `T`. -/
-theorem si_unique_arith {n d : ℤ} (hn1 : 1 ≤ n) (hnd : n < d) (hd3 : 3 ≤ d) (hnodd : n % 2 = 1) (hdodd : d % 2 = 1)
-    {a b : Site} (ha : W1.StrictInterior n d a) (hb : W1.StrictInterior n d b) {i j : ℤ}
-    (hb1 : b.1 = a.1 + (i * d + j * (n - d))) (hb2 : b.2 = a.2 + (i * n + j * (n + d))) : b = a := by
-  have hT : 0 < W1.w1T n d := by
-    have e : W1.w1T n d = (d - n) * (d + n) + 2 * (n * d) := by unfold W1.w1T; ring
-    have h1 : 0 < (d - n) * (d + n) := mul_pos (by omega) (by omega)
-    have h2 : 0 < n * d := mul_pos (by omega) (by omega)
-    rw [e]
-    linarith
-  have hL : 4 ≤ d + n := by omega
-  have hpar : (b.1 + b.2) % 2 = (a.1 + a.2) % 2 := by
-    have hc := combine_even hnodd hdodd i j
-    rw [hb1, hb2]
-    omega
-  have ht : (n * b.1 - d * b.2) - (n * a.1 - d * a.2) = -(j * W1.w1T n d) := by
-    rw [hb1, hb2]
-    unfold W1.w1T
-    ring
-  have hs : ((d + n) * b.1 + (d - n) * b.2) - ((d + n) * a.1 + (d - n) * a.2) = i * W1.w1T n d := by
-    rw [hb1, hb2]
-    unfold W1.w1T
-    ring
-  simp only [W1.StrictInterior, W1.w1b, W1.w1t, W1.w1a, W1.w1h, W1.w1s, W1.w1c] at ha hb
-  generalize W1.w1T n d = T at ha hb hT ht hs
-  have key : (j * T < T ∧ -T < j * T) ∧ (i * T < T ∧ -T < i * T) := by
-    by_cases hev : EvenSite a
-    · have hevb : EvenSite b := by
-        unfold EvenSite at hev ⊢
-        omega
-      simp only [hev, hevb, ↓reduceIte] at ha hb
-      obtain ⟨ha1, ha2, ha3, ha4⟩ := ha
-      obtain ⟨hb1', hb2', hb3, hb4⟩ := hb
-      refine ⟨⟨?_, ?_⟩, ⟨?_, ?_⟩⟩ <;> linarith
-    · have hevb : ¬ EvenSite b := by
-        unfold EvenSite at hev ⊢
-        omega
-      simp only [hev, hevb, ↓reduceIte] at ha hb
-      obtain ⟨ha1, ha2, ha3, ha4⟩ := ha
-      obtain ⟨hb1', hb2', hb3, hb4⟩ := hb
-      refine ⟨⟨?_, ?_⟩, ⟨?_, ?_⟩⟩ <;> linarith
-  obtain ⟨⟨hj1, hj2⟩, ⟨hi1, hi2⟩⟩ := key
-  have hi0 : i = 0 := by
-    rcases lt_trichotomy i 0 with h | h | h
-    · exfalso
-      have h1 : (0 : ℤ) ≤ (-1 - i) * T := mul_nonneg (by omega) hT.le
-      have h2 : (-1 - i) * T = -T - i * T := by ring
-      linarith
-    · exact h
-    · exfalso
-      have h1 : (0 : ℤ) ≤ (i - 1) * T := mul_nonneg (by omega) hT.le
-      have h2 : (i - 1) * T = i * T - T := by ring
-      linarith
-  have hj0 : j = 0 := by
-    rcases lt_trichotomy j 0 with h | h | h
-    · exfalso
-      have h1 : (0 : ℤ) ≤ (-1 - j) * T := mul_nonneg (by omega) hT.le
-      have h2 : (-1 - j) * T = -T - j * T := by ring
-      linarith
-    · exact h
-    · exfalso
-      have h1 : (0 : ℤ) ≤ (j - 1) * T := mul_nonneg (by omega) hT.le
-      have h2 : (j - 1) * T = j * T - T := by ring
-      linarith
-  refine Prod.ext ?_ ?_
-  · simp [hb1, hi0, hj0]
-  · simp [hb2, hi0, hj0]
-
-/-- The deck combination in coordinates: `combine i j = (i d + j (n − d), i n + j (n + d))` for the child frame. -/
-theorem combine_coords (frame : ChildFrame) (i j : ℤ) :
-    frame.child.modifiedDeck.combine i j =
-      (i * frame.child.den + j * (frame.child.num - frame.child.den),
-        i * frame.child.num + j * (frame.child.num + frame.child.den)) := by
-  have hk : frame.child.modifiedDeck.kernel = (frame.child.den, frame.child.num) := frame.child_modifiedDeck_kernel
-  have ht : frame.child.modifiedDeck.transverse =
-      (frame.child.num - frame.child.den, frame.child.num + frame.child.den) :=
-    EndpointDeck.transverse_eq_Vdeck frame
-  ext <;> simp [PeriodDeck.combine, hk, ht]
-
-/-- Deck combinations have even coordinate sum. -/
-theorem span_parity (frame : ChildFrame) {v : Site} (hv : v ∈ frame.child.modifiedDeck.span) :
-    (v.1 + v.2) % 2 = 0 := by
-  obtain ⟨i, j, rfl⟩ := hv
-  obtain ⟨hnodd, hdodd⟩ := frame.child_odd
-  rw [combine_coords frame i j]
-  exact combine_even hnodd hdodd i j
-
-/-- **Uniqueness of strict-interior representatives.** Two strict-interior points differing by a deck translate are equal. -/
-theorem strictInterior_unique (frame : ChildFrame) {a b v : Site}
-    (ha : W1.StrictInterior frame.child.num frame.child.den a)
-    (hb : W1.StrictInterior frame.child.num frame.child.den b)
-    (hv : v ∈ frame.child.modifiedDeck.span) (hba : b = a + v) : b = a := by
-  obtain ⟨hn0, hnd, -, hd3, -⟩ := frame.child_facts
-  obtain ⟨hnodd, hdodd⟩ := frame.child_odd
-  obtain ⟨i, j, rfl⟩ := hv
-  rw [combine_coords frame i j] at hba
-  have hb1 : b.1 = a.1 + (i * frame.child.den + j * (frame.child.num - frame.child.den)) := by
-    simp [hba]
-  have hb2 : b.2 = a.2 + (i * frame.child.num + j * (frame.child.num + frame.child.den)) := by
-    simp [hba]
-  exact si_unique_arith (by omega) hnd hd3 hnodd hdodd ha hb hb1 hb2
-
 /-- Nonfreeness is invariant under deck translates. -/
 theorem nonfree_add_span (frame : ChildFrame) {z v : Site} (hz : Nonfree frame z)
     (hv : v ∈ frame.child.modifiedDeck.span) : Nonfree frame (z + v) := by
@@ -203,86 +87,59 @@ theorem nonfree_add_span (frame : ChildFrame) {z v : Site} (hz : Nonfree frame z
 
 /-! ## The rank of the passage -/
 
-/-- **The representative key decreases along the passage.** For the sheet minimum `M` with a global burning rank `R`, and the field
-`F = M` on the closed polygon, the lift of a nonfree passage step is a strict decrease of `R` at the representatives. -/
-theorem passage_rank {β : Type*} [LinearOrder β] (frame : ChildFrame) {F M : Field} {cU cV : ℤ}
-    (hper : HasGeneratorPeriods frame.child F cU cV)
+/-- **The passage rank (Q36).** For the sheet minimum `M` with a global burning rank `R`, and `F = M` on the closed polygon, a nonfree
+passage step between nonfree points of the closed polygon strictly lowers `R`: a black step to an input by `IsBurningRank`, a white
+step along a W1-forced edge of the strict interior by `forcedEdgeIn_congr` and `TransferSat.forced_sound_R` (the selection of `M`
+is the forced input). The counting rank of `nat_rank_of_key` then decreases along every such step. No translates are needed:
+a nonfree point of the closed polygon is strict-interior (`TransferW1.nonfree_strictInterior`). -/
+theorem passage_rank {β : Type*} [LinearOrder β] (frame : ChildFrame) {F M : Field}
     (hFM : ∀ s, s ∈ frame.closedPolygon → F s = M s)
-    {R : Site → β} (hR : IsBurningRank M R)
-    (hQ39 : ∀ z o v : Site, v ∈ frame.child.modifiedDeck.span →
-      W1.StrictInterior frame.child.num frame.child.den (z + v) →
-      ForcedEdge F (fun _ _ => False) z o →
-      W1.ForcedEdgeIn M (W1.StrictInterior frame.child.num frame.child.den) (fun _ _ => False) (z + v) (o + v)) :
-    ∃ ρ : Site → ℕ, ∀ z o : Site, Nonfree frame z → Nonfree frame o → PassageStep F z o → ρ o < ρ z := by
+    {R : Site → β} (hR : IsBurningRank M R) :
+    ∃ ρ : Site → ℕ, ∀ z o : Site, (z ∈ frame.closedPolygon ∧ Nonfree frame z) →
+      (o ∈ frame.closedPolygon ∧ Nonfree frame o) →
+      PassageStep frame.child.num frame.child.den F z o → ρ o < ρ z := by
   classical
-  have hvex : ∀ z, Nonfree frame z → ∃ v, v ∈ frame.child.modifiedDeck.span ∧
-      W1.StrictInterior frame.child.num frame.child.den (z + v) :=
-    fun z hz => nonfree_bridge frame z hz
-  choose! vr hvr hvSI using hvex
   obtain ⟨sel, hsel, hsq⟩ := burning_sel hR
-  have hdec : ∀ z o : Site, Nonfree frame z → Nonfree frame o → PassageStep F z o →
-      R (o + vr o) < R (z + vr z) := by
-    intro z o hz ho hG
-    have hedge : o = incomingNeg z ∨ o = incomingPos z := by
-      rcases hG with ⟨-, h⟩ | ⟨-, hf⟩
-      · exact h
-      · exact MinPassage.forced_input_of_unseeded hf
-    have hvz : vr z ∈ frame.child.modifiedDeck.span := hvr z hz
-    have hvo : vr o ∈ frame.child.modifiedDeck.span := hvr o ho
-    have hev : EvenSite (vr z) := span_parity frame hvz
-    have hyS : W1.StrictInterior frame.child.num frame.child.den (z + vr z) := hvSI z hz
-    have hyst := TransferW1.strictInterior_star frame hyS
-    -- the translate of `o` by `vr z` is an input of `z + vr z`
-    have hin : o + vr z = incomingNeg (z + vr z) ∨ o + vr z = incomingPos (z + vr z) := by
-      rcases hedge with rfl | rfl
-      · exact Or.inl (ForcedArrows.incomingNeg_add_even hev).symm
-      · exact Or.inr (ForcedArrows.incomingPos_add_even hev).symm
-    have hwS : o + vr z ∈ frame.closedPolygon := by
-      rcases hin with h | h
-      · rw [h]
-        exact hyst.2.1
-      · rw [h]
-        exact hyst.2.2
-    have hwSI : W1.StrictInterior frame.child.num frame.child.den (o + vr z) :=
-      TransferW1.nonfree_strictInterior frame hwS (nonfree_add_span frame ho hvz)
-    -- the representative of `o` is `o + vr z`
-    have hvdiff : vr o - vr z ∈ frame.child.modifiedDeck.span := FreeClosure.span_sub hvo hvz
-    have hsame : o + vr o = o + vr z :=
-      strictInterior_unique frame hwSI (hvSI o ho) hvdiff (by abel)
-    rw [hsame]
-    -- the lift to `M` at `y = z + vr z`
-    have hFy : laplacian F (z + vr z) = laplacian F z := by
-      obtain ⟨i, j, hij⟩ := hvz
-      rw [hij]
-      exact laplacian_add_combine hper z i j
-    have hyF : laplacian M (z + vr z) = laplacian F z := by
-      rw [← hFy]
-      exact (W1Bridge.laplacian_congr (hFM (z + vr z) hyst.1) (hFM (incomingNeg (z + vr z)) hyst.2.1)
-        (hFM (incomingPos (z + vr z)) hyst.2.2)).symm
-    rcases hG with ⟨hl, -⟩ | ⟨hl, hf⟩
-    · -- a black edge: both inputs of `M` at `y` have smaller rank
-      have hbl : laplacian M (z + vr z) = -1 := by rw [hyF, hl]
-      rcases hR (z + vr z) with ⟨-, hn, hp⟩ | ⟨hl0, -⟩
-      · rcases hin with h | h
+  have hagree : ∀ c, FLatticePaper.W1.StrictInterior frame.child.num frame.child.den c →
+      F c = M c ∧ F (incomingNeg c) = M (incomingNeg c) ∧ F (incomingPos c) = M (incomingPos c) := by
+    intro c hc
+    have hs := TransferW1.strictInterior_star frame hc
+    exact ⟨hFM c hs.1, hFM _ hs.2.1, hFM _ hs.2.2⟩
+  have hdec : ∀ z o : Site, (z ∈ frame.closedPolygon ∧ Nonfree frame z) →
+      (o ∈ frame.closedPolygon ∧ Nonfree frame o) →
+      PassageStep frame.child.num frame.child.den F z o → R o < R z := by
+    rintro z o ⟨hzc, hzn⟩ - hG
+    have hSI := TransferW1.nonfree_strictInterior frame hzc hzn
+    have hstar := TransferW1.strictInterior_star frame hSI
+    have hlapM : laplacian F z = laplacian M z :=
+      W1Bridge.laplacian_congr (hFM z hstar.1) (hFM _ hstar.2.1) (hFM _ hstar.2.2)
+    rcases hG with ⟨hl, hedge⟩ | ⟨hl, hf⟩
+    · -- a black edge: both inputs of `M` at `z` have smaller rank
+      have hbl : laplacian M z = -1 := by rw [← hlapM, hl]
+      rcases hR z with ⟨-, hn, hp⟩ | ⟨hl0, -⟩
+      · rcases hedge with h | h
         · rw [h]
           exact hn
         · rw [h]
           exact hp
       · exact absurd (hbl.symm.trans hl0) (by norm_num)
-    · -- a white edge: the forced input of `M` at `y` is the selected input, which has smaller rank
-      have hwh : laplacian M (z + vr z) = 0 := by rw [hyF, hl]
-      have hQ := hQ39 z o (vr z) hvz hyS hf
-      have hsel_eq : sel (z + vr z) = o + vr z :=
-        TransferSat.forced_sound_R (R := W1.StrictInterior frame.child.num frame.child.den) sel
-          (fun c hc => (hsel c hc).1) (fun a b _ => hsq a b) (z + vr z) (o + vr z) hQ
+    · -- a white edge: the W1-forced input of `M` at `z` is the selected input, which has smaller rank
+      have hwh : laplacian M z = 0 := by rw [← hlapM, hl]
+      have hMf : FLatticePaper.W1.ForcedEdgeIn M (FLatticePaper.W1.StrictInterior frame.child.num frame.child.den)
+          (fun _ _ => False) z o :=
+        W1Bridge.forcedEdgeIn_congr hagree hf
+      have hsel_eq : sel z = o :=
+        TransferSat.forced_sound_R (R := FLatticePaper.W1.StrictInterior frame.child.num frame.child.den) sel
+          (fun c hc => (hsel c hc).1) (fun a b _ => hsq a b) z o hMf
       rw [← hsel_eq]
-      exact (hsel (z + vr z) hwh).2
-  have hfin : {c : Site | W1.StrictInterior frame.child.num frame.child.den c}.Finite :=
+      exact (hsel z hwh).2
+  have hfin : {c : Site | FLatticePaper.W1.StrictInterior frame.child.num frame.child.den c}.Finite :=
     W1Step.strictInterior_child_finite frame
-  exact nat_rank_of_key _ hfin R (fun z => z + vr z) (Nonfree frame) (PassageStep F)
-    (fun z hz => hvSI z hz) (fun z o hz ho hG => hdec z o hz ho hG)
+  exact nat_rank_of_key _ hfin R (fun z => z) (fun z => z ∈ frame.closedPolygon ∧ Nonfree frame z)
+    (PassageStep frame.child.num frame.child.den F)
+    (fun z hz => TransferW1.nonfree_strictInterior frame hz.1 hz.2) (fun z o hz ho hG => hdec z o hz ho hG)
 
-/-! ## The sheet minimum's burning rank, and the named Protected Web input -/
+/-! ## The sheet minimum's burning rank from the conjugate's strong estimates -/
 
 /-- **The burning rank of the sheet minimum from the conjugate's strong estimates** (the chain proof of `W1MRank`, its rank part). -/
 theorem sheetMin_burning_of_strong {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
@@ -297,49 +154,35 @@ theorem sheetMin_burning_of_strong {word : Word} (h : ∃ x ∈ word, x ≠ Digi
     (permitC_invariant h hG) hsheet.permitC hsheet.noC
   exact W1MRank.sheetMin_burningRank_of_chain h hG hsheet.unit rankA rankC hrankA hrankC
 
-/-- **Q39 (the Protected Web Lemma), a named input until w2's lemma lands.** An unseeded forced edge `z → o` of `standardField word`
-lifts, at every deck translate `z + v` that lies in the strict interior, to a forced edge of the sheet minimum inside the strict
-interior, with the translated input `o + v`. -/
-def Q39Hyp (word : Word) : Prop :=
-  ∀ z o v : Site, v ∈ (frameAt word).child.modifiedDeck.span →
-    W1.StrictInterior (frameAt word).child.num (frameAt word).child.den (z + v) →
-    ForcedEdge (standardField word) (fun _ _ => False) z o →
-    W1.ForcedEdgeIn ((frameAt word).sheetMin (quarterTurnField (standardField (conjWord word))))
-      (W1.StrictInterior (frameAt word).child.num (frameAt word).child.den) (fun _ _ => False) (z + v) (o + v)
-
 /-! ## The passage reaches a free site, with the acyclic rank -/
 
-/-- **The `K₊`-passage stops at a free site (Q36).** The acyclic rank of the passage is supplied by `passage_rank`, from the sheet
-minimum's burning rank and the named Protected Web input `Q39Hyp`. -/
+/-- **The `K₊`-passage stops at a free site (Q36).** The acyclic rank of the passage is `passage_rank`, from the sheet minimum's
+burning rank; the white steps are the W1-forced edges of `W1At`. -/
 theorem plus_passage_free_Q36 {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hPR : FLatticePaper.PassagePR.PriceRangeOn word)
     (hW : HasSatSelection (standardField word))
     (hW1 : FLatticePaper.W1.W1Forced (frameAt word).child.num (frameAt word).child.den (standardField word))
-    (hQ39 : Q39Hyp word)
     {S : Set Site} (hfort : FortAt (Nonfree (frameAt word)) (standardField word) S) {z₀ : Site} (hz₀S : z₀ ∈ S)
     (hz₀E : z₀ ∈ (frameAt word).closedPolygon)
     (hmin : ∀ w ∈ S, kPlusW word z₀ ≤ kPlusW word w) :
     ∃ f, f ∈ S ∧ f ∈ (frameAt word).closedPolygon ∧ kPlusW word f = kPlusW word z₀ ∧ ¬ Nonfree (frameAt word) f := by
   obtain ⟨R, hR⟩ := sheetMin_burning_of_strong h hSE
-  obtain ⟨ρ, hρ⟩ := passage_rank (frameAt word) (StripsM.hper_word h hSE)
-    (fun s hs => standardField_eq_sheetMin_of_strong h hSE hs) hR hQ39
+  obtain ⟨ρ, hρ⟩ := passage_rank (frameAt word) (fun s hs => standardField_eq_sheetMin_of_strong h hSE hs) hR
   exact FreeSchedule.plus_passage_free h hSE hPR hW hW1 hfort hz₀S hz₀E hmin
-    ⟨ρ, fun z o _ hnz hG _ hno => hρ z o hnz hno hG⟩
+    ⟨ρ, fun z o hz hnz hG ho hno => hρ z o ⟨hz.2.1, hnz⟩ ⟨ho.2.1, hno⟩ hG⟩
 
 /-- **The `K₋`-passage stops at a free site (Q36).** The same statement for `K₋`. -/
 theorem minus_passage_free_Q36 {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hPR : FLatticePaper.PassagePR.PriceRangeOn word)
     (hW : HasSatSelection (standardField word))
     (hW1 : FLatticePaper.W1.W1Forced (frameAt word).child.num (frameAt word).child.den (standardField word))
-    (hQ39 : Q39Hyp word)
     {S : Set Site} (hfort : FortAt (Nonfree (frameAt word)) (standardField word) S) {z₀ : Site} (hz₀S : z₀ ∈ S)
     (hz₀E : z₀ ∈ (frameAt word).closedPolygon)
     (hmin : ∀ w ∈ S, kMinusW word z₀ ≤ kMinusW word w) :
     ∃ f, f ∈ S ∧ f ∈ (frameAt word).closedPolygon ∧ kMinusW word f = kMinusW word z₀ ∧ ¬ Nonfree (frameAt word) f := by
   obtain ⟨R, hR⟩ := sheetMin_burning_of_strong h hSE
-  obtain ⟨ρ, hρ⟩ := passage_rank (frameAt word) (StripsM.hper_word h hSE)
-    (fun s hs => standardField_eq_sheetMin_of_strong h hSE hs) hR hQ39
+  obtain ⟨ρ, hρ⟩ := passage_rank (frameAt word) (fun s hs => standardField_eq_sheetMin_of_strong h hSE hs) hR
   exact FreeSchedule.minus_passage_free h hSE hPR hW hW1 hfort hz₀S hz₀E hmin
-    ⟨ρ, fun z o _ hnz hG _ hno => hρ z o hnz hno hG⟩
+    ⟨ρ, fun z o hz hnz hG ho hno => hρ z o ⟨hz.2.1, hnz⟩ ⟨ho.2.1, hno⟩ hG⟩
 
 end FLatticePaper.PassageRank
