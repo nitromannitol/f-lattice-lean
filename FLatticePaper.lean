@@ -531,6 +531,7 @@ import FLatticePaper.Plane.Induction.AlignedClassSite
 import FLatticePaper.Plane.Induction.BoundarySite
 import FLatticePaper.Plane.Induction.FaceWitness
 import FLatticePaper.Plane.Induction.FaceReflect
+import FLatticePaper.Plane.Induction.ExteriorNbr
 import FLatticePaper.Plane.Induction.ConjFreeRoot
 import FLatticePaper.Plane.Induction.EvenWindow
 import FLatticePaper.Plane.Induction.NeighbourDrop
