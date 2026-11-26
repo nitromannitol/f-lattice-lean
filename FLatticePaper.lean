@@ -733,6 +733,8 @@ import FLatticePaper.StepHeadline
 import FLatticePaper.Plane.Induction.StrongCoreDef
 import FLatticePaper.Plane.Induction.StrongCore
 import FLatticePaper.Plane.Induction.GamesAssembly
+import FLatticePaper.Plane.Induction.TieRankPeriods
+import FLatticePaper.Plane.Induction.TieAgreeClose
 import FLatticePaper.Plane.Induction.TieSquare
 import FLatticePaper.Plane.Induction.TieRankBound
 import FLatticePaper.Plane.Induction.TieChainStep

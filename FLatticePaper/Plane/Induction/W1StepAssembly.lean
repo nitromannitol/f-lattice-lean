@@ -11,6 +11,7 @@ import FLatticePaper.Plane.Induction.FreeRoutes
 import FLatticePaper.Plane.Induction.RouteAssembly
 import FLatticePaper.Plane.Induction.W1StepParts
 import FLatticePaper.Plane.Induction.OldPolicyBuild
+import FLatticePaper.Plane.Induction.TieAgreeClose
 
 /-! # The W1 step from the proved parts, with the open items as explicit hypotheses
 
@@ -21,7 +22,7 @@ canonical game (`OldPolicyBuild.oldPolicyRanked_of_games`), the canonical rules 
 the strip and odd-band inputs of the standard field, `hX1`, `hX2` (`HX12Strong`), `hX3` (`LowerMem` and the strips of the conjugate),
 and `hTop` (`TopStrictDischarge`).
 
-The explicit hypotheses are the open items: `hQ37` (the `h3` middle target for `t ≤ d`), `hFreeIn` (a forced white with a free white input forces that input), `hagree` (`TieAgreeHyp`), `hRow` (`RowStrictHyp`), `hPsi` (`PsiFaceSign`). -/
+`TieAgreeHyp` is no longer an input: it is `TieAgreeClose.tieAgreeHyp_of_routes`, from the route data above. The explicit hypotheses are the open items: `hQ37` (the `h3` middle target for `t ≤ d`), `hFreeIn` (a forced white with a free white input forces that input), `hRow` (`RowStrictHyp`), `hPsi` (`PsiFaceSign`). -/
 
 namespace FLatticePaper.W1StepAssembly
 
@@ -38,11 +39,6 @@ theorem w1Step_of_parts
         laplacian (standardField (conjWord word)) c = 0 →
         (o = incomingNeg c ∨ o = incomingPos c) → o ∈ (frameAt (conjWord word)).freeH ∪ (frameAt (conjWord word)).freeV →
         laplacian (standardField (conjWord word)) o = 0 → o = i)
-    (hagree : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) →
-      ∀ (G : CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word)))
-        (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) (fun _ _ => False)
-          (frameAt word).eps),
-        P.retained = (G.game (frameAt word).eps (frameAt word).eps_unit).policy → CollarChain.TieAgreeHyp word P)
     (hRow : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) →
       ∀ (G : CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word)))
         (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) (fun _ _ => False)
@@ -163,7 +159,7 @@ theorem w1Step_of_parts
   have hTop := TopStrictDischarge.topStrictHyp_of_packet hproper hSE
   have hn3 := FLatticePaper.Induction.child_num_ge_three hproper
   have hE := CollarChain.W1Forced_end_to_end (word := word) hproper hSE P rfl hW1c hn3 δ hδη hδ G hPret hH hVodd hX3 hX1 hX2
-    hcanon hTop (hRow word hproper G P hPret) (hPsi word hproper) (hagree word hproper G P hPret)
+    hcanon hTop (hRow word hproper G P hPret) (hPsi word hproper) (TieAgreeClose.tieAgreeHyp_of_routes hproper hSE P rfl hW1c G hPret hRoute δ hδη hδ hX3 hX1 hX2 hcanon)
   exact W1Bridge.W1Forced_standardField_of_MW word hproper hSE hE
 
 end FLatticePaper.W1StepAssembly
