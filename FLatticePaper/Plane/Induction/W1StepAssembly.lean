@@ -14,6 +14,7 @@ import FLatticePaper.Plane.Induction.PsiPacket
 import FLatticePaper.Plane.Induction.OldPolicyBuild
 import FLatticePaper.Plane.Induction.WestClose
 import FLatticePaper.Plane.Induction.TieAgreeClose
+import FLatticePaper.Plane.Induction.FreeInStep
 
 /-! # The W1 step from the proved parts, with the open items as explicit hypotheses
 
@@ -24,7 +25,7 @@ canonical game (`OldPolicyBuild.oldPolicyRanked_of_games`), the canonical rules 
 the strip and odd-band inputs of the standard field, `hX1`, `hX2` (`HX12Strong`), `hX3` (`LowerMem` and the strips of the conjugate),
 and `hTop` (`TopStrictDischarge`).
 
-`TieAgreeHyp` is no longer an input: it is `TieAgreeClose.tieAgreeHyp_of_routes`, from the route data above. The explicit hypotheses are the open items: `hFreeIn` (a forced white with a free white input forces that input), `hRow` (`RowStrictHyp`). `PsiFaceSign` is `PsiPacket.psiFaceSign_of_packet`. -/
+`TieAgreeHyp` is no longer an input: it is `TieAgreeClose.tieAgreeHyp_of_routes`, from the route data above. The explicit hypothesis is the open item `hRow` (`RowStrictHyp`); `hFreeIn` is `FreeInStep.hFreeIn_of_strong`. `PsiFaceSign` is `PsiPacket.psiFaceSign_of_packet`. -/
 
 namespace FLatticePaper.W1StepAssembly
 
@@ -32,11 +33,6 @@ open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.W1 FLatticePaper.
   FLatticePaper.AndOrRank FLatticePaper.SquareClauses FLatticePaper.W1Witness FLatticePaper.W1Phase
 
 theorem w1Step_of_parts
-    (hFreeIn : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) →
-      ∀ c i o, ForcedEdge (standardField (conjWord word)) (fun _ _ => False) c i →
-        laplacian (standardField (conjWord word)) c = 0 →
-        (o = incomingNeg c ∨ o = incomingPos c) → o ∈ (frameAt (conjWord word)).freeH ∪ (frameAt (conjWord word)).freeV →
-        laplacian (standardField (conjWord word)) o = 0 → o = i)
     (hRow : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) →
       ∀ (G : CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word)))
         (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) (fun _ _ => False)
@@ -56,7 +52,7 @@ theorem w1Step_of_parts
   let P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) (fun _ _ => False)
       (frameAt word).eps :=
     OldPolicyBuild.oldPolicyRanked_of_games hSE.packet hF G (frameAt word).eps hη R cU cV hRU hRV hR
-      hW1c (hFreeIn word hproper)
+      hW1c (fun c i o h _ ho hfo _ => FreeInStep.hFreeIn_of_strong hSE hpar c i o h ho hfo)
   have hPret : P.retained = (G.game (frameAt word).eps hη).policy := rfl
   obtain ⟨δ, hδη, hδ⟩ : ∃ δ : ℤ, (frameAt word).eps = -δ ∧ (δ = 1 ∨ δ = -1) :=
     ⟨-(frameAt word).eps, by ring, by omega⟩
@@ -161,11 +157,6 @@ theorem w1Step_of_parts
 
 
 theorem westFree_of_parts
-    (hFreeIn : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) →
-      ∀ c i o, ForcedEdge (standardField (conjWord word)) (fun _ _ => False) c i →
-        laplacian (standardField (conjWord word)) c = 0 →
-        (o = incomingNeg c ∨ o = incomingPos c) → o ∈ (frameAt (conjWord word)).freeH ∪ (frameAt (conjWord word)).freeV →
-        laplacian (standardField (conjWord word)) o = 0 → o = i)
     (hRow : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) →
       ∀ (G : CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word)))
         (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) (fun _ _ => False)
@@ -195,7 +186,7 @@ theorem westFree_of_parts
   let P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) (fun _ _ => False)
       (frameAt word).eps :=
     OldPolicyBuild.oldPolicyRanked_of_games hSE.packet hF G (frameAt word).eps hη R cU cV hRU hRV hR
-      hW1c (hFreeIn word hproper)
+      hW1c (fun c i o h _ ho hfo _ => FreeInStep.hFreeIn_of_strong hSE hpar c i o h ho hfo)
   have hPret : P.retained = (G.game (frameAt word).eps hη).policy := rfl
   obtain ⟨δ, hδη, hδ⟩ : ∃ δ : ℤ, (frameAt word).eps = -δ ∧ (δ = 1 ∨ δ = -1) :=
     ⟨-(frameAt word).eps, by ring, by omega⟩

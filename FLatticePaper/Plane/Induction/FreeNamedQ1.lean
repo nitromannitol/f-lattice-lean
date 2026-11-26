@@ -141,11 +141,6 @@ theorem gamesStep_of_noFort {word : Word} (h2 : ∃ x ∈ word, x ≠ Digit.two)
       RestrictedNoFort (standardField word)
         (fun z => (frameAt word).price (standardField word) z + (frameAt word).roundedSlip (standardField word) η z)
         (permitsQ1 (frameAt word) (standardField word) η))
-    (hFreeIn : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) →
-      ∀ c i o, ForcedEdge (standardField (conjWord word)) (fun _ _ => False) c i →
-        laplacian (standardField (conjWord word)) c = 0 →
-        (o = incomingNeg c ∨ o = incomingPos c) → o ∈ (frameAt (conjWord word)).freeH ∪ (frameAt (conjWord word)).freeV →
-        laplacian (standardField (conjWord word)) o = 0 → o = i)
     (hRow : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) →
       ∀ (G : CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word)))
         (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) (fun _ _ => False)
@@ -166,7 +161,7 @@ theorem gamesStep_of_noFort {word : Word} (h2 : ∃ x ∈ word, x ≠ Digit.two)
       freeNamedInputs_of_Q1 h hcore hSE hG hpar hW1c hW1 hη hcon hstrict (hforced η hη)
         (hcorner η hη)
         (by
-          have hh := FLatticePaper.W1StepAssembly.westFree_of_parts hFreeIn hRow word h hcore hseed hSE hpar hG
+          have hh := FLatticePaper.W1StepAssembly.westFree_of_parts hRow word h hcore hseed hSE hpar hG
             hW1c (AuxRankQ1.hasSat_of_constrained hcore.packet.binary hcon) η
           have e : (frameAt word).parents.odd.num + (frameAt word).parents.odd.den - 1 =
               (frameAt word).parents.odd.den + (frameAt word).parents.odd.num - 1 := by ring
