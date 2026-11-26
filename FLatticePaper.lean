@@ -733,6 +733,7 @@ import FLatticePaper.StepHeadline
 import FLatticePaper.Plane.Induction.StrongCoreDef
 import FLatticePaper.Plane.Induction.StrongCore
 import FLatticePaper.Plane.Induction.GamesAssembly
+import FLatticePaper.Plane.Induction.BoundarySlip
 import FLatticePaper.Plane.Induction.WestClose
 import FLatticePaper.Plane.Induction.SouthPolicy
 import FLatticePaper.Plane.Induction.RoundedLocal

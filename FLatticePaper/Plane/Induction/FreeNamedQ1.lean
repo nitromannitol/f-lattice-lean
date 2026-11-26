@@ -5,6 +5,7 @@ import FLatticePaper.Plane.Induction.ForcedPriceSI
 import FLatticePaper.Plane.Induction.HfreePhase1
 import FLatticePaper.Plane.Induction.WordPolicy
 import FLatticePaper.Plane.Induction.AuxRankQ1
+import FLatticePaper.Plane.Induction.W1StepAssembly
 
 /-! # The free-policy named inputs of the games step, from the Q1 rank (`hN` of `gamesWithRank_of_Q1`)
 
@@ -25,6 +26,7 @@ named inputs `hforced`, `hcorner`, `hwest`, together with the conjugate's data. 
 
 namespace FLatticePaper.FreeNamedQ1
 
+open FLatticePaper.W1Phase
 open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.FreePolicy FLatticePaper.AuxRankSign FLatticePaper.FreeClosure
   FLatticePaper.AuxRank FLatticePaper.SquareClauses FLatticePaper.FreePermittedS FLatticePaper.AuxRankQ1
   FLatticePaper.GamesAssembly
@@ -129,7 +131,7 @@ theorem freeNamedInputs_of_Q1 {word : Word} (h : ∃ x ∈ word, x ≠ Digit.thr
 /-- **The games step with the Q1 rank.** `gamesWithRank_of_Q1` with `hN := freeNamedInputs_of_Q1`: the explicit inputs are `hno` and
 the named forced, corner and west inputs, for both signs. -/
 theorem gamesStep_of_noFort {word : Word} (h2 : ∃ x ∈ word, x ≠ Digit.two) (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hcore : StrongCore word)
+    (hcore : StrongCore word) (hseed : FLatticePaper.W1Seeds.SeedFields word)
     (hSE : StrongEstimates (conjWord word)) (hG : GamesWithRank (conjWord word))
     (hpar : FLatticePaper.W1Seeds.SeedFields (conjWord word))
     (hW1c : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
@@ -139,6 +141,21 @@ theorem gamesStep_of_noFort {word : Word} (h2 : ∃ x ∈ word, x ≠ Digit.two)
       RestrictedNoFort (standardField word)
         (fun z => (frameAt word).price (standardField word) z + (frameAt word).roundedSlip (standardField word) η z)
         (permitsQ1 (frameAt word) (standardField word) η))
+    (hQ37 : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → StrongEstimates (conjWord word) →
+      ∀ z ∈ (frameAt (conjWord word)).freeH, EvenSite z → (z.1 - 1, z.2) ∈ (frameAt (conjWord word)).freeH →
+        (frameAt (conjWord word)).tGrade z ≤ (frameAt (conjWord word)).child.den →
+        laplacian (standardField (conjWord word)) (z.1, z.2 + 1) = 0)
+    (hFreeIn : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) →
+      ∀ c i o, ForcedEdge (standardField (conjWord word)) (fun _ _ => False) c i →
+        laplacian (standardField (conjWord word)) c = 0 →
+        (o = incomingNeg c ∨ o = incomingPos c) → o ∈ (frameAt (conjWord word)).freeH ∪ (frameAt (conjWord word)).freeV →
+        laplacian (standardField (conjWord word)) o = 0 → o = i)
+    (hRow : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) →
+      ∀ (G : CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word)))
+        (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) (fun _ _ => False)
+          (frameAt word).eps),
+        P.retained = (G.game (frameAt word).eps (frameAt word).eps_unit).policy →
+          CollarChain.RowStrictHyp word (standardField (conjWord word)) P.retained)
     (hforced : ∀ η : ℤ, (η = 1 ∨ η = -1) → ∀ c o : Site, ¬ freeClosure (frameAt word) c →
       laplacian (standardField word) c = 0 → ForcedEdge (standardField word) (fun _ _ => False) c o →
       slipPermits (standardField word) (fun z => standardField word (z + η • (frameAt word).shortShift)) c o)
@@ -146,15 +163,18 @@ theorem gamesStep_of_noFort {word : Word} (h2 : ∃ x ∈ word, x ≠ Digit.two)
       (frameAt word).parents.odd.num = 1 →
       FLatticePaper.W1Step.sheetPsi word (FLatticePaper.ArcPsi.reflH word (FLatticePaper.Induction.hFirst + (0, -η))) = 0 ∧
         (frameAt word).sheetA (FLatticePaper.W1MSheet.FqW word)
-          (FLatticePaper.ArcPsi.reflH word (FLatticePaper.Induction.hFirst + (0, -η))) = 0)
-    (hwest : ∀ η : ℤ, (η = 1 ∨ η = -1) → (frameAt word).eps = 1 → freePolicy (frameAt word) (standardField word) η
-      ((frameAt word).parents.odd.num - (frameAt word).parents.odd.den + 1,
-        (frameAt word).parents.odd.den + (frameAt word).parents.odd.num - 1)
-      (incomingNeg ((frameAt word).parents.odd.num - (frameAt word).parents.odd.den + 1,
-        (frameAt word).parents.odd.den + (frameAt word).parents.odd.num - 1))) :
+          (FLatticePaper.ArcPsi.reflH word (FLatticePaper.Induction.hFirst + (0, -η))) = 0) :
     GamesWithRank word :=
   gamesWithRank_of_Q1 h2 hcore hW1 hno
-    (fun η hη _ hcon hstrict => freeNamedInputs_of_Q1 h hcore hSE hG hpar hW1c hW1 hη hcon hstrict (hforced η hη)
-      (hcorner η hη) (hwest η hη))
+    (fun η hη _ hcon hstrict =>
+      freeNamedInputs_of_Q1 h hcore hSE hG hpar hW1c hW1 hη hcon hstrict (hforced η hη)
+        (hcorner η hη)
+        (by
+          have hh := FLatticePaper.W1StepAssembly.westFree_of_parts hQ37 hFreeIn hRow word h hcore hseed hSE hpar hG
+            hW1c (AuxRankQ1.hasSat_of_constrained hcore.packet.binary hcon) η
+          have e : (frameAt word).parents.odd.num + (frameAt word).parents.odd.den - 1 =
+              (frameAt word).parents.odd.den + (frameAt word).parents.odd.num - 1 := by ring
+          rw [e] at hh
+          exact hh))
 
 end FLatticePaper.FreeNamedQ1
