@@ -66,7 +66,7 @@ theorem sheetPolicyA_south {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
       FLatticePaper.Induction.hFirst - ((frameAt word).parents.odd.den + (frameAt word).parents.odd.num,
         (frameAt word).parents.odd.den - (frameAt word).parents.odd.num) := by
     unfold zTurn FLatticePaper.Induction.hFirst
-    ext <;> simp <;> ring
+    ext <;> (simp; try ring)
   have e2 : zTurn ((frameAt word).parents.odd.num - (frameAt word).parents.odd.den + 1 - 1,
       (frameAt word).parents.odd.num + (frameAt word).parents.odd.den - 1) =
       (FLatticePaper.Induction.hFirst + (0, -1)) - ((frameAt word).parents.odd.den + (frameAt word).parents.odd.num,
