@@ -1024,6 +1024,7 @@ import FLatticePaper.Plane.Induction.TransferSat
 import FLatticePaper.Plane.Induction.TransferW1
 import FLatticePaper.Plane.Induction.FreeSchedule
 import FLatticePaper.Plane.Induction.PassageRank
+import FLatticePaper.Plane.Induction.EasyHRankDiag
 import FLatticePaper.Plane.Induction.FreeRows
 import FLatticePaper.Plane.Induction.PriceH
 import FLatticePaper.Plane.Induction.PriceBoundary
@@ -1060,7 +1061,6 @@ import FLatticePaper.Plane.Induction.TopSquare
 import FLatticePaper.Plane.Induction.TopStrictDischarge
 import FLatticePaper.Plane.Induction.ColourPacket
 import FLatticePaper.Plane.Induction.PsiSign
-import FLatticePaper.Plane.Induction.PsiPacket
 import FLatticePaper.Plane.Induction.TieDeficit
 
 /-! Root import for the corrected F-lattice paper. -/
