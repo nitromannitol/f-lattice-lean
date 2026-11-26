@@ -733,6 +733,16 @@ import FLatticePaper.StepHeadline
 import FLatticePaper.Plane.Induction.StrongCoreDef
 import FLatticePaper.Plane.Induction.StrongCore
 import FLatticePaper.Plane.Induction.GamesAssembly
+import FLatticePaper.Plane.Induction.WordVPattern
+import FLatticePaper.Plane.Induction.RowPairWord
+import FLatticePaper.Plane.Induction.RowPair
+import FLatticePaper.Plane.Induction.RestrictedH0Core
+import FLatticePaper.Plane.Induction.RefuteTree
+import FLatticePaper.Plane.Induction.HGap
+import FLatticePaper.Plane.Induction.EasyNoFortWord
+import FLatticePaper.Plane.Induction.EasyNoFort
+import FLatticePaper.Plane.Induction.EasyHRank
+import FLatticePaper.Plane.Induction.EastColour
 import FLatticePaper.Plane.Induction.W1StepAssembly
 import FLatticePaper.Plane.Induction.W1StepParts
 import FLatticePaper.Plane.Induction.PsiPacket
