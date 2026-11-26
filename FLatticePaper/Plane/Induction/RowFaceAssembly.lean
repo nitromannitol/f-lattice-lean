@@ -40,15 +40,13 @@ theorem rowFaceStrictHyp_of_classes {word : Word} {G : Field} {R : Site → Site
       laplacian (MW word) c = 0 → 0 ≤ sheetPsi word c → CollarFrame (frameAt word) c → RightWit (frameAt word) c →
       (frameAt word).eps = -1 → ¬ Nonfree (frameAt (conjWord word)) (zTurn (c - (frameAt word).sheetShift)) →
       (zTurn (c - (frameAt word).sheetShift) - (0, -1) ∈ (frameAt (conjWord word)).child.modifiedDeck.span ∨
-        zTurn (c - (frameAt word).sheetShift) - (1, -1) ∈ (frameAt (conjWord word)).child.modifiedDeck.span))
-    (hNoAlignedTop : ∀ c, FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c →
-      laplacian (MW word) c = 0 → 0 ≤ sheetPsi word c → AlignedWit (frameAt word) c → ¬ TopWit (frameAt word) c) :
+        zTurn (c - (frameAt word).sheetShift) - (1, -1) ∈ (frameAt (conjWord word)).child.modifiedDeck.span)) :
     FLatticePaper.CollarChain.RowFaceStrictHyp word G R := by
-  intro c hcS hM hc0 hcoll hWit hnf
+  intro c hcS hM hc0 hcoll hWit hnot hnf
   rcases hWit with hB | hA
   · exact bottom_face_of_class hP hW1 hpres hwu hdeck hq hret hcS (hOne c hM) hB
       (hClassB c hcS hM hc0 hcoll hB hnf)
-  · have hT : ¬ TopWit (frameAt word) c := hNoAlignedTop c hcS hM hc0 hA
+  · have hT : ¬ TopWit (frameAt word) c := fun h => hnot (Or.inl h)
     by_cases hBc : BottomWit (frameAt word) c
     · exact bottom_face_of_class hP hW1 hpres hwu hdeck hq hret hcS (hOne c hM) hBc
         (hClassB c hcS hM hc0 hcoll hBc hnf)

@@ -28,6 +28,7 @@ theorem odometersTheorem_of_inputs
           (frameAt word).eps),
         P.retained = (G.game (frameAt word).eps (frameAt word).eps_unit).policy →
           CollarChain.RowFaceStrictHyp word (standardField (conjWord word)) P.retained)
+    (hDich : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → CollarChain.WitnessDichotomy word)
     (hforced : ∀ word : Word, ∀ η : ℤ, (η = 1 ∨ η = -1) → ∀ c o : Site, ¬ freeClosure (frameAt word) c →
       laplacian (standardField word) c = 0 → ForcedEdge (standardField word) (fun _ _ => False) c o →
       slipPermits (standardField word) (fun z => standardField word (z + η • (frameAt word).shortShift)) c o)
@@ -40,7 +41,7 @@ theorem odometersTheorem_of_inputs
   StepHeadline.odometersTheorem_of_steps
     (fun word hproper hnot hcore hseed _ hSE hpar _ _ _ hG hW1c hW1 =>
       FreeNamedQ1.gamesStep_of_noFort (exists_ne_two_of_not_twoPow hproper hnot) hproper hcore hseed hSE hG hpar hW1c hW1
-        (hno word) hRow (hforced word) (hcorner word))
-    (W1StepAssembly.w1Step_of_parts hRow)
+        (hno word) hRow hDich (hforced word) (hcorner word))
+    (W1StepAssembly.w1Step_of_parts hRow hDich)
 
 end FLatticePaper.OdometersInputs

@@ -734,6 +734,8 @@ import FLatticePaper.OdometersInputs
 import FLatticePaper.Plane.Induction.StrongCoreDef
 import FLatticePaper.Plane.Induction.StrongCore
 import FLatticePaper.Plane.Induction.GamesAssembly
+import FLatticePaper.Plane.Induction.WitnessPairs
+import FLatticePaper.Plane.Induction.ClassOne
 import FLatticePaper.Plane.Induction.ProtectedWeb
 import FLatticePaper.Plane.Induction.FreeInStep
 import FLatticePaper.Plane.Induction.FreeWebClaims

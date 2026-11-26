@@ -38,7 +38,8 @@ theorem w1Step_of_parts
         (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) (fun _ _ => False)
           (frameAt word).eps),
         P.retained = (G.game (frameAt word).eps (frameAt word).eps_unit).policy →
-          CollarChain.RowFaceStrictHyp word (standardField (conjWord word)) P.retained) :
+          CollarChain.RowFaceStrictHyp word (standardField (conjWord word)) P.retained)
+    (hDich : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → CollarChain.WitnessDichotomy word) :
     W1Step := by
   intro word hproper _ hcore hseed _ hSE hpar _ _ _ hGc hW1c
   obtain ⟨G, hGr⟩ := hGc
@@ -152,7 +153,7 @@ theorem w1Step_of_parts
   have hTop := TopStrictDischarge.topStrictHyp_of_packet hproper hSE
   have hn3 := FLatticePaper.Induction.child_num_ge_three hproper
   have hE := CollarChain.W1Forced_end_to_end (word := word) hproper hSE P rfl hW1c hn3 δ hδη hδ G hPret hH hVodd hX3 hX1 hX2
-    hcanon hTop (hRow word hproper G P hPret) (FLatticePaper.PsiPacket.psiFaceSign_of_packet hproper hcore hseed hSE hpar hn3) (TieAgreeClose.tieAgreeHyp_of_routes hproper hSE P rfl hW1c G hPret hRoute δ hδη hδ hX3 hX1 hX2 hcanon)
+    hcanon hTop (hRow word hproper G P hPret) (hDich word hproper) (FLatticePaper.PsiPacket.psiFaceSign_of_packet hproper hcore hseed hSE hpar hn3) (TieAgreeClose.tieAgreeHyp_of_routes hproper hSE P rfl hW1c G hPret hRoute δ hδη hδ hX3 hX1 hX2 hcanon)
   exact W1Bridge.W1Forced_standardField_of_MW word hproper hSE hE
 
 
@@ -163,6 +164,7 @@ theorem westFree_of_parts
           (frameAt word).eps),
         P.retained = (G.game (frameAt word).eps (frameAt word).eps_unit).policy →
           CollarChain.RowFaceStrictHyp word (standardField (conjWord word)) P.retained)
+    (hDich : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → CollarChain.WitnessDichotomy word)
     (word : Word) (hproper : ∃ x ∈ word, x ≠ Digit.three) (hcore : StrongCore word) (hseed : FLatticePaper.W1Seeds.SeedFields word)
     (hSE : StrongEstimates (conjWord word)) (hpar : FLatticePaper.W1Seeds.SeedFields (conjWord word))
     (hGc : FLatticePaper.Induction.GamesWithRank (conjWord word))
@@ -301,9 +303,9 @@ theorem westFree_of_parts
     intro c hcS hM hcoll
     by_cases h0 : 0 ≤ FLatticePaper.W1Step.sheetPsi word c
     · exact FLatticePaper.CollarChain.hcollar_A hproper hSE P rfl hW1c G hPret hTop (hRow word hproper G P hPret)
-        hfree hPsi hagree c hcS hM h0 hcoll
+        hfree hPsi hagree (hDich word hproper) c hcS hM h0 hcoll
     · exact FLatticePaper.CollarChain.hC_of_inputs hproper hSE P rfl hW1c G hPret hTop (hRow word hproper G P hPret)
-        hfree hPsi c hcS hM hcoll (by omega)
+        hfree hPsi (hDich word hproper) c hcS hM hcoll (by omega)
   exact FLatticePaper.WestClose.westAtException_of_routes hproper hSE hcore P rfl hW1c G hPret heps hfree hcollar hsat η
 
 end FLatticePaper.W1StepAssembly
