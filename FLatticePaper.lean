@@ -682,6 +682,7 @@ import FLatticePaper.Plane.Induction.W4Guard
 import FLatticePaper.Plane.Induction.W4White
 import FLatticePaper.Plane.Induction.RestrictedPassage
 import FLatticePaper.Plane.Induction.FreeCutSucc
+import FLatticePaper.Plane.Induction.FreeCutExist
 import FLatticePaper.TraceHeadline
 import FLatticePaper.FlatPlusHeadline
 import FLatticePaper.Plane.Induction.TwosDeckEta
