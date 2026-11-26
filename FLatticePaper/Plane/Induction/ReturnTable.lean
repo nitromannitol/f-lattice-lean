@@ -62,16 +62,10 @@ theorem forcedEdgeIn_mem {F : Field} {R : Site → Prop} {seed : Site → Site �
   | seed hs => exact fun hns => absurd hs hns
   | @unit _ _ c' _ _ hR hc _ _ _ _ _ _ => exact fun _ => hR c' hc
 
-/-- **Forced whites are non-free.** With an empty seed, every forced white has a strict-interior forcing derivation
-(`strictForced`), and strict-interior sites are non-free (`strictInterior_nonfree`). This derives the fan theorem's
-`hforcedNF` (`FanCompat.fan_agrees_forced`) instead of assuming it. -/
-theorem forcedNF_of_witness {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} {η : ℤ}
-    (P : FLatticePaper.W1Witness.OldPolicyWitness frame G seed η) (hs : ∀ y i, ¬ seed y i) :
-    ∀ y i, ForcedEdge G seed y i → laplacian G y = 0 → Nonfree frame y := by
-  intro y i hF _
-  exact FLatticePaper.Induction.strictInterior_nonfree frame
-    (forcedEdgeIn_mem (P.strictForced y i hF (hs y i)) (hs y i))
-
+/-- **Strict forced whites are non-free.** A strict-interior site is non-free (`strictInterior_nonfree`). -/
+theorem forcedNF_of_strict {frame : ChildFrame} (y : Site)
+    (hSI : FLatticePaper.W1.StrictInterior frame.child.num frame.child.den y) : Nonfree frame y :=
+  FLatticePaper.Induction.strictInterior_nonfree frame hSI
 
 /-- An empty seed (the table's hypothesis `seed = fun _ _ => False`) has no seed edges. -/
 theorem not_seed_of_empty {seed : Site → Site → Prop} (hs : seed = fun _ _ => False) :
@@ -80,24 +74,24 @@ theorem not_seed_of_empty {seed : Site → Site → Prop} (hs : seed = fun _ _ =
   rw [hs]
   exact fun h => h
 
-/-- **Fan compatibility with the policy's forced whites** (`FanCompat.fan_agrees_forced`, with `free := ¬ Nonfree`, the W1-free whites):
-on a physical subgraph `D` with no fan cycle, every forced non-free white of `D` selects its forced input. The hypothesis `hforcedNF` is
-now derived (`forcedNF_of_witness`) from the policy's strict-interior forcing, not assumed. -/
-theorem fan_agrees_of_witness {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} {η : ℤ}
-    (P : FLatticePaper.W1Witness.OldPolicyWitness frame G seed η) (hs : ∀ y i, ¬ seed y i)
+/-- **Fan compatibility with the forced whites**, with the forced-nonfree premise `hforcedNF` explicit. The premise is not derivable:
+a forced white need not be strict (`forcedNF_of_strict` covers strict sites), and a free forced white is possible. -/
+theorem fan_agrees_of_witness {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop}
+    (hs : ∀ y i, ¬ seed y i)
     {sel : Site → Site} {D : Set Site}
     (hbin : ∀ y, laplacian G y = -1 ∨ laplacian G y = 0)
     (hblack : ∀ y ∈ D, laplacian G y = -1 → incomingNeg y ∈ D ∧ incomingPos y ∈ D)
     (hwhite : ∀ y ∈ D, laplacian G y = 0 → Nonfree frame y →
       sel y ∈ D ∧ (sel y = incomingNeg y ∨ sel y = incomingPos y))
     (hacyc : ∀ y, ¬ Relation.TransGen
-      (FLatticePaper.FanCompat.fanRel G D (fun x => ¬ Nonfree frame x) sel) y y) :
+      (FLatticePaper.FanCompat.fanRel G D (fun x => ¬ Nonfree frame x) sel) y y)
+    (hforcedNF : ∀ y i, ForcedEdge G seed y i → laplacian G y = 0 → Nonfree frame y) :
     ∀ c i, ForcedEdge G seed c i → c ∈ D → Nonfree frame c → sel c = i := by
   intro c i h hD hnf
   exact FLatticePaper.FanCompat.fan_agrees_forced hbin hblack
     (fun y hy hw hnf' => hwhite y hy hw (not_not.mp hnf')) hacyc
     (fun y i' h' _ _ => absurd h' (hs y i'))
-    (fun y i' hF hw => not_not.mpr (forcedNF_of_witness P hs y i' hF hw))
+    (fun y i' hF hw => not_not.mpr (hforcedNF y i' hF hw))
     c i h hD (not_not.mpr hnf)
 
 end FLatticePaper.ReturnTable

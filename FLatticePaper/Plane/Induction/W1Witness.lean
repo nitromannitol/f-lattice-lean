@@ -1,5 +1,6 @@
 import FLatticePaper.Plane.Induction.OldPolicy
 import FLatticePaper.Plane.Induction.W1Constructor
+import FLatticePaper.Plane.Induction.S3FreeBoundary
 
 /-! Task 62 (2): the witness data of the earlier canonical policy, as a structure extending `OldPolicyData` (w3's file is not edited).
 
@@ -16,9 +17,14 @@ open Farey FLatticePaper FLatticePaper.SquareClauses FLatticePaper.AndOrRank FLa
 /-- The earlier canonical policy with its strict-interior witnesses and private squares at the forced whites. -/
 structure OldPolicyWitness (frame : ChildFrame) (G : Field) (seed : Site → Site → Prop) (η : ℤ)
     extends OldPolicyData frame G seed η where
-  /-- Every forced non-seed white of the earlier field is forced by a derivation whose squares lie in the earlier strict interior. -/
-  strictForced : ∀ c i, ForcedEdge G seed c i → ¬ seed c i →
+  /-- A forced non-seed white of the earlier field lying in the strict interior is forced by a derivation whose squares lie in the strict
+  interior. Restricted to strict sites: a forced white outside the strict interior has no such derivation. -/
+  strictForced : ∀ c i, StrictInterior frame.child.num frame.child.den c → ForcedEdge G seed c i → ¬ seed c i →
     ForcedEdgeIn G (StrictInterior frame.child.num frame.child.den) seed c i
+  /-- The free-input fact (checked numerically on the unseeded forcing of the conjugate fields of words of length at most four, not
+  proved): a forced white whose input `o` is a free white point (laplacian `0`) forces exactly that input. -/
+  freeInputForced : ∀ c i o, ForcedEdge G seed c i → laplacian G c = 0 → (o = incomingNeg c ∨ o = incomingPos c) →
+    o ∈ frame.freeH ∪ frame.freeV → laplacian G o = 0 → o = i
   /-- PRIVATE witness squares (the parent's W1 data, inherited; archive ALL_WHITE_THREE_STEP_RETURNS §A and AUDIT §1): the witness square
   of a forced non-seed white `c` contains `c`, and every other corner `c'` is joined to `c` by a chain of retained lattice edges, each
   step a retained input of the site before it (`c'` keeps … keeps `c`). The rejected input of `c` is the square corner `u` with

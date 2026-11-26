@@ -50,7 +50,7 @@ theorem prescribedH_even {frame : ChildFrame} (η : ℤ) {x : Site} (he : EvenSi
 /-- **A white with a free white input.** A non-free white `x` with an input `y` that is a free white (`y ∈ freeH ∪ freeV`, `laplacian y = 0`)
 retains `y` (`forced_input_of_free`); a black `x` retains both inputs. -/
 theorem edgeOK_of_free_input {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} {η : ℤ}
-    (P : FLatticePaper.W1Witness.OldPolicyWitness frame G seed η) (hs : ∀ y i, ¬ seed y i) {x y : Site}
+    (P : FLatticePaper.W1Witness.OldPolicyWitness frame G seed η) (_hs : ∀ y i, ¬ seed y i) {x y : Site}
     (hbin : laplacian G x = -1 ∨ laplacian G x = 0)
     (hF : laplacian G x = 0 → ∃ i, ForcedEdge G seed x i)
     (hy : y = incomingNeg x ∨ y = incomingPos x) (hyfree : y ∈ frame.freeH ∪ frame.freeV)
@@ -58,7 +58,7 @@ theorem edgeOK_of_free_input {frame : ChildFrame} {G : Field} {seed : Site → S
   rcases hbin with hb | hw
   · exact Or.inl ⟨hb, hy⟩
   · obtain ⟨i, hi⟩ := hF hw
-    have hyi : y = i := forced_input_of_free P hs hi hy hyw (not_nonfree_of_free frame hyfree)
+    have hyi : y = i := P.freeInputForced x i y hi hw hy hyfree hyw
     exact Or.inr (by rw [hyi]; exact hi)
 
 /-- **Shape 7 (the reflected audit shape 1) from its three edges.** `z+S → z+SW` (the fan edge, named as `e1`), `z+SW → z+W`

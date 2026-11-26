@@ -34,26 +34,22 @@ theorem incomingPos_ne (x : Site) : incomingPos x ≠ x := by
     have e2 := congrArg Prod.snd e
     simp at e2
 
-/-- **A forced white selects its free white input.** With an empty seed, a forced white `c` (`ForcedEdge G seed c i`, white) whose input
-`o` is a free white (`¬ Nonfree`, `laplacian = 0`) has forced input `i = o`. -/
-theorem forced_input_of_free {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} {η : ℤ}
+/-- **A strict forced white selects its free white input.** A strict forced white has a strict-interior derivation (`strictForced`); its
+corners are strict, hence non-free, so a free white input is not a corner. The forced input is then the outside input of the square. -/
+theorem forced_input_of_free_strict {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} {η : ℤ}
     (P : FLatticePaper.W1Witness.OldPolicyWitness frame G seed η) (hs : ∀ y i, ¬ seed y i)
-    {c i o : Site} (hF : ForcedEdge G seed c i)
-    (ho : o = incomingNeg c ∨ o = incomingPos c) (hod : laplacian G o = 0) (hfree : ¬ Nonfree frame o) :
+    {c i o : Site} (hcS : FLatticePaper.W1.StrictInterior frame.child.num frame.child.den c) (hF : ForcedEdge G seed c i)
+    (ho : o = incomingNeg c ∨ o = incomingPos c) (hfree : o ∈ frame.freeH ∪ frame.freeV) :
     o = i := by
-  cases hF with
+  have hFin := P.strictForced c i hcS hF (hs c i)
+  cases hFin with
   | seed hsd => exact absurd hsd (hs _ _)
-  | @unit a b _ o' inside hx hw ho' hout hin hforced =>
+  | @unit a b _ o' inside hR hx _ ho' hout hin _ =>
     by_cases hmem : o ∈ squareCorners a b
-    · exfalso
-      have hne : o ≠ c := by
-        rcases ho with h | h
-        · rw [h]; exact incomingNeg_ne c
-        · rw [h]; exact incomingPos_ne c
-      rcases hin o hmem hne with hb | ⟨-, -, -⟩
-      · rw [hod] at hb
-        norm_num at hb
-      · exact hfree (forcedNF_of_witness P hs o _ (hforced o hmem hne hod) hod)
+    · have hNF := FLatticePaper.Induction.strictInterior_nonfree frame (hR o hmem)
+      have hzero : (0 : Site) ∈ frame.child.modifiedDeck.span :=
+        ⟨0, 0, by ext <;> simp [FLatticePaper.Farey.PeriodDeck.combine]⟩
+      exact (hNF 0 hzero (by rw [add_zero]; exact hfree)).elim
     · have hiff := square_one_input a b hx
       rcases ho with h1 | h1 <;> rcases ho' with h2 | h2
       · rw [h1, h2]

@@ -2,7 +2,6 @@ import FLatticePaper.StepHeadline
 import FLatticePaper.Plane.Induction.CollarChain
 import FLatticePaper.Plane.Induction.HX12Strong
 import FLatticePaper.Plane.Induction.LowerMem
-import FLatticePaper.Plane.Induction.LowerBandStrong
 import FLatticePaper.Plane.Induction.TopStrictDischarge
 import FLatticePaper.Plane.Induction.W1Bridge
 import FLatticePaper.Plane.Induction.ChildNumerator
@@ -11,55 +10,61 @@ import FLatticePaper.Plane.Induction.EvenWindow
 import FLatticePaper.Plane.Induction.FreeRoutes
 import FLatticePaper.Plane.Induction.RouteAssembly
 import FLatticePaper.Plane.Induction.W1StepParts
+import FLatticePaper.Plane.Induction.OldPolicyBuild
 
 /-! # The W1 step from the proved parts, with the open items as explicit hypotheses
 
-`StepHeadline.W1Step` at a proper word `word` (not a two-power): the W1 forcing of the word, from the conjugate's strong estimates,
-seeds, trace, games with a deck rank and W1 forcing. The engine is `CollarChain.W1Forced_end_to_end`; its inputs are wired here:
-the route fields (`RouteAssembly.routeGenuine_of_parts`, through `FreeRoutes.hH_of_routes` and `hVodd_of_routes`), the four canonical
-rules (`HderivClosed.hcanon_east` / `hcanon_west`), the strip and odd-band inputs of the standard field, and `hX1`, `hX2`, `hX3`
-(`HX12Strong`, `LowerBandStrong`, `LowerMem`), and `hTop` (`TopStrictDischarge`).
+`StepHeadline.W1Step` at a proper word `word`: the W1 forcing of the word, from the conjugate's strong estimates, seeds, trace, games
+with a deck rank and W1 forcing. The engine is `CollarChain.W1Forced_end_to_end`; its inputs are wired here: the route fields
+(`RouteAssembly.routeGenuine_of_parts`, through `FreeRoutes.hH_of_routes` and `hVodd_of_routes`), the ranked old policy of the
+canonical game (`OldPolicyBuild.oldPolicyRanked_of_games`), the canonical rules by sign (`HderivClosed.hcanon_east` / `hcanon_west`),
+the strip and odd-band inputs of the standard field, `hX1`, `hX2` (`HX12Strong`), `hX3` (`LowerMem` and the strips of the conjugate),
+and `hTop` (`TopStrictDischarge`).
 
-The explicit hypotheses are the open items: `hQ37` (the `h3` middle target for `t ≤ d`), `hPbuild` (the ranked old policy of the
-conjugate's canonical game, which is not yet built from the games), `hagree` (`TieAgreeHyp`), `hRow` (`RowStrictHyp`), `hPsi`
-(`PsiFaceSign`), and `hthree` (the words whose conjugate is a pure power of threes, where the colour lemma of `hX3` does not apply). -/
+The explicit hypotheses are the open items: `hQ37` (the `h3` middle target for `t ≤ d`), `hFreeIn` (a forced white with a free white input forces that input), `hagree` (`TieAgreeHyp`), `hRow` (`RowStrictHyp`), `hPsi` (`PsiFaceSign`). -/
 
 namespace FLatticePaper.W1StepAssembly
 
 open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.W1 FLatticePaper.StepHeadline FLatticePaper.W1NonfreeOut
+  FLatticePaper.AndOrRank FLatticePaper.SquareClauses FLatticePaper.W1Witness FLatticePaper.W1Phase
 
 theorem w1Step_of_parts
     (hQ37 : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → StrongEstimates (conjWord word) →
       ∀ z ∈ (frameAt (conjWord word)).freeH, EvenSite z → (z.1 - 1, z.2) ∈ (frameAt (conjWord word)).freeH →
         (frameAt (conjWord word)).tGrade z ≤ (frameAt (conjWord word)).child.den →
         laplacian (standardField (conjWord word)) (z.1, z.2 + 1) = 0)
-    (hPbuild : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) →
-      ∀ G : CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word)),
-        ∃ P : W1Phase.OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) (fun _ _ => False)
-          (frameAt word).eps,
-          P.retained = (G.game (frameAt word).eps (frameAt word).eps_unit).policy)
+    (hFreeIn : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) →
+      ∀ c i o, ForcedEdge (standardField (conjWord word)) (fun _ _ => False) c i →
+        laplacian (standardField (conjWord word)) c = 0 →
+        (o = incomingNeg c ∨ o = incomingPos c) → o ∈ (frameAt (conjWord word)).freeH ∪ (frameAt (conjWord word)).freeV →
+        laplacian (standardField (conjWord word)) o = 0 → o = i)
     (hagree : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) →
       ∀ (G : CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word)))
-        (P : W1Phase.OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) (fun _ _ => False)
+        (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) (fun _ _ => False)
           (frameAt word).eps),
         P.retained = (G.game (frameAt word).eps (frameAt word).eps_unit).policy → CollarChain.TieAgreeHyp word P)
     (hRow : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) →
       ∀ (G : CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word)))
-        (P : W1Phase.OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) (fun _ _ => False)
+        (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) (fun _ _ => False)
           (frameAt word).eps),
         P.retained = (G.game (frameAt word).eps (frameAt word).eps_unit).policy →
           CollarChain.RowStrictHyp word (standardField (conjWord word)) P.retained)
-    (hPsi : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → FaceWitness.PsiFaceSign word)
-    (hthree : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → (∃ k : ℕ, conjWord word = List.replicate k Digit.three) →
-      W1At word) :
-    W1Step   := by
-  intro word hproper _ _ _ _ hSE hpar _ hSE2 _ hGc hW1c
-  by_cases hk : ∃ k : ℕ, conjWord word = List.replicate k Digit.three
-  · exact hthree word hproper hk
-  have hnot : ¬ ∃ k : ℕ, conjWord word = List.replicate k Digit.three := hk
-  obtain ⟨G, -⟩ := hGc
-  obtain ⟨P, hPret⟩ := hPbuild word hproper G
+    (hPsi : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → FaceWitness.PsiFaceSign word) :
+    W1Step := by
+  intro word hproper _ _ _ _ hSE hpar _ _ _ hGc hW1c
+  obtain ⟨G, hGr⟩ := hGc
   have hη := (frameAt word).eps_unit
+  obtain ⟨R, cU, cV, hRU, hRV, hR⟩ := hGr (frameAt word).eps hη
+  have hF : ∀ z, standardField (conjWord word) (reflectionI - z) = standardField (conjWord word) z := by
+    intro z
+    have h := FLatticePaper.W1Strips.standardField_iRefl hSE z
+    rw [FLatticePaper.W1Strips.iRefl_eq_sub] at h
+    exact h
+  let P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) (fun _ _ => False)
+      (frameAt word).eps :=
+    OldPolicyBuild.oldPolicyRanked_of_games hSE.packet hF G (frameAt word).eps hη R cU cV hRU hRV hR
+      hW1c (hFreeIn word hproper)
+  have hPret : P.retained = (G.game (frameAt word).eps hη).policy := rfl
   obtain ⟨δ, hδη, hδ⟩ : ∃ δ : ℤ, (frameAt word).eps = -δ ∧ (δ = 1 ∨ δ = -1) :=
     ⟨-(frameAt word).eps, by ring, by omega⟩
   have hP := hSE.packet
@@ -70,11 +75,7 @@ theorem w1Step_of_parts
   have hslip : ∀ z ∈ (frameAt (conjWord word)).closedPolygon, 0 ≤ (frameAt (conjWord word)).slip
       (standardField (conjWord word)) 1 z := fun z hz => (hslipR z hz).1
   have hIsym := FLatticePaper.W1Strips.standardField_iRefl hSE
-  have hI : ∀ y : Site, standardField (conjWord word) (reflectionI - y) = standardField (conjWord word) y := by
-    intro y
-    have h := hIsym y
-    rw [FLatticePaper.W1Strips.iRefl_eq_sub] at h
-    exact h
+  have hI : ∀ y : Site, standardField (conjWord word) (reflectionI - y) = standardField (conjWord word) y := hF
   have hS : ∀ x : Site, 2 - 2 * (frameAt (conjWord word)).child.den ≤ (frameAt (conjWord word)).sGrade x →
       (frameAt (conjWord word)).sGrade x ≤ 2 * ((frameAt (conjWord word)).child.den + (frameAt (conjWord word)).child.num) - 2 →
       standardField (conjWord word) x = harmonicGrid x := fun x h1 h2 =>
@@ -113,11 +114,13 @@ theorem w1Step_of_parts
     rw [hPret]
     exact FreeRoutes.hH_of_routes (G.game (frameAt word).eps hη) hη hP (G.deckEquiv (frameAt word).eps hη) hRoute z hz hw
   have hVodd : ∀ z ∈ (frameAt (conjWord word)).freeV, ¬ EvenSite z →
-      laplacian (standardField (conjWord word)) z = 0 → W1NonfreeOut.ParentSquareOut (standardField (conjWord word)) P.retained z := by
+      laplacian (standardField (conjWord word)) z = 0 →
+      W1NonfreeOut.ParentSquareOut (standardField (conjWord word)) P.retained z := by
     intro z hz hodd hw
     rw [hPret]
     exact FreeRoutes.hVodd_of_routes (G.game (frameAt word).eps hη) hη hP (G.deckEquiv (frameAt word).eps hη) hRoute z hz hodd hw
-  have hδz' : ∀ z : Site, ((frameAt word).eps = -1 ∨ z ≠ (frameAt (conjWord word)).vLast) → (δ = 1 ∨ z ≠ (frameAt (conjWord word)).vLast) := by
+  have hδz' : ∀ z : Site, ((frameAt word).eps = -1 ∨ z ≠ (frameAt (conjWord word)).vLast) →
+      (δ = 1 ∨ z ≠ (frameAt (conjWord word)).vLast) := by
     intro z hδz
     by_cases hd : δ = 1
     · exact Or.inl hd
@@ -142,7 +145,8 @@ theorem w1Step_of_parts
       (z.1, z.2 - δ) ∈ (frameAt (conjWord word)).freeV ∧
         laplacian (standardField (conjWord word)) (z.1, z.2 - δ) = 0 := fun z hz hev hzF hδz _ =>
     ⟨(frameAt (conjWord word)).lower_mem_freeV hz hev hzF hδ (hδz' z hδz),
-      lap_lower_of_strong hnot hSE2 hz hev hzF hδ (hδz' z hδz)⟩
+      (frameAt (conjWord word)).lap_lower_eq_zero (fun x h1 h2 => hP.strips.2 x (by omega) (by omega)) hz hev hzF hδ
+        (hδz' z hδz)⟩
   have hcanon : ∀ z ∈ (frameAt (conjWord word)).freeV, EvenSite z → z ≠ FLatticePaper.Induction.vFirst →
       ((frameAt word).eps = -1 ∨ z ≠ (frameAt (conjWord word)).vLast) → laplacian (standardField (conjWord word)) z = 0 →
       laplacian (standardField (conjWord word)) (z.1 + δ, z.2) = 0 →
