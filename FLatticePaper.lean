@@ -711,6 +711,9 @@ import FLatticePaper.Plane.Induction.ListPrefix
 import FLatticePaper.Plane.Induction.FortPairMin
 import FLatticePaper.Plane.Induction.ListForce
 import FLatticePaper.Plane.Induction.WhiteRoute
+import FLatticePaper.Plane.Induction.RouteStay
+import FLatticePaper.Plane.Induction.RouteReflect
+import FLatticePaper.Plane.Induction.RoutePlus
 import FLatticePaper.TraceHeadline
 import FLatticePaper.FlatPlusHeadline
 import FLatticePaper.Plane.Induction.TwosDeckEta
@@ -743,6 +746,7 @@ import FLatticePaper.Plane.Induction.M2White
 import FLatticePaper.Plane.Induction.StripColours
 import FLatticePaper.Plane.Induction.HderivClosed
 import FLatticePaper.Plane.Induction.InternalReturns
+import FLatticePaper.Plane.Induction.FreeRoutes
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame
 import FLatticePaper.Plane.Induction.BaseMembership
