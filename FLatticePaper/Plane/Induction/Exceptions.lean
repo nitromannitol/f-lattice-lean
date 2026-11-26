@@ -245,4 +245,33 @@ theorem vLast_strict_excl {n d : ℤ} (hn : n % 2 = 1) (hd : d % 2 = 1) (hn1 : 1
           rw [← w1t_diff n d c v, ← w1s_diff n d c v]
           exact freeVn_shift_FVr hn hd v hvF⟩
 
+/-! ## (5d): the only strict neighbour of `R = vLast + K = (n+1, 2n+d-1)` -/
+
+/-- The strict offsets from `R`: only `(-1,-1)`, the site `(n, 2n+d-2)` (black by `lap_R_sub_one_one`). -/
+theorem R_grade_offsets (n d T i j : Int) (hn : n % 2 = 1) (hd : d % 2 = 1) (hn1 : 1 ≤ n) (hnd : n + 2 ≤ d)
+    (hTe : T % 2 = 0) (hi1 : -1 ≤ i) (hi2 : i ≤ 1) (hj1 : -1 ≤ j) (hj2 : j ≤ 1)
+    (hS : SIG n d T (-T + n + d + n * i - d * j) (T + 2 * n + (d + n) * i + (d - n) * j)) :
+    i = -1 ∧ j = -1 := by
+  have hi : i = -1 ∨ i = 0 ∨ i = 1 := by omega
+  have hj : j = -1 ∨ j = 0 ∨ j = 1 := by omega
+  rcases hi with rfl | rfl | rfl <;> rcases hj with rfl | rfl | rfl <;> simp only [SIG] at hS <;> omega
+
+/-- **The only strict site next to `R` is `(n, 2n+d-2)`.** -/
+theorem R_strict_unique {n d : ℤ} (hn : n % 2 = 1) (hd : d % 2 = 1) (hn1 : 1 ≤ n) (hnd : n + 2 ≤ d)
+    (c : Site) (hc1 : |c.1 - (n + 1)| ≤ 1) (hc2 : |c.2 - (2 * n + d - 1)| ≤ 1) (hS : StrictInterior n d c) :
+    c = (n, 2 * n + d - 2) := by
+  have hT4 := period_ge2 hn1 hnd
+  have hTe := parity_w1T hn hd
+  have hSg := (strict_iff_SIG' hn hd c).mp hS
+  have e1 : w1t n d c = -w1T n d + n + d + n * (c.1 - (n + 1)) - d * (c.2 - (2 * n + d - 1)) := by
+    unfold w1t w1T; ring
+  have e2 : w1s n d c = w1T n d + 2 * n + (d + n) * (c.1 - (n + 1)) + (d - n) * (c.2 - (2 * n + d - 1)) := by
+    unfold w1s w1T; ring
+  rw [e1, e2] at hSg
+  have hb1 := abs_le.mp hc1
+  have hb2 := abs_le.mp hc2
+  obtain ⟨hi, hj⟩ := R_grade_offsets n d (w1T n d) (c.1 - (n + 1)) (c.2 - (2 * n + d - 1)) hn hd hn1 hnd hTe
+    hb1.1 hb1.2 hb2.1 hb2.2 hSg
+  exact Prod.ext (by dsimp only; omega) (by dsimp only; omega)
+
 end FLatticePaper.Exceptions
