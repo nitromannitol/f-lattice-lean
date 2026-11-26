@@ -1,4 +1,5 @@
 import FLatticePaper.Plane.Induction.PairClass
+import FLatticePaper.Plane.Induction.ColourPacket
 import FLatticePaper.Plane.Induction.SquareImage
 import FLatticePaper.Plane.Induction.CrossingLattice
 import FLatticePaper.Plane.Induction.ExteriorNbr
@@ -162,8 +163,6 @@ theorem corner_mem_all (a b : ℤ) :
 /-- **The word-image of a conjugate square is strict** (the content of `TopStrictHyp`), for a strict white centre
 `c` with a bottom or aligned witness. The colour facts come from the packet (`HasStrips`, `HasGeneratorPeriods`). -/
 theorem top_corner_strict (word : Word) (hw : ∃ x ∈ word, x ≠ Digit.three)
-    {cU cV : ℤ} (hS : (frameAt word).HasStrips (MW word))
-    (hF : HasGeneratorPeriods (frameAt word).child (MW word) cU cV)
     (hSE : StrongEstimates (conjWord word))
     (c v ρ : Site) (a b : ℤ)
     (hc : StrictInterior (frameAt word).child.num (frameAt word).child.den c)
@@ -226,7 +225,7 @@ theorem top_corner_strict (word : Word) (hw : ∃ x ∈ word, x ≠ Digit.three)
           have hc2 : |c.2 - ((frameAt word).child.num - 1)| ≤ 1 := by
             rw [abs_le] at ha2 ⊢; constructor <;> omega
           have hcE := FLatticePaper.Exceptions.hLast_strict hnO hdO hn1 hnd c hc1 hc2 hc
-          have hl := StripColours.lap_den_sub_one (frameAt word) hS hF
+          have hl := ColourPacket.lap_MW_dn1 hw hSE
           rw [hcE, hl] at hM
           norm_num at hM
         · exact (BottomGrade.bottom_not_nonfree word hw hε1 ((freeH_iff_freeHn (frameAt word) bb).mpr hBH) hbl) hNF
@@ -236,7 +235,7 @@ theorem top_corner_strict (word : Word) (hw : ∃ x ∈ word, x ≠ Digit.three)
           ⟨bb, ha1, ha2, by rw [kernel_eq]; exact (freeV_iff_freeVn (frameAt word) _).mpr hKV⟩
         rcases hWit with hB | hA
         · have hcE := right_bottom_centre (frameAt word) hc hRW hB
-          have hl := StripColours.lap_den_sub_one (frameAt word) hS hF
+          have hl := ColourPacket.lap_MW_dn1 hw hSE
           rw [hcE, hl] at hM
           norm_num at hM
         · rcases hA with ⟨-, hL⟩ | ⟨hεm', -⟩
@@ -258,7 +257,7 @@ theorem top_corner_strict (word : Word) (hw : ∃ x ∈ word, x ≠ Digit.three)
               refine Prod.ext ?_ ?_
               · simp only [ChildFrame.vLast]; ring
               · simp only [ChildFrame.vLast]
-            have hl := StripColours.lap_vLast_east (frameAt word) hS hF
+            have hl := ColourPacket.lap_MW_vLast hw hSE
             rw [hcE, hl] at hM
             norm_num at hM
           · rw [hε1] at hεm'
@@ -290,7 +289,7 @@ theorem top_corner_strict (word : Word) (hw : ∃ x ∈ word, x ≠ Digit.three)
           have hc2 : |c.2 - (2 * (frameAt word).child.num + (frameAt word).child.den - 1)| ≤ 1 := by
             rw [abs_le] at ha2 ⊢; constructor <;> omega
           have hcE := FLatticePaper.Exceptions.R_strict_unique hnO hdO hn1 hnd c hc1 hc2 hc
-          have hl := StripColours.lap_R_sub_one_one (frameAt word) hS hF
+          have hl := ColourPacket.lap_MW_R hw hSE
           rw [hcE, hl] at hM
           norm_num at hM
         · have hz' : (bb.1 - (frameAt word).child.den, bb.2 - (frameAt word).child.num) ∈
@@ -312,7 +311,7 @@ theorem top_corner_strict (word : Word) (hw : ∃ x ∈ word, x ≠ Digit.three)
           · rw [hεm] at hε1'
             norm_num at hε1'
           · have hcC := classify_minus hnO hdO hn1 hnd hTL c hc (rightWit_site hR) hT
-            have hl := StripColours.lap_R_sub_one_one (frameAt word) hS hF
+            have hl := ColourPacket.lap_MW_R hw hSE
             rw [hcC, hl] at hM
             norm_num at hM
   rcases hcr with hall | ⟨h0, h0'⟩ | ⟨h1, h1'⟩ | ⟨h2, h2'⟩ | ⟨h3, h3'⟩
