@@ -38,6 +38,23 @@ jobs:
           restore-keys: |
             lake-build-lean4.32.0-
 
+      # Sums the resident memory of the lean processes every 30 seconds into memory.log, so the job log shows the peak
+      # of the summed memory of the concurrent elaborations (the runner has 16 GB).
+      - name: Start the memory sampler
+        shell: bash
+        run: |
+          cat > memory-sampler.sh <<'SAMPLER'
+          #!/usr/bin/env bash
+          while true; do
+            total=$(ps -C lean -o rss= | awk '{ s += $1 } END { print s + 0 }')
+            echo "$(date -u +%H:%M:%S) lean RSS total KB: ${total}" >> memory.log
+            sleep 30
+          done
+          SAMPLER
+          chmod +x memory-sampler.sh
+          nohup ./memory-sampler.sh > /dev/null 2>&1 &
+          echo $! > memory-sampler.pid
+
       # Lake 4.32 has no job flag; LEAN_NUM_THREADS caps its concurrent elaborations (measured: 2 threads gives a peak of
       # 4 concurrent lean processes, against 10 with the default), which bounds the peak memory on the hosted runner.
       - name: Build the library
@@ -49,6 +66,13 @@ jobs:
         run: |
           set -o pipefail
           lake build FLatticePaper 2>&1 | tee build.log
+
+      - name: Stop the memory sampler and print its log
+        if: always()
+        shell: bash
+        run: |
+          if [ -f memory-sampler.pid ]; then kill "$(cat memory-sampler.pid)" 2>/dev/null || true; fi
+          cat memory.log 2>/dev/null || echo "no memory samples were taken"
 
       - name: Fail on any error or warning
         shell: bash
