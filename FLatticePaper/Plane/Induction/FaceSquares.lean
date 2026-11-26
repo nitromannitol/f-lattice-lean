@@ -20,7 +20,7 @@ for a white centre with `Ψ ≥ 0` (named premises, numerically checked on words
 
 namespace FLatticePaper.FaceSquares
 
-open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.SquareClauses FLatticePaper.AndOrRank FLatticePaper.W1NonfreeOut
+open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.SquareClauses FLatticePaper.AndOrRank FLatticePaper.W1NonfreeOut FLatticePaper.FaceWitness
   FLatticePaper.CollarSquare FLatticePaper.W1CollarFrame FLatticePaper.CollarChain FLatticePaper.FaceSign
   FLatticePaper.W1NonfreeHsqNonneg FLatticePaper.W1Step FLatticePaper.W1MSheet FLatticePaper.ChainWire
 

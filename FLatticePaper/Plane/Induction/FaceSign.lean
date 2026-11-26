@@ -1,4 +1,5 @@
 import FLatticePaper.Plane.Induction.CollarChain
+import FLatticePaper.Plane.Induction.FaceWitness
 
 /-! # The face of a collar centre, the sign of `Ψ` per face, and the face-restricted row input
 
@@ -21,39 +22,7 @@ namespace FLatticePaper.FaceSign
 open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.SquareClauses FLatticePaper.AndOrRank
 open FLatticePaper.W1NonfreeOut FLatticePaper.CollarSquare FLatticePaper.W1SheetSquare FLatticePaper.W1PrivateSquare
 open FLatticePaper.W1NonfreeHsqNonneg FLatticePaper.W1Step FLatticePaper.W1MSheet FLatticePaper.W1CollarFrame
-open FLatticePaper.W1NonfreeHsqC FLatticePaper.ChainWire FLatticePaper.CollarChain
-
-/-- The bottom face: a free H point within one pixel. -/
-def BottomWit (frame : ChildFrame) (c : Site) : Prop :=
-  ∃ v : Site, |v.1 - c.1| ≤ 1 ∧ |v.2 - c.2| ≤ 1 ∧ v ∈ frame.freeH
-
-/-- The top face: a free H point translated by the transverse vector, within one pixel. -/
-def TopWit (frame : ChildFrame) (c : Site) : Prop :=
-  ∃ v : Site, |v.1 - c.1| ≤ 1 ∧ |v.2 - c.2| ≤ 1 ∧ (v - frame.child.modifiedDeck.transverse) ∈ frame.freeH
-
-/-- The left vertical face: a free V point within one pixel. -/
-def LeftWit (frame : ChildFrame) (c : Site) : Prop :=
-  ∃ v : Site, |v.1 - c.1| ≤ 1 ∧ |v.2 - c.2| ≤ 1 ∧ v ∈ frame.freeV
-
-/-- The right vertical face: a free V point translated by the kernel, within one pixel. -/
-def RightWit (frame : ChildFrame) (c : Site) : Prop :=
-  ∃ v : Site, |v.1 - c.1| ≤ 1 ∧ |v.2 - c.2| ≤ 1 ∧ (v - frame.child.modifiedDeck.kernel) ∈ frame.freeV
-
-/-- The aligned vertical face: left when `ε = 1` (`W = 1`), right when `ε = −1` (`W = 0`). -/
-def AlignedWit (frame : ChildFrame) (c : Site) : Prop :=
-  (frame.eps = 1 ∧ LeftWit frame c) ∨ (frame.eps = -1 ∧ RightWit frame c)
-
-/-- The opposite vertical face: right when `ε = 1`, left when `ε = −1`. -/
-def OppositeWit (frame : ChildFrame) (c : Site) : Prop :=
-  (frame.eps = 1 ∧ RightWit frame c) ∨ (frame.eps = -1 ∧ LeftWit frame c)
-
-/-- **The sign of `Ψ` per face** (named premise; numerically checked on 358 words of length at most 5). For a white strict collar
-centre, `Ψ ≥ 0` on the bottom or the aligned face, and `Ψ ≤ 0` on the top or the opposite face. -/
-def PsiFaceSign (word : Word) : Prop :=
-  ∀ c : Site, FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c →
-    laplacian (MW word) c = 0 → CollarFrame (frameAt word) c →
-    ((BottomWit (frameAt word) c ∨ AlignedWit (frameAt word) c) → 0 ≤ sheetPsi word c) ∧
-    ((TopWit (frameAt word) c ∨ OppositeWit (frameAt word) c) → sheetPsi word c ≤ 0)
+open FLatticePaper.W1NonfreeHsqC FLatticePaper.ChainWire FLatticePaper.CollarChain FLatticePaper.FaceWitness
 
 /-- **`RowStrictHyp` restricted to the bottom or aligned face**: the explicit parent square with strictly interior child corners, at a
 strict collar centre with `Ψ ≥ 0` on the bottom or the aligned face whose parent root is free. -/
