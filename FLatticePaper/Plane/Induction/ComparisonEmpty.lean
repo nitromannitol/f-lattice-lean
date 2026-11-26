@@ -1,4 +1,5 @@
 import FLatticePaper.Plane.Induction.ComparisonTransfer
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! Task 70 part 2 (c): the concrete empty clause and the satisfiability form of (W).
 
@@ -144,7 +145,7 @@ theorem not_emptyClause_of_cmp {word : Word} (hW : HasSatSelection (standardFiel
 /-- **Forced contacts from (T) and (W).** For the unseeded unit proofs, a contact forced-white root has a contact forced input,
 where (T) is the hypothesis `hT` with the concrete empty clause and (W) is `hW`. -/
 theorem forced_contact_of_sat {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hSE : StrongEstimates (conjWord word)) (hWord : StrongEstimates word)
+    (hSE : StrongEstimates (conjWord word)) (hWord : StrongCore word)
     (hW : HasSatSelection (standardField word))
     (hT : ∀ m, IsCmpField word m → ∀ c o, laplacian (standardField word) c = 0 →
       standardField word c = m c → ForcedEdge (standardField word) (fun _ _ => False) c o →
@@ -156,7 +157,7 @@ theorem forced_contact_of_sat {word : Word} (h : ∃ x ∈ word, x ≠ Digit.thr
 
 /-- `P` does not increase along unseeded forced white edges, from (T) with the concrete empty clause and (W). -/
 theorem price_nonincrease_forced_of_sat {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hSE : StrongEstimates (conjWord word)) (hWord : StrongEstimates word)
+    (hSE : StrongEstimates (conjWord word)) (hWord : StrongCore word)
     (hW : HasSatSelection (standardField word))
     (hT : ∀ m, IsCmpField word m → ∀ c o, laplacian (standardField word) c = 0 →
       standardField word c = m c → ForcedEdge (standardField word) (fun _ _ => False) c o →
@@ -168,7 +169,7 @@ theorem price_nonincrease_forced_of_sat {word : Word} (h : ∃ x ∈ word, x ≠
 
 /-- `J₊` does not increase along unseeded forced white edges, from (T) with the concrete empty clause and (W). -/
 theorem jplus_nonincrease_forced_of_sat {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hSE : StrongEstimates (conjWord word)) (hWord : StrongEstimates word)
+    (hSE : StrongEstimates (conjWord word)) (hWord : StrongCore word)
     (hW : HasSatSelection (standardField word))
     (hT : ∀ m, IsCmpField word m → ∀ c o, laplacian (standardField word) c = 0 →
       standardField word c = m c → ForcedEdge (standardField word) (fun _ _ => False) c o →
@@ -181,7 +182,7 @@ theorem jplus_nonincrease_forced_of_sat {word : Word} (h : ∃ x ∈ word, x ≠
 
 /-- `J₋` does not increase along unseeded forced white edges, from (T) with the concrete empty clause and (W). -/
 theorem jminus_nonincrease_forced_of_sat {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hSE : StrongEstimates (conjWord word)) (hWord : StrongEstimates word)
+    (hSE : StrongEstimates (conjWord word)) (hWord : StrongCore word)
     (hW : HasSatSelection (standardField word))
     (hT : ∀ m, IsCmpField word m → ∀ c o, laplacian (standardField word) c = 0 →
       standardField word c = m c → ForcedEdge (standardField word) (fun _ _ => False) c o →

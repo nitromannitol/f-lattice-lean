@@ -1,6 +1,7 @@
 import FLatticePaper.Plane.Induction.Sec3Shift
 import FLatticePaper.Plane.Induction.W1NonfreeHsq
 import FLatticePaper.Plane.Induction.SheetPieces
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! §3 of the canonical V raw-slip monotonicity note, as a chain of named premises.
 
@@ -14,7 +15,7 @@ namespace FLatticePaper.Sec3Monotone
 open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.W1MSheet FLatticePaper.Sec3Shift FLatticePaper.W1Step
 
 theorem slip_eq_neg_min_sheetPsi {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hW : StrongEstimates word) (hSE : StrongEstimates (conjWord word)) {w : Site}
+    (hW : StrongCore word) (hSE : StrongEstimates (conjWord word)) {w : Site}
     (hw : standardField word w = FqW word w) (hs : w + sec3X word ∈ (frameAt word).closedPolygon) :
     (frameAt word).slip (standardField word) 1 w = -min 0 (sheetPsi word (w + sec3X word)) := by
   unfold ChildFrame.slip
@@ -30,7 +31,7 @@ theorem slip_eq_neg_min_sheetPsi {word : Word} (h : ∃ x ∈ word, x ≠ Digit.
   exact key _ _
 
 theorem slip_le_of_retained {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hW : StrongEstimates word) (hSE : StrongEstimates (conjWord word)) {seed : Site → Site → Prop}
+    (hW : StrongCore word) (hSE : StrongEstimates (conjWord word)) {seed : Site → Site → Prop}
     (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     {w u : Site} (hw : standardField word w = FqW word w) (hu : standardField word u = FqW word u)
     (hsw : w + sec3X word ∈ (frameAt word).closedPolygon) (hsu : u + sec3X word ∈ (frameAt word).closedPolygon)

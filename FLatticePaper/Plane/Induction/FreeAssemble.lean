@@ -3,6 +3,7 @@ import FLatticePaper.Plane.Induction.WordPolicy
 import FLatticePaper.Plane.Induction.ForcedPriceSI
 import FLatticePaper.Plane.Induction.HfreePhase1
 import FLatticePaper.Plane.Induction.OddBlackStep
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! The `FreeNamedInputs` of the word's free-edge signed policy, for a sign `η ∈ {±1}`.
 
@@ -20,7 +21,7 @@ namespace FLatticePaper.FreeAssemble
 open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.FreePolicy FLatticePaper.AuxRankSign FLatticePaper.FreeClosure
   FLatticePaper.WordPolicy FLatticePaper.SquareClauses
 
-theorem free_named_inputs {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hWord : StrongEstimates word)
+theorem free_named_inputs {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hWord : StrongCore word)
     (hSE : StrongEstimates (conjWord word))
     (hG : GamesWithRank (conjWord word))
     (hpar : FLatticePaper.W1Seeds.SeedFields (conjWord word))
@@ -55,7 +56,7 @@ theorem free_named_inputs {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) 
   have hstrict : ∀ c i, freePolicy (frameAt word) (standardField word) η c i → R i < R c := by
     intro c i hci
     exact hstrictR c i (freePolicy_aux η hη hex (evenSite_shortShift (frameAt word)) hWord.packet.binary
-      hWord.F1_unitSlip (CanonicalPermit.standardField_reflect hWord) hstrictR hci)
+      hWord.F1_unitSlip (CanonicalPermit.standardField_reflect_core hWord) hstrictR hci)
   exact
     { permitted := FreePermittedS.permitted_S h hWord hSE G hOdd hW1 hη hstrictR
       nonincreasingP := fun c i hci => by

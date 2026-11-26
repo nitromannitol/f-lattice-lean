@@ -1,5 +1,6 @@
 import FLatticePaper.Plane.Induction.AuxRankSign
 import FLatticePaper.Plane.Induction.FreePermitted
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! The `permitted` field of the free-edge policy of a sign `η ∈ {±1}`, with the aux rank of that sign as the one named input.
 
@@ -13,7 +14,7 @@ open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.FreePolicy FLatti
   FLatticePaper.SquareClauses
 
 /-- The sign-η free V permit at a free V white `c'`: `slip η (c' + prescribedV η c') ≤ slip η c'`. -/
-theorem freeV_permit_S {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hW : StrongEstimates word)
+theorem freeV_permit_S {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hW : StrongCore word)
     (hSE : StrongEstimates (conjWord word))
     (G : CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word)))
     {η : ℤ} (hη : η = 1 ∨ η = -1) {c' : Site} (hc' : c' ∈ (frameAt word).freeV) :
@@ -25,7 +26,7 @@ theorem freeV_permit_S {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hW
 
 /-- **The `permitted` field of sign η.** Named inputs: `OddBlackNoRise` of the word's shifted field, `W1Forced` (the forced inputs
 come from `forcedExists_of`), and the aux rank `R` of sign η (`hstrict`). -/
-theorem permitted_S {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hW : StrongEstimates word)
+theorem permitted_S {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hW : StrongCore word)
     (hSE : StrongEstimates (conjWord word))
     (G : CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word)))
     (hOdd : OddBlackNoRise (standardField word) (frameAt word).shortShift)
@@ -37,7 +38,7 @@ theorem permitted_S {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hW : 
   intro c i hci
   rw [FreePermitted.slipPermits_iff_slip]
   have hex := forcedExists_of (frameAt word) hW.packet hW1
-  have hI := CanonicalPermit.standardField_reflect hW
+  have hI := CanonicalPermit.standardField_reflect_core hW
   have hn3 := child_num_ge_three h
   have hσ := evenSite_shortShift (frameAt word)
   unfold freePolicy at hci

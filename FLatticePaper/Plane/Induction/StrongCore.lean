@@ -1,60 +1,18 @@
 import FLatticePaper.Plane.Induction.StrongResidualStep
 import FLatticePaper.Plane.Induction.StrongBridge
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! # The strong estimates of a word before its games
 
 `StrongEstimates u` has one field, `F2F3_policy`, that needs the signed policies of the word `u` itself. Every other field comes
 from the strong estimates of the conjugate word, the boundary price bound of `u` and the seed fields of the conjugate
-(`strongEstimates_step_strong`, `strongResidual_of_conj`). `StrongCore u` is the structure of these other fields, with the same
-names. `strongCore_of_conj` builds it at a proper word that is not a two-power, so the games of the word can be constructed
+(`strongEstimates_step_strong`, `strongResidual_of_conj`). `StrongCore u` (StrongCoreDef) is the structure of these other fields.
+`strongCore_of_conj` builds it at a proper word that is not a two-power, so the games of the word can be constructed
 from it before the strong estimates of the word are assembled. -/
 
 namespace FLatticePaper.Induction
 
 open Farey FLatticePaper
-
-/-- The strong estimates of `u` without the policy field `F2F3_policy`. -/
-structure StrongCore (u : Word) : Prop where
-  packet : (frameAt u).Packet (standardField u)
-  slipRange : ∀ z ∈ (frameAt u).closedPolygon,
-    0 ≤ (frameAt u).slip (standardField u) 1 z ∧ (frameAt u).slip (standardField u) 1 z ≤ 2
-  priceRange : ∀ z ∈ (frameAt u).closedPolygon,
-    (frameAt u).cutPrice - 1 ≤ (frameAt u).price (standardField u) z ∧
-      (frameAt u).price (standardField u) z ≤ (frameAt u).cutPrice
-  priceDrift : ∀ z,
-    (frameAt u).price (standardField u) (z + (frameAt u).child.modifiedDeck.kernel) -
-        (frameAt u).price (standardField u) z = -1 ∧
-      (frameAt u).price (standardField u) (z + (frameAt u).child.modifiedDeck.transverse) -
-        (frameAt u).price (standardField u) z = 0
-  slipDrift : ∀ η : ℤ, (η = 1 ∨ η = -1) → ∀ z,
-    (frameAt u).slip (standardField u) η (z + (frameAt u).child.modifiedDeck.kernel) -
-        (frameAt u).slip (standardField u) η z = 0 ∧
-      (frameAt u).slip (standardField u) η (z + (frameAt u).child.modifiedDeck.transverse) -
-        (frameAt u).slip (standardField u) η z = 2 * η
-  zeroStripInterval : ∀ x : Site,
-    1 - parentD u ≤ parentN u * x.1 - parentD u * x.2 →
-      parentN u * x.1 - parentD u * x.2 ≤ parentN u + 2 * parentD u - 1 →
-        quarterTurnField (standardField u) x = 0
-  zeroEvenLine : ∀ x : Site, (x.1 + x.2) % 2 = 0 →
-    parentN u * x.1 - parentD u * x.2 = -parentD u → quarterTurnField (standardField u) x = 0
-  F1_unitSlip : HasUnitSlip (standardField u) (fun z => standardField u (z + (frameAt u).shortShift))
-  F1_noSlipSaddle : NoEvenSlipSaddle (standardField u) (fun z => standardField u (z + (frameAt u).shortShift))
-  F1_unitPrice : HasUnitPrice (frameAt u) (standardField u)
-  F1_noPriceSaddle : NoPriceSaddle (frameAt u) (standardField u)
-
-/-- The fields of the strong estimates other than the policy. -/
-theorem StrongEstimates.toCore {u : Word} (h : StrongEstimates u) : StrongCore u :=
-  { packet := h.packet
-    slipRange := h.slipRange
-    priceRange := h.priceRange
-    priceDrift := h.priceDrift
-    slipDrift := h.slipDrift
-    zeroStripInterval := h.zeroStripInterval
-    zeroEvenLine := h.zeroEvenLine
-    F1_unitSlip := h.F1_unitSlip
-    F1_noSlipSaddle := h.F1_noSlipSaddle
-    F1_unitPrice := h.F1_unitPrice
-    F1_noPriceSaddle := h.F1_noPriceSaddle }
 
 /-- **The core of the strong estimates of a proper word that is not a two-power**, from the conjugate's strong estimates, the
 boundary price bound and the conjugate's seed fields. The fields are those of `strongEstimates_step_strong` and

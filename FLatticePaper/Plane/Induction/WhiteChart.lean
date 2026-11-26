@@ -2,6 +2,7 @@ import FLatticePaper.Plane.Induction.WhiteNative
 import FLatticePaper.Plane.Induction.MatchedPolicy
 import FLatticePaper.Plane.Induction.W1HagreeNonfree
 import FLatticePaper.Plane.Induction.RepClasses
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! # The chart coordinates of the sheet pointer (W1 identification), and the native white W2 with the pointer as premise
 
@@ -66,7 +67,7 @@ theorem chart_retained_iff {word : Word} (hε : (frameAt word).eps = 1) {seed : 
 `WestException.sheetOut_forcedIn`: the forced input is the sheet pointer of `sheetPolicyA`. The span invariance `hspan` is
 `deck_of_games` for the canonical witness of `P`. -/
 theorem forced_native_plus_ptr {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hW : StrongEstimates word) (hSE : StrongEstimates (conjWord word))
+    (hW : StrongCore word) (hSE : StrongEstimates (conjWord word))
     {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hspan : ∀ (i j : ℤ) (a b : Site), P.retained a b →
       P.retained (a - (frameAt (conjWord word)).child.modifiedDeck.combine i j)

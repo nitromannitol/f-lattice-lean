@@ -2,6 +2,7 @@ import FLatticePaper.Plane.Induction.PsiRep
 import FLatticePaper.Plane.Induction.SheetStars
 import FLatticePaper.Plane.Induction.FreeVH0
 import FLatticePaper.Plane.Induction.Sec3Monotone
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! The §3 permit for free V whites `w ≠ V_end` with the native-edge retention replaced: the premise is the prescription of the
 canonical policy at the free points (`PrescribedAt`), and the Ψ inequality comes from `PsiRep.psi_le_of_rep`.
@@ -12,7 +13,7 @@ namespace FLatticePaper.Sec3PermitRep
 
 open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.Sec3Shift FLatticePaper.W1MSheet FLatticePaper.W1Step
 
-theorem slip_permit_freeV_psi {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hW : StrongEstimates word)
+theorem slip_permit_freeV_psi {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hW : StrongCore word)
     (hSE : StrongEstimates (conjWord word)) {seed : Site → Site → Prop}
     (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hPres : PrescribedAt (frameAt (conjWord word)) (standardField (conjWord word)) (frameAt word).eps P.retained)

@@ -1,5 +1,6 @@
 import FLatticePaper.Plane.Induction.WhiteSheetPlus
 import FLatticePaper.Plane.Induction.Sec3Monotone
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! # W2 of the white case of Q34: the native chart at a forced white (`ε = +1`, sign `+1`)
 
@@ -15,7 +16,7 @@ open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.W1MSheet FLattice
 
 /-- **W2 (native chart, sign `+1`, `ε = +1`).** -/
 theorem forced_native_plus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hW : StrongEstimates word) (hSE : StrongEstimates (conjWord word))
+    (hW : StrongCore word) (hSE : StrongEstimates (conjWord word))
     {seed : Site → Site → Prop} (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hε : (frameAt word).eps = 1) {z u : Site}
     (hF : laplacian (standardField word) z = 0) (hA : standardField word z = FqW word z)

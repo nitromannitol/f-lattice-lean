@@ -2,6 +2,7 @@ import FLatticePaper.Plane.Induction.Strips
 import FLatticePaper.Plane.Induction.W1Exit
 import FLatticePaper.Plane.Induction.StrongEstimates
 import FLatticePaper.Plane.Induction.Q3Field
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! Task 47, step 1: the lower extension of the even zero interval, `F = 0` on even `t ∈ [2 − L, 1 − d]`.
 
@@ -307,6 +308,12 @@ theorem iRefl_eq_sub (z : Site) : iRefl z = (1, -1) - z := by
 
 /-- **The reflection of the standard field, from its packet** (`packet_reflection_I`): `F (I − z) = F z`. -/
 theorem standardField_iRefl {u : Word} (h : StrongEstimates u) (z : Site) :
+    standardField u (iRefl z) = standardField u z := by
+  rw [iRefl_eq_sub]
+  exact packet_reflection_I (frameAt u) h.packet z
+
+/-- `standardField_iRefl` from the core of the strong estimates. -/
+theorem standardField_iRefl_core {u : Word} (h : StrongCore u) (z : Site) :
     standardField u (iRefl z) = standardField u z := by
   rw [iRefl_eq_sub]
   exact packet_reflection_I (frameAt u) h.packet z

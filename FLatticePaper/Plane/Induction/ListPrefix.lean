@@ -5,6 +5,7 @@ import FLatticePaper.Plane.Induction.FreeVOrdinate
 import FLatticePaper.Plane.Induction.PriceDeck
 import FLatticePaper.Plane.Induction.HPaidInputs
 import FLatticePaper.Plane.Induction.WordBoundary
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! # The prefix of the displayed lists: removal of the first entries and the core candidates
 
@@ -197,7 +198,7 @@ theorem plus_hcand (frame : ChildFrame) (F G : Field) (hP : frame.Packet F) (r :
 word and `hJH` from its own zero strip. Named: the minimum of `K` on `S`, the fan exits, the paid exits, the per-entry trichotomy, and the V
 pattern. -/
 theorem minus_hcand_word {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three)
-    (hSE : StrongEstimates (conjWord word)) (hW : StrongEstimates word) (hTr : TraceFromPsi.TraceAt word)
+    (hSE : StrongEstimates (conjWord word)) (hW : StrongCore word) (hTr : TraceFromPsi.TraceAt word)
     (G : Field) (r : ℤ) (hrL : r ≤ (frameAt word).child.den + (frameAt word).child.num - 1)
     (hpat : ∀ k : ℕ, (k : ℤ) < (frameAt word).child.den + (frameAt word).child.num →
       (frameAt word).roundedSlip (standardField word) (-1) (VChain.vpath (frameAt word) k) =
@@ -231,7 +232,7 @@ theorem minus_hcand_word {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three)
 /-- **The plus core candidates at the game's word.** On the domain `E − V`; `hPH` from the trace, `hJH` from the word's own zero strip
 (`η = 1`). Named: the minimum of `K` on `S`, the fan exits, the paid exits, the per-entry trichotomy, and the V pattern. -/
 theorem plus_hcand_word {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three)
-    (hSE : StrongEstimates (conjWord word)) (hW : StrongEstimates word) (hTr : TraceFromPsi.TraceAt word)
+    (hSE : StrongEstimates (conjWord word)) (hW : StrongCore word) (hTr : TraceFromPsi.TraceAt word)
     (G : Field) (r : ℤ) (hr2 : r ≤ (frameAt word).child.den + (frameAt word).child.num - 2)
     (hpat : ∀ k : ℕ, (k : ℤ) < (frameAt word).child.den + (frameAt word).child.num →
       (frameAt word).roundedSlip (standardField word) 1 (VChain.vpath (frameAt word) k) =

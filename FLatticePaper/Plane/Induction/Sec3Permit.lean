@@ -1,5 +1,6 @@
 import FLatticePaper.Plane.Induction.SheetStars
 import FLatticePaper.Plane.Induction.Sec3Monotone
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! The §3 permit for free V whites `w ≠ V_end`: `D₊(u) ≤ D₊(w)` for the prescribed input `u = w + prescribedV 1 w`.
 The h0 equalities and the shifted stars are proved (`FreeVH0`, `SheetStars`). The native retention of the edge
@@ -9,7 +10,7 @@ namespace FLatticePaper.Sec3Permit
 
 open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.W1MSheet FLatticePaper.Sec3Shift
 
-theorem slip_permit_freeV {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hW : StrongEstimates word)
+theorem slip_permit_freeV {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hW : StrongCore word)
     (hSE : StrongEstimates (conjWord word)) {seed : Site → Site → Prop}
     (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     {w : Site} (hw : w ∈ (frameAt word).freeV) (hne : w ≠ (frameAt word).vLast)

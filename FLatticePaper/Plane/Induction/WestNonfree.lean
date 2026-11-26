@@ -1,5 +1,6 @@
 import FLatticePaper.Plane.Induction.WestException
 import FLatticePaper.Plane.Induction.PriceInputs
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! The exceptional vertex `v = V_p + I` is not free (`hNF` of `WestException`), and it is strictly interior (`hSI`).
 
@@ -248,7 +249,7 @@ theorem not_freeClosure_exceptional {word : Word} (h : ∃ x ∈ word, x ≠ Dig
 /-- **`hwest`, with the geometric leaves discharged**: under `ε = 1`, the free policy of the word retains the west input at the
 exceptional vertex, given the parent's retained south image (`hSouth`), the W1 square data and a satisfying selection. -/
 theorem hwest_of_south {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
-    (hWord : StrongEstimates word)
+    (hWord : StrongCore word)
     {seed : Site → Site → Prop}
     (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hsq : ∀ c : Site, FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c →

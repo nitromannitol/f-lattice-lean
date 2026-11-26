@@ -3,6 +3,7 @@ import FLatticePaper.Plane.Induction.RawB
 import FLatticePaper.Plane.Induction.NonfreeBridge
 import FLatticePaper.Plane.Induction.W1Step
 import FLatticePaper.Plane.Induction.W1HagreeNonfree
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! # W4 (Q34): the sign `−1` permit at a forced nonfree white, adjacent chart, from one named input
 
@@ -49,7 +50,7 @@ noncomputable def NoAFallForced (word : Word) : Prop :=
 `D₋(i) ≤ D₋(c)` for the input `i` of `c`, from the named input `hnofall`, the monotonicity of `B` along the retained edge `hret`,
 and the unit bound on `a`. -/
 theorem slip_minus_forced_adjacent {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hW : StrongEstimates word) (hSE : StrongEstimates (conjWord word))
+    (hW : StrongCore word) (hSE : StrongEstimates (conjWord word))
     {seed : Site → Site → Prop}
     (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hnofall : NoAFallForced word) {c i : Site}
@@ -88,7 +89,7 @@ theorem hret_of_sheetOut {word : Word} (hSE : StrongEstimates (conjWord word))
 (`hout`, the W1 identification from the square data of `sheetOut_forcedIn`); the retention `hret` is then derived by
 `hret_of_sheetOut`. The named input is still `NoAFallForced`. -/
 theorem slip_minus_forced_adjacent_sheetOut {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hW : StrongEstimates word) (hSE : StrongEstimates (conjWord word))
+    (hW : StrongCore word) (hSE : StrongEstimates (conjWord word))
     {seed : Site → Site → Prop}
     (P : FLatticePaper.W1Phase.OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hnofall : NoAFallForced word) {c i : Site}
@@ -135,7 +136,7 @@ polygon (`slip_minus_range`) leaves the drops `2 → 1` (excluded by the roundin
 
 **Strictness `hSI` is an input of the caller.** A forced edge `ForcedEdge` has no region, so the reduction does not derive `StrictInterior` at `c`. The supply (the lead's argument, not formalised here): every nonfree white has a deck translate in the closed polygon (`PeriodDeck.exists_square_representative`, quotient coverage); a closed nonfree site is strict, since `BoundarySpectrum.spectrum_even` and `spectrum_odd` put every closed site with an outside 4-neighbour in `freeH`, `freeV`, `freeV + K` or `freeH + V`; and the deck invariance of the permit transfers nonfreeness to the translate. With that, `hSI` is supplied. -/
 theorem slip_minus_forced_adjacent_rise {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hW : StrongEstimates word) (hSE : StrongEstimates (conjWord word))
+    (hW : StrongCore word) (hSE : StrongEstimates (conjWord word))
     (hpk : (frameAt word).Packet (standardField word))
     {seed : Site → Site → Prop}
     (P : FLatticePaper.W1Phase.OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)

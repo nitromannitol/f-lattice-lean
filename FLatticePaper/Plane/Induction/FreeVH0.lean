@@ -3,6 +3,7 @@ import FLatticePaper.Plane.Induction.FreeVOrdinate
 import FLatticePaper.Plane.Induction.FreeVWindow
 import FLatticePaper.Plane.Induction.CutRowsAll
 import FLatticePaper.Plane.Induction.StrongEstimates
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! The h0 equality at free V whites: `F(w) = F_p(w)`, both equal to the harmonic grid. The child strip gives `F(w)` from the
 free V window (`freeV_even_window`, `freeV_odd_window`), and the parent strip gives `F_p(w)` from `ParentStrip.even_strip` (at the
@@ -12,7 +13,7 @@ namespace FLatticePaper.FreeVH0
 
 open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.W1MSheet
 
-theorem standardField_eq_harmonic_of_freeV {word : Word} (hW : StrongEstimates word) {w : Site}
+theorem standardField_eq_harmonic_of_freeV {word : Word} (hW : StrongCore word) {w : Site}
     (hw : w ∈ (frameAt word).freeV) : standardField word w = harmonicGrid w := by
   obtain ⟨hn0, hnd, hd2, hd3, hT⟩ := (frameAt word).child_facts
   by_cases he : EvenSite w
@@ -36,7 +37,7 @@ theorem FqW_eq_harmonic_of_freeV {word : Word} (h : ∃ x ∈ word, x ≠ Digit.
     have hwin := FreeVWindow.freeV_odd_window (frameAt word) hw he
     exact (ParentStrip.odd_strip h hSE w he o0 (by omega) hwin.1 hwin.2).1
 
-theorem h0_eq_of_freeV {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hW : StrongEstimates word)
+theorem h0_eq_of_freeV {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hW : StrongCore word)
     (hSE : StrongEstimates (conjWord word)) {w : Site} (hw : w ∈ (frameAt word).freeV) :
     standardField word w = FqW word w :=
   (standardField_eq_harmonic_of_freeV hW hw).trans (FqW_eq_harmonic_of_freeV h hSE hw).symm

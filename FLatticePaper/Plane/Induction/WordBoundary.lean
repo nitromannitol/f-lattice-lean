@@ -2,6 +2,7 @@ import FLatticePaper.Plane.Induction.W4NativeSlip
 import FLatticePaper.Plane.Induction.StripsM
 import FLatticePaper.Plane.Induction.TraceFromPsi
 import FLatticePaper.Plane.Induction.BoundaryPair
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! # The boundary set at the game's own word
 
@@ -58,7 +59,7 @@ theorem hPH_of_trace {word : Word} (hTr : TraceFromPsi.TraceAt word) :
 
 /-- **The minus boundary set at the game's word.** Only the V pattern `hpat` is named. -/
 theorem minus_boundary_word {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three)
-    (hSE : StrongEstimates (conjWord word)) (hW : StrongEstimates word) (hTr : TraceFromPsi.TraceAt word)
+    (hSE : StrongEstimates (conjWord word)) (hW : StrongCore word) (hTr : TraceFromPsi.TraceAt word)
     (r : ℤ)
     (hpat : ∀ k : ℕ, (k : ℤ) < (frameAt word).child.den + (frameAt word).child.num →
       (frameAt word).roundedSlip (standardField word) (-1) (VChain.vpath (frameAt word) k) =
@@ -74,7 +75,7 @@ theorem minus_boundary_word {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.thre
 
 /-- **The plus boundary set at the game's word.** Only the V pattern `hpat` is named. -/
 theorem plus_boundary_word {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three)
-    (hSE : StrongEstimates (conjWord word)) (hW : StrongEstimates word) (hTr : TraceFromPsi.TraceAt word)
+    (hSE : StrongEstimates (conjWord word)) (hW : StrongCore word) (hTr : TraceFromPsi.TraceAt word)
     (r : ℤ)
     (hpat : ∀ k : ℕ, (k : ℤ) < (frameAt word).child.den + (frameAt word).child.num →
       (frameAt word).roundedSlip (standardField word) 1 (VChain.vpath (frameAt word) k) =

@@ -7,6 +7,7 @@ import FLatticePaper.Plane.Induction.RawB
 import FLatticePaper.Plane.Induction.W1Step
 import FLatticePaper.Plane.Induction.NativeQ34
 import FLatticePaper.Plane.Induction.UnitBound
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! # W3 of Q34: the sign `+1` permit at a strict `A`-edge in the positive adjacent chart
 
@@ -31,14 +32,14 @@ theorem uq_eq_smul (frame : ChildFrame) :
   ext <;> simp
 
 /-- `F` is invariant under the kernel in both directions. -/
-theorem kernel_period_sub {word : Word} (hW : StrongEstimates word) (y : Site) :
+theorem kernel_period_sub {word : Word} (hW : StrongCore word) (y : Site) :
     standardField word (y - (frameAt word).child.modifiedDeck.kernel) = standardField word y := by
   have h := Sec3Shift.kernel_period hW (y - (frameAt word).child.modifiedDeck.kernel)
   rw [sub_add_cancel] at h
   exact h.symm
 
 /-- **The shortShift slip is the adjacent difference.** `D₊(v) = F v − F (v − uq)`. -/
-theorem slip_one_eq_uq {word : Word} (hW : StrongEstimates word) (v : Site) :
+theorem slip_one_eq_uq {word : Word} (hW : StrongCore word) (v : Site) :
     (frameAt word).slip (standardField word) 1 v =
       standardField word v - standardField word (v - (frameAt word).uq) := by
   unfold ChildFrame.slip
@@ -108,7 +109,7 @@ theorem F_eq_sheetA_of_psi_nonneg {word : Word} (h : ∃ x ∈ word, x ≠ Digit
 
 /-- **The sign `+1` slip at an `A`-root in the adjacent chart is minus the minimum of the two offers.** -/
 theorem slip_adj_min {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hW : StrongEstimates word) (hSE : StrongEstimates (conjWord word)) {v : Site}
+    (hW : StrongCore word) (hSE : StrongEstimates (conjWord word)) {v : Site}
     (hv : v ∈ (frameAt word).closedPolygon) (hvA : v - (frameAt word).uq ∈ (frameAt word).closedPolygon)
     (hψ : 0 ≤ sheetPsi word v) :
     (frameAt word).slip (standardField word) 1 v =
@@ -125,7 +126,7 @@ theorem slip_adj_min {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
 /-- **W3 (Q34): the sign `+1` permit at a strict `A`-edge in the positive adjacent chart.** The unit bound along `e` is
 `UnitBound.unit_bound` (proved from the conjugate's price range and drifts), so no premise beyond the word and the edge. -/
 theorem plus_adjacent_strictA {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hW : StrongEstimates word) (hSE : StrongEstimates (conjWord word))
+    (hW : StrongCore word) (hSE : StrongEstimates (conjWord word))
     {seed : Site → Site → Prop}
     (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     {z u : Site}

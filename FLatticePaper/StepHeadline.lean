@@ -34,12 +34,13 @@ def W1Step : Prop :=
   ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word →
     StrongCore word → W1Seeds.SeedFields word → TraceFromPsi.TraceAt word →
     StrongEstimates (conjWord word) → W1Seeds.SeedFields (conjWord word) → TraceFromPsi.TraceAt (conjWord word) →
+    StrongEstimates (conjWord (conjWord word)) → W1Seeds.SeedFields (conjWord (conjWord word)) →
     GamesWithRank (conjWord word) → W1At (conjWord word) → W1At word
 
 /-- The data carried by the induction: the strong estimates, seeds and traces (with the conjugate's), the games with a deck
-rank, and the W1 forcing. -/
+rank, the W1 forcing, and the conjugate's seed fields. -/
 def StepBundle (w : Word) : Prop :=
-  TraceSeeds w ∧ GamesWithRank w ∧ W1At w
+  TraceSeeds w ∧ GamesWithRank w ∧ W1At w ∧ W1Seeds.SeedFields (conjWord w)
 
 theorem strong_threes (k : ℕ) : StrongEstimates (List.replicate k Digit.three) :=
   StrongEstimates.of_base_pure k (EPolicy.pure_threes_inputs.1 k) (EPolicy.pure_threes_inputs.2 k)
@@ -65,23 +66,27 @@ theorem bundle_all (hG : GamesStep) (hW : W1Step) : ∀ word : Word, StepBundle 
   · intro k
     have hc : conjWord (List.replicate k Digit.three) = [] := ConjBase.conjWord_threes k
     refine ⟨⟨strong_threes k, W1BaseSeeds.seedFields_threes k, PureTrace.traceAt_threes k, ?_, ?_⟩,
-      gamesWithRank_threes k, w1_threes k⟩
+      gamesWithRank_threes k, w1_threes k, ?_⟩
     · rw [hc]
       exact strong_threes 0
     · rw [hc]
       exact PureTrace.traceAt_threes 0
+    · rw [hc]
+      exact W1BaseSeeds.seedFields_threes 0
   · intro word hproper ih
-    obtain ⟨⟨hS, hpar, hTW, hSE', hTrace'⟩, hGc, hW1c⟩ := ih
+    obtain ⟨⟨hS, hpar, hTW, hSE', hTrace'⟩, hGc, hW1c, hpar'⟩ := ih
     by_cases hI : IsTwoPow word
     · obtain ⟨k, rfl⟩ := hI
       have hc : conjWord (List.replicate (k + 1) Digit.two) = List.replicate k Digit.three :=
         conjWord_replicate_two k
       refine ⟨⟨strong_twos k, W1BaseSeeds.seedFields_two_succ k (strong_threes k), TwosTrace.traceAt_twos k, ?_, ?_⟩,
-        games_twos k, w1_twos k⟩
+        games_twos k, w1_twos k, ?_⟩
       · rw [hc]
         exact strong_threes k
       · rw [hc]
         exact PureTrace.traceAt_threes k
+      · rw [hc]
+        exact W1BaseSeeds.seedFields_threes k
     · -- the trace step (as in `traceSeeds_of_all`), with the conjugate's games from the induction
       obtain ⟨base, hbase⟩ := PsiArc.conj_base_exists word
       obtain ⟨H, N, hN2, hNd, hHmem, hHabs, hcover⟩ := ConjBase.freeH_enum_N (frameAt word)
@@ -104,15 +109,15 @@ theorem bundle_all (hG : GamesStep) (hW : W1Step) : ∀ word : Word, StepBundle 
       -- the core, the seeds, the W1 forcing and the games of the word, then its residual
       have hcore : StrongCore word := strongCore_of_conj hproper h2 hS hbd hpar
       have hseed : W1Seeds.SeedFields word := W1SeedFields.seedFields_of_conj hproper hS hpar
-      have hW1w : W1At word := hW word hproper hI hcore hseed hT hS hpar hTW hGc hW1c
+      have hW1w : W1At word := hW word hproper hI hcore hseed hT hS hpar hTW hSE' hpar' hGc hW1c
       have hGw : GamesWithRank word := hG word hproper hI hcore hseed hT hS hpar hTW hGc hW1c hW1w
       have hR : StrongResidual word :=
         strongResidual_of_conj hproper h2 hS hbd hpar (policy_of_gamesWithRank hGw)
-      exact ⟨⟨strongEstimates_step_strong hproper hS hR, hseed, hT, hS, hTW⟩, hGw, hW1w⟩
+      exact ⟨⟨strongEstimates_step_strong hproper hS hR, hseed, hT, hS, hTW⟩, hGw, hW1w, hpar⟩
 
 /-- **The odometers theorem from the two induction steps.** -/
 theorem odometersTheorem_of_steps (hG : GamesStep) (hW : W1Step) : OdometersTheorem :=
   odometersTheorem_no_flat (fun word _ _ => (bundle_all hG hW word).2.1)
-    (fun word _ _ _ _ => (bundle_all hG hW (conjWord word)).2.2)
+    (fun word _ _ _ _ => (bundle_all hG hW (conjWord word)).2.2.1)
 
 end FLatticePaper.StepHeadline

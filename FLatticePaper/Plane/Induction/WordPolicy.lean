@@ -5,6 +5,7 @@ import FLatticePaper.Plane.Induction.PriceDeck
 import FLatticePaper.Plane.Induction.TransferW1
 import FLatticePaper.Plane.Induction.StrongEstimates
 import FLatticePaper.Plane.Induction.StrongPriceValues
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! hgames, items 11–12 for the word: the policy specialised to `F = standardField word` on `frameAt word`.
 
@@ -56,7 +57,7 @@ theorem nonfree_of_not_closure (frame : ChildFrame) {c : Site} (h : ¬ freeClosu
 
 /-- **The black edges.** A black retained edge does not increase the primitive price (`price_nonincrease_black`, at a polygon representative). -/
 theorem black_monotone_word (word : Word) (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hSE : StrongEstimates (conjWord word)) (hWord : StrongEstimates word)
+    (hSE : StrongEstimates (conjWord word)) (hWord : StrongCore word)
     {c i : Site} (hb : laplacian (standardField word) c = -1) (hE : Edge i c) :
     (frameAt word).price (standardField word) i ≤ (frameAt word).price (standardField word) c := by
   obtain ⟨y, hy, a, b, rfl⟩ := (frameAt word).closedPolygon_covers c
@@ -75,7 +76,7 @@ theorem black_monotone_word (word : Word) (h : ∃ x ∈ word, x ≠ Digit.three
 /-- **The forced edges.** A forced edge of a nonfree white does not increase the primitive price (`price_nonincrease_forced`, at a
 strict-interior representative whose forced output lies in the polygon). -/
 theorem forced_monotone_word (word : Word) (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hSE : StrongEstimates (conjWord word)) (hWord : StrongEstimates word)
+    (hSE : StrongEstimates (conjWord word)) (hWord : StrongCore word)
     (EC : Field → Prop)
     (hT : ∀ m, IsCmpField word m → ∀ c o, laplacian (standardField word) c = 0 → standardField word c = m c →
       ForcedEdge (standardField word) (fun _ _ => False) c o →
@@ -113,7 +114,7 @@ theorem forced_monotone_word (word : Word) (h : ∃ x ∈ word, x ≠ Digit.thre
 /-- **Items 11 (primitive price), the policy on the word.** The retained edges of `freePolicy` do not increase the primitive price,
 given the word's strong estimates, the forced existence, the comparison data (`EC`, `hT`, `hW`) and the free-edge price premise `hfreeP`. -/
 theorem word_price_nonincreasing (word : Word) (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hSE : StrongEstimates (conjWord word)) (hWord : StrongEstimates word)
+    (hSE : StrongEstimates (conjWord word)) (hWord : StrongCore word)
     (hW1 : FLatticePaper.W1.W1Forced (frameAt word).child.num (frameAt word).child.den (standardField word))
     (EC : Field → Prop)
     (hT : ∀ m, IsCmpField word m → ∀ c o, laplacian (standardField word) c = 0 → standardField word c = m c →
@@ -160,7 +161,7 @@ theorem word_permitted (word : Word) (η : ℤ)
 /-- **The named inputs of the word's signed policy:** the primitive price (items 11), the permit and the rounded slip (items 8, 12), the strict
 rank and the exceptional west input, with the premises listed in the module header. -/
 theorem word_named_inputs (word : Word) (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hSE : StrongEstimates (conjWord word)) (hWord : StrongEstimates word)
+    (hSE : StrongEstimates (conjWord word)) (hWord : StrongCore word)
     (hW1 : FLatticePaper.W1.W1Forced (frameAt word).child.num (frameAt word).child.den (standardField word))
     (EC : Field → Prop)
     (hT : ∀ m, IsCmpField word m → ∀ c o, laplacian (standardField word) c = 0 → standardField word c = m c →

@@ -4,6 +4,7 @@ import FLatticePaper.Plane.Induction.HResNCases
 import FLatticePaper.Plane.Induction.CanonicalPermit
 import FLatticePaper.Plane.Induction.GamesPolicy
 import FLatticePaper.Plane.Induction.NegTieHCutFinal
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! `OddBlackNoRise` of the word, as a step theorem.
 
@@ -40,7 +41,7 @@ theorem hQ21_of_old {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE :
 
 /-- **`OddBlackNoRise` of the word**, from the conjugate's games (`hG`), the conjugate's seed fields (`hpar`) and `W1Forced` (`hW1c`),
 which the induction carries. The V-block input is `hQ21_of_old`. -/
-theorem oddBlackNoRise_step {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hWord : StrongEstimates word)
+theorem oddBlackNoRise_step {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hWord : StrongCore word)
     (hSE : StrongEstimates (conjWord word)) (hG : GamesWithRank (conjWord word))
     (hpar : FLatticePaper.W1Seeds.SeedFields (conjWord word))
     (hW1c : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den

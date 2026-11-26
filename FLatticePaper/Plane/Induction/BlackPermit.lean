@@ -1,6 +1,7 @@
 import FLatticePaper.Plane.Induction.SlipPermits
 import FLatticePaper.Plane.Induction.StrongEstimates
 import FLatticePaper.Plane.Induction.StarRangeArgument
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! hslip, the black-even piece (sign `+1`): at a black site whose raw slip `D = F − F(· + σ)` is even, both inputs are permitted.
 
@@ -47,7 +48,7 @@ namespace FLatticePaper.BlackPermit
 open FLatticePaper FLatticePaper.Induction
 
 /-- **The black-even permit at a word.** For a word, the unit slip and the no-saddle condition are fields of the strong estimates. -/
-theorem black_even_permit_word (word : Farey.Word) (hWord : StrongEstimates word) {c i : Site}
+theorem black_even_permit_word (word : Farey.Word) (hWord : StrongCore word) {c i : Site}
     (hc : laplacian (standardField word) c = -1)
     (hpar : (standardField word c - standardField word (c + (frameAt word).shortShift)) % 2 = 0)
     (hi : i = FLatticePaper.incomingNeg c ∨ i = FLatticePaper.incomingPos c) :

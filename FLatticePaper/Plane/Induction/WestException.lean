@@ -6,6 +6,7 @@ import FLatticePaper.Plane.Induction.CornerPositive
 import FLatticePaper.Plane.Induction.FreePolicy
 import FLatticePaper.Plane.Induction.ComparisonEmpty
 import FLatticePaper.Plane.Induction.SheetPieces
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! `hwest`: the prescribed west input at the exceptional vertex `v = V_p + I` when `ε = 1`.
 
@@ -140,7 +141,7 @@ theorem agree_MW_standard {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) 
 /-- **`hwest` (forced form)**: at a white exceptional vertex `v` with `ε = 1`, `v` not free, and a satisfying selection, the west input
 is the forced output of the standard field, so the free policy of the word retains it. -/
 theorem hwest_freePolicy {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
-    (hWord : StrongEstimates word)
+    (hWord : StrongCore word)
     {seed : Site → Site → Prop}
     (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
     (hsq : ∀ c : Site, StrictInterior (frameAt word).child.num (frameAt word).child.den c →

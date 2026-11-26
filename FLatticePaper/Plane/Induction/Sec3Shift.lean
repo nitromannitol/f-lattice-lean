@@ -3,6 +3,7 @@ import FLatticePaper.Plane.Induction.HarmWrap
 import FLatticePaper.Plane.Induction.VArcLongitudinal
 import FLatticePaper.Plane.Induction.Reflection
 import FLatticePaper.Plane.Induction.StrongEstimates
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! §3 of the canonical V raw-slip monotonicity note: the shifted offers, in the note's convention.
 
@@ -29,7 +30,7 @@ theorem child_kernel_eq (word : Word) :
   · simp only [Prod.snd_add]
     linarith
 
-theorem kernel_period {word : Word} (hW : StrongEstimates word) (z : Site) :
+theorem kernel_period {word : Word} (hW : StrongCore word) (z : Site) :
     standardField word (z + (frameAt word).child.modifiedDeck.kernel) = standardField word z := by
   have h := hW.packet.periods.1 z
   rw [ChildFrame.coherentConstantU_eq_zero (frameAt word)] at h
@@ -40,7 +41,7 @@ theorem shortShift_eq_eps_Upar (word : Word) :
   unfold ChildFrame.shortShift Upar
   ext <;> simp <;> ring
 
-theorem standardField_shortShift_eq_sec3X {word : Word} (hW : StrongEstimates word) (z : Site) :
+theorem standardField_shortShift_eq_sec3X {word : Word} (hW : StrongCore word) (z : Site) :
     standardField word (z + (frameAt word).shortShift) = standardField word (z + sec3X word) := by
   unfold sec3X
   rcases ChildFrame.eps_unit (frameAt word) with he | he

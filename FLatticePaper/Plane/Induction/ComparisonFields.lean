@@ -1,5 +1,6 @@
 import FLatticePaper.Plane.Induction.ComparisonContacts
 import FLatticePaper.Plane.Induction.TieReduce
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! Task 70 part 2 (fixes/Q1.md paragraphs 3–4): the three comparison fields are below `F` on the closed polygon.
 
@@ -18,7 +19,7 @@ namespace FLatticePaper.Induction
 open Farey FLatticePaper
 
 /-- `cmpLow ≤ F` on the closed polygon: the word's price lower bound `P ≥ c₀ − 1`, with `c₀` the cut price. -/
-theorem cmpLow_le_of_price {word : Word} (hWord : StrongEstimates word) :
+theorem cmpLow_le_of_price {word : Word} (hWord : StrongCore word) :
     ∀ z ∈ (frameAt word).closedPolygon,
       FLatticePaper.Contacts.cmpLow (standardField word) (frameAt word).parentShift (frameAt word).eps
         ((frameAt word).parents.odd.num, -(frameAt word).parents.odd.den) (frameAt word).cutPrice z ≤

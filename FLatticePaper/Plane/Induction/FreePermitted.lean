@@ -6,6 +6,7 @@ import FLatticePaper.Plane.Induction.CanonicalPermit
 import FLatticePaper.Plane.Induction.SlipMinusPermit
 import FLatticePaper.Plane.Induction.BothFreeGrades
 import FLatticePaper.Plane.Induction.ChildNumerator
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! The `permitted` field of the word's free-edge signed policy, for both signs.
 
@@ -30,7 +31,7 @@ theorem slipPermits_iff_slip {word : Word} (η : ℤ) (c i : Site) :
   constructor <;> intro hh <;> linarith
 
 /-- Translation: a permit at the representative `c' = c + t`, `i' = i + t` gives the permit at `c, i` (the drift `2ηj` cancels). -/
-theorem slip_le_of_translate {word : Word} (hW : StrongEstimates word) (η : ℤ) {c i c' i' t : Site}
+theorem slip_le_of_translate {word : Word} (hW : StrongCore word) (η : ℤ) {c i c' i' t : Site}
     (ht : t ∈ (frameAt word).child.modifiedDeck.span) (hc' : c' = c + t) (hi' : i' = i + t)
     (h' : (frameAt word).slip (standardField word) η i' ≤ (frameAt word).slip (standardField word) η c') :
     (frameAt word).slip (standardField word) η i ≤ (frameAt word).slip (standardField word) η c := by
@@ -49,7 +50,7 @@ theorem vFirst_ne_vLast {word : Word} :
   omega
 
 /-- The free V permit for sign +1 at a free V white `c'` with `i' = c' + prescribedV 1 c'`. -/
-theorem freeV_permit_plus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hW : StrongEstimates word)
+theorem freeV_permit_plus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hW : StrongCore word)
     (hSE : StrongEstimates (conjWord word))
     (G : CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word)))
     {c' : Site} (hc' : c' ∈ (frameAt word).freeV) :
@@ -68,7 +69,7 @@ theorem freeV_permit_plus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) 
 
 /-- The sign +1 `permitted` field. Named inputs: `OddBlackNoRise` of the word's shifted field, `ForcedExists` (the forced inputs at the
 nonfree whites), and the aux rank `R` (`hstrict`). -/
-theorem permitted_plus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hW : StrongEstimates word)
+theorem permitted_plus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hW : StrongCore word)
     (hSE : StrongEstimates (conjWord word))
     (G : CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word)))
     (hOdd : OddBlackNoRise (standardField word) (frameAt word).shortShift)
@@ -109,7 +110,7 @@ theorem permitted_plus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hW
 
 /-- The sign −1 `permitted` field. Named inputs: `OddBlackNoRise`, `ForcedExists`, and the sign −1 forced permit `hforced` (the
 forced edges of the sign −1 aux graph). -/
-theorem permitted_minus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hW : StrongEstimates word)
+theorem permitted_minus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hW : StrongCore word)
     (hSE : StrongEstimates (conjWord word))
     (G : CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word)))
     (hOdd : OddBlackNoRise (standardField word) (frameAt word).shortShift)
@@ -127,7 +128,7 @@ theorem permitted_minus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (h
   · -- black edge
     have key := black_permit_neg (F := standardField word) (σ := (frameAt word).shortShift)
       (evenSite_shortShift (frameAt word)) hW.packet.binary hW.F1_unitSlip hW.F1_noSlipSaddle hOdd
-      (CanonicalPermit.standardField_reflect hW) hl hE
+      (CanonicalPermit.standardField_reflect_core hW) hl hE
     unfold slipPermits slipIncrement at key
     dsimp only at key
     unfold ChildFrame.slip

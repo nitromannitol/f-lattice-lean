@@ -1,5 +1,6 @@
 import FLatticePaper.Plane.Induction.NegTieSpan
 import FLatticePaper.Plane.Induction.HResP
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! Task 72 (wiring of hResP through the V block).
 
@@ -19,7 +20,7 @@ open Farey FLatticePaper
 
 /-- **The negative tied-target exclusion from the V-block input Q21** (target `0 ≤ Ψ i`, ties allowed). -/
 theorem hNegTie_of_Q21 {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hE : StrongEstimates word) (hEc : StrongEstimates (conjWord word))
+    (hE : StrongCore word) (hEc : StrongEstimates (conjWord word))
     (hpar : FLatticePaper.W1Seeds.SeedFields (conjWord word))
     {seed : Site → Site → Prop}
     (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
@@ -48,7 +49,7 @@ theorem hNegTie_of_Q21 {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
 
 /-- **The tied rising pair `hResP` from the V-block input Q21.** -/
 theorem hResP_of_Q21 {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hE : StrongEstimates word) (hEc : StrongEstimates (conjWord word))
+    (hE : StrongCore word) (hEc : StrongEstimates (conjWord word))
     (hpar : FLatticePaper.W1Seeds.SeedFields (conjWord word))
     {seed : Site → Site → Prop}
     (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)

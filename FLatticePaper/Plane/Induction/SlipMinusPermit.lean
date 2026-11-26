@@ -3,6 +3,7 @@ import FLatticePaper.Plane.Induction.SlipReflectMinus
 import FLatticePaper.Plane.Induction.CanonicalPermit
 import FLatticePaper.Plane.Induction.FinalRootSlip
 import FLatticePaper.Plane.Induction.SheetStars
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! The sign −1 V slip permit for free V whites.
 
@@ -15,7 +16,7 @@ namespace FLatticePaper.SlipMinusPermit
 
 open Farey FLatticePaper FLatticePaper.Induction
 
-theorem slip_zero_V0_H0 {word : Word} (hW : StrongEstimates word) (z : Site)
+theorem slip_zero_V0_H0 {word : Word} (hW : StrongCore word) (z : Site)
     (hz : z = (0, 0) ∨ z = (1, 0)) :
     (frameAt word).slip (standardField word) (-1) z = 0 := by
   obtain ⟨hn0, hnd, hd2, hd3, -⟩ := (frameAt word).child_facts
@@ -53,7 +54,7 @@ theorem slip_zero_V0_H0 {word : Word} (hW : StrongEstimates word) (z : Site)
     rw [h0, h1]; ring
 
 /-- **The sign −1 V permit.** For a free V white `w`, `D₋(w + prescribedV (−1) w) ≤ D₋(w)`. -/
-theorem slip_permit_freeV_minus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hW : StrongEstimates word)
+theorem slip_permit_freeV_minus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hW : StrongCore word)
     (hSE : StrongEstimates (conjWord word))
     (G : CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word)))
     {w : Site} (hw : w ∈ (frameAt word).freeV) :

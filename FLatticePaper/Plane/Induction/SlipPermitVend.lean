@@ -2,6 +2,7 @@ import FLatticePaper.Plane.Induction.FinalRootSlip
 import FLatticePaper.Plane.Induction.StrongEstimates
 import FLatticePaper.Plane.Induction.NonfreeBridge
 import FLatticePaper.Plane.Induction.RankFromForts
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! The permit at the final V vertex `vLast = I + V` (the exempt root of the note's §1). Its prescribed sign `+1` input is `vLast + (1,0)`,
 which lies in the closed polygon, so its slip is at most `2` (`slipRange`), while the slip at `vLast` is `2` (`slip_vLast`). -/
@@ -31,7 +32,7 @@ theorem vLast_add_mem_closedPolygon (frame : ChildFrame) :
   right
   refine ⟨hodd, ?_, ?_, ?_, ?_⟩ <;> nlinarith
 
-theorem slip_permit_Vend {word : Word} (hW : StrongEstimates word) :
+theorem slip_permit_Vend {word : Word} (hW : StrongCore word) :
     slipPermits (standardField word) (fun z => standardField word (z + (frameAt word).shortShift))
       (frameAt word).vLast ((frameAt word).vLast + (1, 0)) := by
   have hc := FinalRootSlip.slip_vLast (frameAt word) hW.packet (η := 1) (Or.inl rfl)

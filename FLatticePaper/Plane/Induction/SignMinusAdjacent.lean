@@ -1,4 +1,5 @@
 import FLatticePaper.Plane.Induction.PlusAdjacent
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! # W4 (Q34): the sign `−1` slip at an `A`-root in the adjacent chart, as `−min(a, B)`
 
@@ -16,7 +17,7 @@ namespace FLatticePaper.SignMinusAdjacent
 open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.W1MSheet FLatticePaper.W1Step
 
 /-- **The sign `−1` slip is the adjacent difference:** `D₋(v) = F v − F (v + uq)`. -/
-theorem slip_minus_one_eq_uq {word : Word} (hW : StrongEstimates word) (v : Site) :
+theorem slip_minus_one_eq_uq {word : Word} (hW : StrongCore word) (v : Site) :
     (frameAt word).slip (standardField word) (-1) v =
       standardField word v - standardField word (v + (frameAt word).uq) := by
   unfold ChildFrame.slip
@@ -46,7 +47,7 @@ theorem slip_minus_one_eq_uq {word : Word} (hW : StrongEstimates word) (v : Site
 
 /-- **The sign `−1` adjacent identity:** at an `A`-root `z` (`Ψ z ≥ 0`) with `z + uq` in the closed polygon,
 `D₋(z) = − min(a z, B z)`, the two sheet quantities of `RawB`. -/
-theorem slip_minus_adj_eq {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hW : StrongEstimates word)
+theorem slip_minus_adj_eq {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hW : StrongCore word)
     (hSE : StrongEstimates (conjWord word)) {z : Site}
     (hz : z ∈ (frameAt word).closedPolygon) (hzu : z + (frameAt word).uq ∈ (frameAt word).closedPolygon)
     (hΨ : 0 ≤ sheetPsi word z) :

@@ -2,6 +2,7 @@ import FLatticePaper.Plane.Induction.TieReduce
 import FLatticePaper.Plane.Induction.HResPWire
 import FLatticePaper.Plane.Induction.HResNCases
 import FLatticePaper.Plane.Induction.OddBlackStep
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! # The tie case of the raw-slip permit, with no named input from the resonance premises
 
@@ -17,7 +18,7 @@ open Farey FLatticePaper FLatticePaper.Induction
 /-- **The tie case, assembled.** A rising black pair for `σ` with a tie (`Ψ(c) = 0` or `Ψ(i) = 0`) at a point of the polygon is
 impossible. The inputs are the word's strong estimates on the conjugate, the packet, the seed fields and the old-policy data. -/
 theorem tie_excluded_assembled {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hE : StrongEstimates word) (hEc : StrongEstimates (conjWord word))
+    (hE : StrongCore word) (hEc : StrongEstimates (conjWord word))
     (hpk : (frameAt word).Packet (standardField word))
     (hpar : FLatticePaper.W1Seeds.SeedFields (conjWord word))
     {seed : Site → Site → Prop}

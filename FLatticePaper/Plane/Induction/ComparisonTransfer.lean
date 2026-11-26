@@ -1,6 +1,7 @@
 import FLatticePaper.Plane.Induction.ComparisonFields
 import FLatticePaper.Plane.Induction.SquareClauses
 import FLatticePaper.Plane.Induction.W1Lower
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! Task 70 part 2 (c): `P`, `J₊`, `J₋` do not increase along retained black edges and forced white edges (fixes/Q1.md
 paragraphs 3–4).
@@ -43,7 +44,7 @@ def IsCmpField (word : Word) (m : Field) : Prop :=
 
 /-- Each comparison field lies below `F` on the closed polygon (ComparisonFields). -/
 theorem isCmp_le_on_E {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hSE : StrongEstimates (conjWord word)) (hWord : StrongEstimates word) {m : Field} (hm : IsCmpField word m) :
+    (hSE : StrongEstimates (conjWord word)) (hWord : StrongCore word) {m : Field} (hm : IsCmpField word m) :
     ∀ z ∈ (frameAt word).closedPolygon, m z ≤ standardField word z := by
   rcases hm with rfl | rfl | rfl
   · exact cmpLow_le_of_price hWord
@@ -94,7 +95,7 @@ theorem slip_minus_range {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
 comparison field `m` has every forced input `o` a contact: otherwise (T) produces an empty clause `EC m`, which (W) excludes.
 `EC m` is "a finite empty clause for `m`" in the unit closure. -/
 theorem forced_contact_transfer {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hSE : StrongEstimates (conjWord word)) (hWord : StrongEstimates word) {seed : Site → Site → Prop}
+    (hSE : StrongEstimates (conjWord word)) (hWord : StrongCore word) {seed : Site → Site → Prop}
     (EC : Field → Prop)
     (hT : ∀ m, IsCmpField word m → ∀ c o, laplacian (standardField word) c = 0 →
       standardField word c = m c → SquareClauses.ForcedEdge (standardField word) seed c o →
@@ -133,7 +134,7 @@ theorem black_pair {word : Word} (hpk : (frameAt word).Packet (standardField wor
 /-- `P` does not increase along a forced white edge (task 70 (c)): a lower contact root forces a lower contact input (T, W);
 a non-lower root has `P = c₀` on the whole range. -/
 theorem price_nonincrease_forced {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hSE : StrongEstimates (conjWord word)) (hWord : StrongEstimates word) {seed : Site → Site → Prop}
+    (hSE : StrongEstimates (conjWord word)) (hWord : StrongCore word) {seed : Site → Site → Prop}
     (EC : Field → Prop)
     (hT : ∀ m, IsCmpField word m → ∀ c o, laplacian (standardField word) c = 0 →
       standardField word c = m c → SquareClauses.ForcedEdge (standardField word) seed c o →
@@ -154,7 +155,7 @@ theorem price_nonincrease_forced {word : Word} (h : ∃ x ∈ word, x ≠ Digit.
 /-- `J₊` does not increase along a forced white edge (task 70 (c)): `J₊ = ⌈D₊/2⌉` with `D₊ ∈ [0, 2]`; `J₊ = 0` exactly at the
 contact of `cmpUp`, whose forced input is a contact (T, W). -/
 theorem jplus_nonincrease_forced {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hSE : StrongEstimates (conjWord word)) (hWord : StrongEstimates word) {seed : Site → Site → Prop}
+    (hSE : StrongEstimates (conjWord word)) (hWord : StrongCore word) {seed : Site → Site → Prop}
     (EC : Field → Prop)
     (hT : ∀ m, IsCmpField word m → ∀ c o, laplacian (standardField word) c = 0 →
       standardField word c = m c → SquareClauses.ForcedEdge (standardField word) seed c o →
@@ -178,7 +179,7 @@ theorem jplus_nonincrease_forced {word : Word} (h : ∃ x ∈ word, x ≠ Digit.
 /-- `J₋` does not increase along a forced white edge (task 70 (c)): `J₋ = ⌈D₋/2⌉` with `D₋ ∈ [−2, 0]`; `J₋ = −1` exactly at the
 contact of `cmpDown`, whose forced input is a contact (T, W). -/
 theorem jminus_nonincrease_forced {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hSE : StrongEstimates (conjWord word)) (hWord : StrongEstimates word)
+    (hSE : StrongEstimates (conjWord word)) (hWord : StrongCore word)
     (hpk : (frameAt word).Packet (standardField word)) {seed : Site → Site → Prop}
     (EC : Field → Prop)
     (hT : ∀ m, IsCmpField word m → ∀ c o, laplacian (standardField word) c = 0 →
@@ -204,7 +205,7 @@ theorem jminus_nonincrease_forced {word : Word} (h : ∃ x ∈ word, x ≠ Digit
 
 /-- `P` does not increase along a black edge (task 70 (c)). -/
 theorem price_nonincrease_black {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hSE : StrongEstimates (conjWord word)) (hWord : StrongEstimates word)
+    (hSE : StrongEstimates (conjWord word)) (hWord : StrongCore word)
     (hpk : (frameAt word).Packet (standardField word)) {c i : Site}
     (hcE : c ∈ (frameAt word).closedPolygon) (hb : laplacian (standardField word) c = -1)
     (hi : i = FLatticePaper.incomingNeg c ∨ i = FLatticePaper.incomingPos c) :

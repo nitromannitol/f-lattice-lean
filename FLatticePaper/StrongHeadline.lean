@@ -5,6 +5,7 @@ import FLatticePaper.Plane.Induction.StrongInduction
 import FLatticePaper.Plane.Induction.BaseFields
 import FLatticePaper.Plane.Induction.StrongBridge
 import FLatticePaper.Plane.Induction.TieReduce
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! Task 39, step 1: the odometers theorem from the strong estimates of the conjugate words.
 
@@ -88,7 +89,7 @@ theorem odometersTheorem_of_base
     hres hstar harc hodd hbulk
 
 /-- The star estimates of a proper word from its own strong estimates, with the odd black no-rise and the S3 inputs. -/
-theorem starEstimates_of_strong {word : Word} (hS : StrongEstimates word)
+theorem starEstimates_of_strong {word : Word} (hS : StrongCore word)
     (hodd : OddBlackNoRise (standardField word) (frameAt word).shortShift)
     (hS3n : S3NoFortInputs (frameAt word) (standardField word)) : StarEstimates word := by
   have hS3p := permitLocal_of_star_data (evenSite_shortShift (frameAt word)) hS.packet.binary hS.F1_unitSlip

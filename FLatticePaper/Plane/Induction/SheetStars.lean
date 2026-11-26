@@ -8,6 +8,7 @@ import FLatticePaper.Plane.Induction.ArcRanges
 import FLatticePaper.Plane.Induction.ParentStrip
 import FLatticePaper.Plane.Induction.RootClassify
 import FLatticePaper.Plane.Induction.CutRowsAll
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 namespace FLatticePaper.SheetStars
 
@@ -229,7 +230,7 @@ theorem u_odd_shift_mem (word : Word) (h : ∃ x ∈ word, x ≠ Digit.three) {w
     constructor <;> linarith [hs.1, hs.2, hX.1, hX.2.1, hX.2.2]
 
 /-- The h0 equality at the prescribed input `u = w + prescribedV 1 w` of a free V white `w ≠ V_end`. -/
-theorem h0_u_of_freeV {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hW : StrongEstimates word)
+theorem h0_u_of_freeV {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hW : StrongCore word)
     (hSE : StrongEstimates (conjWord word)) {w : Site}
     (hw : w ∈ (frameAt word).freeV) (hne : w ≠ (frameAt word).vLast) :
     standardField word (w + (frameAt word).prescribedV 1 w) = FqW word (w + (frameAt word).prescribedV 1 w) := by

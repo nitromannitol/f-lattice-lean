@@ -4,6 +4,7 @@ import FLatticePaper.Plane.Induction.ComparisonEmpty
 import FLatticePaper.Plane.Induction.AuxRankSign
 import FLatticePaper.Plane.Induction.WordPolicy
 import FLatticePaper.Plane.Induction.CanonicalPermit
+import FLatticePaper.Plane.Induction.StrongCoreDef
 
 /-! The forced price monotonicity of the word policy, with the concrete premises: no comparison data.
 
@@ -18,11 +19,11 @@ namespace FLatticePaper.ForcedPriceSI
 open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.AuxRankSign FLatticePaper.FreeClosure FLatticePaper.FreePolicy
   FLatticePaper.SquareClauses FLatticePaper.PassagePR FLatticePaper.WordPolicy
 
-theorem priceRangeOn_of_strong {word : Word} (hWord : StrongEstimates word) : PriceRangeOn word :=
+theorem priceRangeOn_of_strong {word : Word} (hWord : StrongCore word) : PriceRangeOn word :=
   fun z hz => hWord.priceRange z hz
 
 /-- A selection from the aux rank of sign η: blacks keep both inputs, whites their aux input, with the strict rank. -/
-theorem hasSat_of_aux {word : Word} (η : ℤ) (hη : η = 1 ∨ η = -1) (hWord : StrongEstimates word)
+theorem hasSat_of_aux {word : Word} (η : ℤ) (hη : η = 1 ∨ η = -1) (hWord : StrongCore word)
     {R : Site → ℤ} (hstrict : ∀ c i, auxS (frameAt word) (standardField word) η c i → R i < R c) :
     HasSatSelection (standardField word) := by
   refine hasSat_of_strict (R := R) hWord.packet.binary ?_ ?_
@@ -32,13 +33,13 @@ theorem hasSat_of_aux {word : Word} (η : ℤ) (hη : η = 1 ∨ η = -1) (hWord
   · intro c
     by_cases hc : laplacian (standardField word) c = 0
     · obtain ⟨i, hi⟩ := auxS_exists (frameAt word) η hη (evenSite_shortShift (frameAt word)) hWord.packet.binary
-        hWord.F1_unitSlip (CanonicalPermit.standardField_reflect hWord) hc
+        hWord.F1_unitSlip (CanonicalPermit.standardField_reflect_core hWord) hc
       exact ⟨i, fun _ => ⟨auxS_edge hη hi, by have := hstrict c i hi; omega⟩⟩
     · exact ⟨incomingNeg c, fun h0 => absurd h0 hc⟩
 
 /-- The forced price monotonicity at a nonfree white, with the strict-interior comparison and no comparison data. -/
 theorem forced_monotone_PR (word : Word) (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hSE : StrongEstimates (conjWord word)) (hWord : StrongEstimates word)
+    (hSE : StrongEstimates (conjWord word)) (hWord : StrongCore word)
     (hW1 : FLatticePaper.W1.W1Forced (frameAt word).child.num (frameAt word).child.den (standardField word))
     (hW : HasSatSelection (standardField word))
     {c o : Site} (hl : laplacian (standardField word) c = 0) (hnc : ¬ freeClosure (frameAt word) c)
@@ -81,7 +82,7 @@ theorem forced_monotone_PR (word : Word) (h : ∃ x ∈ word, x ≠ Digit.three)
 /-- **The word's price monotonicity along the free-edge policy**, with the strict-interior comparison and no comparison data:
 blacks by `black_monotone_word`, free whites by `hfreeP`, nonfree whites by `forced_monotone_PR` (with `HasSatSelection`). -/
 theorem word_price_nonincreasing_SI (word : Word) (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hSE : StrongEstimates (conjWord word)) (hWord : StrongEstimates word)
+    (hSE : StrongEstimates (conjWord word)) (hWord : StrongCore word)
     (hW1 : FLatticePaper.W1.W1Forced (frameAt word).child.num (frameAt word).child.den (standardField word))
     (hW : HasSatSelection (standardField word)) (η : ℤ)
     (hfreeP : ∀ c i, laplacian (standardField word) c = 0 → freeClosure (frameAt word) c →
