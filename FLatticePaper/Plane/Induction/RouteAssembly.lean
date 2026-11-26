@@ -12,6 +12,7 @@ import FLatticePaper.Plane.Induction.V3Last
 import FLatticePaper.Plane.Induction.RouteRows
 import FLatticePaper.Plane.Induction.EndpointStrips
 import FLatticePaper.Plane.Induction.HMidStrict
+import FLatticePaper.Plane.Induction.V3HardNW
 
 /-! # The route genuine structure from its parts (assembly with explicit open hypotheses)
 
@@ -52,7 +53,11 @@ theorem routeGenuine_of_parts {frame : ChildFrame} {G : Field} {seed : Site → 
       frame.sGrade x ≤ 3 * frame.child.den + frame.child.num - 2 → G x = harmonicGrid x)
     (hQ37 : ∀ z ∈ frame.freeH, EvenSite z → (z.1 - 1, z.2) ∈ frame.freeH → frame.tGrade z ≤ frame.child.den →
       laplacian G (z.1, z.2 + 1) = 0)
-    (hv3hard : frame.child.den < 2 * frame.child.num → ∀ z ∈ frame.freeV, ¬ (η = -1 ∧ z = (0, 1)) →
+    (hprice : ∀ z ∈ frame.closedPolygon, frame.cutPrice - 1 ≤ frame.price G z ∧ frame.price G z ≤ frame.cutPrice)
+    (hdrU : ∀ z, frame.price G (z + frame.child.modifiedDeck.kernel) = frame.price G z - 1)
+    (hdrV : ∀ z, frame.price G (z + frame.child.modifiedDeck.transverse) = frame.price G z)
+    (hperK : ∀ z : Site, G (z + (frame.child.den, frame.child.num)) = G z)
+    (hv3plus : η = 1 → frame.child.den < 2 * frame.child.num → ∀ z ∈ frame.freeV, ¬ (η = -1 ∧ z = (0, 1)) →
       laplacian G z = 0 → ¬ EvenSite z → (z.1, z.2 - -η) ∈ frame.freeV →
       (laplacian G (z.1 - -η, z.2 - -η) = -1 ∨ C.policy (z.1 - -η, z.2 - -η) (z.1 - -η, z.2))) :
     RouteGenuine C := by
@@ -113,7 +118,12 @@ theorem routeGenuine_of_parts {frame : ChildFrame} {G : Field} {seed : Site → 
         · have hnb : (z.1, z.2 - 1) ∈ frame.freeV := by simpa using hq
           have h := v3_arrow_minus_easy C hW1 hP hbin hdeck hS hlow hup hd2 hz hodd hnb
           simpa using h
-      · exact hv3hard (by omega) z hz hne hw hodd hq
+      · rcases hη with rfl | rfl
+        · exact hv3plus rfl (by omega) z hz hne hw hodd hq
+        · have hne' : z ≠ (0, 1) := fun h => hne ⟨rfl, h⟩
+          have h := FLatticePaper.V3HardNW.v3_mid_minus_hard C hP hprice hdrU hdrV hW1 hperK hbin
+            (by omega) hz hodd hq hne'
+          simpa using h
     have hlast : laplacian G (z.1 - -η, z.2) = -1 ∨ C.policy (z.1 - -η, z.2) z := by
       rcases hη with rfl | rfl
       · have hnb : (z.1, z.2 + 1) ∈ frame.freeV := by simpa using hq
