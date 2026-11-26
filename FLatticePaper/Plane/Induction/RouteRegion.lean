@@ -1,5 +1,6 @@
 import FLatticePaper.Plane.Induction.CanonForced
 import FLatticePaper.Plane.Induction.RegionalCompat
+import FLatticePaper.Plane.Induction.ForcedArrows
 
 /-! # The regional argument for a nonfree white route arrow (one generic statement)
 
@@ -58,5 +59,64 @@ theorem nonfree_next_of_region {frame : ChildFrame} {G : Field} {η : ℤ} (C : 
   have hpol := (nonfree_policy_of_region C hr hS hblack hwhite hqw hqS hf).2
   rw [hK o hKo] at hpol
   exact hpol
+
+/-- An input is never the site it feeds. -/
+theorem input_ne (x u : Site) (hu : u = incomingNeg x ∨ u = incomingPos x) : u ≠ x := by
+  intro h
+  subst h
+  rcases hu with hu | hu
+  · unfold incomingNeg at hu
+    split_ifs at hu <;> simp only [Prod.ext_iff] at hu <;> omega
+  · unfold incomingPos at hu
+    split_ifs at hu <;> simp only [Prod.ext_iff] at hu <;> omega
+
+/-- **The port instance.** A white `q` whose route next `nxt` is an input, and whose translate `q + s` (with `s` even and the
+deck equivariance `hT`) lies in the strict interior, while the translate of `nxt` does not: the region `{q + s}` with the single
+arrow to `nxt + s` satisfies the regional hypotheses, so the canonical policy keeps `nxt` at `q`. -/
+theorem route_port_arrow {frame : ChildFrame} {G : Field} {η : ℤ} (C : CanonicalSignedPolicy frame G η)
+    (hW1 : W1Forced frame.child.num frame.child.den G)
+    {q nxt s : Site} (hs : EvenSite s)
+    (hT : ∀ x u, C.policy x u ↔ C.policy (x + s) (u + s))
+    (hqw : laplacian G (q + s) = 0)
+    (hqS : StrictInterior frame.child.num frame.child.den (q + s))
+    (hin : nxt = incomingNeg q ∨ nxt = incomingPos q)
+    (hport : ¬ StrictInterior frame.child.num frame.child.den (nxt + s)) :
+    C.policy q nxt := by
+  have hne : nxt ≠ q := input_ne q nxt hin
+  have hne' : nxt + s ≠ q + s := fun h => hne (add_right_cancel h)
+  have hin' : nxt + s = incomingNeg (q + s) ∨ nxt + s = incomingPos (q + s) := by
+    rcases hin with h | h
+    · left
+      rw [FLatticePaper.ForcedArrows.incomingNeg_add_even hs, h]
+    · right
+      rw [FLatticePaper.ForcedArrows.incomingPos_add_even hs, h]
+  obtain ⟨o, hf⟩ := hW1 (q + s) hqS hqw
+  have hr : ∀ x u, (x = q + s ∧ u = nxt + s) →
+      (if u = q + s then (1:ℤ) else 0) < (if x = q + s then (1:ℤ) else 0) := by
+    rintro x u ⟨hx, hu⟩
+    subst hx
+    subst hu
+    rw [if_neg hne', if_pos rfl]
+    norm_num
+  have hS : ∀ x u, (x = q + s) → (x = q + s ∧ u = nxt + s) → StrictInterior frame.child.num frame.child.den u →
+      (u = q + s) := by
+    intro x u _ hK hR
+    exact absurd (hK.2 ▸ hR) hport
+  have hblack : ∀ x, (x = q + s) → laplacian G x = -1 →
+      ∀ u, (u = incomingNeg x ∨ u = incomingPos x) → (x = q + s ∧ u = nxt + s) := by
+    intro x hx hl
+    rw [hx, hqw] at hl
+    norm_num at hl
+  have hwhite : ∀ x, (x = q + s) → laplacian G x = 0 →
+      ∃ u, (x = q + s ∧ u = nxt + s) ∧ (u = incomingNeg x ∨ u = incomingPos x) := by
+    intro x hx _
+    subst hx
+    exact ⟨nxt + s, ⟨rfl, rfl⟩, hin'⟩
+  have hpol : C.policy (q + s) (nxt + s) :=
+    nonfree_next_of_region C (R := StrictInterior frame.child.num frame.child.den)
+      (S := fun x => x = q + s) (K := fun x u => x = q + s ∧ u = nxt + s)
+      (r := fun x => if x = q + s then (1:ℤ) else 0) (q := q + s) (nxt := nxt + s)
+      hr hS hblack hwhite hqw rfl hf (fun u h => h.2)
+  exact (hT q nxt).mpr hpol
 
 end FLatticePaper.RouteRegion
