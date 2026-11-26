@@ -194,7 +194,7 @@ theorem colour_q_odd (frame : ChildFrame) {G : Field} (hS : frame.HasStrips G)
     rw [if_neg hqO]
     refine Prod.ext ?_ ?_
     · simp
-    · simp only [Prod.fst_add, Prod.snd_add]
+    · simp only [Prod.snd_add]
       ring
   have eE : frame.tGrade (z + ((1 : ℤ), (0 : ℤ))) = frame.tGrade z + frame.child.num := by
     unfold ChildFrame.tGrade
