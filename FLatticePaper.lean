@@ -973,5 +973,6 @@ import FLatticePaper.Plane.Induction.EPolicyFinal
 import FLatticePaper.Plane.Induction.StrongResidualStep
 import FLatticePaper.Plane.Induction.BottomTopEmpty
 import FLatticePaper.Plane.Induction.BottomExcl
+import FLatticePaper.Plane.Induction.Exceptions
 
 /-! Root import for the corrected F-lattice paper. -/
