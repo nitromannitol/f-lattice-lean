@@ -137,7 +137,9 @@ structure RouteGenuine {frame : ChildFrame} {G : Field} {η : ℤ} (C : Canonica
     (laplacian G (z.1 - 1, z.2) = -1 ∨ C.policy (z.1 - 1, z.2) (z.1 - 1, z.2 - 1)) ∧
     (laplacian G (z.1 - 1, z.2 - 1) = -1 ∨ C.policy (z.1 - 1, z.2 - 1) (z.1, z.2 - 1)) ∧
     (laplacian G (z.1, z.2 - 1) = -1 ∨ C.policy (z.1, z.2 - 1) z)
-  h3 : ∀ z ∈ frame.freeH, laplacian G z = 0 → EvenSite z → (z.1 - 1, z.2) ∈ frame.freeH →
+  /-- `H_1 = (2,0)` is excluded: its route is the row `rH1` (`C.2` for `η = 1`, `C.3` for `η = -1`), since for `η = 1` the
+  arrow `(1,0) → (1,1)` of this field contradicts the row's `(1,0)` keeping `(1,-1)`. -/
+  h3 : ∀ z ∈ frame.freeH, z ≠ (2, 0) → laplacian G z = 0 → EvenSite z → (z.1 - 1, z.2) ∈ frame.freeH →
     (laplacian G (z.1 - 1, z.2) = -1 ∨ C.policy (z.1 - 1, z.2) (z.1 - 1, z.2 + 1)) ∧
     (laplacian G (z.1 - 1, z.2 + 1) = -1 ∨ C.policy (z.1 - 1, z.2 + 1) (z.1, z.2 + 1)) ∧
     (laplacian G (z.1, z.2 + 1) = -1 ∨ C.policy (z.1, z.2 + 1) z)
@@ -145,7 +147,9 @@ structure RouteGenuine {frame : ChildFrame} {G : Field} {η : ℤ} (C : Canonica
     (laplacian G (z.1, z.2 - -η) = -1 ∨ C.policy (z.1, z.2 - -η) (z.1 + -η, z.2 - -η)) ∧
     (laplacian G (z.1 + -η, z.2 - -η) = -1 ∨ C.policy (z.1 + -η, z.2 - -η) (z.1 + -η, z.2)) ∧
     (laplacian G (z.1 + -η, z.2) = -1 ∨ C.policy (z.1 + -η, z.2) z)
-  v3 : ∀ z ∈ frame.freeV, laplacian G z = 0 → ¬ EvenSite z → (z.1, z.2 - -η) ∈ frame.freeV →
+  /-- `V_1 = (0,1)` is excluded for `η = -1`: its route is the row `rV1` (the `v2` route), since its axial predecessor
+  `(0,0)` and its diagonal `(1,0)` are both free, and the `v3` arrows contradict the row. -/
+  v3 : ∀ z ∈ frame.freeV, ¬ (η = -1 ∧ z = (0, 1)) → laplacian G z = 0 → ¬ EvenSite z → (z.1, z.2 - -η) ∈ frame.freeV →
     (laplacian G (z.1, z.2 - -η) = -1 ∨ C.policy (z.1, z.2 - -η) (z.1 - -η, z.2 - -η)) ∧
     (laplacian G (z.1 - -η, z.2 - -η) = -1 ∨ C.policy (z.1 - -η, z.2 - -η) (z.1 - -η, z.2)) ∧
     (laplacian G (z.1 - -η, z.2) = -1 ∨ C.policy (z.1 - -η, z.2) z)
@@ -268,8 +272,8 @@ theorem hH_of_routes {frame : ChildFrame} {G : Field} {η : ℤ} (C : CanonicalS
     · exact row_eta_neg_H1 hL frame hS hpr (Rg.rH1.2 h).1 (Rg.rH1.2 h).2
   by_cases hodd : EvenSite z
   · rcases freeH_split frame hz h1 with hax | hdg
-    · exact internal_H_case3 C hbin hz hw hodd rfl (Rg.h3 z hz hw hodd hax).1 (Rg.h3 z hz hw hodd hax).2.1
-        (Rg.h3 z hz hw hodd hax).2.2
+    · exact internal_H_case3 C hbin hz hw hodd rfl (Rg.h3 z hz h3 hw hodd hax).1 (Rg.h3 z hz h3 hw hodd hax).2.1
+        (Rg.h3 z hz h3 hw hodd hax).2.2
     · exact internal_H_case2 C hbin hz hw hodd rfl (Rg.h2 z hz hw hodd hdg).1 (Rg.h2 z hz hw hodd hdg).2.1
         (Rg.h2 z hz hw hodd hdg).2.2
   · exact internal_H_case1 C hbin hz hw hodd h1 h2 rfl (Rg.h1 z hz hw hodd h1 h2).1 (Rg.h1 z hz hw hodd h1 h2).2.1
@@ -311,9 +315,10 @@ theorem hVodd_of_routes {frame : ChildFrame} {G : Field} {η : ℤ} (C : Canonic
       rw [e1] at hA
       exact hA
   · have hz' : (z.1, z.2) ∈ frame.freeV := hz
+    have hne3 : ¬ (η = -1 ∧ z = (0, 1)) := fun h => hexc (Or.inl h)
     rcases freeV_split frame hη hz hodd with hax | hdg
-    · exact internal_V_case3 C hbin (δ := -η) rfl hη hz hw hodd rfl (Rg.v3 z hz hw hodd hax).1
-        (Rg.v3 z hz hw hodd hax).2.1 (Rg.v3 z hz hw hodd hax).2.2
+    · exact internal_V_case3 C hbin (δ := -η) rfl hη hz hw hodd rfl (Rg.v3 z hz hne3 hw hodd hax).1
+        (Rg.v3 z hz hne3 hw hodd hax).2.1 (Rg.v3 z hz hne3 hw hodd hax).2.2
     · exact internal_V_case2 C hbin (δ := -η) rfl hη hz hw hodd rfl (Rg.v2 z hz hw hodd hdg).1
         (Rg.v2 z hz hw hodd hdg).2.1 (Rg.v2 z hz hw hodd hdg).2.2
 
