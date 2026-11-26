@@ -688,6 +688,8 @@ import FLatticePaper.Plane.Induction.VOddLower
 import FLatticePaper.Plane.Induction.FreeVCutExist
 import FLatticePaper.Plane.Induction.FreeCutPred
 import FLatticePaper.Plane.Induction.FirstExit
+import FLatticePaper.Plane.Induction.PairTranslate
+import FLatticePaper.Plane.Induction.HPaidSet
 import FLatticePaper.TraceHeadline
 import FLatticePaper.FlatPlusHeadline
 import FLatticePaper.Plane.Induction.TwosDeckEta
