@@ -979,5 +979,6 @@ import FLatticePaper.Plane.Induction.BottomTopEmpty
 import FLatticePaper.Plane.Induction.BottomExcl
 import FLatticePaper.Plane.Induction.Exceptions
 import FLatticePaper.Plane.Induction.PairClass
+import FLatticePaper.Plane.Induction.TopSquare
 
 /-! Root import for the corrected F-lattice paper. -/
