@@ -710,6 +710,7 @@ import FLatticePaper.Plane.Induction.WordBoundary
 import FLatticePaper.Plane.Induction.ListPrefix
 import FLatticePaper.Plane.Induction.FortPairMin
 import FLatticePaper.Plane.Induction.ListForce
+import FLatticePaper.Plane.Induction.WhiteRoute
 import FLatticePaper.TraceHeadline
 import FLatticePaper.FlatPlusHeadline
 import FLatticePaper.Plane.Induction.TwosDeckEta
