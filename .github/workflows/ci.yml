@@ -38,25 +38,19 @@ jobs:
           restore-keys: |
             lake-build-lean4.32.0-
 
-      # Sums the resident memory of the lean processes every 30 seconds into memory.log, so the job log shows the peak
-      # of the summed memory of the concurrent elaborations (the runner has 16 GB).
-      - name: Start the memory sampler
+      # Swap keeps the build running when the summed resident memory of the concurrent elaborations exceeds the RAM of the
+      # hosted runner: slower, but not killed by the kernel.
+      - name: Add swap space
         shell: bash
         run: |
-          cat > memory-sampler.sh <<'SAMPLER'
-          #!/usr/bin/env bash
-          while true; do
-            total=$(ps -C lean -o rss= | awk '{ s += $1 } END { print s + 0 }')
-            echo "$(date -u +%H:%M:%S) lean RSS total KB: ${total}" >> memory.log
-            sleep 30
-          done
-          SAMPLER
-          chmod +x memory-sampler.sh
-          nohup ./memory-sampler.sh > /dev/null 2>&1 &
-          echo $! > memory-sampler.pid
+          df -h /
+          sudo fallocate -l 16G /swapfile_ci && sudo chmod 600 /swapfile_ci && sudo mkswap /swapfile_ci && sudo swapon /swapfile_ci
+          free -h
 
       # Lake 4.32 has no job flag; LEAN_NUM_THREADS caps its concurrent elaborations (measured: 2 threads gives a peak of
       # 4 concurrent lean processes, against 10 with the default), which bounds the peak memory on the hosted runner.
+      # The memory sampler runs in the background of this step and prints the summed resident memory of the lean processes
+      # every 30 seconds into the step's own log, so the samples survive a runner kill.
       - name: Build the library
         # A step limit below the apparent hour: a slow build ends as a timed-out step, so the save step still runs.
         timeout-minutes: 40
@@ -65,14 +59,14 @@ jobs:
           LEAN_NUM_THREADS: "2"
         run: |
           set -o pipefail
+          ( while true; do
+              total=$(ps -C lean -o rss= 2>/dev/null | awk '{ s += $1 } END { print s + 0 }' || true)
+              echo "$(date -u +%H:%M:%S) lean RSS total KB: ${total}"
+              sleep 30
+            done ) &
+          sampler=$!
+          trap 'kill "$sampler" 2>/dev/null || true' EXIT
           lake build FLatticePaper 2>&1 | tee build.log
-
-      - name: Stop the memory sampler and print its log
-        if: always()
-        shell: bash
-        run: |
-          if [ -f memory-sampler.pid ]; then kill "$(cat memory-sampler.pid)" 2>/dev/null || true; fi
-          cat memory.log 2>/dev/null || echo "no memory samples were taken"
 
       - name: Fail on any error or warning
         shell: bash
