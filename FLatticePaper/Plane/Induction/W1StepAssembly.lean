@@ -10,6 +10,7 @@ import FLatticePaper.Plane.Induction.EvenWindow
 import FLatticePaper.Plane.Induction.FreeRoutes
 import FLatticePaper.Plane.Induction.RouteAssembly
 import FLatticePaper.Plane.Induction.W1StepParts
+import FLatticePaper.Plane.Induction.PsiPacket
 import FLatticePaper.Plane.Induction.OldPolicyBuild
 import FLatticePaper.Plane.Induction.TieAgreeClose
 
@@ -22,7 +23,7 @@ canonical game (`OldPolicyBuild.oldPolicyRanked_of_games`), the canonical rules 
 the strip and odd-band inputs of the standard field, `hX1`, `hX2` (`HX12Strong`), `hX3` (`LowerMem` and the strips of the conjugate),
 and `hTop` (`TopStrictDischarge`).
 
-`TieAgreeHyp` is no longer an input: it is `TieAgreeClose.tieAgreeHyp_of_routes`, from the route data above. The explicit hypotheses are the open items: `hQ37` (the `h3` middle target for `t ≤ d`), `hFreeIn` (a forced white with a free white input forces that input), `hRow` (`RowStrictHyp`), `hPsi` (`PsiFaceSign`). -/
+`TieAgreeHyp` is no longer an input: it is `TieAgreeClose.tieAgreeHyp_of_routes`, from the route data above. The explicit hypotheses are the open items: `hQ37` (the `h3` middle target for `t ≤ d`), `hFreeIn` (a forced white with a free white input forces that input), `hRow` (`RowStrictHyp`). `PsiFaceSign` is `PsiPacket.psiFaceSign_of_packet`. -/
 
 namespace FLatticePaper.W1StepAssembly
 
@@ -44,10 +45,9 @@ theorem w1Step_of_parts
         (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) (fun _ _ => False)
           (frameAt word).eps),
         P.retained = (G.game (frameAt word).eps (frameAt word).eps_unit).policy →
-          CollarChain.RowStrictHyp word (standardField (conjWord word)) P.retained)
-    (hPsi : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → FaceWitness.PsiFaceSign word) :
+          CollarChain.RowStrictHyp word (standardField (conjWord word)) P.retained) :
     W1Step := by
-  intro word hproper _ _ _ _ hSE hpar _ _ _ hGc hW1c
+  intro word hproper _ hcore hseed _ hSE hpar _ _ _ hGc hW1c
   obtain ⟨G, hGr⟩ := hGc
   have hη := (frameAt word).eps_unit
   obtain ⟨R, cU, cV, hRU, hRV, hR⟩ := hGr (frameAt word).eps hη
@@ -159,7 +159,7 @@ theorem w1Step_of_parts
   have hTop := TopStrictDischarge.topStrictHyp_of_packet hproper hSE
   have hn3 := FLatticePaper.Induction.child_num_ge_three hproper
   have hE := CollarChain.W1Forced_end_to_end (word := word) hproper hSE P rfl hW1c hn3 δ hδη hδ G hPret hH hVodd hX3 hX1 hX2
-    hcanon hTop (hRow word hproper G P hPret) (hPsi word hproper) (TieAgreeClose.tieAgreeHyp_of_routes hproper hSE P rfl hW1c G hPret hRoute δ hδη hδ hX3 hX1 hX2 hcanon)
+    hcanon hTop (hRow word hproper G P hPret) (FLatticePaper.PsiPacket.psiFaceSign_of_packet hproper hcore hseed hSE hpar hn3) (TieAgreeClose.tieAgreeHyp_of_routes hproper hSE P rfl hW1c G hPret hRoute δ hδη hδ hX3 hX1 hX2 hcanon)
   exact W1Bridge.W1Forced_standardField_of_MW word hproper hSE hE
 
 end FLatticePaper.W1StepAssembly
