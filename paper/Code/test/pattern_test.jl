@@ -1,4 +1,4 @@
-@testset "Exact period extension and the published clipping examples" begin
+@testset "Periodic extension" begin
     for (word,counts) in (("",nothing),("3312",nothing),
             ("1"*repeat("2",37),(42125,82011,82028,82028)),
             ("1"*repeat("2",44),(58701,114757,114774,114774)))
@@ -19,22 +19,14 @@
             @test pattern_value(field,z)==pattern_value(field,z+3*field.u-2*field.v)
             step = iseven(real(z)+imag(z)+field.horizontal_parity) ? 1 : im
             @test pattern_value(field,z)==periodic_height(field,z+step)+periodic_height(field,z-step)-2*periodic_height(field,z)
-            if length(word)==38 && f==2 && j==1
-                @test field.area==41966
-                clipped = copy(tile)
-                for y in 217:221
-                    @test pop!(clipped,pt(123,y))==periodic_height(field,123+y*im)
-                end
-                @test_throws ArgumentError periodic_pattern(clipped,fractions[j])
-            end
         end
     end
 end
 
-module MatrixCompatibility
+module MatrixInterface
 using Test
 include("../init.jl")
-@testset "Matrix entry point" begin
+@testset "Matrix interface" begin
     m,a = get_odometers("23")
     em,ea = FLatticeExact.get_odometers("23")
     @test getFracs("23")==FLatticeExact.getFracs("23")

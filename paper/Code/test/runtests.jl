@@ -2,7 +2,7 @@ using Test
 using FLatticeExact
 using FLatticeExact: _recbirth, rational_approximation, pt, place, touch, llcenter, ur
 const X = FLatticeExact
-@testset "No coordinate clipping, no floating arithmetic, no silent disjoint joins" begin
+@testset "Basic operations" begin
     v=big(2)^125; h=big(2)^140+1
     T=Tile(pt(0,0)=>h,pt(1,0)=>h+1,pt(-2,1)=>-h)
     U=place(T,pt(-v,v+1),pt(v,2v))
@@ -12,9 +12,8 @@ const X = FLatticeExact
         @test U[k]==hz+v*real(k)+2v*imag(k)
     end
     @test X.ll(T)==pt(0,0) && ur(T)==pt(-2,1)
-    @test X.ll(X.trim(T))==pt(2,0) # rectangular trim != true LL
-    # Weak contact at one point, incoming one higher at an older point;
-    # exact first ownership must retain the old lower value at that site.
+    @test X.ll(X.trim(T))==pt(2,0)
+    # The old tile keeps its values where the two tiles overlap.
     B=Tile(pt(0,0)=>h+7, pt(1,0)=>h+9, pt(2,0)=>h+10)
     R=touch(T,B;context="unit example")
     @test R[pt(1,0)]==h+1 && R[pt(2,0)]==h+3
@@ -25,7 +24,7 @@ const X = FLatticeExact
     @test_throws ArgumentError get_odometers("12𝟛")
     @test denominator(getFracs(repeat("1",100))[1])>typemax(Int64)
 end
-@testset "Archived original Julia TSVs: whole support and absolute height" begin
+@testset "Saved tiles" begin
     dir=joinpath(@__DIR__,"fixtures")
     fixtures=sort(filter(f->endswith(f,".tsv"),readdir(dir)))
     @test length(fixtures)==31

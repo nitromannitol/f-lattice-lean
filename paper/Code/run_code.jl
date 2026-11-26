@@ -1,5 +1,5 @@
-# julia --project=Code Code/run_code.jl 3312 patterns.svg
-# The four panels show the physical Laplacian on each native tile.
+# julia --project=. run_code.jl 3312 patterns.svg
+# Draws the Laplacian of the two standard and two alternate tiles of a word.
 include(joinpath(@__DIR__,"src","FLatticeExact.jl"))
 using .FLatticeExact
 
@@ -25,7 +25,6 @@ end
 function render(word,path)
     standards,alternates = get_odometers(word)
     fractions = getFracs(word)
-    # Finish all four checked panels before opening the output file.
     svg = IOBuffer()
     println(svg,"<svg xmlns='http://www.w3.org/2000/svg' width='704' height='686' viewBox='0 0 704 686' font-family='sans-serif' font-size='17'>")
     println(svg,"<title>F-lattice patterns for $(isempty(word) ? "the empty word" : word)</title><rect width='704' height='686' fill='white'/>")

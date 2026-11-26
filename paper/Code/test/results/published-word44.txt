@@ -1,4 +1,0 @@
-Julia 1.12.5. Published code at commit 551746cfde3ccd9f9ece6afa0a8117721871e5e9.
-First entirely lost starting piece: k=44  original sites=21  previous k retained=4  canvas=(304, 256)  shift=-86 + 180im
-Literal public flipped helper, long=false  BoundsError in unpad.
-Literal public flipped helper, long=true  BoundsError in unpad.

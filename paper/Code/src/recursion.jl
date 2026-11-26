@@ -1,8 +1,4 @@
-# Sparse, unbounded transcription of final_code/{odometer_recursion,get_l_correction}.jl.
-# Requires Tile,pt,place,trim,llcenter,ur,touch,maxzero,base_quad and original offsets.
-# Inputs to each constructor use a common LL at zero. Output support is rectangularly
-# trimmed; heights are NOT LL-normalized. The original affine increment is
-# evaluated on zero-based destination coordinates. The overlap rule erases per-source constants.
+# Builds the tiles for a word one letter at a time.
 
 _recphase(w) = count(==('1'), w) % 2
 _recall(w,c) = all(==(c),w)
@@ -28,8 +24,7 @@ function _recplaced(tiles,vs,slopes)
     [place(tiles[i],vs[i],slopes[i]) for i in 1:length(tiles)]
 end
 
-# Birth along the genuine lineage, replacing rational_approximation(...,999).
-# No denominator bound and no recovery of unrelated descendants.
+# Find the first prefix of w at which frac appears as the odd (or even) fraction.
 function _recbirth(frac,w,odd)
     slot=odd ? 1 : 2
     for k in 0:length(w)
@@ -39,7 +34,7 @@ function _recbirth(frac,w,odd)
             return a,fs
         end
     end
-    error("parent $frac has no birth on lineage $w")
+    error("$frac does not appear along the word $w")
 end
 function translate_alts(mats,w)
     palt,qalt=mats[3],mats[4]
@@ -107,10 +102,10 @@ end
 
 function get_l_correct(mats,alts,ancestor,w;getOdd=true,isFlip=false,isLong=false)
     k=length(w)-length(ancestor)
-    startswith(w,ancestor) || throw(ArgumentError("helper ancestor is not a prefix"))
+    startswith(w,ancestor) || throw(ArgumentError("ancestor is not a prefix of the word"))
     all(==(getOdd ? '2' : '3'),w[length(ancestor)+1:end]) ||
-        throw(ArgumentError("saved helper suffix has the wrong letter"))
-    isempty(ancestor) && error("empty-root helper is not a consumed constructor")
+        throw(ArgumentError("wrong letters after the ancestor"))
+    isempty(ancestor) && error("ancestor must be nonempty")
     m=map(llcenter,mats); a=map(llcenter,alts)
     p,q=m[3:4]
     pa,qa=translate_alts((p,q,a[3],a[4]),w)
@@ -156,12 +151,12 @@ struct RecursionState
 end
 function _recpair(st,s,long)
     anc=s=='2' ? st.ancestor2 : st.ancestor3
-    # Helpers saved at the previous word, BEFORE current symbol is appended.
+    # Compute the L corrections before the next letter is added.
     ntuple(i -> llcenter(get_l_correct(anc.mats,anc.alts,anc.word,st.word;
         getOdd=(s=='2'),isFlip=(i==1),isLong=long)),2)
 end
 function get_next_mat(st::RecursionState,s::Char)
-    s in ('1','2','3') || throw(ArgumentError("invalid child"))
+    s in ('1','2','3') || throw(ArgumentError("letter must be 1, 2 or 3"))
     m=map(llcenter,st.mats); a=map(llcenter,st.alts)
     ip=s=='3' ? 3 : 1; iq=s=='2' ? 4 : 2
     parents=(m[ip],m[iq],a[ip],a[iq]); w=st.word*string(s)
@@ -177,13 +172,11 @@ function get_next_mat(st::RecursionState,s::Char)
                              s in ('1','2') ? saved : st.ancestor3)
 end
 """
-    get_odometers(word::AbstractString) -> (standards, alternates)
+    get_odometers(word)
 
-Construct the original finite native F-lattice tiles in unbounded integer
-coordinates. Each returned four-tuple has current odd, current even, retained
-odd, and retained even registers, in getFracs(word) order. Every tile's actual
-bottom-row leftmost site is at 0+0im. Heights retain original normalization;
-no value is implicitly supplied off the finite support.
+Return the standard and alternate tiles for a word in the letters 1, 2, 3.
+Each is a tuple of four tiles: odd, even, odd parent, even parent, in the same
+order as getFracs(word). In each tile the leftmost point of the bottom row is at 0.
 """
 function get_odometers(word::AbstractString)
     w=_recword(word); first=_recfirst(w)
@@ -194,7 +187,5 @@ function get_odometers(word::AbstractString)
     for i in length(first)+1:length(w)
         state=get_next_mat(state,w[i])
     end
-    # Export each tile in the original TSV convention: native lexicographic LL at zero.
-    # This last spatial translation changes NO heights.
     map(llcenter,state.mats), map(llcenter,state.alts)
 end

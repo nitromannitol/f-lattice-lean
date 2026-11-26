@@ -1,49 +1,46 @@
-# Julia code for the F-lattice odometers
+# Julia code
 
-Julia 1.7 or later is required. The package uses the Julia standard library. Run the following commands from this directory.
+This folder contains Julia code to produce tile odometers and tiles for the Abelian sandpile on the F-lattice, following the algorithm in
 
-~~~sh
-julia --project=. run_code.jl 3312 patterns.svg
-julia --project=. examples/export.jl 23 alt odd > word23.tsv
-julia --project=. test/runtests.jl
-~~~
+> Ahmed Bou-Rabee, *Integer superharmonic matrices on the F-lattice*, [arXiv:2110.07556](https://arxiv.org/abs/2110.07556). [PDF](https://nitromannitol.github.io/manuscripts/farey_recursion.pdf)
 
-The first command draws the two standards and the two alternates. Black is Laplacian −1, gray is 0, and white is outside the finite tile. The program evaluates incoming neighbors across period boundaries. The second command exports exact integer heights relative to the leftmost occupied point of the bottom row. The empty word is written as two quotes. [Example for word 3312](examples/3312.svg)
+All heights are computed with exact integer arithmetic.
 
-In a fresh interactive Julia session, `include("run_code.jl")` also draws the original example. Use `render("23","word23.svg")` to draw another word.
+## Instructions
 
-## Tile and pattern interface
+1. Install Julia 1.7 or later: https://julialang.org/downloads/. No other packages are needed.
 
-~~~julia
-using FLatticeExact
-standards, alternates = get_odometers("23")
-p, q, p_parent, q_parent = getFracs("23")
-odd_alt = alternates[1]
-field = periodic_pattern(odd_alt, p)
+2. From this folder, draw the standard and alternate tiles for a word, for example `3312`:
 
-odd_alt[0 + 0im]             # exact height at the native anchor
-periodic_height(field, 4im)  # exact extended height in this tile's coordinates
-pattern_value(field, 4im)    # F-lattice Laplacian at that site
-~~~
+   ```sh
+   julia --project=. run_code.jl 3312 patterns.svg
+   ```
 
-Each family returns four tiles in the order current odd, current even, retained odd parent and retained even parent. A tile maps integer lattice coordinates to integer heights using arbitrary precision. A missing key denotes a position outside the tile. Each tile has its own local coordinate frame. Reanchoring changes the coordinates and preserves the absolute heights.
+   Words use the digits 1, 2 and 3. Each tile is colored by the Laplacian of its odometer: black is −1, gray is 0, and white is outside the tile. This is what the output looks like: [examples/3312.svg](examples/3312.svg)
 
-The constructor translates every occupied point, adds the affine slope at its destination and takes the prescribed minimum at each successive contact. Both lengths of an L-correction use the saved ancestor from the preceding word. The parent registers, insertion order and normalization are the same as in the paper. [Constructor details](RECURSION_IMPLEMENTATION.md)
+3. To work with the tiles directly, start Julia with `julia --project=.` and run, for example
 
-The pattern calculation obtains the two additive period constants from repeated sites, checks every repeated height, and requires the tile to cover its period quotient. It evaluates both possible checkerboards over a whole period to recover the physical incoming directions in the local frame. The optional keyword *horizontal_parity* fixes a known horizontal-input parity, 0 or 1. Inconsistent data or an unresolved checkerboard produce an error. The returned field exposes its periods as *u* and *v* and its period area as *area*. [Exact period arithmetic](src/pattern.jl)
+   ```julia
+   using FLatticeExact
+   str = "31"
+   mats, alt_mats = get_odometers(str)
+   p1, q1, p0, q0 = getFracs(str)
+   ```
 
-## Matrix interface
+   `mats` holds the four standard tiles and `alt_mats` the four alternate tiles, in the order odd, even, odd parent, even parent. `getFracs` returns their four slopes in the same order. Each tile is a dictionary from lattice points, written as complex integers `x + y*im`, to exact integer heights. Points outside the tile are not in the dictionary.
 
-A script using the original, unqualified constructor can load the matrix interface in a fresh Julia session.
+4. To get the Laplacian of a tile at a point:
 
-~~~julia
-include("init.jl")
-mats, alt_mats = get_odometers("3312")
-p, q, p_parent, q_parent = getFracs("3312")
-~~~
+   ```julia
+   field = periodic_pattern(mats[1], p1)
+   pattern_value(field, 4im)     # Laplacian at (0, 4)
+   periodic_height(field, 4im)   # height at (0, 4), extended periodically
+   ```
 
-This returns the same eight registers as matrices. The first dimension is the horizontal coordinate. Finite entries retain their exact integer heights. Empty entries and the one-site border are NaN. Matrices are allocated at the final output size, after the complete sparse computation.
+   `periodic_pattern` throws an error if the tile is not consistent with its period.
 
-## Clipping regression
+---
 
-At the word consisting of 1 and 37 twos, the odd alternate at 39/116 has 82,028 occupied sites and covers all 41,966 period classes. The old published output lost the five points from (123,217) through (123,221), each the only representative of its class. The tests check those points, deliberately remove them, and verify that the period reconstruction detects the incomplete tile. The tests also construct both standards and both alternates at 44 twos. [Regression and matrix tests](test/pattern_test.jl)
+- `include("init.jl")` instead of `using FLatticeExact` gives the same tiles as matrices. The first index is the x-coordinate, and points outside the tile are `NaN`, as is a one-cell border.
+- To save a tile as a table of `x y height`, run for example `julia --project=. examples/export.jl 23 alt odd > word23.tsv`. Use `std` or `alt`, then `odd` or `even`.
+- To run the tests: `julia --project=. test/runtests.jl`

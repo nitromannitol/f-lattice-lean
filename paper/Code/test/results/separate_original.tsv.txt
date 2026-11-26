@@ -1,1 +1,0 @@
-previously separately run original Julia TSVs, all 8 registers; words=1,12,121,13,131,2,21,23,3,31,32,323 fields=96 sites=26298

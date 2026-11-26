@@ -1,4 +1,0 @@
-Test Summary:                   |  Pass  Total  Time
-literal original source offsets | 15272  15272  3.1s
-Test Summary:                         | Pass  Total  Time
-unbounded exact history and rotations |   74     74  0.2s

@@ -1,15 +1,12 @@
-# Exact finite formulas from original final_code/base_case.jl.
-# No Float64, NaN, bounded translate buffer, or rational search is used.
-# Tile and pt are provided by the including module. Each returned tile is
-# rectangular-minimum trimmed, not lexicographically lower-left centered.
+# Base case tiles: the empty word and words of all 2s or all 3s.
 
-"Construct one literal pure initializer with its true integer parameter d."
+"One of the base case tiles, with size parameter d."
 function _base_shape(kind::Symbol, d::Integer)
     d = big(d)
     staircase = kind in (:stair_even, :stair_odd, :stair_even_alt, :stair_odd_alt)
     ladder = kind in (:ladder_odd, :ladder_even, :ladder_odd_alt, :ladder_even_alt)
     ((staircase && isodd(d) && d >= 3) || (ladder && iseven(d) && d >= 4)) ||
-        throw(ArgumentError("invalid initializer kind or parameter"))
+        throw(ArgumentError("invalid shape or size"))
     T = Tile()
     if kind == :stair_even
         for x in (2-d):d, y in big(0):(d+1)
@@ -94,7 +91,7 @@ function _base_shape(kind::Symbol, d::Integer)
             if -1 <= x+y <= 2d+1 && !((-1 <= y <= 0 && x >= d) || (d+1 <= y <= d+2 && x <= -1))
                 T[pt(x,y)] = z
                 if x+y == d && 0 < x < d-1
-                    # Literal source excludes z4 in this diagonal override.
+                    # no min(d-x-1,0) term on this diagonal
                     T[pt(x,y)] = z1+z2+z3+1
                 end
             end
@@ -116,14 +113,14 @@ function _base_shape(kind::Symbol, d::Integer)
             end
         end
     else
-        throw(ArgumentError("unknown initializer $kind"))
+        throw(ArgumentError("unknown shape $kind"))
     end
     return trim(T)
 end
 
-"The original endpoint atom, attached at a standard's actual lexicographic LL."
+"The small tile for the fraction 0 or 1, placed at the leftmost point of the bottom row of T."
 function _base_endpoint(T::Tile, endpoint::Symbol)
-    isempty(T) && throw(ArgumentError("empty endpoint anchor"))
+    isempty(T) && throw(ArgumentError("empty tile"))
     z0 = ll(T)
     B = Tile()
     if endpoint == :zero
@@ -141,15 +138,13 @@ function _base_endpoint(T::Tile, endpoint::Symbol)
 end
 
 """
-    base_quad(word::AbstractString)
-Return (standards, alternates), each a four-tuple of fresh exact Tiles in
-original register order (current odd,current even,retained odd,retained even).
-Only the empty word and pure 2/3 words are initializers. Coordinates use trim,
-which removes empty rectangular margins without changing heights. Root is
-selected BEFORE pure-run tests, exactly as in the original Julia source.
+    base_quad(word)
+
+Return the standard and alternate tiles for the empty word or a word of all 2s
+or all 3s, in the order odd, even, odd parent, even parent.
 """
 function base_quad(word::AbstractString)
-    all(c -> c == '2' || c == '3', word) || throw(ArgumentError("not a base word"))
+    all(c -> c == '2' || c == '3', word) || throw(ArgumentError("word must be empty, all 2s or all 3s"))
     k = big(length(word))
     if isempty(word)
         p = _base_shape(:stair_odd,3)
@@ -167,6 +162,6 @@ function base_quad(word::AbstractString)
         p0,q0 = _base_endpoint(p,:zero),_base_shape(:stair_even,2k+1)
         return ((p,q,p0,q0),(_base_shape(:ladder_odd_alt,2k+2),_base_shape(:stair_even_alt,2k+3),copy(p0),_base_shape(:stair_even_alt,2k+1)))
     else
-        throw(ArgumentError("not a base word"))
+        throw(ArgumentError("word must be empty, all 2s or all 3s"))
     end
 end
