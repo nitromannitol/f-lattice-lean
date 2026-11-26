@@ -75,6 +75,72 @@ theorem psq_of_arrows {G : Field} {R : Site → Site → Prop} {z q0 q1 q2 o : S
     exact hosq (by rw [← e]; exact h0)
   exact parentSquareOut_of_square hz h0 h1 h2 hcov d01 d12 d02 hin0 hn0 e1 e2 e3 r01 r12 r20 hout hosq ro huq c0 c1 c2
 
+/-- The parent-square data with its square `squareCorners a b` explicit: the body of `CollarSquare.PSquare`. -/
+def ParentSquareAt (G : Field) (R : Site → Site → Prop) (z q0 q1 q2 o : Site) (a b : ℤ) : Prop :=
+  z ∈ squareCorners a b ∧ q0 ∈ squareCorners a b ∧ q1 ∈ squareCorners a b ∧ q2 ∈ squareCorners a b ∧
+  (∀ c' ∈ squareCorners a b, c' ≠ z → c' = q0 ∨ c' = q1 ∨ c' = q2) ∧
+  q0 ≠ q1 ∧ q1 ≠ q2 ∧ q0 ≠ q2 ∧ (q0 = incomingNeg z ∨ q0 = incomingPos z) ∧ ¬ R z q0 ∧
+  Edge q1 q0 ∧ Edge q2 q1 ∧ Edge z q2 ∧ R q0 q1 ∧ R q1 q2 ∧ R q2 z ∧
+  (o = incomingNeg z ∨ o = incomingPos z) ∧ o ∉ squareCorners a b ∧ R z o ∧
+  (∀ j, R z j → j = o) ∧
+  (laplacian G q0 = -1 ∨ (laplacian G q0 = 0 ∧ ∀ j, R q0 j → j = q1)) ∧
+  (laplacian G q1 = -1 ∨ (laplacian G q1 = 0 ∧ ∀ j, R q1 j → j = q2)) ∧
+  (laplacian G q2 = -1 ∨ (laplacian G q2 = 0 ∧ ∀ j, R q2 j → j = z))
+
+theorem psq_of_arrows_at {G : Field} {R : Site → Site → Prop} {z q0 q1 q2 o : Site} {a b : ℤ}
+    (hbin : ∀ c, laplacian G c = -1 ∨ laplacian G c = 0)
+    (hq : RetainQuota G R)
+    (hwu : ∀ c j j', laplacian G c = 0 → R c j → R c j' → j = j')
+    (hzw : laplacian G z = 0)
+    (hz : z ∈ squareCorners a b) (h0 : q0 ∈ squareCorners a b) (h1 : q1 ∈ squareCorners a b)
+    (h2 : q2 ∈ squareCorners a b)
+    (hcov : ∀ c' ∈ squareCorners a b, c' ≠ z → c' = q0 ∨ c' = q1 ∨ c' = q2)
+    (d01 : q0 ≠ q1) (d12 : q1 ≠ q2) (d02 : q0 ≠ q2)
+    (hin0 : q0 = incomingNeg z ∨ q0 = incomingPos z)
+    (e1 : Edge q1 q0) (e2 : Edge q2 q1) (e3 : Edge z q2)
+    (A0 : laplacian G q0 = 0 → R q0 q1) (A1 : laplacian G q1 = 0 → R q1 q2) (A2 : laplacian G q2 = 0 → R q2 z)
+    (hout : o = incomingNeg z ∨ o = incomingPos z) (hosq : o ∉ squareCorners a b) (ro : R z o) :
+    ParentSquareAt G R z q0 q1 q2 o a b := by
+  -- the arrows: black corners by the quota, white corners by their class
+  have r01 : R q0 q1 := by
+    rcases hbin q0 with hb | hb
+    · rcases e1 with h | h
+      · rw [h]; exact (hq.1 q0 hb).1
+      · rw [h]; exact (hq.1 q0 hb).2
+    · exact A0 hb
+  have r12 : R q1 q2 := by
+    rcases hbin q1 with hb | hb
+    · rcases e2 with h | h
+      · rw [h]; exact (hq.1 q1 hb).1
+      · rw [h]; exact (hq.1 q1 hb).2
+    · exact A1 hb
+  have r20 : R q2 z := by
+    rcases hbin q2 with hb | hb
+    · rcases e3 with h | h
+      · rw [h]; exact (hq.1 q2 hb).1
+      · rw [h]; exact (hq.1 q2 hb).2
+    · exact A2 hb
+  -- the white clauses: the unique retained input is the successor
+  have c0 : laplacian G q0 = -1 ∨ (laplacian G q0 = 0 ∧ ∀ j, R q0 j → j = q1) := by
+    rcases hbin q0 with hb | hb
+    · exact Or.inl hb
+    · exact Or.inr ⟨hb, fun j hj => hwu q0 j q1 hb hj r01⟩
+  have c1 : laplacian G q1 = -1 ∨ (laplacian G q1 = 0 ∧ ∀ j, R q1 j → j = q2) := by
+    rcases hbin q1 with hb | hb
+    · exact Or.inl hb
+    · exact Or.inr ⟨hb, fun j hj => hwu q1 j q2 hb hj r12⟩
+  have c2 : laplacian G q2 = -1 ∨ (laplacian G q2 = 0 ∧ ∀ j, R q2 j → j = z) := by
+    rcases hbin q2 with hb | hb
+    · exact Or.inl hb
+    · exact Or.inr ⟨hb, fun j hj => hwu q2 j z hb hj r20⟩
+  -- the root retains only `o`, so it rejects `q0`
+  have huq : ∀ j, R z j → j = o := fun j hj => hwu z j o hzw hj ro
+  have hn0 : ¬ R z q0 := by
+    intro h
+    have e : q0 = o := hwu z q0 o hzw h ro
+    exact hosq (by rw [← e]; exact h0)
+  exact ⟨hz, h0, h1, h2, hcov, d01, d12, d02, hin0, hn0, e1, e2, e3, r01, r12, r20, hout, hosq, ro, huq, c0, c1, c2⟩
+
 /-- **The arrow of a free white corner on the H side is its prescription** (`PrescribedAt`, the class of a free H point). -/
 theorem arrow_of_free_H {frame : ChildFrame} {G : Field} {R : Site → Site → Prop} {η : ℤ}
     (hpres : PrescribedAt frame G η R) {p : Site} (hp : p ∈ frame.freeH) (hl : laplacian G p = 0) :

@@ -59,7 +59,7 @@ theorem row_H10_left {frame : ChildFrame} {G : Field} {R : Site → Site → Pro
     (hpres : PrescribedAt frame G 1 R)
     (hwu : ∀ c j j', laplacian G c = 0 → R c j → R c j' → j = j')
     (hq : RetainQuota G R) (F : EndpointFacts frame G) :
-    ParentSquareOut G R (1, 0) := by
+    ParentSquareAt G R (1, 0) (1, 1) (0, 1) (0, 0) (1, -1) 0 0 := by
   have hbin : ∀ c, laplacian G c = -1 ∨ laplacian G c = 0 := hP.binary
   have hz : ((1 : ℤ), (0 : ℤ)) ∈ squareCorners 0 0 := by simp [squareCorners]
   have h0 : ((1 : ℤ), (1 : ℤ)) ∈ squareCorners 0 0 := by simp [squareCorners]
@@ -109,7 +109,7 @@ theorem row_H10_left {frame : ChildFrame} {G : Field} {R : Site → Site → Pro
       ((1 : ℤ), (-1 : ℤ)) = incomingPos ((1 : ℤ), (0 : ℤ)) := Or.inl (by simp [incomingNeg, EvenSite])
   have hosq : ((1 : ℤ), (-1 : ℤ)) ∉ squareCorners 0 0 := by
     simp [squareCorners]
-  exact psq_of_arrows hbin hq hwu F.w10 hz h0 h1 h2 hcov d01 d12 d02 hin0 e1 e2 e3 A0 A1 A2 hout hosq ro
+  exact psq_of_arrows_at hbin hq hwu F.w10 hz h0 h1 h2 hcov d01 d12 d02 hin0 e1 e2 e3 A0 A1 A2 hout hosq ro
 
 /-- The deck vector `combine 0 1` is the transverse `Vdeck`. -/
 theorem combine_zero_one_eq_Vdeck' (frame : ChildFrame) :
@@ -134,7 +134,7 @@ theorem row_Vm1_right {frame : ChildFrame} {G : Field} {R : Site → Site → Pr
     (hdeck : ∀ (i j : ℤ) (z u : Site), R z u →
       R (z - frame.child.modifiedDeck.combine i j) (u - frame.child.modifiedDeck.combine i j))
     (hq : RetainQuota G R) (F : EndpointFacts frame G) :
-    ParentSquareOut G R ((0 : ℤ), (-1 : ℤ)) := by
+    ParentSquareAt G R (0, -1) (0, -2) (1, -2) (1, -1) (0, 0) 0 (-2) := by
   have hbin : ∀ c, laplacian G c = -1 ∨ laplacian G c = 0 := hP.binary
   have hcV := combine_zero_one_eq_Vdeck' frame
   have hcK := combine_one_zero_eq_Kdeck' frame
@@ -223,6 +223,6 @@ theorem row_Vm1_right {frame : ChildFrame} {G : Field} {R : Site → Site → Pr
   have hout : ((0 : ℤ), (0 : ℤ)) = incomingNeg ((0 : ℤ), (-1 : ℤ)) ∨
       ((0 : ℤ), (0 : ℤ)) = incomingPos ((0 : ℤ), (-1 : ℤ)) := Or.inr (by simp [incomingPos, EvenSite])
   have hosq : ((0 : ℤ), (0 : ℤ)) ∉ squareCorners 0 (-2) := by simp [squareCorners]
-  exact psq_of_arrows hbin hq hwu F.w0m1 hz h0 h1 h2 hcov d01 d12 d02 hin0 e1 e2 e3 A0 A1 A2 hout hosq ro
+  exact psq_of_arrows_at hbin hq hwu F.w0m1 hz h0 h1 h2 hcov d01 d12 d02 hin0 e1 e2 e3 A0 A1 A2 hout hosq ro
 
 end FLatticePaper.FaceRows

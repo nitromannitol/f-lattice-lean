@@ -24,20 +24,6 @@ open FLatticePaper.W1NonfreeOut FLatticePaper.CollarSquare FLatticePaper.W1Sheet
 open FLatticePaper.W1NonfreeHsqNonneg FLatticePaper.W1Step FLatticePaper.W1MSheet FLatticePaper.W1CollarFrame
 open FLatticePaper.W1NonfreeHsqC FLatticePaper.ChainWire FLatticePaper.CollarChain FLatticePaper.FaceWitness
 
-/-- **`RowStrictHyp` restricted to the bottom or aligned face**: the explicit parent square with strictly interior child corners, at a
-strict collar centre with `Ψ ≥ 0` on the bottom or the aligned face whose parent root is free. -/
-def RowFaceStrictHyp (word : Word) (G : Field) (R : Site → Site → Prop) : Prop :=
-  ∀ c : Site, FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c →
-    laplacian (MW word) c = 0 → 0 ≤ sheetPsi word c → CollarFrame (frameAt word) c →
-    (BottomWit (frameAt word) c ∨ AlignedWit (frameAt word) c) →
-    ¬ Nonfree (frameAt (conjWord word)) (zTurn (c - (frameAt word).sheetShift)) →
-    ∃ q0 q1 q2 o : Site, ∃ qa qb : ℤ,
-      PSquare G R (zTurn (c - (frameAt word).sheetShift)) q0 q1 q2 o qa qb ∧
-      FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den
-        ((frameAt word).sheetShift + FLatticePaper.W1Phase.zTurnInv q0) ∧
-      FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den
-        ((frameAt word).sheetShift + FLatticePaper.W1Phase.zTurnInv q1) ∧
-      FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den
-        ((frameAt word).sheetShift + FLatticePaper.W1Phase.zTurnInv q2)
+-- `RowFaceStrictHyp` is defined in `CollarChain` (this module imports it).
 
 end FLatticePaper.FaceSign

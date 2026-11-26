@@ -23,7 +23,7 @@ theorem row_V00_left {frame : ChildFrame} {G : Field} {R : Site → Site → Pro
     (hq : RetainQuota G R)
     (hret : ∀ c i, ForcedEdge G (fun _ _ => False) c i → R c i)
     (F : EndpointFacts frame G) :
-    ParentSquareOut G R ((0 : ℤ), (0 : ℤ)) := by
+    ParentSquareAt G R (0, 0) (-1, 0) (-1, 1) (0, 1) (1, 0) (-1) 0 := by
   have hbin : ∀ c, laplacian G c = -1 ∨ laplacian G c = 0 := hP.binary
   have hfreeV01 : ¬ Nonfree frame ((0 : ℤ), (1 : ℤ)) :=
     translate_free (zero_mem_span frame) (by rw [add_zero]; exact Set.mem_union_right _ F.fV01)
@@ -68,7 +68,7 @@ theorem row_V00_left {frame : ChildFrame} {G : Field} {R : Site → Site → Pro
   have hout : ((1 : ℤ), (0 : ℤ)) = incomingNeg ((0 : ℤ), (0 : ℤ)) ∨
       ((1 : ℤ), (0 : ℤ)) = incomingPos ((0 : ℤ), (0 : ℤ)) := Or.inr (by simp [incomingPos, EvenSite])
   have hosq : ((1 : ℤ), (0 : ℤ)) ∉ squareCorners (-1) 0 := by simp [squareCorners]
-  exact psq_of_arrows hbin hq hwu F.w00 hz h0 h1 h2 hcov d01 d12 d02 hin0 e1 e2 e3 A0 A1 A2 hout hosq ro
+  exact psq_of_arrows_at hbin hq hwu F.w00 hz h0 h1 h2 hcov d01 d12 d02 hin0 e1 e2 e3 A0 A1 A2 hout hosq ro
 
 /-- The prescribed input of the free H site `(dc−1, nc−1)` (the translate of `(−1,−1)` by the kernel) is `(1,0)`. -/
 theorem prescH_hPrev {frame : ChildFrame} (η : ℤ) :
@@ -102,7 +102,7 @@ theorem row_Vm01_bottom {frame : ChildFrame} {G : Field} {R : Site → Site → 
     (hq : RetainQuota G R)
     (hret : ∀ c i, ForcedEdge G (fun _ _ => False) c i → R c i)
     (F : EndpointFacts frame G) :
-    ParentSquareOut G R ((0 : ℤ), (-1 : ℤ)) := by
+    ParentSquareAt G R (0, -1) (0, -2) (-1, -2) (-1, -1) (0, 0) (-1) (-2) := by
   have hbin : ∀ c, laplacian G c = -1 ∨ laplacian G c = 0 := hP.binary
   have hcK := combine_one_zero_eq_Kdeck' frame
   have hPrevE : ((-1 : ℤ), (-1 : ℤ)) + Kdeck frame = (frame.child.den - 1, frame.child.num - 1) := by
@@ -178,7 +178,7 @@ theorem row_Vm01_bottom {frame : ChildFrame} {G : Field} {R : Site → Site → 
       ((0 : ℤ), (0 : ℤ)) = incomingPos ((0 : ℤ), (-1 : ℤ)) := Or.inr (by simp [incomingPos, EvenSite])
   have hosq : ((0 : ℤ), (0 : ℤ)) ∉ squareCorners (-1) (-2) := by simp [squareCorners]
   have ro : R ((0 : ℤ), (-1 : ℤ)) ((0 : ℤ), (0 : ℤ)) := hT2
-  exact psq_of_arrows hbin hq hwu F.w0m1 hz h0 h1 h2 hcov d01 d12 d02 hin0 e1 e2 e3 A0 A1 A2 hout hosq ro
+  exact psq_of_arrows_at hbin hq hwu F.w0m1 hz h0 h1 h2 hcov d01 d12 d02 hin0 e1 e2 e3 A0 A1 A2 hout hosq ro
 
 /-- **The right row at `(1,−1)`** (`η = −1`): the square `(2,−1) → (2,−2) → (1,−2) → (1,−1)`. The corner `(2,−1)` is black; `(2,−2)`
 is nonfree (`nonfree_2m2`) and is forced to its free input `(1,−2)` (a translate of the free `V_prev`, with prescription `(0,1)`); the root is
@@ -192,7 +192,7 @@ theorem row_1m1_right {frame : ChildFrame} {G : Field} {R : Site → Site → Pr
     (hq : RetainQuota G R)
     (hret : ∀ c i, ForcedEdge G (fun _ _ => False) c i → R c i)
     (F : EndpointFacts frame G) :
-    ParentSquareOut G R ((1 : ℤ), (-1 : ℤ)) := by
+    ParentSquareAt G R (1, -1) (2, -1) (2, -2) (1, -2) (0, -1) 1 (-2) := by
   have hbin : ∀ c, laplacian G c = -1 ∨ laplacian G c = 0 := hP.binary
   have hcV := combine_zero_one_eq_Vdeck' frame
   -- the corner (1,−2): transported prescription (0,1) of V_prev
@@ -271,6 +271,6 @@ theorem row_1m1_right {frame : ChildFrame} {G : Field} {R : Site → Site → Pr
       ((0 : ℤ), (-1 : ℤ)) = incomingPos ((1 : ℤ), (-1 : ℤ)) := Or.inl (by simp [incomingNeg, EvenSite])
   have hosq : ((0 : ℤ), (-1 : ℤ)) ∉ squareCorners 1 (-2) := by simp [squareCorners]
   have ro : R ((1 : ℤ), (-1 : ℤ)) ((0 : ℤ), (-1 : ℤ)) := hT2
-  exact psq_of_arrows hbin hq hwu F.w1m1 hz h0 h1 h2 hcov d01 d12 d02 hin0 e1 e2 e3 A0 A1 A2 hout hosq ro
+  exact psq_of_arrows_at hbin hq hwu F.w1m1 hz h0 h1 h2 hcov d01 d12 d02 hin0 e1 e2 e3 A0 A1 A2 hout hosq ro
 
 end FLatticePaper.FaceRowsForced

@@ -26,6 +26,7 @@ def GamesStep : Prop :=
   ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → ¬ IsTwoPow word →
     StrongCore word → W1Seeds.SeedFields word → TraceFromPsi.TraceAt word →
     StrongEstimates (conjWord word) → W1Seeds.SeedFields (conjWord word) → TraceFromPsi.TraceAt (conjWord word) →
+    StrongEstimates (conjWord (conjWord word)) → W1Seeds.SeedFields (conjWord (conjWord word)) →
     GamesWithRank (conjWord word) → W1At (conjWord word) → W1At word → GamesWithRank word
 
 /-- **The W1 step**: at a proper word that is not a two-power, the W1 forcing of the word, from the conjugate's data and the
@@ -110,7 +111,7 @@ theorem bundle_all (hG : GamesStep) (hW : W1Step) : ∀ word : Word, StepBundle 
       have hcore : StrongCore word := strongCore_of_conj hproper h2 hS hbd hpar
       have hseed : W1Seeds.SeedFields word := W1SeedFields.seedFields_of_conj hproper hS hpar
       have hW1w : W1At word := hW word hproper hI hcore hseed hT hS hpar hTW hSE' hpar' hGc hW1c
-      have hGw : GamesWithRank word := hG word hproper hI hcore hseed hT hS hpar hTW hGc hW1c hW1w
+      have hGw : GamesWithRank word := hG word hproper hI hcore hseed hT hS hpar hTW hSE' hpar' hGc hW1c hW1w
       have hR : StrongResidual word :=
         strongResidual_of_conj hproper h2 hS hbd hpar (policy_of_gamesWithRank hGw)
       exact ⟨⟨strongEstimates_step_strong hproper hS hR, hseed, hT, hS, hTW⟩, hGw, hW1w, hpar⟩

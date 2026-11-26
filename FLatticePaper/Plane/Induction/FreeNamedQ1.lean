@@ -155,7 +155,7 @@ theorem gamesStep_of_noFort {word : Word} (h2 : ∃ x ∈ word, x ≠ Digit.two)
         (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) (fun _ _ => False)
           (frameAt word).eps),
         P.retained = (G.game (frameAt word).eps (frameAt word).eps_unit).policy →
-          CollarChain.RowStrictHyp word (standardField (conjWord word)) P.retained)
+          CollarChain.RowFaceStrictHyp word (standardField (conjWord word)) P.retained)
     (hforced : ∀ η : ℤ, (η = 1 ∨ η = -1) → ∀ c o : Site, ¬ freeClosure (frameAt word) c →
       laplacian (standardField word) c = 0 → ForcedEdge (standardField word) (fun _ _ => False) c o →
       slipPermits (standardField word) (fun z => standardField word (z + η • (frameAt word).shortShift)) c o)

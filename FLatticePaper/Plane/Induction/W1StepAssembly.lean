@@ -46,7 +46,7 @@ theorem w1Step_of_parts
         (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) (fun _ _ => False)
           (frameAt word).eps),
         P.retained = (G.game (frameAt word).eps (frameAt word).eps_unit).policy →
-          CollarChain.RowStrictHyp word (standardField (conjWord word)) P.retained) :
+          CollarChain.RowFaceStrictHyp word (standardField (conjWord word)) P.retained) :
     W1Step := by
   intro word hproper _ hcore hseed _ hSE hpar _ _ _ hGc hW1c
   obtain ⟨G, hGr⟩ := hGc
@@ -179,7 +179,7 @@ theorem westFree_of_parts
         (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) (fun _ _ => False)
           (frameAt word).eps),
         P.retained = (G.game (frameAt word).eps (frameAt word).eps_unit).policy →
-          CollarChain.RowStrictHyp word (standardField (conjWord word)) P.retained)
+          CollarChain.RowFaceStrictHyp word (standardField (conjWord word)) P.retained)
     (word : Word) (hproper : ∃ x ∈ word, x ≠ Digit.three) (hcore : StrongCore word) (hseed : FLatticePaper.W1Seeds.SeedFields word)
     (hSE : StrongEstimates (conjWord word)) (hpar : FLatticePaper.W1Seeds.SeedFields (conjWord word))
     (hGc : FLatticePaper.Induction.GamesWithRank (conjWord word))

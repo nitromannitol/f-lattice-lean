@@ -317,6 +317,23 @@ def RowStrictHyp (word : Word) (G : Field) (R : Site → Site → Prop) : Prop :
       FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den
         ((frameAt word).sheetShift + FLatticePaper.W1Phase.zTurnInv q2)
 
+/-- **`RowStrictHyp` restricted to the bottom or aligned face**: the explicit parent square with strictly interior child corners, at a
+strict collar centre with `Ψ ≥ 0` on the bottom or the aligned face whose parent root is free. (Moved here from `FaceSign`, which imports
+this module.) -/
+def RowFaceStrictHyp (word : Word) (G : Field) (R : Site → Site → Prop) : Prop :=
+  ∀ c : Site, FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c →
+    laplacian (MW word) c = 0 → 0 ≤ sheetPsi word c → FLatticePaper.W1CollarFrame.CollarFrame (frameAt word) c →
+    (FLatticePaper.FaceWitness.BottomWit (frameAt word) c ∨ FLatticePaper.FaceWitness.AlignedWit (frameAt word) c) →
+    ¬ Nonfree (frameAt (conjWord word)) (zTurn (c - (frameAt word).sheetShift)) →
+    ∃ q0 q1 q2 o : Site, ∃ qa qb : ℤ,
+      PSquare G R (zTurn (c - (frameAt word).sheetShift)) q0 q1 q2 o qa qb ∧
+      FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den
+        ((frameAt word).sheetShift + FLatticePaper.W1Phase.zTurnInv q0) ∧
+      FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den
+        ((frameAt word).sheetShift + FLatticePaper.W1Phase.zTurnInv q1) ∧
+      FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den
+        ((frameAt word).sheetShift + FLatticePaper.W1Phase.zTurnInv q2)
+
 /-- **The collar `HsqAt` at the centres with `Ψ c ≥ 0`**, from the named inputs `TopStrictHyp` (the forced case, from the unit square of
 the derivation at a strict translate) and `RowStrictHyp` (the free-root case). -/
 theorem collar_psquare_A {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
@@ -328,7 +345,7 @@ theorem collar_psquare_A {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) 
     (G : CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word)))
     (hW : P.retained = (G.game (frameAt word).eps (frameAt word).eps_unit).policy)
     (hTop : TopStrictHyp word (standardField (conjWord word)) (frameAt word).sheetShift)
-    (hRow : RowStrictHyp word (standardField (conjWord word)) P.retained)
+    (hRow : RowFaceStrictHyp word (standardField (conjWord word)) P.retained)
     {c : Site} (hcS : FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c)
     (hM : laplacian (MW word) c = 0) (hc0 : 0 ≤ sheetPsi word c)
     (hcoll : FLatticePaper.W1CollarFrame.CollarFrame (frameAt word) c)
@@ -365,7 +382,7 @@ theorem collar_psquare_A {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) 
       have hstr := hTop c v (zTurn (c - (frameAt word).sheetShift) + v) o a b inside hcS hM hc0 hWit rfl hv hSI hR hc hw' ho hout hin hforced
       exact ⟨q0 - v, q1 - v, q2 - v, o - v, a - v.1, b - v.2, hPS', hstr q0 hPS.2.1, hstr q1 hPS.2.2.1,
         hstr q2 hPS.2.2.2.1⟩
-  · exact hRow c hcS hM hc0 hcoll hnf
+  · exact hRow c hcS hM hc0 hcoll hWit hnf
 
 /-- **The collar `HsqAt` at a tie with a top or opposite witness (`Ψ c = 0`)**: the reflected partner `R - c` has the bottom or aligned
 witness (`topWit_bottom`, `oppositeWit_alignedWit`), so its explicit parent square gives the `C`-square at `c` by `hsq_C_collar_le`,
@@ -380,7 +397,7 @@ theorem hC_tie {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE : Str
     (G : CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word)))
     (hW : P.retained = (G.game (frameAt word).eps (frameAt word).eps_unit).policy)
     (hTop : TopStrictHyp word (standardField (conjWord word)) (frameAt word).sheetShift)
-    (hRow : RowStrictHyp word (standardField (conjWord word)) P.retained)
+    (hRow : RowFaceStrictHyp word (standardField (conjWord word)) P.retained)
     (hfree : ∀ c : Site, 0 ≤ sheetPsi word c → laplacian (MW word) c = 0 →
       ¬ Nonfree (frameAt (conjWord word)) (zTurn (c - (frameAt word).sheetShift)) →
       ParentSquareOut (standardField (conjWord word)) P.retained (zTurn (c - (frameAt word).sheetShift)))
@@ -425,7 +442,7 @@ theorem hcollar_A {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE : 
     (G : CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word)))
     (hW : P.retained = (G.game (frameAt word).eps (frameAt word).eps_unit).policy)
     (hTop : TopStrictHyp word (standardField (conjWord word)) (frameAt word).sheetShift)
-    (hRow : RowStrictHyp word (standardField (conjWord word)) P.retained)
+    (hRow : RowFaceStrictHyp word (standardField (conjWord word)) P.retained)
     (hfree : ∀ c : Site, 0 ≤ sheetPsi word c → laplacian (MW word) c = 0 →
       ¬ Nonfree (frameAt (conjWord word)) (zTurn (c - (frameAt word).sheetShift)) →
       ParentSquareOut (standardField (conjWord word)) P.retained (zTurn (c - (frameAt word).sheetShift)))
@@ -460,7 +477,7 @@ theorem hC_of_inputs {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE
     (G : CanonicalSignedGames (frameAt (conjWord word)) (standardField (conjWord word)))
     (hW : P.retained = (G.game (frameAt word).eps (frameAt word).eps_unit).policy)
     (hTop : TopStrictHyp word (standardField (conjWord word)) (frameAt word).sheetShift)
-    (hRow : RowStrictHyp word (standardField (conjWord word)) P.retained)
+    (hRow : RowFaceStrictHyp word (standardField (conjWord word)) P.retained)
     (hfree : ∀ c : Site, 0 ≤ sheetPsi word c → laplacian (MW word) c = 0 →
       ¬ Nonfree (frameAt (conjWord word)) (zTurn (c - (frameAt word).sheetShift)) →
       ParentSquareOut (standardField (conjWord word)) P.retained (zTurn (c - (frameAt word).sheetShift)))
@@ -534,7 +551,7 @@ theorem W1Forced_end_to_end {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.thre
       laplacian (standardField (conjWord word)) (z.1 + δ, z.2 - δ) = -1 →
       P.retained (z.1 + δ, z.2) (z.1 + δ, z.2 - δ))
     (hTop : TopStrictHyp word (standardField (conjWord word)) (frameAt word).sheetShift)
-    (hRow : RowStrictHyp word (standardField (conjWord word)) P.retained)
+    (hRow : RowFaceStrictHyp word (standardField (conjWord word)) P.retained)
     (hPsi : FLatticePaper.FaceWitness.PsiFaceSign word)
     (hagree : TieAgreeHyp word P) :
     FLatticePaper.W1.W1Forced (frameAt word).child.num (frameAt word).child.den (MW word) := by

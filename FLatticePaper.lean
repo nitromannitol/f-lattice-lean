@@ -734,6 +734,9 @@ import FLatticePaper.OdometersInputs
 import FLatticePaper.Plane.Induction.StrongCoreDef
 import FLatticePaper.Plane.Induction.StrongCore
 import FLatticePaper.Plane.Induction.GamesAssembly
+import FLatticePaper.Plane.Induction.RowFacts
+import FLatticePaper.Plane.Induction.RowCorners
+import FLatticePaper.Plane.Induction.PSquareCorners
 import FLatticePaper.Plane.Induction.BoundarySlip
 import FLatticePaper.Plane.Induction.WestClose
 import FLatticePaper.Plane.Induction.SouthPolicy
