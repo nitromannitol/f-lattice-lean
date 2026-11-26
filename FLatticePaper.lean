@@ -1023,6 +1023,7 @@ import FLatticePaper.Plane.Induction.MinPassage
 import FLatticePaper.Plane.Induction.TransferSat
 import FLatticePaper.Plane.Induction.TransferW1
 import FLatticePaper.Plane.Induction.FreeSchedule
+import FLatticePaper.Plane.Induction.PassageRank
 import FLatticePaper.Plane.Induction.FreeRows
 import FLatticePaper.Plane.Induction.PriceH
 import FLatticePaper.Plane.Induction.PriceBoundary
