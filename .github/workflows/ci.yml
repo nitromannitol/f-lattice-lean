@@ -47,6 +47,20 @@ jobs:
           sudo fallocate -l 16G /swapfile_ci && sudo chmod 600 /swapfile_ci && sudo mkswap /swapfile_ci && sudo swapon /swapfile_ci
           free -h
 
+      # The heaviest modules (up to about 13 GB of resident memory each) are built first, one target at a time, so two of them never
+      # elaborate together on the hosted runner. A timeout here does not stop the job: the full build below continues from the cache.
+      - name: Build the heaviest modules one at a time
+        timeout-minutes: 90
+        continue-on-error: true
+        shell: bash
+        env:
+          LEAN_NUM_THREADS: "1"
+        run: |
+          for m in FLatticePaper.Plane.Induction.TwosChainMinus FLatticePaper.Plane.Induction.EPolicyValues FLatticePaper.Plane.Induction.ReflectWitness FLatticePaper.Plane.Induction.QRankPlusDeck FLatticePaper.Plane.Induction.EPolicySquares FLatticePaper.Plane.Induction.SlipBase FLatticePaper.Plane.Induction.QRankDeck FLatticePaper.Plane.Induction.EPolicyCover FLatticePaper.Construction.PureRank FLatticePaper.Construction.PureRankPlus5 FLatticePaper.Plane.Induction.PureBaseUnitPrice FLatticePaper.Plane.Induction.CollarBottomBand FLatticePaper.Plane.Induction.TwosChainMono FLatticePaper.Plane.Induction.CollarBottomCases FLatticePaper.Construction.PureRankPlus1; do
+            echo "== $m"
+            lake build "$m" 2>&1 | tail -n 2
+          done
+
       # Lake 4.32 has no job flag; LEAN_NUM_THREADS caps its concurrent elaborations (measured: 2 threads gives a peak of
       # 4 concurrent lean processes, against 10 with the default), which bounds the peak memory on the hosted runner. With
       # 2 threads the summed resident memory stayed at 15 GB and the build made no progress for two hours (swap), so 1.
