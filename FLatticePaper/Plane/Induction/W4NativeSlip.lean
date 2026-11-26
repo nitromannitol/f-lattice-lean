@@ -62,4 +62,22 @@ theorem conj_slip_zero_native_H (hX : ∃ x ∈ conjWord word, x ≠ Digit.three
   rw [hz0, hy]
   ring
 
+/-- **`D'_η = 0` on the native free H points of the conjugate, from the conjugate's own packet.** The zero band of the conjugate's
+standard field is the `HasStrips` of its packet `hSE.packet`, so neither properness of the conjugate nor the grand conjugate's estimates
+is needed. -/
+theorem conj_slip_zero_native_H_packet {word : Word} (hSE : StrongEstimates (conjWord word)) {z : Site}
+    (hz : z ∈ (frameAt (conjWord word)).freeH) {η : ℤ} (hη : η = 1 ∨ η = -1) :
+    (frameAt (conjWord word)).slip (standardField (conjWord word)) η z = 0 := by
+  obtain ⟨hA, hB⟩ := freeH_strip_margin (frameAt (conjWord word)) hz
+  have hz0 : standardField (conjWord word) z = 0 := hSE.packet.strips.1 z (by omega) (by omega)
+  have hy : standardField (conjWord word) (z + η • (frameAt (conjWord word)).shortShift) = 0 := by
+    refine hSE.packet.strips.1 _ ?_ ?_
+    · rw [tGrade_add_smul_shortShift]
+      rcases hη with rfl | rfl <;> omega
+    · rw [tGrade_add_smul_shortShift]
+      rcases hη with rfl | rfl <;> omega
+  unfold ChildFrame.slip
+  rw [hz0, hy]
+  ring
+
 end FLatticePaper.W4NativeSlip

@@ -734,6 +734,16 @@ import FLatticePaper.OdometersInputs
 import FLatticePaper.Plane.Induction.StrongCoreDef
 import FLatticePaper.Plane.Induction.StrongCore
 import FLatticePaper.Plane.Induction.GamesAssembly
+import FLatticePaper.Plane.Induction.RiseInput
+import FLatticePaper.Plane.Induction.PlusBoundary
+import FLatticePaper.Plane.Induction.PermitNative
+import FLatticePaper.Plane.Induction.ForcedSheet
+import FLatticePaper.Plane.Induction.ForcedPlusStrict
+import FLatticePaper.Plane.Induction.ForcedPermitAll
+import FLatticePaper.Plane.Induction.ForcedInputE
+import FLatticePaper.Plane.Induction.CornerN1
+import FLatticePaper.Plane.Induction.AdjacentPlus
+import FLatticePaper.Plane.Induction.AdjacentMinus
 import FLatticePaper.Plane.Induction.WitnessPairs
 import FLatticePaper.Plane.Induction.ClassOne
 import FLatticePaper.Plane.Induction.ProtectedWeb

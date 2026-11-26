@@ -123,17 +123,15 @@ theorem reflH_sub_kernel_eq {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three
   refine Prod.ext ?_ ?_ <;> simp <;> ring
 
 /-- `D'_ε` at `reflH g` is zero (native, `conj_slip_zero_native_H`). -/
-theorem slip_reflH_zero {word : Word} (hX : ∃ x ∈ conjWord word, x ≠ Digit.three)
-    (hSE' : StrongEstimates (conjWord (conjWord word))) {g : Site}
+theorem slip_reflH_zero {word : Word} (hSE : StrongEstimates (conjWord word)) {g : Site}
     (hg : g ∈ (frameAt (conjWord word)).freeH) :
     (frameAt (conjWord word)).slip (standardField (conjWord word)) (frameAt word).eps
       (FLatticePaper.ReflectedFan.reflH (frameAt (conjWord word)) g) = 0 :=
-  FLatticePaper.W4NativeSlip.conj_slip_zero_native_H hX hSE' (reflH_conj_mem_freeH hg) (frameAt word).eps_unit
+  FLatticePaper.W4NativeSlip.conj_slip_zero_native_H_packet hSE (reflH_conj_mem_freeH hg) (frameAt word).eps_unit
 
 /-- `D'_ε(I − g) = 0`: the kernel drift is zero and `(I − g) + U' = reflH g`. -/
 theorem slip_I_sub_zero {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hSE : StrongEstimates (conjWord word)) (hX : ∃ x ∈ conjWord word, x ≠ Digit.three)
-    (hSE' : StrongEstimates (conjWord (conjWord word))) {g : Site}
+    (hSE : StrongEstimates (conjWord word)) {g : Site}
     (hg : g ∈ (frameAt (conjWord word)).freeH) :
     (frameAt (conjWord word)).slip (standardField (conjWord word)) (frameAt word).eps (reflectionI - g) = 0 := by
   have hdrift := (hSE.slipDrift (frameAt word).eps (frameAt word).eps_unit (reflectionI - g)).1
@@ -143,20 +141,19 @@ theorem slip_I_sub_zero {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
       FLatticePaper.ReflectedFan.reflH (frameAt (conjWord word)) g := by
     rw [← reflH_sub_kernel_eq h g]
     ring
-  rw [e, slip_reflH_zero hX hSE' hg, sub_eq_zero] at hdrift
+  rw [e, slip_reflH_zero hSE hg, sub_eq_zero] at hdrift
   rw [hdrift]
 
 /-- `D'_ε(I − g + V') = 2ε`: the transverse drift is `2ε`, and `D'_ε(I − g) = 0`. -/
 theorem slip_I_sub_add_V {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
-    (hSE : StrongEstimates (conjWord word)) (hX : ∃ x ∈ conjWord word, x ≠ Digit.three)
-    (hSE' : StrongEstimates (conjWord (conjWord word))) {g : Site}
+    (hSE : StrongEstimates (conjWord word)) {g : Site}
     (hg : g ∈ (frameAt (conjWord word)).freeH) :
     (frameAt (conjWord word)).slip (standardField (conjWord word)) (frameAt word).eps
         (reflectionI - g + (-2 * (frameAt word).parents.odd.num, 2 * (frameAt word).parents.odd.den)) =
       2 * (frameAt word).eps := by
   have hdrift := (hSE.slipDrift (frameAt word).eps (frameAt word).eps_unit (reflectionI - g)).2
   rw [W4OldH.conj_transverse_eq h] at hdrift
-  rw [slip_I_sub_zero h hSE hX hSE' hg] at hdrift
+  rw [slip_I_sub_zero h hSE hg] at hdrift
   linarith
 
 open FLatticePaper.W1 in
@@ -165,7 +162,6 @@ open FLatticePaper.W1 in
 interior, we have a contradiction. The shift `c₂` is `0` or `1` (polygon bounds), `B(c) = 2W − 2ε c₂` (the native slip zero and the
 transverse drift), and the boundary contradiction at `c = Zg` (`ε = 1`) or `c = Zg + (d, n)` (`ε = −1`). -/
 theorem oldV_guard_a1 {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
-    (hX : ∃ x ∈ conjWord word, x ≠ Digit.three) (hSE' : StrongEstimates (conjWord (conjWord word)))
     {g : Site} (hg : g ∈ (frameAt (conjWord word)).freeH)
     (hne : g ≠ (frameAt (conjWord word)).hLast ∨ (frameAt word).eps = -1)
     {x c : Site} (c2 : ℤ)
@@ -341,7 +337,7 @@ theorem oldV_guard_a1 {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE
   rcases hc2 with rfl | rfl
   · have hpt : reflectionI - g + ((0 : ℤ) * (-2 * N), (0 : ℤ) * (2 * D)) = reflectionI - g := by
       ext <;> simp
-    rw [hpt, slip_I_sub_zero h hSE hX hSE' hg] at hB
+    rw [hpt, slip_I_sub_zero h hSE hg] at hB
     rcases hεu with hεu | hεu
     · have hsh0 : (frameAt word).sheetShift = (0, 0) := by
         rw [hshift, hphase, hεu]
@@ -358,7 +354,7 @@ theorem oldV_guard_a1 {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE
   · have hpt : reflectionI - g + ((1 : ℤ) * (-2 * N), (1 : ℤ) * (2 * D)) =
         reflectionI - g + (-2 * N, 2 * D) := by
       ext <;> simp
-    rw [hpt, slip_I_sub_add_V h hSE hX hSE' hg] at hB
+    rw [hpt, slip_I_sub_add_V h hSE hg] at hB
     rcases hεu with hεu | hεu
     · rw [hεu] at hB
       norm_num at hB
@@ -382,7 +378,6 @@ theorem reflH_hFirst (frame : ChildFrame) :
 (old V, with `g = reflH h`, `g = hFirst`: `j = 0`; `g = hLast` with `ε = 1`: the exceptional endpoint; otherwise the guard) or a
 conjugate free V point (old H, `oldH_star_jumpA'`). Each case gives `a(i) ≠ 0`, contradicting `a(i) = 0`. -/
 theorem freeTail_a1 {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
-    (hX : ∃ x ∈ conjWord word, x ≠ Digit.three) (hSE' : StrongEstimates (conjWord (conjWord word)))
     (hTr : FLatticePaper.TraceFromPsi.TraceAt (conjWord word))
     {seed : Site → Site → Prop}
     (P : OldPolicyData (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
@@ -477,7 +472,7 @@ theorem freeTail_a1 {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE :
           rw [if_neg hgF] at ha1
           omega
         rw [hc1] at hroot
-        exact oldV_guard_a1 h hSE hX hSE' hg hne (-j') hroot hcx hc hcu hSI hB
+        exact oldV_guard_a1 h hSE hg hne (-j') hroot hcx hc hcu hSI hB
   · -- the free V case: the old H star
     have hxq : zTurn x = (zTurn x + v) + ((-i') * ((frameAt word).parents.odd.den + (frameAt word).parents.odd.num) +
         (-j') * (-2 * (frameAt word).parents.odd.num),
@@ -497,8 +492,8 @@ theorem freeTail_a1 {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE :
 The caller's hypotheses, with their providers:
 * `h` (the word is proper): the induction on words (the non-base case).
 * `hSE : StrongEstimates (conjWord word)`: the earlier stage's estimates of the conjugate word (`StrongEstimates` of the induction).
-* `hX` (the conjugate word is proper, the non-base case) and `hSE' : StrongEstimates (conjWord (conjWord word))` (the grand conjugate's
-  estimates, the native slip zero `conj_slip_zero_native_H`): the same inputs as `TraceStep.traceAt_step`.
+* No properness of the conjugate and no grand-conjugate estimates: the native slip zero of the conjugate's free H points comes from the
+  conjugate's own packet (`conj_slip_zero_native_H_packet`), so the conjugate may be pure (`3^k`).
 * `hTr : TraceAt (conjWord word)`: the trace induction (`TraceStep.traceAt_step`, the H-trace price on the conjugate's free H points).
 * `hW1`: the conjugate's `W1Forced` (the W1 forcing of the earlier stage, `W1NonfreeHsqC.W1Forced_of_inputs`).
 * `P` (the retained policy of the conjugate, with `sheetPolicyA`): the old policy of the earlier stage (`OldPolicyData`).
@@ -509,7 +504,6 @@ The caller's hypotheses, with their providers:
 The strictness `hSI` and the edge `Edge i c` are per-white arguments of `NoRiseForced` itself. -/
 theorem noRiseForced_proved {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word))
-    (hX : ∃ x ∈ conjWord word, x ≠ Digit.three) (hSE' : StrongEstimates (conjWord (conjWord word)))
     (hTr : FLatticePaper.TraceFromPsi.TraceAt (conjWord word))
     (hW1 : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
       (standardField (conjWord word)))
@@ -535,7 +529,7 @@ theorem noRiseForced_proved {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three
     exact FLatticePaper.W4FreeTail.rise_excluded_nonfree h hSE P hW1 hconj hpol h1' h0'
   · unfold FLatticePaper.Induction.Nonfree at hconj
     push Not at hconj
-    exact freeTail_a1 h hSE hX hSE' hTr P hPres
+    exact freeTail_a1 h hSE hTr P hPres
       (FLatticePaper.W4White.hwhite_of_strict h hSE hSI hc hlap hΨc) hSI hc hcu hpol hEdge hconj ha1 h0 hB
 
 end FLatticePaper.W4Guard

@@ -6,6 +6,9 @@ import FLatticePaper.Plane.Induction.HfreePhase1
 import FLatticePaper.Plane.Induction.WordPolicy
 import FLatticePaper.Plane.Induction.AuxRankQ1
 import FLatticePaper.Plane.Induction.W1StepAssembly
+import FLatticePaper.Plane.Induction.ForcedPermitAll
+import FLatticePaper.Plane.Induction.CornerN1
+import FLatticePaper.Plane.Induction.RiseInput
 
 /-! # The free-policy named inputs of the games step, from the Q1 rank (`hN` of `gamesWithRank_of_Q1`)
 
@@ -134,6 +137,7 @@ theorem gamesStep_of_noFort {word : Word} (h2 : ∃ x ∈ word, x ≠ Digit.two)
     (hcore : StrongCore word) (hseed : FLatticePaper.W1Seeds.SeedFields word)
     (hSE : StrongEstimates (conjWord word)) (hG : GamesWithRank (conjWord word))
     (hpar : FLatticePaper.W1Seeds.SeedFields (conjWord word))
+    (hTr : FLatticePaper.TraceFromPsi.TraceAt (conjWord word))
     (hW1c : FLatticePaper.W1.W1Forced (frameAt (conjWord word)).child.num (frameAt (conjWord word)).child.den
       (standardField (conjWord word)))
     (hW1 : FLatticePaper.W1.W1Forced (frameAt word).child.num (frameAt word).child.den (standardField word))
@@ -147,20 +151,17 @@ theorem gamesStep_of_noFort {word : Word} (h2 : ∃ x ∈ word, x ≠ Digit.two)
           (frameAt word).eps),
         P.retained = (G.game (frameAt word).eps (frameAt word).eps_unit).policy →
           CollarChain.RowFaceStrictHyp word (standardField (conjWord word)) P.retained)
-    (hDich : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → CollarChain.WitnessDichotomy word)
-    (hforced : ∀ η : ℤ, (η = 1 ∨ η = -1) → ∀ c o : Site, ¬ freeClosure (frameAt word) c →
-      laplacian (standardField word) c = 0 → ForcedEdge (standardField word) (fun _ _ => False) c o →
-      slipPermits (standardField word) (fun z => standardField word (z + η • (frameAt word).shortShift)) c o)
-    (hcorner : ∀ η : ℤ, (η = 1 ∨ η = -1) → (frameAt word).eps = 1 → η = -1 →
-      (frameAt word).parents.odd.num = 1 →
-      FLatticePaper.W1Step.sheetPsi word (FLatticePaper.ArcPsi.reflH word (FLatticePaper.Induction.hFirst + (0, -η))) = 0 ∧
-        (frameAt word).sheetA (FLatticePaper.W1MSheet.FqW word)
-          (FLatticePaper.ArcPsi.reflH word (FLatticePaper.Induction.hFirst + (0, -η))) = 0) :
+    (hDich : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → CollarChain.WitnessDichotomy word) :
     GamesWithRank word :=
   gamesWithRank_of_Q1 h2 hcore hW1 hno
-    (fun η hη _ hcon hstrict =>
-      freeNamedInputs_of_Q1 h hcore hSE hG hpar hW1c hW1 hη hcon hstrict (hforced η hη)
-        (hcorner η hη)
+    (fun η hη _ hcon hstrict => by
+      have hsat := AuxRankQ1.hasSat_of_constrained hcore.packet.binary hcon
+      obtain ⟨G, P, hWP, hsheet⟩ := FLatticePaper.W1StepAssembly.sheetOut_forced_of_parts hRow hDich word h
+        hcore hseed hSE hpar hG hW1c hsat
+      have hrise := FLatticePaper.RiseInput.noRise_of_canonical h hSE hTr hW1c P.toOldPolicyWitness G hWP
+      exact freeNamedInputs_of_Q1 h hcore hSE hG hpar hW1c hW1 hη hcon hstrict
+        (FLatticePaper.ForcedPermitAll.forced_slip_permit h hcore hSE P hsheet hsat hW1 hrise η hη)
+        (fun hW1' hη1 hN => FLatticePaper.CornerN1.corner_N1 h hSE hpar hW1' hN η hη1)
         (by
           have hh := FLatticePaper.W1StepAssembly.westFree_of_parts hRow hDich word h hcore hseed hSE hpar hG
             hW1c (AuxRankQ1.hasSat_of_constrained hcore.packet.binary hcon) η
