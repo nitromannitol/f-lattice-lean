@@ -1,5 +1,6 @@
 import FLatticePaper.FlatPlusHeadline
 import FLatticePaper.FlatMinusHeadline
+import FLatticePaper.StepHeadline
 import FLatticePaper.TraceHeadline
 import FLatticePaper.MainTheorems
 import FLatticePaper.Plane.GlobalOdometersAll
@@ -9,6 +10,7 @@ axioms `propext`, `Classical.choice` and `Quot.sound` (and no `sorryAx`) for eac
 
 #print axioms FLatticePaper.odometersTheorem_no_flatP
 #print axioms FLatticePaper.odometersTheorem_no_flat
+#print axioms FLatticePaper.StepHeadline.odometersTheorem_of_steps
 #print axioms FLatticePaper.odometersTheorem_no_hbd
 #print axioms FLatticePaper.hyperbola_of_odometersTheorem
 #print axioms FLatticePaper.circlePacking_of_odometersTheorem
