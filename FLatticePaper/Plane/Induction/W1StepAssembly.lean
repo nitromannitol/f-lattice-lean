@@ -24,7 +24,7 @@ canonical game (`OldPolicyBuild.oldPolicyRanked_of_games`), the canonical rules 
 the strip and odd-band inputs of the standard field, `hX1`, `hX2` (`HX12Strong`), `hX3` (`LowerMem` and the strips of the conjugate),
 and `hTop` (`TopStrictDischarge`).
 
-`TieAgreeHyp` is no longer an input: it is `TieAgreeClose.tieAgreeHyp_of_routes`, from the route data above. The explicit hypotheses are the open items: `hQ37` (the `h3` middle target for `t ≤ d`), `hFreeIn` (a forced white with a free white input forces that input), `hRow` (`RowStrictHyp`). `PsiFaceSign` is `PsiPacket.psiFaceSign_of_packet`. -/
+`TieAgreeHyp` is no longer an input: it is `TieAgreeClose.tieAgreeHyp_of_routes`, from the route data above. The explicit hypotheses are the open items: `hFreeIn` (a forced white with a free white input forces that input), `hRow` (`RowStrictHyp`). `PsiFaceSign` is `PsiPacket.psiFaceSign_of_packet`. -/
 
 namespace FLatticePaper.W1StepAssembly
 
@@ -32,10 +32,6 @@ open Farey FLatticePaper FLatticePaper.Induction FLatticePaper.W1 FLatticePaper.
   FLatticePaper.AndOrRank FLatticePaper.SquareClauses FLatticePaper.W1Witness FLatticePaper.W1Phase
 
 theorem w1Step_of_parts
-    (hQ37 : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → StrongEstimates (conjWord word) →
-      ∀ z ∈ (frameAt (conjWord word)).freeH, EvenSite z → (z.1 - 1, z.2) ∈ (frameAt (conjWord word)).freeH →
-        (frameAt (conjWord word)).tGrade z ≤ (frameAt (conjWord word)).child.den →
-        laplacian (standardField (conjWord word)) (z.1, z.2 + 1) = 0)
     (hFreeIn : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) →
       ∀ c i o, ForcedEdge (standardField (conjWord word)) (fun _ _ => False) c i →
         laplacian (standardField (conjWord word)) c = 0 →
@@ -104,7 +100,7 @@ theorem w1Step_of_parts
   have hRoute := RouteAssembly.routeGenuine_of_parts (G.game (frameAt word).eps hη) hη hP hW1c
     (G.deckEquiv (frameAt word).eps hη) hP.binary P.toOldPolicyWitness hPret (fun _ _ h => h) hsig
     (W1StepParts.hAS_all hP hsig) (W1StepParts.hsym_of_iRefl hP hIsym) (W1StepParts.hper_of_packet hP) hslip
-    hpar.even_zero hIsym hlow hup (hQ37 word hproper hSE) hpriceR hdrU hdrV (W1StepParts.perK_of_packet hP)
+    hpar.even_zero hIsym hlow hup hpriceR hdrU hdrV (W1StepParts.perK_of_packet hP)
   have hH : ∀ z ∈ (frameAt (conjWord word)).freeH, laplacian (standardField (conjWord word)) z = 0 →
       W1NonfreeOut.ParentSquareOut (standardField (conjWord word)) P.retained z := by
     intro z hz hw
@@ -165,10 +161,6 @@ theorem w1Step_of_parts
 
 
 theorem westFree_of_parts
-    (hQ37 : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → StrongEstimates (conjWord word) →
-      ∀ z ∈ (frameAt (conjWord word)).freeH, EvenSite z → (z.1 - 1, z.2) ∈ (frameAt (conjWord word)).freeH →
-        (frameAt (conjWord word)).tGrade z ≤ (frameAt (conjWord word)).child.den →
-        laplacian (standardField (conjWord word)) (z.1, z.2 + 1) = 0)
     (hFreeIn : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) →
       ∀ c i o, ForcedEdge (standardField (conjWord word)) (fun _ _ => False) c i →
         laplacian (standardField (conjWord word)) c = 0 →
@@ -247,7 +239,7 @@ theorem westFree_of_parts
   have hRoute := RouteAssembly.routeGenuine_of_parts (G.game (frameAt word).eps hη) hη hP hW1c
     (G.deckEquiv (frameAt word).eps hη) hP.binary P.toOldPolicyWitness hPret (fun _ _ h => h) hsig
     (W1StepParts.hAS_all hP hsig) (W1StepParts.hsym_of_iRefl hP hIsym) (W1StepParts.hper_of_packet hP) hslip
-    hpar.even_zero hIsym hlow hup (hQ37 word hproper hSE) hpriceR hdrU hdrV (W1StepParts.perK_of_packet hP)
+    hpar.even_zero hIsym hlow hup hpriceR hdrU hdrV (W1StepParts.perK_of_packet hP)
   have hH : ∀ z ∈ (frameAt (conjWord word)).freeH, laplacian (standardField (conjWord word)) z = 0 →
       W1NonfreeOut.ParentSquareOut (standardField (conjWord word)) P.retained z := by
     intro z hz hw

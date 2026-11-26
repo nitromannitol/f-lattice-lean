@@ -19,7 +19,6 @@ import FLatticePaper.Plane.Induction.StripColours
 /-! # The route genuine structure from its parts (assembly with explicit open hypotheses)
 
 `RouteGenuine C` is assembled from the field lemmas. Three inputs are explicit hypotheses, each an open claim:
-* `hQ37` : the middle target of the `h3` second arrow is white when `t(z) ≤ d` (the claim filed as Q37);
 The `d ≥ 3n − 2` and `d ≥ 2n` cases of the middles are proved from the north fan and the easy-regime lemmas. -/
 
 namespace FLatticePaper.RouteAssembly
@@ -28,6 +27,76 @@ open FLatticePaper FLatticePaper.Induction FLatticePaper.W1 FLatticePaper.W1Witn
   FLatticePaper.EndpointRows FLatticePaper.RoutePresc FLatticePaper.RouteH3 FLatticePaper.RouteFan
   FLatticePaper.RouteH3Easy FLatticePaper.VEasy FLatticePaper.V3Last FLatticePaper.RouteRows FLatticePaper.C2Axial
   FLatticePaper.V2Minus
+
+/-- **The easy-regime whiteness of `p` from the child's own lower even zero interval.** In the easy H regime `d < 3n - 2`, an even
+free H root `z` with `t(z) ≤ d` whose west neighbour is free has `t(z) ≥ 2n` (the west neighbour is odd, so `t(z) = t(z - (1,0)) + n`),
+so the far input `q = z + (0,2)` of `p = z + (0,1)` has `2 - L ≤ t(q) ≤ 1 - d`, and `G q = 0` by `W1Strips.even_zero_lower`. The ordinary
+zero strip gives `G z = G p = 0`, so `p` is white. -/
+theorem lap_p_zero_of_west {frame : ChildFrame} {G : Field}
+    (hper : HasGeneratorPeriods frame.child G 0 frame.coherentConstantV) (hS : frame.HasStrips G)
+    (hslip : ∀ z ∈ frame.closedPolygon, 0 ≤ frame.slip G 1 z)
+    (hseed : ∀ z : Site, EvenSite z → frame.tGrade z = 2 - (frame.child.den + frame.child.num) → G z = 0)
+    {z : Site} (hz : z ∈ frame.freeH) (hev : EvenSite z) (hq : (z.1 - 1, z.2) ∈ frame.freeH)
+    (hd : frame.child.den < 3 * frame.child.num - 2) (ht : frame.tGrade z ≤ frame.child.den) :
+    laplacian G (z.1, z.2 + 1) = 0 := by
+  obtain ⟨hn0, hnd, hdn, hd3, -⟩ := frame.child_facts
+  have hz' := hz
+  simp only [ChildFrame.freeH, Set.mem_setOf_eq] at hz'
+  obtain ⟨-, -, hsp⟩ := hz'
+  unfold ChildFrame.hSpectrum at hsp
+  have htz2 : 2 ≤ frame.tGrade z := by
+    have hp := tGrade_parity frame z
+    unfold EvenSite at hev
+    rcases hsp with h | h <;> omega
+  have hodd : ¬ EvenSite (z.1 - 1, z.2) := by
+    unfold EvenSite at hev ⊢
+    simp only at hev ⊢
+    omega
+  have htb : frame.tGrade (z.1 - 1, z.2) = frame.tGrade z - frame.child.num := by
+    unfold ChildFrame.tGrade
+    ring
+  have htb_ge : frame.child.num ≤ frame.tGrade (z.1 - 1, z.2) := by
+    have hq' := hq
+    simp only [ChildFrame.freeH, Set.mem_setOf_eq] at hq'
+    obtain ⟨-, -, hsq⟩ := hq'
+    unfold ChildFrame.hSpectrum at hsq
+    have hp := tGrade_parity frame (z.1 - 1, z.2)
+    unfold EvenSite at hodd
+    simp only at hodd hp
+    rcases hsq with h | h <;> omega
+  have ht2 : 2 * frame.child.num ≤ frame.tGrade z := by omega
+  have htq : frame.tGrade (z.1, z.2 + 2) = frame.tGrade z - 2 * frame.child.den := by
+    unfold ChildFrame.tGrade
+    ring
+  have htp : frame.tGrade (z.1, z.2 + 1) = frame.tGrade z - frame.child.den := by
+    unfold ChildFrame.tGrade
+    ring
+  have hqev : EvenSite (z.1, z.2 + 2) := by
+    unfold EvenSite at hev ⊢
+    simp only at hev ⊢
+    omega
+  have hGq : G (z.1, z.2 + 2) = 0 :=
+    FLatticePaper.W1Strips.even_zero_lower frame hper hS hslip hseed (z.1, z.2 + 2) hqev (by omega) (by omega)
+  have hGz : G z = 0 := hS.1 z (by omega) (by omega)
+  have hGp : G (z.1, z.2 + 1) = 0 := hS.1 (z.1, z.2 + 1) (by omega) (by omega)
+  have hodd' : ¬ EvenSite (z.1, z.2 + 1) := by
+    unfold EvenSite at hev ⊢
+    simp only at hev ⊢
+    omega
+  have eN : incomingNeg (z.1, z.2 + 1) = z := by
+    unfold incomingNeg
+    rw [if_neg hodd']
+    refine Prod.ext ?_ ?_ <;> simp
+  have eP : incomingPos (z.1, z.2 + 1) = (z.1, z.2 + 2) := by
+    unfold incomingPos
+    rw [if_neg hodd']
+    refine Prod.ext ?_ ?_
+    · simp
+    · simp
+      omega
+  unfold laplacian
+  rw [eN, eP, hGz, hGq, hGp]
+  ring
 
 /-- **The route genuine structure of the canonical policy**, from the parts. -/
 theorem routeGenuine_of_parts {frame : ChildFrame} {G : Field} {seed : Site → Site → Prop} {η : ℤ}
@@ -52,8 +121,6 @@ theorem routeGenuine_of_parts {frame : ChildFrame} {G : Field} {seed : Site → 
       frame.sGrade x ≤ 1 - 2 * frame.child.den → G x = harmonicGrid x)
     (hup : ∀ x : Site, ¬ EvenSite x → frame.child.den + frame.child.num - 2 < frame.sGrade x →
       frame.sGrade x ≤ 3 * frame.child.den + frame.child.num - 2 → G x = harmonicGrid x)
-    (hQ37 : ∀ z ∈ frame.freeH, EvenSite z → (z.1 - 1, z.2) ∈ frame.freeH → frame.tGrade z ≤ frame.child.den →
-      laplacian G (z.1, z.2 + 1) = 0)
     (hprice : ∀ z ∈ frame.closedPolygon, frame.cutPrice - 1 ≤ frame.price G z ∧ frame.price G z ≤ frame.cutPrice)
     (hdrU : ∀ z, frame.price G (z + frame.child.modifiedDeck.kernel) = frame.price G z - 1)
     (hdrV : ∀ z, frame.price G (z + frame.child.modifiedDeck.transverse) = frame.price G z)
@@ -99,7 +166,7 @@ theorem routeGenuine_of_parts {frame : ChildFrame} {G : Field} {seed : Site → 
       have hpw : laplacian G (z.1, z.2 + 1) = 0 := by
         by_cases ht : frame.child.den + 1 ≤ frame.tGrade z
         · exact HEasyP.lap_p_zero_of_free hS hz hev ht
-        · exact hQ37 z hz hev hq (by omega)
+        · exact lap_p_zero_of_west hper hS hslip hseed hz hev hq (by omega) (by omega)
       exact h3_arrow_easy C hW1 hbin hz hev hm' hpw
   have v3 : ∀ z ∈ frame.freeV, ¬ (η = -1 ∧ z = (0, 1)) → laplacian G z = 0 → ¬ EvenSite z →
       (z.1, z.2 - -η) ∈ frame.freeV →
