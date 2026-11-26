@@ -2,6 +2,7 @@ import FLatticePaper.Plane.Induction.FaceSign
 import FLatticePaper.Plane.Induction.CollarBottomSquare
 import FLatticePaper.Plane.Induction.CollarLeft
 import FLatticePaper.Plane.Induction.CollarRight
+import FLatticePaper.Plane.Induction.StripColours
 
 /-! # The per-face strictness of the row squares (the arithmetic of `RowFaceStrictHyp`)
 
@@ -14,7 +15,7 @@ The six face rows of `FaceRows` / `FaceRowsForced` use, per face, one square of 
 The band lemmas need: the bottom centre is not `(1,1)`; a left (right) centre is neither bottom nor top. Two field facts supply these
 for a white centre with `Ψ ≥ 0` (named premises, numerically checked on words of length at most 3):
 
-* `OneOneBlack`: the laplacian of `MW` at `(1,1)` is `−1` (the point `(1,1)` is strict and bottom but black);
+* the laplacian of `MW` at `(1,1)` is `−1`, now from the strips of the word's frame (`StripColours.lap_one_one` with the input `HasStrips (MW word)`; the point `(1,1)` is strict and bottom but black);
 * `SingleFaceSign`: a white strict collar centre with `Ψ ≥ 0` has at most one face witness. -/
 
 namespace FLatticePaper.FaceSquares
@@ -47,9 +48,6 @@ theorem right_face_strict {word : Word} {c : Site} (hn3 : 3 ≤ (frameAt word).c
       FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c' :=
   FLatticePaper.CollarRight.right_square_strict (frameAt word) hn3 hcS hB hT hR
 
-/-- **The field fact at `(1,1)`** (named premise): the sheet-minimum laplacian at `(1,1)` is `−1`. -/
-def OneOneBlack (word : Word) : Prop := laplacian (MW word) (1, 1) = -1
-
 /-- **The single-face fact** (named premise): a white strict collar centre with `Ψ ≥ 0` is on at most one of the four faces. -/
 def SingleFaceSign (word : Word) : Prop :=
   ∀ c : Site, FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c →
@@ -63,7 +61,7 @@ def SingleFaceSign (word : Word) : Prop :=
 
 /-- **The three face squares of a white strict collar centre with `Ψ ≥ 0`**, from the two field facts. -/
 theorem face_squares_of_premises {word : Word} (hn3 : 3 ≤ (frameAt word).child.num)
-    (hOne : OneOneBlack word) (hSingle : SingleFaceSign word) {c : Site}
+    (hS : (frameAt word).HasStrips (MW word)) (hSingle : SingleFaceSign word) {c : Site}
     (hcS : FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c)
     (hM : laplacian (MW word) c = 0) (hc0 : 0 ≤ sheetPsi word c) (hcoll : CollarFrame (frameAt word) c) :
     (BottomWit (frameAt word) c →
@@ -80,8 +78,7 @@ theorem face_squares_of_premises {word : Word} (hn3 : 3 ≤ (frameAt word).child
   · apply bottom_face_strict hcS _ hB
     intro e
     subst e
-    have := hOne
-    unfold OneOneBlack at this
+    have := FLatticePaper.StripColours.lap_one_one (frameAt word) hS
     rw [hM] at this
     norm_num at this
   · exact left_face_strict hn3 hcS (fun hB => h1 ⟨hB, hL⟩) (fun hT => h5 ⟨hL, hT⟩) hL
