@@ -20,12 +20,9 @@ From this folder, run
 ~~~sh
 julia --project=Code Code/run_code.jl 3312 patterns.svg
 julia --project=Code Code/test/runtests.jl
-julia --project=Code Code/audits/check_patterns.jl 4
 ~~~
 
-The first command draws both standards and both alternates. It uses exact integer heights on the occupied coordinates and the true period increments at every seam. The package also exports tile heights as TSV, evaluates the height or Laplacian at a specified lattice site, and provides a matrix interface for existing scripts. Julia 1.7 or later is required. [Julia instructions](Code/README.md) · [Four-panel example](Code/examples/3312.svg)
-
-The packaged tests passed 433 assertions on both Julia 1.7.1 and Julia 1.12.5, including the 37- and 44-two clipping examples. The depth-four check covered the empty word and all 120 nonempty words of length at most four, across all 484 standard and alternate outputs and 1,147,064 period classes. [Test results](Code/test/results/corrected-edition.txt) · [Published 37-two comparison](Code/test/results/published-word37.txt) · [Published 44-two failure](Code/test/results/published-word44.txt)
+The first command draws the standard and alternate tiles for the word 3312, and the second runs the tests. Julia 1.7 or later is required. [Julia instructions](Code/README.md) · [Example for 3312](Code/examples/3312.svg)
 
 ## Rebuilding the PDFs
 

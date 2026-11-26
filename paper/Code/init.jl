@@ -1,4 +1,4 @@
-# Matrix interface for scripts written against the arXiv implementation.
+# Same as FLatticeExact, but get_odometers returns matrices instead of dictionaries.
 if !isdefined(@__MODULE__, :FLatticeExact)
     include(joinpath(@__DIR__,"src","FLatticeExact.jl"))
 end
@@ -16,7 +16,8 @@ function _odometer_matrix(tile)
     result
 end
 
-"""Return the eight original matrix registers with a one-cell NaN border and exact occupied heights."""
+"""Return the standard and alternate tiles as matrices. Points outside the tile are NaN,
+and there is a border of NaN around each matrix."""
 function get_odometers(word)
     standards,alternates = FLatticeExact.get_odometers(word)
     map(_odometer_matrix,standards),map(_odometer_matrix,alternates)

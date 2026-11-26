@@ -1,6 +1,5 @@
-# Include after the exact implementation (all definitions in the current module).
 using Test
-@testset "constructor dispatch and saved-state smoke" begin
+@testset "Tile sizes" begin
     expected=Dict(""=>(21,21,30,30),"1"=>(93,93,110,110),
       "2"=>(45,57,72,58),"3"=>(57,45,58,72),
       "11"=>(499,499,586,586),"12"=>(221,291,308,308),
@@ -13,7 +12,7 @@ using Test
     end
     @test_throws ArgumentError get_odometers("10")
     @test_throws ArgumentError get_odometers("abc")
-    # Independently supplied inverse-history API must agree with lineage births.
+    # _recbirth and rational_approximation should agree.
     words=[""]
     for depth in 1:4
         layer=[w*string(c) for w in words if length(w)==depth-1 for c in ('1','2','3')]

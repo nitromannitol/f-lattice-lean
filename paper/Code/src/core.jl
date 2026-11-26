@@ -1,4 +1,5 @@
-# Finite integer functions on the plane; missing dictionary key = outside domain.
+# A tile is a dictionary from lattice points to integer heights.
+# Points outside the tile are not in the dictionary.
 const Site = Complex{BigInt}
 const Tile = Dict{Site,BigInt}
 pt(x::Integer, y::Integer) = complex(BigInt(x), BigInt(y))
@@ -12,7 +13,7 @@ function _require_nonempty(t::Tile, which::AbstractString)
     isempty(t) && throw(ArgumentError("empty tile: $which"))
     return t
 end
-# Rectangular origin and lexicographic anchors are deliberately DIFFERENT.
+# ll is the leftmost point of the bottom row, ur is the rightmost point of the top row.
 function ll(t::Tile)
     _require_nonempty(t, "LL")
     return argmin(z -> (imag(z),real(z)), keys(t))
@@ -21,7 +22,7 @@ function ur(t::Tile)
     _require_nonempty(t, "UR")
     return argmax(z -> (imag(z),real(z)), keys(t))
 end
-"""Translate the full support by v; add the affine slope at the destination coordinate."""
+"""Shift a tile by v and add the linear function with the given slope, evaluated at the new position."""
 function place(t::Tile, v, slope)
     _require_nonempty(t,"place")
     w = _site(v); a = _site(slope)
@@ -39,20 +40,20 @@ function place(t::Tile, v, slope)
     end
     return out
 end
-"""Rectangular-bounding-box minimum at zero; heights unchanged."""
+"""Shift a tile so that its smallest x and smallest y coordinates are 0."""
 function trim(t::Tile)
     _require_nonempty(t,"trim")
     return place(t,-pt(minimum(real,keys(t)), minimum(imag,keys(t))),0)
 end
-"""Actual bottom-row leftmost site at zero; heights unchanged."""
+"""Shift a tile so that the leftmost point of its bottom row is at 0."""
 llcenter(t::Tile) = place(t,-ll(t),0)
 function maxzero(t::Tile)
     _require_nonempty(t,"maxzero")
     m=maximum(values(t))
     return Tile(z => h-m for (z,h) in t)
 end
-"""Lower the incoming tile until it touches the old one; take their pointwise minimum.
-Queries only their true intersection. If it is empty, no relative gauge is defined."""
+"""Shift the incoming tile up or down so that it touches the old tile from above, then take the
+minimum of the two. The tiles must overlap."""
 function touch(old::Tile, incoming::Tile; context="")
     _require_nonempty(old,"old in $context"); _require_nonempty(incoming,"incoming in $context")
     delta = nothing
@@ -65,9 +66,8 @@ function touch(old::Tile, incoming::Tile; context="")
             end
         end
     end
-    isnothing(delta) && throw(ArgumentError("disjoint required tile overlap: $context"))
-    # With this normalization the old value wins at EVERY old site in the overlap.
-    # Hence only insert fresh sites. This is exactly the ordered min_nan rule.
+    isnothing(delta) && throw(ArgumentError("tiles do not overlap: $context"))
+    # After the shift the old tile is the minimum on the overlap, so only new points are added.
     out=copy(old)
     for (z,h) in incoming
         if !haskey(out,z)
@@ -76,11 +76,10 @@ function touch(old::Tile, incoming::Tile; context="")
     end
     return out
 end
-"""Write exact integer heights in legacy export convention: sorted (x,y) relative
-to the occupied bottom row's leftmost point; never subtract a height gauge."""
+"""Write a tile as lines of x, y and height, with the leftmost point of the bottom row at (0,0)."""
 function write_tile(io::IO,t::Tile)
     a=ll(t)
-    println(io,"# x\ty\theight; LL anchor = (0,0); exact integers")
+    println(io,"# x\ty\theight")
     for z in sort!(collect(keys(t));by=z->(real(z),imag(z)))
         u=z-a
         println(io,real(u),'\t',imag(u),'\t',t[z])

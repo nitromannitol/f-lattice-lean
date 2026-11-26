@@ -1,5 +1,4 @@
-# Exact offsets, ported directly from original final_code/tile_decomp/tile_offsets.jl.
-# No arrays, floating-point arithmetic, bounded ancestry search, or fixed-width heights.
+# Offsets used to place the parent tiles when building a child tile.
 _offset_zero() = Complex{BigInt}(0, 0)
 _exact_fraction(p::Rational) = BigInt(numerator(p)) // BigInt(denominator(p))
 _exact_fraction(p::Integer) = BigInt(p) // BigInt(1)
@@ -14,7 +13,7 @@ function vf(n::Integer, d::Integer)
     return Complex{BigInt}(D,N),Complex{BigInt}(N-D,N+D)
 end
 vf(p::Rational) = vf(numerator(p),denominator(p))
-# Original m(n,d)*v1=0 and m(n,d)*v2=(n,-d), identically.
+# m(n,d)*v1 = 0 and m(n,d)*v2 = (n,-d)
 function af(n::Integer,d::Integer)
     return _offset_zero(),Complex{BigInt}(BigInt(n),-BigInt(d))
 end
@@ -40,13 +39,11 @@ function getFracs(s::AbstractString)
     return f
 end
 _between(x,a,b) = min(a,b)<=x<=max(a,b)
-"""Exact unbounded inverse Farey history for a rational strictly between 0 and 1.
-The optional legacy depth argument is ignored, never used as a search cutoff.
-Endpoint atoms 0 and 1 are not children and have no inverse creation word.
-"""
-function rational_approximation(x::Rational, legacy_depth::Integer=0)
+"""Return the word at which x first appears, and the fractions for that word.
+x must be strictly between 0 and 1."""
+function rational_approximation(x::Rational)
     X=_exact_fraction(x)
-    0<X<1 || throw(DomainError(X,"inverse creation history requires 0 < x < 1"))
+    0<X<1 || throw(DomainError(X,"x must be strictly between 0 and 1"))
     f=getFracs(""); word=IOBuffer()
     while X!=f[1] && X!=f[2]
         p,q,a,b=f
@@ -62,11 +59,11 @@ function getModFareyParents(p::Rational)
 end
 function getParents(o::Rational,e::Rational)
     O,E=_exact_fraction(o),_exact_fraction(e)
-    O==0 && throw(DomainError(O,"endpoint has no earlier parents"))
+    O==0 && throw(DomainError(O,"0 has no parents"))
     return (numerator(E)-numerator(O))//(denominator(E)-denominator(O)),
            (2*numerator(O)-numerator(E))//(2*denominator(O)-denominator(E))
 end
-# Physical clockwise and counterclockwise rotations, with no Float64 promotion.
+# Rotations by 90 degrees clockwise and counterclockwise.
 Rot(z::Complex{<:Integer}) = Complex{BigInt}(BigInt(imag(z)),-BigInt(real(z)))
 rotccw(z::Complex{<:Integer}) = Complex{BigInt}(-BigInt(imag(z)),BigInt(real(z)))
 arithmetic_dual(p::Rational) = (big(1)-_exact_fraction(p))/(big(1)+_exact_fraction(p))
