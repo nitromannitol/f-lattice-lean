@@ -525,6 +525,7 @@ import FLatticePaper.Plane.Induction.BoundarySpectrum
 import FLatticePaper.Plane.Induction.CollarTie
 import FLatticePaper.Plane.Induction.Lattice
 import FLatticePaper.Plane.Induction.CrossingLattice
+import FLatticePaper.Plane.Induction.AlignedClassGrade
 import FLatticePaper.Plane.Induction.ConjFreeRoot
 import FLatticePaper.Plane.Induction.EvenWindow
 import FLatticePaper.Plane.Induction.NeighbourDrop
