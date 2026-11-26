@@ -983,5 +983,6 @@ import FLatticePaper.Plane.Induction.PairClass
 import FLatticePaper.Plane.Induction.TopSquare
 import FLatticePaper.Plane.Induction.TopStrictDischarge
 import FLatticePaper.Plane.Induction.ColourPacket
+import FLatticePaper.Plane.Induction.PsiSign
 
 /-! Root import for the corrected F-lattice paper. -/
