@@ -785,6 +785,7 @@ import FLatticePaper.Plane.Induction.RouteRows
 import FLatticePaper.Plane.Induction.FreeNonfree
 import FLatticePaper.Plane.Induction.RouteH1Field
 import FLatticePaper.Plane.Induction.VGradeBounds
+import FLatticePaper.Plane.Induction.V3Last
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame
 import FLatticePaper.Plane.Induction.BaseMembership
