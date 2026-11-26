@@ -1,5 +1,6 @@
 import FLatticePaper.Plane.Induction.CollarCReflect
 import FLatticePaper.Plane.Induction.CollarSquare
+import FLatticePaper.Plane.Induction.TieChainStep
 
 /-! # The collar `hsq` at a tie (`Ψ c = 0`), from the reflected parent square
 
@@ -55,9 +56,11 @@ an `A`-chain from `K − x` to `K − y` (each step is at a tie, so the tie agre
 theorem transGen_reflect_tie {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE : StrongEstimates (conjWord word))
     {seed : Site → Site → Prop}
     (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed (frameAt word).eps)
-    (hagree : ∀ x, sheetPsi word x = 0 → ∀ y,
+    (hagreeM : ∀ x, sheetPsi word x = 0 → laplacian (MW word) x = 0 → ∀ y,
       sheetPolicyA P.toOldPolicyWitness.toOldPolicyData (frameAt word).sheetShift x y ↔
         sheetPolicyC P.toOldPolicyWitness.toOldPolicyData (frameAt word).sheetShift (frameAt word).centre x y)
+    (hEdgeS : ∀ c i, sheetPolicyA P.toOldPolicyWitness.toOldPolicyData (frameAt word).sheetShift c i →
+      i = incomingNeg c ∨ i = incomingPos c)
     {x y : Site}
     (hxy : Relation.TransGen (sheetPolicyA P.toOldPolicyWitness.toOldPolicyData (frameAt word).sheetShift) x y)
     (hx : sheetPsi word x = 0) (hy : sheetPsi word y = 0) :
@@ -67,7 +70,8 @@ theorem transGen_reflect_tie {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.thr
   induction hxy with
   | single h1 =>
     intro hy
-    exact Relation.TransGen.single ((hagree _ hx _).mp h1)
+    exact Relation.TransGen.single (FLatticePaper.TieChainStep.tie_step_C hw hSE P.toOldPolicyWitness.toOldPolicyData
+      (FLatticePaper.Induction.sheetExchange_of_packet hw hSE.packet) (frameAt word).evenSite_centre hEdgeS hagreeM hx hy h1)
   | tail hab hbc ih =>
     intro hy
     rename_i b z
@@ -75,7 +79,8 @@ theorem transGen_reflect_tie {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.thr
       have h1 := psi_mono_chain hw hSE P.toOldPolicyWitness.toOldPolicyData hab
       have h2 := psi_mono hw hSE P.toOldPolicyWitness.toOldPolicyData hbc
       omega
-    exact Relation.TransGen.tail (ih hb0) ((hagree _ hb0 _).mp hbc)
+    exact Relation.TransGen.tail (ih hb0) (FLatticePaper.TieChainStep.tie_step_C hw hSE P.toOldPolicyWitness.toOldPolicyData
+      (FLatticePaper.Induction.sheetExchange_of_packet hw hSE.packet) (frameAt word).evenSite_centre hEdgeS hagreeM hb0 hy hbc)
 
 /-- **The collar `hsq` at a tie (`Ψ c = 0`, `c` white)**: the reflected parent square at `K − c` gives the square at `c`, with the tie
 agreement `hagree` as the named premise (the common arrow of a white tie). -/
@@ -88,9 +93,11 @@ theorem hsq_C_collar_tie {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) 
     (hfree : ∀ c : Site, 0 ≤ sheetPsi word c → laplacian (MW word) c = 0 →
       ¬ Nonfree (frameAt (conjWord word)) (zTurn (c - (frameAt word).sheetShift)) →
       ParentSquareOut (standardField (conjWord word)) P.retained (zTurn (c - (frameAt word).sheetShift)))
-    (hagree : ∀ x, sheetPsi word x = 0 → ∀ y,
+    (hagreeM : ∀ x, sheetPsi word x = 0 → laplacian (MW word) x = 0 → ∀ y,
       sheetPolicyA P.toOldPolicyWitness.toOldPolicyData (frameAt word).sheetShift x y ↔
         sheetPolicyC P.toOldPolicyWitness.toOldPolicyData (frameAt word).sheetShift (frameAt word).centre x y)
+    (hEdgeS : ∀ c i, sheetPolicyA P.toOldPolicyWitness.toOldPolicyData (frameAt word).sheetShift c i →
+      i = incomingNeg c ∨ i = incomingPos c)
     {c : Site} (hcS : StrictInterior (frameAt word).child.num (frameAt word).child.den c)
     (hc0 : sheetPsi word c = 0) (hwhite : laplacian (MW word) c = 0)
     {q0 q1 q2 o : Site} {qa qb : ℤ}
@@ -170,7 +177,7 @@ theorem hsq_C_collar_tie {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) 
     exact (strict_reflect_centre (frameAt word) c').mp hS
   · have hsoC : sheetOut P (frameAt word).sheetShift (frameAt word).centre (sheetPsi word) c =
         (frameAt word).centre - o' := by
-      rw [sheetOut_tie_eq P hc0 (hagree c hc0)]
+      rw [sheetOut_tie_eq P hc0 (hagreeM c hc0 hwhite)]
       have h := pointerOf_sheetC_reflect P.toOldPolicyWitness.toOldPolicyData (frameAt word).sheetShift
         (frameAt word).centre hK ((frameAt word).centre - c) o' hoin hRo hun
       rw [sub_sub_cancel] at h
@@ -213,17 +220,17 @@ theorem hsq_C_collar_tie {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) 
       Relation.TransGen.single hR2
     rcases hcov ((frameAt word).centre - x) hxS hne' with e | e | e
     · have hx' : x = (frameAt word).centre - p0 := by rw [← e, sub_sub_cancel]
-      have T0' := transGen_reflect_tie hw hSE P hagree T0 hp0e hr0
+      have T0' := transGen_reflect_tie hw hSE P hagreeM hEdgeS T0 hp0e hr0
       rw [sub_sub_cancel] at T0'
       rw [hx', hph]
       exact ⟨⟨fun _ => by rw [psi_reflect hw hSE p0]; omega, fun h => absurd hc0 h⟩, T0'⟩
     · have hx' : x = (frameAt word).centre - p1 := by rw [← e, sub_sub_cancel]
-      have T1' := transGen_reflect_tie hw hSE P hagree T1 hp1e hr0
+      have T1' := transGen_reflect_tie hw hSE P hagreeM hEdgeS T1 hp1e hr0
       rw [sub_sub_cancel] at T1'
       rw [hx', hph]
       exact ⟨⟨fun _ => by rw [psi_reflect hw hSE p1]; omega, fun h => absurd hc0 h⟩, T1'⟩
     · have hx' : x = (frameAt word).centre - p2 := by rw [← e, sub_sub_cancel]
-      have T2' := transGen_reflect_tie hw hSE P hagree T2 hp2e hr0
+      have T2' := transGen_reflect_tie hw hSE P hagreeM hEdgeS T2 hp2e hr0
       rw [sub_sub_cancel] at T2'
       rw [hx', hph]
       exact ⟨⟨fun _ => by rw [psi_reflect hw hSE p2]; omega, fun h => absurd hc0 h⟩, T2'⟩
@@ -251,9 +258,11 @@ theorem hsq_C_collar_le {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (
     (hfree : ∀ c : Site, 0 ≤ sheetPsi word c → laplacian (MW word) c = 0 →
       ¬ Nonfree (frameAt (conjWord word)) (zTurn (c - (frameAt word).sheetShift)) →
       ParentSquareOut (standardField (conjWord word)) P.retained (zTurn (c - (frameAt word).sheetShift)))
-    (hagree : ∀ x, sheetPsi word x = 0 → ∀ y,
+    (hagreeM : ∀ x, sheetPsi word x = 0 → laplacian (MW word) x = 0 → ∀ y,
       sheetPolicyA P.toOldPolicyWitness.toOldPolicyData (frameAt word).sheetShift x y ↔
         sheetPolicyC P.toOldPolicyWitness.toOldPolicyData (frameAt word).sheetShift (frameAt word).centre x y)
+    (hEdgeS : ∀ c i, sheetPolicyA P.toOldPolicyWitness.toOldPolicyData (frameAt word).sheetShift c i →
+      i = incomingNeg c ∨ i = incomingPos c)
     {c : Site} (hcS : StrictInterior (frameAt word).child.num (frameAt word).child.den c)
     (hc0 : sheetPsi word c ≤ 0) (hwhite : sheetPsi word c = 0 → laplacian (MW word) c = 0)
     {q0 q1 q2 o : Site} {qa qb : ℤ}
@@ -268,6 +277,6 @@ theorem hsq_C_collar_le {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (
     HsqAt word P c := by
   rcases lt_or_eq_of_le hc0 with h | h
   · exact hsq_C_collar hw hSE P hs hW1 hfree hcS h hpsq hstrict0 hstrict1 hstrict2
-  · exact hsq_C_collar_tie hw hSE P hs hW1 hfree hagree hcS h (hwhite h) hpsq hstrict0 hstrict1 hstrict2
+  · exact hsq_C_collar_tie hw hSE P hs hW1 hfree hagreeM hEdgeS hcS h (hwhite h) hpsq hstrict0 hstrict1 hstrict2
 
 end FLatticePaper.CollarTie

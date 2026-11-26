@@ -269,7 +269,7 @@ theorem psquare_sub_span {frame : ChildFrame} {G : Field} {R : Site → Site →
 def TieAgreeHyp (word : Word) {seed : Site → Site → Prop}
     (P : FLatticePaper.W1Phase.OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) seed
       (frameAt word).eps) : Prop :=
-  ∀ x : Site, sheetPsi word x = 0 → ∀ y : Site,
+  ∀ x : Site, sheetPsi word x = 0 → laplacian (MW word) x = 0 → ∀ y : Site,
     FLatticePaper.Induction.sheetPolicyA P.toOldPolicyWitness.toOldPolicyData (frameAt word).sheetShift x y ↔
       FLatticePaper.Induction.sheetPolicyC P.toOldPolicyWitness.toOldPolicyData (frameAt word).sheetShift
         (frameAt word).centre x y
@@ -407,7 +407,10 @@ theorem hC_tie {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) (hSE : Str
     · exact Or.inr (FLatticePaper.FaceReflect.oppositeWit_alignedWit (frameAt word) h)
   obtain ⟨q0, q1, q2, o, qa, qb, hPS, h0, h1, h2⟩ :=
     collar_psquare_A hw hSE P hs hW1 G hW hTop hRow hcS' hM' hψ' hcoll' hWit'
-  exact FLatticePaper.CollarTie.hsq_C_collar_le hw hSE P hs hW1 hfree hagree hcS (le_of_eq hψ)
+  have hPE : ∀ c i, P.retained c i → Edge i c := fun c i h =>
+    (G.game (frameAt word).eps (frameAt word).eps_unit).policyEdge c i (by rw [← hW]; exact h)
+  have hEdgeS := FLatticePaper.TieChainStep.sheetEdge_of_parent P.toOldPolicyWitness.toOldPolicyData hPE
+  exact FLatticePaper.CollarTie.hsq_C_collar_le hw hSE P hs hW1 hfree hagree hEdgeS hcS (le_of_eq hψ)
     (fun _ => hM) hPS h0 h1 h2
 
 /-- **The collar `HsqAt` at the centres with `Ψ c ≥ 0`**: the explicit parent square (`collar_psquare_A`) and `hsq_collar_of_psquare`

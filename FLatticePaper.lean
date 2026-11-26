@@ -733,6 +733,9 @@ import FLatticePaper.StepHeadline
 import FLatticePaper.Plane.Induction.StrongCoreDef
 import FLatticePaper.Plane.Induction.StrongCore
 import FLatticePaper.Plane.Induction.GamesAssembly
+import FLatticePaper.Plane.Induction.TieSquare
+import FLatticePaper.Plane.Induction.TieRankBound
+import FLatticePaper.Plane.Induction.TieChainStep
 import FLatticePaper.Plane.Induction.PrivateSquare
 import FLatticePaper.Plane.Induction.OldPolicyBuild
 import FLatticePaper.Plane.Induction.WordVPattern
@@ -1041,5 +1044,7 @@ import FLatticePaper.Plane.Induction.TopSquare
 import FLatticePaper.Plane.Induction.TopStrictDischarge
 import FLatticePaper.Plane.Induction.ColourPacket
 import FLatticePaper.Plane.Induction.PsiSign
+import FLatticePaper.Plane.Induction.PsiPacket
+import FLatticePaper.Plane.Induction.TieDeficit
 
 /-! Root import for the corrected F-lattice paper. -/
