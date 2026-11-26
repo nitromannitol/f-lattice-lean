@@ -285,6 +285,7 @@ def TopStrictHyp (word : Word) (G : Field)
     laplacian (MW word) c = 0 → 0 ≤ sheetPsi word c →
     (FLatticePaper.FaceWitness.BottomWit (frameAt word) c ∨ FLatticePaper.FaceWitness.AlignedWit (frameAt word) c) →
     ρ = zTurn (c - lvAt) + v →
+    v ∈ (frameAt (conjWord word)).child.modifiedDeck.span →
     FLatticePaper.W1.StrictInterior (frameAt (conjWord word)).child.num
       (frameAt (conjWord word)).child.den ρ →
     (∀ c' ∈ squareCorners a b, FLatticePaper.W1.StrictInterior (frameAt (conjWord word)).child.num
@@ -361,7 +362,7 @@ theorem collar_psquare_A {word : Word} (hw : ∃ x ∈ word, x ≠ Digit.three) 
         hforcedF
       have hPS' := psquare_sub_span hP hdeck hv hPS
       rw [add_sub_cancel_right] at hPS'
-      have hstr := hTop c v (zTurn (c - (frameAt word).sheetShift) + v) o a b inside hcS hM hc0 hWit rfl hSI hR hc hw' ho hout hin hforced
+      have hstr := hTop c v (zTurn (c - (frameAt word).sheetShift) + v) o a b inside hcS hM hc0 hWit rfl hv hSI hR hc hw' ho hout hin hforced
       exact ⟨q0 - v, q1 - v, q2 - v, o - v, a - v.1, b - v.2, hPS', hstr q0 hPS.2.1, hstr q1 hPS.2.2.1,
         hstr q2 hPS.2.2.2.1⟩
   · exact hRow c hcS hM hc0 hcoll hnf
