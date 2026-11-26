@@ -733,6 +733,9 @@ import FLatticePaper.StepHeadline
 import FLatticePaper.Plane.Induction.StrongCoreDef
 import FLatticePaper.Plane.Induction.StrongCore
 import FLatticePaper.Plane.Induction.GamesAssembly
+import FLatticePaper.Plane.Induction.PsiPacket
+import FLatticePaper.Plane.Induction.OppMain
+import FLatticePaper.Plane.Induction.OppCore
 import FLatticePaper.Plane.Induction.VZeroS
 import FLatticePaper.Plane.Induction.V3HardNW
 import FLatticePaper.Plane.Induction.HtopCross
