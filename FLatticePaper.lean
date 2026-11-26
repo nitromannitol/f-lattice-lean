@@ -749,6 +749,8 @@ import FLatticePaper.Plane.Induction.InternalReturns
 import FLatticePaper.Plane.Induction.FreeRoutes
 import FLatticePaper.Plane.Induction.RouteRegion
 import FLatticePaper.Plane.Induction.C2Axial
+import FLatticePaper.Plane.Induction.VGap
+import FLatticePaper.Plane.Induction.V2Arrows
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame
 import FLatticePaper.Plane.Induction.BaseMembership
