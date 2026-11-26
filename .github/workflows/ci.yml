@@ -52,8 +52,9 @@ jobs:
       # The memory sampler runs in the background of this step and prints the summed resident memory of the lean processes
       # every 30 seconds into the step's own log, so the samples survive a runner kill.
       - name: Build the library
-        # A step limit below the apparent hour: a slow build ends as a timed-out step, so the save step still runs.
-        timeout-minutes: 40
+        # A step limit below the job limit: a slow build ends as a timed-out step, so the save step still runs. The slowest
+        # modules take 10 to 20 minutes each on a fast machine, so the limit leaves room for several of them in sequence.
+        timeout-minutes: 200
         shell: bash
         env:
           LEAN_NUM_THREADS: "2"
