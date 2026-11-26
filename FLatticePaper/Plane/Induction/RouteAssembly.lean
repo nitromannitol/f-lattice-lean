@@ -13,12 +13,13 @@ import FLatticePaper.Plane.Induction.RouteRows
 import FLatticePaper.Plane.Induction.EndpointStrips
 import FLatticePaper.Plane.Induction.HMidStrict
 import FLatticePaper.Plane.Induction.V3HardNW
+import FLatticePaper.Plane.Induction.V3ReflPlus
+import FLatticePaper.Plane.Induction.StripColours
 
 /-! # The route genuine structure from its parts (assembly with explicit open hypotheses)
 
 `RouteGenuine C` is assembled from the field lemmas. Three inputs are explicit hypotheses, each an open claim:
 * `hQ37` : the middle target of the `h3` second arrow is white when `t(z) ≤ d` (the claim filed as Q37);
-* `hv3hard` : the middle arrow of the `v3` row for `d < 2n` (the rotated fan, in progress).
 The `d ≥ 3n − 2` and `d ≥ 2n` cases of the middles are proved from the north fan and the easy-regime lemmas. -/
 
 namespace FLatticePaper.RouteAssembly
@@ -56,10 +57,7 @@ theorem routeGenuine_of_parts {frame : ChildFrame} {G : Field} {seed : Site → 
     (hprice : ∀ z ∈ frame.closedPolygon, frame.cutPrice - 1 ≤ frame.price G z ∧ frame.price G z ≤ frame.cutPrice)
     (hdrU : ∀ z, frame.price G (z + frame.child.modifiedDeck.kernel) = frame.price G z - 1)
     (hdrV : ∀ z, frame.price G (z + frame.child.modifiedDeck.transverse) = frame.price G z)
-    (hperK : ∀ z : Site, G (z + (frame.child.den, frame.child.num)) = G z)
-    (hv3plus : η = 1 → frame.child.den < 2 * frame.child.num → ∀ z ∈ frame.freeV, ¬ (η = -1 ∧ z = (0, 1)) →
-      laplacian G z = 0 → ¬ EvenSite z → (z.1, z.2 - -η) ∈ frame.freeV →
-      (laplacian G (z.1 - -η, z.2 - -η) = -1 ∨ C.policy (z.1 - -η, z.2 - -η) (z.1 - -η, z.2))) :
+    (hperK : ∀ z : Site, G (z + (frame.child.den, frame.child.num)) = G z) :
     RouteGenuine C := by
   have hS : frame.HasStrips G := hP.strips
   have hK : frame.child.modifiedDeck.combine 1 0 = (frame.child.den, frame.child.num) := combine_one_zero frame
@@ -119,7 +117,24 @@ theorem routeGenuine_of_parts {frame : ChildFrame} {G : Field} {seed : Site → 
           have h := v3_arrow_minus_easy C hW1 hP hbin hdeck hS hlow hup hd2 hz hodd hnb
           simpa using h
       · rcases hη with rfl | rfl
-        · exact hv3plus rfl (by omega) z hz hne hw hodd hq
+        · by_cases hvl : (z.1, z.2 - -1) = frame.vLast
+          · left
+            have h := FLatticePaper.StripColours.lap_vLast_east frame hS hP.periods
+            have e1 : z.1 - -1 = frame.vLast.1 + 1 := by
+              have := congrArg Prod.fst hvl
+              simp only at this
+              omega
+            have e2 : z.2 - -1 = frame.vLast.2 := by
+              have := congrArg Prod.snd hvl
+              simp only at this
+              omega
+            rw [e1, e2]
+            exact h
+          · have hnb : (z.1, z.2 + 1) ∈ frame.freeV := by simpa using hq
+            have hnbV : (z.1, z.2 + 1) ≠ frame.vLast := by simpa using hvl
+            have h := FLatticePaper.V3ReflPlus.v3_mid_plus_hard C hP hprice hdrU hdrV hW1 hperK hIsym hbin
+              (by omega) hz hodd hnb hnbV
+            simpa using h
         · have hne' : z ≠ (0, 1) := fun h => hne ⟨rfl, h⟩
           have h := FLatticePaper.V3HardNW.v3_mid_minus_hard C hP hprice hdrU hdrV hW1 hperK hbin
             (by omega) hz hodd hq hne'
