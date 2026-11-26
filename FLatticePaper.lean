@@ -697,6 +697,7 @@ import FLatticePaper.Plane.Induction.HPaidSet
 import FLatticePaper.Plane.Induction.HPaidInputs
 import FLatticePaper.Plane.Induction.HChain
 import FLatticePaper.Plane.Induction.VChain
+import FLatticePaper.Plane.Induction.RowAt
 import FLatticePaper.TraceHeadline
 import FLatticePaper.FlatPlusHeadline
 import FLatticePaper.Plane.Induction.TwosDeckEta
