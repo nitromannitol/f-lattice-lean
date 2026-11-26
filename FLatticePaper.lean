@@ -730,6 +730,7 @@ import FLatticePaper.Plane.Induction.TwosMinusTile
 import FLatticePaper.Plane.Induction.TwosFlatMinus
 import FLatticePaper.FlatMinusHeadline
 import FLatticePaper.StepHeadline
+import FLatticePaper.OdometersInputs
 import FLatticePaper.Plane.Induction.StrongCoreDef
 import FLatticePaper.Plane.Induction.StrongCore
 import FLatticePaper.Plane.Induction.GamesAssembly
