@@ -712,6 +712,8 @@ import FLatticePaper.Plane.Induction.CentralForced
 import FLatticePaper.Plane.Induction.WestEast
 import FLatticePaper.Plane.Induction.HardEast
 import FLatticePaper.Plane.Induction.M2White
+import FLatticePaper.Plane.Induction.StripColours
+import FLatticePaper.Plane.Induction.HderivClosed
 import FLatticePaper.Plane.Induction.QueryCP
 import FLatticePaper.Plane.Induction.QueryCPFrame
 import FLatticePaper.Plane.Induction.BaseMembership
