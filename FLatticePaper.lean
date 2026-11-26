@@ -686,6 +686,7 @@ import FLatticePaper.Plane.Induction.FreeCutExist
 import FLatticePaper.Plane.Induction.VLastOfT
 import FLatticePaper.Plane.Induction.VOddLower
 import FLatticePaper.Plane.Induction.FreeVCutExist
+import FLatticePaper.Plane.Induction.FreeCutPred
 import FLatticePaper.TraceHeadline
 import FLatticePaper.FlatPlusHeadline
 import FLatticePaper.Plane.Induction.TwosDeckEta
