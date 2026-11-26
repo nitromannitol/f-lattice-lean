@@ -48,16 +48,17 @@ jobs:
           free -h
 
       # Lake 4.32 has no job flag; LEAN_NUM_THREADS caps its concurrent elaborations (measured: 2 threads gives a peak of
-      # 4 concurrent lean processes, against 10 with the default), which bounds the peak memory on the hosted runner.
+      # 4 concurrent lean processes, against 10 with the default), which bounds the peak memory on the hosted runner. With
+      # 2 threads the summed resident memory stayed at 15 GB and the build made no progress for two hours (swap), so 1.
       # The memory sampler runs in the background of this step and prints the summed resident memory of the lean processes
       # every 30 seconds into the step's own log, so the samples survive a runner kill.
       - name: Build the library
-        # A step limit below the job limit: a slow build ends as a timed-out step, so the save step still runs. The slowest
-        # modules take 10 to 20 minutes each on a fast machine, so the limit leaves room for several of them in sequence.
-        timeout-minutes: 200
+        # A step limit below the point where the hosted runner has been terminated (about two hours into the step, which
+        # also skips the save step): a slow build ends as a timed-out step, so the save step still runs.
+        timeout-minutes: 100
         shell: bash
         env:
-          LEAN_NUM_THREADS: "2"
+          LEAN_NUM_THREADS: "1"
         run: |
           set -o pipefail
           ( while true; do
