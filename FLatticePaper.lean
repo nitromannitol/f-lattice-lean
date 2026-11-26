@@ -704,6 +704,10 @@ import FLatticePaper.Plane.Induction.VChain
 import FLatticePaper.Plane.Induction.RowAt
 import FLatticePaper.Plane.Induction.H0CoreRecurrent
 import FLatticePaper.Plane.Induction.PairForcing
+import FLatticePaper.Plane.Induction.SlicePassage
+import FLatticePaper.Plane.Induction.BoundaryPair
+import FLatticePaper.Plane.Induction.WordBoundary
+import FLatticePaper.Plane.Induction.ListPrefix
 import FLatticePaper.TraceHeadline
 import FLatticePaper.FlatPlusHeadline
 import FLatticePaper.Plane.Induction.TwosDeckEta
