@@ -15,7 +15,7 @@ open FLatticePaper FLatticePaper.Induction FLatticePaper.AuxRankQ1 FLatticePaper
 /-- **The plus `V_{-1}` is refuted by `V_{-2}`.** -/
 theorem refuted_Vm1_plus (frame : ChildFrame) (F : Field) {E C : Site → Prop}
     (hw : laplacian F ((1 : ℤ), (-1 : ℤ)) = 0)
-    (hp : ∀ i, FreePolicy.FreePresc frame 1 ((1 : ℤ), (-1 : ℤ)) i ↔ i = ((2 : ℤ), (-1 : ℤ)))
+    (hpos : FreePolicy.FreePresc frame 1 ((1 : ℤ), (-1 : ℤ)) ((2 : ℤ), (-1 : ℤ)))
     (hy : laplacian F ((2 : ℤ), (-1 : ℤ)) = -1)
     (hz : laplacian F ((2 : ℤ), (-2 : ℤ)) = 0)
     (hnfz : ¬ FreeClosure.freeClosure frame ((2 : ℤ), (-2 : ℤ)))
@@ -46,7 +46,6 @@ theorem refuted_Vm1_plus (frame : ChildFrame) (F : Field) {E C : Site → Prop}
     · rw [hn]; exact hzref
     · rw [hpo]; exact hwref
   -- the free white V_{-1} with its free prescription (2,-1)
-  have hpos : FreePolicy.FreePresc frame 1 ((1 : ℤ), (-1 : ℤ)) ((2 : ℤ), (-1 : ℤ)) := (hp _).mpr rfl
   have hperm : permitsQ1 frame F 1 ((1 : ℤ), (-1 : ℤ)) ((2 : ℤ), (-1 : ℤ)) :=
     Or.inr ⟨hw, Or.inl ⟨PlusRowEndpoint.freeClosure_of_freePresc frame hpos, hpos⟩⟩
   exact RefuteTree.Refuted.white hw hperm hyref
