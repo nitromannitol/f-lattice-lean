@@ -246,7 +246,9 @@ def IsWeakAltFamily (S : WeakData) (altBdry : Option Word → Bool → Finset GI
 
 /-- The alternate base condition of the base words (`prop:base_cases`, the alternate tiles and values): the same pairs of
 tiles as `PaperBaseCond`, with the alternate tiles `paperStairAltTile` and the alternate values; the `N`-tiles are read at
-`x + (0, 1)`. Membership is in the paper tiles (as sets). -/
+`x + (0, 1)`. Membership is in the paper tiles (as sets). Each alternate is placed with `c(T̂) = 0` (line 3694: the lower-left
+vertex, except `c(T̂_{1/d}) = (0, 0)` for `paperStairAltTile`): the odd alternate of `3^k`, `paperLadderAltTile`, has its
+lower-left vertex at `(-1, -1)`, so it is read at `x - (1, 1)`. -/
 def PaperAltBaseCond (w : Word) (O E : PartialOdometer) : Prop :=
   (w = [] →
     (∀ x : GInt, x ∈ O.dom ↔ x + (0, 1) ∈ paperNearStairAltTile 3) ∧
@@ -254,8 +256,8 @@ def PaperAltBaseCond (w : Word) (O E : PartialOdometer) : Prop :=
     (∀ x : GInt, x ∈ E.dom ↔ x ∈ paperStairAltTile 3) ∧
       (∀ x ∈ E.dom, E.val x = paperStairAltValue 3 x)) ∧
   (∀ k : ℕ, 1 ≤ k → w = List.replicate k Digit.three →
-    (∀ x : GInt, x ∈ O.dom ↔ x ∈ paperLadderAltTile (2 * (k : ℤ) + 2)) ∧
-      (∀ x ∈ O.dom, O.val x = paperLadderAltValue (2 * (k : ℤ) + 2) x) ∧
+    (∀ x : GInt, x ∈ O.dom ↔ x - (1, 1) ∈ paperLadderAltTile (2 * (k : ℤ) + 2)) ∧
+      (∀ x ∈ O.dom, O.val x = paperLadderAltValue (2 * (k : ℤ) + 2) (x - (1, 1))) ∧
     (∀ x : GInt, x ∈ E.dom ↔ x ∈ paperStairAltTile (2 * (k : ℤ) + 3)) ∧
       (∀ x ∈ E.dom, E.val x = paperStairAltValue (2 * (k : ℤ) + 3) x)) ∧
   (∀ k : ℕ, 1 ≤ k → w = List.replicate k Digit.two →
