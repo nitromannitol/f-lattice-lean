@@ -443,6 +443,7 @@ import FLatticePaper.Tiles.StringCover
 import FLatticePaper.Tiles.HorizontalSides
 import FLatticePaper.Tiles.ReflectedCover
 import FLatticePaper.Tiles.HorizontalTop
+import FLatticePaper.Tiles.VerticalCover
 import FLatticePaper.Tiles.OverlapSides
 import FLatticePaper.Tiles.VerticalZeroOne
 import FLatticePaper.Tiles.VerticalReflect
