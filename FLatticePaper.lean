@@ -734,6 +734,9 @@ import FLatticePaper.OdometersInputs
 import FLatticePaper.Plane.Induction.StrongCoreDef
 import FLatticePaper.Plane.Induction.StrongCore
 import FLatticePaper.Plane.Induction.GamesAssembly
+import FLatticePaper.Plane.Induction.HardRank4
+import FLatticePaper.Plane.Induction.HardHGap
+import FLatticePaper.Plane.Induction.HardH
 import FLatticePaper.Plane.Induction.CapRayWide
 import FLatticePaper.Plane.Induction.RowVTailRow
 import FLatticePaper.Plane.Induction.RowVTail
