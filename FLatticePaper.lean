@@ -82,6 +82,12 @@ import FLatticePaper.Tiles.BaseCasePseudoSquares
 import FLatticePaper.Tiles.NearOneRotation
 import FLatticePaper.Tiles.NearOneAlmostTiling
 import FLatticePaper.Tiles.CommonExtension
+import FLatticePaper.Tiles.CommonExtensionClosedWalks
+import FLatticePaper.Tiles.CommonExtensionFamily
+import FLatticePaper.Tiles.StandardCornerCells
+import FLatticePaper.Tiles.PointNonNeighbour
+import FLatticePaper.Tiles.CommonExtensionStandard
+import FLatticePaper.Tiles.CommonExtensionWitness
 import FLatticePaper.Tiles.BaseCaseTiling
 import FLatticePaper.Tiles.BaseCaseAlmostTiling
 import FLatticePaper.Tiles.BaseCaseDecided
@@ -398,7 +404,6 @@ import FLatticePaper.Tiles.CornerPositions
 import FLatticePaper.Tiles.TexVPositions
 import FLatticePaper.Tiles.CellDerivation
 import FLatticePaper.Tiles.CellRegisters
-import FLatticePaper.Tiles.StandardCornerCells
 import FLatticePaper.Tiles.SiteBaseDischarge
 import FLatticePaper.Tiles.SitePairScope
 import FLatticePaper.Tiles.SiteCell
