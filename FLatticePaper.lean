@@ -88,6 +88,11 @@ import FLatticePaper.Tiles.StandardCornerCells
 import FLatticePaper.Tiles.PointNonNeighbour
 import FLatticePaper.Tiles.CommonExtensionStandard
 import FLatticePaper.Tiles.CommonExtensionWitness
+import FLatticePaper.Tiles.OverlapStrings
+import FLatticePaper.Tiles.PTUniqueness
+import FLatticePaper.Tiles.TileListBridge
+import FLatticePaper.Tiles.HKappaAssembly
+import FLatticePaper.Tiles.CornerAlpha
 import FLatticePaper.Tiles.BaseCaseTiling
 import FLatticePaper.Tiles.BaseCaseAlmostTiling
 import FLatticePaper.Tiles.BaseCaseDecided

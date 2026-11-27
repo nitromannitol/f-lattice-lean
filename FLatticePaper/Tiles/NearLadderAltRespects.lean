@@ -81,45 +81,71 @@ theorem nla_hStringAt (m : ℕ) (c : GInt) :
   rw [hr, List.map_cons, List.cons_append, List.zip_cons_cons]
   simp [List.zip_append, nla_zip_rep, List.map_map, Function.comp_def]
 
-theorem nla_rev_qq (w : BinaryWord) (c : GInt) :
-    hRevStringAt (Letter.q :: Letter.q :: w) c =
-      (ZTile.one, c) :: hRevStringAt (Letter.q :: w) (c + ((1 : ℤ), (1 : ℤ))) := by
-  simp [hRevStringAt, hRevOffset, letterZTile, List.scanl_cons]
+/-! ### Reversed runs of the enlarged tile sequence
 
-theorem nla_rev_pq (w : BinaryWord) (c : GInt) :
-    hRevStringAt (Letter.p :: Letter.q :: w) c =
-      (ZTile.zero, c) :: hRevStringAt (Letter.q :: w) (c + ((2 : ℤ), (1 : ℤ))) := by
-  simp [hRevStringAt, hRevOffset, letterZTile, List.scanl_cons]
+The enlargement applies in the letter order of the reversed word (surgical lines 1293-1300): the second `T_{1/1}` of each
+consecutive `q q` is `T^d_{1/1}`. -/
 
-/-- The reversed run `q^{n+1}` at `c`: one tiles at `c + (j, j)`. -/
-theorem nla_rev_qlist (n : ℕ) (c : GInt) :
-    hRevStringAt (List.replicate (n + 1) Letter.q) c =
-      (List.range (n + 1)).map fun j : ℕ => (ZTile.one, (c.1 + (j : ℤ), c.2 + (j : ℤ))) := by
-  induction n generalizing c with
-  | zero => simp [hRevStringAt, letterZTile]
-  | succ n ih =>
-    have e : List.replicate (n + 1 + 1) Letter.q = Letter.q :: Letter.q :: List.replicate n Letter.q := rfl
-    have e2 : Letter.q :: List.replicate n Letter.q = List.replicate (n + 1) Letter.q := rfl
-    have hr : List.range (n + 1 + 1) = 0 :: List.map Nat.succ (List.range (n + 1)) := by
-      rw [List.range_succ_eq_map]
-    rw [e, nla_rev_qq, e2, ih, hr, List.map_cons, List.map_map, List.cons_eq_cons]
-    refine ⟨by simp, ?_⟩
-    apply List.map_congr_left
-    intro j _
-    simp only [Function.comp_apply, Nat.succ_eq_add_one, Prod.mk.injEq, true_and, Prod.fst_add, Prod.snd_add]
-    push_cast
-    ring_nf
-    simp
+theorem hRev_p_cons_q (L : BinaryWord) (c : GInt) :
+    hRevStringAt (Letter.p :: Letter.q :: L) c =
+      (ZTile.zero, c) :: hRevStringAt (Letter.q :: L) (c + ((2 : ℤ), (1 : ℤ))) := by
+  have ht : tileSeq (Letter.p :: Letter.q :: L) = ZTile.zero :: tileSeq (Letter.q :: L) := by
+    unfold tileSeq
+    rw [tileSeqAux_none_eq (Letter.q :: L)]
+    rfl
+  unfold hRevStringAt
+  rw [ht]
+  simp [hRevOffset, List.scanl_cons]
 
-/-- The reversed string `p q^{m+1}` at `c`: the zero tile at `c`, then one tiles at `c + (2 + j, 1 + j)`. -/
-theorem nla_rev_list (m : ℕ) (c : GInt) :
-    hRevStringAt (Letter.p :: List.replicate (m + 1) Letter.q) c =
-      (ZTile.zero, c) :: (List.range (m + 1)).map fun j : ℕ =>
-        (ZTile.one, (c.1 + 2 + (j : ℤ), c.2 + 1 + (j : ℤ))) := by
-  have e : Letter.p :: List.replicate (m + 1) Letter.q = Letter.p :: Letter.q :: List.replicate m Letter.q := rfl
-  have e2 : Letter.q :: List.replicate m Letter.q = List.replicate (m + 1) Letter.q := rfl
-  rw [e, nla_rev_pq, e2, nla_rev_qlist m]
-  simp
+/-- The first tile of a placed list becomes `oneD` (the enlargement of a `q` after a `q`). -/
+def hRevChangeHead : List (ZTile × GInt) → List (ZTile × GInt)
+  | [] => []
+  | (_, p) :: l => (ZTile.oneD, p) :: l
+
+theorem zip_oneD_eq (T : List ZTile) (c : GInt) (L : List GInt) :
+    (ZTile.oneD :: T).zip (List.scanl (· + ·) c L) =
+      hRevChangeHead ((ZTile.one :: T).zip (List.scanl (· + ·) c L)) := by
+  cases L with
+  | nil => simp [hRevChangeHead]
+  | cons b L' => simp [hRevChangeHead, List.scanl_cons]
+
+theorem hRev_qq (M : BinaryWord) (c : GInt) :
+    hRevStringAt (Letter.q :: Letter.q :: M) c =
+      (ZTile.one, c) :: hRevChangeHead (hRevStringAt (Letter.q :: M) (c + ((1 : ℤ), (1 : ℤ)))) := by
+  have ht : tileSeq (Letter.q :: Letter.q :: M) = ZTile.one :: ZTile.oneD :: tileSeqAux (some Letter.q) M := rfl
+  have ht2 : tileSeq (Letter.q :: M) = ZTile.one :: tileSeqAux (some Letter.q) M := rfl
+  have h11 : hRevOffset Letter.q Letter.q = ((1 : ℤ), (1 : ℤ)) := rfl
+  unfold hRevStringAt
+  rw [ht, ht2]
+  simp only [List.tail_cons, List.zip_cons_cons, List.map_cons, List.scanl_cons, h11]
+  congr 1
+  exact zip_oneD_eq _ _ _
+
+theorem hRev_run (m : ℕ) : ∀ c : GInt, hRevStringAt (List.replicate (m + 1) Letter.q) c =
+    (ZTile.one, c) :: (List.range m).map fun j : ℕ =>
+      (ZTile.oneD, (c.1 + ((j : ℤ) + 1), c.2 + ((j : ℤ) + 1))) := by
+  induction m with
+  | zero => intro c; simp [hRevStringAt, tileSeq, tileSeqAux]
+  | succ m ih =>
+    intro c
+    have e : List.replicate (m + 1 + 1) Letter.q = Letter.q :: Letter.q :: List.replicate m Letter.q := rfl
+    have e2 : Letter.q :: List.replicate m Letter.q = List.replicate (m + 1) Letter.q := rfl
+    rw [e, hRev_qq, e2, ih]
+    simp only [hRevChangeHead]
+    rw [List.range_succ_eq_map, List.map_cons, List.map_map, List.cons.injEq, List.cons.injEq]
+    refine ⟨rfl, ?_, ?_⟩
+    · refine Prod.ext rfl (Prod.ext ?_ ?_)
+      · show c.1 + 1 = c.1 + (((0 : ℕ) : ℤ) + 1)
+        omega
+      · show c.2 + 1 = c.2 + (((0 : ℕ) : ℤ) + 1)
+        omega
+    · congr 1
+      funext j
+      refine Prod.ext rfl (Prod.ext ?_ ?_)
+      · show c.1 + 1 + ((j : ℤ) + 1) = c.1 + (((j + 1 : ℕ) : ℤ) + 1)
+        omega
+      · show c.2 + 1 + ((j : ℤ) + 1) = c.2 + (((j + 1 : ℕ) : ℤ) + 1)
+        omega
 
 /-! ### The two families -/
 
@@ -131,6 +157,24 @@ def nlaFwd (k : ℕ) : PTFamily where
 
 /-- The reversed corner `(-2, 4k+2)` of the reversed string. -/
 def nlaRevC (k : ℕ) : GInt := (-2, 4 * (k : ℤ) + 2)
+
+theorem nla_hRev_eq (k : ℕ) : hRevStringAt (nlaWord k).reverse (nlaRevC k) =
+    (ZTile.zero, nlaRevC k) :: (ZTile.one, (((0 : ℕ) : ℤ), 4 * (k : ℤ) + 3 + ((0 : ℕ) : ℤ))) ::
+      (List.range (2 * k)).map fun j : ℕ => (ZTile.oneD, ((j : ℤ) + 1, 4 * (k : ℤ) + 4 + (j : ℤ))) := by
+  rw [nla_word_reverse]
+  have e : Letter.p :: List.replicate (2 * k + 1) Letter.q = Letter.p :: Letter.q :: List.replicate (2 * k) Letter.q :=
+    rfl
+  have e2 : Letter.q :: List.replicate (2 * k) Letter.q = List.replicate (2 * k + 1) Letter.q := rfl
+  rw [e, hRev_p_cons_q, e2, hRev_run (2 * k)]
+  have hc : nlaRevC k + ((2 : ℤ), (1 : ℤ)) = (((0 : ℕ) : ℤ), 4 * (k : ℤ) + 3 + ((0 : ℕ) : ℤ)) := by
+    unfold nlaRevC
+    apply Prod.ext <;> simp
+    ring
+  rw [hc]
+  congr 3
+  funext j
+  apply Prod.ext <;> simp
+  ring
 
 /-- The reversed family of `p q^{2k+1}` at `(-2,4k+2)`: the zero tile has affine factor `(2k+1, -(2k+2))`, the one tiles
 `(2k, -(2k+2))`, and every tile has constant `(2k+2)^2`. -/
@@ -165,22 +209,31 @@ theorem nlaFwd_tile_last (k : ℕ) :
   simp
   ring
 
+theorem nlaRev_ts_eq (k : ℕ) : (nlaRev k).ts = (ZTile.zero, nlaRevC k) ::
+    (ZTile.one, (((0 : ℕ) : ℤ), 4 * (k : ℤ) + 3 + ((0 : ℕ) : ℤ))) ::
+      (List.range (2 * k)).map fun j : ℕ => (ZTile.oneD, ((j : ℤ) + 1, 4 * (k : ℤ) + 4 + (j : ℤ))) :=
+  nla_hRev_eq k
+
 theorem nlaRev_n (k : ℕ) : (nlaRev k).n = 2 * k + 2 := by
-  simp [PTFamily.n, nlaRev, nlaWord, nla_rev_list, nlaRevC]
+  unfold PTFamily.n
+  rw [nlaRev_ts_eq]
+  simp
 
 theorem nlaRev_tile_zero (k : ℕ) : (nlaRev k).tile 0 = (ZTile.zero, nlaRevC k) := by
   unfold PTFamily.tile
-  show (hRevStringAt (nlaWord k).reverse (nlaRevC k)).getD 0 _ = _
-  rw [nla_word_reverse, nla_rev_list]
+  rw [nlaRev_ts_eq]
   simp
 
-theorem nlaRev_tile_succ (k j : ℕ) (hj : j < 2 * k + 1) :
-    (nlaRev k).tile (j + 1) = (ZTile.one, ((j : ℤ), 4 * (k : ℤ) + 3 + (j : ℤ))) := by
+theorem nlaRev_tile_one (k : ℕ) :
+    (nlaRev k).tile (0 + 1) = (ZTile.one, (((0 : ℕ) : ℤ), 4 * (k : ℤ) + 3 + ((0 : ℕ) : ℤ))) := by
   unfold PTFamily.tile
-  show (hRevStringAt (nlaWord k).reverse (nlaRevC k)).getD (j + 1) _ = _
-  rw [nla_word_reverse, nla_rev_list, List.getD_cons_succ, altStair_getD_map_range _ _ _ _ hj]
-  simp only [nlaRevC, Prod.mk.injEq, true_and]
-  constructor <;> ring
+  rw [nlaRev_ts_eq]
+  simp
+
+theorem nlaRev_tile_oneD (k j : ℕ) (hj : j < 2 * k) :
+    (nlaRev k).tile (j + 1 + 1) = (ZTile.oneD, ((j : ℤ) + 1, 4 * (k : ℤ) + 4 + (j : ℤ))) := by
+  unfold PTFamily.tile
+  rw [nlaRev_ts_eq, List.getD_cons_succ, List.getD_cons_succ, altStair_getD_map_range _ _ _ _ hj]
 
 /-! ### The point set `T̂_{q_1}` and its inside-tile clause -/
 
@@ -234,9 +287,9 @@ theorem nla_inside (k : ℕ) (hk : 1 ≤ k) :
       rw [mem_nlaTile]
       simp only [Prod.ext_iff]
       omega
-  · rw [nla_word_reverse, nla_rev_list] at htp
+  · rw [nla_hRev_eq] at htp
     simp only [List.mem_cons, List.mem_map, List.mem_range] at htp
-    rcases htp with rfl | ⟨j, hj, rfl⟩
+    rcases htp with rfl | rfl | ⟨j, hj, rfl⟩
     · dsimp only [nlaRevC] at hy
       rw [mem_shape_zero] at hy
       unfold zeroAt at hy
@@ -246,6 +299,11 @@ theorem nla_inside (k : ℕ) (hk : 1 ≤ k) :
     · dsimp only [nlaRevC] at hy
       rw [mem_shape_one] at hy
       unfold oneAt at hy
+      rw [mem_nlaTile]
+      simp only [Prod.ext_iff]
+      omega
+    · dsimp only at hy
+      rw [mem_shape_oneD] at hy
       rw [mem_nlaTile]
       simp only [Prod.ext_iff]
       omega
@@ -390,6 +448,28 @@ theorem nla_rev_value_one (k j : ℕ) (hk : 1 ≤ k) (hj : j < 2 * k + 1) (x : G
     generalize (k : ℤ) ^ 2 = Q <;> split_ifs <;>
       (try simp only [false_and, false_or] at *) <;> omega
 
+theorem nla_rev_value_oneD (k j : ℕ) (hk : 1 ≤ k) (hj : j < 2 * k) (x : GInt)
+    (hx : x ∈ (tileShape ZTile.oneD).map (· + ((j : ℤ) + 1, 4 * (k : ℤ) + 4 + (j : ℤ)))) :
+    paperNearLadderAltValue (2 * (k : ℤ) + 2) x =
+      zTileOdo ZTile.oneD (x - ((j : ℤ) + 1, 4 * (k : ℤ) + 4 + (j : ℤ))) + (2 * (k : ℤ)) * x.1 +
+        (-(2 * (k : ℤ) + 2)) * x.2 + (2 * (k : ℤ) + 2) * (2 * (k : ℤ) + 2) := by
+  rw [mem_shape_oneD] at hx
+  obtain ⟨x1, x2⟩ := x
+  simp only at hx ⊢
+  have hk' : (1 : ℤ) ≤ (k : ℤ) := by exact_mod_cast hk
+  have hj' : (j : ℤ) < 2 * (k : ℤ) := by exact_mod_cast hj
+  rw [nla_value_eq]
+  obtain ⟨s, rfl⟩ : ∃ s : ℤ, x1 = ((j : ℤ) + 1) + s := ⟨x1 - ((j : ℤ) + 1), by ring⟩
+  obtain ⟨t, rfl⟩ : ∃ t : ℤ, x2 = 4 * (k : ℤ) + 4 + (j : ℤ) + t := ⟨x2 - (4 * (k : ℤ) + 4 + (j : ℤ)), by ring⟩
+  have hs : s = -1 ∨ s = 0 ∨ s = 1 := by omega
+  have ht : t = -1 ∨ t = 0 ∨ t = 1 := by omega
+  rw [show 4 * (k : ℤ) + 4 + (j : ℤ) + t - (((j : ℤ) + 1) + s) = 2 * (2 * (k : ℤ) + 2) + (t - s - 1) by ring,
+    nla_sq_div4]
+  simp only [zTileOdo, oneOdometer, Prod.mk_sub_mk, Prod.mk.injEq, min_def, max_def]
+  rcases hs with rfl | rfl | rfl <;> rcases ht with rfl | rfl | rfl <;> norm_num <;> ring_nf <;>
+    generalize (k : ℤ) ^ 2 = Q <;> split_ifs <;>
+      (try simp only [false_and, false_or] at *) <;> omega
+
 /-! ### Slopes -/
 
 theorem unitSquares_oneD_ne' : unitSquares (tileShape ZTile.oneD) ≠ [] := by decide
@@ -499,11 +579,18 @@ theorem nlaRev_odo_zero (k : ℕ) (x : GInt) :
   rw [nlaRev_tile_zero, nlaRev_a_zero]
   simp [nlaRev]
 
-theorem nlaRev_odo_succ (k j : ℕ) (hj : j < 2 * k + 1) (x : GInt) :
-    (nlaRev k).odo (j + 1) x = zTileOdo ZTile.one (x - ((j : ℤ), 4 * (k : ℤ) + 3 + (j : ℤ))) +
+theorem nlaRev_odo_one (k : ℕ) (x : GInt) :
+    (nlaRev k).odo (0 + 1) x = zTileOdo ZTile.one (x - (((0 : ℕ) : ℤ), 4 * (k : ℤ) + 3 + ((0 : ℕ) : ℤ))) +
       (2 * (k : ℤ)) * x.1 + (-(2 * (k : ℤ) + 2)) * x.2 + (2 * (k : ℤ) + 2) * (2 * (k : ℤ) + 2) := by
   unfold PTFamily.odo
-  rw [nlaRev_tile_succ k j hj, nlaRev_a_succ k j]
+  rw [nlaRev_tile_one k, nlaRev_a_succ k 0]
+  simp [nlaRev]
+
+theorem nlaRev_odo_oneD (k j : ℕ) (hj : j < 2 * k) (x : GInt) :
+    (nlaRev k).odo (j + 1 + 1) x = zTileOdo ZTile.oneD (x - ((j : ℤ) + 1, 4 * (k : ℤ) + 4 + (j : ℤ))) +
+      (2 * (k : ℤ)) * x.1 + (-(2 * (k : ℤ) + 2)) * x.2 + (2 * (k : ℤ) + 2) * (2 * (k : ℤ) + 2) := by
+  unfold PTFamily.odo
+  rw [nlaRev_tile_oneD k j hj, nlaRev_a_succ k (j + 1)]
   simp [nlaRev]
 
 theorem nlaRev_slope_zero (k : ℕ) :
@@ -513,12 +600,19 @@ theorem nlaRev_slope_zero (k : ℕ) :
     nlaRev_a_zero]
   simp [intrinsic_zero]
 
-theorem nlaRev_slope_one (k j : ℕ) (hj : j < 2 * k + 1) :
-    slopeOf ((nlaRev k).odo (j + 1)) ((nlaRev k).dom (j + 1)) =
+theorem nlaRev_slope_one (k : ℕ) :
+    slopeOf ((nlaRev k).odo (0 + 1)) ((nlaRev k).dom (0 + 1)) =
       (1 / 2, -1 / 2) + ((2 * (k : ℚ)), -(2 * (k : ℚ) + 2)) := by
-  rw [slope_fam_odo _ _ (by rw [nlaRev_tile_succ k j hj]; exact unitSquares_one_ne),
-    nlaRev_tile_succ k j hj, nlaRev_a_succ k j]
+  rw [slope_fam_odo _ _ (by rw [nlaRev_tile_one k]; exact unitSquares_one_ne),
+    nlaRev_tile_one k, nlaRev_a_succ k 0]
   simp [intrinsic_one]
+
+theorem nlaRev_slope_oneD (k j : ℕ) (hj : j < 2 * k) :
+    slopeOf ((nlaRev k).odo (j + 1 + 1)) ((nlaRev k).dom (j + 1 + 1)) =
+      (1 / 2, -1 / 2) + ((2 * (k : ℚ)), -(2 * (k : ℚ) + 2)) := by
+  rw [slope_fam_odo _ _ (by rw [nlaRev_tile_oneD k j hj]; exact unitSquares_oneD_ne'),
+    nlaRev_tile_oneD k j hj, nlaRev_a_succ k (j + 1)]
+  simp [intrinsic_oneD]
 
 theorem nla_fwd_agree (k : ℕ) (hk : 1 ≤ k) :
     ∀ j < (nlaFwd k).n, ∀ x ∈ (nlaFwd k).dom j,
@@ -547,15 +641,19 @@ theorem nla_rev_agree (k : ℕ) (hk : 1 ≤ k) :
       paperNearLadderAltValue (2 * (k : ℤ) + 2) x = (nlaRev k).odo j x := by
   intro j hj x hx
   rw [nlaRev_n] at hj
-  rcases j with _ | j
+  rcases j with _ | _ | j
   · unfold PTFamily.dom at hx
     rw [nlaRev_tile_zero] at hx
     dsimp only at hx
     rw [nla_rev_value_zero k hk x hx, nlaRev_odo_zero]
   · unfold PTFamily.dom at hx
-    rw [nlaRev_tile_succ k j (by omega)] at hx
+    rw [nlaRev_tile_one k] at hx
     dsimp only at hx
-    rw [nla_rev_value_one k j hk (by omega) x hx, nlaRev_odo_succ k j (by omega) x]
+    rw [nla_rev_value_one k 0 hk (by omega) x hx, nlaRev_odo_one k x]
+  · unfold PTFamily.dom at hx
+    rw [nlaRev_tile_oneD k j (by omega)] at hx
+    dsimp only at hx
+    rw [nla_rev_value_oneD k j hk (by omega) x hx, nlaRev_odo_oneD k j (by omega) x]
 
 /-- The forward family respects `q^{2k+1} p`: the one tile, the enlarged one tiles and the zero tile. -/
 theorem nla_fwd_respects (k : ℕ) (hk : 1 ≤ k) : (nlaFwd k).Respects .horizontal false := by
@@ -573,7 +671,7 @@ theorem nla_fwd_respects (k : ℕ) (hk : 1 ≤ k) : (nlaFwd k).Respects .horizon
       exact List.mem_map.2 ⟨((1 : ℤ), (1 : ℤ)), by decide, by decide⟩
     · unfold PTFamily.dom
       rw [e1]
-      exact List.mem_map.2 ⟨((0 : ℤ), (0 : ℤ)), by decide, by decide⟩
+      exact List.mem_map.2 ⟨((0 : ℤ), (0 : ℤ)), by show ((0 : ℤ), (0 : ℤ)) ∈ tileShape ZTile.oneD; decide, by decide⟩
   · obtain ⟨i, rfl⟩ : ∃ i, J = i + 1 := ⟨J - 1, by omega⟩
     by_cases hi : i + 2 ≤ 2 * k
     · have ea := nlaFwd_tile_succ k i (by omega)
@@ -614,33 +712,50 @@ theorem nla_rev_respects (k : ℕ) (hk : 1 ≤ k) : (nlaRev k).Respects .horizon
   rcases Nat.eq_zero_or_pos J with h0 | hpos
   · subst h0
     have e0 := nlaRev_tile_zero k
-    have e1 := nlaRev_tile_succ k 0 (by omega)
+    have e1 := nlaRev_tile_one k
     refine ⟨?_, fun _ x hx y hy hu => ⟨fun _ => ?_, fun h => by cases h⟩⟩
-    · rw [nlaRev_slope_zero k, nlaRev_slope_one k 0 (by omega), e0, e1]
+    · rw [nlaRev_slope_zero k, nlaRev_slope_one k, e0, e1]
       ext <;> (norm_num [surgicalSlopeDiff, zTileLetter, Prod.ext_iff]; try ring_nf)
     · unfold PTFamily.dom at hx hy
       rw [e0, mem_shape_zero] at hx
       rw [e1] at hy
       rw [mem_shape_one] at hy
-      rw [nlaRev_odo_zero, nlaRev_odo_succ k 0 (by omega), nlaRev_a_zero]
+      rw [nlaRev_odo_zero, nlaRev_odo_one k, nlaRev_a_zero]
       have key := key_zo (nlaRevC k) (((0 : ℕ) : ℤ), 4 * (k : ℤ) + 3 + ((0 : ℕ) : ℤ)) x y
         (by simp [nlaRevC]) (by norm_num [nlaRevC]; try ring) hx hy hu
       simp only [Nat.cast_zero, add_zero, sub_zero, Prod.fst_sub, zTileOdo, ptDot] at key ⊢
       linarith [key]
   · obtain ⟨i, rfl⟩ : ∃ i, J = i + 1 := ⟨J - 1, by omega⟩
-    have ea := nlaRev_tile_succ k i (by omega)
-    have eb := nlaRev_tile_succ k (i + 1) (by omega)
-    refine ⟨?_, boundary_vacuous _ _ _ (((i : ℤ) + 1), (4 * (k : ℤ) + 4 + (i : ℤ))) ?_ ?_⟩
-    · rw [nlaRev_slope_one k (i + 1) (by omega), nlaRev_slope_one k i (by omega), ea, eb]
-      norm_num [surgicalSlopeDiff, zTileLetter, Prod.ext_iff]
-    · unfold PTFamily.dom
-      rw [ea]
-      exact List.mem_map.2 ⟨((1 : ℤ), (1 : ℤ)), by simp [tileShape], by
-        ext <;> simp only [Prod.fst_add, Prod.snd_add] <;> ring⟩
-    · unfold PTFamily.dom
-      rw [eb]
-      exact List.mem_map.2 ⟨((0 : ℤ), (0 : ℤ)), by simp [tileShape], by
-        ext <;> simp only [Prod.fst_add, Prod.snd_add, Nat.cast_add, Nat.cast_one] <;> ring⟩
+    rcases i with _ | j
+    · -- the pair (tile 1, tile 2): a `one` tile against a `oneD` tile
+      have ea := nlaRev_tile_one k
+      have eb := nlaRev_tile_oneD k 0 (by omega)
+      refine ⟨?_, boundary_vacuous _ _ _ (((0 : ℤ) + 1), (4 * (k : ℤ) + 4 + ((0 : ℕ) : ℤ))) ?_ ?_⟩
+      · rw [nlaRev_slope_one k, nlaRev_slope_oneD k 0 (by omega), ea, eb]
+        norm_num [surgicalSlopeDiff, zTileLetter, Prod.ext_iff]
+      · unfold PTFamily.dom
+        rw [ea]
+        exact List.mem_map.2 ⟨((1 : ℤ), (1 : ℤ)), by simp [tileShape], by
+          ext <;> simp only [Prod.fst_add, Prod.snd_add] <;> ring⟩
+      · unfold PTFamily.dom
+        rw [eb]
+        exact List.mem_map.2 ⟨((0 : ℤ), (0 : ℤ)), by show ((0 : ℤ), (0 : ℤ)) ∈ tileShape ZTile.oneD; decide, by
+          ext <;> simp only [Prod.fst_add, Prod.snd_add, Nat.cast_zero] <;> ring⟩
+    · -- the pair (tile j+2, tile j+3): both `oneD`
+      have ea := nlaRev_tile_oneD k j (by omega)
+      have eb := nlaRev_tile_oneD k (j + 1) (by omega)
+      refine ⟨?_, boundary_vacuous _ _ _
+        ((((j + 1 : ℕ) : ℤ) + 1), (4 * (k : ℤ) + 4 + ((j + 1 : ℕ) : ℤ))) ?_ ?_⟩
+      · rw [nlaRev_slope_oneD k j (by omega), nlaRev_slope_oneD k (j + 1) (by omega), ea, eb]
+        norm_num [surgicalSlopeDiff, zTileLetter, Prod.ext_iff]
+      · unfold PTFamily.dom
+        rw [ea]
+        exact List.mem_map.2 ⟨((1 : ℤ), (1 : ℤ)), by show ((1 : ℤ), (1 : ℤ)) ∈ tileShape ZTile.oneD; decide, by
+          ext <;> simp only [Prod.fst_add, Prod.snd_add] <;> push_cast <;> ring⟩
+      · unfold PTFamily.dom
+        rw [eb]
+        exact List.mem_map.2 ⟨((0 : ℤ), (0 : ℤ)), by show ((0 : ℤ), (0 : ℤ)) ∈ tileShape ZTile.oneD; decide, by
+          ext <;> simp only [Prod.fst_add, Prod.snd_add] <;> push_cast <;> ring⟩
 
 theorem nla_fwd_tiles (k : ℕ) (hk : 1 ≤ k) :
     RespectsTiles .horizontal false (hStringAt (nlaWord k) (0, 1))

@@ -252,29 +252,70 @@ theorem getLastD_eq_getD' {α : Type*} (L : List α) (d : α) :
     L.getLastD d = L.getD (L.length - 1) d := by
   simp [List.getLastD_eq_getLast?, List.getLast?_eq_getElem?, List.getD_eq_getElem?_getD]
 
+theorem tileSeqAux_length_sac (prev : Option Letter) (w : BinaryWord) :
+    (tileSeqAux prev w).length = w.length := by
+  induction w generalizing prev with
+  | nil => rfl
+  | cons x xs ih => simp [tileSeqAux, ih]
+
 theorem hRevStringAt_length (u : BinaryWord) (c : GInt) : (hRevStringAt u c).length = u.length := by
   unfold hRevStringAt
-  simp only [List.length_zip, List.length_map, List.length_scanl, List.length_tail]
+  simp only [tileSeq, tileSeqAux_length_sac, List.length_zip, List.length_map, List.length_scanl, List.length_tail]
   omega
 
-/-- The first coordinates of the reversed horizontal string are the letters of its word. -/
+/-- The first coordinates of the reversed horizontal string are its doubled tile sequence (`tileSeq u`, enlargement in the
+letter order of `u`, surgical lines 1293-1300). -/
 theorem hRevStringAt_map_fst (u : BinaryWord) (c : GInt) :
-    (hRevStringAt u c).map Prod.fst = u.map letterZTile := by
+    (hRevStringAt u c).map Prod.fst = tileSeq u := by
   unfold hRevStringAt
   apply List.map_fst_zip
-  simp only [List.length_map, List.length_scanl, List.length_zip, List.length_tail]
+  simp only [tileSeq, tileSeqAux_length_sac, List.length_map, List.length_scanl, List.length_zip, List.length_tail]
   omega
 
-theorem hRevStringAt_getD_fst (u : BinaryWord) (c : GInt) (i : ℕ) (hi : i < u.length) :
-    ((hRevStringAt u c).getD i (ZTile.zero, (0 : GInt))).1 = letterZTile (u.getD i .p) := by
+/-- In a word, a position carrying `q` has tile `one` or `oneD` in the doubled tile sequence. -/
+theorem tileSeqAux_getD_q (xs : BinaryWord) : ∀ (prev : Option Letter) (k : ℕ), k < xs.length →
+    xs.getD k Letter.p = Letter.q →
+      (tileSeqAux prev xs).getD k ZTile.zero = ZTile.one ∨ (tileSeqAux prev xs).getD k ZTile.zero = ZTile.oneD := by
+  induction xs with
+  | nil => intro prev k hk; simp at hk
+  | cons y ys ih =>
+    intro prev k hk hq
+    cases k with
+    | zero =>
+      have hy : y = Letter.q := by simpa using hq
+      subst hy
+      cases prev with
+      | none => exact Or.inl rfl
+      | some x => cases x with
+        | p => exact Or.inl rfl
+        | q => exact Or.inr rfl
+    | succ k =>
+      have hk' : k < ys.length := by simp at hk; omega
+      have hq' : ys.getD k Letter.p = Letter.q := by simpa using hq
+      exact ih (some y) k hk' hq'
+
+theorem tileSeq_getD_q (u : BinaryWord) (k : ℕ) (hk : k < u.length) (hq : u.getD k Letter.p = Letter.q) :
+    (tileSeq u).getD k ZTile.zero = ZTile.one ∨ (tileSeq u).getD k ZTile.zero = ZTile.oneD :=
+  tileSeqAux_getD_q u none k hk hq
+
+/-- A reversed string whose first letter is `p` begins with the zero tile. -/
+theorem tileSeq_getD_zero_head (u : BinaryWord) (hu : u ≠ []) (h0 : u.getD 0 Letter.p = Letter.p) :
+    (tileSeq u).getD 0 ZTile.zero = ZTile.zero := by
+  cases u with
+  | nil => exact absurd rfl hu
+  | cons a l =>
+    have ha : a = Letter.p := by simpa using h0
+    subst ha
+    rfl
+
+theorem hRevStringAt_getD_fst (u : BinaryWord) (c : GInt) (i : ℕ) :
+    ((hRevStringAt u c).getD i (ZTile.zero, (0 : GInt))).1 = (tileSeq u).getD i ZTile.zero := by
   have e1 : ((hRevStringAt u c).map Prod.fst).getD i ZTile.zero =
       ((hRevStringAt u c).getD i (ZTile.zero, (0 : GInt))).1 := by
     rw [List.getD_eq_getElem?_getD, List.getD_eq_getElem?_getD, List.getElem?_map]
     generalize (hRevStringAt u c)[i]? = o
     cases o <;> simp
-  have e2 : (u.map letterZTile).getD i ZTile.zero = letterZTile (u.getD i .p) := by
-    simp [List.getD_eq_getElem?_getD, List.getElem?_map, List.getElem?_eq_getElem hi]
-  rw [← e1, hRevStringAt_map_fst, e2]
+  rw [← e1, hRevStringAt_map_fst]
 
 /-- The forward corner identity: the affine factors of the first and last tiles of the forward horizontal string agree.
 No nonemptiness is needed: for the empty string the two tiles coincide. -/
@@ -315,14 +356,25 @@ theorem corner_rev (u : BinaryWord) (c : GInt) (S : GInt → ℤ)
   have hF1 : ∀ i, F.tile i = (hRevStringAt u c).getD i (ZTile.zero, 0) := fun i => by
     rw [← hF]
     rfl
+  have hfirst0 : (tileSeq u).getD 0 ZTile.zero = ZTile.zero := by
+    cases u with
+    | nil => exact absurd rfl hu
+    | cons a l =>
+      have ha : a = Letter.p := by simpa using h0
+      subst ha
+      rfl
   have hfirst : (F.tile 0).1 = ZTile.zero := by
-    rw [hF1, hRevStringAt_getD_fst u c 0 hpos, h0]
-    rfl
-  have hlast' : (F.tile (F.n - 1)).1 = ZTile.one := by
-    rw [hF1, hRevStringAt_getD_fst u c (F.n - 1) (by omega), hn, hl]
-    rfl
+    rw [hF1, hRevStringAt_getD_fst u c 0]
+    exact hfirst0
+  have hlast' : (F.tile (F.n - 1)).1 = ZTile.one ∨ (F.tile (F.n - 1)).1 = ZTile.oneD := by
+    rw [hF1, hRevStringAt_getD_fst u c (F.n - 1), hn]
+    exact tileSeq_getD_q u (u.length - 1) (by omega) hl
+  have hslope : zTileBaseSlope (F.tile (F.n - 1)).1 = zTileBaseSlope ZTile.one := by
+    rcases hlast' with h | h
+    · rw [h]
+    · rw [h, zTileBaseSlope_oneD, zTileBaseSlope_one]
   have key := chain_rev F S hS (fun k hk => (hRes k hk).1) (F.n - 1) (by omega)
-  rw [hlast', hfirst, zTileBaseSlope_one, zTileBaseSlope_zero] at key
+  rw [hslope, hfirst, zTileBaseSlope_one, zTileBaseSlope_zero] at key
   rw [getLastD_eq_getD', headD_eq_getD_zero', ← hF]
   show tileAffine S (F.tile (F.n - 1)) - tileAffine S (F.tile 0) = ((-1 : ℚ), (0 : ℚ))
   have h1 := congrArg Prod.fst key

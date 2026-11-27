@@ -65,7 +65,13 @@ theorem hStringAt_stairH (k : ℕ) :
 theorem hRevStringAt_cons_pp (w : BinaryWord) (c : GInt) :
     hRevStringAt (Letter.p :: Letter.p :: w) c =
       (ZTile.zero, c) :: hRevStringAt (Letter.p :: w) (c + ((2 : ℤ), (0 : ℤ))) := by
-  simp [hRevStringAt, hRevOffset, letterZTile, List.scanl_cons]
+  have ht : tileSeq (Letter.p :: Letter.p :: w) = ZTile.zero :: tileSeq (Letter.p :: w) := by
+    unfold tileSeq
+    rw [tileSeqAux_none_eq (Letter.p :: w)]
+    rfl
+  unfold hRevStringAt
+  rw [ht]
+  simp [hRevOffset, List.scanl_cons]
 
 /-- The reversed string of `p^{m+1} q` at `c`: zero tiles at `c + (2j, 0)`, `j = 0..m`, then the one tile at `c + (2(m+1), 1)`. -/
 theorem hRevStringAt_rep (m : ℕ) (c : GInt) :
@@ -76,7 +82,8 @@ theorem hRevStringAt_rep (m : ℕ) (c : GInt) :
   | zero =>
     have e0 : (List.replicate 1 Letter.p) ++ [Letter.q] = [Letter.p, Letter.q] := rfl
     rw [e0]
-    simp [hRevStringAt, hRevOffset, letterZTile, List.range_succ, Prod.ext_iff]
+    simp [hRevStringAt, hRevOffset, tileSeq, tileSeqAux, List.range_succ]
+    rfl
   | succ m ih =>
     have e : List.replicate (m + 1 + 1) Letter.p ++ [Letter.q] =
         Letter.p :: Letter.p :: (List.replicate m Letter.p ++ [Letter.q]) := rfl

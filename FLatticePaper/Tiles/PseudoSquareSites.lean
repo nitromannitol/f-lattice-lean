@@ -56,11 +56,19 @@ line 1281). -/
 def hStringAt (w : BinaryWord) (c : GInt) : List (ZTile × GInt) :=
   (tileSeq w).zip (List.scanl (· + ·) c (w.tail.map hOffset))
 
-/-- The reversed horizontal string `B^r_u` with its positions. Convention: no doubling in reversed strings, and the first
-letter of `u` is `p` (a reversed horizontal string begins with `T_{0/1}`, line 1281). -/
+/-- The reversed horizontal string `B^r_u` with its positions. The enlargement applies in the letter order of `u` (the
+second `T_{1/1}` of every consecutive `q q` of `u` is `T^d_{1/1}`, surgical lines 1293-1300), so the tiles are `tileSeq u`,
+as for `hStringAt`. The first letter of `u` is `p` for a reversed horizontal string (`T_{0/1}`, line 1281). -/
 def hRevStringAt (u : BinaryWord) (c : GInt) : List (ZTile × GInt) :=
-  (u.map letterZTile).zip
+  (tileSeq u).zip
     (List.scanl (· + ·) c ((u.zip u.tail).map fun ab => hRevOffset ab.1 ab.2))
+
+/-- Starting the doubled tile sequence with `none` is the same as starting after `p` (the first letter is a `T_{0/1}`
+or a `T_{1/1}`, and both rules agree there). -/
+theorem tileSeqAux_none_eq (w : BinaryWord) : tileSeqAux none w = tileSeqAux (some Letter.p) w := by
+  cases w with
+  | nil => rfl
+  | cons x xs => cases x <;> rfl
 
 /-- The vertical zero-one string `B_w` (no doubling; the first letter of `w` is `p`, line 1348). -/
 def vStringAt (w : BinaryWord) (c : GInt) : List (ZTile × GInt) :=

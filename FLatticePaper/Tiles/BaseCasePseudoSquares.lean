@@ -238,9 +238,17 @@ theorem vStringAt_cons (a b : Letter) (v : BinaryWord) (c : GInt) :
     vStringAt (a :: b :: v) c = (letterZTile a, c) :: vStringAt (b :: v) (c + vOffset b) := by
   simp [vStringAt, List.scanl_cons]
 
-theorem hRevStringAt_cons (a b : Letter) (v : BinaryWord) (c : GInt) :
+theorem hRevStringAt_cons (a b : Letter) (v : BinaryWord) (c : GInt) (h : a = Letter.p ∨ b = Letter.p) :
     hRevStringAt (a :: b :: v) c = (letterZTile a, c) :: hRevStringAt (b :: v) (c + hRevOffset a b) := by
-  simp [hRevStringAt, List.scanl_cons]
+  have ht : tileSeq (a :: b :: v) = letterZTile a :: tileSeq (b :: v) := by
+    rcases h with rfl | rfl
+    · unfold tileSeq
+      rw [tileSeqAux_none_eq (b :: v)]
+      rfl
+    · cases a <;> rfl
+  unfold hRevStringAt
+  rw [ht]
+  simp [List.scanl_cons]
 
 theorem vRevStringAt_cons (a b : Letter) (v : BinaryWord) (c : GInt) :
     vRevStringAt (a :: b :: v) c = (letterZTile a, c) :: vRevStringAt (b :: v) (c + vRevOffset a b) := by
@@ -313,7 +321,7 @@ theorem vRevOffset_pp : vRevOffset Letter.p Letter.p = (-1, 1) := rfl
 theorem vRevOffset_qp : vRevOffset Letter.q Letter.p = (0, 1) := rfl
 
 theorem hRevStringAt_single_q (c : GInt) : hRevStringAt [Letter.q] c = [(ZTile.one, c)] := by
-  simp [hRevStringAt, letterZTile]
+  simp [hRevStringAt, tileSeq, tileSeqAux]
 
 theorem vStringAt_single_q (c : GInt) : vStringAt [Letter.q] c = [(ZTile.one, c)] := by
   simp [vStringAt, letterZTile]
@@ -327,7 +335,7 @@ theorem mem_hRevRun (n : ℕ) (c x : GInt) :
   induction n generalizing c with
   | zero =>
     rw [show List.replicate (0 + 1) Letter.p ++ [Letter.q] = [Letter.p, Letter.q] from rfl,
-      hRevStringAt_cons, letterZTile_p, hRevStringAt_single_q, hRevOffset_pq, placedSites_cons_zero, placedSites_cons_one,
+      hRevStringAt_cons Letter.p Letter.q [] c (Or.inl rfl), letterZTile_p, hRevStringAt_single_q, hRevOffset_pq, placedSites_cons_zero, placedSites_cons_one,
       placedSites_nil, List.append_nil, List.mem_append, mem_shape_zero, mem_shape_one]
     constructor
     · rintro (h | h)
@@ -355,7 +363,7 @@ theorem mem_hRevRun (n : ℕ) (c x : GInt) :
   | succ n ih =>
     have e : hRevStringAt (List.replicate (n + 1 + 1) Letter.p ++ [Letter.q]) c =
         (ZTile.zero, c) :: hRevStringAt (List.replicate (n + 1) Letter.p ++ [Letter.q]) (c + hRevOffset Letter.p Letter.p) :=
-      hRevStringAt_cons Letter.p Letter.p (List.replicate n Letter.p ++ [Letter.q]) c
+      hRevStringAt_cons Letter.p Letter.p (List.replicate n Letter.p ++ [Letter.q]) c (Or.inl rfl)
     rw [e, placedSites_cons_zero, List.mem_append, mem_shape_zero, ih, hRevOffset_pp]
     constructor
     · rintro (h | (⟨j, hj, h⟩ | h))
@@ -904,7 +912,7 @@ theorem mem_topRun (n : ℕ) (s : GInt) (rest : BinaryWord) (x : GInt) :
   | zero =>
     have e : hRevStringAt (List.replicate (0 + 1) Letter.p ++ Letter.q :: rest) s =
         (ZTile.zero, s) :: hRevStringAt (Letter.q :: rest) (s + hRevOffset Letter.p Letter.q) :=
-      hRevStringAt_cons Letter.p Letter.q rest s
+      hRevStringAt_cons Letter.p Letter.q rest s (Or.inl rfl)
     have hq : s + hRevOffset Letter.p Letter.q = (s.1 + ((0 : ℕ) : ℤ) * 2 + 2, s.2 + 1) := by
       rw [hRevOffset_pq]
       exact Prod.ext (by simp) (by simp)
@@ -923,7 +931,7 @@ theorem mem_topRun (n : ℕ) (s : GInt) (rest : BinaryWord) (x : GInt) :
   | succ n ih =>
     have e : hRevStringAt (List.replicate (n + 1 + 1) Letter.p ++ Letter.q :: rest) s =
         (ZTile.zero, s) :: hRevStringAt (List.replicate (n + 1) Letter.p ++ Letter.q :: rest) (s + hRevOffset Letter.p Letter.p) :=
-      hRevStringAt_cons Letter.p Letter.p (List.replicate n Letter.p ++ Letter.q :: rest) s
+      hRevStringAt_cons Letter.p Letter.p (List.replicate n Letter.p ++ Letter.q :: rest) s (Or.inl rfl)
     have hpos : ((s + hRevOffset Letter.p Letter.p).1 + (n : ℤ) * 2 + 2, (s + hRevOffset Letter.p Letter.p).2 + 1) =
         (s.1 + ((n + 1 : ℕ) : ℤ) * 2 + 2, s.2 + 1) := by
       rw [hRevOffset_pp]
@@ -965,7 +973,7 @@ theorem mem_hRevStringAt_qp (v : BinaryWord) (t x : GInt) :
       oneAt t x ∨ x ∈ placedSites (hRevStringAt (Letter.p :: v) (t + (1, 0))) := by
   have e : hRevStringAt (Letter.q :: Letter.p :: v) t =
       (ZTile.one, t) :: hRevStringAt (Letter.p :: v) (t + hRevOffset Letter.q Letter.p) :=
-    hRevStringAt_cons Letter.q Letter.p v t
+    hRevStringAt_cons Letter.q Letter.p v t (Or.inr rfl)
   rw [e, hRevOffset_qp, placedSites_cons_one, List.mem_append, mem_shape_one]
 
 theorem mem_vLeftGen (n : ℕ) (c x : GInt) :

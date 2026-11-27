@@ -96,7 +96,7 @@ theorem hRevStringAt_getD_snd_zero (u : BinaryWord) (c : GInt) (hu : u ≠ []) :
     ((hRevStringAt u c).getD 0 (ZTile.zero, (0 : GInt))).2 = c := by
   cases u with
   | nil => exact absurd rfl hu
-  | cons a l => simp [hRevStringAt]
+  | cons a l => simp [hRevStringAt, tileSeq, tileSeqAux]
 
 theorem lastPosOf_eq_getD (L : List (ZTile × GInt)) :
     lastPosOf L = (L.getD (L.length - 1) (ZTile.zero, (0 : GInt))).2 := by
@@ -205,9 +205,10 @@ theorem corner_third (wh wv : BinaryWord) (k : ℕ) (S : GInt → ℤ)
       F.tile k := by
     rw [headD_eq_getD_zero', hFk]
     apply Prod.ext
-    · rw [hRevStringAt_getD_fst wh.reverse _ 0 (by
-        rw [List.length_reverse]
-        exact List.length_pos_of_ne_nil hwne), hwhr, hrev_last]
+    · rw [hRevStringAt_getD_fst wh.reverse _ 0,
+        tileSeq_getD_zero_head wh.reverse
+          (by intro h; apply hwne; have := congrArg List.reverse h; simpa using this) hwhr, hrev_last]
+      rfl
     · rw [hRevStringAt_getD_snd_zero wh.reverse _ hrne]
   -- the tile at the first index of the reversed vertical string is the first tile of the forward horizontal string
   have hF0 : F.tile 0 = (ZTile.one, 0) := by
