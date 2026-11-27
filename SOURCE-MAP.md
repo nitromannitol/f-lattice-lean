@@ -1,7 +1,7 @@
 # Source correspondence
 
 **Target: the surgical edition.** The target is the surgical edition of `farey_recursion.tex` (the October 2023 arXiv text
-with minimal corrections, Sections 5–8), pinned at commit baf0f77 of its source repository; its text is not copied here.
+with minimal corrections, Sections 5–8), pinned at commit 1953073 of its source repository; its text is not copied here.
 The surgical map of Sections 1–8 (label, surgical line, Lean declaration, agreement) is the last section of this file. The
 table that follows maps the corrected edition pinned in `paper/`.
 
@@ -130,12 +130,12 @@ A separate, shorter write-up (`flattice-simple-proof`, `short-proof.tex` with it
 
 ## Surgical edition map (Sections 1–8)
 
-Lines refer to `farey_recursion.tex` at commit baf0f77 of the surgical edition's source repository; its text is not copied
+Lines refer to `farey_recursion.tex` at commit 1953073 of the surgical edition's source repository; its text is not copied
 here. E-numbers refer to that repository's error list (`notes/ERRORS_S5-8.md` and the section notes). Status words:
 **agrees** (the Lean statement matches the surgical statement and is proved), **conditional** (proved from named inputs),
 **partial** (some parts proved), **differs** (the Lean states another form; the surgical form is open), **defined** (the
 definitions are in place), **open** (no Lean statement yet), **cited** (an outside result, cited as in the text).
-Section 2 has no numbered statements; Section 9 is being rewritten and is not mapped.
+Section 2 has no numbered statements. Section 9 is the new text of the surgical edition, under audit; its rows may change.
 
 | Label | Line | Lean | Status |
 |---|---|---|---|
@@ -196,3 +196,6 @@ Section 2 has no numbered statements; Section 9 is being rewritten and is not ma
 | definition of tile odometers (unlabelled) | 3976 | — | open (E41) |
 | lemma:l_correct_existence | 4003 | — | open (E42) |
 | lemma:tile-odometer-existence | 4026 | — | open (E43) |
+| lemma:global_odometers | 4097 | `Plane.GlobalOdometers.global_odometers` (the corrected edition's route, from named inputs) | open in the surgical form (the extension of the tile odometers by eq:global_translation) |
+| lemma:global_superharmonic | 4130 | — | open |
+| lemma:global_recurrence | 4149 | — | open |

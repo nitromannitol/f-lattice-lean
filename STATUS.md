@@ -4,8 +4,8 @@ This file states what the repository proves and which named hypotheses the headl
 The Lean sources are the authority; each link points to the declaration.
 
 **Target.** The target is the surgical edition of the October 2023 manuscript: the author's arXiv text with minimal
-corrections in its own language, pinned at commit baf0f77 of its source repository (Sections 1–8; Section 9 is being
-rewritten). Sections 1–8 are being mapped to the Lean statement by statement in [SOURCE-MAP.md](SOURCE-MAP.md), and the
+corrections in its own language, pinned at commit 1953073 of its source repository (Sections 1–9; the new Section 9 is under
+audit). Sections 1–8 are being mapped to the Lean statement by statement in [SOURCE-MAP.md](SOURCE-MAP.md), and the
 statements corrected in Sections 5–8 are restated and proved in their surgical form. The corrected edition pinned in
 [paper/](paper/README.md) replaced the proofs of Sections 6, 8 and 9 by a supplement; the headline theorems below follow
 that edition, and their named hypotheses belong to the supplement's route. That code stays as a library.
