@@ -34,8 +34,8 @@ theorem squares_at {s z : ℤ × ℤ} (h : HasCorner s z) :
     s = z ∨ s = z + ((-1 : ℤ), (0 : ℤ)) ∨ s = z + ((0 : ℤ), (-1 : ℤ)) ∨ s = z + ((-1 : ℤ), (-1 : ℤ)) := by
   rcases h with rfl | rfl | rfl | rfl
   · exact Or.inl rfl
-  · exact Or.inr (Or.inl (by ext <;> simp <;> omega))
-  · exact Or.inr (Or.inr (Or.inl (by ext <;> simp <;> omega)))
+  · exact Or.inr (Or.inl (by ext <;> simp; omega))
+  · exact Or.inr (Or.inr (Or.inl (by ext <;> simp; omega)))
   · exact Or.inr (Or.inr (Or.inr (by ext <;> simp <;> omega)))
 
 /-- **The cell derivation of (d).** A point common to two tiles lies in the zero-one strings of both, given the cell facts
