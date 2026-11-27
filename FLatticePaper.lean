@@ -1172,5 +1172,12 @@ import FLatticePaper.Plane.Induction.FreeSelSat
 import FLatticePaper.Plane.Induction.FreeSelSquares
 import FLatticePaper.Tiles.NearBaseBridges
 import FLatticePaper.Tiles.SurgicalWeakOdometers
+import FLatticePaper.Tiles.SurgicalOdometerStep
+import FLatticePaper.Tiles.SurgicalCorners
+import FLatticePaper.Tiles.SurgicalAffineChain
+import FLatticePaper.Tiles.SurgicalAltOdometers
+import FLatticePaper.Tiles.SurgicalCornerThird
+import FLatticePaper.Tiles.SurgicalAltTileLemma
+import FLatticePaper.Tiles.SurgicalAltTiles
 
 /-! Root import for the corrected F-lattice paper. -/

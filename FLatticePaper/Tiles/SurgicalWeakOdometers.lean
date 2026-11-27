@@ -192,6 +192,19 @@ def IsPaperWeakStdFamily (zeroO oneO : PartialOdometer) (bdry : Option Word → 
     (partialT : Option Word → Bool → Bool → Finset Site) (oddO evenO : Word → PartialOdometer) : Prop :=
   IsWeakStdFamily (paperWeakData zeroO oneO bdry partialT) oddO evenO
 
+/-- (a) for the concrete instance (`lemma:weak_standard_odometer_properties` (a)): in every weak standard family with the
+Section 6 base cases, the odometer of each word respects its horizontal and vertical boundary words at the anchors
+(`RespectsAnchored`), for the odd child (`hWordOf w false`, `vWordOf w false`) and the even child (`hWordOf w true`,
+`vWordOf w true`). The statement is a projection of the family predicate. -/
+theorem paper_respects_statement (zeroO oneO : PartialOdometer) (bdry : Option Word → Bool → Finset Site)
+    (partialT : Option Word → Bool → Bool → Finset Site) (oddO evenO : Word → PartialOdometer)
+    (h : IsPaperWeakStdFamily zeroO oneO bdry partialT oddO evenO) (w : Word) :
+    RespectsAnchored (oddO w).dom (FLatticePaper.Tiles.SiteStrings.hWordOf w false)
+        (FLatticePaper.Tiles.SiteStrings.vWordOf w false) (oddO w).val ∧
+    RespectsAnchored (evenO w).dom (FLatticePaper.Tiles.SiteStrings.hWordOf w true)
+        (FLatticePaper.Tiles.SiteStrings.vWordOf w true) (evenO w).val :=
+  ⟨(h w).2.2.2.2.1, (h w).2.2.2.2.2⟩
+
 /-! ### Named hypotheses
 
 Each is a statement that another worker proves. They are used by name and are not proved here. -/
