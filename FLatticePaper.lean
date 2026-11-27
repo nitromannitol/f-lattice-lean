@@ -421,6 +421,7 @@ import FLatticePaper.Tiles.ClosedPathCorners
 import FLatticePaper.Tiles.ClosedPathSum
 import FLatticePaper.Tiles.ClosedPathContacts
 import FLatticePaper.Tiles.ClosedPathAssembly
+import FLatticePaper.Tiles.MixedCompatBase
 import FLatticePaper.Tiles.ClosedPathStandard
 import FLatticePaper.Tiles.ClosedPathExcluded
 import FLatticePaper.Tiles.ClosedPathDiagonal
@@ -1286,6 +1287,7 @@ import FLatticePaper.Tiles.JointInduction
 import FLatticePaper.Tiles.JointGlue
 import FLatticePaper.Tiles.PaperAltBase
 import FLatticePaper.Tiles.LCorrecProps
+import FLatticePaper.Tiles.CorrectedCellsOrdinary
 import FLatticePaper.Tiles.TileTranslation
 import FLatticePaper.Tiles.HorizontalStepOne
 import FLatticePaper.Tiles.VerticalStepOne
