@@ -432,6 +432,8 @@ import FLatticePaper.Tiles.CellRegisters
 import FLatticePaper.Tiles.WalkDecomp
 import FLatticePaper.Tiles.HorizontalPair
 import FLatticePaper.Tiles.HBottom
+import FLatticePaper.Tiles.VerticalRight
+import FLatticePaper.Tiles.VerticalPair
 import FLatticePaper.Tiles.SiteBaseDischarge
 import FLatticePaper.Tiles.SitePairScope
 import FLatticePaper.Tiles.SiteCell
