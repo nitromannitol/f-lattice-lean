@@ -43,7 +43,7 @@ theorem walk_reach (u : F2Word) (hu : ∀ x ∈ u, x = Unit4.one ∨ x = Unit4.i
     have hnot := Nat.find_min hex hlt
     have hcast : ((Nat.find hex : ℕ) : ℤ) - 1 = ((Nat.find hex - 1 : ℕ) : ℤ) := by omega
     rw [hcast]
-    push_neg at hnot
+    push Not at hnot
     exact hnot.le
   · exact hm
 
@@ -65,7 +65,7 @@ theorem lower_link (P : Finset GInt) (w1 w2 : F2Word) (hP : HasCornerCell P)
     have e1 : (x.1 = c.1 ∧ x.2 = c.2) ∨ (x.1 = c.1 + 1 ∧ x.2 = c.2) ∨
         (x.1 = c.1 ∧ x.2 = c.2 + 1) ∨ (x.1 = c.1 + 1 ∧ x.2 = c.2 + 1) := by
       simp only [cellCorners, Finset.mem_insert, Finset.mem_singleton] at hxc
-      rcases hxc with h | h | h | h <;> subst h <;> simp [gOne, gI] <;> omega
+      rcases hxc with h | h | h | h <;> subst h <;> simp [gOne, gI]
     omega
   rcases lt_or_ge c.2 (cntI w1) with hlt | hge
   · rw [nrow_lo hlt] at hN'
