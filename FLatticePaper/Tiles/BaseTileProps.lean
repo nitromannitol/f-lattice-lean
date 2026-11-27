@@ -1517,4 +1517,144 @@ theorem base_tileProps (w : Word) (hw : IsBase w) (O E aO aE : PartialOdometer) 
     · exact tileProps_empty O E aO aE hS hA hW
     · exact tileProps_two k hk O E aO aE hS hA hW
 
+/-- The base odometers are normalised with slope `0` (`α = 0` on the tiles of the base families): the four odometers of a
+base word, the standard odd and even and the alternate odd and even, each with `FirstTileNormal _ 0 b` for some `b`. -/
+theorem base_slopes (w : Word) (hw : IsBase w) (O E aO aE : PartialOdometer) (hS : PaperBaseCond w O E)
+    (hA : PaperAltBaseCond w aO aE) :
+    (∃ b : ℤ, FirstTileNormal O 0 b) ∧ (∃ b : ℤ, FirstTileNormal E 0 b) ∧
+      (∃ b : ℤ, FirstTileNormal aO 0 b) ∧ (∃ b : ℤ, FirstTileNormal aE 0 b) := by
+  rcases hw with rfl | h3 | h2
+  · obtain ⟨hOd, hOv, hEd, hEv⟩ := hS.1 rfl
+    obtain ⟨haOd, haOv, haEd, haEv⟩ := hA.1 rfl
+    exact ⟨⟨0, nstairO_firstNormal 0 le_rfl O hOd hOv⟩, ⟨0, stairE_firstNormal 3 (by norm_num) E hEd hEv⟩,
+      ⟨0, nsA_normal 3 (by norm_num) aO haOd haOv⟩, ⟨0, stA_normal 3 (by norm_num) aE haEd haEv⟩⟩
+  · obtain ⟨k, rfl⟩ : ∃ k, w = List.replicate k Digit.three := ⟨w.length, List.eq_replicate_iff.mpr ⟨rfl, h3⟩⟩
+    rcases Nat.eq_zero_or_pos k with rfl | hk
+    · obtain ⟨hOd, hOv, hEd, hEv⟩ := hS.1 rfl
+      obtain ⟨haOd, haOv, haEd, haEv⟩ := hA.1 rfl
+      exact ⟨⟨0, nstairO_firstNormal 0 le_rfl O hOd hOv⟩, ⟨0, stairE_firstNormal 3 (by norm_num) E hEd hEv⟩,
+        ⟨0, nsA_normal 3 (by norm_num) aO haOd haOv⟩, ⟨0, stA_normal 3 (by norm_num) aE haEd haEv⟩⟩
+    · obtain ⟨hOd, hOv, hEd, hEv⟩ := hS.2.1 k hk rfl
+      obtain ⟨haOd, haOv, haEd, haEv⟩ := hA.2.1 k hk rfl
+      exact ⟨⟨0, ladO_firstNormal (2 * (k : ℤ) + 2) (by omega) O hOd hOv⟩,
+        ⟨0, stairE_firstNormal (2 * (k : ℤ) + 3) (by omega) E hEd hEv⟩,
+        ⟨0, ladA_normal (2 * (k : ℤ) + 2) (by omega) aO haOd haOv⟩,
+        ⟨0, stA_normal (2 * (k : ℤ) + 3) (by omega) aE haEd haEv⟩⟩
+  · obtain ⟨k, rfl⟩ : ∃ k, w = List.replicate k Digit.two := ⟨w.length, List.eq_replicate_iff.mpr ⟨rfl, h2⟩⟩
+    rcases Nat.eq_zero_or_pos k with rfl | hk
+    · obtain ⟨hOd, hOv, hEd, hEv⟩ := hS.1 rfl
+      obtain ⟨haOd, haOv, haEd, haEv⟩ := hA.1 rfl
+      exact ⟨⟨0, nstairO_firstNormal 0 le_rfl O hOd hOv⟩, ⟨0, stairE_firstNormal 3 (by norm_num) E hEd hEv⟩,
+        ⟨0, nsA_normal 3 (by norm_num) aO haOd haOv⟩, ⟨0, stA_normal 3 (by norm_num) aE haEd haEv⟩⟩
+    · obtain ⟨hOd, hOv, hEd, hEv⟩ := hS.2.2 k hk rfl
+      obtain ⟨haOd, haOv, haEd, haEv⟩ := hA.2.2 k hk rfl
+      exact ⟨⟨0, nstairO_firstNormal (k : ℤ) (by positivity) O hOd hOv⟩,
+        ⟨0, nlE_firstNormal (2 * (k : ℤ) + 2) (by omega) E hEd hEv⟩,
+        ⟨0, nsA_normal (2 * (k : ℤ) + 3) (by omega) aO haOd haOv⟩,
+        ⟨0, nlA_normal (2 * (k : ℤ) + 2) (by omega) aE haEd haEv⟩⟩
+
+/-! ### The rotation identities at the base words (`RotProps`)
+
+`h0 x = -(chooseTwo x_1 - (x_1 - x_2 - 1)^2/4)`; the identities are the value identities of `TileRotation` and
+`AltRotation`, with all normalisations `α = β = 0`. -/
+
+/-- The two floor squares of identity A have opposite parity, so their floors sum exactly. -/
+theorem floor_pair_A (a b : ℤ) : 2 * ((a + b - 2) ^ 2 / 4 + (a - b - 1) ^ 2 / 4) = a ^ 2 + b ^ 2 - 3 * a - b + 2 := by
+  rcases Int.emod_two_eq_zero_or_one (a + b) with h | h
+  · obtain ⟨m, hm⟩ : ∃ m, a + b - 2 = 2 * m := ⟨(a + b - 2) / 2, by omega⟩
+    obtain ⟨n, hn⟩ : ∃ n, a - b - 1 = 2 * n + 1 := ⟨(a - b - 2) / 2, by omega⟩
+    rw [sq4_even _ m hm, sq4_odd _ n hn]
+    obtain rfl : a = m + n + 2 := by omega
+    obtain rfl : b = m - n := by omega
+    ring
+  · obtain ⟨m, hm⟩ : ∃ m, a + b - 2 = 2 * m + 1 := ⟨(a + b - 3) / 2, by omega⟩
+    obtain ⟨n, hn⟩ : ∃ n, a - b - 1 = 2 * n := ⟨(a - b - 1) / 2, by omega⟩
+    rw [sq4_odd _ m hm, sq4_even _ n hn]
+    obtain rfl : a = m + n + 2 := by omega
+    obtain rfl : b = m - n + 1 := by omega
+    ring
+
+/-- The value identity A: the stair `stairF d` at `(a, b)` against the near-one stair `nstairN d` at the rotated point
+`(d + 1 - b, a + d - 1)` (read at `+(0,1)`), with the correction `-h0 (a, b)`. -/
+theorem rotA_val (d a b : ℤ) :
+    paperStairValue d (a, b) = paperNearStairValue d (d + 1 - b, a + d - 1) - h0 (a, b) := by
+  have e1 : a + d - 1 - (d + 1 - b) = a + b - 2 := by ring
+  have e2 : d - (a + d - 1) = 1 - a := by ring
+  have hI : (if (d + 1 - b, a + d - 1) = ((0 : ℤ), d + 1) ∨ (d + 1 - b, a + d - 1) = (d + 1, d - 1) then (1 : ℤ) else 0) =
+      (if (a, b) = ((0 : ℤ), (0 : ℤ)) ∨ (a, b) = ((2 : ℤ), d + 1) then (1 : ℤ) else 0) := by
+    simp only [Prod.mk.injEq]
+    split_ifs <;> omega
+  have hmin : min (1 - a) 0 - min (a - 1) 0 = 1 - a := by omega
+  have hF := floor_pair_A a b
+  have hC := two_mul_chooseTwo a
+  have hT := two_mul_T2 b
+  unfold paperStairValue paperNearStairValue h0 centeredQuarterTurnCorrection
+  dsimp only
+  rw [e1, e2, hI]
+  linarith
+
+/-- The value identity B: the near-one stair `nstairN d` at `(a, b)` (read at `+(0,1)`) against the stair `stairF d` at
+the rotated point `(d - b, a)`, with the correction `-h0 (a, b)`. -/
+theorem rotB_val (d a b : ℤ) :
+    paperNearStairValue d (a, b + 1) = paperStairValue d (d - b, a) - h0 (a, b) := by
+  have hI : (if (a, b + 1) = ((0 : ℤ), d + 1) ∨ (a, b + 1) = (d + 1, d - 1) then (1 : ℤ) else 0) =
+      (if (d - b, a) = ((0 : ℤ), (0 : ℤ)) ∨ (d - b, a) = ((2 : ℤ), d + 1) then (1 : ℤ) else 0) := by
+    simp only [Prod.mk.injEq]
+    split_ifs <;> omega
+  have hsq : (b + 1 - a) ^ 2 = (a - b - 1) ^ 2 := by ring
+  have hmin : min (d - (b + 1)) 0 = min (d - b - 1) 0 := by
+    rw [show d - (b + 1) = d - b - 1 by ring]
+  have hT := two_mul_T2 a
+  have hC := two_mul_chooseTwo a
+  unfold paperNearStairValue paperStairValue h0 centeredQuarterTurnCorrection
+  dsimp only
+  rw [hI, hsq, hmin]
+  linarith
+
+/-- The value identity C: the near-one ladder `nladderN d` at `(a, b)` (read at `+(0,1)`) against the ladder `ladderF d`
+at the rotated point `(2d - b, a + 1)`, with `-h0 (a, b)`. -/
+theorem rotC_val (d a b : ℤ) :
+    paperNearLadderValue d (a, b + 1) = paperLadderValue d (2 * d - b, a + 1) - h0 (a, b) := by
+  have hI : (if (a, b + 1) = ((-1 : ℤ), 2 * d + 1) ∨ (a, b + 1) = (d + 1, d - 1) ∨
+        (b + 1 - a = d ∧ 0 < a ∧ a < d) then (1 : ℤ) else 0) =
+      (if (2 * d - b, a + 1) = ((0 : ℤ), (0 : ℤ)) ∨ (2 * d - b, a + 1) = (d + 2, d + 2) ∨
+        (2 * d - b + (a + 1) = d + 2 ∧ 1 < a + 1 ∧ a + 1 < d + 1) then (1 : ℤ) else 0) := by
+    simp only [Prod.mk.injEq]
+    split_ifs <;> omega
+  have hM : min 0 (d - (b + 1)) + min 0 (2 * d - (b + 1)) + max ((b + 1 - a) - d) 0 -
+      (min (2 * d - b - 1) 0 + min 0 (d + 1 - (2 * d - b)) + max (2 * d - b + (a + 1) - d - 2) 0) = -a := by
+    omega
+  have hsq : (b + 1 - a) ^ 2 = (a - b - 1) ^ 2 := by ring
+  have hT := two_mul_T2 (a + 1)
+  have hC := two_mul_chooseTwo a
+  rw [pnlV, plV]
+  unfold h0 centeredQuarterTurnCorrection
+  dsimp only
+  rw [hI, hsq]
+  linarith
+
+/-- The value identity D: the ladder `ladderF d` at `(a, b)` against the near-one ladder `nladderN d` at the rotated point
+`(d + 1 - b, a + d - 1)` (read at `+(0,1)`), with `-h0 (a, b)`. -/
+theorem rotD_val (d a b : ℤ) :
+    paperLadderValue d (a, b) = paperNearLadderValue d (d + 1 - b, a + d - 1) - h0 (a, b) := by
+  have hI : (if (a, b) = ((0 : ℤ), (0 : ℤ)) ∨ (a, b) = (d + 2, d + 2) ∨ (a + b = d + 2 ∧ 1 < b ∧ b < d + 1) then
+        (1 : ℤ) else 0) =
+      (if (d + 1 - b, a + d - 1) = ((-1 : ℤ), 2 * d + 1) ∨ (d + 1 - b, a + d - 1) = (d + 1, d - 1) ∨
+        (a + d - 1 - (d + 1 - b) = d ∧ 0 < d + 1 - b ∧ d + 1 - b < d) then (1 : ℤ) else 0) := by
+    simp only [Prod.mk.injEq]
+    split_ifs <;> omega
+  have hM : min (a - 1) 0 + min 0 (d + 1 - a) + max (a + b - d - 2) 0 -
+      (min 0 (1 - a) + min 0 (2 * d - (a + d - 1)) + max (a + b - 2 - d) 0) = a - 1 := by
+    omega
+  have hF := floor_pair_A a b
+  have hC := two_mul_chooseTwo a
+  have hT := two_mul_T2 b
+  have e1 : a + d - 1 - (d + 1 - b) = a + b - 2 := by ring
+  have e2 : d - (a + d - 1) = 1 - a := by ring
+  rw [plV, pnlV]
+  unfold h0 centeredQuarterTurnCorrection
+  dsimp only
+  rw [hI, e1, e2]
+  linarith
+
 end FLatticePaper.Tiles.BaseTileProps
