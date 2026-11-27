@@ -405,6 +405,18 @@ def printedEvenSides (odd plus : Bool) : List Side :=
   | true, false => [.hMinus, .vMinus]
   | false, false => [.hMinus, .vPlus]
 
+/-- The sides of the child tile that each L-correction contains (`lSides oddChild W1odd plus elongated`). The elongated even
+correction has the printed sides of `lemma:l_correc_properties` (2) (`printedEvenSides`); a short correction has the one side of its
+partial tile (`T^{h±}(q_0)`, and `T^{v±}(p_0)` with `+` and `-` flipped when `W_1` is even, `def:odd_l_correction`,
+`def:even_l_correction`); the elongated odd correction has that `v` side and the `h` side opposite to its sign. The containment of
+these strings in the cells of the L-correction holds for every word of length at most 5 and no other side is contained for every
+word (numerics, `tmp-w6/chk3.py`); it is not proved here. -/
+def paperLSides (oddChild odd plus elong : Bool) : List Side :=
+  if oddChild then
+    (if elong then [if plus then .hMinus else .hPlus] else []) ++ [if odd == plus then .vPlus else .vMinus]
+  else
+    if elong then printedEvenSides odd plus else [if plus then .hPlus else .hMinus]
+
 /-! ### The properties: (c) of `lemma:weak_standard_odometer_properties`, (a)-(c) of `lemma:tile-odometer-existence` -/
 
 /-- `h_0` of `eq:harmonic_h0` (`Plane.SurgicalH0`). -/
