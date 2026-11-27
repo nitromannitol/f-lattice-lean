@@ -416,6 +416,10 @@ import FLatticePaper.Tiles.SiteStrings
 import FLatticePaper.Tiles.SiteInduction
 import FLatticePaper.Tiles.MixedPiecesInMarks
 import FLatticePaper.Tiles.ChildGlue
+import FLatticePaper.Tiles.ClosedPathCycle
+import FLatticePaper.Tiles.ClosedPathCorners
+import FLatticePaper.Tiles.ClosedPathSum
+import FLatticePaper.Tiles.ClosedPathContacts
 import FLatticePaper.Tiles.MixedOverlapStrings
 import FLatticePaper.Tiles.ChildAssembly
 import FLatticePaper.Tiles.PTAffineTransport
