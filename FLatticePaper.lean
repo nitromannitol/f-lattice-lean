@@ -259,6 +259,7 @@ import FLatticePaper.Tiles.StackedStringConnected
 import FLatticePaper.Tiles.StackFinalAssembly
 import FLatticePaper.Tiles.TilingCriteria
 import FLatticePaper.Tiles.StandardTiles
+import FLatticePaper.Tiles.StandardBaseBridge
 import FLatticePaper.Tiles.BottomEdges
 import FLatticePaper.Tiles.AdmissibleStatement
 import FLatticePaper.Tiles.AdmissibleFinal
@@ -1155,6 +1156,8 @@ import FLatticePaper.Tiles.AltStairPseudo
 import FLatticePaper.Tiles.AltStairRespects
 import FLatticePaper.Tiles.NearLadderAltRespects
 import FLatticePaper.Tiles.LadderVerticalRespects
+import FLatticePaper.Tiles.NearStairVerticalRespects
+import FLatticePaper.Construction.PropBaseCasesE
 import FLatticePaper.Tiles.StackedMoreover
 import FLatticePaper.Tiles.SurgicalDict
 import FLatticePaper.Tiles.SurgicalPartial
