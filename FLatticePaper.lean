@@ -1158,5 +1158,9 @@ import FLatticePaper.Tiles.SurgicalPartial
 import FLatticePaper.Tiles.PartialBoundary
 import FLatticePaper.Tiles.PseudoSquareAnchored
 import FLatticePaper.Tiles.SurgicalSlopes
+import FLatticePaper.Construction.LadderRotationTile
+import FLatticePaper.Construction.PropBaseCasesFG
+import FLatticePaper.Plane.Induction.FreeSelSat
+import FLatticePaper.Plane.Induction.FreeSelSquares
 
 /-! Root import for the corrected F-lattice paper. -/
