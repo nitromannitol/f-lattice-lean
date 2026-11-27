@@ -17,8 +17,8 @@ subodometers around closed paths (condition (C)) for every decomposition, standa
 packing is proved for both children (`Tiles.H3Pairs`), and condition (C) is proved for both
 standard children from named local inputs (`Tiles.ClosedPathStandard`). The weak odometers of Section 7 are built from the tile odometers of the parents (Section 8), so Sections 7 and 8
 are formalised as one induction over the recursion word. Open in the text: E29, items (3)–(5) of
-`lemma:alternate_tile_properties`, and the local compatibility of overlapping copies claimed in Section 8 (checked numerically to
-length 5).
+`lemma:alternate_tile_properties`, the local compatibility of overlapping copies claimed in Section 8 (checked numerically to
+length 5), and that the corrected decompositions of Section 8 cover exactly the standard tiles (asserted through figures; measured on 706 decompositions).
 
 ## Headline theorems
 
