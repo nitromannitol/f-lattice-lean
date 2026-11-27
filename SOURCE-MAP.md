@@ -1,7 +1,7 @@
 # Source correspondence
 
 **Target: the surgical edition.** The target is the surgical edition of `farey_recursion.tex` (the October 2023 arXiv text
-with minimal corrections, Sections 5–8), pinned at commit 0f7dde5 of its source repository; its text is not copied here.
+with minimal corrections, Sections 5–8), pinned at commit 5880d64 of its source repository; its text is not copied here.
 The surgical map of Sections 1–8 (label, surgical line, Lean declaration, agreement) is the last section of this file. The
 table that follows maps the corrected edition pinned in `paper/`.
 
@@ -130,7 +130,7 @@ A separate, shorter write-up (`flattice-simple-proof`, `short-proof.tex` with it
 
 ## Surgical edition map (Sections 1–8)
 
-Lines refer to `farey_recursion.tex` at commit 0f7dde5 of the surgical edition's source repository; its text is not copied
+Lines refer to `farey_recursion.tex` at commit 5880d64 of the surgical edition's source repository; its text is not copied
 here. E-numbers refer to that repository's error list (`notes/ERRORS_S5-8.md` and the section notes). Status words:
 **agrees** (the Lean statement matches the surgical statement and is proved), **conditional** (proved from named inputs),
 **partial** (some parts proved), **differs** (the Lean states another form; the surgical form is open), **defined** (the
@@ -195,7 +195,7 @@ Section 2 has no numbered statements. Section 9 is the new text of the surgical 
 | lemma:l_correc_properties | 4012 | `Tiles.LCorrections` (the comparisons with the table) | open: (1)–(3) |
 | definition of tile odometers (unlabelled) | 4135 | — | open (E41) |
 | lemma:l_correct_existence | 4162 | — | open (E42) |
-| lemma:tile-odometer-existence | 4185 | — | open (E43) |
-| lemma:global_odometers | 4256 | `Plane.SurgicalGlobalOdometers.surgical_corrected_periodicity`; `Plane.GlobalOdometers.global_odometers` (the corrected edition's route, from named inputs) | partial: the periodicity and growth algebra is proved; the standard extension by eq:global_translation is open; the alternate extension has no proof in the text (audit) |
-| lemma:global_superharmonic | 4289 | — | open (the text's proof depends on the open inputs listed by the audit) |
-| lemma:global_recurrence | 4304 | — | open: the text's proof is not a proof (audit); recurrence is checked numerically for all periodic patterns of words of length at most 4 |
+| lemma:tile-odometer-existence | 4193 | — | open (E43) |
+| lemma:global_odometers | 4339 | `Plane.SurgicalGlobalOdometers.surgical_corrected_periodicity`; `Plane.GlobalOdometers.global_odometers` (the corrected edition's route, from named inputs) | partial: the periodicity and growth algebra is proved; the standard extension by eq:global_translation is open; the alternate extension has no proof in the text (audit) |
+| lemma:global_superharmonic | 4372 | — | open (the text's proof depends on the open inputs listed by the audit) |
+| lemma:global_recurrence | 4387 | — | open: the text's proof is not a proof (audit); recurrence is checked numerically for all periodic patterns of words of length at most 4 |

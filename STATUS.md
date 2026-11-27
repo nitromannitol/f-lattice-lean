@@ -4,7 +4,7 @@ This file states what the repository proves and which named hypotheses the headl
 The Lean sources are the authority; each link points to the declaration.
 
 **Target.** The target is the surgical edition of the October 2023 manuscript: the author's arXiv text with minimal
-corrections in its own language, pinned at commit 0f7dde5 of its source repository (Sections 1–9). The new Section 9 failed its
+corrections in its own language, pinned at commit 5880d64 of its source repository (Sections 1–9). The new Section 9 failed its
 audit: its standard extension (lemma:global_odometers for standard tiles) and the periodicity and growth algebra are sound,
 while its proof of recurrence and of the alternate extension is not a proof, and the general recurrence is open. Sections 1–8 are being mapped to the Lean statement by statement in [SOURCE-MAP.md](SOURCE-MAP.md), and the
 statements corrected in Sections 5–8 are restated and proved in their surgical form. The corrected edition pinned in
@@ -13,11 +13,12 @@ that edition, and their named hypotheses belong to the supplement's route. That 
 
 **Surgical edition, open inputs.** The surgical text now proves the packing in item (d) of `lemma:standard_tile_properties`
 (no cell lies in a copy of each parent of a standard decomposition) and the consistency of the offset constants of the placed
-subodometers around closed paths (condition (C)) for the standard decompositions and for the alternate decompositions without
-the alternate parent. The Lean still carries both as named inputs (`Tiles.CellRegisters`, `CellsDisjointOdd`; `Tiles.ChildGlue`,
-condition (C)) until those proofs are formalised. Condition (C) stays open in the text for the alternate decompositions with the
-alternate parent and for the corrected decompositions of Section 8, as do E29 and items (3)–(5) of
-`lemma:alternate_tile_properties`.
+subodometers around closed paths (condition (C)) for every decomposition, standard, alternate and corrected. The Lean still
+carries both as named inputs (`Tiles.CellRegisters`, `CellsDisjointOdd`; `Tiles.ChildGlue`, condition (C)) until those proofs
+are formalised. The weak odometers of Section 7 are built from the tile odometers of the parents (Section 8), so Sections 7 and 8
+are formalised as one induction over the recursion word. Open in the text: E29, items (3)–(5) of
+`lemma:alternate_tile_properties`, and the local compatibility of overlapping copies claimed in Section 8 (checked numerically to
+length 5).
 
 ## Headline theorems
 
