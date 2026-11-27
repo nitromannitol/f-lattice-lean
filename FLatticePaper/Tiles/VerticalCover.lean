@@ -158,10 +158,10 @@ theorem cover_chain (rest : List ZTile) : ∀ (t : ZTile) (o : GInt) (pr : Optio
     have hz' : z ∈ F2Word.walk (o + rotI (anchorOff ZTile.zero) + ((1 : ℤ), (0 : ℤ))) [Unit4.i] := by
       simpa [chainMV] using hz
     rw [WalkDecomp.walk_cons, WalkDecomp.walk_nil] at hz'
-    simp only [List.mem_cons, List.mem_singleton, List.not_mem_nil, or_false] at hz'
+    simp only [List.mem_cons, List.not_mem_nil, or_false] at hz'
     apply tileCovers_of_right
     apply tileCovers_of_shape
-    simp only [vtl, vtileOf, List.mem_map]
+    simp only [vtileOf, List.mem_map]
     rcases hz' with rfl | rfl
     · exact ⟨((1 : ℤ), (0 : ℤ)), by decide, by simp [anchorOff, rotI]; abel⟩
     · exact ⟨((1 : ℤ), (1 : ℤ)), by decide, by
@@ -204,7 +204,7 @@ theorem cover_chain (rest : List ZTile) : ∀ (t : ZTile) (o : GInt) (pr : Optio
     show tileCovers (predL pr o t ++ ((vtileOf t, o) :: vtl (t' :: rest) (o + rotI (incr t')))) z
     rcases List.mem_append.1 hz with hz1 | hz2
     · rw [WalkDecomp.walk_cons, WalkDecomp.walk_cons, WalkDecomp.walk_nil] at hz1
-      simp only [List.mem_cons, List.mem_singleton, List.not_mem_nil, or_false] at hz1
+      simp only [List.mem_cons, List.not_mem_nil, or_false] at hz1
       rcases hz1 with rfl | rfl | rfl
       · -- the start point
         rcases pr with _ | p
@@ -273,7 +273,7 @@ theorem lastZero_tileSeqAux : ∀ (w : BinaryWord) (pr : Option Letter),
     | nil =>
       have hx : x = Letter.p := by simpa using hl
       subst hx
-      simp [tileSeqAux, zTileOf]
+      simp [tileSeqAux]
     | cons y w' =>
       rw [tileSeqAux_cons pr x (y :: w'), tileSeqAux_cons (some x) y w']
       have hl' : (y :: w').getLast? = some Letter.p := by simpa using hl
@@ -339,7 +339,7 @@ theorem S3_odd (w : Word) : ∀ z ∈ F2Word.walk (F2Word.sum (oddBottom w)) (od
       FLatticePaper.Tiles.CornerPositions.lastPos_hWordOf_false w
     rw [h]
     unfold almostV₁ gI
-    ext <;> simp <;> ring
+    ext <;> simp
   rw [hrot, gH_mulI] at hz
   rw [hvw, hlp]
   have hz' : z ∈ F2Word.walk ((F2Word.sum (oddBottom w) - ((1 : ℤ), (0 : ℤ))) + ((1 : ℤ), (0 : ℤ)))
@@ -365,7 +365,7 @@ theorem S3_even (w : Word) : ∀ z ∈ F2Word.walk (F2Word.sum (evenBottom w)) (
       FLatticePaper.Tiles.CornerPositions.lastPos_hWordOf_true w
     rw [h]
     unfold almostV₁ gI
-    ext <;> simp <;> ring
+    ext <;> simp
   rw [hrot, gH_mulI] at hz
   rw [hvw, hlp]
   have hz' : z ∈ F2Word.walk ((F2Word.sum (evenBottom w) - ((1 : ℤ), (0 : ℤ))) + ((1 : ℤ), (0 : ℤ)))
