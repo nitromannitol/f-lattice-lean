@@ -1155,16 +1155,18 @@ import FLatticePaper.Tiles.AltStairPseudo
 import FLatticePaper.Tiles.StackedMoreover
 import FLatticePaper.Tiles.SurgicalDict
 import FLatticePaper.Tiles.SurgicalPartial
-import FLatticePaper.Tiles.PartialBoundary
+import FLatticePaper.Tiles.SurgicalOdometers
 import FLatticePaper.Tiles.PseudoSquareAnchored
 import FLatticePaper.Tiles.SurgicalSlopes
 import FLatticePaper.Tiles.StackedLocal
 import FLatticePaper.Tiles.HorizontalFamily
 import FLatticePaper.Tiles.HorizontalMoreoverProof
+import FLatticePaper.Tiles.PartialBoundary
 import FLatticePaper.Construction.LadderRotationTile
 import FLatticePaper.Construction.PropBaseCasesFG
 import FLatticePaper.Plane.Induction.FreeSelSat
 import FLatticePaper.Plane.Induction.FreeSelSquares
-import FLatticePaper.Tiles.SurgicalOdometers
+import FLatticePaper.Tiles.NearBaseBridges
+import FLatticePaper.Tiles.SurgicalWeakOdometers
 
 /-! Root import for the corrected F-lattice paper. -/

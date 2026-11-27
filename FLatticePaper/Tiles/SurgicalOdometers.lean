@@ -14,12 +14,12 @@ namespace FLatticePaper.Tiles
 
 /-- A partial odometer on a point set: its domain (a list of lattice points) and its values. -/
 structure PartialOdometer where
-  dom : List Site
+  dom : Finset Site
   val : Site → ℤ
 
 /-- The slope `s(h)` of a partial odometer: the average over the unit squares of its domain (`slopeOf`). -/
-def PartialOdometer.slope (h : PartialOdometer) : ℚ × ℚ :=
-  slopeOf h.val h.dom
+noncomputable def PartialOdometer.slope (h : PartialOdometer) : ℚ × ℚ :=
+  slopeOf h.val h.dom.toList
 
 /-- The offset `a_{n/d,i}` for `i = 1` (`false`) and `i = 2` (`true`): `a_{n/d,1} = (0,0)`, `a_{n/d,2} = (n, −d)`. -/
 def offsetA (n d : ℤ) : Bool → ℤ × ℤ
@@ -29,12 +29,12 @@ def offsetA (n d : ℤ) : Bool → ℤ × ℤ
 /-- `o_1` and `o_2` are translations of one another by `v` with affine correction `a^T x + b` (surgical definition of
 translations): the domain of `o_1` is that of `o_2` moved by `v`, and `o_1(x) = o_2(x − v) + a^T x + b` on it. -/
 def IsTranslationOf (o₁ o₂ : PartialOdometer) (v a : ℤ × ℤ) (b : ℤ) : Prop :=
-  o₁.dom = o₂.dom.map (· + v) ∧
+  o₁.dom = o₂.dom.image (· + v) ∧
     ∀ x ∈ o₁.dom, o₁.val x = o₂.val (x - v) + (a.1 * x.1 + a.2 * x.2) + b
 
 /-- Two partial odometers `o(n/d)` and `o(n'/d')` respect the tile translations for `i` (surgical def., line 3375): the slope
 of `o(n'/d')` minus the slope of `o(n/d)` is `a_{n/d,i}`, and the domains are the tiles `T(n/d)` and `T(n'/d')`. -/
-def RespectTileTranslations (n d : ℤ) (i : Bool) (T T' : List Site) (o o' : PartialOdometer) : Prop :=
+def RespectTileTranslations (n d : ℤ) (i : Bool) (T T' : Finset Site) (o o' : PartialOdometer) : Prop :=
   o.dom = T ∧ o'.dom = T' ∧
     o'.slope - o.slope = (((offsetA n d i).1 : ℚ), ((offsetA n d i).2 : ℚ))
 
@@ -42,5 +42,9 @@ def RespectTileTranslations (n d : ℤ) (i : Bool) (T T' : List Site) (o o' : Pa
 slopes differ by `a_{n/d,i}`. -/
 def LatticeAdjacent (n d : ℤ) (i : Bool) (c c' : Site) (vi : Site) (o o' : PartialOdometer) : Prop :=
   c - c' = vi ∧ o.slope - o'.slope = (((offsetA n d i).1 : ℚ), ((offsetA n d i).2 : ℚ))
+
+/-- Two partial odometers are compatible (surgical line 1115): `o₁ − o₂` is an offset constant `c ∈ ℤ` on the common domain. -/
+def Compatible (o₁ o₂ : PartialOdometer) : Prop :=
+  ∃ c : ℤ, ∀ x ∈ o₁.dom ∩ o₂.dom, o₁.val x - o₂.val x = c
 
 end FLatticePaper.Tiles

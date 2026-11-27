@@ -49,7 +49,7 @@ def offsetP0 (odd : Bool) (vp1 vp2 vq1 vq2 : Site) : P0Piece → Site
 /-- `c(T) − c(T(q_0))` of `eq:offsets_w1_odd` and `eq:offsets_w1_even`. -/
 def offsetQ0 (odd : Bool) (vp1 vp2 vq1 vq2 : Site) : Q0Piece → Site
   | .p1DPlus => if odd then 0 else vq1
-  | .p1DMinus => if odd then vq1 + vq2 else vq1
+  | .p1DMinus => if odd then vq1 + vq2 else vq2
   | .q1Plus => if odd then vp1 else 0
   | .q1Minus => if odd then vp2 + vp2 else vp1 + vp2 + vp2
 
@@ -115,5 +115,14 @@ def placeAltQ0 (odd : Bool) (Tp Tq : Tile) (Sq : Site) (vp1 vp2 vq1 vq2 : Site) 
   | .dsQ1Minus => shift (doubled Tq Sq) (altOffsetQ0 odd vp1 vp2 vq1 vq2 .dsQ1Minus)
   | .p1Plus => shift Tp (altOffsetQ0 odd vp1 vp2 vq1 vq2 .p1Plus)
   | .p1Minus => shift Tp (altOffsetQ0 odd vp1 vp2 vq1 vq2 .p1Minus)
+
+/-- The doubling shifts `(S_p, S_q)` of `eq:alt_doubled`: `(v_{q,1} + v_{p,2}, −v_{q,1} + v_{p,2})` when `W_1` is even, and
+`(−v_{q,1} + v_{p,2}, v_{q,1} + v_{p,2})` otherwise. The Boolean is `W_1` odd (`true` = odd). -/
+def altShifts (w1Odd : Bool) (vp2 vq1 : Site) : Site × Site :=
+  if w1Odd then (-vq1 + vp2, vq1 + vp2) else (vq1 + vp2, -vq1 + vp2)
+
+theorem altShifts_even (vp2 vq1 : Site) : altShifts false vp2 vq1 = (vq1 + vp2, -vq1 + vp2) := rfl
+
+theorem altShifts_odd (vp2 vq1 : Site) : altShifts true vp2 vq1 = (-vq1 + vp2, vq1 + vp2) := rfl
 
 end FLatticePaper.Tiles.SurgicalDict
