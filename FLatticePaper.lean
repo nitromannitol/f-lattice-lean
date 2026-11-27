@@ -434,6 +434,10 @@ import FLatticePaper.Tiles.HorizontalPair
 import FLatticePaper.Tiles.HBottom
 import FLatticePaper.Tiles.VerticalRight
 import FLatticePaper.Tiles.VerticalPair
+import FLatticePaper.Tiles.StringCover
+import FLatticePaper.Tiles.HorizontalSides
+import FLatticePaper.Tiles.ReflectedCover
+import FLatticePaper.Tiles.HorizontalTop
 import FLatticePaper.Tiles.SiteBaseDischarge
 import FLatticePaper.Tiles.SitePairScope
 import FLatticePaper.Tiles.SiteCell
