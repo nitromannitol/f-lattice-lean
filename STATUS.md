@@ -4,7 +4,7 @@ This file states what the repository proves and which named hypotheses the headl
 The Lean sources are the authority; each link points to the declaration.
 
 **Target.** The target is the surgical edition of the October 2023 manuscript: the author's arXiv text with minimal
-corrections in its own language, pinned at commit 1953073 of its source repository (Sections 1–9). The new Section 9 failed its
+corrections in its own language, pinned at commit da28d55 of its source repository (Sections 1–9). The new Section 9 failed its
 audit: its standard extension (lemma:global_odometers for standard tiles) and the periodicity and growth algebra are sound,
 while its proof of recurrence and of the alternate extension is not a proof, and the general recurrence is open. Sections 1–8 are being mapped to the Lean statement by statement in [SOURCE-MAP.md](SOURCE-MAP.md), and the
 statements corrected in Sections 5–8 are restated and proved in their surgical form. The corrected edition pinned in
@@ -16,7 +16,9 @@ inputs of the existence of the weak standard odometers (Section 7): the packing 
 `lemma:standard_tile_properties`, that no cell lies in a copy of each parent of a standard decomposition
 (`Tiles.CellRegisters`, `CellsDisjointOdd`; checked numerically for every word of length at most 5), and the consistency of the
 offset constants of the placed subodometers around every closed path of overlapping pieces (`Tiles.ChildGlue`, condition (C);
-checked numerically for every word of length at most 5). Everything else in the surgical map is either proved, stated and open,
+checked numerically for every word of length at most 5). The surgical text now proves (C) for the standard decompositions and
+for the alternate decompositions without the alternate parent; it remains open for the alternate decompositions with the
+alternate parent and for the corrected decompositions of Section 8. Everything else in the surgical map is either proved, stated and open,
 or listed there with its status.
 
 ## Headline theorems

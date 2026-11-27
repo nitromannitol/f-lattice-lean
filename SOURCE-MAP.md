@@ -1,7 +1,7 @@
 # Source correspondence
 
 **Target: the surgical edition.** The target is the surgical edition of `farey_recursion.tex` (the October 2023 arXiv text
-with minimal corrections, Sections 5–8), pinned at commit 1953073 of its source repository; its text is not copied here.
+with minimal corrections, Sections 5–8), pinned at commit da28d55 of its source repository; its text is not copied here.
 The surgical map of Sections 1–8 (label, surgical line, Lean declaration, agreement) is the last section of this file. The
 table that follows maps the corrected edition pinned in `paper/`.
 
@@ -130,7 +130,7 @@ A separate, shorter write-up (`flattice-simple-proof`, `short-proof.tex` with it
 
 ## Surgical edition map (Sections 1–8)
 
-Lines refer to `farey_recursion.tex` at commit 1953073 of the surgical edition's source repository; its text is not copied
+Lines refer to `farey_recursion.tex` at commit da28d55 of the surgical edition's source repository; its text is not copied
 here. E-numbers refer to that repository's error list (`notes/ERRORS_S5-8.md` and the section notes). Status words:
 **agrees** (the Lean statement matches the surgical statement and is proved), **conditional** (proved from named inputs),
 **partial** (some parts proved), **differs** (the Lean states another form; the surgical form is open), **defined** (the
@@ -185,17 +185,17 @@ Section 2 has no numbered statements. Section 9 is the new text of the surgical 
 | def:standard_odometer_doubling | 3377 | `Tiles.SurgicalPartial.doubledTile`; `Tiles.SurgicalDict` | defined |
 | def:weak_standard_odometers | 3399 | `Tiles.SurgicalOdometerStep`; `Tiles.SurgicalWeakOdometers` | defined, with the base odometers of Section 6 |
 | lemma:weak_standard_odometer_properties | 3421 | `Tiles.SurgicalCorners`; `Tiles.SurgicalCornerThird.corner_3_family`, `corner_3_family_even`; `Tiles.SurgicalWeakOdometers`; `Tiles.ChildAssembly`; `Tiles.ChildGlue` | partial: (b), in affine factors, for both children of every weak standard family; (a) and (c) stated; the existence step glues the placed pieces on their kept domains given (d), the agreement on the marked strings and condition (C) |
-| def:alternate_tiles | 3458 | `Tiles.AlternateTiles`; `Tiles.AlternateConstructor` | differs (E30) |
-| lemma:alternate_tile_properties | 3593 | `Tiles.SurgicalAltTileLemma`; `Tiles.SurgicalAltTiles` | partial: (3) proved as anchor facts; (1) up to a translation, (2), (4) and (5) as corrected are stated and open (E31–E34) |
-| def:alternate_doubled_tile | 3672 | — | open |
-| def:weak_alternate_odometers | 3688 | `Tiles.SurgicalAltOdometers.IsWeakAltFamily`; `Tiles.SurgicalAltTiles` | defined |
-| lemma:weak_alternate_odometer_properties | 3707 | `Tiles.SurgicalAltOdometers.alt_respects_statement` | partial: (a) stated with the anchors of the alternate tiles (E35); existence and compatibility open |
-| def:odd_l_correction | 3741 | `Tiles.LCorrections.oddTexK`, `oddBridgeShift`, `oddLCorrection` | agrees (E36, E37) |
-| def:even_l_correction | 3797 | `Tiles.LCorrections.evenTexK`, `evenLCorrection` | agrees (E37); in case 01 the copy after an ancestor 2^j replaces the bridge (3839) |
-| lemma:l_correc_properties | 3853 | `Tiles.LCorrections` (the comparisons with the table) | open: (1)–(3) |
-| definition of tile odometers (unlabelled) | 3976 | — | open (E41) |
-| lemma:l_correct_existence | 4003 | — | open (E42) |
-| lemma:tile-odometer-existence | 4026 | — | open (E43) |
-| lemma:global_odometers | 4097 | `Plane.SurgicalGlobalOdometers.surgical_corrected_periodicity`; `Plane.GlobalOdometers.global_odometers` (the corrected edition's route, from named inputs) | partial: the periodicity and growth algebra is proved; the standard extension by eq:global_translation is open; the alternate extension has no proof in the text (audit) |
-| lemma:global_superharmonic | 4130 | — | open (the text's proof depends on the open inputs listed by the audit) |
-| lemma:global_recurrence | 4149 | — | open: the text's proof is not a proof (audit); recurrence is checked numerically for all periodic patterns of words of length at most 4 |
+| def:alternate_tiles | 3528 | `Tiles.AlternateTiles`; `Tiles.AlternateConstructor` | differs (E30) |
+| lemma:alternate_tile_properties | 3663 | `Tiles.SurgicalAltTileLemma`; `Tiles.SurgicalAltTiles` | partial: (3) proved as anchor facts; (1) up to a translation, (2), (4) and (5) as corrected are stated and open (E31–E34) |
+| def:alternate_doubled_tile | 3742 | — | open |
+| def:weak_alternate_odometers | 3758 | `Tiles.SurgicalAltOdometers.IsWeakAltFamily`; `Tiles.SurgicalAltTiles` | defined |
+| lemma:weak_alternate_odometer_properties | 3777 | `Tiles.SurgicalAltOdometers.alt_respects_statement` | partial: (a) stated with the anchors of the alternate tiles (E35); existence and compatibility open |
+| def:odd_l_correction | 3842 | `Tiles.LCorrections.oddTexK`, `oddBridgeShift`, `oddLCorrection` | agrees (E36, E37) |
+| def:even_l_correction | 3898 | `Tiles.LCorrections.evenTexK`, `evenLCorrection` | agrees (E37); in case 01 the copy after an ancestor 2^j replaces the bridge (3839) |
+| lemma:l_correc_properties | 3954 | `Tiles.LCorrections` (the comparisons with the table) | open: (1)–(3) |
+| definition of tile odometers (unlabelled) | 4077 | — | open (E41) |
+| lemma:l_correct_existence | 4104 | — | open (E42) |
+| lemma:tile-odometer-existence | 4127 | — | open (E43) |
+| lemma:global_odometers | 4198 | `Plane.SurgicalGlobalOdometers.surgical_corrected_periodicity`; `Plane.GlobalOdometers.global_odometers` (the corrected edition's route, from named inputs) | partial: the periodicity and growth algebra is proved; the standard extension by eq:global_translation is open; the alternate extension has no proof in the text (audit) |
+| lemma:global_superharmonic | 4231 | — | open (the text's proof depends on the open inputs listed by the audit) |
+| lemma:global_recurrence | 4246 | — | open: the text's proof is not a proof (audit); recurrence is checked numerically for all periodic patterns of words of length at most 4 |
