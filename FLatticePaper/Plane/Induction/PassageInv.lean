@@ -86,8 +86,8 @@ theorem step_inv_minus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hS
   · have hf := FLatticePaper.W1.forcedEdgeIn_forced hF
     have hSIz := nonfree_strictInterior (frameAt word) hzE hNF
     have hT := hT_of_W1 h hSE hPR hW hW1
-    have hP := price_nonincrease_forced_of_sat_PR h hSE hPR hW hT hSIz hw hzE hf hoE
-    have hJ := jminus_nonincrease_forced_of_sat_PR h hSE hPR hW hT hSIz hw hzE hf hoE
+    have hP := price_nonincrease_forced_of_sat_PR h hSE hPR hT hSIz hw hzE hf hoE
+    have hJ := jminus_nonincrease_forced_of_sat_PR h hSE hPR hT hSIz hw hzE hf hoE
     rw [roundedSlip_neg_eq, roundedSlip_neg_eq]
     exact ⟨hP, hJ⟩
 
@@ -110,8 +110,8 @@ theorem step_inv_plus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three) (hSE
   · have hf := FLatticePaper.W1.forcedEdgeIn_forced hF
     have hSIz := nonfree_strictInterior (frameAt word) hzE hNF
     have hT := hT_of_W1 h hSE hPR hW hW1
-    have hP := price_nonincrease_forced_of_sat_PR h hSE hPR hW hT hSIz hw hzE hf hoE
-    have hJ := jplus_nonincrease_forced_of_sat_PR h hSE hPR hW hT hSIz hw hzE hf hoE
+    have hP := price_nonincrease_forced_of_sat_PR h hSE hPR hT hSIz hw hzE hf hoE
+    have hJ := jplus_nonincrease_forced_of_sat_PR h hSE hPR hT hSIz hw hzE hf hoE
     rw [roundedSlip_pos_eq, roundedSlip_pos_eq]
     exact ⟨hP, hJ⟩
 

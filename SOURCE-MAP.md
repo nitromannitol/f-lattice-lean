@@ -1,5 +1,10 @@
 # Source correspondence
 
+**Target: the surgical edition.** The target is the surgical edition of `farey_recursion.tex` (the October 2023 arXiv text
+with minimal corrections, Sections 5–8), pinned at commit 23ad96c of its source repository; its text is not copied here.
+The surgical map of Sections 1–8 (label, surgical line, Lean declaration, agreement) is being added below. The table that
+follows maps the corrected edition pinned in `paper/`.
+
 The corrected October 2023 edition is pinned by [paper.sha256](paper.sha256). The links below locate its statements and the exact sparse Julia constructor delivered with it. `sha256sum --quiet -c paper.sha256` verifies the sources locally.
 
 | Source | Lean result or outstanding obligation |

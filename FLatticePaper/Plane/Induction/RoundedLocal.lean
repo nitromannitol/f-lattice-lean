@@ -27,7 +27,7 @@ theorem rounded_forced_SI {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (standardField word o - standardField word (o + -(frameAt word).shortShift) + 1) / 2 ≤
       (standardField word c - standardField word (c + -(frameAt word).shortShift) + 1) / 2 := by
   have hPR := ForcedPriceSI.priceRangeOn_of_strong hWord
-  refine PassagePR.jminus_nonincrease_forced_of_sat_PR h hSE hPR hW ?_ hSIc hw hcE hf hoE
+  refine PassagePR.jminus_nonincrease_forced_of_sat_PR h hSE hPR ?_ hSIc hw hcE hf hoE
   intro m hm c' o' hSI hw' hc' hf' _ hlt
   exact absurd (TransferW1.hT_strict h hSE hPR hW hW1 hm hSI hw' hc' hf') (ne_of_gt hlt)
 

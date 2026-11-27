@@ -161,60 +161,55 @@ theorem price_nonincrease_black_PR {word : Word} (h : ∃ x ∈ word, x ≠ Digi
 where (T) is the hypothesis `hT` with the concrete empty clause and (W) is `hW`. -/
 theorem forced_contact_of_sat_PR {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hPR : PriceRangeOn word)
-    (hW : HasSatSelection (standardField word))
     (hT : ∀ m, IsCmpField word m → ∀ c o, FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c →
       laplacian (standardField word) c = 0 →
       standardField word c = m c → ForcedEdge (standardField word) (fun _ _ => False) c o →
-      o ∈ (frameAt word).closedPolygon → m o < standardField word o → EmptyClause m)
+      o ∈ (frameAt word).closedPolygon → m o < standardField word o → False)
     {m : Field} (hm : IsCmpField word m) {c o : Site} (hSIc : FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c)
     (hw : laplacian (standardField word) c = 0)
     (hc : standardField word c = m c) (hf : ForcedEdge (standardField word) (fun _ _ => False) c o)
     (hoE : o ∈ (frameAt word).closedPolygon) : standardField word o = m o :=
-  forced_contact_transfer_PR h hSE hPR EmptyClause hT (fun _ hm' => not_emptyClause_of_cmp hW hm') hm hSIc hw hc hf hoE
+  forced_contact_transfer_PR h hSE hPR (fun _ => False) hT (fun _ _ h => h) hm hSIc hw hc hf hoE
 
 /-- `P` does not increase along unseeded forced white edges, from (T) with the concrete empty clause and (W). -/
 theorem price_nonincrease_forced_of_sat_PR {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hPR : PriceRangeOn word)
-    (hW : HasSatSelection (standardField word))
     (hT : ∀ m, IsCmpField word m → ∀ c o, FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c →
       laplacian (standardField word) c = 0 →
       standardField word c = m c → ForcedEdge (standardField word) (fun _ _ => False) c o →
-      o ∈ (frameAt word).closedPolygon → m o < standardField word o → EmptyClause m)
+      o ∈ (frameAt word).closedPolygon → m o < standardField word o → False)
     {c o : Site} (hSIc : FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c)
     (hw : laplacian (standardField word) c = 0) (hcE : c ∈ (frameAt word).closedPolygon)
     (hf : ForcedEdge (standardField word) (fun _ _ => False) c o) (hoE : o ∈ (frameAt word).closedPolygon) :
     (frameAt word).price (standardField word) o ≤ (frameAt word).price (standardField word) c :=
-  price_nonincrease_forced_PR h hSE hPR EmptyClause hT (fun _ hm' => not_emptyClause_of_cmp hW hm') hSIc hw hcE hf hoE
+  price_nonincrease_forced_PR h hSE hPR (fun _ => False) hT (fun _ _ h => h) hSIc hw hcE hf hoE
 
 /-- `J₊` does not increase along unseeded forced white edges, from (T) with the concrete empty clause and (W). -/
 theorem jplus_nonincrease_forced_of_sat_PR {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hPR : PriceRangeOn word)
-    (hW : HasSatSelection (standardField word))
     (hT : ∀ m, IsCmpField word m → ∀ c o, FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c →
       laplacian (standardField word) c = 0 →
       standardField word c = m c → ForcedEdge (standardField word) (fun _ _ => False) c o →
-      o ∈ (frameAt word).closedPolygon → m o < standardField word o → EmptyClause m)
+      o ∈ (frameAt word).closedPolygon → m o < standardField word o → False)
     {c o : Site} (hSIc : FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c)
     (hw : laplacian (standardField word) c = 0) (hcE : c ∈ (frameAt word).closedPolygon)
     (hf : ForcedEdge (standardField word) (fun _ _ => False) c o) (hoE : o ∈ (frameAt word).closedPolygon) :
     (standardField word o - standardField word (o + (frameAt word).shortShift) + 1) / 2 ≤
       (standardField word c - standardField word (c + (frameAt word).shortShift) + 1) / 2 :=
-  jplus_nonincrease_forced_PR h hSE hPR EmptyClause hT (fun _ hm' => not_emptyClause_of_cmp hW hm') hSIc hw hcE hf hoE
+  jplus_nonincrease_forced_PR h hSE hPR (fun _ => False) hT (fun _ _ h => h) hSIc hw hcE hf hoE
 
 /-- `J₋` does not increase along unseeded forced white edges, from (T) with the concrete empty clause and (W). -/
 theorem jminus_nonincrease_forced_of_sat_PR {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     (hSE : StrongEstimates (conjWord word)) (hPR : PriceRangeOn word)
-    (hW : HasSatSelection (standardField word))
     (hT : ∀ m, IsCmpField word m → ∀ c o, FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c →
       laplacian (standardField word) c = 0 →
       standardField word c = m c → ForcedEdge (standardField word) (fun _ _ => False) c o →
-      o ∈ (frameAt word).closedPolygon → m o < standardField word o → EmptyClause m)
+      o ∈ (frameAt word).closedPolygon → m o < standardField word o → False)
     {c o : Site} (hSIc : FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c)
     (hw : laplacian (standardField word) c = 0) (hcE : c ∈ (frameAt word).closedPolygon)
     (hf : ForcedEdge (standardField word) (fun _ _ => False) c o) (hoE : o ∈ (frameAt word).closedPolygon) :
     (standardField word o - standardField word (o + -(frameAt word).shortShift) + 1) / 2 ≤
       (standardField word c - standardField word (c + -(frameAt word).shortShift) + 1) / 2 :=
-  jminus_nonincrease_forced_PR h hSE hPR (packet_of_strong h hSE) EmptyClause hT
-    (fun _ hm' => not_emptyClause_of_cmp hW hm') hSIc hw hcE hf hoE
+  jminus_nonincrease_forced_PR h hSE hPR (packet_of_strong h hSE) (fun _ => False) hT (fun _ _ h => h) hSIc hw hcE hf hoE
 
 end FLatticePaper.PassagePR

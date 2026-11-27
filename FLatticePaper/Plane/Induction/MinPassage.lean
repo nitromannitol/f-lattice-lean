@@ -30,7 +30,7 @@ theorem hT_of_W1 {word : Word} (h : ∃ x ∈ word, x ≠ Digit.three)
     ∀ m, IsCmpField word m → ∀ c o, FLatticePaper.W1.StrictInterior (frameAt word).child.num (frameAt word).child.den c →
       laplacian (standardField word) c = 0 → standardField word c = m c →
       ForcedEdge (standardField word) (fun _ _ => False) c o →
-      o ∈ (frameAt word).closedPolygon → m o < standardField word o → EmptyClause m := by
+      o ∈ (frameAt word).closedPolygon → m o < standardField word o → False := by
   intro m hm c o hSI hw hc hf _ hlt
   exfalso
   have h1 := FLatticePaper.TransferW1.hT_strict h hSE hPR hW hW1 hm hSI hw hc hf
@@ -57,8 +57,8 @@ theorem minK_white_forced_plus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.th
       · exact hp
   have hT := hT_of_W1 h hSE hPR hW hW1
   have hSIz := FLatticePaper.TransferW1.nonfree_strictInterior (frameAt word) hzE hNF
-  have hpr := price_nonincrease_forced_of_sat_PR h hSE hPR hW hT hSIz hw hzE hf hoE
-  have hjr := jplus_nonincrease_forced_of_sat_PR h hSE hPR hW hT hSIz hw hzE hf hoE
+  have hpr := price_nonincrease_forced_of_sat_PR h hSE hPR hT hSIz hw hzE hf hoE
+  have hjr := jplus_nonincrease_forced_of_sat_PR h hSE hPR hT hSIz hw hzE hf hoE
   have hmi := hmin o hoS
   refine ⟨hoS, ?_⟩
   unfold kPlusW jPlusW at hmi ⊢
@@ -85,8 +85,8 @@ theorem minK_white_forced_minus {word : Word} (h : ∃ x ∈ word, x ≠ Digit.t
       · exact hp
   have hT := hT_of_W1 h hSE hPR hW hW1
   have hSIz := FLatticePaper.TransferW1.nonfree_strictInterior (frameAt word) hzE hNF
-  have hpr := price_nonincrease_forced_of_sat_PR h hSE hPR hW hT hSIz hw hzE hf hoE
-  have hjr := jminus_nonincrease_forced_of_sat_PR h hSE hPR hW hT hSIz hw hzE hf hoE
+  have hpr := price_nonincrease_forced_of_sat_PR h hSE hPR hT hSIz hw hzE hf hoE
+  have hjr := jminus_nonincrease_forced_of_sat_PR h hSE hPR hT hSIz hw hzE hf hoE
   have hmi := hmin o hoS
   refine ⟨hoS, ?_⟩
   unfold kMinusW jMinusW at hmi ⊢
