@@ -72,15 +72,36 @@ def ParentPieceOk (parent child : PartialOdometer) (vp1 vp2 vq1 vq2 : GInt) (np 
   | none => True
   | some c => PlacedPiece parent child (coeffOff vp1 vp2 vq1 vq2 c) (coeffAffine np dp nq dq c)
 
+/-- The partial tile of a doubled alternate piece: the L-correction `T^{L,±}` (`partialT`) when the piece is corrected, and the
+boundary tile `T^b` on both copies otherwise (`def:alternate_doubled_tile`: the doubled pieces are corrected only in Type 2 for the
+odd alternate child and Type 3 for the even one; otherwise both copies are full). -/
+def altPartial (S : WeakData) (u : Option Word) (b corrected : Bool) (lab : Bool) : Finset Site :=
+  if corrected then S.partialT u b lab else S.bdry u b
+
+/-- The alternate weak doubling (`def:alternate_doubled_tile`, manuscript f9cf1c2), defined like `IsWeakDoublingStd`: the doubled
+odometer `d = o ∪ o*` of `IsWeakDoublingOn` with the partial tile on the second copy (`firstPartial = false`) or on the first copy
+(`firstPartial = true`), and, after restriction to the meeting string of the first copy (`meet`: the horizontal `rev(w_h)` for the
+odd register `p`, the vertical `rev(w_v)` or `w_v` for `q` by the parity of `W_1`), `o*` and `o` respect the tile translations with
+the affine factor of the shift (`a_{p,2}` for both `S_p` and `S_q`, so `i = true`, `(n, d) = (p.num, p.den)`). -/
+def IsWeakDoublingAlt (firstPartial : Bool) (meet : FLatticePaper.Tiles.Side) (n d : ℤ) (i : Bool) (wh wv : BinaryWord)
+    (Tb Th : Finset Site) (v : Site) (o dd : PartialOdometer) : Prop :=
+  ∃ ostar : PartialOdometer,
+    (if firstPartial then IsWeakDoublingOn Th Tb v o dd ostar else IsWeakDoublingOn Tb Th v o dd ostar) ∧
+    FLatticePaper.Tiles.DoublingRespect.RespectsMeeting n d i wh wv meet v o ostar
+
 /-- The alternate odd child `T̂(p_0)` of the word `w` (`eq:alt_decomp`, first line): the shifted doublings `ds(o)_{p_1}^±`
 of the odd register (shift `S_p`), the plain pieces `o_{q_1}^±` of the even register, and the parent piece `ô(q_1)` of the even
 alternate register (when the type of `w` is not `two`). -/
 def AltOddNode (S : WeakData) (oddO evenO altOdd altEven : Word → PartialOdometer) (w : Word) : Prop :=
   ∃ dsp dsm : PartialOdometer,
-    IsWeakDoubling (S.bdry (regsAt w).1 true) (S.partialT (regsAt w).1 true true)
+    IsWeakDoublingAlt false FLatticePaper.Tiles.Side.hMinus (parentsAt w).odd.num (parentsAt w).odd.den true
+        (FLatticePaper.Tiles.DoublingRespect.regWords true (regsAt w).1).1 (FLatticePaper.Tiles.DoublingRespect.regWords true (regsAt w).1).2
+        (S.bdry (regsAt w).1 true) (altPartial S (regsAt w).1 true (altTypeOf w == some Digit.two) false)
         (altShifts (phase w == 1) (texV2 (parentsAt w).odd) (texV1Even (parentsAt w).even)).1
         (regOdo S oddO evenO (regsAt w).1 true) dsp ∧
-    IsWeakDoubling (S.bdry (regsAt w).1 true) (S.partialT (regsAt w).1 true false)
+    IsWeakDoublingAlt true FLatticePaper.Tiles.Side.hMinus (parentsAt w).odd.num (parentsAt w).odd.den true
+        (FLatticePaper.Tiles.DoublingRespect.regWords true (regsAt w).1).1 (FLatticePaper.Tiles.DoublingRespect.regWords true (regsAt w).1).2
+        (S.bdry (regsAt w).1 true) (altPartial S (regsAt w).1 true (altTypeOf w == some Digit.two) true)
         (altShifts (phase w == 1) (texV2 (parentsAt w).odd) (texV1Even (parentsAt w).even)).1
         (regOdo S oddO evenO (regsAt w).1 true) dsm ∧
     PlacedPiece (altOdd w) dsp
@@ -116,10 +137,16 @@ odd register, the shifted doublings `ds(o)_{q_1}^±` of the even register (shift
 odd alternate register (when the type of `w` is not `three`). -/
 def AltEvenNode (S : WeakData) (oddO evenO altOdd altEven : Word → PartialOdometer) (w : Word) : Prop :=
   ∃ dsp dsm : PartialOdometer,
-    IsWeakDoubling (S.bdry (regsAt w).2 false) (S.partialT (regsAt w).2 false true)
+    IsWeakDoublingAlt true (FLatticePaper.Tiles.DoublingRespect.doublingSide false (phase w == 1))
+        (parentsAt w).odd.num (parentsAt w).odd.den true
+        (FLatticePaper.Tiles.DoublingRespect.regWords false (regsAt w).2).1 (FLatticePaper.Tiles.DoublingRespect.regWords false (regsAt w).2).2
+        (S.bdry (regsAt w).2 false) (altPartial S (regsAt w).2 false (altTypeOf w == some Digit.three) true)
         (altShifts (phase w == 1) (texV2 (parentsAt w).odd) (texV1Even (parentsAt w).even)).2
         (regOdo S oddO evenO (regsAt w).2 false) dsp ∧
-    IsWeakDoubling (S.bdry (regsAt w).2 false) (S.partialT (regsAt w).2 false false)
+    IsWeakDoublingAlt false (FLatticePaper.Tiles.DoublingRespect.doublingSide false (phase w == 1))
+        (parentsAt w).odd.num (parentsAt w).odd.den true
+        (FLatticePaper.Tiles.DoublingRespect.regWords false (regsAt w).2).1 (FLatticePaper.Tiles.DoublingRespect.regWords false (regsAt w).2).2
+        (S.bdry (regsAt w).2 false) (altPartial S (regsAt w).2 false (altTypeOf w == some Digit.three) false)
         (altShifts (phase w == 1) (texV2 (parentsAt w).odd) (texV1Even (parentsAt w).even)).2
         (regOdo S oddO evenO (regsAt w).2 false) dsm ∧
     PlacedPiece (altEven w) dsp

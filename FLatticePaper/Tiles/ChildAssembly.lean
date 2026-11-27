@@ -10,11 +10,11 @@ places all four pieces if the placed values agree on the overlaps, with the thre
 * `PlacedMixed` (H1, claim (d), OPEN): placed pieces of different parents meet only inside their marks;
 * `PlacedMarksAgree` (H2, OPEN): placed pieces of different parents agree at the sites of both marks
   (`lemma:stacked_zero_one_string`, i.e. Moreover + (a) + (b) at the interface);
-* `PlacedSameAgree` (H3, OPEN): placed pieces of one parent agree on their whole overlap (the operator's (c) at the lower
-  depth). Only the pairs that overlap need it (see the numerics in the report).
+* `PlacedDoubledAgree` (H3, (c), OPEN): the two copies of a doubled piece agree on their whole overlap. The other same-parent
+  overlaps are removed by the Step 1 deletion, which keeps one copy on each overlap (`ChildGlue.keptSet`).
 
-The conclusion is one parent odometer that places every piece (`placed_step_exists`); this is the existence content of
-`IsStdStepP0`, with the glued values on the union of the placed domains. -/
+The conclusion is one parent odometer that places every piece on its kept part (`placed_step_kept`); this is the existence
+content of `IsStdStepP0`, with the glued values on the union of the placed domains. -/
 
 namespace FLatticePaper.Tiles.ChildAssembly
 
@@ -42,29 +42,36 @@ def PlacedMarksAgree (ch : ℕ → PartialOdometer) (off a : ℕ → ℤ × ℤ)
   ∀ i j, i < 4 → j < 4 → pieceFlag4 i ≠ pieceFlag4 j →
     ∀ z, z ∈ M i → z ∈ M j → placedVal ch off a i z = placedVal ch off a j z
 
-/-- Input H3 (OPEN): placed pieces of one parent agree on their whole overlap. -/
-def PlacedSameAgree (ch : ℕ → PartialOdometer) (off a : ℕ → ℤ × ℤ) : Prop :=
-  ∀ i j, i < 4 → j < 4 → i ≠ j → pieceFlag4 i = pieceFlag4 j →
+/-- Input (c) on doubled pairs (OPEN): the two placed copies of a doubled piece (`Dbl i j`) agree on their whole overlap. No other
+same-parent agreement is assumed: the Step 1 deletion makes the other overlaps disjoint on their kept parts. -/
+def PlacedDoubledAgree (ch : ℕ → PartialOdometer) (off a : ℕ → ℤ × ℤ) (Dbl : ℕ → ℕ → Prop) : Prop :=
+  ∀ i j, i < 4 → j < 4 → i < j → pieceFlag4 i = pieceFlag4 j → Dbl i j →
     ∀ z, z ∈ placedSet ch off i → z ∈ placedSet ch off j → placedVal ch off a i z = placedVal ch off a j z
 
-/-- **The existence assembly.** Given the three inputs, one parent odometer places all four pieces. -/
-theorem placed_step_exists (ch : ℕ → PartialOdometer) (off a : ℕ → ℤ × ℤ) (M : ℕ → Set (ℤ × ℤ))
-    (H1 : PlacedMixed ch off M) (H2 : PlacedMarksAgree ch off a M) (H3 : PlacedSameAgree ch off a) :
-    ∃ parent : PartialOdometer, ∀ i, i < 4 → PlacedPiece parent (ch i) (off i) (a i) := by
-  obtain ⟨g, hg⟩ := glue_full 4 (placedSet ch off) M pieceFlag4 (placedVal ch off a) H1 H2 H3
+/-- A placed piece restricted to its kept part `K`: the parent is defined on `K` by the piece's value, placed by `off` with the
+affine correction `a` and the constant `0`. -/
+def PlacedKeptPiece (parent child : PartialOdometer) (K : Set (ℤ × ℤ)) (off a : ℤ × ℤ) : Prop :=
+  (∀ x ∈ K, x ∈ parent.dom) ∧
+    ∀ x ∈ K, parent.val x = child.val (x - off) + (a.1 * x.1 + a.2 * x.2)
+
+/-- **The existence assembly on kept domains** (the operator's Step 1, manuscript dbd159d): from the mixed inputs `H1`, `H2` and
+the doubled-pair agreement `H3`, one parent odometer, on the union of the placed domains, places every piece on its kept part. -/
+theorem placed_step_kept (ch : ℕ → PartialOdometer) (off a : ℕ → ℤ × ℤ) (M : ℕ → Set (ℤ × ℤ)) (Dbl : ℕ → ℕ → Prop)
+    (H1 : PlacedMixed ch off M) (H2 : PlacedMarksAgree ch off a M) (H3 : PlacedDoubledAgree ch off a Dbl) :
+    ∃ parent : PartialOdometer, ∀ i, i < 4 →
+      PlacedKeptPiece parent (ch i) (keptSet (placedSet ch off) pieceFlag4 Dbl i) (off i) (a i) := by
+  obtain ⟨g, hg⟩ := glue_kept_gen 4 (placedSet ch off) M pieceFlag4 Dbl (placedVal ch off a) H1 H2 H3
   refine ⟨⟨(Finset.range 4).biUnion (fun i => (ch i).dom.image (· + off i)), g⟩, ?_⟩
   intro i hi
-  refine ⟨0, ?_, ?_⟩
+  refine ⟨?_, ?_⟩
   · intro z hz
-    rw [Finset.mem_image] at hz
-    obtain ⟨x, hx, rfl⟩ := hz
+    have hzD : z ∈ placedSet ch off i := hz.1
+    have hzF : z ∈ (ch i).dom.image (· + off i) := Finset.mem_coe.1 hzD
     rw [Finset.mem_biUnion]
-    exact ⟨i, Finset.mem_range.2 hi, Finset.mem_image.2 ⟨x, hx, rfl⟩⟩
+    exact ⟨i, Finset.mem_range.2 hi, hzF⟩
   · intro x hx
-    have hxD : x ∈ placedSet ch off i := Finset.mem_coe.2 hx
-    have hgx := hg i hi x hxD
+    have hgx := hg i hi x hx
     simp only [placedVal] at hgx
-    simp only [add_zero]
     exact hgx
 
 end FLatticePaper.Tiles.ChildAssembly

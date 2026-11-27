@@ -44,4 +44,16 @@ def RespectsSideTranslation (n d : ℤ) (i : Bool) (wh wv : BinaryWord) (s : Sid
     slopeOf ostar.val ((tileShape t.1).map (· + (t.2 + v))) - slopeOf o.val ((tileShape t.1).map (· + t.2)) =
       (((offsetA n d i).1 : ℚ), ((offsetA n d i).2 : ℚ))
 
+/-- The respect of the tile translations on the meeting tiles (`def:alternate_doubled_tile`): the copies meet where the translate
+of a tile of the side string of the first copy lies in the second copy. On those tiles the second copy's odometer minus the first
+one has slope difference `a_{n/d,i}`; the other tiles of the side string are not constrained. The alternate doubling uses this
+definition; the standard doubling uses `RespectsSideTranslation`, whose partial copy contains the whole side. -/
+def RespectsMeeting (n d : ℤ) (i : Bool) (wh wv : BinaryWord) (s : Side) (v : ℤ × ℤ)
+    (o ostar : PartialOdometer) : Prop :=
+  ∀ t ∈ sideString wh wv (0, 0) s,
+    (∀ x ∈ tileShape t.1, x + t.2 + v ∈ ostar.dom) →
+    (∀ x ∈ tileShape t.1, x + t.2 ∈ o.dom) ∧
+    slopeOf ostar.val ((tileShape t.1).map (· + (t.2 + v))) - slopeOf o.val ((tileShape t.1).map (· + t.2)) =
+      (((offsetA n d i).1 : ℚ), ((offsetA n d i).2 : ℚ))
+
 end FLatticePaper.Tiles.DoublingRespect
