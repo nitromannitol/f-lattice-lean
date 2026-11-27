@@ -4,6 +4,7 @@ import FLatticePaper.Tiles.SiteHullOdd
 import FLatticePaper.Tiles.SiteHullEven
 import FLatticePaper.Tiles.SiteLowLeft
 import FLatticePaper.Tiles.StandardBoundary
+import FLatticePaper.Tiles.HBottom
 
 /-! The horizontal pair of the walk form of H2 (the bottom side and the top side of the boundary walk of a tile lie in the marked
 sites `markedSites`).
@@ -86,5 +87,20 @@ theorem top_marks_odd (w : Word)
       p ∈ markedSites (oddTile w) (hWordOf w false) (vWordOf w false) :=
   top_marks_of_bottom (oddTile w) (hWordOf w false) (vWordOf w false) (oddBottom w) (oddRight w)
     (FLatticePaper.Tiles.SiteLowLeft.lowLeft_oddTile w) (hP_odd w) hB
+
+/-- **The top side of the odd child lies in the marks**, with no remaining input: the bottom side lies in the horizontal string
+sites by `HBottom.hB_odd`. -/
+theorem top_marks_odd_all (w : Word) :
+    ∀ p ∈ (F2Word.walk 0 (oddBottom w)).map (fun z => (0 + F2Word.sum (oddBottom w) + F2Word.sum (oddRight w)) - z),
+      p ∈ markedSites (oddTile w) (hWordOf w false) (vWordOf w false) :=
+  top_marks_odd w (FLatticePaper.Tiles.HBottom.hB_odd w)
+
+/-- **The top side of the even child lies in the marks**: the bottom side lies in the horizontal string sites by
+`HBottom.hB_even`, and the corner is the half-turn centre (`hP_even`). -/
+theorem top_marks_even (w : Word) :
+    ∀ p ∈ (F2Word.walk 0 (evenBottom w)).map (fun z => (0 + F2Word.sum (evenBottom w) + F2Word.sum (evenRight w)) - z),
+      p ∈ markedSites (evenTile w) (hWordOf w true) (vWordOf w true) :=
+  top_marks_of_bottom (evenTile w) (hWordOf w true) (vWordOf w true) (evenBottom w) (evenRight w)
+    (FLatticePaper.Tiles.SiteLowLeft.lowLeft_evenTile w) (hP_even w) (FLatticePaper.Tiles.HBottom.hB_even w)
 
 end FLatticePaper.Tiles.HorizontalPair
