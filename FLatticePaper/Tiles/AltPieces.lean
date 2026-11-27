@@ -19,7 +19,7 @@ lower-left vertex of the piece at offset `0`. -/
 namespace FLatticePaper.Tiles.AltPieces
 
 open FLatticePaper FLatticePaper.Farey FLatticePaper.Construction FLatticePaper.Tiles
-open FLatticePaper.Tiles.Standard (Tile shift mem_shift shift_shift shift_union stateAt IsBase)
+open FLatticePaper.Tiles.Standard (Tile shift rot mem_shift shift_shift shift_union stateAt IsBase swapW)
 open FLatticePaper.Tiles.SurgicalDict (doubled altShifts AltP0Piece AltQ0Piece)
 open FLatticePaper.Tiles.SurgicalAlt (coeffOff altP0Coeff altQ0Coeff altQ1Coeff altP1Coeff altTypeOf)
 open FLatticePaper.Tiles.SurgicalAltTiles
@@ -329,5 +329,75 @@ theorem inH_box (f : Fraction) (hn : 0 < f.num) (hnd : f.num < f.den) (z : GInt)
     refine box_core f.num f.den _ z.1 z.2 f.num (min (f.den - f.num) (3 * f.num - f.den)) (by omega) hnd
       (by linarith) (by linarith) (by linarith) (by linarith) (Or.inr ⟨rfl, ?_⟩)
     rcases min_choice (f.den - f.num) (3 * f.num - f.den) with h | h <;> rw [h] <;> simp
+
+/-! ### The half-turn of the alternate children (item (1)), with its centre
+
+Item (1) of `lemma:alternate_tile_properties` (`AltRotStep.altRot`) at `w` and at the swapped word gives `T̂ = D - T̂` for the
+alternate children of the paper base: composing the two rotations, `T̂(q₀) ↦ T̂(R(q₀))` and back, is `z ↦ τ₂ + i τ₁ - z`. In the
+frame `c(T̂) = 0` the centres are those of the proof of the text (Step 2): `D = A + 2B + V + 1 - i` for `T̂(q₀)` in the even-first
+orientation and `D = A + 2B + V + 2U + 1 - i` in the odd-first one; for `T̂(p₀)` the other way round. Here
+`(A, B, U, V) = (v_{p₁,1}, v_{p₁,2}, v_{q₁,1}, v_{q₁,2})`. -/
+
+/-- The centre of the half-turn of `T̂(q₀)`: `A + 2B + V + 1 - i`, plus `2U` when `W₁` is odd. -/
+def centreEven (o : Bool) (p q : Fraction) : Site :=
+  (2 * p.num + q.num - q.den + 1 + (if o then 2 * q.den else 0),
+    4 * p.num + 2 * p.den + q.num + q.den - 1 + (if o then 2 * q.num else 0))
+
+/-- The centre of the half-turn of `T̂(p₀)`: `A + 2B + V + 1 - i`, plus `2U` when `W₁` is even. -/
+def centreOdd (o : Bool) (p q : Fraction) : Site :=
+  (2 * p.num + q.num - q.den + 1 + (if o then 0 else 2 * q.den),
+    4 * p.num + 2 * p.den + q.num + q.den - 1 + (if o then 0 else 2 * q.num))
+
+theorem mem_shift_rot (S : Tile) (t x : Site) : x ∈ shift (rot S) t ↔ ((x - t).2, -(x - t).1) ∈ S := by
+  rw [mem_shift, Standard.mem_rot]
+
+/-- Two rotations, each followed by a translation, are a half-turn. -/
+theorem halfTurn_of_rots (S S' : Tile) (t1 t2 : Site) (h1 : shift (rot S) t1 = S') (h2 : shift (rot S') t2 = S) (z : Site) :
+    z ∈ S ↔ (t2.1 - t1.2 - z.1, t2.2 + t1.1 - z.2) ∈ S := by
+  have key : ∀ y : Site, y ∈ S ↔ (t2.1 - t1.2 - y.1, t2.2 + t1.1 - y.2) ∈ S := by
+    intro y
+    conv_lhs => rw [← h2]
+    rw [mem_shift_rot, ← h1, mem_shift_rot]
+    constructor <;> intro h <;> convert h using 2 <;> simp <;> ring
+  exact key z
+
+theorem parents_swapW (w : Word) :
+    (parentsAt (swapW w)).odd = (parentsAt w).even.rotate ∧ (parentsAt (swapW w)).even = (parentsAt w).odd.rotate := by
+  have h1 := VStep.rot_parent_even_swap (swapW w)
+  have h2 := VStep.rot_parent_odd_swap (swapW w)
+  rw [AltRotStep.swapW_swapW] at h1 h2
+  exact ⟨h1.symm, h2.symm⟩
+
+/-- **The half-turn of `T̂(q₀)`** about `centreEven` (non-base words, the paper base). -/
+theorem altEven_halfTurn {w : Word} (hw : ¬ IsBase w) (z : Site) :
+    z ∈ altEvenTile AltRotStep.B w ↔
+      centreEven (phase w == 1) (parentsAt w).odd (parentsAt w).even - z ∈ altEvenTile AltRotStep.B w := by
+  have h1 := (AltRotStep.altRot w).2
+  have h2 := (AltRotStep.altRot (swapW w)).1
+  rw [AltRotStep.swapW_swapW] at h2
+  rw [halfTurn_of_rots _ _ _ _ h1 h2 z]
+  obtain ⟨hp1, hp2, hq1, hq2, hpo, hqe, -⟩ := parents_facts hw
+  obtain ⟨hs1, hs2⟩ := parents_swapW w
+  have hph : phase (swapW w) = phase w := Standard.phase_swapW w
+  unfold AltRotStep.tauO AltRotStep.tauE AltRotStep.tauOdd AltRotStep.tauEven AltRotStep.tauShort AltRotStep.tauLong
+  rw [hs1, hs2, hph, Fraction.rotate_of_odd hpo, Fraction.rotate_of_even hqe]
+  unfold centreEven
+  constructor <;> intro h <;> convert h using 2 <;> cases (phase w == 1) <;> simp <;> omega
+
+/-- **The half-turn of `T̂(p₀)`** about `centreOdd` (non-base words, the paper base). -/
+theorem altOdd_halfTurn {w : Word} (hw : ¬ IsBase w) (z : Site) :
+    z ∈ altOddTile AltRotStep.B w ↔
+      centreOdd (phase w == 1) (parentsAt w).odd (parentsAt w).even - z ∈ altOddTile AltRotStep.B w := by
+  have h1 := (AltRotStep.altRot w).1
+  have h2 := (AltRotStep.altRot (swapW w)).2
+  rw [AltRotStep.swapW_swapW] at h2
+  rw [halfTurn_of_rots _ _ _ _ h1 h2 z]
+  obtain ⟨hp1, hp2, hq1, hq2, hpo, hqe, -⟩ := parents_facts hw
+  obtain ⟨hs1, hs2⟩ := parents_swapW w
+  have hph : phase (swapW w) = phase w := Standard.phase_swapW w
+  unfold AltRotStep.tauO AltRotStep.tauE AltRotStep.tauOdd AltRotStep.tauEven AltRotStep.tauShort AltRotStep.tauLong
+  rw [hs1, hs2, hph, Fraction.rotate_of_odd hpo, Fraction.rotate_of_even hqe]
+  unfold centreOdd
+  constructor <;> intro h <;> convert h using 2 <;> cases (phase w == 1) <;> simp <;> omega
 
 end FLatticePaper.Tiles.AltPieces
