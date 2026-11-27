@@ -1,7 +1,7 @@
 # Source correspondence
 
 **Target: the surgical edition.** The target is the surgical edition of `farey_recursion.tex` (the October 2023 arXiv text
-with minimal corrections, Sections 5–8), pinned at commit af007b5 of its source repository; its text is not copied here.
+with minimal corrections, Sections 5–8), pinned at commit 571253f of its source repository; its text is not copied here.
 The surgical map of Sections 1–8 (label, surgical line, Lean declaration, agreement) is the last section of this file. The
 table that follows maps the corrected edition pinned in `paper/`.
 
@@ -130,7 +130,7 @@ A separate, shorter write-up (`flattice-simple-proof`, `short-proof.tex` with it
 
 ## Surgical edition map (Sections 1–8)
 
-Lines refer to `farey_recursion.tex` at commit af007b5 of the surgical edition's source repository; its text is not copied
+Lines refer to `farey_recursion.tex` at commit 571253f of the surgical edition's source repository; its text is not copied
 here. E-numbers refer to that repository's error list (`notes/ERRORS_S5-8.md` and the section notes). Status words:
 **agrees** (the Lean statement matches the surgical statement and is proved), **conditional** (proved from named inputs),
 **partial** (some parts proved), **differs** (the Lean states another form; the surgical form is open), **defined** (the
