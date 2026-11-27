@@ -192,7 +192,7 @@ Section 2 has no numbered statements. Section 9 is the new text of the surgical 
 | lemma:weak_alternate_odometer_properties | 3835 | `Tiles.SurgicalAltOdometers.alt_respects_statement` | partial: (a) stated with the anchors of the alternate tiles (E35); existence and compatibility open |
 | def:odd_l_correction | 3900 | `Tiles.LCorrections.oddTexK`, `oddBridgeShift`, `oddLCorrection` | agrees (E36, E37) |
 | def:even_l_correction | 3956 | `Tiles.LCorrections.evenTexK`, `evenLCorrection` | agrees (E37); in case 01 the copy after an ancestor 2^j replaces the bridge (3839) |
-| lemma:l_correc_properties | 4012 | `Tiles.LCorrections` (the comparisons with the table) | open: (1)–(3) |
+| lemma:l_correc_properties | 4012 | `Tiles.LCorrections` (the comparisons with the table) | open: the existence statement and items (1), (2) |
 | definition of tile odometers (unlabelled) | 4135 | — | open (E41) |
 | lemma:l_correct_existence | 4162 | — | open (E42) |
 | lemma:tile-odometer-existence | 4193 | — | open (E43) |
