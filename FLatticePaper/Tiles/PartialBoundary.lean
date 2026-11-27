@@ -76,18 +76,25 @@ end PTFamily
 /-- Two sites at unit distance. -/
 def unitApart (x y : GInt) : Prop := (x.1 - y.1).natAbs + (x.2 - y.2).natAbs = 1
 
+/-- The dot product of two sites. -/
+def ptDot (v x : GInt) : ℤ := v.1 * x.1 + v.2 * x.2
+
 /-- The family `F` respects the string of orientation `o` (reversed when `rev`): for each consecutive pair of tiles the slope
-change is the table value, and for consecutive non-overlapping tiles the boundary condition holds after the shared translation
-(which the constants `b` absorb): horizontally `o_i(x) = o_{i+1}(y)` for unit-apart `x, y`; vertically
-`o_{i+1}(y) - o_i(x) = -1`. -/
+change is the table value, and for consecutive non-overlapping tiles the boundary condition holds after a shared translation
+by the affine factor `a_i` of the first tile of the pair (the constants `b` absorb the rest): horizontally
+`o_i(x) - a_i·x = o_{i+1}(y) - a_i·y` for unit-apart `x, y`; vertically `(o_{i+1}(y) - a_i·y) - (o_i(x) - a_i·x) = -1`.
+(The shared translation is the one that the operator's model uses, and it is needed: without it the cross system of the
+vertical Moreover is inconsistent, scratchpad `vert_debug.py`.) -/
 def PTFamily.Respects (o : Orientation) (rev : Bool) (F : PTFamily) : Prop :=
   ∀ k, k + 1 < F.n →
     slopeOf (F.odo (k + 1)) (F.dom (k + 1)) - slopeOf (F.odo k) (F.dom k) =
         surgicalSlopeDiff o rev (zTileLetter (F.tile k).1) (zTileLetter (F.tile (k + 1)).1) ∧
       ((¬ ∃ x, x ∈ F.dom k ∧ x ∈ F.dom (k + 1)) →
         ∀ x ∈ F.dom k, ∀ y ∈ F.dom (k + 1), unitApart x y →
-          (o = .horizontal → F.odo k x = F.odo (k + 1) y) ∧
-            (o = .vertical → F.odo (k + 1) y - F.odo k x = -1))
+          (o = .horizontal →
+              F.odo k x - ptDot (F.a k) x = F.odo (k + 1) y - ptDot (F.a k) y) ∧
+            (o = .vertical →
+              (F.odo (k + 1) y - ptDot (F.a k) y) - (F.odo k x - ptDot (F.a k) x) = -1))
 
 /-- The partial odometer `S` restricted to the placed tiles `ts` respects the string: there is a family on exactly these tiles,
 `S` equals its odometer on each of its domains, and the family respects the string (reversed when `rev`). -/

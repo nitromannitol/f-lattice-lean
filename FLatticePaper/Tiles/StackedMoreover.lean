@@ -19,8 +19,10 @@ Choices made here, each taken from the text:
 * the common extension is offset zero on every overlap, within each family and across the two families;
 * "affine factor" is the parameter `a` of `PTFamily` (the `i`-th odometer is `base(x - c_i) + a_i · x + b_i`).
 
-The horizontal half is stated here for the parameters found by the numerics (scratchpad `moreover_*.py`): the existence of the
-families, not their values. The vertical half (lines 1593-1597, "equal in the vertical case") is on hold (operator). -/
+Both halves are stated (the vertical one for almost palindromes starting with `p` and ending with `q`, with the stacking
+`(-1,-1)` of the vertical fixed offsets and equal first affine factors). The non-overlap rule of `PTFamily.Respects` holds after
+a shared translation by the affine factor of the first tile of each consecutive pair (see `PartialBoundary`). The vertical
+model was checked on `pqpqq` exactly (scratchpad `vert_debug.py`, `exact_solve.py`): the first factors are forced equal. -/
 
 namespace FLatticePaper.Tiles
 
@@ -62,5 +64,29 @@ def HorizontalMoreover (w : BinaryWord) : Prop :=
       M.Respects .horizontal true ∧
       WithinCommon P ∧ WithinCommon M ∧ CrossCommon P M ∧
       P.a 0 - M.a 0 = ((0 : ℤ), (-1 : ℤ))
+
+/-- The vertical stacking shift `c(T_1^+) - c(T_1^-)` of the vertical zero-one fixed offsets (line 1368). -/
+def verticalStackShift : GInt := (-1, -1)
+
+/-- The vertical forward zero-one string of the letters `ℓ` on `n` tiles, at the vertical zero-one positions. -/
+def zoForwardV (ℓ : ℕ → Letter) (n : ℕ) : List (ZTile × GInt) :=
+  (List.range n).map fun k => (letterZTile (ℓ k), posF .vertical false ℓ k)
+
+/-- The reversed vertical zero-one string of the letters `ℓ` on `n` tiles, shifted by `-verticalStackShift`. -/
+def zoReversedStackedV (ℓ : ℕ → Letter) (n : ℕ) : List (ZTile × GInt) :=
+  (List.range n).map fun k => (letterZTile (ℓ k), posF .vertical true ℓ k - verticalStackShift)
+
+/-- The vertical half of the Moreover (for almost palindromes starting with `p` and ending with `q`): families `P` on the
+forward vertical string and `M` on the reversed stacked vertical string, each respecting its string (the vertical table,
+no exchange; non-overlap rule after a shared translation), with a common extension, and with equal first affine factors. -/
+def VerticalMoreover (w : BinaryWord) : Prop :=
+  IsAlmostPalindrome w → w.head? = some Letter.p → w.getLast? = some Letter.q →
+    ∃ P M : PTFamily,
+      P.ts = zoForwardV (lettersOf w false) w.length ∧
+      M.ts = zoReversedStackedV (lettersOf w true) w.length ∧
+      P.Respects .vertical false ∧
+      M.Respects .vertical true ∧
+      WithinCommon P ∧ WithinCommon M ∧ CrossCommon P M ∧
+      P.a 0 = M.a 0
 
 end FLatticePaper.Tiles

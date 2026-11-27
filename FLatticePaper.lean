@@ -1155,5 +1155,8 @@ import FLatticePaper.Tiles.AltStairPseudo
 import FLatticePaper.Tiles.StackedMoreover
 import FLatticePaper.Tiles.SurgicalDict
 import FLatticePaper.Tiles.SurgicalPartial
+import FLatticePaper.Tiles.PartialBoundary
+import FLatticePaper.Tiles.PseudoSquareAnchored
+import FLatticePaper.Tiles.SurgicalSlopes
 
 /-! Root import for the corrected F-lattice paper. -/
