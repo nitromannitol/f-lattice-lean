@@ -46,16 +46,16 @@ theorem mem_of_mem_unitSquares {T : List GInt} {x : GInt} (h : x ∈ unitSquares
   exact ⟨h1, h2.1, h2.2.1, h2.2.2⟩
 
 /-- The real square term of `slopeOf`. -/
-def reTerm (f : GInt → ℤ) (x : GInt) : ℚ :=
+def chainReTerm (f : GInt → ℤ) (x : GInt) : ℚ :=
   ((f (x + (1, 0)) : ℚ) - f x + ((f (x + (1, 1)) : ℚ) - f (x + (0, 1)))) / 2
 
 /-- The imaginary square term of `slopeOf`. -/
-def imTerm (f : GInt → ℤ) (x : GInt) : ℚ :=
+def chainImTerm (f : GInt → ℤ) (x : GInt) : ℚ :=
   ((f (x + (0, 1)) : ℚ) - f x + ((f (x + (1, 1)) : ℚ) - f (x + (1, 0)))) / 2
 
 theorem slopeOf_eq (f : GInt → ℤ) (T : List GInt) :
-    slopeOf f T = (((unitSquares T).map (reTerm f)).sum / ((unitSquares T).length : ℚ),
-      ((unitSquares T).map (imTerm f)).sum / ((unitSquares T).length : ℚ)) := rfl
+    slopeOf f T = (((unitSquares T).map (chainReTerm f)).sum / ((unitSquares T).length : ℚ),
+      ((unitSquares T).map (chainImTerm f)).sum / ((unitSquares T).length : ℚ)) := rfl
 
 /-- The slope depends only on the values on the tile. -/
 theorem slopeOf_congr (f g : GInt → ℤ) (T : List GInt) (h : ∀ x ∈ T, f x = g x) :
@@ -66,21 +66,21 @@ theorem slopeOf_congr (f g : GInt → ℤ) (T : List GInt) (h : ∀ x ∈ T, f x
     obtain ⟨h0, h1, h2, h3⟩ := mem_of_mem_unitSquares hx
     exact ⟨h x h0, h _ h1, h _ h2, h _ h3⟩
   rw [slopeOf_eq, slopeOf_eq]
-  have hre : (unitSquares T).map (reTerm f) = (unitSquares T).map (reTerm g) := by
+  have hre : (unitSquares T).map (chainReTerm f) = (unitSquares T).map (chainReTerm g) := by
     apply List.map_congr_left
     intro x hx
     obtain ⟨_, e1, e2, e3⟩ := hsq x hx
-    unfold reTerm
+    unfold chainReTerm
     rw [e1, e2, e3, (hsq x hx).1]
-  have him : (unitSquares T).map (imTerm f) = (unitSquares T).map (imTerm g) := by
+  have him : (unitSquares T).map (chainImTerm f) = (unitSquares T).map (chainImTerm g) := by
     apply List.map_congr_left
     intro x hx
     obtain ⟨_, e1, e2, e3⟩ := hsq x hx
-    unfold imTerm
+    unfold chainImTerm
     rw [e1, e2, e3, (hsq x hx).1]
   rw [hre, him]
 
-theorem mem_map_add_iff (T : List GInt) (p y : GInt) : y ∈ T.map (· + p) ↔ y - p ∈ T := by
+theorem chain_mem_map_add_iff (T : List GInt) (p y : GInt) : y ∈ T.map (· + p) ↔ y - p ∈ T := by
   constructor
   · intro h
     obtain ⟨a, ha, rfl⟩ := List.mem_map.mp h
@@ -88,7 +88,7 @@ theorem mem_map_add_iff (T : List GInt) (p y : GInt) : y ∈ T.map (· + p) ↔ 
   · intro h
     exact List.mem_map.mpr ⟨y - p, h, by simp⟩
 
-theorem unitSquares_map_add (T : List GInt) (p : GInt) :
+theorem chain_unitSquares_map_add (T : List GInt) (p : GInt) :
     unitSquares (T.map (· + p)) = (unitSquares T).map (· + p) := by
   unfold unitSquares
   rw [List.filter_map]
@@ -96,7 +96,7 @@ theorem unitSquares_map_add (T : List GInt) (p : GInt) :
   apply List.filter_congr
   intro x _
   have e : ∀ a : GInt, x + p + a - p = x + a := fun a => by abel
-  simp only [Function.comp_apply, mem_map_add_iff, e]
+  simp only [Function.comp_apply, chain_mem_map_add_iff, e]
 
 theorem chain_sum_map_add_const (S : List GInt) (f : GInt → ℚ) (c : ℚ) :
     (S.map fun x => f x + c).sum = (S.map f).sum + (S.length : ℚ) * c := by
@@ -108,8 +108,8 @@ theorem chain_sum_map_add_const (S : List GInt) (f : GInt → ℚ) (c : ℚ) :
     ring
 
 theorem reTerm_translate (g : GInt → ℤ) (p a : GInt) (b : ℤ) (x : GInt) :
-    reTerm (fun y => g (y - p) + a.1 * y.1 + a.2 * y.2 + b) (x + p) = reTerm g x + (a.1 : ℚ) := by
-  unfold reTerm
+    chainReTerm (fun y => g (y - p) + a.1 * y.1 + a.2 * y.2 + b) (x + p) = chainReTerm g x + (a.1 : ℚ) := by
+  unfold chainReTerm
   have h1 : x + p + (1, 0) - p = x + (1, 0) := by abel
   have h2 : x + p + (1, 1) - p = x + (1, 1) := by abel
   have h3 : x + p + (0, 1) - p = x + (0, 1) := by abel
@@ -119,8 +119,8 @@ theorem reTerm_translate (g : GInt → ℤ) (p a : GInt) (b : ℤ) (x : GInt) :
   ring
 
 theorem imTerm_translate (g : GInt → ℤ) (p a : GInt) (b : ℤ) (x : GInt) :
-    imTerm (fun y => g (y - p) + a.1 * y.1 + a.2 * y.2 + b) (x + p) = imTerm g x + (a.2 : ℚ) := by
-  unfold imTerm
+    chainImTerm (fun y => g (y - p) + a.1 * y.1 + a.2 * y.2 + b) (x + p) = chainImTerm g x + (a.2 : ℚ) := by
+  unfold chainImTerm
   have h1 : x + p + (0, 1) - p = x + (0, 1) := by abel
   have h2 : x + p + (1, 1) - p = x + (1, 1) := by abel
   have h3 : x + p + (1, 0) - p = x + (1, 0) := by abel
@@ -137,12 +137,12 @@ theorem slopeOf_translate_affine (g : GInt → ℤ) (L : List GInt) (p a : GInt)
   have hlen : ((unitSquares L).length : ℚ) ≠ 0 := by
     have : (unitSquares L).length ≠ 0 := fun h => hne (List.length_eq_zero_iff.mp h)
     exact_mod_cast this
-  rw [slopeOf_eq, slopeOf_eq, unitSquares_map_add, List.length_map, List.map_map, List.map_map]
-  have hre : ((unitSquares L).map ((reTerm fun y => g (y - p) + a.1 * y.1 + a.2 * y.2 + b) ∘ (· + p))) =
-      (unitSquares L).map (fun x => reTerm g x + (a.1 : ℚ)) :=
+  rw [slopeOf_eq, slopeOf_eq, chain_unitSquares_map_add, List.length_map, List.map_map, List.map_map]
+  have hre : ((unitSquares L).map ((chainReTerm fun y => g (y - p) + a.1 * y.1 + a.2 * y.2 + b) ∘ (· + p))) =
+      (unitSquares L).map (fun x => chainReTerm g x + (a.1 : ℚ)) :=
     List.map_congr_left fun x _ => reTerm_translate g p a b x
-  have him : ((unitSquares L).map ((imTerm fun y => g (y - p) + a.1 * y.1 + a.2 * y.2 + b) ∘ (· + p))) =
-      (unitSquares L).map (fun x => imTerm g x + (a.2 : ℚ)) :=
+  have him : ((unitSquares L).map ((chainImTerm fun y => g (y - p) + a.1 * y.1 + a.2 * y.2 + b) ∘ (· + p))) =
+      (unitSquares L).map (fun x => chainImTerm g x + (a.2 : ℚ)) :=
     List.map_congr_left fun x _ => imTerm_translate g p a b x
   rw [hre, him, chain_sum_map_add_const, chain_sum_map_add_const]
   refine Prod.ext ?_ ?_
