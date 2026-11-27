@@ -83,8 +83,12 @@ theorem vertex_edge (T : CellTile) (z : GInt) (hz : BoundaryVertex (↑T : Set G
     ∃ e ∈ T.boundaryEdges, z = e.1 ∨ z = e.2 := by
   obtain ⟨⟨s, hs, hsz⟩, hnot⟩ := hz
   have hs' : s ∈ T := Finset.mem_coe.1 hs
-  have k1 : z + ((-1 : ℤ), (0 : ℤ)) = z - gOne := by ext <;> simp [gOne] <;> ring
-  have k2 : z + ((0 : ℤ), (-1 : ℤ)) = z - gI := by ext <;> simp [gI] <;> ring
+  have k1 : z + ((-1 : ℤ), (0 : ℤ)) = z - gOne := by
+    ext <;> simp [gOne]
+    ring
+  have k2 : z + ((0 : ℤ), (-1 : ℤ)) = z - gI := by
+    ext <;> simp [gI]
+    ring
   have k3 : z + ((-1 : ℤ), (-1 : ℤ)) = z - gOne - gI := by ext <;> simp [gOne, gI] <;> ring
   unfold Interior at hnot
   simp only [Finset.mem_coe, k1, k2, k3] at hnot
@@ -105,8 +109,6 @@ theorem vertex_edge (T : CellTile) (z : GInt) (hz : BoundaryVertex (↑T : Set G
     | exact in_out_4 T z (by assumption) (by assumption)
     | exact in_out_5 T z (by assumption) (by assumption)
     | exact in_out_6 T z (by assumption) (by assumption)
-    | exact in_out_7 T z (by assumption) (by assumption)
-    | exact in_out_8 T z (by assumption) (by assumption)
 
 /-- **A boundary vertex lies on every boundary walk of its cell region.** -/
 theorem mem_walk_of_boundaryVertex (T : CellTile) (c : GInt) (w : F2Word) (hw : IsBoundaryWordAt T c w)
