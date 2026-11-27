@@ -1114,5 +1114,12 @@ import FLatticePaper.Plane.Induction.WordDischarge
 import FLatticePaper.Plane.Induction.WordMinusEasy
 import FLatticePaper.Plane.Induction.WordPlusEasy
 import FLatticePaper.Plane.Induction.WordMinusRow
+import FLatticePaper.Plane.Induction.FinalCoverMinus
+import FLatticePaper.Plane.Induction.FinalAssemblyMinus
+import FLatticePaper.Plane.Induction.PlusRowPair
+import FLatticePaper.Plane.Induction.PlusCover
+import FLatticePaper.Plane.Induction.PlusFinal
+import FLatticePaper.Plane.Induction.PassageInv
+import FLatticePaper.Plane.Induction.PlusAssembly
 
 /-! Root import for the corrected F-lattice paper. -/
