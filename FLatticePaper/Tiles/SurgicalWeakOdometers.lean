@@ -79,20 +79,29 @@ def IsWeakDoublingOn (Tb Th : Finset Site) (v : Site) (o d ostar : PartialOdomet
   o.dom = Tb ∧ ostar.dom = Th.image (· + v) ∧ d.dom = Tb ∪ Th.image (· + v) ∧
     (∀ x ∈ o.dom, d.val x = o.val x) ∧ (∀ x ∈ ostar.dom, d.val x = ostar.val x)
 
-/-- The standard weak doubling (`def:standard_odometer_doubling`, manuscript f9cf1c2). The doubled odometer is `d = o ∪ o*` of
-`IsWeakDoublingOn`, with the partial tile on the second copy (`firstPartial = false`) or on the first copy (`firstPartial = true`,
-the text's "the partial tile is the first tile instead"). After restriction to the relevant side string of the partial tile
-(`DoublingRespect`), `o*` and `o` respect the tile translations, with the affine factor `a_{n/d,i}` (`i = false` for `v_{q,1}`,
-`i = true` for `v_{p,2}`). The side is `doublingSide oddChild sideSign`, where `sideSign` already carries the flips of the text.
+/-- The standard weak doubling (`def:standard_odometer_doubling`, manuscript f9cf1c2). The doubled odometer is `d = o ∪ o*`: the
+given odometer `o` (domain `T^b`) is on the full copy and the odometer `o*` on the partial copy. With the partial tile on the second
+copy (`firstPartial = false`), `d` is `IsWeakDoublingOn Tb Th v o d o*`: `o` at `0`, `o*` on `T^h + v`. With the partial tile on the
+first copy (`firstPartial = true`, the text's "the partial tile is the first tile instead", `T^{d,p} = T^h ∪ (T^b + v)`), `o*` is on
+`T^h` and the full copy `T^b + v` carries the translate `o_2` of `o` by `v` with the affine factor `a_{n/d,i}` (`IsTranslationOf`).
+After restriction to the relevant side string of the partial tile (`DoublingRespect`), the first and the second copy respect the
+tile translations, with the affine factor `a_{n/d,i}` (`i = false` for `v_{q,1}`, `i = true` for `v_{p,2}`). The side is
+`doublingSide oddChild sideSign`, where `sideSign` already carries the flips of the text.
 
 Correspondence (operator's measurements, S8_FIXES.md DS): the partial tile of `T^{d,p,±}(p_0)` is the L-correction `T^{L,∓}(p_0)`,
 and that of `T^{d,p,±}(q_0)` is `T^{L,±}(q_0)`; the L-sign is the `side` argument of `partialT`. -/
 def IsWeakDoublingStd (oddChild sideSign firstPartial : Bool) (n d : ℤ) (i : Bool) (wh wv : BinaryWord)
     (Tb Th : Finset Site) (v : Site) (o dd : PartialOdometer) : Prop :=
   ∃ ostar : PartialOdometer,
-    (if firstPartial then IsWeakDoublingOn Th Tb v o dd ostar else IsWeakDoublingOn Tb Th v o dd ostar) ∧
-    FLatticePaper.Tiles.DoublingRespect.RespectsSideTranslation n d i wh wv
-      (FLatticePaper.Tiles.DoublingRespect.doublingSide oddChild sideSign) v o ostar
+    if firstPartial then
+      ∃ (o2 : PartialOdometer) (b : ℤ), o.dom = Tb ∧ IsTranslationOf o2 o v (offsetA n d i) b ∧
+        IsWeakDoublingOn Th Tb v ostar dd o2 ∧
+        FLatticePaper.Tiles.DoublingRespect.RespectsSideTranslation n d i wh wv
+          (FLatticePaper.Tiles.DoublingRespect.doublingSide oddChild sideSign) v ostar o2
+    else
+      IsWeakDoublingOn Tb Th v o dd ostar ∧
+        FLatticePaper.Tiles.DoublingRespect.RespectsSideTranslation n d i wh wv
+          (FLatticePaper.Tiles.DoublingRespect.doublingSide oddChild sideSign) v o ostar
 
 /-- The even-child decomposition with the offsets of `offsetQ0` (`eq:std_odometer_decomposition`, second line): the doubled
 pieces `d(o)_{p_1}^±` at `p1DPlus`, `p1DMinus` and the plain pieces `o_{q_1}^±` at `q1Plus`, `q1Minus`. -/

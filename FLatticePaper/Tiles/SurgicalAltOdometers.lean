@@ -79,15 +79,21 @@ def altPartial (S : WeakData) (u : Option Word) (b corrected : Bool) (lab : Bool
   if corrected then S.partialT u b lab else S.bdry u b
 
 /-- The alternate weak doubling (`def:alternate_doubled_tile`, manuscript f9cf1c2), defined like `IsWeakDoublingStd`: the doubled
-odometer `d = o ∪ o*` of `IsWeakDoublingOn` with the partial tile on the second copy (`firstPartial = false`) or on the first copy
-(`firstPartial = true`), and, after restriction to the meeting string of the first copy (`meet`: the horizontal `rev(w_h)` for the
-odd register `p`, the vertical `rev(w_v)` or `w_v` for `q` by the parity of `W_1`), `o*` and `o` respect the tile translations with
+odometer `d = o ∪ o*`, the given odometer `o` on the full copy and `o*` on the partial copy. With the partial tile on the second copy
+(`firstPartial = false`), `o` is at `0` and `o*` on `T^h + S`; with the partial tile on the first copy (`firstPartial = true`,
+`T^{ds} = T^{h/v,±} ∪ (T^b + S)`), `o*` is on `T^h` and the full copy carries the translate `o_2` of `o` by `S` with the affine factor
+`a_{n/d,i}`. After restriction to the meeting string of the first copy (`meet`: the horizontal `rev(w_h)` for the odd register `p`,
+the vertical `rev(w_v)` or `w_v` for `q` by the parity of `W_1`), the first and the second copy respect the tile translations with
 the affine factor of the shift (`a_{p,2}` for both `S_p` and `S_q`, so `i = true`, `(n, d) = (p.num, p.den)`). -/
 def IsWeakDoublingAlt (firstPartial : Bool) (meet : FLatticePaper.Tiles.Side) (n d : ℤ) (i : Bool) (wh wv : BinaryWord)
     (Tb Th : Finset Site) (v : Site) (o dd : PartialOdometer) : Prop :=
   ∃ ostar : PartialOdometer,
-    (if firstPartial then IsWeakDoublingOn Th Tb v o dd ostar else IsWeakDoublingOn Tb Th v o dd ostar) ∧
-    FLatticePaper.Tiles.DoublingRespect.RespectsMeeting n d i wh wv meet v o ostar
+    if firstPartial then
+      ∃ (o2 : PartialOdometer) (b : ℤ), o.dom = Tb ∧ IsTranslationOf o2 o v (offsetA n d i) b ∧
+        IsWeakDoublingOn Th Tb v ostar dd o2 ∧
+        FLatticePaper.Tiles.DoublingRespect.RespectsMeeting n d i wh wv meet v ostar o2
+    else
+      IsWeakDoublingOn Tb Th v o dd ostar ∧ FLatticePaper.Tiles.DoublingRespect.RespectsMeeting n d i wh wv meet v o ostar
 
 /-- The alternate odd child `T̂(p_0)` of the word `w` (`eq:alt_decomp`, first line): the shifted doublings `ds(o)_{p_1}^±`
 of the odd register (shift `S_p`), the plain pieces `o_{q_1}^±` of the even register, and the parent piece `ô(q_1)` of the even
