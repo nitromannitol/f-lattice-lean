@@ -39,13 +39,13 @@ translation rules of the modified deck of `fracEven w`. The covering hypotheses 
 theorem even_glue (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
     (oddO evenO : FLatticePaper.Farey.Word → PartialOdometer)
     (h : FLatticePaper.Tiles.SurgicalWeak.IsWeakStdFamily S oddO evenO) (w : FLatticePaper.Farey.Word)
-    (H2X_v : ∀ z, BoundaryVertex (↑(cellTileOf (evenTile w)) : Set GInt) z →
+    (H2X_v : ∀ z, BoundaryVertex (↑(cellTileOf (evenTile w)) : Set GInt) z → z - texV1Even (fracEven w) ∈ evenTile w →
       tileCovers (vStringAt (vWordOf w true) (lastPosOf (hStringAt (hWordOf w true) 0))) z)
-    (H2Y_v : ∀ z, BoundaryVertex ({t : GInt | t - texV1Even (fracEven w) ∈ cellTileOf (evenTile w)} : Set GInt) z →
+    (H2Y_v : ∀ z, BoundaryVertex ({t : GInt | t - texV1Even (fracEven w) ∈ cellTileOf (evenTile w)} : Set GInt) z → z ∈ evenTile w →
       tileCovers (vRevStringAt (vWordOf w true).reverse (texV1Even (fracEven w))) z)
-    (H2X_h : ∀ z, BoundaryVertex (↑(cellTileOf (evenTile w)) : Set GInt) z →
+    (H2X_h : ∀ z, BoundaryVertex (↑(cellTileOf (evenTile w)) : Set GInt) z → z - (-texV2 (fracEven w)) ∈ evenTile w →
       tileCovers (hStringAt (hWordOf w true) 0) z)
-    (H2Y_h : ∀ z, BoundaryVertex ({t : GInt | t - (-texV2 (fracEven w)) ∈ cellTileOf (evenTile w)} : Set GInt) z →
+    (H2Y_h : ∀ z, BoundaryVertex ({t : GInt | t - (-texV2 (fracEven w)) ∈ cellTileOf (evenTile w)} : Set GInt) z → z ∈ evenTile w →
       tileCovers (hRevStringAt (hWordOf w true).reverse (1, -2)) z) :
     ∃ f : ℤ × ℤ → ℤ, (∃ c : ℤ, ∀ x ∈ (↑(evenTile w) : Set (ℤ × ℤ)), f x = (evenO w).val x + c) ∧
       (∃ c1 : ℤ, ∀ x : ℤ × ℤ, f (x + texV1Even (fracEven w)) = f x + c1) ∧

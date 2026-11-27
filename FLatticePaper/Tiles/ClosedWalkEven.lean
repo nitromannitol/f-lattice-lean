@@ -25,9 +25,9 @@ open FLatticePaper FLatticePaper.Farey FLatticePaper.Construction FLatticePaper.
 theorem vertical_kappa_even (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
     (oddO evenO : FLatticePaper.Farey.Word → PartialOdometer)
     (h : FLatticePaper.Tiles.SurgicalWeak.IsWeakStdFamily S oddO evenO) (w : FLatticePaper.Farey.Word)
-    (H2X : ∀ z, BoundaryVertex (↑(cellTileOf (evenTile w)) : Set GInt) z →
+    (H2X : ∀ z, BoundaryVertex (↑(cellTileOf (evenTile w)) : Set GInt) z → z - texV1Even (fracEven w) ∈ evenTile w →
       tileCovers (vStringAt (vWordOf w true) (lastPosOf (hStringAt (hWordOf w true) 0))) z)
-    (H2Y : ∀ z, BoundaryVertex ({t : GInt | t - texV1Even (fracEven w) ∈ cellTileOf (evenTile w)} : Set GInt) z →
+    (H2Y : ∀ z, BoundaryVertex ({t : GInt | t - texV1Even (fracEven w) ∈ cellTileOf (evenTile w)} : Set GInt) z → z ∈ evenTile w →
       tileCovers (vRevStringAt (vWordOf w true).reverse (texV1Even (fracEven w))) z) :
     ∃ κ : ℤ, ∀ z : GInt, z ∈ (↑(evenTile w) : Set GInt) → z - texV1Even (fracEven w) ∈ (↑(evenTile w) : Set GInt) →
       (evenO w).val z - (evenO w).val (z - texV1Even (fracEven w)) = κ := by
@@ -49,8 +49,8 @@ theorem vertical_kappa_even (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
       (∃ k < FA.n, z ∈ FA.dom k) ∧ (∃ j < FB.n, z ∈ FB.dom j) := by
     intro z hz
     have hO := evenTile_common_in_strings w {z | ∃ k < FA.n, z ∈ FA.dom k} {z | ∃ j < FB.n, z ∈ FB.dom j}
-      (fun z' hz' => (covers_iff_dom FA _ hFAts z').2 (H2X z' hz'))
-      (fun z' hz' => (covers_iff_dom FB _ hFBts z').2 (H2Y z' hz'))
+      (fun z' hz' hz'' => (covers_iff_dom FA _ hFAts z').2 (H2X z' hz' hz''))
+      (fun z' hz' hz'' => (covers_iff_dom FB _ hFBts z').2 (H2Y z' hz' hz''))
       z (Finset.mem_coe.1 hz.1) (Finset.mem_coe.1 hz.2)
     exact ⟨hO.1, hO.2⟩
   obtain ⟨κ, hκ⟩ := PTFamily.hkappa_of_families (evenO w).val (texV1Even (fracEven w)) 0
@@ -83,9 +83,9 @@ theorem even_hdisj_neg2 (w : FLatticePaper.Farey.Word) :
 theorem horizontal_kappa_even (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
     (oddO evenO : FLatticePaper.Farey.Word → PartialOdometer)
     (h : FLatticePaper.Tiles.SurgicalWeak.IsWeakStdFamily S oddO evenO) (w : FLatticePaper.Farey.Word)
-    (H2X : ∀ z, BoundaryVertex (↑(cellTileOf (evenTile w)) : Set GInt) z →
+    (H2X : ∀ z, BoundaryVertex (↑(cellTileOf (evenTile w)) : Set GInt) z → z - (-texV2 (fracEven w)) ∈ evenTile w →
       tileCovers (hStringAt (hWordOf w true) 0) z)
-    (H2Y : ∀ z, BoundaryVertex ({t : GInt | t - (-texV2 (fracEven w)) ∈ cellTileOf (evenTile w)} : Set GInt) z →
+    (H2Y : ∀ z, BoundaryVertex ({t : GInt | t - (-texV2 (fracEven w)) ∈ cellTileOf (evenTile w)} : Set GInt) z → z ∈ evenTile w →
       tileCovers (hRevStringAt (hWordOf w true).reverse (1, -2)) z) :
     ∃ κ : ℤ, ∀ z : GInt, z ∈ (↑(evenTile w) : Set GInt) → z - (-texV2 (fracEven w)) ∈ (↑(evenTile w) : Set GInt) →
       (evenO w).val z - (evenO w).val (z - (-texV2 (fracEven w))) -
@@ -108,8 +108,8 @@ theorem horizontal_kappa_even (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
     intro z hz
     have hO := common_in_strings_of_translate (evenTile_hcc w) (-texV2 (fracEven w)) (even_hdisj_neg2 w)
       {z | ∃ k < FA.n, z ∈ FA.dom k} {z | ∃ j < FB.n, z ∈ FB.dom j}
-      (fun z' hz' => (covers_iff_dom FA _ hFAts z').2 (H2X z' hz'))
-      (fun z' hz' => (covers_iff_dom FB _ hFBts z').2 (H2Y z' hz'))
+      (fun z' hz' hz'' => (covers_iff_dom FA _ hFAts z').2 (H2X z' hz' hz''))
+      (fun z' hz' hz'' => (covers_iff_dom FB _ hFBts z').2 (H2Y z' hz' hz''))
       z (Finset.mem_coe.1 hz.1) (Finset.mem_coe.1 hz.2)
     exact ⟨hO.1, hO.2⟩
   have hadjP : ∀ k, k + 1 < P.n → (∃ x, x ∈ P.dom k ∧ x ∈ P.dom (k + 1)) ∨
@@ -131,13 +131,13 @@ differences of the translates are constant on the overlaps (the hypothesis of `f
 theorem even_hkappa (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
     (oddO evenO : FLatticePaper.Farey.Word → PartialOdometer)
     (h : FLatticePaper.Tiles.SurgicalWeak.IsWeakStdFamily S oddO evenO) (w : FLatticePaper.Farey.Word)
-    (H2X_v : ∀ z, BoundaryVertex (↑(cellTileOf (evenTile w)) : Set GInt) z →
+    (H2X_v : ∀ z, BoundaryVertex (↑(cellTileOf (evenTile w)) : Set GInt) z → z - texV1Even (fracEven w) ∈ evenTile w →
       tileCovers (vStringAt (vWordOf w true) (lastPosOf (hStringAt (hWordOf w true) 0))) z)
-    (H2Y_v : ∀ z, BoundaryVertex ({t : GInt | t - texV1Even (fracEven w) ∈ cellTileOf (evenTile w)} : Set GInt) z →
+    (H2Y_v : ∀ z, BoundaryVertex ({t : GInt | t - texV1Even (fracEven w) ∈ cellTileOf (evenTile w)} : Set GInt) z → z ∈ evenTile w →
       tileCovers (vRevStringAt (vWordOf w true).reverse (texV1Even (fracEven w))) z)
-    (H2X_h : ∀ z, BoundaryVertex (↑(cellTileOf (evenTile w)) : Set GInt) z →
+    (H2X_h : ∀ z, BoundaryVertex (↑(cellTileOf (evenTile w)) : Set GInt) z → z - (-texV2 (fracEven w)) ∈ evenTile w →
       tileCovers (hStringAt (hWordOf w true) 0) z)
-    (H2Y_h : ∀ z, BoundaryVertex ({t : GInt | t - (-texV2 (fracEven w)) ∈ cellTileOf (evenTile w)} : Set GInt) z →
+    (H2Y_h : ∀ z, BoundaryVertex ({t : GInt | t - (-texV2 (fracEven w)) ∈ cellTileOf (evenTile w)} : Set GInt) z → z ∈ evenTile w →
       tileCovers (hRevStringAt (hWordOf w true).reverse (1, -2)) z) :
     ∃ κ : ℤ × ℤ → ℤ, ∀ (d' : ℤ × ℤ) (y : ℤ × ℤ), y ∈ (↑(evenTile w) : Set (ℤ × ℤ)) →
       y - vP (texV1Even (fracEven w)) (texV2 (fracEven w)) d' ∈ (↑(evenTile w) : Set (ℤ × ℤ)) →
@@ -217,13 +217,13 @@ theorem even_hkappa (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
 theorem closed_walks_even (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
     (oddO evenO : FLatticePaper.Farey.Word → PartialOdometer)
     (h : FLatticePaper.Tiles.SurgicalWeak.IsWeakStdFamily S oddO evenO) (w : FLatticePaper.Farey.Word)
-    (H2X_v : ∀ z, BoundaryVertex (↑(cellTileOf (evenTile w)) : Set GInt) z →
+    (H2X_v : ∀ z, BoundaryVertex (↑(cellTileOf (evenTile w)) : Set GInt) z → z - texV1Even (fracEven w) ∈ evenTile w →
       tileCovers (vStringAt (vWordOf w true) (lastPosOf (hStringAt (hWordOf w true) 0))) z)
-    (H2Y_v : ∀ z, BoundaryVertex ({t : GInt | t - texV1Even (fracEven w) ∈ cellTileOf (evenTile w)} : Set GInt) z →
+    (H2Y_v : ∀ z, BoundaryVertex ({t : GInt | t - texV1Even (fracEven w) ∈ cellTileOf (evenTile w)} : Set GInt) z → z ∈ evenTile w →
       tileCovers (vRevStringAt (vWordOf w true).reverse (texV1Even (fracEven w))) z)
-    (H2X_h : ∀ z, BoundaryVertex (↑(cellTileOf (evenTile w)) : Set GInt) z →
+    (H2X_h : ∀ z, BoundaryVertex (↑(cellTileOf (evenTile w)) : Set GInt) z → z - (-texV2 (fracEven w)) ∈ evenTile w →
       tileCovers (hStringAt (hWordOf w true) 0) z)
-    (H2Y_h : ∀ z, BoundaryVertex ({t : GInt | t - (-texV2 (fracEven w)) ∈ cellTileOf (evenTile w)} : Set GInt) z →
+    (H2Y_h : ∀ z, BoundaryVertex ({t : GInt | t - (-texV2 (fracEven w)) ∈ cellTileOf (evenTile w)} : Set GInt) z → z ∈ evenTile w →
       tileCovers (hRevStringAt (hWordOf w true).reverse (1, -2)) z) :
     ∃ κ : ℤ × ℤ → ℤ, ∀ (u : ℤ × ℤ)
       (wk : (overlapGraph (dom (↑(evenTile w) : Set (ℤ × ℤ)) (texV1Even (fracEven w)) (texV2 (fracEven w)))).Walk u u),

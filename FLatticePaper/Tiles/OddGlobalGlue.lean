@@ -192,13 +192,13 @@ translation rules of the modified deck of `fracOdd w`. The covering hypotheses H
 theorem odd_glue (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
     (oddO evenO : FLatticePaper.Farey.Word → PartialOdometer)
     (h : FLatticePaper.Tiles.SurgicalWeak.IsWeakStdFamily S oddO evenO) (w : FLatticePaper.Farey.Word)
-    (H2X_v : ∀ z, BoundaryVertex (↑(cellTileOf (oddTile w)) : Set GInt) z →
+    (H2X_v : ∀ z, BoundaryVertex (↑(cellTileOf (oddTile w)) : Set GInt) z → z - texV1Odd (fracOdd w) ∈ oddTile w →
       tileCovers (vStringAt (vWordOf w false) (lastPosOf (hStringAt (hWordOf w false) 0))) z)
-    (H2Y_v : ∀ z, BoundaryVertex ({t : GInt | t - texV1Odd (fracOdd w) ∈ cellTileOf (oddTile w)} : Set GInt) z →
+    (H2Y_v : ∀ z, BoundaryVertex ({t : GInt | t - texV1Odd (fracOdd w) ∈ cellTileOf (oddTile w)} : Set GInt) z → z ∈ oddTile w →
       tileCovers (vRevStringAt (vWordOf w false).reverse (texV1Odd (fracOdd w))) z)
-    (H2X_h : ∀ z, BoundaryVertex (↑(cellTileOf (oddTile w)) : Set GInt) z →
+    (H2X_h : ∀ z, BoundaryVertex (↑(cellTileOf (oddTile w)) : Set GInt) z → z - (-texV2 (fracOdd w)) ∈ oddTile w →
       tileCovers (hStringAt (hWordOf w false) 0) z)
-    (H2Y_h : ∀ z, BoundaryVertex ({t : GInt | t - (-texV2 (fracOdd w)) ∈ cellTileOf (oddTile w)} : Set GInt) z →
+    (H2Y_h : ∀ z, BoundaryVertex ({t : GInt | t - (-texV2 (fracOdd w)) ∈ cellTileOf (oddTile w)} : Set GInt) z → z ∈ oddTile w →
       tileCovers (hRevStringAt (hWordOf w false).reverse (1, -2)) z) :
     ∃ f : ℤ × ℤ → ℤ, (∃ c : ℤ, ∀ x ∈ (↑(oddTile w) : Set (ℤ × ℤ)), f x = (oddO w).val x + c) ∧
       (∃ c1 : ℤ, ∀ x : ℤ × ℤ, f (x + texV1Odd (fracOdd w)) = f x + c1) ∧

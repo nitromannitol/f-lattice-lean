@@ -18,13 +18,13 @@ open scoped Matrix
 theorem surgical_global_odometer_standard_odd (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
     (oddO evenO : FLatticePaper.Farey.Word → PartialOdometer)
     (h : FLatticePaper.Tiles.SurgicalWeak.IsWeakStdFamily S oddO evenO) (w : FLatticePaper.Farey.Word)
-    (H2X_v : ∀ z, BoundaryVertex (↑(cellTileOf (oddTile w)) : Set GInt) z →
+    (H2X_v : ∀ z, BoundaryVertex (↑(cellTileOf (oddTile w)) : Set GInt) z → z - texV1Odd (fracOdd w) ∈ oddTile w →
       tileCovers (vStringAt (vWordOf w false) (lastPosOf (hStringAt (hWordOf w false) 0))) z)
-    (H2Y_v : ∀ z, BoundaryVertex ({t : GInt | t - texV1Odd (fracOdd w) ∈ cellTileOf (oddTile w)} : Set GInt) z →
+    (H2Y_v : ∀ z, BoundaryVertex ({t : GInt | t - texV1Odd (fracOdd w) ∈ cellTileOf (oddTile w)} : Set GInt) z → z ∈ oddTile w →
       tileCovers (vRevStringAt (vWordOf w false).reverse (texV1Odd (fracOdd w))) z)
-    (H2X_h : ∀ z, BoundaryVertex (↑(cellTileOf (oddTile w)) : Set GInt) z →
+    (H2X_h : ∀ z, BoundaryVertex (↑(cellTileOf (oddTile w)) : Set GInt) z → z - (-texV2 (fracOdd w)) ∈ oddTile w →
       tileCovers (hStringAt (hWordOf w false) 0) z)
-    (H2Y_h : ∀ z, BoundaryVertex ({t : GInt | t - (-texV2 (fracOdd w)) ∈ cellTileOf (oddTile w)} : Set GInt) z →
+    (H2Y_h : ∀ z, BoundaryVertex ({t : GInt | t - (-texV2 (fracOdd w)) ∈ cellTileOf (oddTile w)} : Set GInt) z → z ∈ oddTile w →
       tileCovers (hRevStringAt (hWordOf w false).reverse (1, -2)) z) :
     ∃ g : Field, (∃ c : ℤ, ∀ x ∈ (↑(oddTile w) : Set (ℤ × ℤ)), g x = (oddO w).val x + c) ∧
       SatisfiesPeriodicity (fracOdd w) g ∧ HasQuadraticGrowth g (fracOdd w).matrix ∧
@@ -41,13 +41,13 @@ theorem surgical_global_odometer_standard_odd (S : FLatticePaper.Tiles.SurgicalW
 theorem surgical_global_odometer_standard_even (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
     (oddO evenO : FLatticePaper.Farey.Word → PartialOdometer)
     (h : FLatticePaper.Tiles.SurgicalWeak.IsWeakStdFamily S oddO evenO) (w : FLatticePaper.Farey.Word)
-    (H2X_v : ∀ z, BoundaryVertex (↑(cellTileOf (evenTile w)) : Set GInt) z →
+    (H2X_v : ∀ z, BoundaryVertex (↑(cellTileOf (evenTile w)) : Set GInt) z → z - texV1Even (fracEven w) ∈ evenTile w →
       tileCovers (vStringAt (vWordOf w true) (lastPosOf (hStringAt (hWordOf w true) 0))) z)
-    (H2Y_v : ∀ z, BoundaryVertex ({t : GInt | t - texV1Even (fracEven w) ∈ cellTileOf (evenTile w)} : Set GInt) z →
+    (H2Y_v : ∀ z, BoundaryVertex ({t : GInt | t - texV1Even (fracEven w) ∈ cellTileOf (evenTile w)} : Set GInt) z → z ∈ evenTile w →
       tileCovers (vRevStringAt (vWordOf w true).reverse (texV1Even (fracEven w))) z)
-    (H2X_h : ∀ z, BoundaryVertex (↑(cellTileOf (evenTile w)) : Set GInt) z →
+    (H2X_h : ∀ z, BoundaryVertex (↑(cellTileOf (evenTile w)) : Set GInt) z → z - (-texV2 (fracEven w)) ∈ evenTile w →
       tileCovers (hStringAt (hWordOf w true) 0) z)
-    (H2Y_h : ∀ z, BoundaryVertex ({t : GInt | t - (-texV2 (fracEven w)) ∈ cellTileOf (evenTile w)} : Set GInt) z →
+    (H2Y_h : ∀ z, BoundaryVertex ({t : GInt | t - (-texV2 (fracEven w)) ∈ cellTileOf (evenTile w)} : Set GInt) z → z ∈ evenTile w →
       tileCovers (hRevStringAt (hWordOf w true).reverse (1, -2)) z) :
     ∃ g : Field, (∃ c : ℤ, ∀ x ∈ (↑(evenTile w) : Set (ℤ × ℤ)), g x = (evenO w).val x + c) ∧
       SatisfiesPeriodicity (fracEven w) g ∧ HasQuadraticGrowth g (fracEven w).matrix ∧

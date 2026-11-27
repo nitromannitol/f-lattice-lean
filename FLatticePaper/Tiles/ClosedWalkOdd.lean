@@ -28,13 +28,13 @@ differences of the translates are constant on the overlaps (the hypothesis of `f
 theorem odd_hkappa (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
     (oddO evenO : FLatticePaper.Farey.Word → PartialOdometer)
     (h : FLatticePaper.Tiles.SurgicalWeak.IsWeakStdFamily S oddO evenO) (w : FLatticePaper.Farey.Word)
-    (H2X_v : ∀ z, BoundaryVertex (↑(cellTileOf (oddTile w)) : Set GInt) z →
+    (H2X_v : ∀ z, BoundaryVertex (↑(cellTileOf (oddTile w)) : Set GInt) z → z - texV1Odd (fracOdd w) ∈ oddTile w →
       tileCovers (vStringAt (vWordOf w false) (lastPosOf (hStringAt (hWordOf w false) 0))) z)
-    (H2Y_v : ∀ z, BoundaryVertex ({t : GInt | t - texV1Odd (fracOdd w) ∈ cellTileOf (oddTile w)} : Set GInt) z →
+    (H2Y_v : ∀ z, BoundaryVertex ({t : GInt | t - texV1Odd (fracOdd w) ∈ cellTileOf (oddTile w)} : Set GInt) z → z ∈ oddTile w →
       tileCovers (vRevStringAt (vWordOf w false).reverse (texV1Odd (fracOdd w))) z)
-    (H2X_h : ∀ z, BoundaryVertex (↑(cellTileOf (oddTile w)) : Set GInt) z →
+    (H2X_h : ∀ z, BoundaryVertex (↑(cellTileOf (oddTile w)) : Set GInt) z → z - (-texV2 (fracOdd w)) ∈ oddTile w →
       tileCovers (hStringAt (hWordOf w false) 0) z)
-    (H2Y_h : ∀ z, BoundaryVertex ({t : GInt | t - (-texV2 (fracOdd w)) ∈ cellTileOf (oddTile w)} : Set GInt) z →
+    (H2Y_h : ∀ z, BoundaryVertex ({t : GInt | t - (-texV2 (fracOdd w)) ∈ cellTileOf (oddTile w)} : Set GInt) z → z ∈ oddTile w →
       tileCovers (hRevStringAt (hWordOf w false).reverse (1, -2)) z) :
     ∃ κ : ℤ × ℤ → ℤ, ∀ (d' : ℤ × ℤ) (y : ℤ × ℤ), y ∈ (↑(oddTile w) : Set (ℤ × ℤ)) →
       y - vP (texV1Odd (fracOdd w)) (texV2 (fracOdd w)) d' ∈ (↑(oddTile w) : Set (ℤ × ℤ)) →
@@ -114,13 +114,13 @@ theorem odd_hkappa (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
 theorem closed_walks_odd (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
     (oddO evenO : FLatticePaper.Farey.Word → PartialOdometer)
     (h : FLatticePaper.Tiles.SurgicalWeak.IsWeakStdFamily S oddO evenO) (w : FLatticePaper.Farey.Word)
-    (H2X_v : ∀ z, BoundaryVertex (↑(cellTileOf (oddTile w)) : Set GInt) z →
+    (H2X_v : ∀ z, BoundaryVertex (↑(cellTileOf (oddTile w)) : Set GInt) z → z - texV1Odd (fracOdd w) ∈ oddTile w →
       tileCovers (vStringAt (vWordOf w false) (lastPosOf (hStringAt (hWordOf w false) 0))) z)
-    (H2Y_v : ∀ z, BoundaryVertex ({t : GInt | t - texV1Odd (fracOdd w) ∈ cellTileOf (oddTile w)} : Set GInt) z →
+    (H2Y_v : ∀ z, BoundaryVertex ({t : GInt | t - texV1Odd (fracOdd w) ∈ cellTileOf (oddTile w)} : Set GInt) z → z ∈ oddTile w →
       tileCovers (vRevStringAt (vWordOf w false).reverse (texV1Odd (fracOdd w))) z)
-    (H2X_h : ∀ z, BoundaryVertex (↑(cellTileOf (oddTile w)) : Set GInt) z →
+    (H2X_h : ∀ z, BoundaryVertex (↑(cellTileOf (oddTile w)) : Set GInt) z → z - (-texV2 (fracOdd w)) ∈ oddTile w →
       tileCovers (hStringAt (hWordOf w false) 0) z)
-    (H2Y_h : ∀ z, BoundaryVertex ({t : GInt | t - (-texV2 (fracOdd w)) ∈ cellTileOf (oddTile w)} : Set GInt) z →
+    (H2Y_h : ∀ z, BoundaryVertex ({t : GInt | t - (-texV2 (fracOdd w)) ∈ cellTileOf (oddTile w)} : Set GInt) z → z ∈ oddTile w →
       tileCovers (hRevStringAt (hWordOf w false).reverse (1, -2)) z) :
     ∃ κ : ℤ × ℤ → ℤ, ∀ (u : ℤ × ℤ)
       (wk : (overlapGraph (dom (↑(oddTile w) : Set (ℤ × ℤ)) (texV1Odd (fracOdd w)) (texV2 (fracOdd w)))).Walk u u),

@@ -33,8 +33,8 @@ theorem hasCorner_add_sub_iff (s z v : GInt) : HasCorner (s + v) z ↔ HasCorner
 `P + v` lies in the strings `SX` of `P` and in `SY` (the translate of the strings, by hypothesis H2 for each tile). -/
 theorem common_in_strings_of_translate {P : Finset GInt} (hP : HasCornerCell P) (v : GInt)
     (hdisj : ∀ s, s ∈ cellTileOf P → s - v ∈ cellTileOf P → False) (SX SY : Set GInt)
-    (H2X : ∀ z, BoundaryVertex (↑(cellTileOf P) : Set GInt) z → z ∈ SX)
-    (H2Y : ∀ z, BoundaryVertex ({t : GInt | t - v ∈ cellTileOf P} : Set GInt) z → z ∈ SY) :
+    (H2X : ∀ z, BoundaryVertex (↑(cellTileOf P) : Set GInt) z → z - v ∈ P → z ∈ SX)
+    (H2Y : ∀ z, BoundaryVertex ({t : GInt | t - v ∈ cellTileOf P} : Set GInt) z → z ∈ P → z ∈ SY) :
     ∀ z ∈ P, z - v ∈ P → z ∈ SX ∧ z ∈ SY := by
   intro z hz hzv
   have H1X : ∀ z ∈ (↑P : Set GInt), ∃ s ∈ (↑(cellTileOf P) : Set GInt), HasCorner s z := by
@@ -55,7 +55,7 @@ theorem common_in_strings_of_translate {P : Finset GInt} (hP : HasCornerCell P) 
   have H3 : ∀ s, s ∈ (↑(cellTileOf P) : Set GInt) → s ∈ ({t : GInt | t - v ∈ cellTileOf P} : Set GInt) → False := by
     intro s hs hs'
     exact hdisj s (Finset.mem_coe.1 hs) hs'
-  exact FLatticePaper.Tiles.CellDerivation.common_point_in_strings (↑(cellTileOf P) : Set GInt)
+  exact FLatticePaper.Tiles.CellDerivation.common_point_in_strings_ov (↑(cellTileOf P) : Set GInt)
     ({t : GInt | t - v ∈ cellTileOf P} : Set GInt) (↑P : Set GInt) ({z : GInt | z - v ∈ P} : Set GInt) SX SY
     H1X H1Y H2X H2Y H3 z (Finset.mem_coe.2 hz) hzv
 
@@ -85,8 +85,9 @@ theorem odd_hdisj (w : Word) :
 /-- **(e) for the odd standard tile.** A common point of `T` and `T + v₁` lies in the strings `SX` of `T` and `SY` of `T + v₁`,
 given H2 for both tiles (the boundary vertices of their cell regions lie in their strings; the input of w3). -/
 theorem oddTile_common_in_strings (w : Word) (SX SY : Set GInt)
-    (H2X : ∀ z, BoundaryVertex (↑(cellTileOf (oddTile w)) : Set GInt) z → z ∈ SX)
-    (H2Y : ∀ z, BoundaryVertex ({t : GInt | t - texV1Odd (fracOdd w) ∈ cellTileOf (oddTile w)} : Set GInt) z → z ∈ SY) :
+    (H2X : ∀ z, BoundaryVertex (↑(cellTileOf (oddTile w)) : Set GInt) z → z - texV1Odd (fracOdd w) ∈ oddTile w → z ∈ SX)
+    (H2Y : ∀ z, BoundaryVertex ({t : GInt | t - texV1Odd (fracOdd w) ∈ cellTileOf (oddTile w)} : Set GInt) z →
+      z ∈ oddTile w → z ∈ SY) :
     ∀ z ∈ oddTile w, z - texV1Odd (fracOdd w) ∈ oddTile w → z ∈ SX ∧ z ∈ SY :=
   common_in_strings_of_translate (oddTile_hcc w) (texV1Odd (fracOdd w)) (odd_hdisj w) SX SY H2X H2Y
 
@@ -113,8 +114,9 @@ theorem even_hdisj (w : Word) :
 
 /-- **(e) for the even standard tile**, with H2 for both tiles as hypotheses. -/
 theorem evenTile_common_in_strings (w : Word) (SX SY : Set GInt)
-    (H2X : ∀ z, BoundaryVertex (↑(cellTileOf (evenTile w)) : Set GInt) z → z ∈ SX)
-    (H2Y : ∀ z, BoundaryVertex ({t : GInt | t - texV1Even (fracEven w) ∈ cellTileOf (evenTile w)} : Set GInt) z → z ∈ SY) :
+    (H2X : ∀ z, BoundaryVertex (↑(cellTileOf (evenTile w)) : Set GInt) z → z - texV1Even (fracEven w) ∈ evenTile w → z ∈ SX)
+    (H2Y : ∀ z, BoundaryVertex ({t : GInt | t - texV1Even (fracEven w) ∈ cellTileOf (evenTile w)} : Set GInt) z →
+      z ∈ evenTile w → z ∈ SY) :
     ∀ z ∈ evenTile w, z - texV1Even (fracEven w) ∈ evenTile w → z ∈ SX ∧ z ∈ SY :=
   common_in_strings_of_translate (evenTile_hcc w) (texV1Even (fracEven w)) (even_hdisj w) SX SY H2X H2Y
 

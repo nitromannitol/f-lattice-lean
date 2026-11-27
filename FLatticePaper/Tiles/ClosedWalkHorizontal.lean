@@ -39,9 +39,9 @@ theorem odd_hdisj_neg2 (w : FLatticePaper.Farey.Word) :
 theorem horizontal_kappa (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
     (oddO evenO : FLatticePaper.Farey.Word → PartialOdometer)
     (h : FLatticePaper.Tiles.SurgicalWeak.IsWeakStdFamily S oddO evenO) (w : FLatticePaper.Farey.Word)
-    (H2X : ∀ z, BoundaryVertex (↑(cellTileOf (oddTile w)) : Set GInt) z →
+    (H2X : ∀ z, BoundaryVertex (↑(cellTileOf (oddTile w)) : Set GInt) z → z - (-texV2 (fracOdd w)) ∈ oddTile w →
       tileCovers (hStringAt (hWordOf w false) 0) z)
-    (H2Y : ∀ z, BoundaryVertex ({t : GInt | t - (-texV2 (fracOdd w)) ∈ cellTileOf (oddTile w)} : Set GInt) z →
+    (H2Y : ∀ z, BoundaryVertex ({t : GInt | t - (-texV2 (fracOdd w)) ∈ cellTileOf (oddTile w)} : Set GInt) z → z ∈ oddTile w →
       tileCovers (hRevStringAt (hWordOf w false).reverse (1, -2)) z) :
     ∃ κ : ℤ, ∀ z : GInt, z ∈ (↑(oddTile w) : Set GInt) → z - (-texV2 (fracOdd w)) ∈ (↑(oddTile w) : Set GInt) →
       (oddO w).val z - (oddO w).val (z - (-texV2 (fracOdd w))) -
@@ -64,8 +64,8 @@ theorem horizontal_kappa (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
     intro z hz
     have hO := common_in_strings_of_translate (oddTile_hcc w) (-texV2 (fracOdd w)) (odd_hdisj_neg2 w)
       {z | ∃ k < FA.n, z ∈ FA.dom k} {z | ∃ j < FB.n, z ∈ FB.dom j}
-      (fun z' hz' => (covers_iff_dom FA _ hFAts z').2 (H2X z' hz'))
-      (fun z' hz' => (covers_iff_dom FB _ hFBts z').2 (H2Y z' hz'))
+      (fun z' hz' hz'' => (covers_iff_dom FA _ hFAts z').2 (H2X z' hz' hz''))
+      (fun z' hz' hz'' => (covers_iff_dom FB _ hFBts z').2 (H2Y z' hz' hz''))
       z (Finset.mem_coe.1 hz.1) (Finset.mem_coe.1 hz.2)
     exact ⟨hO.1, hO.2⟩
   have hadjP : ∀ k, k + 1 < P.n → (∃ x, x ∈ P.dom k ∧ x ∈ P.dom (k + 1)) ∨

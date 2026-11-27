@@ -70,4 +70,46 @@ theorem common_point_in_strings (CX CY PX PY SX SY : Set (ℤ × ℤ))
     exact H3 s hsC hsY
   exact ⟨H2X z hXb, H2Y z hYb⟩
 
+/-- A common point of two tiles is a boundary vertex of both cell regions (the argument of `common_point_in_strings`). -/
+theorem common_boundary (CX CY PX PY : Set (ℤ × ℤ))
+    (H1X : ∀ z ∈ PX, ∃ s ∈ CX, HasCorner s z)
+    (H1Y : ∀ z ∈ PY, ∃ s ∈ CY, HasCorner s z)
+    (H3 : ∀ s, s ∈ CX → s ∈ CY → False) :
+    ∀ z ∈ PX, z ∈ PY → BoundaryVertex CX z ∧ BoundaryVertex CY z := by
+  intro z hX hY
+  obtain ⟨s, hsC, hsz⟩ := H1X z hX
+  obtain ⟨t, htC, htz⟩ := H1Y z hY
+  have hXb : BoundaryVertex CX z := by
+    refine ⟨⟨s, hsC, hsz⟩, fun hint => ?_⟩
+    have htX : t ∈ CX := by
+      rcases squares_at htz with h | h | h | h
+      · rw [h]; exact hint.1
+      · rw [h]; exact hint.2.1
+      · rw [h]; exact hint.2.2.1
+      · rw [h]; exact hint.2.2.2
+    exact H3 t htX htC
+  have hYb : BoundaryVertex CY z := by
+    refine ⟨⟨t, htC, htz⟩, fun hint => ?_⟩
+    have hsY : s ∈ CY := by
+      rcases squares_at hsz with h | h | h | h
+      · rw [h]; exact hint.1
+      · rw [h]; exact hint.2.1
+      · rw [h]; exact hint.2.2.1
+      · rw [h]; exact hint.2.2.2
+    exact H3 s hsC hsY
+  exact ⟨hXb, hYb⟩
+
+/-- The restricted form of `common_point_in_strings`: `H2X` is only needed at the boundary vertices of `CX` that lie in
+`PY`, and `H2Y` only at the boundary vertices of `CY` that lie in `PX`. -/
+theorem common_point_in_strings_ov (CX CY PX PY SX SY : Set (ℤ × ℤ))
+    (H1X : ∀ z ∈ PX, ∃ s ∈ CX, HasCorner s z)
+    (H1Y : ∀ z ∈ PY, ∃ s ∈ CY, HasCorner s z)
+    (H2X : ∀ z, BoundaryVertex CX z → z ∈ PY → z ∈ SX)
+    (H2Y : ∀ z, BoundaryVertex CY z → z ∈ PX → z ∈ SY)
+    (H3 : ∀ s, s ∈ CX → s ∈ CY → False) :
+    ∀ z ∈ PX, z ∈ PY → z ∈ SX ∧ z ∈ SY := by
+  intro z hX hY
+  obtain ⟨hXb, hYb⟩ := common_boundary CX CY PX PY H1X H1Y H3 z hX hY
+  exact ⟨H2X z hXb hY, H2Y z hYb hX⟩
+
 end FLatticePaper.Tiles.CellDerivation
