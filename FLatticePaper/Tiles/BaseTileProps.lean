@@ -120,7 +120,7 @@ theorem stairV_2d' (d : ℤ) (hd : 3 ≤ d) :
   · rw [min_eq_left (by omega : 2 - d - 1 ≤ 0)]
     ring
 
-theorem stairV_2d1 (d : ℤ) (hd : 3 ≤ d) :
+theorem stairV_2d1 (d : ℤ) (_hd : 3 ≤ d) :
     paperStairValue d (2, d + 1) = -((d + 1) * (d + 1 + 1) / 2) + (d + 2) := by
   unfold paperStairValue
   dsimp only
@@ -129,7 +129,7 @@ theorem stairV_2d1 (d : ℤ) (hd : 3 ≤ d) :
     ring
   · exact absurd (Or.inr rfl) h1
 
-theorem stairV_1d1 (d : ℤ) (hd : 3 ≤ d) :
+theorem stairV_1d1 (d : ℤ) (_hd : 3 ≤ d) :
     paperStairValue d (1, d + 1) = -((d + 1) * (d + 1 + 1) / 2) + (d + 1) := by
   unfold paperStairValue
   dsimp only
@@ -163,7 +163,7 @@ theorem stairE_halfturn (d : ℤ) (hd : 3 ≤ d) (E : PartialOdometer) (hdom : E
   rintro ⟨a, b⟩ hx
   have hxS : (a, b) ∈ stairF d := by rw [← hdom]; exact hx
   have hD : ((d, 1) + (1 - d, 1 + d) + ((1 : ℤ), (-1 : ℤ))) = ((2 : ℤ), d + 1) := by
-    ext <;> simp <;> ring
+    ext <;> simp; ring
   have hy : ((2 : ℤ), d + 1) - (a, b) = (2 - a, d + 1 - b) := by
     rw [Prod.mk_sub_mk]
   rw [hD, hy]
@@ -218,27 +218,27 @@ theorem stairE_corners (d : ℤ) (hd : 3 ≤ d) (E : PartialOdometer) (hdom : E.
     exact ⟨m, by rw [v, stairV_d1 d hd]⟩
   have k4 : (1 - d, 1 + d) + ((1 : ℤ), (0 : ℤ)) ∈ E.dom ∧
       E.val ((1 - d, 1 + d) + (1, 0)) = -((1 + d) * (1 + d + 1) / 2) + 2 := by
-    have e : ((1 - d, 1 + d) : Site) + (1, 0) = (2 - d, 1 + d) := by ext <;> simp <;> ring
+    have e : ((1 - d, 1 + d) : Site) + (1, 0) = (2 - d, 1 + d) := by ext <;> simp; ring
     rw [e]
     obtain ⟨m, v⟩ := at_ (2 - d) (1 + d) ((mem_stairF_ab d hd _ _).2 (by omega))
     exact ⟨m, by rw [v, stairV_2d d hd]⟩
   have k5 : (1 - d, 1 + d) + ((1 : ℤ), (-1 : ℤ)) ∈ E.dom ∧
       E.val ((1 - d, 1 + d) + (1, -1)) = -(d * (d + 1) / 2) + 1 := by
-    have e : ((1 - d, 1 + d) : Site) + (1, -1) = (2 - d, d) := by ext <;> simp <;> ring
+    have e : ((1 - d, 1 + d) : Site) + (1, -1) = (2 - d, d) := by ext <;> simp; ring
     rw [e]
     obtain ⟨m, v⟩ := at_ (2 - d) d ((mem_stairF_ab d hd _ _).2 (by omega))
     exact ⟨m, by rw [v, stairV_2d' d hd]⟩
   have k6 : (d, 1) + (1 - d, 1 + d) + ((1 : ℤ), (-1 : ℤ)) ∈ E.dom ∧
       E.val ((d, 1) + (1 - d, 1 + d) + (1, -1)) = -((d + 1) * (d + 1 + 1) / 2) + (d + 2) := by
     have e : ((d, 1) + (1 - d, 1 + d) + ((1 : ℤ), (-1 : ℤ)) : Site) = (2, d + 1) := by
-      ext <;> simp <;> ring
+      ext <;> simp; ring
     rw [e]
     obtain ⟨m, v⟩ := at_ 2 (d + 1) ((mem_stairF_ab d hd _ _).2 (by omega))
     exact ⟨m, by rw [v, stairV_2d1 d hd]⟩
   have k7 : (d, 1) + (1 - d, 1 + d) + ((1 : ℤ), (-1 : ℤ)) - ((1 : ℤ), (0 : ℤ)) ∈ E.dom ∧
       E.val ((d, 1) + (1 - d, 1 + d) + (1, -1) - (1, 0)) = -((d + 1) * (d + 1 + 1) / 2) + (d + 1) := by
     have e : ((d, 1) + (1 - d, 1 + d) + ((1 : ℤ), (-1 : ℤ)) - ((1 : ℤ), (0 : ℤ)) : Site) = (1, d + 1) := by
-      ext <;> simp <;> ring
+      ext <;> simp; ring
     rw [e]
     obtain ⟨m, v⟩ := at_ 1 (d + 1) ((mem_stairF_ab d hd _ _).2 (by omega))
     exact ⟨m, by rw [v, stairV_1d1 d hd]⟩
