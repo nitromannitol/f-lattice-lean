@@ -1657,4 +1657,467 @@ theorem rotD_val (d a b : ℤ) :
   rw [hI, e1, e2]
   linarith
 
+/-- The floor squares of two integers whose sum is odd: `4 (u^2/4 + v^2/4) = u^2 + v^2 - 1`. -/
+theorem floor_pair (u v : ℤ) (h : (u + v) % 2 = 1) : 4 * (u ^ 2 / 4 + v ^ 2 / 4) = u ^ 2 + v ^ 2 - 1 := by
+  rcases Int.emod_two_eq_zero_or_one u with hu | hu
+  · obtain ⟨m, hm⟩ : ∃ m, u = 2 * m := ⟨u / 2, by omega⟩
+    obtain ⟨n, hn⟩ : ∃ n, v = 2 * n + 1 := ⟨(v - 1) / 2, by omega⟩
+    subst hm hn
+    rw [sq4_even _ m rfl, sq4_odd _ n rfl]
+    ring
+  · obtain ⟨m, hm⟩ : ∃ m, u = 2 * m + 1 := ⟨(u - 1) / 2, by omega⟩
+    obtain ⟨n, hn⟩ : ∃ n, v = 2 * n := ⟨v / 2, by omega⟩
+    subst hm hn
+    rw [sq4_odd _ m rfl, sq4_even _ n rfl]
+    ring
+
+/-- The value identity A1 (the odd alternate `[]`/`2^k` against the even alternate `3^k` family): the stair alternate
+`stAlt (2k+3)` at `(a, b)` against the near-one stair alternate at the rotated point, with `γ = (k+1, k)`, `c0 = (k+1)^2`. -/
+theorem rotA1_val (k a b : ℤ) :
+    paperStairAltValue (2 * k + 3) (a, b) =
+      paperNearStairAltValue (2 * k + 3) (2 * k + 3 - b, a + 2 * (2 * k + 3) - 3) - h0 (a, b) +
+        ((k + 1) * a + k * b) + (k + 1) ^ 2 := by
+  have hF := floor_pair (a + b + 2 * k) (a - b - 1) (by omega)
+  have hT := two_mul_T2 b
+  have hC := two_mul_chooseTwo a
+  rw [pstA, pnsA]
+  unfold h0 centeredQuarterTurnCorrection
+  dsimp only
+  have e1 : a + 2 * (2 * k + 3) - 3 - (2 * k + 3 - b) = a + b + 2 * k := by ring
+  rw [e1]
+  have hm23 : min 0 (2 * k + 3 - 2 + a) - min (2 * k + 3 - (a + 2 * (2 * k + 3) - 3) - 1) 0 = 2 * k + 3 - 2 + a := by
+    omega
+  have hc1 : min 0 (2 - a) = min (2 * (2 * k + 3) - 1 - (a + 2 * (2 * k + 3) - 3)) 0 := by omega
+  have hc2 : max (a + b - 2) 0 = max (a + b + 2 * k - (2 * k + 3) + 1) 0 := by omega
+  split_ifs <;> first | omega | linarith
+
+/-- The value identity A2 (`x.aEven = stAlt`, `r.aOdd = nsAlt`, `cf = (d, 0)`, `γ = 0`, `c0 = 0`). -/
+theorem rotA2_val (k a b : ℤ) :
+    paperNearStairAltValue (2 * k + 3) (a, b + 1) = paperStairAltValue (2 * k + 3) (2 * k + 3 - b, a) - h0 (a, b) := by
+  have hsq : (b + 1 - a) ^ 2 = (a - b - 1) ^ 2 := by ring
+  have hT := two_mul_T2 a
+  have hC := two_mul_chooseTwo a
+  rw [pnsA, pstA]
+  unfold h0 centeredQuarterTurnCorrection
+  dsimp only
+  rw [hsq]
+  have hm : min (2 * k + 3 - (b + 1) - 1) 0 + min (2 * (2 * k + 3) - 1 - (b + 1)) 0 +
+      max (b + 1 - a - (2 * k + 3) + 1) 0 -
+      (min 0 (2 - (2 * k + 3 - b)) + min 0 (2 * k + 3 - 2 + (2 * k + 3 - b)) + max (2 * k + 3 - b + a - 2) 0) =
+      -a := by
+    omega
+  split_ifs <;> first | omega | linarith
+
+/-- The value identity A3 (`x.aOdd = ladAlt`, `r.aEven = nlAlt`, `cf = (2d-1, 2)`, `γ = (1, 0)`, `c0 = 1`), `d = 2k+2`. -/
+theorem rotA3_val (k a b : ℤ) :
+    paperNearLadderAltValue (2 * k + 2) (a, b + 1) =
+      paperLadderAltValue (2 * k + 2) (2 * (2 * k + 2) - 2 - b, a + 1) - h0 (a, b) + a + 1 := by
+  have hsq : (b + 1 - a) ^ 2 = (a - b - 1) ^ 2 := by ring
+  have hT := two_mul_T2 (a + 1)
+  have hC := two_mul_chooseTwo a
+  rw [pnlA, pladA]
+  unfold h0 centeredQuarterTurnCorrection
+  dsimp only
+  rw [hsq]
+  have hm : min 0 (2 * k + 2 - (b + 1)) + min 0 (2 * (2 * k + 2) - 1 - (b + 1)) +
+      max 0 (b + 1 - a - (2 * k + 2)) -
+      (min 0 (2 * (2 * k + 2) - 2 - b) + min 0 (2 * k + 2 - (2 * (2 * k + 2) - 2 - b) - 1) +
+        max (2 * (2 * k + 2) - 2 - b + (a + 1) - (2 * k + 2)) 0) = -a := by
+    omega
+  split_ifs <;> first | omega | linarith
+
+/-- The value identity A4 (`x.aEven = nlAlt`, `r.aOdd = ladAlt`, `cf = (d+1, d-2)`, `γ = 0`, `c0 = 0`), `d = 2k+2`. -/
+theorem rotA4_val (k a b : ℤ) :
+    paperLadderAltValue (2 * k + 2) (a - 1, b - 1) =
+      paperNearLadderAltValue (2 * k + 2) (2 * k + 2 + 1 - b, a + (2 * k + 2) - 1) - h0 (a, b) := by
+  have e1 : a + (2 * k + 2) - 1 - (2 * k + 2 + 1 - b) = a + b - 2 := by ring
+  have hF := floor_pair_A a b
+  have hT := two_mul_T2 (b - 1)
+  have hC := two_mul_chooseTwo a
+  rw [pladA, pnlA]
+  unfold h0 centeredQuarterTurnCorrection
+  dsimp only
+  rw [e1]
+  have hm : min 0 (a - 1) + min 0 (2 * k + 2 - (a - 1) - 1) + max (a - 1 + (b - 1) - (2 * k + 2)) 0 -
+      (min 0 (2 * k + 2 - (a + (2 * k + 2) - 1)) + min 0 (2 * (2 * k + 2) - 1 - (a + (2 * k + 2) - 1)) +
+        max 0 (a + b - 2 - (2 * k + 2))) = a - 1 := by
+    omega
+  split_ifs <;> first | omega | linarith
+
+/-! #### The rotation predicates of the base families -/
+
+theorem tileRotation_congr {o oR : PartialOdometer} {v v' : ℤ × ℤ} (h : TileRotation o oR v) (hv : v = v') :
+    TileRotation o oR v' := by
+  subst hv
+  exact h
+
+theorem altRotation_congr {o oR : PartialOdometer} {cf cf' γ γ' : ℤ × ℤ} (h : AltRotation o oR cf γ) (hc : cf = cf')
+    (hg : γ = γ') : AltRotation o oR cf' γ' := by
+  subst hc hg
+  exact h
+
+/-- `TileRotation` at the stair (`o = nstairN`, `oR = stairF`, `v1 = (2k+4, 2k+2)`): the odd child of `2^k` and `[]`
+against the even child of the swapped word. -/
+theorem rotStd_A (k : ℤ) (hk : 0 ≤ k) (O E : PartialOdometer) (hOd : O.dom = nstairN (2 * k + 3))
+    (hOv : ∀ x ∈ O.dom, O.val x = paperNearStairValue (2 * k + 3) (x + (0, 1)))
+    (hEd : E.dom = stairF (2 * k + 3)) (hEv : ∀ x ∈ E.dom, E.val x = paperStairValue (2 * k + 3) x) :
+    TileRotation O E (2 * k + 4, 2 * k + 2) := by
+  refine ⟨0, 0, 0, 0, nstairO_firstNormal k hk O hOd hOv, stairE_firstNormal (2 * k + 3) (by omega) E hEd hEv, ?_⟩
+  rintro ⟨a, b⟩ hx
+  have hxS : (a, b) ∈ stairF (2 * k + 3) := by
+    rw [← hEd]
+    exact hx
+  have hmS : (2 * k + 4 - b, a + (2 * k + 2)) ∈ nstairF (2 * k + 3) :=
+    (mem_nstairF_ab _ (by omega) _ _).2 (by
+      have h := (mem_stairF_ab (2 * k + 3) (by omega) a b).1 hxS
+      omega)
+  have hyO : (2 * k + 4 - b, a + (2 * k + 2) - 1) ∈ O.dom := by
+    rw [hOd, mem_nstairN_ab, show a + (2 * k + 2) - 1 + 1 = a + (2 * k + 2) by ring]
+    exact hmS
+  have ey : mulI ((a, b) : Site) + (2 * k + 4, 2 * k + 2) - ((0 : ℤ), (1 : ℤ)) =
+      (2 * k + 4 - b, a + (2 * k + 2) - 1) := by
+    ext <;> simp [mulI]; ring
+  rw [ey]
+  refine ⟨hyO, ?_⟩
+  rw [normed_zero, normed_zero, hEv _ hx, hOv _ hyO,
+    show (2 * k + 4 - b, a + (2 * k + 2) - 1) + ((0 : ℤ), (1 : ℤ)) = (2 * k + 3 + 1 - b, a + (2 * k + 3) - 1) by
+      ext <;> simp <;> ring]
+  exact rotA_val (2 * k + 3) a b
+
+/-- `TileRotation` at the even stair (`o = stairF`, `oR = nstairN`, `v1 = (2k+3, 1)`). -/
+theorem rotStd_B (k : ℤ) (hk : 0 ≤ k) (St NS : PartialOdometer) (hSd : St.dom = stairF (2 * k + 3))
+    (hSv : ∀ x ∈ St.dom, St.val x = paperStairValue (2 * k + 3) x)
+    (hNd : NS.dom = nstairN (2 * k + 3))
+    (hNv : ∀ x ∈ NS.dom, NS.val x = paperNearStairValue (2 * k + 3) (x + (0, 1))) :
+    TileRotation St NS (2 * k + 3, 1) := by
+  refine ⟨0, 0, 0, 0, stairE_firstNormal (2 * k + 3) (by omega) St hSd hSv, nstairO_firstNormal k hk NS hNd hNv, ?_⟩
+  rintro ⟨a, b⟩ hx
+  have hxN : (a, b + 1) ∈ nstairF (2 * k + 3) := by
+    rw [← mem_nstairN_ab, ← hNd]
+    exact hx
+  have hyS : (2 * k + 3 - b, a) ∈ stairF (2 * k + 3) :=
+    (mem_stairF_ab _ (by omega) _ _).2 (by
+      have h := (mem_nstairF_ab _ (by omega) a (b + 1)).1 hxN
+      omega)
+  have hyO : (2 * k + 3 - b, a) ∈ St.dom := by
+    rw [hSd]
+    exact hyS
+  have ey : mulI ((a, b) : Site) + (2 * k + 3, 1) - ((0 : ℤ), (1 : ℤ)) = (2 * k + 3 - b, a) := by
+    ext <;> simp [mulI]; ring
+  rw [ey]
+  refine ⟨hyO, ?_⟩
+  rw [normed_zero, normed_zero, hNv _ hx, hSv _ hyO,
+    show (a, b) + ((0 : ℤ), (1 : ℤ)) = (a, b + 1) by ext <;> simp]
+  exact rotB_val (2 * k + 3) a b
+
+/-- `TileRotation` at the ladder (`o = ladderF`, `oR = nladderN`, `v1 = (4k+4, 2)`), `k ≥ 1`. -/
+theorem rotStd_C (k : ℤ) (hk : 1 ≤ k) (L NL : PartialOdometer) (hLd : L.dom = ladderF (2 * k + 2))
+    (hLv : ∀ x ∈ L.dom, L.val x = paperLadderValue (2 * k + 2) x)
+    (hNd : NL.dom = nladderN (2 * k + 2))
+    (hNv : ∀ x ∈ NL.dom, NL.val x = paperNearLadderValue (2 * k + 2) (x + (0, 1))) :
+    TileRotation L NL (2 * (2 * k + 2), 2) := by
+  refine ⟨0, 0, 0, 0, ladO_firstNormal (2 * k + 2) (by omega) L hLd hLv,
+    nlE_firstNormal (2 * k + 2) (by omega) NL hNd hNv, ?_⟩
+  rintro ⟨a, b⟩ hx
+  have hxN : (a, b + 1) ∈ nladderF (2 * k + 2) := by
+    rw [← mem_nladderN_ab, ← hNd]
+    exact hx
+  have hyL : (2 * (2 * k + 2) - b, a + 1) ∈ ladderF (2 * k + 2) :=
+    (mem_ladderF_ab _ (by omega) _ _).2 (by
+      have h := (mem_nladderF_ab _ (by omega) a (b + 1)).1 hxN
+      omega)
+  have hyO : (2 * (2 * k + 2) - b, a + 1) ∈ L.dom := by
+    rw [hLd]
+    exact hyL
+  have ey : mulI ((a, b) : Site) + (2 * (2 * k + 2), 2) - ((0 : ℤ), (1 : ℤ)) = (2 * (2 * k + 2) - b, a + 1) := by
+    ext <;> simp [mulI] <;> ring
+  rw [ey]
+  refine ⟨hyO, ?_⟩
+  rw [normed_zero, normed_zero, hNv _ hx, hLv _ hyO, show (a, b) + ((0 : ℤ), (1 : ℤ)) = (a, b + 1) by
+    ext <;> simp]
+  exact rotC_val (2 * k + 2) a b
+
+/-- `TileRotation` at the near-one ladder (`o = nladderN`, `oR = ladderF`, `v1 = (d+1, d-1)`), `k ≥ 1`. -/
+theorem rotStd_D (k : ℤ) (hk : 1 ≤ k) (NL L : PartialOdometer) (hNd : NL.dom = nladderN (2 * k + 2))
+    (hNv : ∀ x ∈ NL.dom, NL.val x = paperNearLadderValue (2 * k + 2) (x + (0, 1)))
+    (hLd : L.dom = ladderF (2 * k + 2)) (hLv : ∀ x ∈ L.dom, L.val x = paperLadderValue (2 * k + 2) x) :
+    TileRotation NL L (2 * k + 2 + 1, 2 * k + 2 - 1) := by
+  refine ⟨0, 0, 0, 0, nlE_firstNormal (2 * k + 2) (by omega) NL hNd hNv,
+    ladO_firstNormal (2 * k + 2) (by omega) L hLd hLv, ?_⟩
+  rintro ⟨a, b⟩ hx
+  have hxL : (a, b) ∈ ladderF (2 * k + 2) := by
+    rw [← hLd]
+    exact hx
+  have hyN : (2 * k + 2 + 1 - b, a + (2 * k + 2) - 2) ∈ NL.dom := by
+    rw [hNd, mem_nladderN_ab, show a + (2 * k + 2) - 2 + 1 = a + (2 * k + 2) - 1 by ring]
+    exact (mem_nladderF_ab _ (by omega) _ _).2 (by
+      have h := (mem_ladderF_ab _ (by omega) a b).1 hxL
+      omega)
+  have ey : mulI ((a, b) : Site) + (2 * k + 2 + 1, 2 * k + 2 - 1) - ((0 : ℤ), (1 : ℤ)) =
+      (2 * k + 2 + 1 - b, a + (2 * k + 2) - 2) := by
+    ext <;> simp [mulI] <;> ring
+  rw [ey]
+  refine ⟨hyN, ?_⟩
+  rw [normed_zero, normed_zero, hLv _ hx, hNv _ hyN,
+    show (2 * k + 2 + 1 - b, a + (2 * k + 2) - 2) + ((0 : ℤ), (1 : ℤ)) = (2 * k + 2 + 1 - b, a + (2 * k + 2) - 1) by
+      ext <;> simp; ring]
+  exact rotD_val (2 * k + 2) a b
+
+set_option maxHeartbeats 400000 in
+/-- `AltRotation` of the near-one stair alternate (`o = nsAlt (2k+3)`) against the stair alternate (`oR = stAlt`),
+`cf = (2k+3, 4k+2)`, `γ = (k+1, k)`, `c0 = (k+1)^2` (the domain transport uses the disjunctive tile membership). -/
+theorem rotAlt_A1 (k : ℤ) (hk : 0 ≤ k) (NS ST : PartialOdometer)
+    (hNd : ∀ x : Site, x ∈ NS.dom ↔ x + (0, 1) ∈ paperNearStairAltTile (2 * k + 3))
+    (hNv : ∀ x ∈ NS.dom, NS.val x = paperNearStairAltValue (2 * k + 3) (x + (0, 1)))
+    (hSd : ∀ x : Site, x ∈ ST.dom ↔ x ∈ paperStairAltTile (2 * k + 3))
+    (hSv : ∀ x ∈ ST.dom, ST.val x = paperStairAltValue (2 * k + 3) x) :
+    AltRotation NS ST (2 * k + 3, 2 * (2 * k + 3) - 4) (k + 1, k) := by
+  refine ⟨0, 0, 0, 0, (k + 1) ^ 2, nsA_normal (2 * k + 3) (by omega) NS hNd hNv,
+    stA_normal (2 * k + 3) (by omega) ST hSd hSv, ?_⟩
+  rintro ⟨a, b⟩ hx
+  have hxT : (a, b) ∈ paperStairAltTile (2 * k + 3) := (hSd _).1 hx
+  have hyT : (2 * k + 3 - b, a + 2 * (2 * k + 3) - 3) ∈ paperNearStairAltTile (2 * k + 3) :=
+    (mem_nsAlt _ _ _).2 (by
+      have h := (mem_stAlt _ a b).1 hxT
+      omega)
+  have hyN : (2 * k + 3 - b, a + 2 * (2 * k + 3) - 4) ∈ NS.dom := by
+    apply (hNd _).2
+    rw [show ((2 * k + 3 - b, a + 2 * (2 * k + 3) - 4) : Site) + (0, 1) =
+      (2 * k + 3 - b, a + 2 * (2 * k + 3) - 3) by ext <;> simp; ring]
+    exact hyT
+  have ey : mulI ((a, b) : Site) + (2 * k + 3, 2 * (2 * k + 3) - 4) = (2 * k + 3 - b, a + 2 * (2 * k + 3) - 4) := by
+    ext <;> simp [mulI] <;> ring
+  rw [ey]
+  refine ⟨hyN, ?_⟩
+  rw [normed_zero, normed_zero, hSv _ hx, hNv _ hyN, show (2 * k + 3 - b, a + 2 * (2 * k + 3) - 4) + ((0 : ℤ), (1 : ℤ)) =
+    (2 * k + 3 - b, a + 2 * (2 * k + 3) - 3) by ext <;> simp; ring]
+  have h := rotA1_val k a b
+  simp only [dotS]
+  linarith
+
+set_option maxHeartbeats 400000 in
+/-- `AltRotation` of the stair alternate (`o = stAlt`) against the near-one stair alternate (`oR = nsAlt`), `cf = (2k+3, 0)`,
+`γ = 0`, `c0 = 0`. -/
+theorem rotAlt_A2 (k : ℤ) (hk : 0 ≤ k) (ST NS : PartialOdometer)
+    (hSd : ∀ x : Site, x ∈ ST.dom ↔ x ∈ paperStairAltTile (2 * k + 3))
+    (hSv : ∀ x ∈ ST.dom, ST.val x = paperStairAltValue (2 * k + 3) x)
+    (hNd : ∀ x : Site, x ∈ NS.dom ↔ x + (0, 1) ∈ paperNearStairAltTile (2 * k + 3))
+    (hNv : ∀ x ∈ NS.dom, NS.val x = paperNearStairAltValue (2 * k + 3) (x + (0, 1))) :
+    AltRotation ST NS (2 * k + 3, 0) (0, 0) := by
+  refine ⟨0, 0, 0, 0, 0, stA_normal (2 * k + 3) (by omega) ST hSd hSv,
+    nsA_normal (2 * k + 3) (by omega) NS hNd hNv, ?_⟩
+  rintro ⟨a, b⟩ hx
+  have hxN : (a, b + 1) ∈ paperNearStairAltTile (2 * k + 3) := by
+    have h := (hNd _).1 hx
+    rwa [show ((a, b) : Site) + (0, 1) = (a, b + 1) by ext <;> simp] at h
+  have hyS : (2 * k + 3 - b, a) ∈ paperStairAltTile (2 * k + 3) :=
+    (mem_stAlt _ _ _).2 (by
+      have h := (mem_nsAlt _ a (b + 1)).1 hxN
+      omega)
+  have hyO : (2 * k + 3 - b, a) ∈ ST.dom := (hSd _).2 hyS
+  have ey : mulI ((a, b) : Site) + (2 * k + 3, 0) = (2 * k + 3 - b, a) := by
+    ext <;> simp [mulI]; ring
+  rw [ey]
+  refine ⟨hyO, ?_⟩
+  rw [normed_zero, normed_zero, hNv _ hx, hSv _ hyO, show ((a, b) : Site) + ((0 : ℤ), (1 : ℤ)) = (a, b + 1) by
+    ext <;> simp]
+  have h := rotA2_val k a b
+  simp only [dotS, zero_mul, add_zero]
+  linarith
+
+set_option maxHeartbeats 400000 in
+/-- `AltRotation` of the ladder alternate (`o = ladAlt`, read at `x - (1,1)`) against the near-one ladder alternate
+(`oR = nlAlt`), `cf = (2d-1, 2)`, `γ = (1, 0)`, `c0 = 1`, `d = 2k+2`. -/
+theorem rotAlt_A3 (k : ℤ) (hk : 1 ≤ k) (LA NLA : PartialOdometer)
+    (hLd : ∀ x : Site, x ∈ LA.dom ↔ x - (1, 1) ∈ paperLadderAltTile (2 * k + 2))
+    (hLv : ∀ x ∈ LA.dom, LA.val x = paperLadderAltValue (2 * k + 2) (x - (1, 1)))
+    (hNd : ∀ x : Site, x ∈ NLA.dom ↔ x + (0, 1) ∈ paperNearLadderAltTile (2 * k + 2))
+    (hNv : ∀ x ∈ NLA.dom, NLA.val x = paperNearLadderAltValue (2 * k + 2) (x + (0, 1))) :
+    AltRotation LA NLA (2 * (2 * k + 2) - 1, 2) (1, 0) := by
+  refine ⟨0, 0, 0, 0, 1, ladA_normal (2 * k + 2) (by omega) LA hLd hLv,
+    nlA_normal (2 * k + 2) (by omega) NLA hNd hNv, ?_⟩
+  rintro ⟨a, b⟩ hx
+  have hxN : (a, b + 1) ∈ paperNearLadderAltTile (2 * k + 2) := by
+    have h := (hNd _).1 hx
+    rwa [show ((a, b) : Site) + (0, 1) = (a, b + 1) by ext <;> simp] at h
+  have hyL : (2 * (2 * k + 2) - 2 - b, a + 1) ∈ paperLadderAltTile (2 * k + 2) :=
+    (mem_ladAlt _ _ _).2 (by
+      have h := (mem_nlAlt _ a (b + 1)).1 hxN
+      omega)
+  have hyO : (2 * (2 * k + 2) - 1 - b, a + 2) ∈ LA.dom := by
+    apply (hLd _).2
+    rw [show ((2 * (2 * k + 2) - 1 - b, a + 2) : Site) - (1, 1) = (2 * (2 * k + 2) - 2 - b, a + 1) by
+      ext <;> simp <;> ring]
+    exact hyL
+  have ey : mulI ((a, b) : Site) + (2 * (2 * k + 2) - 1, 2) = (2 * (2 * k + 2) - 1 - b, a + 2) := by
+    ext <;> simp [mulI]; ring
+  rw [ey]
+  refine ⟨hyO, ?_⟩
+  rw [normed_zero, normed_zero, hNv _ hx, show ((a, b) : Site) + ((0 : ℤ), (1 : ℤ)) = (a, b + 1) by
+    ext <;> simp, hLv _ hyO, show ((2 * (2 * k + 2) - 1 - b, a + 2) : Site) - (1, 1) =
+    (2 * (2 * k + 2) - 2 - b, a + 1) by ext <;> simp <;> ring]
+  have h := rotA3_val k a b
+  simp only [dotS, one_mul, zero_mul, add_zero]
+  linarith
+
+set_option maxHeartbeats 400000 in
+/-- `AltRotation` of the near-one ladder alternate (`o = nlAlt`) against the ladder alternate (`oR = ladAlt`),
+`cf = (d+1, d-2)`, `γ = 0`, `c0 = 0`, `d = 2k+2`. -/
+theorem rotAlt_A4 (k : ℤ) (hk : 1 ≤ k) (NLA LA : PartialOdometer)
+    (hNd : ∀ x : Site, x ∈ NLA.dom ↔ x + (0, 1) ∈ paperNearLadderAltTile (2 * k + 2))
+    (hNv : ∀ x ∈ NLA.dom, NLA.val x = paperNearLadderAltValue (2 * k + 2) (x + (0, 1)))
+    (hLd : ∀ x : Site, x ∈ LA.dom ↔ x - (1, 1) ∈ paperLadderAltTile (2 * k + 2))
+    (hLv : ∀ x ∈ LA.dom, LA.val x = paperLadderAltValue (2 * k + 2) (x - (1, 1))) :
+    AltRotation NLA LA (2 * k + 3, 2 * k) (0, 0) := by
+  refine ⟨0, 0, 0, 0, 0, nlA_normal (2 * k + 2) (by omega) NLA hNd hNv,
+    ladA_normal (2 * k + 2) (by omega) LA hLd hLv, ?_⟩
+  rintro ⟨a, b⟩ hx
+  have hxL : (a - 1, b - 1) ∈ paperLadderAltTile (2 * k + 2) := by
+    have h := (hLd _).1 hx
+    rwa [show ((a, b) : Site) - (1, 1) = (a - 1, b - 1) by ext <;> simp] at h
+  have hyO : (2 * k + 3 - b, a + 2 * k) ∈ NLA.dom := by
+    apply (hNd _).2
+    rw [show ((2 * k + 3 - b, a + 2 * k) : Site) + ((0 : ℤ), (1 : ℤ)) = (2 * k + 3 - b, a + 2 * k + 1) by
+      ext <;> simp]
+    exact (mem_nlAlt _ _ _).2 (by
+      have h := (mem_ladAlt _ _ _).1 hxL
+      omega)
+  have ey : mulI ((a, b) : Site) + (2 * k + 3, 2 * k) = (2 * k + 3 - b, a + 2 * k) := by
+    ext <;> simp [mulI]; ring
+  rw [ey]
+  refine ⟨hyO, ?_⟩
+  rw [normed_zero, normed_zero, hLv _ hx, show ((a, b) : Site) - (1, 1) = (a - 1, b - 1) by ext <;> simp,
+    hNv _ hyO, show ((2 * k + 3 - b, a + 2 * k) : Site) + ((0 : ℤ), (1 : ℤ)) =
+    (2 * k + 2 + 1 - b, a + (2 * k + 2) - 1) by ext <;> simp <;> ring]
+  have h := rotA4_val k a b
+  simp only [dotS, zero_mul, add_zero]
+  linarith
+
+/-! #### `RotProps` at the base words -/
+
+theorem swapW_three_eq (k : ℕ) : swapW (List.replicate k Digit.three) = List.replicate k Digit.two := by
+  unfold swapW
+  rw [List.map_replicate]
+  rfl
+
+theorem swapW_two_eq (k : ℕ) : swapW (List.replicate k Digit.two) = List.replicate k Digit.three := by
+  unfold swapW
+  rw [List.map_replicate]
+  rfl
+
+theorem altCf_three_true_fst (k : ℕ) : (altCf (List.replicate k Digit.three) true).1 = (4 * (k : ℤ) + 3, 2) := by
+  ext <;> simp [altCf, Parents.current, Parents.combine, vP2, W1Odd, phase_three, parents_three, texV1Odd, texV2] ; ring
+
+theorem altCf_three_true_snd (k : ℕ) : (altCf (List.replicate k Digit.three) true).2 = (1, 0) := by
+  ext <;> simp [altCf, Parents.current, Parents.combine, aP2, W1Odd, phase_three, parents_three, offsetA, mulI]
+
+theorem altCf_three_false_fst (k : ℕ) : (altCf (List.replicate k Digit.three) false).1 = (2 * (k : ℤ) + 3, 0) := by
+  ext <;> simp [altCf, vP1, vQ1, W1Odd, phase_three, parents_three, texV1Odd, texV1Even] ; ring
+
+theorem altCf_three_false_snd (k : ℕ) : (altCf (List.replicate k Digit.three) false).2 = (0, 0) := by
+  ext <;> simp [altCf, W1Odd, phase_three]
+
+theorem altCf_two_true_fst (k : ℕ) : (altCf (List.replicate k Digit.two) true).1 = (2 * (k : ℤ) + 3, 4 * (k : ℤ) + 2) := by
+  ext <;> simp [altCf, Parents.current, Parents.combine, vP2, W1Odd, phase_two, parents_two, texV1Odd, texV2] <;> ring
+
+theorem altCf_two_true_snd (k : ℕ) : (altCf (List.replicate k Digit.two) true).2 = ((k : ℤ) + 1, (k : ℤ)) := by
+  ext <;> simp [altCf, Parents.current, Parents.combine, aP2, W1Odd, phase_two, parents_two, offsetA, mulI]
+
+theorem altCf_two_false_fst (k : ℕ) : (altCf (List.replicate k Digit.two) false).1 = (2 * (k : ℤ) + 3, 2 * (k : ℤ)) := by
+  ext <;> simp [altCf, vP1, vQ1, W1Odd, phase_two, parents_two, texV1Odd, texV1Even] ; ring
+
+theorem altCf_two_false_snd (k : ℕ) : (altCf (List.replicate k Digit.two) false).2 = (0, 0) := by
+  ext <;> simp [altCf, W1Odd, phase_two]
+
+/-- `RotProps` at the empty word: the families of `[]` (`nstairN 3`, `stairF 3`, `nsAlt 3`, `stAlt 3`). -/
+theorem rotProps_empty (x r : JSlice) (hx : PaperBaseCond [] x.tOdd x.tEven ∧ PaperAltBaseCond [] x.aOdd x.aEven)
+    (hr : PaperBaseCond [] r.tOdd r.tEven ∧ PaperAltBaseCond [] r.aOdd r.aEven) : RotProps [] x r := by
+  obtain ⟨hOd, hOv, hEd, hEv⟩ := hx.1.1 rfl
+  obtain ⟨haOd, haOv, haEd, haEv⟩ := hx.2.1 rfl
+  obtain ⟨rOd, rOv, rEd, rEv⟩ := hr.1.1 rfl
+  obtain ⟨raOd, raOv, raEd, raEv⟩ := hr.2.1 rfl
+  have c1 : (parentsAt ([] : Word)).current .odd = ⟨1, 2⟩ := by decide
+  have c2 : (parentsAt ([] : Word)).current .even = ⟨1, 3⟩ := by decide
+  have a1 : (altCf ([] : Word) true).1 = (3, 2) := by simpa using altCf_three_true_fst 0
+  have a2 : (altCf ([] : Word) true).2 = (1, 0) := by simpa using altCf_three_true_snd 0
+  have a3 : (altCf ([] : Word) false).1 = (3, 0) := by simpa using altCf_three_false_fst 0
+  have a4 : (altCf ([] : Word) false).2 = (0, 0) := by simpa using altCf_three_false_snd 0
+  unfold RotProps
+  rw [c1, c2]
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · exact tileRotation_congr (rotStd_A 0 le_rfl x.tOdd r.tEven hOd hOv rEd rEv) (by decide)
+  · exact tileRotation_congr (rotStd_B 0 le_rfl x.tEven r.tOdd hEd hEv rOd rOv) (by decide)
+  · exact altRotation_congr (rotAlt_A1 0 le_rfl x.aOdd r.aEven haOd haOv raEd raEv)
+      (by rw [a1]; decide) (by rw [a2]; decide)
+  · exact altRotation_congr (rotAlt_A2 0 le_rfl x.aEven r.aOdd haEd haEv raOd raOv)
+      (by simp [a3]) (by simp [a4])
+
+/-- `RotProps` at the words `3^k`, `k ≥ 1`: `x` on `3^k` against `r` on `2^k`. -/
+theorem rotProps_three (k : ℕ) (hk : 1 ≤ k) (x r : JSlice)
+    (hx : PaperBaseCond (List.replicate k Digit.three) x.tOdd x.tEven ∧
+      PaperAltBaseCond (List.replicate k Digit.three) x.aOdd x.aEven)
+    (hr : PaperBaseCond (List.replicate k Digit.two) r.tOdd r.tEven ∧
+      PaperAltBaseCond (List.replicate k Digit.two) r.aOdd r.aEven) :
+    RotProps (List.replicate k Digit.three) x r := by
+  obtain ⟨hOd, hOv, hEd, hEv⟩ := hx.1.2.1 k hk rfl
+  obtain ⟨haOd, haOv, haEd, haEv⟩ := hx.2.2.1 k hk rfl
+  obtain ⟨rOd, rOv, rEd, rEv⟩ := hr.1.2.2 k hk rfl
+  obtain ⟨raOd, raOv, raEd, raEv⟩ := hr.2.2.2 k hk rfl
+  have a1 := altCf_three_true_fst k
+  have a2 := altCf_three_true_snd k
+  have a3 := altCf_three_false_fst k
+  have a4 := altCf_three_false_snd k
+  unfold RotProps
+  rw [cur_odd_three k, cur_even_three k]
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · exact tileRotation_congr (rotStd_C (k : ℤ) (by exact_mod_cast hk) x.tOdd r.tEven hOd hOv rEd rEv)
+      (by ext <;> simp [texV1Odd])
+  · exact tileRotation_congr (rotStd_B (k : ℤ) (by positivity) x.tEven r.tOdd hEd hEv rOd rOv)
+      (by ext <;> simp [texV1Even])
+  · exact altRotation_congr (rotAlt_A3 (k : ℤ) (by exact_mod_cast hk) x.aOdd r.aEven haOd haOv raEd raEv)
+      (by rw [a1]; ext <;> simp ; ring) (by rw [a2])
+  · exact altRotation_congr (rotAlt_A2 (k : ℤ) (by positivity) x.aEven r.aOdd haEd haEv raOd raOv)
+      (by rw [a3]) (by rw [a4])
+
+/-- `RotProps` at the words `2^k`, `k ≥ 1`: `x` on `2^k` against `r` on `3^k`. -/
+theorem rotProps_two (k : ℕ) (hk : 1 ≤ k) (x r : JSlice)
+    (hx : PaperBaseCond (List.replicate k Digit.two) x.tOdd x.tEven ∧
+      PaperAltBaseCond (List.replicate k Digit.two) x.aOdd x.aEven)
+    (hr : PaperBaseCond (List.replicate k Digit.three) r.tOdd r.tEven ∧
+      PaperAltBaseCond (List.replicate k Digit.three) r.aOdd r.aEven) :
+    RotProps (List.replicate k Digit.two) x r := by
+  obtain ⟨hOd, hOv, hEd, hEv⟩ := hx.1.2.2 k hk rfl
+  obtain ⟨haOd, haOv, haEd, haEv⟩ := hx.2.2.2 k hk rfl
+  obtain ⟨rOd, rOv, rEd, rEv⟩ := hr.1.2.1 k hk rfl
+  obtain ⟨raOd, raOv, raEd, raEv⟩ := hr.2.2.1 k hk rfl
+  unfold RotProps
+  rw [cur_odd_two k, cur_even_two k]
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · exact tileRotation_congr (rotStd_A (k : ℤ) (by positivity) x.tOdd r.tEven hOd hOv rEd rEv)
+      (by ext <;> simp [texV1Odd] <;> ring)
+  · exact tileRotation_congr (rotStd_D (k : ℤ) (by exact_mod_cast hk) x.tEven r.tOdd hEd hEv rOd rOv)
+      (by ext <;> simp [texV1Even] <;> ring)
+  · exact altRotation_congr (rotAlt_A1 (k : ℤ) (by positivity) x.aOdd r.aEven haOd haOv raEd raEv)
+      (by rw [altCf_two_true_fst k]; ext <;> simp ; ring) (by rw [altCf_two_true_snd k])
+  · exact altRotation_congr (rotAlt_A4 (k : ℤ) (by exact_mod_cast hk) x.aEven r.aOdd haEd haEv raOd raOv)
+      (by simp [altCf_two_false_fst k]) (by simp [altCf_two_false_snd k])
+
+/-- The rotation of the base words (`RotProps` at `w`, with the paper base conditions of the two slices). -/
+theorem base_rotProps (w : Word) (hw : IsBase w) (x r : JSlice)
+    (hx : PaperBaseCond w x.tOdd x.tEven ∧ PaperAltBaseCond w x.aOdd x.aEven)
+    (hr : PaperBaseCond (swapW w) r.tOdd r.tEven ∧ PaperAltBaseCond (swapW w) r.aOdd r.aEven) :
+    RotProps w x r := by
+  rcases hw with rfl | h3 | h2
+  · exact rotProps_empty x r hx hr
+  · obtain ⟨k, rfl⟩ : ∃ k, w = List.replicate k Digit.three := ⟨w.length, List.eq_replicate_iff.mpr ⟨rfl, h3⟩⟩
+    rcases Nat.eq_zero_or_pos k with rfl | hk
+    · exact rotProps_empty x r hx hr
+    · rw [swapW_three_eq k] at hr
+      exact rotProps_three k hk x r hx hr
+  · obtain ⟨k, rfl⟩ : ∃ k, w = List.replicate k Digit.two := ⟨w.length, List.eq_replicate_iff.mpr ⟨rfl, h2⟩⟩
+    rcases Nat.eq_zero_or_pos k with rfl | hk
+    · exact rotProps_empty x r hx hr
+    · rw [swapW_two_eq k] at hr
+      exact rotProps_two k hk x r hx hr
+
 end FLatticePaper.Tiles.BaseTileProps
