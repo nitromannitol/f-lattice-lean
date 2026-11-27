@@ -93,9 +93,6 @@ def Piece.placed (p : Piece) : Finset Site := p.odo.dom.image (· + p.off)
 /-- The union of the placed domains. -/
 def pieceUnion (ps : List Piece) : Finset Site := ps.foldr (fun p acc => p.placed ∪ acc) ∅
 
-/-- The dot product. -/
-def dotS (a x : Site) : ℤ := a.1 * x.1 + a.2 * x.2
-
 /-- `o` respects the decomposition `ps`: its domain is the union of the placed domains, and on each placed domain (outside the
 exceptional points of the piece) it is the placed piece plus its affine factor and a constant. -/
 def RespectsPieces (o : PartialOdometer) (ps : List Piece) : Prop :=
@@ -345,9 +342,9 @@ def oddLPieces (S : WeakData) (pOdd pEven aOdd aEven : Word → PartialOdometer)
   let nh := 2 * (k + 1) - (if elong then 0 else 1)
   let stemK : Finset Site := stem.dom.image (· + (o0 + altOff pre ((k : ℤ) • K.1)))
   let hc : ℕ → AltCoeff := fun i => cB + K.2.2.1 + ((i : ℤ) + 1) • K.2.2.2
-  (List.range (k + 1)).map (fun j => stdPiece stem (o0 + altOff pre ((j : ℤ) • K.1)) (a0 + altAff pre ((j : ℤ) • K.1))) ++
+  (List.range (k + 1)).map (fun (j : ℕ) => stdPiece stem (o0 + altOff pre ((j : ℤ) • K.1)) (a0 + altAff pre ((j : ℤ) • K.1))) ++
     [stdPiece bridge (o0 + altOff pre cB + LCorrections.oddBridgeShift triple o plus) (a0 + altAff pre cB)] ++
-    (List.range nh).map (fun i =>
+    (List.range nh).map (fun (i : ℕ) =>
       { odo := head, off := o0 + altOff pre (hc i), aff := a0 + altAff pre (hc i),
         exc := if triple && i == 0 then
           {x | x - (o0 + altOff pre (hc 0)) ∈ paperStairAltA (2 * (pre.length : ℤ) + 1) ∧ x ∈ stemK} else ∅ })
@@ -374,10 +371,10 @@ def evenLPieces (S : WeakData) (pOdd pEven aOdd aEven : Word → PartialOdometer
   let nh := 2 * (k + 1) - (if elong then 0 else 1)
   let stemK : Finset Site := stem.dom.image (· + (o0 + altOff pre ((k : ℤ) • K.1)))
   let hc : ℕ → AltCoeff := fun i => cB + K.2.2.1 + ((i : ℤ) + 1) • K.2.2.2
-  (List.range (k + 1)).map (fun j => stdPiece stem (o0 + altOff pre ((j : ℤ) • K.1)) (a0 + altAff pre ((j : ℤ) • K.1))) ++
+  (List.range (k + 1)).map (fun (j : ℕ) => stdPiece stem (o0 + altOff pre ((j : ℤ) • K.1)) (a0 + altAff pre ((j : ℤ) • K.1))) ++
     (if double && case01 then [] else [stdPiece bridge (o0 + altOff pre cB) (a0 + altAff pre cB)]) ++
     (if double then [stdPiece enlOdo (o0 + altOff pre cB + ((1 : ℤ), (1 : ℤ))) (a0 + altAff pre cB)] else []) ++
-    (List.range nh).map (fun i =>
+    (List.range nh).map (fun (i : ℕ) =>
       { odo := head, off := o0 + altOff pre (hc i), aff := a0 + altAff pre (hc i),
         exc := if double && i == 0 then
           {x | x - (o0 + altOff pre (hc 0)) + ((0 : ℤ), (1 : ℤ)) ∈ paperNearStairAltA (2 * (pre.length : ℤ) + 1) ∧
