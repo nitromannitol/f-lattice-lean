@@ -608,10 +608,26 @@ def RotProps (w : Word) (x r : JSlice) : Prop :=
     AltRotation x.aOdd r.aEven (altCf w true).1 (altCf w true).2 ∧
     AltRotation x.aEven r.aOdd (altCf w false).1 (altCf w false).2
 
+/-- The rotation of an L-corrected odometer (the odometer form of `lemma:l_correc_properties` (1), implicit in "rotating the
+decomposition"): with no normalisation of the L-corrected odometers, `o_R(y) = o(i y + v_{n/d,1} - i) - h_0(y) + c_0` on the
+rotated domain. There is no affine term: each L-corrected odometer agrees with its child on the sides up to a constant, and the
+children rotate with no affine term. -/
+def LRotation (o oR : PartialOdometer) (v1 : Site) : Prop :=
+  ∃ c0 : ℤ, ∀ y ∈ oR.dom, mulI y + v1 - ((0 : ℤ), (1 : ℤ)) ∈ o.dom ∧
+    oR.val y = o.val (mulI y + v1 - ((0 : ℤ), (1 : ℤ))) - h0 y + c0
+
+/-- The rotation identities of the L-corrected odometers at `w` against those of the rotated children at `swapW w`, with the signs
+of `lemma:l_correc_properties` (1) (numerics, words of length at most 3, both elongations). -/
+def LRotProps (w : Word) (x r : JSlice) : Prop :=
+  (EvenLDefined w → ∀ plus elong : Bool,
+    LRotation (x.lEven plus elong) (r.lOdd (plus != W1Odd w) elong) (texV1Even ((parentsAt w).current .even))) ∧
+  (OddLDefined w → ∀ plus elong : Bool,
+    LRotation (x.lOdd plus elong) (r.lEven (plus == W1Odd w) elong) (texV1Odd ((parentsAt w).current .odd)))
+
 /-- The properties at `w` proved by the induction. -/
 def JointProps (f : Word → JSlice) (w : Word) : Prop :=
   WeakProps w (f w).wOdd (f w).wEven ∧ TileProps w (f w).tOdd (f w).tEven (f w).aOdd (f w).aEven ∧
-    RotProps w (f w) (f (swapW w))
+    RotProps w (f w) (f (swapW w)) ∧ LRotProps w (f w) (f (swapW w))
 
 /-- The joint family: the joint predicate and the properties at every word. -/
 def IsJointFamily (D : JointData) (f : Word → JSlice) : Prop :=

@@ -159,12 +159,13 @@ def LStepInput (D : JointData) : Prop :=
     ∃ lo le : Bool → Bool → PartialOdometer, LPart D (below f w) w tod tev lo le
 
 /-- The rotation step ((c) of `lemma:tile-odometer-existence`, "Rotations" in its proof): once every word of length `n` has its
-joint predicate, (c) of the weak odometers and (a), (b) of the tile odometers, the rotation identities hold at length `n`. -/
+joint predicate, (c) of the weak odometers and (a), (b) of the tile odometers, the rotation identities hold at length `n`, for the
+tile odometers and for the L-corrected odometers. -/
 def RotStepInput (D : JointData) : Prop :=
   ∀ (f : Word → JSlice) (n : ℕ), GoodBelow D f n →
     (∀ w : Word, w.length = n →
       IsJointSlice D f w ∧ WeakProps w (f w).wOdd (f w).wEven ∧ TileProps w (f w).tOdd (f w).tEven (f w).aOdd (f w).aEven) →
-    ∀ w : Word, w.length = n → RotProps w (f w) (f (swapW w))
+    ∀ w : Word, w.length = n → RotProps w (f w) (f (swapW w)) ∧ LRotProps w (f w) (f (swapW w))
 
 /-- The one induction of Sections 7-8: given the five per-step inputs, there is a joint family, with the weak, weak alternate,
 tile, alternate tile and L-corrected odometers of every word built over the tile odometers of the shorter words, and with (a) and

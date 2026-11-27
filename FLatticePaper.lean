@@ -1283,6 +1283,7 @@ import FLatticePaper.Tiles.VerticalStepOne
 import FLatticePaper.Tiles.CornerValues
 import FLatticePaper.Tiles.LCorrecRecursion
 import FLatticePaper.Tiles.TileTranslationStd
+import FLatticePaper.Tiles.WeakStepPaper
 import FLatticePaper.Tiles.SurgicalOdometerStep
 import FLatticePaper.Tiles.SurgicalCorners
 import FLatticePaper.Tiles.SurgicalAffineChain
