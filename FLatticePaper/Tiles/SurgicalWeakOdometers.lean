@@ -138,7 +138,7 @@ the anchors of `anchoredStrings`): the domain contains the four boundary strings
 horizontal and reversed vertical strings at `c(T)`, and to the reversed horizontal and forward vertical strings at their
 anchors, respect them (`RespectsTiles`, the surgical table `surgicalSlopeDiff`). -/
 def RespectsAnchored (T : Finset Site) (wh wv : BinaryWord) (S : GInt → ℤ) : Prop :=
-  InsideTile T.toList (hStringAt wh 0 ++ hRevStringAt wh.reverse (lastPosOf (vRevStringAt wv.reverse 0)) ++
+  InsideTile (↑T : Set GInt) (hStringAt wh 0 ++ hRevStringAt wh.reverse (lastPosOf (vRevStringAt wv.reverse 0)) ++
       vRevStringAt wv.reverse 0 ++ vStringAt wv (lastPosOf (hStringAt wh 0))) ∧
   RespectsTiles .horizontal false (hStringAt wh 0) S ∧
   RespectsTiles .horizontal true (hRevStringAt wh.reverse (lastPosOf (vRevStringAt wv.reverse 0))) S ∧
