@@ -6,6 +6,7 @@ import FLatticePaper.Construction.PropBaseCases
 import FLatticePaper.Construction.NearOneBaseCases
 import FLatticePaper.Tiles.StackedMoreover
 import FLatticePaper.Tiles.PartialBoundary
+import FLatticePaper.Tiles.DoublingRespect
 import FLatticePaper.Tiles.SiteStrings
 
 /-! # The weak standard odometer family (surgical `def:weak_standard_odometers`, `def:standard_odometer_doubling`)
@@ -73,6 +74,20 @@ def IsWeakDoubling (Tb Th : Finset Site) (v : Site) (o d : PartialOdometer) : Pr
     d.dom = Tb ∪ Th.image (· + v) ∧
     (∀ x ∈ o.dom, d.val x = o.val x) ∧ (∀ x ∈ ostar.dom, d.val x = ostar.val x)
 
+/-- The weak doubling with the data `ostar` of the second copy (the unfolded form of `IsWeakDoubling`). -/
+def IsWeakDoublingOn (Tb Th : Finset Site) (v : Site) (o d ostar : PartialOdometer) : Prop :=
+  o.dom = Tb ∧ ostar.dom = Th.image (· + v) ∧ d.dom = Tb ∪ Th.image (· + v) ∧
+    (∀ x ∈ o.dom, d.val x = o.val x) ∧ (∀ x ∈ ostar.dom, d.val x = ostar.val x)
+
+/-- The standard weak doubling (`def:standard_odometer_doubling`, faithful to the text): the doubled odometer `d = o ∪ o*` of
+`IsWeakDoublingOn`, and, after restriction to the relevant side string of the partial tile (`DoublingRespect`), `o*` and `o`
+respect the tile translations, with the affine factor `a_{n/d,i}` (`i = false` for `v_{q,1}`, `i = true` for `v_{p,2}`). -/
+def IsWeakDoublingStd (oddChild sign : Bool) (n d : ℤ) (i : Bool) (wh wv : BinaryWord)
+    (Tb Th : Finset Site) (v : Site) (o dd : PartialOdometer) : Prop :=
+  ∃ ostar : PartialOdometer, IsWeakDoublingOn Tb Th v o dd ostar ∧
+    FLatticePaper.Tiles.DoublingRespect.RespectsSideTranslation n d i wh wv
+      (FLatticePaper.Tiles.DoublingRespect.doublingSide oddChild sign) v o ostar
+
 /-- The even-child decomposition with the offsets of `offsetQ0` (`eq:std_odometer_decomposition`, second line): the doubled
 pieces `d(o)_{p_1}^±` at `p1DPlus`, `p1DMinus` and the plain pieces `o_{q_1}^±` at `q1Plus`, `q1Minus`. -/
 def IsStdStepQ0 (odd : Bool) (vp1 vp2 vq1 vq2 : Site)
@@ -99,9 +114,13 @@ def IsStdStepQ0W1Even (vp1 vp2 vq1 vq2 : Site) (np dp nq dq : ℤ)
 pieces `d(o)_{q_1}^±` are weak doublings of `Q` with shift `v_{q_1,1}` (`texV1Even`) on the partial tiles `T^{h±/v±}`. -/
 def OddNode (S : WeakData) (oddO evenO : Word → PartialOdometer) (w : Word) : Prop :=
   ∃ dqp dqm : PartialOdometer,
-    IsWeakDoubling (S.bdry (regsAt w).2 false) (S.partialT (regsAt w).2 false true)
+    IsWeakDoublingStd true true (parentsAt w).even.num (parentsAt w).even.den false
+        (FLatticePaper.Tiles.DoublingRespect.regWords false (regsAt w).2).1 (FLatticePaper.Tiles.DoublingRespect.regWords false (regsAt w).2).2
+        (S.bdry (regsAt w).2 false) (S.partialT (regsAt w).2 false true)
         (texV1Even (parentsAt w).even) (regOdo S oddO evenO (regsAt w).2 false) dqp ∧
-    IsWeakDoubling (S.bdry (regsAt w).2 false) (S.partialT (regsAt w).2 false false)
+    IsWeakDoublingStd true false (parentsAt w).even.num (parentsAt w).even.den false
+        (FLatticePaper.Tiles.DoublingRespect.regWords false (regsAt w).2).1 (FLatticePaper.Tiles.DoublingRespect.regWords false (regsAt w).2).2
+        (S.bdry (regsAt w).2 false) (S.partialT (regsAt w).2 false false)
         (texV1Even (parentsAt w).even) (regOdo S oddO evenO (regsAt w).2 false) dqm ∧
     (phase w = 1 →
       IsStdStepP0W1Odd (texV1Odd (parentsAt w).odd) (texV2 (parentsAt w).odd)
@@ -118,9 +137,13 @@ def OddNode (S : WeakData) (oddO evenO : Word → PartialOdometer) (w : Word) : 
 `d(o)_{p_1}^±` (weak doublings of the odd register with shift `v_{p_1,2}`) and the plain pieces `o_{q_1}^±`. -/
 def EvenNode (S : WeakData) (oddO evenO : Word → PartialOdometer) (w : Word) : Prop :=
   ∃ dpp dpm : PartialOdometer,
-    IsWeakDoubling (S.bdry (regsAt w).1 true) (S.partialT (regsAt w).1 true true)
+    IsWeakDoublingStd false true (parentsAt w).odd.num (parentsAt w).odd.den true
+        (FLatticePaper.Tiles.DoublingRespect.regWords true (regsAt w).1).1 (FLatticePaper.Tiles.DoublingRespect.regWords true (regsAt w).1).2
+        (S.bdry (regsAt w).1 true) (S.partialT (regsAt w).1 true true)
         (texV2 (parentsAt w).odd) (regOdo S oddO evenO (regsAt w).1 true) dpp ∧
-    IsWeakDoubling (S.bdry (regsAt w).1 true) (S.partialT (regsAt w).1 true false)
+    IsWeakDoublingStd false false (parentsAt w).odd.num (parentsAt w).odd.den true
+        (FLatticePaper.Tiles.DoublingRespect.regWords true (regsAt w).1).1 (FLatticePaper.Tiles.DoublingRespect.regWords true (regsAt w).1).2
+        (S.bdry (regsAt w).1 true) (S.partialT (regsAt w).1 true false)
         (texV2 (parentsAt w).odd) (regOdo S oddO evenO (regsAt w).1 true) dpm ∧
     (phase w = 1 →
       IsStdStepQ0W1Odd (texV1Odd (parentsAt w).odd) (texV2 (parentsAt w).odd)

@@ -355,7 +355,8 @@ def CornerAffineStatement (wh wv : BinaryWord) (n d : ℤ) (S : GInt → ℤ) : 
 
 /-- The first two identities of (b) in affine factors, for a horizontal word with head `q` and last letter `p`. The third
 identity is the target: it relates the last tile of the forward string to the last tile of the reversed one through the
-vertical strings and the tile translation `v_{n/d,2}`, and is not proved here. -/
+vertical strings and the tile translation `v_{n/d,2}`. The third identity is proved for every weak standard family in
+`SurgicalCornerThird` (`corner_3_family`, `corner_3_family_even`), from the respect conjuncts. -/
 theorem corner_affine_12 (wh wv : BinaryWord) (S : GInt → ℤ)
     (hhead : wh.head? = some .q) (hlast : wh.getLast? = some .p)
     (hA : RespectsTiles .horizontal false (hStringAt wh 0) S)

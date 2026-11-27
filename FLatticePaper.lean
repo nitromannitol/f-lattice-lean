@@ -382,6 +382,16 @@ import FLatticePaper.Tiles.StandardPacking
 import FLatticePaper.Tiles.IncrementCounts
 import FLatticePaper.Tiles.SiteStrings
 import FLatticePaper.Tiles.SiteInduction
+import FLatticePaper.Tiles.MixedPiecesInMarks
+import FLatticePaper.Tiles.ChildGlue
+import FLatticePaper.Tiles.MixedOverlapStrings
+import FLatticePaper.Tiles.ChildAssembly
+import FLatticePaper.Tiles.PTAffineTransport
+import FLatticePaper.Tiles.PTAppend
+import FLatticePaper.Tiles.PTChain
+import FLatticePaper.Tiles.SeamIdentities
+import FLatticePaper.Tiles.DoublingRespect
+import FLatticePaper.Tiles.PTFamilySlope
 import FLatticePaper.Tiles.SiteBaseDischarge
 import FLatticePaper.Tiles.SitePairScope
 import FLatticePaper.Tiles.SiteCell
