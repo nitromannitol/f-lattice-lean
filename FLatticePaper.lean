@@ -1040,6 +1040,8 @@ import FLatticePaper.Plane.Induction.TransferW1
 import FLatticePaper.Plane.Induction.FreeSchedule
 import FLatticePaper.Plane.Induction.PassageRank
 import FLatticePaper.Plane.Induction.WordWebHyp
+import FLatticePaper.Plane.Induction.RestrictedFan
+import FLatticePaper.Plane.Induction.Rank4Fort
 import FLatticePaper.Plane.Induction.EasyHRankDiag
 import FLatticePaper.Plane.Induction.OddAxialRank
 import FLatticePaper.Plane.Induction.FreeRows
@@ -1079,5 +1081,13 @@ import FLatticePaper.Plane.Induction.TopStrictDischarge
 import FLatticePaper.Plane.Induction.ColourPacket
 import FLatticePaper.Plane.Induction.PsiSign
 import FLatticePaper.Plane.Induction.TieDeficit
+import FLatticePaper.Plane.Induction.ConeFaceArith
+import FLatticePaper.Plane.Induction.ConeBoundary
+import FLatticePaper.Plane.Induction.MinusRowWiring
+import FLatticePaper.Plane.Induction.MinusRowEndpoint
+import FLatticePaper.Plane.Induction.MinusRowRemoval
+import FLatticePaper.Plane.Induction.RankFourStart
+import FLatticePaper.Plane.Induction.MinusRowOdd
+import FLatticePaper.Plane.Induction.MinusRowH
 
 /-! Root import for the corrected F-lattice paper. -/
