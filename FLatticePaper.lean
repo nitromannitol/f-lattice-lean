@@ -1267,6 +1267,7 @@ import FLatticePaper.Tiles.NearBaseBridges
 import FLatticePaper.Tiles.SurgicalWeakOdometers
 import FLatticePaper.Tiles.JointFamily
 import FLatticePaper.Tiles.AltDoubledTile
+import FLatticePaper.Tiles.StdCornerAnchors
 import FLatticePaper.Tiles.JointInduction
 import FLatticePaper.Tiles.JointGlue
 import FLatticePaper.Tiles.PaperAltBase
