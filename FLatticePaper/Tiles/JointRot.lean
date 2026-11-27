@@ -37,7 +37,14 @@ ones, and conversely.
 
 The step at one level (`rotProps_step`): `RotProps` at every word of length `n`, from the family below `n`, the slices at level `n`,
 the base rotations (`BaseRot`; `base_rotProps` for the paper data) and the connectivity of the overlap graphs of the decompositions
-(`Connected4`, a named input). -/
+(`Connected4`, a named input).
+
+The L-rotation (`evenL_rawRot`, `oddL_rawRot`, `lRotProps_step`): when the prefix of `w` before its trailing letters is not `2^j`
+(even L) or `3^j` (odd L), the stems, the bridge and the heads of the L decompositions of `w` and `swapW w` pair index by index,
+with the same offset and affine rules (the heads with `altCf` of the register, `altParP`, `altParQ`). The special prefixes are a
+named input (`SpecialLRot`), as is the connectivity of the overlap graphs of the L decompositions (`ConnectedL`).
+
+The step (`rotStepInput_of`): `RotStepInput D` from `BaseSlopes D`, `BaseRot D`, the connectivity and the special prefixes. -/
 
 namespace FLatticePaper.Tiles.JointRot
 
@@ -2252,5 +2259,497 @@ theorem rotProps_step (D : JointData) (f : Word → JSlice) (n : ℕ) (hgood : G
   obtain ⟨rfl, rfl⟩ := firstTileNormal_unique _ α2 0 β2 b2 hN2 hb2
   exact ⟨tileRotation_of_rawRot _ _ _ _ _ hb1 hb2' hV1.2.2.1.2 R1, tileRotation_of_rawRot _ _ _ _ _ hb2 hb1' hV2.2.2.1.2 R2,
     altRotation_of_rawRot _ _ _ _ _ _ hb3 hb4' R3, altRotation_of_rawRot _ _ _ _ _ _ hb4 hb3' R4⟩
+
+/-! ### The L-corrections: words with trailing letters -/
+
+theorem strip_append_replicate (d : Digit) (w : Word) :
+    stripTrailing d w ++ List.replicate (trailingCount d w) d = w := by
+  induction w using List.reverseRecOn with
+  | nil => simp [stripTrailing, trailingCount]
+  | append_singleton v e ih =>
+    rw [stripTrailing_snoc, trailingCount_snoc]
+    by_cases h : e = d
+    · subst h
+      simp only [↓reduceIte, List.replicate_succ', ← List.append_assoc, ih]
+    · simp [h]
+
+theorem swapW_strip_three (w : Word) :
+    stripTrailing Digit.two (swapW w) = swapW (stripTrailing Digit.three w) ∧
+      trailingCount Digit.two (swapW w) = trailingCount Digit.three w := by
+  induction w using List.reverseRecOn with
+  | nil => simp [stripTrailing, trailingCount, swapW]
+  | append_singleton v e ih =>
+    rw [swapW_append, show swapW [e] = [e.swapTwoThree] from rfl, stripTrailing_snoc, trailingCount_snoc,
+      stripTrailing_snoc, trailingCount_snoc]
+    cases e <;> simp [Digit.swapTwoThree, ih.1, ih.2, swapW_append] <;> rfl
+
+theorem swapW_strip_two (w : Word) :
+    stripTrailing Digit.three (swapW w) = swapW (stripTrailing Digit.two w) ∧
+      trailingCount Digit.three (swapW w) = trailingCount Digit.two w := by
+  induction w using List.reverseRecOn with
+  | nil => simp [stripTrailing, trailingCount, swapW]
+  | append_singleton v e ih =>
+    rw [swapW_append, show swapW [e] = [e.swapTwoThree] from rfl, stripTrailing_snoc, trailingCount_snoc,
+      stripTrailing_snoc, trailingCount_snoc]
+    cases e <;> simp [Digit.swapTwoThree, ih.1, ih.2, swapW_append] <;> rfl
+
+theorem parents_append_threes (v : Word) (k : ℕ) :
+    parentsAt (v ++ List.replicate k Digit.three) =
+      ⟨(parentsAt v).odd, ⟨(parentsAt v).even.num + 2 * k * (parentsAt v).odd.num,
+        (parentsAt v).even.den + 2 * k * (parentsAt v).odd.den⟩⟩ := by
+  induction k with
+  | zero => simp
+  | succ k ih =>
+    rw [List.replicate_succ', ← List.append_assoc, parentsAt_append_singleton, ih]
+    simp only [Parents.step, Parents.current, Parents.combine, Parents.mk.injEq, Fraction.mk.injEq, true_and]
+    push_cast
+    constructor <;> ring
+
+theorem parents_append_twos (v : Word) (k : ℕ) :
+    parentsAt (v ++ List.replicate k Digit.two) =
+      ⟨⟨(parentsAt v).odd.num + k * (parentsAt v).even.num, (parentsAt v).odd.den + k * (parentsAt v).even.den⟩,
+        (parentsAt v).even⟩ := by
+  induction k with
+  | zero => simp
+  | succ k ih =>
+    rw [List.replicate_succ', ← List.append_assoc, parentsAt_append_singleton, ih]
+    simp only [Parents.step, Parents.current, Parents.combine, Parents.mk.injEq, Fraction.mk.injEq, and_true]
+    push_cast
+    constructor <;> ring
+
+theorem phase_append_replicate (v : Word) (k : ℕ) (d : Digit) (hd : d ≠ Digit.one) :
+    phase (v ++ List.replicate k d) = phase v := by
+  unfold phase
+  rw [List.count_append, List.count_replicate]
+  simp [hd]
+
+theorem W1Odd_append_replicate (v : Word) (k : ℕ) (d : Digit) (hd : d ≠ Digit.one) :
+    W1Odd (v ++ List.replicate k d) = W1Odd v := by
+  unfold W1Odd
+  rw [phase_append_replicate v k d hd]
+
+/-- The condition of one pair of pieces in `rawRot_of_pairing`, with the affine rule doubled (no division). -/
+def PairCond (c γ : Site) (pR p : Piece) : Prop :=
+  ∃ cr γr : Site, RawRot p.odo pR.odo cr γr ∧ mulI pR.off = p.off + cr - c ∧
+    2 * (pR.aff - rotR p.aff - γ + γr).1 = pR.off.1 + pR.off.2 ∧
+    2 * (pR.aff - rotR p.aff - γ + γr).2 = pR.off.1 - pR.off.2 ∧
+    (∀ x ∈ pR.placed, x ∉ pR.exc → mulI x + c ∉ p.exc)
+
+theorem pairingOK_of_forall₂ (ps psR : List Piece) (c γ : Site) (h : List.Forall₂ (PairCond c γ) psR ps) :
+    PairingOK ps psR c γ := by
+  intro i pR hi
+  obtain ⟨hlt, rfl⟩ := List.getElem?_eq_some_iff.mp hi
+  have hlen := h.length_eq
+  have hlt' : i < ps.length := hlen ▸ hlt
+  obtain ⟨cr, γr, hpar, hoff, h1, h2, hexc⟩ := h.get hlt hlt'
+  refine ⟨ps[i], List.getElem_mem hlt', cr, γr, hpar, hoff, ?_, ?_, hexc⟩
+  · show ((psR[i]).off.1 + (psR[i]).off.2) % 2 = 0
+    simp only [List.get_eq_getElem] at h1
+    omega
+  · simp only [List.get_eq_getElem] at h1 h2 ⊢
+    refine Prod.ext ?_ ?_ <;> simp only [Prod.fst_add, Prod.snd_add, Prod.fst_sub, Prod.snd_sub, hHalf] at h1 h2 ⊢ <;> omega
+
+/-! ### The L-rotation, generic prefixes -/
+
+set_option hygiene false in
+/-- The tables of the L-corrections, unfolded to the parents of the prefix. -/
+macro "l_unfold" : tactic => `(tactic| (
+  simp only [stdPiece, evenLInitOff, evenLInitAff, oddLInitOff, oddLInitAff, q0Off, q0Aff, p0Off, p0Aff, offsetQ0, offsetP0,
+    altOff, altAff, coeffOff, coeffAffine, evenKCoeff, oddKCoeff, LCorrections.oddBridgeShift, altParP, altParQ, aP2, aQ2,
+    hWo, hWs, hWw, hl, ↓reduceIte, Bool.false_eq_true, Bool.and_false, Bool.false_and, Bool.not_true, Bool.not_false,
+    reduceCtorEq, Option.some.injEq, decide_true, decide_false, bne_self_eq_false, Bool.bne_true, Bool.bne_false,
+    Bool.true_bne, Bool.false_bne, Bool.true_beq, Bool.false_beq, beq_true, beq_false, getLast_swapW,
+    Option.map_some, Digit.swapTwoThree]
+  simp only [vP1, vP2, vQ1, vQ2, hpw, hpsw, e5, e6, texV1Odd, texV1Even, texV2, pairAffine, offsetA, Parents.current,
+    Parents.combine, mulI, rotR, Prod.smul_mk, smul_eq_mul, Prod.fst_add, Prod.snd_add, Prod.fst_sub, Prod.snd_sub,
+    Prod.mk_add_mk, Prod.mk_sub_mk, Prod.fst_zero, Prod.snd_zero, Prod.mk.injEq, hA, hB']))
+
+set_option hygiene false in
+macro "l_ring" : tactic => `(tactic| (
+  all_goals first
+  | (refine ⟨?_, ?_⟩ <;> (try push_cast) <;> ring)
+  | (refine Prod.ext ?_ ?_ <;> simp only [Prod.fst_add, Prod.snd_add, Prod.fst_sub, Prod.snd_sub, Prod.fst_zero,
+      Prod.snd_zero] <;> (try push_cast) <;>
+      ring)
+  | ((try push_cast) <;> ring)))
+
+theorem all_swapW_three (v : Word) :
+    (swapW v).all (fun d => decide (d = Digit.three)) = v.all (fun d => decide (d = Digit.two)) := by
+  induction v with
+  | nil => rfl
+  | cons a v ih =>
+    rw [show swapW (a :: v) = a.swapTwoThree :: swapW v from rfl, List.all_cons, List.all_cons, ih]
+    cases a <;> rfl
+
+theorem all_swapW_two (v : Word) :
+    (swapW v).all (fun d => decide (d = Digit.two)) = v.all (fun d => decide (d = Digit.three)) := by
+  induction v with
+  | nil => rfl
+  | cons a v ih =>
+    rw [show swapW (a :: v) = a.swapTwoThree :: swapW v from rfl, List.all_cons, List.all_cons, ih]
+    cases a <;> rfl
+
+theorem isEmpty_swapW (v : Word) : (swapW v).isEmpty = v.isEmpty := by cases v <;> rfl
+
+theorem swapW_replicate (k : ℕ) (d : Digit) : swapW (List.replicate k d) = List.replicate k d.swapTwoThree := by
+  simp [swapW, List.map_replicate]
+
+/-- The even L-correction of `w` against the odd L-correction of `swapW w` (`lemma:l_correc_properties` (1), odometers), when the
+prefix `w_1 s` (before the trailing `3`s) is not `2^j`: stems, bridge and heads pair index by index. -/
+theorem evenL_rawRot (S : WeakData) (pO pE aO aE : Word → PartialOdometer) (w : Word) (plus elong : Bool)
+    (o oR : PartialOdometer)
+    (ho : RespectsPieces o (evenLPieces S pO pE aO aE w plus elong))
+    (hoR : RespectsPieces oR (oddLPieces S pO pE aO aE (swapW w) (plus != W1Odd w) elong))
+    (hconn : (overlapGraph (goodPart (oddLPieces S pO pE aO aE (swapW w) (plus != W1Odd w) elong))).Connected)
+    (hd : (!(stripTrailing Digit.three w).isEmpty && (stripTrailing Digit.three w).all (fun d => decide (d = Digit.two))) = false)
+    (hlast : (stripTrailing Digit.three w).getLast? = some Digit.one ∨ (stripTrailing Digit.three w).getLast? = some Digit.two)
+    (hS : RawRot (regOdo S pO pE (regsAt (stripTrailing Digit.three w)).1 true) (regOdo S pO pE (regsAt (swapW (stripTrailing Digit.three w))).2 false)
+      (vP1 (stripTrailing Digit.three w) - ((0 : ℤ), (1 : ℤ))) 0)
+    (hB : RawRot (regOdo S pO pE (regsAt (stripTrailing Digit.three w)).2 false) (regOdo S pO pE (regsAt (swapW (stripTrailing Digit.three w))).1 true)
+      (vQ1 (stripTrailing Digit.three w) - ((0 : ℤ), (1 : ℤ))) 0)
+    (hH : RawRot (regOdo S aO aE (regsAt (stripTrailing Digit.three w)).1 true) (regOdo S aO aE (regsAt (swapW (stripTrailing Digit.three w))).2 false)
+      (altParP (stripTrailing Digit.three w)).1 (altParP (stripTrailing Digit.three w)).2) :
+    RawRot o oR (texV1Even ((parentsAt w).current .even) - ((0 : ℤ), (1 : ℤ))) 0 := by
+  refine rawRot_of_pairing o oR _ _ _ _ ho hoR (oddLPieces_covered _ _ _ _ _ _ _ _) hconn
+    (pairingOK_of_forall₂ _ _ _ _ ?_)
+  obtain ⟨hsw1, hsw2⟩ := swapW_strip_three w
+  have hWw := W1Odd_swapW w
+  have htrip : (!(swapW (stripTrailing Digit.three w)).isEmpty && (swapW (stripTrailing Digit.three w)).all (fun d => decide (d = Digit.three))) = false := by
+    rw [isEmpty_swapW, all_swapW_three]; exact hd
+  have hpw : parentsAt w = ⟨(parentsAt (stripTrailing Digit.three w)).odd, ⟨(parentsAt (stripTrailing Digit.three w)).even.num +
+      2 * (trailingCount Digit.three w : ℕ) * (parentsAt (stripTrailing Digit.three w)).odd.num,
+      (parentsAt (stripTrailing Digit.three w)).even.den + 2 * (trailingCount Digit.three w : ℕ) * (parentsAt (stripTrailing Digit.three w)).odd.den⟩⟩ := by
+    conv_lhs => rw [← strip_append_replicate Digit.three w]
+    exact parents_append_threes _ _
+  have hpsw : parentsAt (swapW w) = ⟨⟨(parentsAt (swapW (stripTrailing Digit.three w))).odd.num +
+      (trailingCount Digit.three w : ℕ) * (parentsAt (swapW (stripTrailing Digit.three w))).even.num,
+      (parentsAt (swapW (stripTrailing Digit.three w))).odd.den + (trailingCount Digit.three w : ℕ) * (parentsAt (swapW (stripTrailing Digit.three w))).even.den⟩,
+      (parentsAt (swapW (stripTrailing Digit.three w))).even⟩ := by
+    conv_lhs => rw [← strip_append_replicate Digit.three w, swapW_append, swapW_replicate]
+    exact parents_append_twos _ _
+  have hWo : W1Odd w = W1Odd (stripTrailing Digit.three w) := by
+    conv_lhs => rw [← strip_append_replicate Digit.three w]
+    exact W1Odd_append_replicate _ _ _ (by decide)
+  obtain ⟨-, -, -, -, e5, e6⟩ := vecs_swapW (stripTrailing Digit.three w)
+  have hq : ((parentsAt (stripTrailing Digit.three w)).even.num + (parentsAt (stripTrailing Digit.three w)).even.den) % 2 = 0 := (parentsAt_valid _).even_parity
+  obtain ⟨a, hdq⟩ : ∃ a : ℤ, (parentsAt (stripTrailing Digit.three w)).even.den = 2 * a + (parentsAt (stripTrailing Digit.three w)).even.num :=
+    ⟨((parentsAt (stripTrailing Digit.three w)).even.den - (parentsAt (stripTrailing Digit.three w)).even.num) / 2, by omega⟩
+  have hA : (2 * a + (parentsAt (stripTrailing Digit.three w)).even.num - (parentsAt (stripTrailing Digit.three w)).even.num) / 2 = a := by omega
+  have hB' : (2 * a + (parentsAt (stripTrailing Digit.three w)).even.num + (parentsAt (stripTrailing Digit.three w)).even.num) / 2 = a + (parentsAt (stripTrailing Digit.three w)).even.num := by omega
+  simp only [evenLPieces, oddLPieces, hsw1, hsw2, hWw, hd, htrip, Bool.false_and, Bool.false_eq_true, ↓reduceIte,
+    List.append_nil]
+  refine List.rel_append (List.rel_append ?_ (List.Forall₂.cons ?_ List.Forall₂.nil)) ?_
+  · rw [List.forall₂_map_left_iff, List.forall₂_map_right_iff, List.forall₂_same]
+    intro j _
+    refine ⟨vP1 (stripTrailing Digit.three w) - ((0 : ℤ), (1 : ℤ)), 0, hS, ?_, ?_, ?_, fun x _ _ => by simp [stdPiece]⟩ <;>
+    rcases hlast with hl | hl <;> cases hWs : W1Odd (stripTrailing Digit.three w) <;> cases plus <;> l_unfold <;> simp only [hdq] <;>
+      simp only [hA, hB'] <;> l_ring
+  · refine ⟨vQ1 (stripTrailing Digit.three w) - ((0 : ℤ), (1 : ℤ)), 0, hB, ?_, ?_, ?_, fun x _ _ => by simp [stdPiece]⟩ <;>
+    rcases hlast with hl | hl <;> cases hWs : W1Odd (stripTrailing Digit.three w) <;> cases plus <;> l_unfold <;> simp only [hdq] <;>
+      simp only [hA, hB'] <;> l_ring
+  · rw [List.forall₂_map_left_iff, List.forall₂_map_right_iff, List.forall₂_same]
+    intro i _
+    refine ⟨(altParP (stripTrailing Digit.three w)).1, (altParP (stripTrailing Digit.three w)).2, hH, ?_, ?_, ?_, fun x _ _ => by simp⟩ <;>
+    rcases hlast with hl | hl <;> cases hWs : W1Odd (stripTrailing Digit.three w) <;> cases plus <;> l_unfold <;> simp only [hdq] <;>
+      simp only [hA, hB'] <;> l_ring
+
+set_option maxHeartbeats 400000 in
+/-- The odd L-correction of `w` against the even L-correction of `swapW w`, when the prefix (before the trailing `2`s) is not
+`3^j`: stems, bridge and heads pair index by index. -/
+theorem oddL_rawRot (S : WeakData) (pO pE aO aE : Word → PartialOdometer) (w : Word) (plus elong : Bool)
+    (o oR : PartialOdometer)
+    (ho : RespectsPieces o (oddLPieces S pO pE aO aE w plus elong))
+    (hoR : RespectsPieces oR (evenLPieces S pO pE aO aE (swapW w) (plus == W1Odd w) elong))
+    (hconn : (overlapGraph (goodPart (evenLPieces S pO pE aO aE (swapW w) (plus == W1Odd w) elong))).Connected)
+    (hd : (!(stripTrailing Digit.two w).isEmpty && (stripTrailing Digit.two w).all (fun d => decide (d = Digit.three))) = false)
+    (hlast : (stripTrailing Digit.two w).getLast? = some Digit.one ∨ (stripTrailing Digit.two w).getLast? = some Digit.three)
+    (hS : RawRot (regOdo S pO pE (regsAt (stripTrailing Digit.two w)).2 false) (regOdo S pO pE (regsAt (swapW (stripTrailing Digit.two w))).1 true)
+      (vQ1 (stripTrailing Digit.two w) - ((0 : ℤ), (1 : ℤ))) 0)
+    (hB : RawRot (regOdo S pO pE (regsAt (stripTrailing Digit.two w)).1 true) (regOdo S pO pE (regsAt (swapW (stripTrailing Digit.two w))).2 false)
+      (vP1 (stripTrailing Digit.two w) - ((0 : ℤ), (1 : ℤ))) 0)
+    (hH : RawRot (regOdo S aO aE (regsAt (stripTrailing Digit.two w)).2 false) (regOdo S aO aE (regsAt (swapW (stripTrailing Digit.two w))).1 true)
+      (altParQ (stripTrailing Digit.two w)).1 (altParQ (stripTrailing Digit.two w)).2) :
+    RawRot o oR (texV1Odd ((parentsAt w).current .odd) - ((0 : ℤ), (1 : ℤ))) 0 := by
+  refine rawRot_of_pairing o oR _ _ _ _ ho hoR (evenLPieces_covered _ _ _ _ _ _ _ _) hconn
+    (pairingOK_of_forall₂ _ _ _ _ ?_)
+  obtain ⟨hsw1, hsw2⟩ := swapW_strip_two w
+  have hWw := W1Odd_swapW w
+  have hdbl : (!(swapW (stripTrailing Digit.two w)).isEmpty && (swapW (stripTrailing Digit.two w)).all (fun d => decide (d = Digit.two))) = false := by
+    rw [isEmpty_swapW, all_swapW_two]; exact hd
+  have hpw : parentsAt w = ⟨⟨(parentsAt (stripTrailing Digit.two w)).odd.num + (trailingCount Digit.two w : ℕ) * (parentsAt (stripTrailing Digit.two w)).even.num,
+      (parentsAt (stripTrailing Digit.two w)).odd.den + (trailingCount Digit.two w : ℕ) * (parentsAt (stripTrailing Digit.two w)).even.den⟩, (parentsAt (stripTrailing Digit.two w)).even⟩ := by
+    conv_lhs => rw [← strip_append_replicate Digit.two w]
+    exact parents_append_twos _ _
+  have hpsw : parentsAt (swapW w) = ⟨(parentsAt (swapW (stripTrailing Digit.two w))).odd, ⟨(parentsAt (swapW (stripTrailing Digit.two w))).even.num +
+      2 * (trailingCount Digit.two w : ℕ) * (parentsAt (swapW (stripTrailing Digit.two w))).odd.num,
+      (parentsAt (swapW (stripTrailing Digit.two w))).even.den + 2 * (trailingCount Digit.two w : ℕ) * (parentsAt (swapW (stripTrailing Digit.two w))).odd.den⟩⟩ := by
+    conv_lhs => rw [← strip_append_replicate Digit.two w, swapW_append, swapW_replicate]
+    exact parents_append_threes _ _
+  have hWo : W1Odd w = W1Odd (stripTrailing Digit.two w) := by
+    conv_lhs => rw [← strip_append_replicate Digit.two w]
+    exact W1Odd_append_replicate _ _ _ (by decide)
+  obtain ⟨-, -, -, -, e5, e6⟩ := vecs_swapW (stripTrailing Digit.two w)
+  have hq : ((parentsAt (stripTrailing Digit.two w)).even.num + (parentsAt (stripTrailing Digit.two w)).even.den) % 2 = 0 := (parentsAt_valid _).even_parity
+  obtain ⟨a, hdq⟩ : ∃ a : ℤ, (parentsAt (stripTrailing Digit.two w)).even.den = 2 * a + (parentsAt (stripTrailing Digit.two w)).even.num :=
+    ⟨((parentsAt (stripTrailing Digit.two w)).even.den - (parentsAt (stripTrailing Digit.two w)).even.num) / 2, by omega⟩
+  have hA : (2 * a + (parentsAt (stripTrailing Digit.two w)).even.num - (parentsAt (stripTrailing Digit.two w)).even.num) / 2 = a := by omega
+  have hB' : (2 * a + (parentsAt (stripTrailing Digit.two w)).even.num + (parentsAt (stripTrailing Digit.two w)).even.num) / 2 = a + (parentsAt (stripTrailing Digit.two w)).even.num := by omega
+  simp only [evenLPieces, oddLPieces, hsw1, hsw2, hWw, hd, hdbl, Bool.false_and, Bool.false_eq_true, ↓reduceIte,
+    List.append_nil]
+  refine List.rel_append (List.rel_append ?_ (List.Forall₂.cons ?_ List.Forall₂.nil)) ?_
+  · rw [List.forall₂_map_left_iff, List.forall₂_map_right_iff, List.forall₂_same]
+    intro j _
+    refine ⟨vQ1 (stripTrailing Digit.two w) - ((0 : ℤ), (1 : ℤ)), 0, hS, ?_, ?_, ?_, fun x _ _ => by simp [stdPiece]⟩ <;>
+    rcases hlast with hl | hl <;> cases hWs : W1Odd (stripTrailing Digit.two w) <;> cases plus <;> l_unfold <;> simp only [hdq] <;>
+      simp only [hA, hB'] <;> l_ring
+  · refine ⟨vP1 (stripTrailing Digit.two w) - ((0 : ℤ), (1 : ℤ)), 0, hB, ?_, ?_, ?_, fun x _ _ => by simp [stdPiece]⟩ <;>
+    rcases hlast with hl | hl <;> cases hWs : W1Odd (stripTrailing Digit.two w) <;> cases plus <;> l_unfold <;> simp only [hdq] <;>
+      simp only [hA, hB'] <;> l_ring
+  · rw [List.forall₂_map_left_iff, List.forall₂_map_right_iff, List.forall₂_same]
+    intro i _
+    refine ⟨(altParQ (stripTrailing Digit.two w)).1, (altParQ (stripTrailing Digit.two w)).2, hH, ?_, ?_, ?_, fun x _ _ => by simp⟩ <;>
+    rcases hlast with hl | hl <;> cases hWs : W1Odd (stripTrailing Digit.two w) <;> cases plus <;> l_unfold <;> simp only [hdq] <;>
+      simp only [hA, hB'] <;> l_ring
+
+/-! ### The L-rotation at one level -/
+
+theorem lRotation_of_rawRot (o oR : PartialOdometer) (v1 : Site) (h : RawRot o oR (v1 - ((0 : ℤ), (1 : ℤ))) 0) :
+    LRotation o oR v1 := by
+  obtain ⟨C, hC⟩ := h
+  refine ⟨C, fun y hy => ?_⟩
+  obtain ⟨hm, hv⟩ := hC y hy
+  rw [← add_sub_assoc] at hm hv
+  refine ⟨hm, ?_⟩
+  rw [hv]
+  simp [dotS]
+
+theorem regs_none (w : Word) : ((regsAt w).1 = none → ∀ d ∈ w, d = Digit.three) ∧
+    ((regsAt w).2 = none → ∀ d ∈ w, d = Digit.two) := by
+  induction w using List.reverseRecOn with
+  | nil => exact ⟨fun _ d hd => by simp at hd, fun _ d hd => by simp at hd⟩
+  | append_singleton v d ih =>
+    rw [regsAt_append_singleton]
+    cases d
+    · exact ⟨fun h => by simp [regStep] at h, fun h => by simp [regStep] at h⟩
+    · refine ⟨fun h => by simp [regStep] at h, fun h e he => ?_⟩
+      simp only [List.mem_append, List.mem_singleton] at he
+      rcases he with he | rfl
+      · exact ih.2 h e he
+      · rfl
+    · refine ⟨fun h e he => ?_, fun h => by simp [regStep] at h⟩
+      simp only [List.mem_append, List.mem_singleton] at he
+      rcases he with he | rfl
+      · exact ih.1 h e he
+      · rfl
+
+theorem strip_of_defined (d s : Digit) (hs : s ≠ d) (v : Word) (k : ℕ) :
+    stripTrailing d (v ++ [s] ++ List.replicate k d) = v ++ [s] := by
+  induction k with
+  | zero => simp [stripTrailing_snoc, hs]
+  | succ k ih => rw [List.replicate_succ', ← List.append_assoc, stripTrailing_snoc, if_pos rfl, ih]
+
+theorem oddLDefined_swapW {w : Word} (h : EvenLDefined w) : OddLDefined (swapW w) := by
+  obtain ⟨v, s, k, hs, rfl⟩ := h
+  refine ⟨swapW v, s.swapTwoThree, k, by cases s <;> simp_all [Digit.swapTwoThree], ?_⟩
+  rw [swapW_append, swapW_append, swapW_replicate]
+  rfl
+
+theorem evenLDefined_swapW {w : Word} (h : OddLDefined w) : EvenLDefined (swapW w) := by
+  obtain ⟨v, s, k, hs, rfl⟩ := h
+  refine ⟨swapW v, s.swapTwoThree, k, by cases s <;> simp_all [Digit.swapTwoThree], ?_⟩
+  rw [swapW_append, swapW_append, swapW_replicate]
+  rfl
+
+/-- The overlap graphs of the L decompositions of `w` are connected. -/
+def ConnectedL (D : JointData) (g : Word → JSlice) (w : Word) : Prop :=
+  (∀ plus elong : Bool, OddLDefined w →
+    (overlapGraph (goodPart (oddLPieces D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).aOdd)
+      (fun u => (g u).aEven) w plus elong))).Connected) ∧
+  (∀ plus elong : Bool, EvenLDefined w →
+    (overlapGraph (goodPart (evenLPieces D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).aOdd)
+      (fun u => (g u).aEven) w plus elong))).Connected)
+
+/-- The L-rotation at the words of length `n` whose prefix is `2^j` (even L) or `3^j` (odd L): a named input (the zero-one
+odometers and the exceptional points of the first heads). -/
+def SpecialLRot (f : Word → JSlice) (n : ℕ) : Prop :=
+  ∀ w : Word, w.length = n →
+    (EvenLDefined w → (stripTrailing Digit.three w ≠ [] ∧ ∀ d ∈ stripTrailing Digit.three w, d = Digit.two) →
+      ∀ plus elong : Bool, LRotation ((f w).lEven plus elong) ((f (swapW w)).lOdd (plus != W1Odd w) elong)
+        (texV1Even ((parentsAt w).current .even))) ∧
+    (OddLDefined w → (stripTrailing Digit.two w ≠ [] ∧ ∀ d ∈ stripTrailing Digit.two w, d = Digit.three) →
+      ∀ plus elong : Bool, LRotation ((f w).lOdd plus elong) ((f (swapW w)).lEven (plus == W1Odd w) elong)
+        (texV1Odd ((parentsAt w).current .odd)))
+
+/-- `lemma:l_correc_properties` (1) for the L-corrected odometers at the level `n`, from the family below `n`, the slices at level
+`n`, the base slopes, the connectivity of the overlap graphs of the L decompositions, and the special prefixes. -/
+theorem lRotProps_step (D : JointData) (f : Word → JSlice) (n : ℕ) (hgood : GoodBelow D f n)
+    (hlev : ∀ w : Word, w.length = n → IsJointSlice D f w) (hB : BaseSlopes D)
+    (hconn : ∀ w : Word, w.length = n → ConnectedL D (below f w) w) (hspec : SpecialLRot f n)
+    (w : Word) (hw : w.length = n) : LRotProps w (f w) (f (swapW w)) := by
+  have hJ : ∀ u : Word, u.length ≤ n → IsJointSlice D f u := fun u hu => by
+    rcases lt_or_eq_of_le hu with h | h
+    · exact (hgood u h).1
+    · exact hlev u h
+  have hsl := family_slopes D f n hJ hB
+  have hsw : (swapW w).length = n := by rw [length_swapW, hw]
+  obtain ⟨-, -, -, hLp⟩ := hlev w hw
+  obtain ⟨-, -, -, hLp'⟩ := hlev (swapW w) hsw
+  obtain ⟨hcO, hcE⟩ := hconn (swapW w) hsw
+  rw [below_swapW] at hLp' hcO hcE
+  refine ⟨fun hdef plus elong => ?_, fun hdef plus elong => ?_⟩
+  · -- the even L-correction
+    by_cases hsp : stripTrailing Digit.three w ≠ [] ∧ ∀ d ∈ stripTrailing Digit.three w, d = Digit.two
+    · exact (hspec w hw).1 hdef hsp plus elong
+    have hd : (!(stripTrailing Digit.three w).isEmpty &&
+        (stripTrailing Digit.three w).all (fun d => decide (d = Digit.two))) = false := by
+      by_contra hc
+      simp only [Bool.not_eq_false, Bool.and_eq_true, Bool.not_eq_eq_eq_not, Bool.not_true, List.isEmpty_eq_false_iff,
+        List.all_eq_true, decide_eq_true_eq] at hc
+      exact hsp hc
+    obtain ⟨v, s, k, hs, hwv⟩ := hdef
+    have hpre : stripTrailing Digit.three w = v ++ [s] := by rw [hwv]; exact strip_of_defined _ _ hs v k
+    have hlen : (v ++ [s]).length ≤ w.length := by
+      rw [← hpre]; exact stripTrailing_length_le _ _
+    have hvlen : v.length < w.length := by simp at hlen; omega
+    have hlast : (stripTrailing Digit.three w).getLast? = some Digit.one ∨
+        (stripTrailing Digit.three w).getLast? = some Digit.two := by
+      rw [hpre]; cases s <;> simp_all
+    have hr1 : (regsAt (stripTrailing Digit.three w)).1 = some v := by
+      rw [hpre, regsAt_append_singleton]; cases s <;> simp_all [regStep]
+    obtain ⟨u2, hr2⟩ : ∃ u2, (regsAt (stripTrailing Digit.three w)).2 = some u2 := by
+      cases h : (regsAt (stripTrailing Digit.three w)).2 with
+      | none => exact absurd ⟨by rw [hpre]; simp, (regs_none _).2 h⟩ hsp
+      | some u2 => exact ⟨u2, rfl⟩
+    have l2 := FLatticePaper.Tiles.JointInduction.regsAt_lt _ u2 (Or.inr hr2)
+    have l2' : u2.length < w.length := by have := stripTrailing_length_le Digit.three w; omega
+    obtain ⟨pr1, pr2⟩ := parents_of_regs (stripTrailing Digit.three w)
+    have J1 := (hgood v (by omega)).2.2.2.1
+    have J2 := (hgood u2 (by omega)).2.2.2.1
+    have hS : RawRot (regOdo D.S (fun u => (below f w u).tOdd) (fun u => (below f w u).tEven)
+        (regsAt (stripTrailing Digit.three w)).1 true) (regOdo D.S (fun u => (below f w u).tOdd)
+        (fun u => (below f w u).tEven) (regsAt (swapW (stripTrailing Digit.three w))).2 false)
+        (vP1 (stripTrailing Digit.three w) - ((0 : ℤ), (1 : ℤ))) 0 := by
+      rw [regsAt_swapW, hr1]
+      show RawRot (below f w v).tOdd (below f w (swapW v)).tEven _ _
+      rw [below_of_lt f w v hvlen, below_of_lt f w (swapW v) (by rw [length_swapW]; exact hvlen)]
+      have h := J1.1
+      rw [pr1 v hr1] at h
+      exact rawRot_of_tileRotation_slopes _ _ _ h (hsl v (by omega)).1 (hsl (swapW v) (by rw [length_swapW]; omega)).2.1
+    have hBr : RawRot (regOdo D.S (fun u => (below f w u).tOdd) (fun u => (below f w u).tEven)
+        (regsAt (stripTrailing Digit.three w)).2 false) (regOdo D.S (fun u => (below f w u).tOdd)
+        (fun u => (below f w u).tEven) (regsAt (swapW (stripTrailing Digit.three w))).1 true)
+        (vQ1 (stripTrailing Digit.three w) - ((0 : ℤ), (1 : ℤ))) 0 := by
+      rw [regsAt_swapW, hr2]
+      show RawRot (below f w u2).tEven (below f w (swapW u2)).tOdd _ _
+      rw [below_of_lt f w u2 l2', below_of_lt f w (swapW u2) (by rw [length_swapW]; exact l2')]
+      have h := J2.2.1
+      rw [pr2 u2 hr2] at h
+      exact rawRot_of_tileRotation_slopes _ _ _ h (hsl u2 (by omega)).2.1 (hsl (swapW u2) (by rw [length_swapW]; omega)).1
+    have hH : RawRot (regOdo D.S (fun u => (below f w u).aOdd) (fun u => (below f w u).aEven)
+        (regsAt (stripTrailing Digit.three w)).1 true) (regOdo D.S (fun u => (below f w u).aOdd)
+        (fun u => (below f w u).aEven) (regsAt (swapW (stripTrailing Digit.three w))).2 false)
+        (altParP (stripTrailing Digit.three w)).1 (altParP (stripTrailing Digit.three w)).2 := by
+      rw [regsAt_swapW, hr1]
+      show RawRot (below f w v).aOdd (below f w (swapW v)).aEven _ _
+      rw [below_of_lt f w v hvlen, below_of_lt f w (swapW v) (by rw [length_swapW]; exact hvlen)]
+      have h := J1.2.2.1
+      have hcf := altCf_odd_reg v s (by cases s <;> simp_all)
+      rw [← hpre] at hcf
+      rw [hcf] at h
+      exact rawRot_of_altRotation_slopes _ _ _ _ h (hsl v (by omega)).2.2.1
+        (hsl (swapW v) (by rw [length_swapW]; omega)).2.2.2
+    have hdef' : EvenLDefined w := ⟨v, s, k, hs, hwv⟩
+    have ho := (hLp.2 plus elong hdef').1
+    have hoR := (hLp'.1 (plus != W1Odd w) elong (oddLDefined_swapW hdef')).1
+    exact lRotation_of_rawRot _ _ _ (evenL_rawRot D.S _ _ _ _ w plus elong _ _ ho hoR
+      (hcO (plus != W1Odd w) elong (oddLDefined_swapW hdef')) hd hlast hS hBr hH)
+  · -- the odd L-correction
+    by_cases hsp : stripTrailing Digit.two w ≠ [] ∧ ∀ d ∈ stripTrailing Digit.two w, d = Digit.three
+    · exact (hspec w hw).2 hdef hsp plus elong
+    have hd : (!(stripTrailing Digit.two w).isEmpty &&
+        (stripTrailing Digit.two w).all (fun d => decide (d = Digit.three))) = false := by
+      by_contra hc
+      simp only [Bool.not_eq_false, Bool.and_eq_true, Bool.not_eq_eq_eq_not, Bool.not_true, List.isEmpty_eq_false_iff,
+        List.all_eq_true, decide_eq_true_eq] at hc
+      exact hsp hc
+    obtain ⟨v, s, k, hs, hwv⟩ := hdef
+    have hpre : stripTrailing Digit.two w = v ++ [s] := by rw [hwv]; exact strip_of_defined _ _ hs v k
+    have hlen : (v ++ [s]).length ≤ w.length := by
+      rw [← hpre]; exact stripTrailing_length_le _ _
+    have hvlen : v.length < w.length := by simp at hlen; omega
+    have hlast : (stripTrailing Digit.two w).getLast? = some Digit.one ∨
+        (stripTrailing Digit.two w).getLast? = some Digit.three := by
+      rw [hpre]; cases s <;> simp_all
+    have hr2 : (regsAt (stripTrailing Digit.two w)).2 = some v := by
+      rw [hpre, regsAt_append_singleton]; cases s <;> simp_all [regStep]
+    obtain ⟨u1, hr1⟩ : ∃ u1, (regsAt (stripTrailing Digit.two w)).1 = some u1 := by
+      cases h : (regsAt (stripTrailing Digit.two w)).1 with
+      | none => exact absurd ⟨by rw [hpre]; simp, (regs_none _).1 h⟩ hsp
+      | some u1 => exact ⟨u1, rfl⟩
+    have l1 := FLatticePaper.Tiles.JointInduction.regsAt_lt _ u1 (Or.inl hr1)
+    have l1' : u1.length < w.length := by have := stripTrailing_length_le Digit.two w; omega
+    obtain ⟨pr1, pr2⟩ := parents_of_regs (stripTrailing Digit.two w)
+    have J1 := (hgood u1 (by omega)).2.2.2.1
+    have J2 := (hgood v (by omega)).2.2.2.1
+    have hS : RawRot (regOdo D.S (fun u => (below f w u).tOdd) (fun u => (below f w u).tEven)
+        (regsAt (stripTrailing Digit.two w)).2 false) (regOdo D.S (fun u => (below f w u).tOdd)
+        (fun u => (below f w u).tEven) (regsAt (swapW (stripTrailing Digit.two w))).1 true)
+        (vQ1 (stripTrailing Digit.two w) - ((0 : ℤ), (1 : ℤ))) 0 := by
+      rw [regsAt_swapW, hr2]
+      show RawRot (below f w v).tEven (below f w (swapW v)).tOdd _ _
+      rw [below_of_lt f w v hvlen, below_of_lt f w (swapW v) (by rw [length_swapW]; exact hvlen)]
+      have h := J2.2.1
+      rw [pr2 v hr2] at h
+      exact rawRot_of_tileRotation_slopes _ _ _ h (hsl v (by omega)).2.1 (hsl (swapW v) (by rw [length_swapW]; omega)).1
+    have hBr : RawRot (regOdo D.S (fun u => (below f w u).tOdd) (fun u => (below f w u).tEven)
+        (regsAt (stripTrailing Digit.two w)).1 true) (regOdo D.S (fun u => (below f w u).tOdd)
+        (fun u => (below f w u).tEven) (regsAt (swapW (stripTrailing Digit.two w))).2 false)
+        (vP1 (stripTrailing Digit.two w) - ((0 : ℤ), (1 : ℤ))) 0 := by
+      rw [regsAt_swapW, hr1]
+      show RawRot (below f w u1).tOdd (below f w (swapW u1)).tEven _ _
+      rw [below_of_lt f w u1 l1', below_of_lt f w (swapW u1) (by rw [length_swapW]; exact l1')]
+      have h := J1.1
+      rw [pr1 u1 hr1] at h
+      exact rawRot_of_tileRotation_slopes _ _ _ h (hsl u1 (by omega)).1 (hsl (swapW u1) (by rw [length_swapW]; omega)).2.1
+    have hH : RawRot (regOdo D.S (fun u => (below f w u).aOdd) (fun u => (below f w u).aEven)
+        (regsAt (stripTrailing Digit.two w)).2 false) (regOdo D.S (fun u => (below f w u).aOdd)
+        (fun u => (below f w u).aEven) (regsAt (swapW (stripTrailing Digit.two w))).1 true)
+        (altParQ (stripTrailing Digit.two w)).1 (altParQ (stripTrailing Digit.two w)).2 := by
+      rw [regsAt_swapW, hr2]
+      show RawRot (below f w v).aEven (below f w (swapW v)).aOdd _ _
+      rw [below_of_lt f w v hvlen, below_of_lt f w (swapW v) (by rw [length_swapW]; exact hvlen)]
+      have h := J2.2.2.2
+      have hcf := altCf_even_reg v s (by cases s <;> simp_all)
+      rw [← hpre] at hcf
+      rw [hcf] at h
+      exact rawRot_of_altRotation_slopes _ _ _ _ h (hsl v (by omega)).2.2.2
+        (hsl (swapW v) (by rw [length_swapW]; omega)).2.2.1
+    have hdef' : OddLDefined w := ⟨v, s, k, hs, hwv⟩
+    have ho := (hLp.1 plus elong hdef').1
+    have hoR := (hLp'.2 (plus == W1Odd w) elong (evenLDefined_swapW hdef')).1
+    exact lRotation_of_rawRot _ _ _ (oddL_rawRot D.S _ _ _ _ w plus elong _ _ ho hoR
+      (hcE (plus == W1Odd w) elong (evenLDefined_swapW hdef')) hd hlast hS hBr hH)
+
+/-! ### The rotation step -/
+
+/-- The hypothesis of the rotation step at level `n`: the family below `n` and the slices, (c) of the weak odometers and (a), (b)
+of the tile odometers at level `n`. -/
+def LevelHyp (D : JointData) (f : Word → JSlice) (n : ℕ) : Prop :=
+  GoodBelow D f n ∧ ∀ w : Word, w.length = n →
+    IsJointSlice D f w ∧ WeakProps w (f w).wOdd (f w).wEven ∧ TileProps w (f w).tOdd (f w).tEven (f w).aOdd (f w).aEven
+
+/-- The rotation step of the joint induction ((c) of `lemma:tile-odometer-existence` and `lemma:l_correc_properties` (1) for the
+odometers), from the named inputs: the base slopes and base rotations (`baseSlopes_paper`, `base_rotProps` for the paper data),
+the connectivity of the overlap graphs of the decompositions, and the L-rotation at the special prefixes `2^j`, `3^j`. -/
+theorem rotStepInput_of (D : JointData) (hB : BaseSlopes D) (hBR : BaseRot D)
+    (hconn : ∀ (f : Word → JSlice) (n : ℕ), LevelHyp D f n →
+      ∀ w : Word, w.length = n → ¬ IsBase w → Connected4 D (below f w) w)
+    (hconnL : ∀ (f : Word → JSlice) (n : ℕ), LevelHyp D f n → ∀ w : Word, w.length = n → ConnectedL D (below f w) w)
+    (hspec : ∀ (f : Word → JSlice) (n : ℕ), LevelHyp D f n → SpecialLRot f n) :
+    RotStepInput D := by
+  intro f n hg hlev w hw
+  have hL : LevelHyp D f n := ⟨hg, hlev⟩
+  exact ⟨rotProps_step D f n hg (fun w hw => (hlev w hw).1) hB hBR (hconn f n hL) w hw,
+    lRotProps_step D f n hg (fun w hw => (hlev w hw).1) hB (hconnL f n hL) (hspec f n hL) w hw⟩
 
 end FLatticePaper.Tiles.JointRot
