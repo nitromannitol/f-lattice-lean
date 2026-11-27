@@ -4,7 +4,7 @@ This file states what the repository proves and which named hypotheses the headl
 The Lean sources are the authority; each link points to the declaration.
 
 **Target.** The target is the surgical edition of the October 2023 manuscript: the author's arXiv text with minimal
-corrections in its own language, pinned at commit 7a40613 of its source repository (Sections 1–9). The new Section 9 failed its
+corrections in its own language, pinned at commit 3243bef of its source repository (Sections 1–9). The new Section 9 failed its
 audit: its standard extension (lemma:global_odometers for standard tiles) and the periodicity and growth algebra are sound,
 while its proof of recurrence and of the alternate extension is not a proof, and the general recurrence is open. The standard extension is proved in Lean for both children with no remaining covering hypothesis (item (ii) of `lemma:common-extension-pseudo-square` is proved for both standard tiles); it is stated for the weak family, which is the tile family at the children Section 8 does not correct. Sections 1–8 are being mapped to the Lean statement by statement in [SOURCE-MAP.md](SOURCE-MAP.md), and the
 statements corrected in Sections 5–8 are restated and proved in their surgical form. The corrected edition pinned in
@@ -16,8 +16,7 @@ that edition, and their named hypotheses belong to the supplement's route. That 
 subodometers around closed paths (condition (C)) for every decomposition, standard, alternate and corrected. In the Lean the
 packing is proved for both children (`Tiles.H3Pairs`), and condition (C) is proved for both
 standard children from named local inputs (`Tiles.ClosedPathStandard`). The weak odometers of Section 7 are built from the tile odometers of the parents (Section 8), so Sections 7 and 8
-are formalised as one induction over the recursion word. Open in the text: items (3)–(5) of
-`lemma:alternate_tile_properties`, the local compatibility of overlapping copies claimed in Section 8 (checked numerically to
+are formalised as one induction over the recursion word. Open in the text: the local compatibility of overlapping copies claimed in Section 8 (checked numerically to
 length 5), and that the corrected decompositions of Section 8 cover exactly the standard tiles (asserted through figures; measured on 706 decompositions).
 
 ## Headline theorems
