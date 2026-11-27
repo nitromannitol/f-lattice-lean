@@ -446,6 +446,7 @@ import FLatticePaper.Tiles.HorizontalTop
 import FLatticePaper.Tiles.OverlapSides
 import FLatticePaper.Tiles.VerticalZeroOne
 import FLatticePaper.Tiles.VerticalReflect
+import FLatticePaper.Tiles.StandardPseudoSquare
 import FLatticePaper.Tiles.SiteBaseDischarge
 import FLatticePaper.Tiles.SitePairScope
 import FLatticePaper.Tiles.SiteCell
