@@ -150,20 +150,19 @@ theorem gamesStep_of_noFort {word : Word} (h2 : ∃ x ∈ word, x ≠ Digit.two)
         (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) (fun _ _ => False)
           (frameAt word).eps),
         P.retained = (G.game (frameAt word).eps (frameAt word).eps_unit).policy →
-          CollarChain.RowFaceStrictHyp word (standardField (conjWord word)) P.retained)
-    (hDich : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → CollarChain.WitnessDichotomy word) :
+          CollarChain.RowFaceStrictHyp word (standardField (conjWord word)) P.retained) :
     GamesWithRank word :=
   gamesWithRank_of_Q1 h2 hcore hW1 hno
     (fun η hη _ hcon hstrict => by
       have hsat := AuxRankQ1.hasSat_of_constrained hcore.packet.binary hcon
-      obtain ⟨G, P, hWP, hsheet⟩ := FLatticePaper.W1StepAssembly.sheetOut_forced_of_parts hRow hDich word h
+      obtain ⟨G, P, hWP, hsheet⟩ := FLatticePaper.W1StepAssembly.sheetOut_forced_of_parts hRow word h
         hcore hseed hSE hpar hG hW1c hsat
       have hrise := FLatticePaper.RiseInput.noRise_of_canonical h hSE hTr hW1c P.toOldPolicyWitness G hWP
       exact freeNamedInputs_of_Q1 h hcore hSE hG hpar hW1c hW1 hη hcon hstrict
         (FLatticePaper.ForcedPermitAll.forced_slip_permit h hcore hSE P hsheet hsat hW1 hrise η hη)
         (fun hW1' hη1 hN => FLatticePaper.CornerN1.corner_N1 h hSE hpar hW1' hN η hη1)
         (by
-          have hh := FLatticePaper.W1StepAssembly.westFree_of_parts hRow hDich word h hcore hseed hSE hpar hG
+          have hh := FLatticePaper.W1StepAssembly.westFree_of_parts hRow word h hcore hseed hSE hpar hG
             hW1c (AuxRankQ1.hasSat_of_constrained hcore.packet.binary hcon) η
           have e : (frameAt word).parents.odd.num + (frameAt word).parents.odd.den - 1 =
               (frameAt word).parents.odd.den + (frameAt word).parents.odd.num - 1 := by ring

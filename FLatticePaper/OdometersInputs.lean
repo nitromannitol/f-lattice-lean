@@ -5,8 +5,8 @@ import FLatticePaper.Plane.Induction.StrongSeedInduction
 
 /-! # The odometers theorem from the explicit inputs of the two induction steps
 
-The W1 step (`W1StepAssembly.w1Step_of_parts`) takes `hRow` and the witness dichotomy `hDich` (`hFreeIn` is discharged by
-`FreeInStep.hFreeIn_of_strong`). The games step (`FreeNamedQ1.gamesStep_of_noFort`) takes the same two and the restricted no-fort
+The W1 step (`W1StepAssembly.w1Step_of_parts`) takes `hRow` (the witness dichotomy is discharged by `WitnessCorners.witnessDichotomy`; `hFreeIn` is discharged by
+`FreeInStep.hFreeIn_of_strong`). The games step (`FreeNamedQ1.gamesStep_of_noFort`) takes `hRow` and the restricted no-fort
 `hno`; the forced permit and the corner are derived there. This file assembles the two steps into the odometers theorem
 `StepHeadline.odometersTheorem_of_steps`, with all inputs universal over words. -/
 
@@ -27,13 +27,12 @@ theorem odometersTheorem_of_inputs
         (P : OldPolicyRanked (frameAt (conjWord word)) (standardField (conjWord word)) (fun _ _ => False)
           (frameAt word).eps),
         P.retained = (G.game (frameAt word).eps (frameAt word).eps_unit).policy →
-          CollarChain.RowFaceStrictHyp word (standardField (conjWord word)) P.retained)
-    (hDich : ∀ word : Word, (∃ x ∈ word, x ≠ Digit.three) → CollarChain.WitnessDichotomy word) :
+          CollarChain.RowFaceStrictHyp word (standardField (conjWord word)) P.retained) :
     OdometersTheorem :=
   StepHeadline.odometersTheorem_of_steps
     (fun word hproper hnot hcore hseed _ hSE hpar hTr _ _ hG hW1c hW1 =>
       FreeNamedQ1.gamesStep_of_noFort (exists_ne_two_of_not_twoPow hproper hnot) hproper hcore hseed hSE hG hpar hTr hW1c hW1
-        (hno word) hRow hDich)
-    (W1StepAssembly.w1Step_of_parts hRow hDich)
+        (hno word) hRow)
+    (W1StepAssembly.w1Step_of_parts hRow)
 
 end FLatticePaper.OdometersInputs
