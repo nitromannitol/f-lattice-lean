@@ -23,7 +23,9 @@ def oddKappa (κv κh num den : ℤ) : ℤ × ℤ → ℤ := fun d =>
     if d = (0, 1) then -κh - (num * (num - den) - den * (num + den)) else
       if d = (0, -1) then κh else 0
 
-theorem closed_walks_odd (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
+/-- The constants `κ` of the odd tile at every lattice step, as a statement about the partial odometer: the
+differences of the translates are constant on the overlaps (the hypothesis of `family_closed_walks_zero_paper`). -/
+theorem odd_hkappa (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
     (oddO evenO : FLatticePaper.Farey.Word → PartialOdometer)
     (h : FLatticePaper.Tiles.SurgicalWeak.IsWeakStdFamily S oddO evenO) (w : FLatticePaper.Farey.Word)
     (H2X_v : ∀ z, BoundaryVertex (↑(cellTileOf (oddTile w)) : Set GInt) z →
@@ -34,10 +36,10 @@ theorem closed_walks_odd (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
       tileCovers (hStringAt (hWordOf w false) 0) z)
     (H2Y_h : ∀ z, BoundaryVertex ({t : GInt | t - (-texV2 (fracOdd w)) ∈ cellTileOf (oddTile w)} : Set GInt) z →
       tileCovers (hRevStringAt (hWordOf w false).reverse (1, -2)) z) :
-    ∃ κ : ℤ × ℤ → ℤ, ∀ (u : ℤ × ℤ)
-      (wk : (overlapGraph (dom (↑(oddTile w) : Set (ℤ × ℤ)) (texV1Odd (fracOdd w)) (texV2 (fracOdd w)))).Walk u u),
-      walkSum (offFam κ (texV1Odd (fracOdd w)) (texV2 (fracOdd w)) (0, 0)
-        ((fracOdd w).num, -(fracOdd w).den)) wk = 0 := by
+    ∃ κ : ℤ × ℤ → ℤ, ∀ (d' : ℤ × ℤ) (y : ℤ × ℤ), y ∈ (↑(oddTile w) : Set (ℤ × ℤ)) →
+      y - vP (texV1Odd (fracOdd w)) (texV2 (fracOdd w)) d' ∈ (↑(oddTile w) : Set (ℤ × ℤ)) →
+      (oddO w).val y - ((oddO w).val (y - vP (texV1Odd (fracOdd w)) (texV2 (fracOdd w)) d') +
+        dotZ (aP (0, 0) ((fracOdd w).num, -(fracOdd w).den) d') y) = κ d' := by
   obtain ⟨κv, hv⟩ := vertical_kappa S oddO evenO h w H2X_v H2Y_v
   obtain ⟨κh, hh⟩ := horizontal_kappa S oddO evenO h w H2X_h H2Y_h
   have hκ : ∀ (d' : ℤ × ℤ) (y : ℤ × ℤ), y ∈ (↑(oddTile w) : Set (ℤ × ℤ)) →
@@ -107,10 +109,28 @@ theorem closed_walks_odd (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
         have e := hh y hy hyd
         simp only [dotZ]
         linear_combination e
-  refine ⟨oddKappa κv κh (fracOdd w).num (fracOdd w).den, fun u wk => ?_⟩
+  exact ⟨oddKappa κv κh (fracOdd w).num (fracOdd w).den, hκ⟩
+
+theorem closed_walks_odd (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
+    (oddO evenO : FLatticePaper.Farey.Word → PartialOdometer)
+    (h : FLatticePaper.Tiles.SurgicalWeak.IsWeakStdFamily S oddO evenO) (w : FLatticePaper.Farey.Word)
+    (H2X_v : ∀ z, BoundaryVertex (↑(cellTileOf (oddTile w)) : Set GInt) z →
+      tileCovers (vStringAt (vWordOf w false) (lastPosOf (hStringAt (hWordOf w false) 0))) z)
+    (H2Y_v : ∀ z, BoundaryVertex ({t : GInt | t - texV1Odd (fracOdd w) ∈ cellTileOf (oddTile w)} : Set GInt) z →
+      tileCovers (vRevStringAt (vWordOf w false).reverse (texV1Odd (fracOdd w))) z)
+    (H2X_h : ∀ z, BoundaryVertex (↑(cellTileOf (oddTile w)) : Set GInt) z →
+      tileCovers (hStringAt (hWordOf w false) 0) z)
+    (H2Y_h : ∀ z, BoundaryVertex ({t : GInt | t - (-texV2 (fracOdd w)) ∈ cellTileOf (oddTile w)} : Set GInt) z →
+      tileCovers (hRevStringAt (hWordOf w false).reverse (1, -2)) z) :
+    ∃ κ : ℤ × ℤ → ℤ, ∀ (u : ℤ × ℤ)
+      (wk : (overlapGraph (dom (↑(oddTile w) : Set (ℤ × ℤ)) (texV1Odd (fracOdd w)) (texV2 (fracOdd w)))).Walk u u),
+      walkSum (offFam κ (texV1Odd (fracOdd w)) (texV2 (fracOdd w)) (0, 0)
+        ((fracOdd w).num, -(fracOdd w).den)) wk = 0 := by
+  obtain ⟨κ, hκ⟩ := odd_hkappa S oddO evenO h w H2X_v H2Y_v H2X_h H2Y_h
+  refine ⟨κ, fun u wk => ?_⟩
   refine family_closed_walks_zero_paper (↑(oddTile w) : Set (ℤ × ℤ)) (oddO w).val (fracOdd w).num
     (fracOdd w).den (texV1Odd (fracOdd w)) (texV2 (fracOdd w)) (0, 0) ((fracOdd w).num, -(fracOdd w).den)
-    (oddKappa κv κh (fracOdd w).num (fracOdd w).den) hκ (oddTile_hA1h w) (oddTile_hA1v w) (oddTile_hA2 w)
+    κ hκ (oddTile_hA1h w) (oddTile_hA1v w) (oddTile_hA2 w)
     rfl rfl (Or.inr rfl) u wk
 
 end FLatticePaper.Tiles

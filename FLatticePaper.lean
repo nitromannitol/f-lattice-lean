@@ -103,6 +103,9 @@ import FLatticePaper.Tiles.ClosedWalkVertical
 import FLatticePaper.Tiles.HorizontalAdjacency
 import FLatticePaper.Tiles.ClosedWalkHorizontal
 import FLatticePaper.Tiles.ClosedWalkOdd
+import FLatticePaper.Tiles.OddGlobalGlue
+import FLatticePaper.Tiles.EvenGlobalGlue
+import FLatticePaper.Tiles.ZeroOneH0
 import FLatticePaper.Tiles.EvenStandardInstance
 import FLatticePaper.Tiles.ClosedWalkEven
 import FLatticePaper.Tiles.BaseCaseTiling
@@ -276,6 +279,10 @@ import FLatticePaper.Plane.HarmonicConstant
 import FLatticePaper.Plane.Induction.AlternateFacts
 import FLatticePaper.Plane.GlobalOdometers
 import FLatticePaper.Plane.SurgicalGlobalOdometers
+import FLatticePaper.Plane.SurgicalGlueOdd
+import FLatticePaper.Plane.SurgicalGlueEven
+import FLatticePaper.Plane.SurgicalStandardOdometer
+import FLatticePaper.Plane.SurgicalH0
 import FLatticePaper.Plane.OddPhaseAlternate
 import FLatticePaper.Construction.BaseCaseRecurrence
 import FLatticePaper.Construction.PropBaseCases
