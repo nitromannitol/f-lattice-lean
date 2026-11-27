@@ -1089,5 +1089,11 @@ import FLatticePaper.Plane.Induction.MinusRowRemoval
 import FLatticePaper.Plane.Induction.RankFourStart
 import FLatticePaper.Plane.Induction.MinusRowOdd
 import FLatticePaper.Plane.Induction.MinusRowH
+import FLatticePaper.Plane.Induction.MinusRowPrefix
+import FLatticePaper.Plane.Induction.HChainEta
+import FLatticePaper.Plane.Induction.GenStart
+import FLatticePaper.Plane.Induction.GenH
+import FLatticePaper.Plane.Induction.PlusVIndex
+import FLatticePaper.Plane.Induction.PlusRowEndpoint
 
 /-! Root import for the corrected F-lattice paper. -/
