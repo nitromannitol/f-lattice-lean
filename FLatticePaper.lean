@@ -1145,5 +1145,15 @@ import FLatticePaper.Plane.Induction.PlusCover
 import FLatticePaper.Plane.Induction.PlusFinal
 import FLatticePaper.Plane.Induction.PassageInv
 import FLatticePaper.Plane.Induction.PlusAssembly
+import FLatticePaper.Construction.LadderRotationAlt
+import FLatticePaper.Construction.PropBaseCasesOdo
+import FLatticePaper.Construction.StaircaseRotationTile
+import FLatticePaper.Plane.Induction.FreeSelCase2
+import FLatticePaper.Plane.Induction.LeftPure
+import FLatticePaper.Plane.Induction.PlusHardRefl
+import FLatticePaper.Tiles.AltStairPseudo
+import FLatticePaper.Tiles.StackedMoreover
+import FLatticePaper.Tiles.SurgicalDict
+import FLatticePaper.Tiles.SurgicalPartial
 
 /-! Root import for the corrected F-lattice paper. -/
