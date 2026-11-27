@@ -179,7 +179,7 @@ Section 2 has no numbered statements. Section 9 is the new text of the surgical 
 | lemma:doubled-staircase-recurrent | 2755 | `Construction.BaseCaseRecurrence.doubled_staircase_recurrent` | agrees |
 | lemma:doubled-alt-staircase-recurrent | 2820 | `Construction.BaseCaseRecurrence.doubled_alt_staircase_recurrent` | agrees |
 | def:standard_tiles | 2890 | `Tiles.StandardTiles.oddTile`, `evenTile`, `oddChildB`, `evenChildB`; `Tiles.StandardBaseBridge` | agrees: the printed decompositions with the offsets of eq:offsets_w1_odd and eq:offsets_w1_even and the printed base tiles; at the words 2^j3^k it is the 2021 constructor that differs (E26) |
-| lemma:standard_boundary_word_recursion | 2972 | `Tiles.StandardTiles.rot_standard_tiles`; `Tiles.StandardBoundary` | partial: (1) agrees; (2) for the odd tile word (E27) |
+| lemma:standard_boundary_word_recursion | 2972 | `Tiles.StandardTiles.rot_standard_tiles`; `Tiles.StandardBoundary`; `Tiles.StandardAll.boundaryTilingOdd_all`, `boundaryTilingEven_all` | agrees: (1); (2) for the odd and the even child of every word, with the hypotheses of lemma:almost_square_tiling and both sums (the proof the text asserts, E27) |
 | lemma:standard_tile_properties | 3254 | `Tiles.StandardPacking`; `Tiles.StringCorners`; `Tiles.InterfaceStacked` | partial: (a), (b) and the horizontal part of (c); the vertical part of (c) open; (d) for the odd child from the boundary walk in the strings (open) and the packing (proved in the text at 0f7dde5, a named input in the Lean, `Tiles.CellRegisters`) (E29) |
 | def:partial_tile | 3375 | `Tiles.SurgicalPartial.IsPartialTile` | defined |
 | def:standard_odometer_doubling | 3435 | `Tiles.SurgicalPartial.doubledTile`; `Tiles.SurgicalDict` | defined |
