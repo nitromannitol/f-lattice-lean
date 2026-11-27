@@ -1161,6 +1161,9 @@ import FLatticePaper.Tiles.SurgicalSlopes
 import FLatticePaper.Tiles.StackedLocal
 import FLatticePaper.Tiles.HorizontalFamily
 import FLatticePaper.Tiles.HorizontalMoreoverProof
+import FLatticePaper.Tiles.RespectsLetters
+import FLatticePaper.Tiles.VerticalFamily
+import FLatticePaper.Tiles.VerticalWithin
 import FLatticePaper.Tiles.PartialBoundary
 import FLatticePaper.Construction.LadderRotationTile
 import FLatticePaper.Construction.PropBaseCasesFG
