@@ -98,7 +98,7 @@ theorem unitSquares_map_add (T : List GInt) (p : GInt) :
   have e : ∀ a : GInt, x + p + a - p = x + a := fun a => by abel
   simp only [Function.comp_apply, mem_map_add_iff, e]
 
-theorem sum_map_add_const (S : List GInt) (f : GInt → ℚ) (c : ℚ) :
+theorem chain_sum_map_add_const (S : List GInt) (f : GInt → ℚ) (c : ℚ) :
     (S.map fun x => f x + c).sum = (S.map f).sum + (S.length : ℚ) * c := by
   induction S with
   | nil => simp
@@ -144,7 +144,7 @@ theorem slopeOf_translate_affine (g : GInt → ℤ) (L : List GInt) (p a : GInt)
   have him : ((unitSquares L).map ((imTerm fun y => g (y - p) + a.1 * y.1 + a.2 * y.2 + b) ∘ (· + p))) =
       (unitSquares L).map (fun x => imTerm g x + (a.2 : ℚ)) :=
     List.map_congr_left fun x _ => imTerm_translate g p a b x
-  rw [hre, him, sum_map_add_const, sum_map_add_const]
+  rw [hre, him, chain_sum_map_add_const, chain_sum_map_add_const]
   refine Prod.ext ?_ ?_
   · simp only [Prod.fst_add]
     field_simp
