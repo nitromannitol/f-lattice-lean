@@ -1289,6 +1289,7 @@ import FLatticePaper.Tiles.SurgicalLatticeCompat
 import FLatticePaper.Tiles.SurgicalAltTiles
 import FLatticePaper.Tiles.VerticalH2
 import FLatticePaper.Tiles.AltRotBase
+import FLatticePaper.Tiles.AltRotStep
 import FLatticePaper.Tiles.BaseTileProps
 
 /-! Root import for the corrected F-lattice paper. -/
