@@ -1,7 +1,7 @@
 # Source correspondence
 
 **Target: the surgical edition.** The target is the surgical edition of `farey_recursion.tex` (the October 2023 arXiv text
-with minimal corrections, Sections 5–8), pinned at commit 571253f of its source repository; its text is not copied here.
+with minimal corrections, Sections 5–8), pinned at commit 8824170 of its source repository; its text is not copied here.
 The surgical map of Sections 1–8 (label, surgical line, Lean declaration, agreement) is the last section of this file. The
 table that follows maps the corrected edition pinned in `paper/`.
 
@@ -130,7 +130,7 @@ A separate, shorter write-up (`flattice-simple-proof`, `short-proof.tex` with it
 
 ## Surgical edition map (Sections 1–8)
 
-Lines refer to `farey_recursion.tex` at commit 571253f of the surgical edition's source repository; its text is not copied
+Lines refer to `farey_recursion.tex` at commit 8824170 of the surgical edition's source repository; its text is not copied
 here. E-numbers refer to that repository's error list (`notes/ERRORS_S5-8.md` and the section notes). Status words:
 **agrees** (the Lean statement matches the surgical statement and is proved), **conditional** (proved from named inputs),
 **partial** (some parts proved), **differs** (the Lean states another form; the surgical form is open), **defined** (the
@@ -165,7 +165,7 @@ Section 2 has no numbered statements; Section 9 is being rewritten and is not ma
 | lemma:checkerboard_recurrence | 2042 | `Endpoint.zeroEndpoint` | agrees (E17) |
 | lemma:basecase_3k_even_std | 2101 | `Construction.BaseCaseRecurrence.paperStairTile`, `paperStairValue`, `staircase_recurrent` | agrees |
 | lemma:basecase_2k_odd_std | 2200 | `Construction.NearOneBaseCases.paperNearStairTile`, `paperNearStairValue`, `near_staircase_base` | agrees |
-| lemma:basecase_3k_even_alt | 2241 | `Construction.BaseCaseRecurrence.paperStairAltTile`, `alt_staircase_recurrent`; `Tiles.AltStairPseudo` | partial: the set and the formula agree; the horizontal strings lie in the tile; the partial pseudo-square with c = (0,0) (E15) open |
+| lemma:basecase_3k_even_alt | 2241 | `Construction.BaseCaseRecurrence.paperStairAltTile`, `alt_staircase_recurrent`; `Tiles.AltStairPseudo` | agrees: the set and the formula; the partial w_h-pseudo-square anchored at c = (0,0) (E15) for every k (`Tiles.AltStairRespects.altStair_respectsPartialHAt`) |
 | lemma:basecase_2k_odd_alt | 2281 | `Construction.NearOneBaseCases.paperNearStairAltTile`, `paperNearStairAltValue` | partial: the set and the formula agree (E20); the pseudo-square at 2303 open for general d |
 | lemma:staircase_laplacian | 2334 | `Construction.BaseCaseLaplacian.staircase_laplacian`, `alt_staircase_laplacian`; `Construction.StaircaseRotationTile.staircase_laplacian_rotation`, `staircase_alt_laplacian_rotation` | agrees; the rotation identities (E18) hold on all of Z² for the translate by e₂ |
 | lemma:basecase_3k_odd_std | 2396 | `Construction.BaseCaseRecurrence.paperLadderTile`, `paperLadderValue`, `doubled_staircase_recurrent` | agrees |
@@ -184,12 +184,12 @@ Section 2 has no numbered statements; Section 9 is being rewritten and is not ma
 | def:partial_tile | 3317 | `Tiles.SurgicalPartial.IsPartialTile` | defined |
 | def:standard_odometer_doubling | 3377 | `Tiles.SurgicalPartial.doubledTile`; `Tiles.SurgicalDict` | defined |
 | def:weak_standard_odometers | 3399 | `Tiles.SurgicalOdometerStep`; `Tiles.SurgicalWeakOdometers` | defined, with the base odometers of Section 6 |
-| lemma:weak_standard_odometer_properties | 3421 | — | open |
+| lemma:weak_standard_odometer_properties | 3421 | `Tiles.SurgicalCorners`; `Tiles.SurgicalCornerThird.corner_3_family`, `corner_3_family_even`; `Tiles.SurgicalWeakOdometers` | partial: (b), in affine factors, for both children of every weak standard family; (a) and (c) stated; existence open |
 | def:alternate_tiles | 3458 | `Tiles.AlternateTiles`; `Tiles.AlternateConstructor` | differs (E30) |
-| lemma:alternate_tile_properties | 3593 | — | open (E31–E34) |
+| lemma:alternate_tile_properties | 3593 | `Tiles.SurgicalAltTileLemma`; `Tiles.SurgicalAltTiles` | partial: (3) proved as anchor facts; (1), (2) stated, open; (4), (5) open (E31–E34) |
 | def:alternate_doubled_tile | 3672 | — | open |
-| def:weak_alternate_odometers | 3688 | — | open |
-| lemma:weak_alternate_odometer_properties | 3707 | — | open (E35) |
+| def:weak_alternate_odometers | 3688 | `Tiles.SurgicalAltOdometers.IsWeakAltFamily`; `Tiles.SurgicalAltTiles` | defined |
+| lemma:weak_alternate_odometer_properties | 3707 | `Tiles.SurgicalAltOdometers.alt_respects_statement` | partial: (a) stated with the anchors of the alternate tiles (E35); existence and compatibility open |
 | def:odd_l_correction | 3741 | `Tiles.LCorrections.oddTexK`, `oddBridgeShift`, `oddLCorrection` | agrees (E36, E37) |
 | def:even_l_correction | 3797 | `Tiles.LCorrections.evenTexK`, `evenLCorrection` | agrees (E37); in case 01 the copy after an ancestor 2^j replaces the bridge (3839) |
 | lemma:l_correc_properties | 3853 | `Tiles.LCorrections` (the comparisons with the table) | open: (1)–(3) |
