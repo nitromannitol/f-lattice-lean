@@ -1158,6 +1158,9 @@ import FLatticePaper.Tiles.SurgicalPartial
 import FLatticePaper.Tiles.PartialBoundary
 import FLatticePaper.Tiles.PseudoSquareAnchored
 import FLatticePaper.Tiles.SurgicalSlopes
+import FLatticePaper.Tiles.StackedLocal
+import FLatticePaper.Tiles.HorizontalFamily
+import FLatticePaper.Tiles.HorizontalMoreoverProof
 import FLatticePaper.Construction.LadderRotationTile
 import FLatticePaper.Construction.PropBaseCasesFG
 import FLatticePaper.Plane.Induction.FreeSelSat

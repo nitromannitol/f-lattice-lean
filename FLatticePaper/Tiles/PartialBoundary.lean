@@ -45,7 +45,7 @@ def vPartialTiles (wv : BinaryWord) (c c' : GInt) : List (ZTile × GInt) :=
 
 /-- The placed tiles lie in `T` (the first clause of `def:tile_boundary_strings`; the covering clause is not part of this
 definition). -/
-def InsideTile (T : List GInt) (ts : List (ZTile × GInt)) : Prop :=
+def InsideTile (T : Set GInt) (ts : List (ZTile × GInt)) : Prop :=
   ∀ x ∈ placedSites ts, x ∈ T
 
 /-- A family of placed zero-one and enlarged one tiles with affine parameters: the `k`-th odometer is the base odometer of its
@@ -101,34 +101,106 @@ def PTFamily.Respects (o : Orientation) (rev : Bool) (F : PTFamily) : Prop :=
 def RespectsTiles (o : Orientation) (rev : Bool) (ts : List (ZTile × GInt)) (S : GInt → ℤ) : Prop :=
   ∃ F : PTFamily, F.ts = ts ∧ (∀ k < F.n, ∀ x ∈ F.dom k, S x = F.odo k x) ∧ F.Respects o rev
 
-/-- A `w_h`-pseudo-square (partial): `c(T) = c(T_{1,h}^+)`, and the subtiles `T_{h,*}` lie in `T`. -/
-def IsPartialH (T : List GInt) (wh : BinaryWord) : Prop :=
-  ∃ c c' : GInt, lowerLeftList T = some c ∧ InsideTile T (hPartialTiles wh c c')
+/-- The lexicographic order of the lower-left point: first the imaginary part, then the real part. -/
+def lowerLexLe (p q : GInt) : Prop := p.2 < q.2 ∨ (p.2 = q.2 ∧ p.1 ≤ q.1)
 
-/-- A `w_v`-pseudo-square (partial): `c(T) = c(T_{1,v}^-)`, and the subtiles `T_{*,v}` lie in `T`. -/
-def IsPartialV (T : List GInt) (wv : BinaryWord) : Prop :=
-  ∃ c c' : GInt, lowerLeftList T = some c ∧ InsideTile T (vPartialTiles wv c c')
+/-- `c` is the lower-left point of the point set `T`: it lies in `T` and is least for `lowerLexLe` among the points of `T`
+(the text's `c(T)`, line 1099). -/
+def IsLowerLeftPt (T : Set GInt) (c : GInt) : Prop :=
+  c ∈ T ∧ ∀ x ∈ T, lowerLexLe c x
+
+/-- The lexicographic minimum of two points (the step of `lowerLeftList`). -/
+def lowerLexMin (a b : GInt) : GInt := if b.2 < a.2 ∨ (b.2 = a.2 ∧ b.1 < a.1) then b else a
+
+theorem lowerLexLe_trans {p q r : GInt} (h1 : lowerLexLe p q) (h2 : lowerLexLe q r) : lowerLexLe p r := by
+  unfold lowerLexLe at *; omega
+
+theorem lowerLexMin_le_left (a b : GInt) : lowerLexLe (lowerLexMin a b) a := by
+  unfold lowerLexMin lowerLexLe; split_ifs with h <;> omega
+
+theorem lowerLexMin_le_right (a b : GInt) : lowerLexLe (lowerLexMin a b) b := by
+  unfold lowerLexMin lowerLexLe; split_ifs with h <;> omega
+
+theorem lowerLexMin_mem (a b : GInt) : lowerLexMin a b = a ∨ lowerLexMin a b = b := by
+  unfold lowerLexMin; split_ifs <;> simp
+
+theorem foldl_lowerLexMin (xs : List GInt) : ∀ a : GInt,
+    xs.foldl lowerLexMin a ∈ a :: xs ∧ ∀ x ∈ a :: xs, lowerLexLe (xs.foldl lowerLexMin a) x := by
+  induction xs with
+  | nil => intro a; simp [lowerLexLe]
+  | cons b xs ih =>
+    intro a
+    obtain ⟨hmem, hle⟩ := ih (lowerLexMin a b)
+    constructor
+    · rcases List.mem_cons.1 hmem with h | h
+      · rcases lowerLexMin_mem a b with h2 | h2
+        · exact List.mem_cons.2 (Or.inl (h.trans h2))
+        · exact List.mem_cons.2 (Or.inr (List.mem_cons.2 (Or.inl (h.trans h2))))
+      · exact List.mem_cons.2 (Or.inr (List.mem_cons.2 (Or.inr h)))
+    · intro x hx
+      rw [List.foldl_cons]
+      rcases List.mem_cons.1 hx with rfl | hx'
+      · exact lowerLexLe_trans (hle (lowerLexMin x b) List.mem_cons_self) (lowerLexMin_le_left x b)
+      · rcases List.mem_cons.1 hx' with rfl | hx''
+        · exact lowerLexLe_trans (hle (lowerLexMin a x) List.mem_cons_self) (lowerLexMin_le_right a x)
+        · exact hle x (List.mem_cons_of_mem _ hx'')
+
+/-- The bridge to the list case: the point `c` given by `lowerLeftList` of a list is the lower-left point of the point set of
+the list. -/
+theorem lowerLeftList_isLowerLeft (L : List GInt) (c : GInt) (h : lowerLeftList L = some c) :
+    IsLowerLeftPt {x | x ∈ L} c := by
+  cases L with
+  | nil => simp [lowerLeftList] at h
+  | cons x xs =>
+    have h2 : some (xs.foldl lowerLexMin x) = some c := h
+    have hc : xs.foldl lowerLexMin x = c := Option.some.inj h2
+    have key := foldl_lowerLexMin xs x
+    rw [hc] at key
+    exact ⟨by simpa using key.1, fun y hy => key.2 y (by simpa using hy)⟩
+
+/-- `T_{h,*}` lies in `T` at the anchors `c` (horizontal case): the forward string at `c` and some reversed string. -/
+def IsPartialHAt (T : Set GInt) (c : GInt) (wh : BinaryWord) : Prop :=
+  ∃ c' : GInt, InsideTile T (hPartialTiles wh c c')
+
+/-- `T_{*,v}` lies in `T` at the anchor `c = c(T_{1,v}^-)` (vertical case). -/
+def IsPartialVAt (T : Set GInt) (c : GInt) (wv : BinaryWord) : Prop :=
+  ∃ c' : GInt, InsideTile T (vPartialTiles wv c c')
+
+/-- A `w_h`-pseudo-square: the anchor is the lower-left point `c(T)` of `T` (the text's default). -/
+def IsPartialH (T : Set GInt) (wh : BinaryWord) : Prop :=
+  ∃ c : GInt, IsLowerLeftPt T c ∧ IsPartialHAt T c wh
+
+/-- A `w_v`-pseudo-square: the anchor is the lower-left point `c(T)` of `T` (the text's default). -/
+def IsPartialV (T : Set GInt) (wv : BinaryWord) : Prop :=
+  ∃ c : GInt, IsLowerLeftPt T c ∧ IsPartialVAt T c wv
 
 /-- A `w_h` or `w_v`-pseudo-square (partial). -/
-def IsPartialPseudoSquare (T : List GInt) (wh wv : BinaryWord) : Prop :=
+def IsPartialPseudoSquare (T : Set GInt) (wh wv : BinaryWord) : Prop :=
   IsPartialH T wh ∨ IsPartialV T wv
 
-/-- A partial odometer `S` on a `w_h`-pseudo-square `T`: the subtiles lie in `T` at the anchors `c = c(T)` and `c'`, the forward
-string of `w_h` and the reversed string of `rev w_h` are respected by `S`. -/
-def RespectsPartialH (T : List GInt) (wh : BinaryWord) (S : GInt → ℤ) : Prop :=
-  ∃ c c' : GInt, lowerLeftList T = some c ∧ InsideTile T (hPartialTiles wh c c') ∧
+/-- A partial odometer `S` respects the horizontal strings at the anchor `c` (the forward string at `c`, the reversed string at some
+`c'`). The exception `c(T-hat_{1/d}) = (0,0)` is this predicate at the anchor `(0,0)`. -/
+def RespectsPartialHAt (T : Set GInt) (c : GInt) (wh : BinaryWord) (S : GInt → ℤ) : Prop :=
+  ∃ c' : GInt, InsideTile T (hPartialTiles wh c c') ∧
     RespectsTiles .horizontal false (hStringAt wh c) S ∧
     RespectsTiles .horizontal true (hRevStringAt wh.reverse c') S
 
-/-- A partial odometer `S` on a `w_v`-pseudo-square `T`: the subtiles lie in `T` at the anchors `c = c(T)` and `c'`, the reversed
-string of `rev w_v` and the forward string of `w_v` are respected by `S`. -/
-def RespectsPartialV (T : List GInt) (wv : BinaryWord) (S : GInt → ℤ) : Prop :=
-  ∃ c c' : GInt, lowerLeftList T = some c ∧ InsideTile T (vPartialTiles wv c c') ∧
+/-- A partial odometer `S` respects the vertical strings at the anchor `c = c(T_{1,v}^-)`. -/
+def RespectsPartialVAt (T : Set GInt) (c : GInt) (wv : BinaryWord) (S : GInt → ℤ) : Prop :=
+  ∃ c' : GInt, InsideTile T (vPartialTiles wv c c') ∧
     RespectsTiles .vertical true (vRevStringAt wv.reverse c) S ∧
     RespectsTiles .vertical false (vStringAt wv c') S
 
+/-- The horizontal respect with the default anchor `c(T)`. -/
+def RespectsPartialH (T : Set GInt) (wh : BinaryWord) (S : GInt → ℤ) : Prop :=
+  ∃ c : GInt, IsLowerLeftPt T c ∧ RespectsPartialHAt T c wh S
+
+/-- The vertical respect with the default anchor `c(T)`. -/
+def RespectsPartialV (T : Set GInt) (wv : BinaryWord) (S : GInt → ℤ) : Prop :=
+  ∃ c : GInt, IsLowerLeftPt T c ∧ RespectsPartialVAt T c wv S
+
 /-- The partial odometer `S` on `T` respects `w_h` or `w_v`. -/
-def RespectsPartial (T : List GInt) (wh wv : BinaryWord) (S : GInt → ℤ) : Prop :=
+def RespectsPartial (T : Set GInt) (wh wv : BinaryWord) (S : GInt → ℤ) : Prop :=
   RespectsPartialH T wh S ∨ RespectsPartialV T wv S
 
 end FLatticePaper.Tiles
