@@ -1,9 +1,9 @@
 # Source correspondence
 
 **Target: the surgical edition.** The target is the surgical edition of `farey_recursion.tex` (the October 2023 arXiv text
-with minimal corrections, Sections 5–8), pinned at commit 23ad96c of its source repository; its text is not copied here.
-The surgical map of Sections 1–8 (label, surgical line, Lean declaration, agreement) is being added below. The table that
-follows maps the corrected edition pinned in `paper/`.
+with minimal corrections, Sections 5–8), pinned at commit af007b5 of its source repository; its text is not copied here.
+The surgical map of Sections 1–8 (label, surgical line, Lean declaration, agreement) is the last section of this file. The
+table that follows maps the corrected edition pinned in `paper/`.
 
 The corrected October 2023 edition is pinned by [paper.sha256](paper.sha256). The links below locate its statements and the exact sparse Julia constructor delivered with it. `sha256sum --quiet -c paper.sha256` verifies the sources locally.
 
@@ -127,3 +127,72 @@ A separate, shorter write-up (`flattice-simple-proof`, `short-proof.tex` with it
 - Finite cylinders. Proposition `prop:strip` and Lemma `lem:cutoff` give a finite recurrence certificate for an individual periodic pattern (window $N+(N-1)J$) once a periodic choice with strictly negative quotient cycles is given.
 - What it does not settle. The write-up states that an all-word proof still needs the signed choices (the signed decreasing policy) at every child, which "does not follow from the period vectors alone" and uses the corrected induction's interior estimates (Section `sec:farey`, last paragraphs). So the open local inputs of the headline theorems (the archive's premises B0-B2) are not settled by it.
 - Its all-word note records the reflection of the alternate, $H_+(C-z)=H_-(z)+L(z)-\tfrac12\nabla L\cdot\sigma$ with $L$ integer affine, which exchanges the two signed midpoints; this is a candidate explanation of the affine slope found in the odd alternate of odd phase (`alternateOddTarget`).
+
+## Surgical edition map (Sections 1–8)
+
+Lines refer to `farey_recursion.tex` at commit af007b5 of the surgical edition's source repository; its text is not copied
+here. E-numbers refer to that repository's error list (`notes/ERRORS_S5-8.md` and the section notes). Status words:
+**agrees** (the Lean statement matches the surgical statement and is proved), **conditional** (proved from named inputs),
+**partial** (some parts proved), **differs** (the Lean states another form; the surgical form is open), **defined** (the
+definitions are in place), **open** (no Lean statement yet), **cited** (an outside result, cited as in the text).
+Section 2 has no numbered statements; Section 9 is being rewritten and is not mapped.
+
+| Label | Line | Lean | Status |
+|---|---|---|---|
+| theorem:circle_packing | 90 | `MainTheorems.circlePacking_of_odometersTheorem` | conditional on the odometers theorem |
+| theorem:hyperbola | 122 | `MainTheorems.hyperbola_of_odometersTheorem` | conditional on the odometers theorem |
+| theorem:odometers | 176 | `OdometersStatement.OdometersTheorem`; `OdometerTheorem.odometersTheoremAt_base` | partial: the statement agrees; proved at the base fractions; the general slopes rest on Section 9 |
+| lattice lemma (unlabelled) | 425 | `Farey.MatrixLattice.integralLattice_eq_span` | agrees |
+| density lemma (unlabelled) | 458 | `Farey.SlopeDensity.slopeValue_dense` | agrees |
+| lemma:recursion-unique | 510 | `Farey.RecursionLemmas.recursion_unique`, `parentsAt_injective` | agrees |
+| lemma:rot_parity-laplace | 540 | `Farey.RotationLattice.rot_parity_laplace` | agrees |
+| lemma:rot_child_commute | 585 | `Farey.RecursionLemmas.rot_child_commute` | agrees |
+| lemma:rot_invariance | 605 | `Farey.RecursionLemmas.rot_invariance` | agrees |
+| lemma:lattice_rotation | 684 | `Farey.RotationLattice.lattice_rotation_odd`, `lattice_rotation_even` | agrees |
+| prop:tiling_criteria | 745 | `Tiles.TilingCriteria.tiling_criteria` | agrees |
+| lemma:almost_square_tiling | 780 | `Tiles.AlmostTilingAssembly.almost_square_tiling`; packing in `Tiles.StandardAll` | agrees; the packing clause asserted at 812–813 is proved for every standard tile |
+| lemma:almost_palindrome | 987 | `Tiles.BinaryWords.almost_palindrome_one`, `_two`, `_three` | agrees (E01) |
+| lemma:pairwise_compatibility | 1119 | `Tiles.Gluing.exists_compatible_iff_walkSum_eq_zero`, `compatible_unique` | agrees; the closed-path condition (E03) is `walkSum = 0` |
+| lemma:almost_palindrome_offset | 1163 | `Tiles.BoundaryStrings.almost_palindrome_offset` | agrees |
+| lemma:zero-one-fixed-offsets | 1357 | `Tiles.BoundaryStrings.zeroOne_fixed_offsets_horizontal`, `_vertical`; `Tiles.StackFinalAssembly` | agrees (E04) |
+| lemma:stacked_zero_one_string | 1593 | `Tiles.ZeroOneStringPositions.zeroOneFirstSentence_all`; `Tiles.SurgicalSlopes`; `Tiles.StackedMoreover.HorizontalMoreover` | partial: the first sentence is proved with the older slope table, whose horizontal signs are exchanged (E05); the surgical table is `surgicalSlopeDiff`; the second sentence (E06) is stated for horizontal strings and open |
+| def:tile_boundary_strings | 1647 | `Tiles.PseudoSquare.IsPseudoSquare`; `Tiles.PseudoSquareAnchored.IsPseudoSquareAnchored` | differs: the older predicates place the strings at fixed stacking offsets; the anchored predicate (E07) is defined |
+| boundary-word lemma (unlabelled) | 1704 | `Tiles.PseudoSquare.pseudoSquare_boundaryWord`, `pseudoSquare_halfTurn`, `pseudoSquare_quarterTurn` | partial: the identities of Table 1 are hypotheses (E10) |
+| lemma:common-extension-pseudo-square | 1731 | `Tiles.CommonExtension.common_extension_almost`, `common_extension_unique` | partial: (i) and (iii) agree; (ii) open (E12) |
+| def:partial_tile_boundary_strings | 1754 | `Tiles.PartialBoundary` | defined |
+| prop:base_cases | 1920 | `Construction.PropBaseCases.prop_base_cases_*`; `Construction.PropBaseCasesFG`; `Construction.PropBaseCasesOdo` | partial: (a)–(d) for the base families; (e), with the exception to the definition of c, open (E15); (f), (g): the tile inclusions and the first odometer equality are proved |
+| prop:recurrence | 2032 | — | cited, as in the text (E16) |
+| lemma:checkerboard_recurrence | 2042 | `Endpoint.zeroEndpoint` | agrees (E17) |
+| lemma:basecase_3k_even_std | 2101 | `Construction.BaseCaseRecurrence.paperStairTile`, `paperStairValue`, `staircase_recurrent` | agrees |
+| lemma:basecase_2k_odd_std | 2200 | `Construction.NearOneBaseCases.paperNearStairTile`, `paperNearStairValue`, `near_staircase_base` | agrees |
+| lemma:basecase_3k_even_alt | 2241 | `Construction.BaseCaseRecurrence.paperStairAltTile`, `alt_staircase_recurrent`; `Tiles.AltStairPseudo` | partial: the set and the formula agree; the horizontal strings lie in the tile; the partial pseudo-square with c = (0,0) (E15) open |
+| lemma:basecase_2k_odd_alt | 2281 | `Construction.NearOneBaseCases.paperNearStairAltTile`, `paperNearStairAltValue` | partial: the set and the formula agree (E20); the pseudo-square at 2303 open for general d |
+| lemma:staircase_laplacian | 2334 | `Construction.BaseCaseLaplacian.staircase_laplacian`, `alt_staircase_laplacian`; `Construction.StaircaseRotationTile.staircase_laplacian_rotation`, `staircase_alt_laplacian_rotation` | agrees; the rotation identities (E18) hold on all of Z² for the translate by e₂ |
+| lemma:basecase_3k_odd_std | 2396 | `Construction.BaseCaseRecurrence.paperLadderTile`, `paperLadderValue`, `doubled_staircase_recurrent` | agrees |
+| lemma:basecase_2k_even_std | 2423 | `Construction.NearOneBaseCases.paperNearLadderTile`, `paperNearLadderValue` | agrees |
+| lemma:basecase_3k_odd_alt | 2450 | `Construction.BaseCaseRecurrence.paperLadderAltValue` | partial: the sets and the formula agree; the pseudo-square at 2470 open for general d |
+| lemma:basecase_2k_even_alt | 2499 | `Construction.NearOneBaseCases.paperNearLadderAltTile`, `paperNearLadderAltValue` | partial: the sets and the formula agree (E22); the pseudo-square at 2519 open for general d |
+| lemma:doubled_staircase_laplacian | 2549 | `Construction.BaseCaseLaplacian.doubled_staircase_laplacian`, `doubled_alt_staircase_laplacian`; `Construction.LadderRotationTile.doubled_staircase_laplacian_rotation`; `Construction.LadderRotationAlt.doubled_alt_laplacian_rotation` | agrees; the rotation identities (E18) hold on all of Z², the alternate one with the extra affine term z₁ + 1 |
+| lemma:rot_recurrence_invariance | 2596 | `Plane.RecurrenceRotation.Recurrent.quarterTurn` | agrees (E23) |
+| lemma:staircase_recurrent | 2611 | `Construction.BaseCaseRecurrence.staircase_recurrent` | agrees |
+| lemma:alt-staircase-recurrent | 2677 | `Construction.BaseCaseRecurrence.alt_staircase_recurrent` | agrees |
+| lemma:doubled-staircase-recurrent | 2755 | `Construction.BaseCaseRecurrence.doubled_staircase_recurrent` | agrees |
+| lemma:doubled-alt-staircase-recurrent | 2820 | `Construction.BaseCaseRecurrence.doubled_alt_staircase_recurrent` | agrees |
+| def:standard_tiles | 2890 | `Tiles.StandardTiles.oddTile`, `evenTile` | differs: the Lean follows the 2021 constructor at the words 2^j3^k (E26) |
+| lemma:standard_boundary_word_recursion | 2972 | `Tiles.StandardTiles.rot_standard_tiles`; `Tiles.StandardBoundary` | partial: (1) agrees; (2) for the odd tile word (E27) |
+| lemma:standard_tile_properties | 3254 | `Tiles.StandardPacking`; `Tiles.StringCorners`; `Tiles.InterfaceStacked` | partial: (a), (b) and the horizontal part of (c); the vertical part of (c) and (d) open (E29) |
+| def:partial_tile | 3317 | `Tiles.SurgicalPartial.IsPartialTile` | defined |
+| def:standard_odometer_doubling | 3377 | `Tiles.SurgicalPartial.doubledTile`; `Tiles.SurgicalDict` | defined |
+| def:weak_standard_odometers | 3399 | — | open |
+| lemma:weak_standard_odometer_properties | 3421 | — | open |
+| def:alternate_tiles | 3458 | `Tiles.AlternateTiles`; `Tiles.AlternateConstructor` | differs (E30) |
+| lemma:alternate_tile_properties | 3593 | — | open (E31–E34) |
+| def:alternate_doubled_tile | 3672 | — | open |
+| def:weak_alternate_odometers | 3688 | — | open |
+| lemma:weak_alternate_odometer_properties | 3707 | — | open (E35) |
+| def:odd_l_correction | 3741 | `Tiles.LCorrections.oddTexK`, `oddBridgeShift`, `oddLCorrection` | agrees (E36, E37) |
+| def:even_l_correction | 3797 | `Tiles.LCorrections.evenTexK`, `evenLCorrection` | agrees (E37); in case 01 the copy after an ancestor 2^j replaces the bridge (3839) |
+| lemma:l_correc_properties | 3853 | `Tiles.LCorrections` (the comparisons with the table) | open: (1)–(3) |
+| definition of tile odometers (unlabelled) | 3976 | — | open (E41) |
+| lemma:l_correct_existence | 4003 | — | open (E42) |
+| lemma:tile-odometer-existence | 4026 | — | open (E43) |
