@@ -115,7 +115,8 @@ theorem mem_marked_vert_iff (u : BinaryWord) (x : GInt) :
       tileCovers (vRevStringAt u (0, 0)) x := by
   rw [covers_iff_Mv, Prod.mk_zero_zero, sub_zero]
   have hs : stringSites true true u = Mv u ((0 : GInt) + ((1 : ℤ), (1 : ℤ))) := by
-    simp [stringSites, Mv, startPos] <;> rfl
+    simp [stringSites, Mv, startPos]
+    rfl
   rw [hs, List.mem_map]
   constructor
   · rintro ⟨s, hs', hsx⟩
