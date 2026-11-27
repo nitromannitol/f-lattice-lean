@@ -181,7 +181,10 @@ def childVectors (f : Fraction) : GInt × GInt :=
 def nbrVec (v1 v2 : GInt) (k1 k2 : ℤ) : GInt :=
   (k1 * v1.1 + k2 * v2.1, k1 * v1.2 + k2 * v2.2)
 
-/-! ### Items (4) and (5): the readings are isolated in one definition each (operator's answers, 8824170) -/
+/-! ### Item (4): the reading is isolated in one definition (operator's answers, 8824170)
+
+Item (5) is stated and proved in `Tiles/AltItem5.lean` with the strings of the copies themselves (the earlier statement here took
+the stacked strings as a free parameter, which made it hold trivially). -/
 
 /-- Item (4) for one tile `T` with generators `v₁, v₂` and stacked strings `strings`, against the standard subtiles `std`: for
 each neighbour `v = k₁v₁ + k₂v₂` with `|k₁|, |k₂| ≤ 1` and `v ≠ 0`, every point of `T ∩ (T + v)` lies in the stacked strings, or
@@ -196,11 +199,6 @@ def AltItem4Reading (T : Standard.Tile) (v1 v2 : GInt) (strings : Finset GInt) (
         (x ∈ Standard.shift s (nbrVec v1 v2 k1 k2) ∧
           ∀ y ∈ Standard.shift s (nbrVec v1 v2 k1 k2), y ∈ T ∧ y ∈ Standard.shift T (nbrVec v1 v2 k1 k2))
 
-/-- Item (5) for the standard subtiles of two different parents, `P` (one parent) and `Q` (the other): two neighbouring subtiles
-(their point sets intersect) share their common points only in the stacked strings. -/
-def AltItem5Reading (strings : Finset GInt) (P Q : List Standard.Tile) : Prop :=
-  ∀ s ∈ P, ∀ t ∈ Q, (∃ z, z ∈ s ∧ z ∈ t) → ∀ z ∈ s, z ∈ t → z ∈ strings
-
 /-- Item (4) for the alternate children of the non-base words, with the stacked strings of each child as the parameter. -/
 def AltItem4 (base : Word → Standard.Tile × Standard.Tile) (strings : Word → Bool → Finset GInt) : Prop :=
   ∀ w : Word, ¬ FLatticePaper.Tiles.Standard.IsBase w →
@@ -208,12 +206,6 @@ def AltItem4 (base : Word → Standard.Tile × Standard.Tile) (strings : Word �
         (childVectors ((parentsAt w).current .odd)).2 (strings w false) (altOddPFam w ++ altOddQFam w) ∧
     AltItem4Reading (altEvenTile base w) (childVectors ((parentsAt w).current .even)).1
         (childVectors ((parentsAt w).current .even)).2 (strings w true) (altEvenPFam w ++ altEvenQFam w)
-
-/-- Item (5) for the alternate children of the non-base words. -/
-def AltItem5 (strings : Word → Bool → Finset GInt) : Prop :=
-  ∀ w : Word, ¬ FLatticePaper.Tiles.Standard.IsBase w →
-    AltItem5Reading (strings w false) (altOddPFam w) (altOddQFam w) ∧
-    AltItem5Reading (strings w true) (altEvenPFam w) (altEvenQFam w)
 
 /-- Item (1), symmetry: the tile is 180-degree symmetric as a set of cells (its lower-left vertices): for some integer `s`,
 `x ∈ T ↔ s - x ∈ T`. The reflection of a cell set through a point maps lower-left vertices by `x ↦ s - x` with `s ∈ ℤ²`
