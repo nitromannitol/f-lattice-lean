@@ -38,6 +38,25 @@ plus tile and the first minus tile differ by `horizontalStackShift`. -/
 def zoReversedStacked (ℓ : ℕ → Letter) (n : ℕ) : List (ZTile × GInt) :=
   (List.range n).map fun k => (letterZTile (ℓ k), posF .horizontal true ℓ k - horizontalStackShift)
 
+/-- The tile of a horizontal zero-one string after the letters `x` (previous) and `y` (current): `oneD` after `q q`. -/
+def hTt : Letter → Letter → ZTile
+  | .q, .q => ZTile.oneD
+  | _, y => letterZTile y
+
+/-- The letter before position `k` (with `p` before the first position). -/
+def hPrev (ℓ : ℕ → Letter) (k : ℕ) : Letter := if k = 0 then Letter.p else ℓ (k - 1)
+
+/-- The tile type of a horizontal string at position `k`. -/
+def hTileAt (ℓ : ℕ → Letter) (k : ℕ) : ZTile := hTt (hPrev ℓ k) (ℓ k)
+
+/-- The forward horizontal zero-one string with the enlarged tiles. -/
+def zoForwardE (ℓ : ℕ → Letter) (n : ℕ) : List (ZTile × GInt) :=
+  (List.range n).map fun k => (hTileAt ℓ k, posF .horizontal false ℓ k)
+
+/-- The reversed horizontal stacked string with the enlarged tiles, shifted by the stacking offset. -/
+def zoReversedStackedE (ℓ : ℕ → Letter) (n : ℕ) : List (ZTile × GInt) :=
+  (List.range n).map fun k => (hTileAt ℓ k, posF .horizontal true ℓ k - horizontalStackShift)
+
 /-- The common extension of two families: the odometers agree (offset zero) on every overlap of two domains, within a family
 and across the two families. -/
 def WithinCommon (F : PTFamily) : Prop :=
@@ -53,13 +72,14 @@ def CrossLocal (P M : PTFamily) : Prop :=
   ∀ k < P.n, ∀ j < M.n, (∃ x, x ∈ P.dom k ∧ x ∈ M.dom j) → j = k ∨ j + 1 = k
 
 /-- The horizontal half of the Moreover (for almost palindromes starting with `q` and ending with `p`): there are families
-`P` on the forward string of `w` and `M` on the reversed stacked string, each respecting its string (surgical slope table,
+`P` on the forward string of `w` and `M` on the reversed stacked string, both with the enlarged tile after each `qq`
+(`zoForwardE`, `zoReversedStackedE`), each respecting its string (surgical slope table,
 non-overlap rule), with a common extension, and with first affine factors differing by `a_{p,2} = (0, -1)`. -/
 def HorizontalMoreover (w : BinaryWord) : Prop :=
   IsAlmostPalindrome w → w.head? = some Letter.q → w.getLast? = some Letter.p →
     ∃ P M : PTFamily,
-      P.ts = zoForward (lettersOf w false) w.length ∧
-      M.ts = zoReversedStacked (lettersOf w true) w.length ∧
+      P.ts = zoForwardE (lettersOf w false) w.length ∧
+      M.ts = zoReversedStackedE (lettersOf w true) w.length ∧
       P.Respects .horizontal false ∧
       M.Respects .horizontal true ∧
       WithinCommon P ∧ WithinCommon M ∧ CrossCommon P M ∧

@@ -1169,6 +1169,9 @@ import FLatticePaper.Tiles.VerticalCross
 import FLatticePaper.Tiles.VerticalCrossLocal
 import FLatticePaper.Tiles.VerticalCrossIdent
 import FLatticePaper.Tiles.VerticalMoreoverProof
+import FLatticePaper.Tiles.FirstSentenceSurgical
+import FLatticePaper.Tiles.HorizontalEnlarged
+import FLatticePaper.Tiles.HorizontalEnlargedCross
 import FLatticePaper.Tiles.PartialBoundary
 import FLatticePaper.Construction.LadderRotationTile
 import FLatticePaper.Construction.PropBaseCasesFG

@@ -388,13 +388,4 @@ theorem HMo_cross (w : BinaryWord) (hw : IsAlmostPalindrome w) (hf : w.head? = s
     rw [hkj] at hxP ⊢
     exact HMo_cross_succ w hw hf hl j hjn x hxP hxM
 
-theorem horizontalMoreover_proof (w : BinaryWord) : HorizontalMoreover w := by
-  unfold HorizontalMoreover
-  intro hw hf hl
-  refine ⟨HP w, HM w, rfl, rfl, HP_respects w, HM_respects w, HMo_within_HP w, HMo_within_HM w,
-    HMo_cross w hw hf hl, ?_⟩
-  show (0 : GInt) - alphaH (lettersOf w true 0) = ((0 : ℤ), (-1 : ℤ))
-  rw [HMo_letter_rev_zero w hl]
-  decide
-
 end FLatticePaper.Tiles
