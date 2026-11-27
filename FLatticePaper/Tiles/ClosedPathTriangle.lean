@@ -180,4 +180,67 @@ theorem fwd_mem_sites_any (t : BinaryWord) (k : ℕ) (hk : k < (Letter.q :: t).l
   rw [hpos]
   rfl
 
+/-! ### Positions of the reversed horizontal string -/
+
+/-- The positions of a reversed horizontal string telescope: `posF + δ(u₀) = Σ_{i<k} hOffset(u_i) + δ(u_k)`. -/
+theorem rev_posF (u : BinaryWord) : ∀ k, k < u.length →
+    posF Orientation.horizontal true (fun j => u.getD j Letter.p) k + ClosedPathCorners.revShift (u.getD 0 Letter.p) =
+      ((u.take k).map hOffset).sum + ClosedPathCorners.revShift (u.getD k Letter.p)
+  | 0, _ => by simp [posF]
+  | k + 1, hk => by
+    have ih := rev_posF u k (by omega)
+    have e := ClosedPathCorners.hRevOffset_eq (u.getD k Letter.p) (u.getD (k + 1) Letter.p)
+    have ht : u.take (k + 1) = u.take k ++ [u.getD k Letter.p] := by
+      rw [List.take_add_one, List.getD_eq_getElem?_getD, List.getElem?_eq_getElem (by omega)]
+      rfl
+    simp only [posF, stepOf_hor_rev] at ih ⊢
+    rw [ht, List.map_append, List.sum_append, List.map_singleton, List.sum_singleton]
+    have i1 := congrArg Prod.fst ih
+    have i2 := congrArg Prod.snd ih
+    have e1 := congrArg Prod.fst e
+    have e2 := congrArg Prod.snd e
+    simp only [Prod.fst_add, Prod.snd_add] at i1 i2 e1 e2
+    ext
+    · simp only [Prod.fst_add]; linarith
+    · simp only [Prod.snd_add]; linarith
+
+/-- **The `k`-th tile of a reversed horizontal string**: its position is the start plus the forward steps of the first `k`
+letters, corrected by `δ`. -/
+theorem rev_tile (u : BinaryWord) (c : GInt) (k : ℕ) (hk : k < u.length) :
+    (hRevStringAt u c).getD k (ZTile.zero, 0) =
+      ((tileSeq u).getD k ZTile.zero, c + ((u.take k).map hOffset).sum +
+        ClosedPathCorners.revShift (u.getD k Letter.p) - ClosedPathCorners.revShift (u.getD 0 Letter.p)) := by
+  apply Prod.ext
+  · exact hRevStringAt_getD_fst u c k
+  · have hlen : (List.scanl (· + ·) c ((u.zip u.tail).map fun ab => hRevOffset ab.1 ab.2)).length ≤
+        (tileSeq u).length := by
+      obtain ⟨a, r, rfl⟩ := List.exists_cons_of_ne_nil (List.ne_nil_of_length_pos (by omega : 0 < u.length))
+      simp [tileSeq, tileSeqAux_length_sac]
+    have hm : (hRevStringAt u c).map Prod.snd =
+        List.scanl (· + ·) c ((u.zip u.tail).map fun ab => hRevOffset ab.1 ab.2) := by
+      unfold hRevStringAt
+      exact List.map_snd_zip hlen
+    have h2 : ((hRevStringAt u c).getD k (ZTile.zero, 0)).2 =
+        (List.scanl (· + ·) c ((u.zip u.tail).map fun ab => hRevOffset ab.1 ab.2)).getD k 0 := by
+      rw [← hm, List.getD_eq_getElem?_getD, List.getD_eq_getElem?_getD, List.getElem?_map]
+      generalize (hRevStringAt u c)[k]? = o
+      cases o <;> simp
+    rw [h2, hRev_pos_gen u c k hk]
+    have := rev_posF u k hk
+    rw [show c + posF Orientation.horizontal true (fun j => u.getD j Letter.p) k =
+      c + (posF Orientation.horizontal true (fun j => u.getD j Letter.p) k +
+        ClosedPathCorners.revShift (u.getD 0 Letter.p)) - ClosedPathCorners.revShift (u.getD 0 Letter.p) by abel, this]
+    abel
+
+/-- The letters `q` among the first `k` letters of the reversed word are those among the last `k` letters of the word. -/
+theorem count_reverse_take (wh : BinaryWord) (k : ℕ) :
+    ((wh.reverse.take k).count Letter.q : ℤ) = qPrefix wh wh.length - qPrefix wh (wh.length - k) := by
+  unfold qPrefix
+  rw [List.take_reverse, List.count_reverse, List.take_length]
+  have h := congrArg (List.count Letter.q) (List.take_append_drop (wh.length - k) wh)
+  rw [List.count_append] at h
+  rw [← h]
+  push_cast
+  ring
+
 end FLatticePaper.Tiles.ClosedPathTriangle
