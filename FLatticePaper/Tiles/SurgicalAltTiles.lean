@@ -215,9 +215,12 @@ def AltItem5 (strings : Word → Bool → Finset GInt) : Prop :=
     AltItem5Reading (strings w false) (altOddPFam w) (altOddQFam w) ∧
     AltItem5Reading (strings w true) (altEvenPFam w) (altEvenQFam w)
 
-/-- Item (1), symmetry: the alternate odd child is 180-degree symmetric about some centre. -/
+/-- Item (1), symmetry: the tile is 180-degree symmetric as a set of cells (its lower-left vertices): for some integer `s`,
+`x ∈ T ↔ s - x ∈ T`. The reflection of a cell set through a point maps lower-left vertices by `x ↦ s - x` with `s ∈ ℤ²`
+(the centre `s/2` may be a half-lattice point); a form `x ↦ 2c - x` with `c ∈ ℤ²` is false for every alternate tile
+(numerics: `p + q` for the lexicographic extremes is odd in both coordinates, words of length ≤ 4). -/
 def AltItem1Symmetric (T : Standard.Tile) : Prop :=
-  ∃ c : GInt, ∀ x : GInt, x ∈ T ↔ (2 * c.1 - x.1, 2 * c.2 - x.2) ∈ T
+  ∃ s : GInt, ∀ x : GInt, x ∈ T ↔ (s.1 - x.1, s.2 - x.2) ∈ T
 
 /-- Item (1), rotation (operator's answer 8824170: up to a translation). The rotation of the alternate tile of `w` followed by the
 translation with equal lower-left vertices is the alternate tile of the rotated word (`swapW w`, the parity exchanged). The lower-
