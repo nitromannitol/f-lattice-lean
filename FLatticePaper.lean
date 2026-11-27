@@ -98,6 +98,13 @@ import FLatticePaper.Tiles.HLinHorizontal
 import FLatticePaper.Tiles.VLinVertical
 import FLatticePaper.Tiles.VerticalIdentities
 import FLatticePaper.Tiles.StandardInstance
+import FLatticePaper.Tiles.VerticalAdjacency
+import FLatticePaper.Tiles.ClosedWalkVertical
+import FLatticePaper.Tiles.HorizontalAdjacency
+import FLatticePaper.Tiles.ClosedWalkHorizontal
+import FLatticePaper.Tiles.ClosedWalkOdd
+import FLatticePaper.Tiles.EvenStandardInstance
+import FLatticePaper.Tiles.ClosedWalkEven
 import FLatticePaper.Tiles.BaseCaseTiling
 import FLatticePaper.Tiles.BaseCaseAlmostTiling
 import FLatticePaper.Tiles.BaseCaseDecided
@@ -268,6 +275,7 @@ import FLatticePaper.Plane.Induction.I3CSheet
 import FLatticePaper.Plane.HarmonicConstant
 import FLatticePaper.Plane.Induction.AlternateFacts
 import FLatticePaper.Plane.GlobalOdometers
+import FLatticePaper.Plane.SurgicalGlobalOdometers
 import FLatticePaper.Plane.OddPhaseAlternate
 import FLatticePaper.Construction.BaseCaseRecurrence
 import FLatticePaper.Construction.PropBaseCases

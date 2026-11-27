@@ -46,7 +46,11 @@ theorem hlin_standard_horizontal (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
       (∀ k < FA.n, ∀ x ∈ FA.dom k, (oddO w).val x = FA.odo k x) ∧
       (∀ k < FB.n, ∀ x ∈ FB.dom k, (oddO w).val (x - v) + a.1 * x.1 + a.2 * x.2 = FB.odo k x) ∧
       P.ts = FA.ts ∧ M.ts = FB.ts ∧
+      FA.ts = hStringAt (hWordOf w false) 0 ∧ P.ts = hStringAt (hWordOf w false) (0, 0) ∧
+      M.ts = hRevStringAt (hWordOf w false).reverse (1, -2) ∧
       FA.Respects Orientation.horizontal false ∧ FB.Respects Orientation.horizontal true ∧
+      P.Respects Orientation.horizontal false ∧ M.Respects Orientation.horizontal true ∧
+      WithinCommon P ∧ WithinCommon M ∧ CrossCommon P M ∧
       P.a 0 - M.a 0 = (0, -1) ∧
       (∀ (α γ : GInt) (β δ : ℤ),
         (∀ k < P.n, ∀ x : GInt, FA.odo k x = P.odo k x + α.1 * x.1 + α.2 * x.2 + β) →
@@ -83,7 +87,7 @@ theorem hlin_standard_horizontal (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
     rw [h1, hcnt.1, hcnt.2]
     ring
   -- the horizontal Moreover pair
-  obtain ⟨P, M, hPts, hMts, hPR, hMR, -, -, -, hPa⟩ :=
+  obtain ⟨P, M, hPts, hMts, hPR, hMR, hWP, hWM, hCr, hPa⟩ :=
     horizontalMoreover_proof (hWordOf w false) (standard_hWord_almostPalindrome w) hhead hlast
   -- the translate `FB` of `G` by `v`, with the affine factor `a`
   obtain ⟨FB, hFB⟩ : ∃ F : PTFamily, F = (G.translate v).affineAdd a 0 := ⟨_, rfl⟩
@@ -131,11 +135,32 @@ theorem hlin_standard_horizontal (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
       tileAffine (oddO w).val (cornerTiles (hWordOf w false) (vWordOf w false) 0).2.1 =
       ((num : ℚ) - 1, 1 - (den : ℚ)) := by
     rw [corner_3_family S oddO evenO h w, hnum, hden]
-  refine ⟨v, a, FA, P, M, FB, (by rw [hv, hnum, hden]), (by rw [ha, hnum, hden]), hFAodo, hFB', htsP, htsM, hFAR, hFBR, hPa, ?_⟩
+  have hPts0 : P.ts = hStringAt (hWordOf w false) (0, 0) := by
+    rw [hPts]
+    exact zoForwardE_eq_hStringAt _
+  have hMts0 : M.ts = hRevStringAt (hWordOf w false).reverse (1, -2) := by
+    rw [hMts]
+    exact zoReversedStackedE_eq _
+  refine ⟨v, a, FA, P, M, FB, (by rw [hv, hnum, hden]), (by rw [ha, hnum, hden]), hFAodo, hFB', htsP, htsM,
+    hFAts, hPts0, hMts0, hFAR, hFBR, hPR, hMR, hWP, hWM, hCr, hPa, ?_⟩
   intro α γ β δ hα hγ
   exact hlin_horizontal (oddO w).val (hWordOf w false) (vWordOf w false) num den v a hhead hlast hvh hvl
     (by rw [hq]) (by rw [hlenZ]) (by rw [hv]) (by rw [ha]) FA P M FB hFAodo hFB' hPts htsP htsM hMts
     hFAR hFBR hPa hC3 α γ β δ hα hγ
+
+/-- Translating two families by the same vector keeps their cross-common agreement. -/
+theorem crossCommon_translate (P M : PTFamily) (s : GInt) (h : CrossCommon P M) :
+    CrossCommon (P.translate s) (M.translate s) := by
+  intro k hk j hj x hxP hxM
+  rw [PTFamily.translate_n] at hk hj
+  rw [PTFamily.translate_dom P s k hk] at hxP
+  rw [PTFamily.translate_dom M s j hj] at hxM
+  obtain ⟨x', hx'P, rfl⟩ := List.mem_map.1 hxP
+  obtain ⟨y, hyM, hy⟩ := List.mem_map.1 hxM
+  have hyx : y = x' := add_right_cancel hy
+  subst hyx
+  rw [PTFamily.translate_odo P s k hk, PTFamily.translate_odo M s j hj, add_sub_cancel_right]
+  exact h k hk j hj y hx'P hyM
 
 /-- The vertical instance for the standard tile: the right side `vStringAt` of the standard tile and the left side of its
 translate by `v = almostV1 (oddBottom w)`, both carried by the vertical Moreover families translated by `B`. -/
@@ -146,13 +171,18 @@ theorem vlin_standard_vertical (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
       (∀ k < FA.n, ∀ x ∈ FA.dom k, (oddO w).val x = FA.odo k x) ∧
       (∀ k < FB.n, ∀ x ∈ FB.dom k, (oddO w).val (x - almostV₁ (oddBottom w)) = FB.odo k x) ∧
       P.ts = FA.ts ∧ M.ts = FB.ts ∧ P.a 0 = M.a 0 ∧
+      FA.ts = vStringAt (vWordOf w false) (lastPosOf (hStringAt (hWordOf w false) 0)) ∧
+      FB.ts = vRevStringAt (vWordOf w false).reverse (almostV₁ (oddBottom w)) ∧
+      FA.Respects Orientation.vertical false ∧ P.Respects Orientation.vertical false ∧
+      FB.Respects Orientation.vertical true ∧ M.Respects Orientation.vertical true ∧
+      WithinCommon P ∧ WithinCommon M ∧ CrossCommon P M ∧
       (∀ (α γ : GInt) (β δ : ℤ),
         (∀ k < P.n, ∀ x : GInt, FA.odo k x = P.odo k x + α.1 * x.1 + α.2 * x.2 + β) →
         (∀ j < M.n, ∀ x : GInt, FB.odo j x = M.odo j x + γ.1 * x.1 + γ.2 * x.2 + δ) →
         α = γ) := by
   obtain ⟨-, hA, -, hVr, hVf⟩ := (h w).2.2.2.2.1
-  obtain ⟨FA, hFAts, hFA, -⟩ := hVf
-  obtain ⟨G, hGts, hGS, -⟩ := hVr
+  obtain ⟨FA, hFAts, hFA, hFAR⟩ := hVf
+  obtain ⟨G, hGts, hGS, hGR⟩ := hVr
   have hvw : vWordOf w false = vertWord w := rfl
   have hvh : (vWordOf w false).head? = some Letter.p := by
     rw [hvw]
@@ -162,7 +192,7 @@ theorem vlin_standard_vertical (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
     exact (StringCorners.vertWord_head_last w).2
   have hhead : (hWordOf w false).head? = some Letter.q := (hWordOf_head_last w false).1
   have hlast : (hWordOf w false).getLast? = some Letter.p := (hWordOf_head_last w false).2
-  obtain ⟨P0, M0, hP0ts, hM0ts, -, -, -, -, -, hPM0⟩ :=
+  obtain ⟨P0, M0, hP0ts, hM0ts, hP0R, hM0R, hW0P, hW0M, hC0, hPM0⟩ :=
     verticalMoreover_proof (vWordOf w false) (standard_vWord_almostPalindrome w) hvh hvl
   obtain ⟨B, hB⟩ : ∃ B : GInt, B = lastPosOf (hStringAt (hWordOf w false) 0) := ⟨_, rfl⟩
   obtain ⟨v, hv⟩ : ∃ v : GInt, v = almostV₁ (oddBottom w) := ⟨_, rfl⟩
@@ -209,7 +239,13 @@ theorem vlin_standard_vertical (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
   have hBv' : lastPosOf (hStringAt (hWordOf w false) 0) = v + (-1, -1) := by
     rw [← hB]
     exact hBv
-  refine ⟨FA, P, M, FB, hFA, (by rw [← hv]; exact hFB'), htsP, htsM, hPM, ?_⟩
+  refine ⟨FA, P, M, FB, hFA, (by rw [← hv]; exact hFB'), htsP, htsM, hPM, hFAts, (by rw [hFBts, hv]), hFAR,
+    (by rw [hP]; exact PTFamily.translate_respects _ _ _ _ hP0R),
+    (by rw [hFB]; exact PTFamily.translate_respects _ _ _ _ hGR),
+    (by rw [hM]; exact PTFamily.translate_respects _ _ _ _ hM0R),
+    (by rw [hP]; exact PTFamily.translate_within _ _ hW0P),
+    (by rw [hM]; exact PTFamily.translate_within _ _ hW0M),
+    (by rw [hP, hM]; exact crossCommon_translate P0 M0 B hC0), ?_⟩
   intro α γ β δ hα hγ
   exact vlin_vertical (oddO w).val (hWordOf w false) (vWordOf w false) v hhead hlast hvh hvl hBv' hA
     FA P M FB hFA hFB' hFAts htsP htsM hFBts hPM α γ β δ hα hγ
