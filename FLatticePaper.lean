@@ -93,6 +93,11 @@ import FLatticePaper.Tiles.PTUniqueness
 import FLatticePaper.Tiles.TileListBridge
 import FLatticePaper.Tiles.HKappaAssembly
 import FLatticePaper.Tiles.CornerAlpha
+import FLatticePaper.Tiles.ReversedTopShift
+import FLatticePaper.Tiles.HLinHorizontal
+import FLatticePaper.Tiles.VLinVertical
+import FLatticePaper.Tiles.VerticalIdentities
+import FLatticePaper.Tiles.StandardInstance
 import FLatticePaper.Tiles.BaseCaseTiling
 import FLatticePaper.Tiles.BaseCaseAlmostTiling
 import FLatticePaper.Tiles.BaseCaseDecided
