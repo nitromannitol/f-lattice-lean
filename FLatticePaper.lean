@@ -1303,6 +1303,7 @@ import FLatticePaper.Tiles.AltRotBase
 import FLatticePaper.Tiles.AltRotStep
 import FLatticePaper.Tiles.AltPieces
 import FLatticePaper.Tiles.AltItem5
+import FLatticePaper.Tiles.JointRot
 import FLatticePaper.Tiles.BaseTileProps
 
 /-! Root import for the corrected F-lattice paper. -/
