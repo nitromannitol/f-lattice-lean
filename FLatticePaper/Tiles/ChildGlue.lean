@@ -1,4 +1,4 @@
-import FLatticePaper.Tiles.MixedPiecesInMarks
+import FLatticePaper.Tiles.MixedPieces
 
 /-! The existence step of `lemma:tile-odometer-existence` (Step 1, the common extension), as a reduction, with full copies.
 
@@ -38,7 +38,7 @@ theorem glue_full (n : ℕ) (D M : ℕ → Set (ℤ × ℤ)) (flag : ℕ → Boo
 
 open FLatticePaper.Farey FLatticePaper.Construction FLatticePaper.Tiles FLatticePaper.Tiles.Standard
 open FLatticePaper.Tiles.SiteStrings FLatticePaper.Tiles.SiteInduction
-open FLatticePaper.Tiles.MixedPiecesInMarks
+open FLatticePaper.Tiles.MixedPieces
 
 /-- Piece `i` of a child: a copy of `T1` at the `i`-th offset of `P` when `i < P.length`, otherwise a copy of `T2` at an
 offset of `Q`. -/

@@ -77,7 +77,7 @@ def PTFamily.SeamClause (o : Orientation) (rev : Bool) (F G : PTFamily) : Prop :
 
 /-- **The concatenation respects the string** when both blocks respect it and the seam clause holds. -/
 theorem PTFamily.append_respects (F G : PTFamily) (o : Orientation) (rev : Bool)
-    (hF : F.Respects o rev) (hG : G.Respects o rev) (hF0 : 0 < F.n) (hG0 : 0 < G.n)
+    (hF : F.Respects o rev) (hG : G.Respects o rev) (hF0 : 0 < F.n) (_hG0 : 0 < G.n)
     (hseam : PTFamily.SeamClause o rev F G) : (F.append G).Respects o rev := by
   intro k hk
   rw [PTFamily.append_n] at hk

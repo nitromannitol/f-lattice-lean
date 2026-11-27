@@ -16,14 +16,14 @@ existence step deletes them first (`lemma:tile-odometer-existence`, Step 1). The
 worker notes: all 3772 mixed pairs of words of length at most 5 satisfy it, and the stronger claim with the inner boundary
 of both copies fails (an overlap site can be interior to one copy). -/
 
-namespace FLatticePaper.Tiles.MixedPiecesInMarks
+namespace FLatticePaper.Tiles.MixedPieces
 
 open FLatticePaper.Farey FLatticePaper.Construction FLatticePaper.Tiles FLatticePaper.Tiles.Standard
 open FLatticePaper.Tiles.SiteStrings FLatticePaper.Tiles.SiteInduction
 
 /-- Offsets of the copies of the odd register `T1` (parent `p`) in the odd child: `oddChildB`, first argument `flag`
 (the phase of the word is odd). In the first case the copies are `T1` and `T1` shifted by `2 v_{q,1} + v_{q,2}`. -/
-def pOffsetsOdd (flag : Bool) (p q : Fraction) : List (ℤ × ℤ) :=
+def pOffsetsOdd (flag : Bool) (_p q : Fraction) : List (ℤ × ℤ) :=
   if flag then [0, texV1Even q + texV1Even q + texV2 q]
   else [texV1Even q + texV1Even q, texV2 q]
 
@@ -38,7 +38,7 @@ def pOffsetsEven (flag : Bool) (p q : Fraction) : List (ℤ × ℤ) :=
   else [texV1Even q, texV1Even q + texV2 p, texV2 q, texV2 q + texV2 p]
 
 /-- Offsets of the copies of the even register `T2` (parent `q`) in the even child, following `evenChildB`. -/
-def qOffsetsEven (flag : Bool) (p q : Fraction) : List (ℤ × ℤ) :=
+def qOffsetsEven (flag : Bool) (p _q : Fraction) : List (ℤ × ℤ) :=
   if flag then [texV1Odd p, texV2 p + texV2 p]
   else [0, texV1Odd p + (texV2 p + texV2 p)]
 
@@ -70,4 +70,4 @@ def MixedPiecesInMarks (w : Word) : Prop :=
 def MixedPiecesInMarksAll : Prop :=
   ∀ w : Word, ¬ IsBase w → MixedPiecesInMarks w
 
-end FLatticePaper.Tiles.MixedPiecesInMarks
+end FLatticePaper.Tiles.MixedPieces

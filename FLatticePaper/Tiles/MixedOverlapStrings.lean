@@ -22,7 +22,7 @@ namespace FLatticePaper.Tiles.MixedOverlapStrings
 
 open FLatticePaper.Farey FLatticePaper.Construction FLatticePaper.Tiles FLatticePaper.Tiles.Standard
 open FLatticePaper.Tiles.SiteStrings FLatticePaper.Tiles.SiteInduction
-open FLatticePaper.Tiles.MixedPiecesInMarks FLatticePaper.Tiles.ChildGlue FLatticePaper.Tiles.MarksIn
+open FLatticePaper.Tiles.MixedPieces FLatticePaper.Tiles.ChildGlue FLatticePaper.Tiles.MarksIn
 
 /-- The four marked strings of a tile as lists, in the order of `markedSites` (index 0 `Sh`, 1 `Sv`, 2 `Sh` half-turned,
 3 `Sv` half-turned). -/

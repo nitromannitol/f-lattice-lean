@@ -54,9 +54,9 @@ theorem seam_identity (o : Orientation) (rev : Bool) (tX tY : ZTile) (aX aY κ :
   have e2 : ((aY.2 : ℤ) : ℚ) - ((aX.2 : ℤ) : ℚ) = ((κ.2 : ℤ) : ℚ) := by exact_mod_cast h2
   unfold seamLHS
   apply Prod.ext
-  · simp only [Prod.fst_add, Prod.fst_sub, Prod.snd_add, Prod.snd_sub]
+  · simp only [Prod.fst_add, Prod.fst_sub]
     linarith
-  · simp only [Prod.fst_add, Prod.fst_sub, Prod.snd_add, Prod.snd_sub]
+  · simp only [Prod.snd_add, Prod.snd_sub]
     linarith
 
 /-! ### The 24 junctions. `pa n d c1 c2` is `pairAffine n d c1 c2`, the placement factor `c1 a_{·,1} + c2 a_{·,2}`. -/
@@ -68,7 +68,7 @@ theorem seam_odd_T_wh_1 :
     seamLHS .zero .one (cornerAff .B np dp) (cornerAff .A nq dq) =
       surgicalSlopeDiff .horizontal false (zTileLetter .zero) (zTileLetter .one) := by
   apply seam_identity .horizontal false .zero .one _ _ (0, 0)
-  · simp only [cornerAff, pairAffine, offsetA, Prod.fst_add, Prod.snd_add]
+  · simp only [cornerAff]
     constructor <;> ring
   · norm_num [surgicalSlopeDiff, zTileLetter, zTileBaseSlope_zero, zTileBaseSlope_one]
 
@@ -113,7 +113,7 @@ theorem seam_odd_T_wh_2 :
     seamLHS .zero .one (cornerAff .B nq dq) (cornerAff .A nq dq) =
       surgicalSlopeDiff .horizontal false (zTileLetter .zero) (zTileLetter .one) := by
   apply seam_identity .horizontal false .zero .one _ _ (0, 0)
-  · simp only [cornerAff, pairAffine, offsetA, Prod.fst_add, Prod.snd_add]
+  · simp only [cornerAff]
     constructor <;> ring
   · norm_num [surgicalSlopeDiff, zTileLetter, zTileBaseSlope_zero, zTileBaseSlope_one]
 
