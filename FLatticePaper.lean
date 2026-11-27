@@ -452,6 +452,10 @@ import FLatticePaper.Tiles.VerticalRevBridge
 import FLatticePaper.Tiles.VertexEdge
 import FLatticePaper.Tiles.H2OddMarks
 import FLatticePaper.Tiles.OverlapSides
+import FLatticePaper.Tiles.CellExtremes
+import FLatticePaper.Tiles.H3Data
+import FLatticePaper.Tiles.H3Bounds
+import FLatticePaper.Tiles.H3Pairs
 import FLatticePaper.Tiles.VerticalZeroOne
 import FLatticePaper.Tiles.VerticalReflect
 import FLatticePaper.Tiles.StandardPseudoSquare
