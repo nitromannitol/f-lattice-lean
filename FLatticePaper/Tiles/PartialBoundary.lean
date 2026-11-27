@@ -115,20 +115,20 @@ def IsPartialPseudoSquare (T : List GInt) (wh wv : BinaryWord) : Prop :=
 
 /-- A partial odometer `S` on a `w_h`-pseudo-square `T`: the subtiles lie in `T` at the anchors `c = c(T)` and `c'`, the forward
 string of `w_h` and the reversed string of `rev w_h` are respected by `S`. -/
-def PartialOdometerH (T : List GInt) (wh : BinaryWord) (S : GInt → ℤ) : Prop :=
+def RespectsPartialH (T : List GInt) (wh : BinaryWord) (S : GInt → ℤ) : Prop :=
   ∃ c c' : GInt, lowerLeftList T = some c ∧ InsideTile T (hPartialTiles wh c c') ∧
     RespectsTiles .horizontal false (hStringAt wh c) S ∧
     RespectsTiles .horizontal true (hRevStringAt wh.reverse c') S
 
 /-- A partial odometer `S` on a `w_v`-pseudo-square `T`: the subtiles lie in `T` at the anchors `c = c(T)` and `c'`, the reversed
 string of `rev w_v` and the forward string of `w_v` are respected by `S`. -/
-def PartialOdometerV (T : List GInt) (wv : BinaryWord) (S : GInt → ℤ) : Prop :=
+def RespectsPartialV (T : List GInt) (wv : BinaryWord) (S : GInt → ℤ) : Prop :=
   ∃ c c' : GInt, lowerLeftList T = some c ∧ InsideTile T (vPartialTiles wv c c') ∧
     RespectsTiles .vertical true (vRevStringAt wv.reverse c) S ∧
     RespectsTiles .vertical false (vStringAt wv c') S
 
 /-- The partial odometer `S` on `T` respects `w_h` or `w_v`. -/
-def PartialOdometer (T : List GInt) (wh wv : BinaryWord) (S : GInt → ℤ) : Prop :=
-  PartialOdometerH T wh S ∨ PartialOdometerV T wv S
+def RespectsPartial (T : List GInt) (wh wv : BinaryWord) (S : GInt → ℤ) : Prop :=
+  RespectsPartialH T wh S ∨ RespectsPartialV T wv S
 
 end FLatticePaper.Tiles
