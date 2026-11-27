@@ -1095,5 +1095,11 @@ import FLatticePaper.Plane.Induction.GenStart
 import FLatticePaper.Plane.Induction.GenH
 import FLatticePaper.Plane.Induction.PlusVIndex
 import FLatticePaper.Plane.Induction.PlusRowEndpoint
+import FLatticePaper.Plane.Induction.PlusVm1
+import FLatticePaper.Plane.Induction.PlusRowWiring
+import FLatticePaper.Plane.Induction.PlusRowH
+import FLatticePaper.Plane.Induction.PlusRowPrefix
+import FLatticePaper.Plane.Induction.PlusRowAssembly
+import FLatticePaper.Plane.Induction.WordDischarge
 
 /-! Root import for the corrected F-lattice paper. -/

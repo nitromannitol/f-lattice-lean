@@ -151,7 +151,7 @@ theorem H_entry_gen (frame : ChildFrame) (F : Field) (η : ℤ) (hη : η = 1 �
     (hKs : frame.child.den + 2 * frame.child.num - 1 ≤ frame.child.num * (K : ℤ))
     (hKu : frame.child.num * (K : ℤ) ≤ frame.child.den + 3 * frame.child.num - 2)
     (B : ℤ)
-    (hcap : ∀ p q : ℤ, frame.child.num * p - frame.child.den * q = 2 - frame.child.num →
+    (hcap : ∃ p q : ℤ, frame.child.num * p - frame.child.den * q = 2 - frame.child.num ∧
       ∀ k : ℕ, k ≤ K → FLatticePaper.QuadraticCap.capMin k ≤ F (p + (k : ℤ), q + (k : ℤ)))
     {S : Set Site} (hS : IsRestrictedFort F (permitsQ1 frame F η) S)
     (hK : ∀ z ∈ S, frame.cutPrice ≤ frame.price F z + frame.roundedSlip F η z)
@@ -161,7 +161,8 @@ theorem H_entry_gen (frame : ChildFrame) (F : Field) (η : ℤ) (hη : η = 1 �
       E (HChain.hpath frame k - RowAt.Uvec frame))
     (hEV : ∀ k : ℕ, (k : ℤ) < frame.child.den + frame.child.num → 1 ≤ (k : ℤ) → (k : ℤ) ≤ B →
       E (VChain.vpath frame k))
-    (hVidx : ∀ x i : Site, frame.openRect x → CapRay.ConeRoot (HChain.hpath frame m) K x → EvenSite x →
+    (hVidx : ¬ EvenSite (HChain.hpath frame m) → ∀ x i : Site, frame.openRect x →
+      CapRay.ConeRoot (HChain.hpath frame m) K x → EvenSite x →
       i = incomingPos x → i ∈ frame.closedPolygon → ¬ frame.openRect i →
       1 ≤ x.2 - frame.child.num ∧ x.2 - frame.child.num ≤ B)
     (hIH : ∀ x, E x → x ∉ S) :
@@ -179,18 +180,14 @@ theorem H_entry_gen (frame : ChildFrame) (F : Field) (η : ℤ) (hη : η = 1 �
         (refuted_even_H_diag_eta frame F η hP hper hnd hZ2 hm1 hm2 hev hfree hE_next)
   · have hfree : ((HChain.hpath frame m).1 + 1, (HChain.hpath frame m).2) ∈ frame.freeH :=
       EasyHRankDiag.east_freeH_of_odd frame hzfree hev (by omega) hzd
-    have hcop : IsCoprime frame.child.num frame.child.den := frame.child_reduced
     rcases hP.binary (HChain.hpath frame m + ((1 : ℤ), (1 : ℤ))) with hb | hw
-    · obtain ⟨u, v, huv⟩ := hcop
-      have hs : frame.child.num * ((2 - frame.child.num) * u) -
-          frame.child.den * (-((2 - frame.child.num) * v)) = 2 - frame.child.num := by
-        linear_combination (2 - frame.child.num) * huv
+    · obtain ⟨p, q, hs, hcq⟩ := hcap
       have hrank4 := rank4_chain_gen frame F η hP hm1 hm2 hzfree hev hfree hb hE_next
       have hstart : ∀ x : Site, x = RowAt.hAt frame ((m : ℤ) - frame.child.den) + ((1 : ℤ), (2 : ℤ)) → x ∉ S := by
         rintro x rfl
         exact rank4_start_gen frame F η hP hsig hZ3 hn1 hnd hm1 hm2 hzfree hev hb hK3 hKs hKu hs
-          (hcap _ _ hs) hS {x | E x} (fun e he => hIH e he) B
-          (fun k h1 h2 => hEH k h1 h2) hEV hVidx
+          hcq hS {x | E x} (fun e he => hIH e he) B
+          (fun k h1 h2 => hEH k h1 h2) hEV (hVidx hev)
       exact RefuteTree.refuted_not_mem frame F hη hS hK hIH hstart _ hrank4
     · exact RefuteTree.refuted_not_mem frame F hη hS hK (C := fun _ => False) hIH (fun x hx => False.elim hx) _
         (refuted_odd_H_white_q_eta frame F η hP hper hnd hm1 hm2 hev hw hE_next)

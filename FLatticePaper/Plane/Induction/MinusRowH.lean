@@ -29,7 +29,7 @@ theorem H_entry_not_mem (frame : ChildFrame) (F : Field) (hP : frame.Packet F)
     (hNo : 1 ≤ frame.parents.odd.num) (hr0 : 0 ≤ frame.parents.odd.den + frame.parents.odd.num)
     (hcap : ∀ (K : ℕ), 3 ≤ K → frame.child.den + 2 * frame.child.num - 1 ≤ frame.child.num * (K : ℤ) →
       frame.child.num * (K : ℤ) ≤ frame.child.den + 3 * frame.child.num - 2 →
-      ∀ p q : ℤ, frame.child.num * p - frame.child.den * q = 2 - frame.child.num →
+      ∃ p q : ℤ, frame.child.num * p - frame.child.den * q = 2 - frame.child.num ∧
         ∀ k : ℕ, k ≤ K → FLatticePaper.QuadraticCap.capMin k ≤ F (p + (k : ℤ), q + (k : ℤ)))
     {S : Set Site} (hS : IsRestrictedFort F (permitsQ1 frame F (-1)) S)
     (hK : ∀ z ∈ S, frame.cutPrice ≤ frame.price F z + frame.roundedSlip F (-1) z)
@@ -57,18 +57,14 @@ theorem H_entry_not_mem (frame : ChildFrame) (F : Field) (hP : frame.Packet F)
         (minus_refuted_even_diag frame F hP hper r hnd hZ2 hm1 hm2 hev hdiag)
   · have hfree : ((HChain.hpath frame m).1 + 1, (HChain.hpath frame m).2) ∈ frame.freeH :=
       EasyHRankDiag.east_freeH_of_odd frame hzfree hev (by omega) hzd
-    have hcop : IsCoprime frame.child.num frame.child.den := frame.child_reduced
     rcases hP.binary (HChain.hpath frame m + ((1 : ℤ), (1 : ℤ))) with hb | hw
     · obtain ⟨K, hK3, hKs, hKu⟩ := exists_minimal_K frame.child.num frame.child.den hn1 hnd
-      obtain ⟨u, v, huv⟩ := hcop
-      have hs : frame.child.num * ((2 - frame.child.num) * u) -
-          frame.child.den * (-((2 - frame.child.num) * v)) = 2 - frame.child.num := by
-        linear_combination (2 - frame.child.num) * huv
+      obtain ⟨p, q, hs, hcq⟩ := hcap K hK3 hKs hKu
       have hrank4 := refuted_rank4_chain frame F hP r hm1 hm2 hzfree hev hfree hb
       have hstart : ∀ x : Site, x = RowAt.hAt frame ((m : ℤ) - frame.child.den) + ((1 : ℤ), (2 : ℤ)) → x ∉ S := by
         rintro x rfl
         exact rank4_start_not_mem frame F hP hsig hZ3 hn1 hnd hNo hr0 hm1 hm2 hzfree hev hb hK3 hKs hKu hs
-          (hcap K hK3 hKs hKu _ _ hs) hS hIH
+          hcq hS hIH
       exact hnot (fun x => x = RowAt.hAt frame ((m : ℤ) - frame.child.den) + ((1 : ℤ), (2 : ℤ))) hstart hrank4
     · exact hnot (fun _ => False) (fun x hx => hx.elim)
         (MinusRowOdd.refuted_odd_H_white_q frame F hP hper hnd hm1 hm2 hev hw (hAt_mem_earlier frame r m hm2))
@@ -92,7 +88,7 @@ theorem minus_H_block_removed (frame : ChildFrame) (F : Field) (hP : frame.Packe
     (hNo : 1 ≤ frame.parents.odd.num) (hr0 : 0 ≤ frame.parents.odd.den + frame.parents.odd.num)
     (hcap : ∀ (K : ℕ), 3 ≤ K → frame.child.den + 2 * frame.child.num - 1 ≤ frame.child.num * (K : ℤ) →
       frame.child.num * (K : ℤ) ≤ frame.child.den + 3 * frame.child.num - 2 →
-      ∀ p q : ℤ, frame.child.num * p - frame.child.den * q = 2 - frame.child.num →
+      ∃ p q : ℤ, frame.child.num * p - frame.child.den * q = 2 - frame.child.num ∧
         ∀ k : ℕ, k ≤ K → FLatticePaper.QuadraticCap.capMin k ≤ F (p + (k : ℤ), q + (k : ℤ)))
     {S : Set Site} (hS : IsRestrictedFort F (permitsQ1 frame F (-1)) S)
     (hK : ∀ z ∈ S, frame.cutPrice ≤ frame.price F z + frame.roundedSlip F (-1) z)

@@ -139,7 +139,7 @@ theorem minus_row_up_to_H_removed (frame : ChildFrame) (F : Field) (hP : frame.P
     (hrL2 : frame.parents.odd.den + frame.parents.odd.num ≤ frame.child.den + frame.child.num - 2)
     (hcap : ∀ (K : ℕ), 3 ≤ K → frame.child.den + 2 * frame.child.num - 1 ≤ frame.child.num * (K : ℤ) →
       frame.child.num * (K : ℤ) ≤ frame.child.den + 3 * frame.child.num - 2 →
-      ∀ p q : ℤ, frame.child.num * p - frame.child.den * q = 2 - frame.child.num →
+      ∃ p q : ℤ, frame.child.num * p - frame.child.den * q = 2 - frame.child.num ∧
         ∀ k : ℕ, k ≤ K → FLatticePaper.QuadraticCap.capMin k ≤ F (p + (k : ℤ), q + (k : ℤ)))
     (hpat : ∀ k : ℕ, (k : ℤ) < frame.child.den + frame.child.num →
       frame.roundedSlip F (-1) (VChain.vpath frame k) =
