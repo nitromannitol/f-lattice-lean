@@ -1282,5 +1282,6 @@ import FLatticePaper.Tiles.SurgicalMoreoverDischarge
 import FLatticePaper.Tiles.SurgicalLatticeCompat
 import FLatticePaper.Tiles.SurgicalAltTiles
 import FLatticePaper.Tiles.VerticalH2
+import FLatticePaper.Tiles.AltRotBase
 
 /-! Root import for the corrected F-lattice paper. -/
