@@ -1152,6 +1152,7 @@ import FLatticePaper.Plane.Induction.FreeSelCase2
 import FLatticePaper.Plane.Induction.LeftPure
 import FLatticePaper.Plane.Induction.PlusHardRefl
 import FLatticePaper.Tiles.AltStairPseudo
+import FLatticePaper.Tiles.AltStairRespects
 import FLatticePaper.Tiles.StackedMoreover
 import FLatticePaper.Tiles.SurgicalDict
 import FLatticePaper.Tiles.SurgicalPartial
