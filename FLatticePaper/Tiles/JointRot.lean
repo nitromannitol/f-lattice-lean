@@ -1,4 +1,7 @@
 import FLatticePaper.Tiles.JointGlue
+import FLatticePaper.Tiles.TileTranslationStd
+import FLatticePaper.Tiles.BaseTileProps
+import FLatticePaper.Tiles.WeakStepPaper
 
 /-! # The rotation step of the joint induction ((c) of `lemma:tile-odometer-existence`)
 
@@ -24,7 +27,17 @@ the child of `swapW w` and of the child of `w` pair by a fixed permutation for e
 alternate parent piece with the alternate parent piece), the L-corrected copies with the L-corrected copies with the signs of
 `LRotProps`. Each pair satisfies the offset and affine rules, so the raw rotation of the parents (from the induction) gives the raw
 rotation of the children. The rotation `(c_r, γ_r)` of the alternate parent is `altCf` of the register word, written in the vectors
-of `w` (`altParQ`, `altParP`, `altCf_even_reg`, `altCf_odd_reg`). -/
+of `w` (`altParQ`, `altParP`, `altCf_even_reg`, `altCf_odd_reg`).
+
+Slopes (`family_slopes`): every tile and alternate tile odometer of the family is normalised on its first tile with `α = 0`. The
+first tile lies in a parent placed at offset `0` with affine factor `0` (for the even alternate child after a `3` at `W_1` even, in
+the bridge of the elongated L-correction, `slope_evenL`), and the base odometers have slope `0` (`BaseSlopes`; for the paper data
+`baseSlopes_paper` from `BaseTileProps.base_slopes`). With slopes `0` the normalised identities of the induction hypothesis are raw
+ones, and conversely.
+
+The step at one level (`rotProps_step`): `RotProps` at every word of length `n`, from the family below `n`, the slices at level `n`,
+the base rotations (`BaseRot`; `base_rotProps` for the paper data) and the connectivity of the overlap graphs of the decompositions
+(`Connected4`, a named input). -/
 
 namespace FLatticePaper.Tiles.JointRot
 
@@ -1172,7 +1185,7 @@ theorem tileAltOdd_rawRot (S : WeakData) (pO pE aO aE : Word → PartialOdometer
     (hconn : (overlapGraph (goodPart (tileAltEvenPieces S pO pE aO aE lE (swapW w)))).Connected)
     (hP : RawRot (regOdo S pO pE (regsAt w).1 true) (regOdo S pO pE (regsAt (swapW w)).2 false) (vP1 w - ((0 : ℤ), (1 : ℤ))) 0)
     (hQ : RawRot (regOdo S pO pE (regsAt w).2 false) (regOdo S pO pE (regsAt (swapW w)).1 true) (vQ1 w - ((0 : ℤ), (1 : ℤ))) 0)
-    (hA : RawRot (regOdo S aO aE (regsAt w).2 false) (regOdo S aO aE (regsAt (swapW w)).1 true) (altParQ w).1 (altParQ w).2)
+    (hA : (w.getLast? = some Digit.one ∨ w.getLast? = some Digit.three) → RawRot (regOdo S aO aE (regsAt w).2 false) (regOdo S aO aE (regsAt (swapW w)).1 true) (altParQ w).1 (altParQ w).2)
     (hL : w.getLast? = some Digit.two → ∀ plus : Bool,
       RawRot (lO w.dropLast plus true) (lE (swapW w.dropLast) (plus == W1Odd w) true) (vP1 w - ((0 : ℤ), (1 : ℤ))) 0) :
     RawRot o oR (altCf w true).1 (altCf w true).2 := by
@@ -1180,14 +1193,14 @@ theorem tileAltOdd_rawRot (S : WeakData) (pO pE aO aE : Word → PartialOdometer
   cases hWo : W1Odd w <;> rcases hl : w.getLast? with _ | d
   · exact tileAltOdd_rawRot_even_none S pO pE aO aE lE lO w hWo hl hP hQ
   · cases d
-    · exact tileAltOdd_rawRot_even_one S pO pE aO aE lE lO w hWo hl hP hQ hA
+    · exact tileAltOdd_rawRot_even_one S pO pE aO aE lE lO w hWo hl hP hQ (hA (Or.inl hl))
     · exact tileAltOdd_rawRot_even_two S pO pE aO aE lE lO w hWo hl hP hQ hL
-    · exact tileAltOdd_rawRot_even_three S pO pE aO aE lE lO w hWo hl hP hQ hA
+    · exact tileAltOdd_rawRot_even_three S pO pE aO aE lE lO w hWo hl hP hQ (hA (Or.inr hl))
   · exact tileAltOdd_rawRot_odd_none S pO pE aO aE lE lO w hWo hl hP hQ
   · cases d
-    · exact tileAltOdd_rawRot_odd_one S pO pE aO aE lE lO w hWo hl hP hQ hA
+    · exact tileAltOdd_rawRot_odd_one S pO pE aO aE lE lO w hWo hl hP hQ (hA (Or.inl hl))
     · exact tileAltOdd_rawRot_odd_two S pO pE aO aE lE lO w hWo hl hP hQ hL
-    · exact tileAltOdd_rawRot_odd_three S pO pE aO aE lE lO w hWo hl hP hQ hA
+    · exact tileAltOdd_rawRot_odd_three S pO pE aO aE lE lO w hWo hl hP hQ (hA (Or.inr hl))
 
 theorem tileAltEven_rawRot_even_none (S : WeakData) (pO pE aO aE : Word → PartialOdometer) (lE lO : Word → Bool → Bool → PartialOdometer)
     (w : Word) (hWo : W1Odd w = false) (hl : w.getLast? = none)
@@ -1639,7 +1652,7 @@ theorem tileAltEven_rawRot (S : WeakData) (pO pE aO aE : Word → PartialOdomete
     (hconn : (overlapGraph (goodPart (tileAltOddPieces S pO pE aO aE lO (swapW w)))).Connected)
     (hP : RawRot (regOdo S pO pE (regsAt w).1 true) (regOdo S pO pE (regsAt (swapW w)).2 false) (vP1 w - ((0 : ℤ), (1 : ℤ))) 0)
     (hQ : RawRot (regOdo S pO pE (regsAt w).2 false) (regOdo S pO pE (regsAt (swapW w)).1 true) (vQ1 w - ((0 : ℤ), (1 : ℤ))) 0)
-    (hA : RawRot (regOdo S aO aE (regsAt w).1 true) (regOdo S aO aE (regsAt (swapW w)).2 false) (altParP w).1 (altParP w).2)
+    (hA : (w.getLast? = some Digit.one ∨ w.getLast? = some Digit.two) → RawRot (regOdo S aO aE (regsAt w).1 true) (regOdo S aO aE (regsAt (swapW w)).2 false) (altParP w).1 (altParP w).2)
     (hL : w.getLast? = some Digit.three → ∀ plus : Bool,
       RawRot (lE w.dropLast plus true) (lO (swapW w.dropLast) (plus != W1Odd w) true) (vQ1 w - ((0 : ℤ), (1 : ℤ))) 0) :
     RawRot o oR (altCf w false).1 (altCf w false).2 := by
@@ -1647,13 +1660,597 @@ theorem tileAltEven_rawRot (S : WeakData) (pO pE aO aE : Word → PartialOdomete
   cases hWo : W1Odd w <;> rcases hl : w.getLast? with _ | d
   · exact tileAltEven_rawRot_even_none S pO pE aO aE lE lO w hWo hl hP hQ
   · cases d
-    · exact tileAltEven_rawRot_even_one S pO pE aO aE lE lO w hWo hl hP hQ hA
-    · exact tileAltEven_rawRot_even_two S pO pE aO aE lE lO w hWo hl hP hQ hA
+    · exact tileAltEven_rawRot_even_one S pO pE aO aE lE lO w hWo hl hP hQ (hA (Or.inl hl))
+    · exact tileAltEven_rawRot_even_two S pO pE aO aE lE lO w hWo hl hP hQ (hA (Or.inr hl))
     · exact tileAltEven_rawRot_even_three S pO pE aO aE lE lO w hWo hl hP hQ hL
   · exact tileAltEven_rawRot_odd_none S pO pE aO aE lE lO w hWo hl hP hQ
   · cases d
-    · exact tileAltEven_rawRot_odd_one S pO pE aO aE lE lO w hWo hl hP hQ hA
-    · exact tileAltEven_rawRot_odd_two S pO pE aO aE lE lO w hWo hl hP hQ hA
+    · exact tileAltEven_rawRot_odd_one S pO pE aO aE lE lO w hWo hl hP hQ (hA (Or.inl hl))
+    · exact tileAltEven_rawRot_odd_two S pO pE aO aE lE lO w hWo hl hP hQ (hA (Or.inr hl))
     · exact tileAltEven_rawRot_odd_three S pO pE aO aE lE lO w hWo hl hP hQ hL
+
+/-! ### Slopes: every tile odometer is normalised with `α = 0`
+
+The first piece of each decomposition that contains the first tile `A = T_{1/1}` at the origin is a parent placed at offset `0` with
+affine factor `0`, so the normalisation of the child has the slope of that parent. From the base words, all slopes are `0`. -/
+
+/-- The normalisation of `o` on the first tile has slope `0`. -/
+def SlopeZero (o : PartialOdometer) : Prop := ∃ β : ℤ, FirstTileNormal o 0 β
+
+theorem slopeZero_of_piece (o : PartialOdometer) (ps : List Piece) (ho : RespectsPieces o ps) (p : Piece) (hp : p ∈ ps)
+    (hoff : p.off = 0) (haff : p.aff = 0) (hexc : p.exc = ∅) (hs : SlopeZero p.odo) : SlopeZero o := by
+  obtain ⟨β, hβ⟩ := hs
+  obtain ⟨b, hb⟩ := ho.2 p hp
+  refine ⟨β + b, fun x hx => ?_⟩
+  obtain ⟨hxd, hxv⟩ := hβ x hx
+  have hxp : x ∈ p.placed := by rw [mem_placed, hoff, sub_zero]; exact hxd
+  have hv := hb x hxp (by rw [hexc]; exact Set.notMem_empty x)
+  rw [hoff, sub_zero, haff] at hv
+  refine ⟨by rw [ho.1]; exact mem_pieceUnion.mpr ⟨p, hp, hxp⟩, ?_⟩
+  simp only [normed, dotS, Prod.fst_zero, Prod.snd_zero, zero_mul, add_zero] at hxv hv ⊢
+  linarith
+
+set_option hygiene false in
+/-- The first piece of a decomposition: offset `0`, affine factor `0`, no exceptional point. -/
+macro "first_piece" : tactic => `(tactic| (
+  simp only [tileOddPieces, tileEvenPieces, tileAltOddPieces, tileAltEvenPieces, List.getElem_cons_succ,
+    List.getElem_cons_zero, List.getElem_append_left, stdPiece, p0Off, q0Off, p0Aff, q0Aff, offsetP0, offsetQ0, altOff, altAff,
+    coeffOff, coeffAffine, altP0Coeff, altQ0Coeff, pairAffine, offsetA, hW, ↓reduceIte, Bool.false_eq_true, Bool.and_false,
+    Bool.false_and, Bool.not_false, Bool.not_true, Bool.and_true, Bool.true_and, decide_true, decide_false]
+  all_goals first
+  | rfl
+  | (ext <;> simp)
+  | simp
+  | skip))
+
+theorem slope_tileOdd (S : WeakData) (pO pE : Word → PartialOdometer) (lE : Word → Bool → Bool → PartialOdometer) (w : Word)
+    (o : PartialOdometer) (ho : RespectsPieces o (tileOddPieces S pO pE lE w))
+    (hP : SlopeZero (regOdo S pO pE (regsAt w).1 true)) (hQ : SlopeZero (regOdo S pO pE (regsAt w).2 false)) :
+    SlopeZero o := by
+  cases hW : W1Odd w
+  · refine slopeZero_of_piece o _ ho ((tileOddPieces S pO pE lE w)[2]'(by simp [tileOddPieces])) (List.getElem_mem _)
+      ?_ ?_ ?_ ?_ <;> first_piece
+    exact hQ
+  · refine slopeZero_of_piece o _ ho ((tileOddPieces S pO pE lE w)[0]'(by simp [tileOddPieces])) (List.getElem_mem _)
+      ?_ ?_ ?_ ?_ <;> first_piece
+    exact hP
+
+theorem slope_tileEven (S : WeakData) (pO pE : Word → PartialOdometer) (lO : Word → Bool → Bool → PartialOdometer) (w : Word)
+    (o : PartialOdometer) (ho : RespectsPieces o (tileEvenPieces S pO pE lO w))
+    (hP : SlopeZero (regOdo S pO pE (regsAt w).1 true)) (hQ : SlopeZero (regOdo S pO pE (regsAt w).2 false)) :
+    SlopeZero o := by
+  cases hW : W1Odd w
+  · refine slopeZero_of_piece o _ ho ((tileEvenPieces S pO pE lO w)[4]'(by simp [tileEvenPieces])) (List.getElem_mem _)
+      ?_ ?_ ?_ ?_ <;> first_piece
+    exact hQ
+  · refine slopeZero_of_piece o _ ho ((tileEvenPieces S pO pE lO w)[0]'(by simp [tileEvenPieces])) (List.getElem_mem _)
+      ?_ ?_ ?_ ?_ <;> first_piece
+    exact hP
+
+theorem slope_tileAltOdd (S : WeakData) (pO pE aO aE : Word → PartialOdometer) (lO : Word → Bool → Bool → PartialOdometer)
+    (w : Word) (o : PartialOdometer) (ho : RespectsPieces o (tileAltOddPieces S pO pE aO aE lO w))
+    (hP : SlopeZero (regOdo S pO pE (regsAt w).1 true)) (hQ : SlopeZero (regOdo S pO pE (regsAt w).2 false)) :
+    SlopeZero o := by
+  cases hW : W1Odd w
+  · refine slopeZero_of_piece o _ ho ((tileAltOddPieces S pO pE aO aE lO w)[4]'(by simp [tileAltOddPieces]))
+      (List.getElem_mem _) ?_ ?_ ?_ ?_ <;> first_piece
+    exact hQ
+  · refine slopeZero_of_piece o _ ho ((tileAltOddPieces S pO pE aO aE lO w)[0]'(by simp [tileAltOddPieces]))
+      (List.getElem_mem _) ?_ ?_ ?_ ?_ <;> first_piece
+    exact hP
+
+theorem slope_tileAltEven (S : WeakData) (pO pE aO aE : Word → PartialOdometer) (lE : Word → Bool → Bool → PartialOdometer)
+    (w : Word) (o : PartialOdometer) (ho : RespectsPieces o (tileAltEvenPieces S pO pE aO aE lE w))
+    (hP : SlopeZero (regOdo S pO pE (regsAt w).1 true)) (hQ : SlopeZero (regOdo S pO pE (regsAt w).2 false))
+    (hL : W1Odd w = false → w.getLast? = some Digit.three → SlopeZero (lE w.dropLast true true)) :
+    SlopeZero o := by
+  cases hW : W1Odd w
+  · refine slopeZero_of_piece o _ ho ((tileAltEvenPieces S pO pE aO aE lE w)[0]'(by simp [tileAltEvenPieces]))
+      (List.getElem_mem _) ?_ ?_ ?_ ?_ <;> first_piece
+    by_cases hc : w.getLast? = some Digit.three
+    · simp only [hc, ↓reduceIte]
+      exact hL hW hc
+    · simp only [hc, ↓reduceIte]
+      exact hQ
+  · refine slopeZero_of_piece o _ ho ((tileAltEvenPieces S pO pE aO aE lE w)[4]'(by simp [tileAltEvenPieces]))
+      (List.getElem_mem _) ?_ ?_ ?_ ?_ <;> first_piece
+    exact hP
+
+/-! ### The trailing letters -/
+
+theorem trailingCount_snoc (d e : Digit) (u : Word) :
+    trailingCount d (u ++ [e]) = if e = d then trailingCount d u + 1 else 0 := by
+  unfold trailingCount
+  rw [List.reverse_append, List.reverse_singleton, List.singleton_append, List.takeWhile_cons]
+  by_cases h : e = d <;> simp [h]
+
+theorem stripTrailing_snoc (d e : Digit) (u : Word) :
+    stripTrailing d (u ++ [e]) = if e = d then stripTrailing d u else u ++ [e] := by
+  unfold stripTrailing
+  rw [trailingCount_snoc]
+  by_cases h : e = d
+  · simp only [h, ↓reduceIte, List.length_append, List.length_singleton]
+    rw [show u.length + 1 - (trailingCount d u + 1) = u.length - trailingCount d u by omega]
+    exact List.take_append_of_le_length (by omega)
+  · simp [h]
+
+theorem stripTrailing_length_le (d : Digit) (u : Word) : (stripTrailing d u).length ≤ u.length := by
+  unfold stripTrailing
+  simp
+
+/-- After the trailing `3`s the odd parent is that of the prefix and `v_{q,1}` has grown by `k v_{p,1}`. -/
+theorem vecs_strip_three (u : Word) :
+    vP1 u = vP1 (stripTrailing Digit.three u) ∧
+      vQ1 u = vQ1 (stripTrailing Digit.three u) + (trailingCount Digit.three u : ℤ) • vP1 (stripTrailing Digit.three u) := by
+  induction u using List.reverseRecOn with
+  | nil => simp [stripTrailing, trailingCount]
+  | append_singleton v e ih =>
+    rw [stripTrailing_snoc, trailingCount_snoc]
+    by_cases h : e = Digit.three
+    · subst h
+      simp only [↓reduceIte]
+      obtain ⟨h1, h2⟩ := ih
+      have e1 : vP1 (v ++ [Digit.three]) = vP1 v := by
+        simp [vP1, parentsAt_append_singleton, Parents.step]
+      have e2 : vQ1 (v ++ [Digit.three]) = vQ1 v + vP1 v := by
+        simp only [vQ1, vP1, parentsAt_append_singleton, Parents.step, Parents.current, Parents.combine, texV1Even,
+          texV1Odd, Prod.mk_add_mk, Prod.mk.injEq]
+        constructor <;> ring
+      refine ⟨by rw [e1, h1], ?_⟩
+      rw [e2, h2, ← h1]
+      push_cast
+      rw [add_smul, one_smul]
+      abel
+    · simp [h]
+
+/-- A word with a letter other than `3` has its even L-correction defined. -/
+theorem evenLDefined_of_mem (u : Word) (h : ∃ d ∈ u, d ≠ Digit.three) : EvenLDefined u := by
+  induction u using List.reverseRecOn with
+  | nil => obtain ⟨d, hd, -⟩ := h; simp at hd
+  | append_singleton v e ih =>
+    by_cases he : e = Digit.three
+    · subst he
+      obtain ⟨d, hd, hne⟩ := h
+      simp only [List.mem_append, List.mem_singleton] at hd
+      rcases hd with hd | rfl
+      · obtain ⟨w1, s, k, hs, rfl⟩ := ih ⟨d, hd, hne⟩
+        exact ⟨w1, s, k + 1, hs, by simp [List.replicate_succ', List.append_assoc]⟩
+      · exact absurd rfl hne
+    · exact ⟨v, e, 0, he, by simp⟩
+
+/-- The elongated `+` even L-correction at `W_1` even contains the first tile in its bridge, at offset `0` with affine factor `0`:
+its slope is that of the even register of the prefix. -/
+theorem slope_evenL (S : WeakData) (pO pE aO aE : Word → PartialOdometer) (u : Word) (L : PartialOdometer)
+    (hL : RespectsPieces L (evenLPieces S pO pE aO aE u true true)) (hW : W1Odd u = false)
+    (hB : SlopeZero (regOdo S pO pE (regsAt (stripTrailing Digit.three u)).2 false)) : SlopeZero L := by
+  obtain ⟨-, hq⟩ := vecs_strip_three u
+  refine slopeZero_of_piece L _ hL (stdPiece (regOdo S pO pE (regsAt (stripTrailing Digit.three u)).2 false)
+    (evenLInitOff u true + altOff (stripTrailing Digit.three u)
+      ((trailingCount Digit.three u : ℤ) • (evenKCoeff (W1Odd u) true
+        (decide ((stripTrailing Digit.three u).getLast? = some Digit.two))).1 +
+        (evenKCoeff (W1Odd u) true (decide ((stripTrailing Digit.three u).getLast? = some Digit.two))).2.1))
+    (evenLInitAff u true + altAff (stripTrailing Digit.three u)
+      ((trailingCount Digit.three u : ℤ) • (evenKCoeff (W1Odd u) true
+        (decide ((stripTrailing Digit.three u).getLast? = some Digit.two))).1 +
+        (evenKCoeff (W1Odd u) true (decide ((stripTrailing Digit.three u).getLast? = some Digit.two))).2.1))) ?_ ?_ ?_ rfl hB
+  · simp only [evenLPieces, hW, Bool.not_false, Bool.not_true, Bool.and_false, Bool.false_eq_true, ↓reduceIte,
+      List.mem_append, List.mem_singleton]
+    simp
+  · simp only [stdPiece, evenLInitOff, q0Off, offsetQ0, hW, ↓reduceIte, Bool.false_eq_true, evenKCoeff, altOff, coeffOff]
+    rw [hq]
+    ext <;> simp
+  · simp only [stdPiece, evenLInitAff, q0Aff, hW, ↓reduceIte, Bool.false_eq_true, evenKCoeff, altAff, coeffAffine, pairAffine,
+      offsetA]
+    ext <;> simp
+
+/-! ### The slopes of the family -/
+
+/-- The base odometers have slope `0` (for the paper data: `BaseTileProps.base_slopes`), and so has the initial odometer
+`o_{1/1}` (it is the bridge of the even L-correction when the prefix is `2^j`). -/
+def BaseSlopes (D : JointData) : Prop :=
+  (∀ w : Word, IsBase w → ∀ O E aO aE : PartialOdometer, D.S.base w O E → D.altBase w aO aE →
+    SlopeZero O ∧ SlopeZero E ∧ SlopeZero aO ∧ SlopeZero aE) ∧ SlopeZero D.S.oneO
+
+theorem below_of_lt (f : Word → JSlice) (w u : Word) (h : u.length < w.length) : below f w u = f u := by
+  simp [below, h]
+
+theorem word_induction (P : Word → Prop) (h : ∀ u, (∀ v : Word, v.length < u.length → P v) → P u) : ∀ u, P u :=
+  fun u => (measure List.length).wf.induction u (fun u ih => h u (fun v hv => ih v hv))
+
+/-- Every tile and alternate tile odometer of the family, up to length `n`, is normalised with slope `0`. -/
+theorem family_slopes (D : JointData) (f : Word → JSlice) (n : ℕ)
+    (hJ : ∀ u : Word, u.length ≤ n → IsJointSlice D f u) (hB : BaseSlopes D) :
+    ∀ u : Word, u.length ≤ n →
+      SlopeZero (f u).tOdd ∧ SlopeZero (f u).tEven ∧ SlopeZero (f u).aOdd ∧ SlopeZero (f u).aEven := by
+  refine word_induction _ (fun u ih hu => ?_)
+  obtain ⟨hWk, hWA, hT, hLp⟩ := hJ u hu
+  by_cases hb : IsBase u
+  · obtain ⟨e1, e2, e3, e4⟩ := hT.1 hb
+    rw [e1, e2, e3, e4]
+    exact hB.1 u hb _ _ _ _ (hWk.2.2.1 hb) (hWA.2.2.1 hb)
+  obtain ⟨hto, hte, hao, hae⟩ := hT.2.1 hb
+  obtain ⟨⟨u1, h1⟩, ⟨u2, h2⟩⟩ := regs_some u hb
+  have l1 := FLatticePaper.Tiles.JointInduction.regsAt_lt u u1 (Or.inl h1)
+  have l2 := FLatticePaper.Tiles.JointInduction.regsAt_lt u u2 (Or.inr h2)
+  have s1 := ih u1 l1 (by omega)
+  have s2 := ih u2 l2 (by omega)
+  have hP : SlopeZero (regOdo D.S (fun v => (below f u v).tOdd) (fun v => (below f u v).tEven) (regsAt u).1 true) := by
+    rw [h1]
+    show SlopeZero (below f u u1).tOdd
+    rw [below_of_lt f u u1 l1]
+    exact s1.1
+  have hQ : SlopeZero (regOdo D.S (fun v => (below f u v).tOdd) (fun v => (below f u v).tEven) (regsAt u).2 false) := by
+    rw [h2]
+    show SlopeZero (below f u u2).tEven
+    rw [below_of_lt f u u2 l2]
+    exact s2.2.1
+  refine ⟨slope_tileOdd _ _ _ _ u _ hto hP hQ, slope_tileEven _ _ _ _ u _ hte hP hQ,
+    slope_tileAltOdd _ _ _ _ _ _ u _ hao hP hQ, slope_tileAltEven _ _ _ _ _ _ u _ hae hP hQ (fun hW hl => ?_)⟩
+  have hu' : u = u.dropLast ++ [Digit.three] := (List.dropLast_append_getLast? _ hl).symm
+  have hlen : u.dropLast.length < u.length := by
+    rw [List.length_dropLast]
+    have : u ≠ [] := fun h => by simp [h] at hl
+    have := List.length_pos_of_ne_nil this
+    omega
+  rw [below_of_lt f u _ hlen]
+  have hdef : EvenLDefined u.dropLast := by
+    refine evenLDefined_of_mem _ ?_
+    by_contra hc
+    refine hb (Or.inr (Or.inl fun d hd => ?_))
+    rw [hu'] at hd
+    simp only [List.mem_append, List.mem_singleton] at hd
+    rcases hd with hd | rfl
+    · by_contra hne
+      exact hc ⟨d, hd, hne⟩
+    · rfl
+  have hRL := ((hJ u.dropLast (by omega)).2.2.2.2 true true hdef).1
+  have hW' : W1Odd u.dropLast = false := by
+    have hph := phase_snoc_three u.dropLast
+    rw [← hu'] at hph
+    unfold W1Odd at hW ⊢
+    rw [← hph]
+    exact hW
+  refine slope_evenL _ _ _ _ _ u.dropLast _ hRL hW' ?_
+  cases h : (regsAt (stripTrailing Digit.three u.dropLast)).2 with
+  | none => exact hB.2
+  | some v =>
+    have lv := FLatticePaper.Tiles.JointInduction.regsAt_lt _ v (Or.inr h)
+    have lp := stripTrailing_length_le Digit.three u.dropLast
+    show SlopeZero (below f u.dropLast v).tEven
+    rw [below_of_lt f u.dropLast v (by omega)]
+    exact (ih v (by omega) (by omega)).2.1
+
+/-! ### The rotation step at one level -/
+
+open FLatticePaper.Tiles.JointInduction (GoodBelow RotStepInput)
+
+theorem swapW_swapW' (w : Word) : swapW (swapW w) = w := FLatticePaper.Farey.swapMap_swapMap w
+
+theorem length_swapW (w : Word) : (swapW w).length = w.length := by simp [swapW]
+
+theorem isBase_swapW {w : Word} (hw : IsBase w) : IsBase (swapW w) := by
+  by_contra h
+  exact FLatticePaper.Tiles.Standard.nonbase_swap h (by rwa [swapW_swapW'])
+
+theorem below_swapW (f : Word → JSlice) (w : Word) : below f (swapW w) = below f w := by
+  funext u
+  simp [below, length_swapW]
+
+theorem zero_sub_rotR_zero : (0 : Site) - rotR 0 = 0 := by
+  ext <;> simp [rotR]
+
+theorem rawRot_of_tileRotation_slopes (o oR : PartialOdometer) (v1 : Site) (h : TileRotation o oR v1)
+    (hs : SlopeZero o) (hsR : SlopeZero oR) : RawRot o oR (v1 - ((0 : ℤ), (1 : ℤ))) 0 := by
+  obtain ⟨α, β, α', β', hN, hNR, hv⟩ := h
+  obtain ⟨b, hb⟩ := hs
+  obtain ⟨b', hb'⟩ := hsR
+  obtain ⟨rfl, -⟩ := firstTileNormal_unique o α 0 β b hN hb
+  obtain ⟨rfl, -⟩ := firstTileNormal_unique oR α' 0 β' b' hNR hb'
+  have := rawRot_of_tileRotation o oR v1 0 0 β β' hv
+  rwa [zero_sub_rotR_zero] at this
+
+theorem rawRot_of_altRotation_slopes (o oR : PartialOdometer) (cf γ : Site) (h : AltRotation o oR cf γ)
+    (hs : SlopeZero o) (hsR : SlopeZero oR) : RawRot o oR cf γ := by
+  obtain ⟨α, β, α', β', c0, hN, hNR, hv⟩ := h
+  obtain ⟨b, hb⟩ := hs
+  obtain ⟨b', hb'⟩ := hsR
+  obtain ⟨rfl, -⟩ := firstTileNormal_unique o α 0 β b hN hb
+  obtain ⟨rfl, -⟩ := firstTileNormal_unique oR α' 0 β' b' hNR hb'
+  have := rawRot_of_altRotation o oR cf γ 0 0 β β' c0 hv
+  rwa [add_sub_assoc, zero_sub_rotR_zero, add_zero] at this
+
+theorem rawRot_of_lRotation (o oR : PartialOdometer) (v1 : Site) (h : LRotation o oR v1) :
+    RawRot o oR (v1 - ((0 : ℤ), (1 : ℤ))) 0 := by
+  obtain ⟨c0, hc⟩ := h
+  refine ⟨c0, fun y hy => ?_⟩
+  obtain ⟨hm, hv⟩ := hc y hy
+  rw [← add_sub_assoc]
+  refine ⟨hm, ?_⟩
+  rw [hv]
+  simp [dotS]
+
+/-- The base rotations: (c) at the base words (for the paper data, `base_rotProps`). -/
+def BaseRot (D : JointData) : Prop :=
+  ∀ w : Word, IsBase w → ∀ x r : JSlice, D.S.base w x.tOdd x.tEven → D.altBase w x.aOdd x.aEven →
+    D.S.base (swapW w) r.tOdd r.tEven → D.altBase (swapW w) r.aOdd r.aEven → RotProps w x r
+
+/-- The overlap graphs of the four decompositions of the children of `w` are connected. -/
+def Connected4 (D : JointData) (g : Word → JSlice) (w : Word) : Prop :=
+  (overlapGraph (goodPart (tileOddPieces D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).lEven) w))).Connected ∧
+  (overlapGraph (goodPart (tileEvenPieces D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).lOdd) w))).Connected ∧
+  (overlapGraph (goodPart (tileAltOddPieces D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).aOdd)
+    (fun u => (g u).aEven) (fun u => (g u).lOdd) w))).Connected ∧
+  (overlapGraph (goodPart (tileAltEvenPieces D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).aOdd)
+    (fun u => (g u).aEven) (fun u => (g u).lEven) w))).Connected
+
+theorem tileAltOddPieces_covered' (S : WeakData) (pO pE aO aE : Word → PartialOdometer) (lO : Word → Bool → Bool → PartialOdometer)
+    (w : Word) : PiecesCovered (tileAltOddPieces S pO pE aO aE lO w) := by
+  refine covered_of_no_exc _ (fun p hp => ?_)
+  simp only [tileAltOddPieces] at hp
+  rw [List.mem_append] at hp
+  rcases hp with hp | hp
+  · simp only [List.mem_cons, List.not_mem_nil, or_false] at hp
+    rcases hp with rfl | rfl | rfl | rfl | rfl | rfl <;> rfl
+  · split at hp
+    · simp at hp
+    · simp only [List.mem_singleton] at hp
+      subst hp
+      rfl
+
+theorem tileAltEvenPieces_covered' (S : WeakData) (pO pE aO aE : Word → PartialOdometer) (lE : Word → Bool → Bool → PartialOdometer)
+    (w : Word) : PiecesCovered (tileAltEvenPieces S pO pE aO aE lE w) := by
+  refine covered_of_no_exc _ (fun p hp => ?_)
+  simp only [tileAltEvenPieces] at hp
+  rw [List.mem_append] at hp
+  rcases hp with hp | hp
+  · simp only [List.mem_cons, List.not_mem_nil, or_false] at hp
+    rcases hp with rfl | rfl | rfl | rfl | rfl | rfl <;> rfl
+  · split at hp
+    · simp at hp
+    · simp only [List.mem_singleton] at hp
+      subst hp
+      rfl
+
+/-- The word without its last letter `d`. -/
+theorem eq_dropLast_append {w : Word} {d : Digit} (hl : w.getLast? = some d) : w = w.dropLast ++ [d] :=
+  (List.dropLast_append_getLast? _ hl).symm
+
+theorem dropLast_length_lt {w : Word} {d : Digit} (hl : w.getLast? = some d) : w.dropLast.length < w.length := by
+  rw [List.length_dropLast]
+  have : w ≠ [] := fun h => by simp [h] at hl
+  have := List.length_pos_of_ne_nil this
+  omega
+
+/-- A word with a letter other than `2` has its odd L-correction defined. -/
+theorem oddLDefined_of_mem (u : Word) (h : ∃ d ∈ u, d ≠ Digit.two) : OddLDefined u := by
+  induction u using List.reverseRecOn with
+  | nil => obtain ⟨d, hd, -⟩ := h; simp at hd
+  | append_singleton v e ih =>
+    by_cases he : e = Digit.two
+    · subst he
+      obtain ⟨d, hd, hne⟩ := h
+      simp only [List.mem_append, List.mem_singleton] at hd
+      rcases hd with hd | rfl
+      · obtain ⟨w1, s, k, hs, rfl⟩ := ih ⟨d, hd, hne⟩
+        exact ⟨w1, s, k + 1, hs, by simp [List.replicate_succ', List.append_assoc]⟩
+      · exact absurd rfl hne
+    · exact ⟨v, e, 0, he, by simp⟩
+
+theorem evenLDefined_dropLast {w : Word} (hb : ¬ IsBase w) (hl : w.getLast? = some Digit.three) :
+    EvenLDefined w.dropLast := by
+  refine evenLDefined_of_mem _ ?_
+  by_contra hc
+  refine hb (Or.inr (Or.inl fun d hd => ?_))
+  rw [eq_dropLast_append hl] at hd
+  simp only [List.mem_append, List.mem_singleton] at hd
+  rcases hd with hd | rfl
+  · by_contra hne
+    exact hc ⟨d, hd, hne⟩
+  · rfl
+
+theorem oddLDefined_dropLast {w : Word} (hb : ¬ IsBase w) (hl : w.getLast? = some Digit.two) :
+    OddLDefined w.dropLast := by
+  refine oddLDefined_of_mem _ ?_
+  by_contra hc
+  refine hb (Or.inr (Or.inr fun d hd => ?_))
+  rw [eq_dropLast_append hl] at hd
+  simp only [List.mem_append, List.mem_singleton] at hd
+  rcases hd with hd | rfl
+  · by_contra hne
+    exact hc ⟨d, hd, hne⟩
+  · rfl
+
+/-- The L-rotation of the even parent, after a `3`. -/
+theorem lrot_three (f : Word → JSlice) (w : Word) (hb : ¬ IsBase w) (hl : w.getLast? = some Digit.three)
+    (hJP : LRotProps w.dropLast (f w.dropLast) (f (swapW w.dropLast))) (elong : Bool) (plus : Bool) :
+    RawRot ((f w.dropLast).lEven plus elong) ((f (swapW w.dropLast)).lOdd (plus != W1Odd w) elong) (vQ1 w - ((0 : ℤ), (1 : ℤ))) 0 := by
+  have h := hJP.1 (evenLDefined_dropLast hb hl) plus elong
+  have hw := eq_dropLast_append hl
+  have hph : W1Odd w.dropLast = W1Odd w := by
+    unfold W1Odd
+    conv_rhs => rw [hw]
+    rw [phase_snoc_three]
+  have hq : texV1Even ((parentsAt w.dropLast).current .even) = vQ1 w := by
+    unfold vQ1
+    conv_rhs => rw [hw]
+    rw [parentsAt_append_singleton]
+    rfl
+  rw [hph, hq] at h
+  exact rawRot_of_lRotation _ _ _ h
+
+/-- The L-rotation of the odd parent, after a `2`. -/
+theorem lrot_two (f : Word → JSlice) (w : Word) (hb : ¬ IsBase w) (hl : w.getLast? = some Digit.two)
+    (hJP : LRotProps w.dropLast (f w.dropLast) (f (swapW w.dropLast))) (elong : Bool) (plus : Bool) :
+    RawRot ((f w.dropLast).lOdd plus elong) ((f (swapW w.dropLast)).lEven (plus == W1Odd w) elong) (vP1 w - ((0 : ℤ), (1 : ℤ))) 0 := by
+  have h := hJP.2 (oddLDefined_dropLast hb hl) plus elong
+  have hw := eq_dropLast_append hl
+  have hph : W1Odd w.dropLast = W1Odd w := by
+    unfold W1Odd
+    conv_rhs => rw [hw]
+    rw [phase_snoc_two]
+  have hq : texV1Odd ((parentsAt w.dropLast).current .odd) = vP1 w := by
+    unfold vP1
+    conv_rhs => rw [hw]
+    rw [parentsAt_append_singleton]
+    rfl
+  rw [hph, hq] at h
+  exact rawRot_of_lRotation _ _ _ h
+
+/-- For the paper data (`WeakStepPaper.paperS`, `PaperAltBaseCond`) the base slopes are those of `BaseTileProps.base_slopes`. -/
+theorem baseSlopes_paper (D : JointData) (hS : D.S = WeakStepPaper.paperS)
+    (hA : D.altBase = SurgicalAlt.PaperAltBaseCond) : BaseSlopes D := by
+  refine ⟨fun w hw O E aO aE hO haO => ?_, ⟨0, fun x hx => ?_⟩⟩
+  · rw [hS] at hO
+    rw [hA] at haO
+    exact BaseTileProps.base_slopes w hw O E aO aE hO haO
+  · rw [hS]
+    simp only [tileShape, List.mem_cons, List.not_mem_nil, or_false] at hx
+    rcases hx with rfl | rfl | rfl | rfl <;>
+      exact ⟨by decide, by simp [normed, dotS, zTileOdo, WeakStepPaper.paperS]⟩
+
+/-- (c) of `lemma:tile-odometer-existence` at the level `n`: from the family below `n` (with the rotations of the parents and of
+their L-corrections), the slices at level `n`, the slopes of the base odometers, the base rotations and the connectivity of the
+overlap graphs of the decompositions, the rotation identities of the tile and alternate tile odometers hold at every word of length
+`n`. The standard ones are normalised with the corner value `N(v_1 - i) = 0` (`TileTranslationStd.stdCorners_odd`, `_even`). -/
+theorem rotProps_step (D : JointData) (f : Word → JSlice) (n : ℕ) (hgood : GoodBelow D f n)
+    (hlev : ∀ w : Word, w.length = n → IsJointSlice D f w)
+    (hB : BaseSlopes D) (hBR : BaseRot D)
+    (hconn : ∀ w : Word, w.length = n → ¬ IsBase w → Connected4 D (below f w) w)
+    (w : Word) (hw : w.length = n) : RotProps w (f w) (f (swapW w)) := by
+  have hJ : ∀ u : Word, u.length ≤ n → IsJointSlice D f u := fun u hu => by
+    rcases lt_or_eq_of_le hu with h | h
+    · exact (hgood u h).1
+    · exact hlev u h
+  have hsl := family_slopes D f n hJ hB
+  have hsw : (swapW w).length = n := by rw [length_swapW, hw]
+  obtain ⟨hWk, hWA, hT, -⟩ := hlev w hw
+  obtain ⟨hWk', hWA', hT', -⟩ := hlev (swapW w) hsw
+  by_cases hb : IsBase w
+  · have hb' := isBase_swapW hb
+    obtain ⟨e1, e2, e3, e4⟩ := hT.1 hb
+    obtain ⟨e1', e2', e3', e4'⟩ := hT'.1 hb'
+    refine hBR w hb _ _ ?_ ?_ ?_ ?_
+    · rw [e1, e2]; exact hWk.2.2.1 hb
+    · rw [e3, e4]; exact hWA.2.2.1 hb
+    · rw [e1', e2']; exact hWk'.2.2.1 hb'
+    · rw [e3', e4']; exact hWA'.2.2.1 hb'
+  have hb' := FLatticePaper.Tiles.Standard.nonbase_swap hb
+  obtain ⟨hto, hte, hao, hae⟩ := hT.2.1 hb
+  obtain ⟨hto', hte', hao', hae'⟩ := hT'.2.1 hb'
+  rw [below_swapW] at hto' hte' hao' hae'
+  obtain ⟨hc1, hc2, hc3, hc4⟩ := hconn (swapW w) hsw hb'
+  rw [below_swapW] at hc1 hc2 hc3 hc4
+  obtain ⟨⟨u1, h1⟩, ⟨u2, h2⟩⟩ := regs_some w hb
+  have l1 := FLatticePaper.Tiles.JointInduction.regsAt_lt w u1 (Or.inl h1)
+  have l2 := FLatticePaper.Tiles.JointInduction.regsAt_lt w u2 (Or.inr h2)
+  have l1' : (swapW u1).length < w.length := by rw [length_swapW]; exact l1
+  have l2' : (swapW u2).length < w.length := by rw [length_swapW]; exact l2
+  have hr1 : (regsAt (swapW w)).2 = some (swapW u1) := by rw [regsAt_swapW, h1]; rfl
+  have hr2 : (regsAt (swapW w)).1 = some (swapW u2) := by rw [regsAt_swapW, h2]; rfl
+  have J1 := (hgood u1 (by omega)).2
+  have J2 := (hgood u2 (by omega)).2
+  obtain ⟨pr1, pr2⟩ := parents_of_regs w
+  have s1 := hsl u1 (by omega)
+  have s2 := hsl u2 (by omega)
+  have s1' := hsl (swapW u1) (by rw [length_swapW]; omega)
+  have s2' := hsl (swapW u2) (by rw [length_swapW]; omega)
+  have sw0 := hsl w (by omega)
+  have sw1 := hsl (swapW w) (by omega)
+  -- the register parents
+  have hP : RawRot (regOdo D.S (fun u => (below f w u).tOdd) (fun u => (below f w u).tEven) (regsAt w).1 true)
+      (regOdo D.S (fun u => (below f w u).tOdd) (fun u => (below f w u).tEven) (regsAt (swapW w)).2 false)
+      (vP1 w - ((0 : ℤ), (1 : ℤ))) 0 := by
+    rw [h1, hr1]
+    show RawRot (below f w u1).tOdd (below f w (swapW u1)).tEven _ _
+    rw [below_of_lt f w u1 l1, below_of_lt f w (swapW u1) l1']
+    have h := J1.2.2.1.1
+    rw [pr1 u1 h1] at h
+    exact rawRot_of_tileRotation_slopes _ _ _ h s1.1 s1'.2.1
+  have hQ : RawRot (regOdo D.S (fun u => (below f w u).tOdd) (fun u => (below f w u).tEven) (regsAt w).2 false)
+      (regOdo D.S (fun u => (below f w u).tOdd) (fun u => (below f w u).tEven) (regsAt (swapW w)).1 true)
+      (vQ1 w - ((0 : ℤ), (1 : ℤ))) 0 := by
+    rw [h2, hr2]
+    show RawRot (below f w u2).tEven (below f w (swapW u2)).tOdd _ _
+    rw [below_of_lt f w u2 l2, below_of_lt f w (swapW u2) l2']
+    have h := J2.2.2.1.2.1
+    rw [pr2 u2 h2] at h
+    exact rawRot_of_tileRotation_slopes _ _ _ h s2.2.1 s2'.1
+  -- the alternate parents
+  have hAq : (w.getLast? = some Digit.one ∨ w.getLast? = some Digit.three) →
+      RawRot (regOdo D.S (fun u => (below f w u).aOdd) (fun u => (below f w u).aEven) (regsAt w).2 false)
+        (regOdo D.S (fun u => (below f w u).aOdd) (fun u => (below f w u).aEven) (regsAt (swapW w)).1 true)
+        (altParQ w).1 (altParQ w).2 := by
+    intro hd
+    obtain ⟨d, hl, hd⟩ : ∃ d, w.getLast? = some d ∧ (d = Digit.one ∨ d = Digit.three) := by
+      rcases hd with h | h
+      · exact ⟨_, h, Or.inl rfl⟩
+      · exact ⟨_, h, Or.inr rfl⟩
+    have hw' := eq_dropLast_append hl
+    have hu2 : u2 = w.dropLast := by
+      have := regsAt_append_singleton w.dropLast d
+      rw [← hw'] at this
+      rw [this] at h2
+      rcases hd with rfl | rfl <;> simp only [regStep, Option.some.injEq] at h2 <;> exact h2.symm
+    rw [h2, hr2]
+    show RawRot (below f w u2).aEven (below f w (swapW u2)).aOdd _ _
+    rw [below_of_lt f w u2 l2, below_of_lt f w (swapW u2) l2']
+    have h := J2.2.2.1.2.2.2
+    have hcf := altCf_even_reg w.dropLast d hd
+    rw [← hw', ← hu2] at hcf
+    rw [hcf] at h
+    exact rawRot_of_altRotation_slopes _ _ _ _ h s2.2.2.2 s2'.2.2.1
+  have hAp : (w.getLast? = some Digit.one ∨ w.getLast? = some Digit.two) →
+      RawRot (regOdo D.S (fun u => (below f w u).aOdd) (fun u => (below f w u).aEven) (regsAt w).1 true)
+        (regOdo D.S (fun u => (below f w u).aOdd) (fun u => (below f w u).aEven) (regsAt (swapW w)).2 false)
+        (altParP w).1 (altParP w).2 := by
+    intro hd
+    obtain ⟨d, hl, hd⟩ : ∃ d, w.getLast? = some d ∧ (d = Digit.one ∨ d = Digit.two) := by
+      rcases hd with h | h
+      · exact ⟨_, h, Or.inl rfl⟩
+      · exact ⟨_, h, Or.inr rfl⟩
+    have hw' := eq_dropLast_append hl
+    have hu1 : u1 = w.dropLast := by
+      have := regsAt_append_singleton w.dropLast d
+      rw [← hw'] at this
+      rw [this] at h1
+      rcases hd with rfl | rfl <;> simp only [regStep, Option.some.injEq] at h1 <;> exact h1.symm
+    rw [h1, hr1]
+    show RawRot (below f w u1).aOdd (below f w (swapW u1)).aEven _ _
+    rw [below_of_lt f w u1 l1, below_of_lt f w (swapW u1) l1']
+    have h := J1.2.2.1.2.2.1
+    have hcf := altCf_odd_reg w.dropLast d hd
+    rw [← hw', ← hu1] at hcf
+    rw [hcf] at h
+    exact rawRot_of_altRotation_slopes _ _ _ _ h s1.2.2.1 s1'.2.2.2
+  -- the L-corrected parents
+  have hL3 : ∀ elong : Bool, w.getLast? = some Digit.three → ∀ plus : Bool,
+      RawRot ((below f w w.dropLast).lEven plus elong) ((below f w (swapW w.dropLast)).lOdd (plus != W1Odd w) elong)
+        (vQ1 w - ((0 : ℤ), (1 : ℤ))) 0 := by
+    intro elong hl plus
+    have hlen := dropLast_length_lt hl
+    rw [below_of_lt f w _ hlen, below_of_lt f w _ (by rw [length_swapW]; exact hlen)]
+    exact lrot_three f w hb hl (hgood w.dropLast (by omega)).2.2.2.2 elong plus
+  have hL2 : ∀ elong : Bool, w.getLast? = some Digit.two → ∀ plus : Bool,
+      RawRot ((below f w w.dropLast).lOdd plus elong) ((below f w (swapW w.dropLast)).lEven (plus == W1Odd w) elong)
+        (vP1 w - ((0 : ℤ), (1 : ℤ))) 0 := by
+    intro elong hl plus
+    have hlen := dropLast_length_lt hl
+    rw [below_of_lt f w _ hlen, below_of_lt f w _ (by rw [length_swapW]; exact hlen)]
+    exact lrot_two f w hb hl (hgood w.dropLast (by omega)).2.2.2.2 elong plus
+  -- the four children
+  have R1 := tileOdd_rawRot D.S _ _ _ _ w _ _ hto hte' hc2 hP hQ (hL3 false)
+  have R2 := tileEven_rawRot D.S _ _ _ _ w _ _ hte hto' hc1 hP hQ (hL2 false)
+  have R3 := tileAltOdd_rawRot D.S _ _ _ _ _ _ w _ _ hao hae' (tileAltEvenPieces_covered' _ _ _ _ _ _ _) hc4 hP hQ hAq
+    (hL2 true)
+  have R4 := tileAltEven_rawRot D.S _ _ _ _ _ _ w _ _ hae hao' (tileAltOddPieces_covered' _ _ _ _ _ _ _) hc3 hP hQ hAp
+    (hL3 true)
+  obtain ⟨⟨b1, hb1⟩, ⟨b2, hb2⟩, ⟨b3, hb3⟩, ⟨b4, hb4⟩⟩ := sw0
+  obtain ⟨⟨b1', hb1'⟩, ⟨b2', hb2'⟩, ⟨b3', hb3'⟩, ⟨b4', hb4'⟩⟩ := sw1
+  obtain ⟨α1, β1, hN1, hV1⟩ := TileTranslationStd.stdCorners_odd w (f w).tOdd hT.2.2.2.2.1
+  obtain ⟨rfl, rfl⟩ := firstTileNormal_unique _ α1 0 β1 b1 hN1 hb1
+  obtain ⟨α2, β2, hN2, hV2⟩ := TileTranslationStd.stdCorners_even w (f w).tEven hT.2.2.2.2.2.1
+  obtain ⟨rfl, rfl⟩ := firstTileNormal_unique _ α2 0 β2 b2 hN2 hb2
+  exact ⟨tileRotation_of_rawRot _ _ _ _ _ hb1 hb2' hV1.2.2.1.2 R1, tileRotation_of_rawRot _ _ _ _ _ hb2 hb1' hV2.2.2.1.2 R2,
+    altRotation_of_rawRot _ _ _ _ _ _ hb3 hb4' R3, altRotation_of_rawRot _ _ _ _ _ _ hb4 hb3' R4⟩
 
 end FLatticePaper.Tiles.JointRot
