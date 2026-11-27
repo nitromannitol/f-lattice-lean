@@ -1,7 +1,7 @@
 # Source correspondence
 
 **Target: the surgical edition.** The target is the surgical edition of `farey_recursion.tex` (the October 2023 arXiv text
-with minimal corrections, Sections 5–8), pinned at commit 42ce075 of its source repository; its text is not copied here.
+with minimal corrections, Sections 5–8), pinned at commit baf0f77 of its source repository; its text is not copied here.
 The surgical map of Sections 1–8 (label, surgical line, Lean declaration, agreement) is the last section of this file. The
 table that follows maps the corrected edition pinned in `paper/`.
 
@@ -130,7 +130,7 @@ A separate, shorter write-up (`flattice-simple-proof`, `short-proof.tex` with it
 
 ## Surgical edition map (Sections 1–8)
 
-Lines refer to `farey_recursion.tex` at commit 42ce075 of the surgical edition's source repository; its text is not copied
+Lines refer to `farey_recursion.tex` at commit baf0f77 of the surgical edition's source repository; its text is not copied
 here. E-numbers refer to that repository's error list (`notes/ERRORS_S5-8.md` and the section notes). Status words:
 **agrees** (the Lean statement matches the surgical statement and is proved), **conditional** (proved from named inputs),
 **partial** (some parts proved), **differs** (the Lean states another form; the surgical form is open), **defined** (the
@@ -158,7 +158,7 @@ Section 2 has no numbered statements; Section 9 is being rewritten and is not ma
 | lemma:stacked_zero_one_string | 1593 | `Tiles.FirstSentenceSurgical`; `Tiles.SurgicalSlopes`; `Tiles.StackedMoreover` | agrees: the first sentence with the surgical slope table (E05) and the enlarged horizontal tiles (`Tiles.FirstSentenceSurgical.zeroOne_first_sentence_surgical`); the second sentence (E06) is stated for both strings, with the non-overlap rule after the shared translation; both halves are proved, the horizontal one with the enlarged one tile after every interface qq (lines 1293–1300) in both parts of the stacked string (`Tiles.HorizontalEnlargedCross.horizontalMoreover_proof`, `Tiles.VerticalMoreoverProof.verticalMoreover_proof`) |
 | def:tile_boundary_strings | 1647 | `Tiles.PseudoSquare.IsPseudoSquare`; `Tiles.PseudoSquareAnchored.IsPseudoSquareAnchoredPt` | differs: the older predicates place the strings at fixed stacking offsets; the anchored predicate (E07) is defined |
 | boundary-word lemma (unlabelled) | 1704 | `Tiles.PseudoSquare.pseudoSquare_boundaryWord`, `pseudoSquare_halfTurn`, `pseudoSquare_quarterTurn` | partial: the identities of Table 1 are hypotheses (E10) |
-| lemma:common-extension-pseudo-square | 1731 | `Tiles.CommonExtension.common_extension_almost`, `common_extension_unique` | partial: (i) and (iii) agree; (ii) open (E12) |
+| lemma:common-extension-pseudo-square | 1731 | `Tiles.CommonExtension.common_extension_almost`, `common_extension_unique`; `Tiles.CommonExtensionFamily`, `Tiles.CommonExtensionStandard`, `Tiles.CommonExtensionWitness`, `Tiles.PointNonNeighbour` | partial: (i) and (iii) agree; (ii) (E12): for the standard tiles the overlap graph of the translates is the unit-step graph and the offsets sum to zero around every closed walk, given constant offsets on unit steps, which are open |
 | def:partial_tile_boundary_strings | 1754 | `Tiles.PartialBoundary` | defined |
 | prop:base_cases | 1920 | `Construction.PropBaseCases.prop_base_cases_*`; `Construction.PropBaseCasesE`; `Construction.PropBaseCasesFG`; `Construction.PropBaseCasesOdo` | agrees: (a)–(d) for the base families; (e) with the exception to the definition of c (E15) (`Construction.PropBaseCasesE.prop_base_cases_e`); (f), (g): the tile inclusions and the odometer equalities on both copies, with the affine factors of the translations, for k ≥ 1 |
 | prop:recurrence | 2032 | — | cited, as in the text (E16) |
@@ -180,11 +180,11 @@ Section 2 has no numbered statements; Section 9 is being rewritten and is not ma
 | lemma:doubled-alt-staircase-recurrent | 2820 | `Construction.BaseCaseRecurrence.doubled_alt_staircase_recurrent` | agrees |
 | def:standard_tiles | 2890 | `Tiles.StandardTiles.oddTile`, `evenTile`, `oddChildB`, `evenChildB`; `Tiles.StandardBaseBridge` | agrees: the printed decompositions with the offsets of eq:offsets_w1_odd and eq:offsets_w1_even and the printed base tiles; at the words 2^j3^k it is the 2021 constructor that differs (E26) |
 | lemma:standard_boundary_word_recursion | 2972 | `Tiles.StandardTiles.rot_standard_tiles`; `Tiles.StandardBoundary` | partial: (1) agrees; (2) for the odd tile word (E27) |
-| lemma:standard_tile_properties | 3254 | `Tiles.StandardPacking`; `Tiles.StringCorners`; `Tiles.InterfaceStacked` | partial: (a), (b) and the horizontal part of (c); the vertical part of (c) and (d) open (E29) |
+| lemma:standard_tile_properties | 3254 | `Tiles.StandardPacking`; `Tiles.StringCorners`; `Tiles.InterfaceStacked` | partial: (a), (b) and the horizontal part of (c); the vertical part of (c) open; (d) for the odd child from the boundary walk in the strings (open) and the named packing input (`Tiles.CellRegisters`) (E29) |
 | def:partial_tile | 3317 | `Tiles.SurgicalPartial.IsPartialTile` | defined |
 | def:standard_odometer_doubling | 3377 | `Tiles.SurgicalPartial.doubledTile`; `Tiles.SurgicalDict` | defined |
 | def:weak_standard_odometers | 3399 | `Tiles.SurgicalOdometerStep`; `Tiles.SurgicalWeakOdometers` | defined, with the base odometers of Section 6 |
-| lemma:weak_standard_odometer_properties | 3421 | `Tiles.SurgicalCorners`; `Tiles.SurgicalCornerThird.corner_3_family`, `corner_3_family_even`; `Tiles.SurgicalWeakOdometers` | partial: (b), in affine factors, for both children of every weak standard family; (a) and (c) stated; existence open |
+| lemma:weak_standard_odometer_properties | 3421 | `Tiles.SurgicalCorners`; `Tiles.SurgicalCornerThird.corner_3_family`, `corner_3_family_even`; `Tiles.SurgicalWeakOdometers`; `Tiles.ChildAssembly`; `Tiles.ChildGlue` | partial: (b), in affine factors, for both children of every weak standard family; (a) and (c) stated; the existence step glues the placed pieces on their kept domains given (d), the agreement on the marked strings and condition (C) |
 | def:alternate_tiles | 3458 | `Tiles.AlternateTiles`; `Tiles.AlternateConstructor` | differs (E30) |
 | lemma:alternate_tile_properties | 3593 | `Tiles.SurgicalAltTileLemma`; `Tiles.SurgicalAltTiles` | partial: (3) proved as anchor facts; (1) up to a translation, (2), (4) and (5) as corrected are stated and open (E31–E34) |
 | def:alternate_doubled_tile | 3672 | — | open |

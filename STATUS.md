@@ -4,11 +4,19 @@ This file states what the repository proves and which named hypotheses the headl
 The Lean sources are the authority; each link points to the declaration.
 
 **Target.** The target is the surgical edition of the October 2023 manuscript: the author's arXiv text with minimal
-corrections in its own language, pinned at commit 42ce075 of its source repository (Sections 1–8; Section 9 is being
+corrections in its own language, pinned at commit baf0f77 of its source repository (Sections 1–8; Section 9 is being
 rewritten). Sections 1–8 are being mapped to the Lean statement by statement in [SOURCE-MAP.md](SOURCE-MAP.md), and the
 statements corrected in Sections 5–8 are restated and proved in their surgical form. The corrected edition pinned in
 [paper/](paper/README.md) replaced the proofs of Sections 6, 8 and 9 by a supplement; the headline theorems below follow
 that edition, and their named hypotheses belong to the supplement's route. That code stays as a library.
+
+**Surgical edition, open inputs.** Two steps of the surgical text have no written argument, and the Lean carries them as named
+inputs of the existence of the weak standard odometers (Section 7): the packing in item (d) of
+`lemma:standard_tile_properties`, that no cell lies in a copy of each parent of a standard decomposition
+(`Tiles.CellRegisters`, `CellsDisjointOdd`; checked numerically for every word of length at most 5), and the consistency of the
+offset constants of the placed subodometers around every closed path of overlapping pieces (`Tiles.ChildGlue`, condition (C);
+checked numerically for every word of length at most 5). Everything else in the surgical map is either proved, stated and open,
+or listed there with its status.
 
 ## Headline theorems
 
