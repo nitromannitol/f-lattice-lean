@@ -460,6 +460,8 @@ import FLatticePaper.Tiles.StackedWalks
 import FLatticePaper.Tiles.StackedTable
 import FLatticePaper.Tiles.StackedColumns
 import FLatticePaper.Tiles.StackedColumnFacts
+import FLatticePaper.Tiles.StackedBottomLink
+import FLatticePaper.Tiles.StackedTopLink
 import FLatticePaper.Tiles.OverlapSides
 import FLatticePaper.Tiles.CellExtremes
 import FLatticePaper.Tiles.H3Data
