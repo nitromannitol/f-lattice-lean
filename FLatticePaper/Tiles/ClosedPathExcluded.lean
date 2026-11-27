@@ -11,10 +11,16 @@ that of `Y + 1` and that of `X`, and imaginary coordinate between `0` and that o
 `lemma:weak_alternate_odometer_properties`). Here this is `site_box_odd` and `site_box_even`, from the box of the cell tile
 (`SeamCover.box_of_mem`) and the fact that every site is a corner of a cell (`CellRegisters.tileH1_of_hcc`).
 
+The excluded pairs are those of Step 3 of `lemma:standard_tile_properties` (surgical edition at 7a40613): for the even child
+`T(q_0)`, `T(q_1)^+ ∩ T(p_1)^{-,2} = T(q_1)^- ∩ T(p_1)^{+,1} = ∅` in both orientations (here the copies `4, 3` and `5, 0` of
+`ExclEven`); for the odd child `T(p_0)`, by rotation, `(T(p_1)^+, T(q_1)^{+,1})`, `(T(p_1)^-, T(q_1)^{-,2})` for `W_1` even and
+`(T(p_1)^+, T(q_1)^{+,2})`, `(T(p_1)^-, T(q_1)^{-,1})` for `W_1` odd (the copies `0, 2`, `1, 5` and `0, 3`, `1, 4` of `ExclOdd`).
+The text proves them from the boundary words of the parents; here they are proved from boxes and diagonal bounds.
+
 In the odd-first orientation (`W_1` odd) the two excluded mixed pairs of each child are separated by one coordinate of these
 boxes: the real coordinate for the odd child (`(P^+, Q^{+,2})`, `(P^-, Q^{-,1})`), the imaginary one for the even child
-(`(P^{+,1}, Q^-)`, `(P^{-,2}, Q^+)`). In the even-first orientation the boxes do not separate them in general, and the text's
-comparison of the boundary words is needed; that case stays an input of `exclOdd_of`, `exclEven_of`. -/
+(`(P^{+,1}, Q^-)`, `(P^{-,2}, Q^+)`). In the even-first orientation the boxes do not separate them in general; that case is
+`ClosedPathDiagonal` (the diagonals `x + y` and `x - y`). -/
 
 namespace FLatticePaper.Tiles.ClosedPathExcluded
 

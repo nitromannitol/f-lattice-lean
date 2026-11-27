@@ -424,6 +424,8 @@ import FLatticePaper.Tiles.ClosedPathAssembly
 import FLatticePaper.Tiles.ClosedPathStandard
 import FLatticePaper.Tiles.ClosedPathExcluded
 import FLatticePaper.Tiles.ClosedPathDiagonal
+import FLatticePaper.Tiles.ClosedPathTriangle
+import FLatticePaper.Tiles.ClosedPathTriOdd
 import FLatticePaper.Tiles.MixedOverlapStrings
 import FLatticePaper.Tiles.ChildAssembly
 import FLatticePaper.Tiles.PTAffineTransport
