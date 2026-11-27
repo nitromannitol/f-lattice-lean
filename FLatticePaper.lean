@@ -427,6 +427,8 @@ import FLatticePaper.Tiles.ClosedPathDiagonal
 import FLatticePaper.Tiles.ClosedPathTriangle
 import FLatticePaper.Tiles.ClosedPathTriOdd
 import FLatticePaper.Tiles.ClosedPathTriEven
+import FLatticePaper.Tiles.ClosedPathAltSum
+import FLatticePaper.Tiles.ClosedPathAlt
 import FLatticePaper.Tiles.MixedOverlapStrings
 import FLatticePaper.Tiles.ChildAssembly
 import FLatticePaper.Tiles.PTAffineTransport
