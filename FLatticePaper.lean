@@ -451,6 +451,8 @@ import FLatticePaper.Tiles.VerticalCover
 import FLatticePaper.Tiles.VerticalRevBridge
 import FLatticePaper.Tiles.VertexEdge
 import FLatticePaper.Tiles.H2OddMarks
+import FLatticePaper.Tiles.H2EvenMarks
+import FLatticePaper.Tiles.MixedFromCells
 import FLatticePaper.Tiles.OverlapSides
 import FLatticePaper.Tiles.CellExtremes
 import FLatticePaper.Tiles.H3Data
