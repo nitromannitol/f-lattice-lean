@@ -10,6 +10,7 @@ import FLatticePaper.Plane.Induction.ForcedPriceSI
 import FLatticePaper.Plane.Induction.Seams
 import FLatticePaper.Plane.Induction.CutOnePerProper
 import FLatticePaper.Plane.Induction.PassageInv
+import FLatticePaper.Plane.Induction.PassageRep
 
 /-! # `RestrictedNoFort` for `permitsQ1` at sign `+1` on the easy words
 
@@ -85,12 +86,7 @@ theorem restrictedNoFort_plus_word {word : Word} (hw : ∃ x ∈ word, x ≠ Dig
     (hnd : 2 * (frameAt word).child.num ≤ (frameAt word).child.den)
     (hW : HasSatSelection (standardField word))
     (hW1 : FLatticePaper.W1.W1Forced (frameAt word).child.num (frameAt word).child.den (standardField word))
-    (hz0 : ∀ (S' : Set Site) (r' : Site),
-      IsRestrictedFort (standardField word) (permitsQ1 (frameAt word) (standardField word) 1) S' →
-      (∀ z ∈ S', (frameAt word).cutPrice ≤ (frameAt word).price (standardField word) z +
-        (frameAt word).roundedSlip (standardField word) 1 z) →
-      r' ∈ S' → (frameAt word).price (standardField word) r' = (frameAt word).cutPrice →
-      (frameAt word).roundedSlip (standardField word) 1 r' = 0 → r' ∈ (frameAt word).closedPolygon) :
+    :
     RestrictedNoFort (standardField word)
       (fun z => (frameAt word).price (standardField word) z +
         (frameAt word).roundedSlip (standardField word) 1 z)
@@ -122,18 +118,17 @@ theorem restrictedNoFort_plus_word {word : Word} (hw : ∃ x ∈ word, x ≠ Dig
   have hcutr : kPlusW word r' = (frameAt word).cutPrice := by
     rw [kPlusW_eq, hr'p, hr's]
     ring
-  have hmin : ∀ w ∈ RestrictedFortShift.shiftSet S T, kPlusW word r' ≤ kPlusW word w := by
-    intro w hw'
-    rw [hcutr, kPlusW_eq]
-    simpa [hr'p, hr's] using hK' w hw'
   have hfort := fortAt_nonfree_of_restricted (frameAt word) (standardField word) 1 hres'
-  have hcR := hz0 (RestrictedFortShift.shiftSet S T) r' hres' hK' hr'S hr'p hr's
+  have hcut : ∀ w ∈ RestrictedFortShift.shiftSet S T, (frameAt word).cutPrice ≤ kPlusW word w := by
+    intro w hw'
+    rw [kPlusW_eq]
+    exact hK' w hw'
   have hI0 : PassageInv.InvP word r' := by
     unfold PassageInv.InvP
     exact ⟨hr'p.le, hr's.le⟩
-  obtain ⟨f, hfS, hfE, hfK, hfn, hfI⟩ := PassageInv.plus_passage_inv hw hSE
-    (ForcedPriceSI.priceRangeOn_of_strong hS) hW hW1 hfort hr'S hcR hmin hI0
-  have hpf := PassageInv.plus_pair_of_inv hfI (hfK.trans hcutr)
+  obtain ⟨f, hfS, hfK, hfn, hfI⟩ := PassageRep.passage_rep_plus hw hSE hS hpar
+    (ForcedPriceSI.priceRangeOn_of_strong hS) hW hW1 hfort hcut hr'S hcutr hI0
+  have hpf := PassageInv.plus_pair_of_inv hfI hfK
   have hex : ∃ v ∈ (frameAt word).child.modifiedDeck.span,
       f + v ∈ (frameAt word).freeH ∪ (frameAt word).freeV := by
     by_contra hcon
