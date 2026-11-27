@@ -447,6 +447,7 @@ import FLatticePaper.Tiles.ReflectedCover
 import FLatticePaper.Tiles.HorizontalTop
 import FLatticePaper.Tiles.VerticalCover
 import FLatticePaper.Tiles.VerticalRevBridge
+import FLatticePaper.Tiles.VertexEdge
 import FLatticePaper.Tiles.OverlapSides
 import FLatticePaper.Tiles.VerticalZeroOne
 import FLatticePaper.Tiles.VerticalReflect
