@@ -1,5 +1,5 @@
 import FLatticePaper.Tiles.SurgicalWeakOdometers
-import FLatticePaper.Tiles.HorizontalMoreoverProof
+import FLatticePaper.Tiles.HorizontalEnlargedCross
 import FLatticePaper.Tiles.VerticalMoreoverProof
 
 /-! # The Section 5 Moreover hypothesis of the weak standard odometers, discharged
