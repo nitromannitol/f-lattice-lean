@@ -135,7 +135,7 @@ here. E-numbers refer to that repository's error list (`notes/ERRORS_S5-8.md` an
 **agrees** (the Lean statement matches the surgical statement and is proved), **conditional** (proved from named inputs),
 **partial** (some parts proved), **differs** (the Lean states another form; the surgical form is open), **defined** (the
 definitions are in place), **open** (no Lean statement yet), **cited** (an outside result, cited as in the text).
-Section 2 has no numbered statements. Section 9 is the new text of the surgical edition, under audit; its rows may change.
+Section 2 has no numbered statements. Section 9 is the new text of the surgical edition; its audit found the proof of recurrence and of the alternate extension incomplete, so only the standard extension is formalised.
 
 | Label | Line | Lean | Status |
 |---|---|---|---|
@@ -196,6 +196,6 @@ Section 2 has no numbered statements. Section 9 is the new text of the surgical 
 | definition of tile odometers (unlabelled) | 3976 | — | open (E41) |
 | lemma:l_correct_existence | 4003 | — | open (E42) |
 | lemma:tile-odometer-existence | 4026 | — | open (E43) |
-| lemma:global_odometers | 4097 | `Plane.GlobalOdometers.global_odometers` (the corrected edition's route, from named inputs) | open in the surgical form (the extension of the tile odometers by eq:global_translation) |
-| lemma:global_superharmonic | 4130 | — | open |
-| lemma:global_recurrence | 4149 | — | open |
+| lemma:global_odometers | 4097 | `Plane.SurgicalGlobalOdometers.surgical_corrected_periodicity`; `Plane.GlobalOdometers.global_odometers` (the corrected edition's route, from named inputs) | partial: the periodicity and growth algebra is proved; the standard extension by eq:global_translation is open; the alternate extension has no proof in the text (audit) |
+| lemma:global_superharmonic | 4130 | — | open (the text's proof depends on the open inputs listed by the audit) |
+| lemma:global_recurrence | 4149 | — | open: the text's proof is not a proof (audit); recurrence is checked numerically for all periodic patterns of words of length at most 4 |
