@@ -1,4 +1,4 @@
-import FLatticePaper.Tiles.MixedPieces
+import FLatticePaper.Tiles.MixedPiecesInMarks
 
 /-! The existence step of `lemma:tile-odometer-existence` (Step 1, the common extension), as a reduction, with full copies.
 
