@@ -1,7 +1,7 @@
 # Source correspondence
 
 **Target: the surgical edition.** The target is the surgical edition of `farey_recursion.tex` (the October 2023 arXiv text
-with minimal corrections, Sections 5–8), pinned at commit 8824170 of its source repository; its text is not copied here.
+with minimal corrections, Sections 5–8), pinned at commit 42ce075 of its source repository; its text is not copied here.
 The surgical map of Sections 1–8 (label, surgical line, Lean declaration, agreement) is the last section of this file. The
 table that follows maps the corrected edition pinned in `paper/`.
 
@@ -130,7 +130,7 @@ A separate, shorter write-up (`flattice-simple-proof`, `short-proof.tex` with it
 
 ## Surgical edition map (Sections 1–8)
 
-Lines refer to `farey_recursion.tex` at commit 8824170 of the surgical edition's source repository; its text is not copied
+Lines refer to `farey_recursion.tex` at commit 42ce075 of the surgical edition's source repository; its text is not copied
 here. E-numbers refer to that repository's error list (`notes/ERRORS_S5-8.md` and the section notes). Status words:
 **agrees** (the Lean statement matches the surgical statement and is proved), **conditional** (proved from named inputs),
 **partial** (some parts proved), **differs** (the Lean states another form; the surgical form is open), **defined** (the
@@ -160,13 +160,13 @@ Section 2 has no numbered statements; Section 9 is being rewritten and is not ma
 | boundary-word lemma (unlabelled) | 1704 | `Tiles.PseudoSquare.pseudoSquare_boundaryWord`, `pseudoSquare_halfTurn`, `pseudoSquare_quarterTurn` | partial: the identities of Table 1 are hypotheses (E10) |
 | lemma:common-extension-pseudo-square | 1731 | `Tiles.CommonExtension.common_extension_almost`, `common_extension_unique` | partial: (i) and (iii) agree; (ii) open (E12) |
 | def:partial_tile_boundary_strings | 1754 | `Tiles.PartialBoundary` | defined |
-| prop:base_cases | 1920 | `Construction.PropBaseCases.prop_base_cases_*`; `Construction.PropBaseCasesFG`; `Construction.PropBaseCasesOdo` | partial: (a)–(d) for the base families; (e), with the exception to the definition of c, open (E15); (f), (g): the tile inclusions and the odometer equalities on both copies, with the affine factors of the translations, are proved for k ≥ 1 |
+| prop:base_cases | 1920 | `Construction.PropBaseCases.prop_base_cases_*`; `Construction.PropBaseCasesE`; `Construction.PropBaseCasesFG`; `Construction.PropBaseCasesOdo` | agrees: (a)–(d) for the base families; (e) with the exception to the definition of c (E15) (`Construction.PropBaseCasesE.prop_base_cases_e`); (f), (g): the tile inclusions and the odometer equalities on both copies, with the affine factors of the translations, for k ≥ 1 |
 | prop:recurrence | 2032 | — | cited, as in the text (E16) |
 | lemma:checkerboard_recurrence | 2042 | `Endpoint.zeroEndpoint` | agrees (E17) |
 | lemma:basecase_3k_even_std | 2101 | `Construction.BaseCaseRecurrence.paperStairTile`, `paperStairValue`, `staircase_recurrent` | agrees |
 | lemma:basecase_2k_odd_std | 2200 | `Construction.NearOneBaseCases.paperNearStairTile`, `paperNearStairValue`, `near_staircase_base` | agrees |
 | lemma:basecase_3k_even_alt | 2241 | `Construction.BaseCaseRecurrence.paperStairAltTile`, `alt_staircase_recurrent`; `Tiles.AltStairPseudo` | agrees: the set and the formula; the partial w_h-pseudo-square anchored at c = (0,0) (E15) for every k (`Tiles.AltStairRespects.altStair_respectsPartialHAt`) |
-| lemma:basecase_2k_odd_alt | 2281 | `Construction.NearOneBaseCases.paperNearStairAltTile`, `paperNearStairAltValue` | partial: the set and the formula agree (E20); the pseudo-square at 2303 open for general d |
+| lemma:basecase_2k_odd_alt | 2281 | `Construction.NearOneBaseCases.paperNearStairAltTile`, `paperNearStairAltValue` | agrees: the set and the formula (E20); the partial w_v-pseudo-square at 2303 for every k (`Tiles.NearStairVerticalRespects.pq_respectsPartialV`) |
 | lemma:staircase_laplacian | 2334 | `Construction.BaseCaseLaplacian.staircase_laplacian`, `alt_staircase_laplacian`; `Construction.StaircaseRotationTile.staircase_laplacian_rotation`, `staircase_alt_laplacian_rotation` | agrees; the rotation identities (E18) hold on all of Z² for the translate by e₂ |
 | lemma:basecase_3k_odd_std | 2396 | `Construction.BaseCaseRecurrence.paperLadderTile`, `paperLadderValue`, `doubled_staircase_recurrent` | agrees |
 | lemma:basecase_2k_even_std | 2423 | `Construction.NearOneBaseCases.paperNearLadderTile`, `paperNearLadderValue` | agrees |
@@ -178,7 +178,7 @@ Section 2 has no numbered statements; Section 9 is being rewritten and is not ma
 | lemma:alt-staircase-recurrent | 2677 | `Construction.BaseCaseRecurrence.alt_staircase_recurrent` | agrees |
 | lemma:doubled-staircase-recurrent | 2755 | `Construction.BaseCaseRecurrence.doubled_staircase_recurrent` | agrees |
 | lemma:doubled-alt-staircase-recurrent | 2820 | `Construction.BaseCaseRecurrence.doubled_alt_staircase_recurrent` | agrees |
-| def:standard_tiles | 2890 | `Tiles.StandardTiles.oddTile`, `evenTile` | differs: the Lean follows the 2021 constructor at the words 2^j3^k (E26) |
+| def:standard_tiles | 2890 | `Tiles.StandardTiles.oddTile`, `evenTile`, `oddChildB`, `evenChildB`; `Tiles.StandardBaseBridge` | agrees: the printed decompositions with the offsets of eq:offsets_w1_odd and eq:offsets_w1_even and the printed base tiles; at the words 2^j3^k it is the 2021 constructor that differs (E26) |
 | lemma:standard_boundary_word_recursion | 2972 | `Tiles.StandardTiles.rot_standard_tiles`; `Tiles.StandardBoundary` | partial: (1) agrees; (2) for the odd tile word (E27) |
 | lemma:standard_tile_properties | 3254 | `Tiles.StandardPacking`; `Tiles.StringCorners`; `Tiles.InterfaceStacked` | partial: (a), (b) and the horizontal part of (c); the vertical part of (c) and (d) open (E29) |
 | def:partial_tile | 3317 | `Tiles.SurgicalPartial.IsPartialTile` | defined |
