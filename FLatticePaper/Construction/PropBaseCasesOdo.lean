@@ -291,4 +291,150 @@ theorem prop_base_cases_g2_odometer_copy2 (k : ℕ) (hk : 1 ≤ k) :
   generalize (x2 - x1) ^ 2 = Q
   split_ifs <;> omega
 
+/-! ### Items (f4)-(f6): the k-dependent factor. The second copy has `v`-factor `a_{p,2}+a_{q,2}−(·)a_{q,1}` with
+`(p,q) = (2^{k−1}(p), 1/1)`, `a_{p,2} = (k, −(k+1))`, `a_{q,2} = (1,−1)`, so the factor is `(k+1, −(k+2))`, and the constant is
+`(k+2)²` (measured; the text does not print it, so it is existential, here witnessed). The base is `T(p) = T_{R(1/(2k+1))}`. -/
+
+/-- (f4), copy 2: `T(2^k q) ⊃ T(p, (−2, 2k+2))`, placed at `x − (1,1) − v`, with `(k+1, −(k+2))` affine factor. -/
+theorem prop_base_cases_f4_odometer_copy2 (k : ℕ) (hk : 1 ≤ k) (x1 x2 : ℤ)
+    (h : (x1 + 1, x2 - 2 * (k : ℤ) - 3) ∈ paperNearStairTile (2 * (k : ℤ) + 1)) :
+    paperNearLadderValue (2 * (k : ℤ) + 2) (x1, x2) =
+      paperNearStairValue (2 * (k : ℤ) + 1) (x1 + 1, x2 - 2 * (k : ℤ) - 3) +
+        affineAt (aVec1 + (aVec2 (k : ℤ) ((k : ℤ) + 1) + aVec2 1 1 - aVec1)) x1 x2 + ((k : ℤ) + 2) ^ 2 := by
+  have hk' : (1 : ℤ) ≤ (k : ℤ) := by exact_mod_cast hk
+  have haff : affineAt (aVec1 + (aVec2 (k : ℤ) ((k : ℤ) + 1) + aVec2 1 1 - aVec1)) x1 x2 =
+      -(((k : ℤ) + 2) * (x2 - x1)) - x1 := by
+    simp only [affineAt, aVec1, aVec2, Prod.fst_add, Prod.snd_add, Prod.fst_sub, Prod.snd_sub]
+    ring
+  rw [haff]
+  have e : x2 - 2 * (k : ℤ) - 3 - (x1 + 1) = x2 - x1 - 2 * ((k : ℤ) + 2) := by ring
+  have hshift := sq_shift_div_four (x2 - x1) ((k : ℤ) + 2)
+  unfold paperNearStairTile at h
+  simp only [Set.mem_union, Set.mem_setOf_eq, Set.mem_insert_iff, Set.mem_singleton_iff, Prod.mk.injEq] at h
+  simp only [paperNearStairValue, paperNearLadderValue, Set.indicator_apply, paperNearLadderA, paperNearLadderB,
+    Set.mem_union, Set.mem_insert_iff, Set.mem_singleton_iff, Set.mem_setOf_eq, Prod.mk.injEq]
+  rw [e, hshift]
+  generalize (x2 - x1) ^ 2 = Q
+  generalize ((k : ℤ) + 2) * (x2 - x1) = P
+  generalize ((k : ℤ) + 2) ^ 2 = R
+  split_ifs <;> omega
+
+/-- (f5), copy 2: `T̂(2^k q) ⊃ T(p, (−3, 2k+1))`, placed at `x − (1,1) − v`, factor `a_{p,2}+a_{q,2}−2a_{q,1} + a_{q,1}`. -/
+theorem prop_base_cases_f5_odometer_copy2 (k : ℕ) (hk : 1 ≤ k) (x1 x2 : ℤ)
+    (h : (x1 + 2, x2 - 2 * (k : ℤ) - 2) ∈ paperNearStairTile (2 * (k : ℤ) + 1)) :
+    paperNearLadderAltValue (2 * (k : ℤ) + 2) (x1, x2) =
+      paperNearStairValue (2 * (k : ℤ) + 1) (x1 + 2, x2 - 2 * (k : ℤ) - 2) +
+        affineAt (aVec1 + (aVec2 (k : ℤ) ((k : ℤ) + 1) + aVec2 1 1 - aVec1 - aVec1)) x1 x2 + ((k : ℤ) + 2) ^ 2 := by
+  have hk' : (1 : ℤ) ≤ (k : ℤ) := by exact_mod_cast hk
+  have haff : affineAt (aVec1 + (aVec2 (k : ℤ) ((k : ℤ) + 1) + aVec2 1 1 - aVec1 - aVec1)) x1 x2 =
+      -(((k : ℤ) + 2) * (x2 - x1)) - x1 := by
+    simp only [affineAt, aVec1, aVec2, Prod.fst_add, Prod.snd_add, Prod.fst_sub, Prod.snd_sub]
+    ring
+  rw [haff]
+  have e : x2 - 2 * (k : ℤ) - 2 - (x1 + 2) = x2 - x1 - 2 * ((k : ℤ) + 2) := by ring
+  have hshift := sq_shift_div_four (x2 - x1) ((k : ℤ) + 2)
+  unfold paperNearStairTile at h
+  simp only [Set.mem_union, Set.mem_setOf_eq, Set.mem_insert_iff, Set.mem_singleton_iff, Prod.mk.injEq] at h
+  simp only [paperNearStairValue, paperNearLadderAltValue, Set.indicator_apply, paperNearLadderAltA,
+    paperNearLadderAltB, Set.mem_union, Set.mem_insert_iff, Set.mem_singleton_iff, Set.mem_setOf_eq, Prod.mk.injEq]
+  rw [e, hshift]
+  generalize (x2 - x1) ^ 2 = Q
+  generalize ((k : ℤ) + 2) * (x2 - x1) = P
+  generalize ((k : ℤ) + 2) ^ 2 = R
+  split_ifs <;> omega
+
+/-- (f6), copy 2: `T̂(2^k p) ⊃ T(p, (−1, 2k+3))`, placed at `x − (1,1) − v`, factor `a_{q,1}+a_{p,2}+a_{q,2}`. -/
+theorem prop_base_cases_f6_odometer_copy2 (k : ℕ) (hk : 1 ≤ k) (x1 x2 : ℤ)
+    (h : (x1, x2 - 2 * (k : ℤ) - 4) ∈ paperNearStairTile (2 * (k : ℤ) + 1)) :
+    paperNearStairAltValue (2 * (k : ℤ) + 3) (x1, x2) =
+      paperNearStairValue (2 * (k : ℤ) + 1) (x1, x2 - 2 * (k : ℤ) - 4) +
+        affineAt (aVec1 + (aVec2 (k : ℤ) ((k : ℤ) + 1) + aVec2 1 1)) x1 x2 + ((k : ℤ) + 2) ^ 2 := by
+  have hk' : (1 : ℤ) ≤ (k : ℤ) := by exact_mod_cast hk
+  have haff : affineAt (aVec1 + (aVec2 (k : ℤ) ((k : ℤ) + 1) + aVec2 1 1)) x1 x2 =
+      -(((k : ℤ) + 2) * (x2 - x1)) - x1 := by
+    simp only [affineAt, aVec1, aVec2, Prod.fst_add, Prod.snd_add]
+    ring
+  rw [haff]
+  have e : x2 - 2 * (k : ℤ) - 4 - x1 = x2 - x1 - 2 * ((k : ℤ) + 2) := by ring
+  have hshift := sq_shift_div_four (x2 - x1) ((k : ℤ) + 2)
+  unfold paperNearStairTile at h
+  simp only [Set.mem_union, Set.mem_setOf_eq, Set.mem_insert_iff, Set.mem_singleton_iff, Prod.mk.injEq] at h
+  simp only [paperNearStairValue, paperNearStairAltValue, Set.indicator_apply, paperNearStairAltA,
+    paperNearStairAltB, Set.mem_union, Set.mem_setOf_eq, Prod.mk.injEq]
+  rw [e, hshift]
+  generalize (x2 - x1) ^ 2 = Q
+  generalize ((k : ℤ) + 2) * (x2 - x1) = P
+  generalize ((k : ℤ) + 2) ^ 2 = R
+  split_ifs <;> omega
+
+/-! ### Copy 1 of (f4)-(f6): offset `v_{q,1} = (1,1)` with factor `a_{q,1} = 0`, so the child equals the base exactly. -/
+
+/-- (f4), copy 1: `T(2^k q)` restricted to the first copy `T(p) + (1,1)` equals the base odometer, exactly. -/
+theorem prop_base_cases_f4_odometer_copy1 (k : ℕ) (hk : 1 ≤ k) (x1 x2 : ℤ)
+    (h : (x1 - 1, x2 - 1) ∈ paperNearStairTile (2 * (k : ℤ) + 1)) :
+    paperNearLadderValue (2 * (k : ℤ) + 2) (x1, x2) = paperNearStairValue (2 * (k : ℤ) + 1) (x1 - 1, x2 - 1) := by
+  have hk' : (1 : ℤ) ≤ (k : ℤ) := by exact_mod_cast hk
+  unfold paperNearStairTile at h
+  simp only [Set.mem_union, Set.mem_setOf_eq, Set.mem_insert_iff, Set.mem_singleton_iff, Prod.mk.injEq] at h
+  simp only [paperNearStairValue, paperNearLadderValue, Set.indicator_apply, paperNearLadderA, paperNearLadderB,
+    Set.mem_union, Set.mem_insert_iff, Set.mem_singleton_iff, Set.mem_setOf_eq, Prod.mk.injEq]
+  have e : (x2 - 1 - (x1 - 1)) ^ 2 = (x2 - x1) ^ 2 := by ring
+  rw [e]
+  generalize (x2 - x1) ^ 2 = Q
+  split_ifs <;> omega
+
+/-- (f5), copy 1: `T̂(2^k q)` restricted to the first copy equals the base odometer, exactly. -/
+theorem prop_base_cases_f5_odometer_copy1 (k : ℕ) (hk : 1 ≤ k) (x1 x2 : ℤ)
+    (h : (x1 - 1, x2 - 1) ∈ paperNearStairTile (2 * (k : ℤ) + 1)) :
+    paperNearLadderAltValue (2 * (k : ℤ) + 2) (x1, x2) = paperNearStairValue (2 * (k : ℤ) + 1) (x1 - 1, x2 - 1) := by
+  have hk' : (1 : ℤ) ≤ (k : ℤ) := by exact_mod_cast hk
+  unfold paperNearStairTile at h
+  simp only [Set.mem_union, Set.mem_setOf_eq, Set.mem_insert_iff, Set.mem_singleton_iff, Prod.mk.injEq] at h
+  simp only [paperNearStairValue, paperNearLadderAltValue, Set.indicator_apply, paperNearLadderAltA,
+    paperNearLadderAltB, Set.mem_union, Set.mem_insert_iff, Set.mem_singleton_iff, Set.mem_setOf_eq, Prod.mk.injEq]
+  have e : (x2 - 1 - (x1 - 1)) ^ 2 = (x2 - x1) ^ 2 := by ring
+  rw [e]
+  generalize (x2 - x1) ^ 2 = Q
+  split_ifs <;> omega
+
+/-- (f6), copy 1: `T̂(2^k p)` restricted to the first copy equals the base odometer, exactly. -/
+theorem prop_base_cases_f6_odometer_copy1 (k : ℕ) (hk : 1 ≤ k) (x1 x2 : ℤ)
+    (h : (x1 - 1, x2 - 1) ∈ paperNearStairTile (2 * (k : ℤ) + 1)) :
+    paperNearStairAltValue (2 * (k : ℤ) + 3) (x1, x2) = paperNearStairValue (2 * (k : ℤ) + 1) (x1 - 1, x2 - 1) := by
+  have hk' : (1 : ℤ) ≤ (k : ℤ) := by exact_mod_cast hk
+  unfold paperNearStairTile at h
+  simp only [Set.mem_union, Set.mem_setOf_eq, Set.mem_insert_iff, Set.mem_singleton_iff, Prod.mk.injEq] at h
+  simp only [paperNearStairValue, paperNearStairAltValue, Set.indicator_apply, paperNearStairAltA,
+    paperNearStairAltB, Set.mem_union, Set.mem_setOf_eq, Prod.mk.injEq]
+  have e : (x2 - 1 - (x1 - 1)) ^ 2 = (x2 - x1) ^ 2 := by ring
+  rw [e]
+  generalize (x2 - x1) ^ 2 = Q
+  split_ifs <;> omega
+
+/-! ### The existential forms of the (f4)-(f6) copy-2 identities (constant `b` uniform in the point). -/
+
+/-- (f4), copy 2, existential constant. -/
+theorem prop_base_cases_f4_odometer_copy2_exists (k : ℕ) (hk : 1 ≤ k) :
+    ∃ b : ℤ, ∀ x1 x2 : ℤ, (x1 + 1, x2 - 2 * (k : ℤ) - 3) ∈ paperNearStairTile (2 * (k : ℤ) + 1) →
+      paperNearLadderValue (2 * (k : ℤ) + 2) (x1, x2) =
+        paperNearStairValue (2 * (k : ℤ) + 1) (x1 + 1, x2 - 2 * (k : ℤ) - 3) +
+          affineAt (aVec1 + (aVec2 (k : ℤ) ((k : ℤ) + 1) + aVec2 1 1 - aVec1)) x1 x2 + b :=
+  ⟨((k : ℤ) + 2) ^ 2, fun x1 x2 h => prop_base_cases_f4_odometer_copy2 k hk x1 x2 h⟩
+
+/-- (f5), copy 2, existential constant. -/
+theorem prop_base_cases_f5_odometer_copy2_exists (k : ℕ) (hk : 1 ≤ k) :
+    ∃ b : ℤ, ∀ x1 x2 : ℤ, (x1 + 2, x2 - 2 * (k : ℤ) - 2) ∈ paperNearStairTile (2 * (k : ℤ) + 1) →
+      paperNearLadderAltValue (2 * (k : ℤ) + 2) (x1, x2) =
+        paperNearStairValue (2 * (k : ℤ) + 1) (x1 + 2, x2 - 2 * (k : ℤ) - 2) +
+          affineAt (aVec1 + (aVec2 (k : ℤ) ((k : ℤ) + 1) + aVec2 1 1 - aVec1 - aVec1)) x1 x2 + b :=
+  ⟨((k : ℤ) + 2) ^ 2, fun x1 x2 h => prop_base_cases_f5_odometer_copy2 k hk x1 x2 h⟩
+
+/-- (f6), copy 2, existential constant. -/
+theorem prop_base_cases_f6_odometer_copy2_exists (k : ℕ) (hk : 1 ≤ k) :
+    ∃ b : ℤ, ∀ x1 x2 : ℤ, (x1, x2 - 2 * (k : ℤ) - 4) ∈ paperNearStairTile (2 * (k : ℤ) + 1) →
+      paperNearStairAltValue (2 * (k : ℤ) + 3) (x1, x2) =
+        paperNearStairValue (2 * (k : ℤ) + 1) (x1, x2 - 2 * (k : ℤ) - 4) +
+          affineAt (aVec1 + (aVec2 (k : ℤ) ((k : ℤ) + 1) + aVec2 1 1)) x1 x2 + b :=
+  ⟨((k : ℤ) + 2) ^ 2, fun x1 x2 h => prop_base_cases_f6_odometer_copy2 k hk x1 x2 h⟩
+
 end FLatticePaper.Construction
