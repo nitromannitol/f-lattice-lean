@@ -11,7 +11,8 @@ A boundary tile contains all four strings. The doubled tile of `def:standard_odo
 boundary tile and the partial tile translated by `v_{n/d}`.
 
 A tile is a `CellTile` (a finite set of cells, identified by lower-left corners) with `IsSimpleTile`, the Section 4
-predicate (`Tiles/AlmostTiling.lean`). -/
+predicate (`Tiles/AlmostTiling.lean`). Its point set is its vertex set `CellTile.vertices`; the side strings are point sets
+(`placedSites`, from `tileShape`), and all containments are between point sets (operator convention, af007b5). -/
 
 namespace FLatticePaper.Tiles
 
@@ -36,18 +37,18 @@ def sideString (wh wv : BinaryWord) (c : GInt) : Side → List (ZTile × GInt)
 
 /-- The sites of the side string of `T` (with lower-left vertex `c(T)`), or none when `T` is empty. -/
 noncomputable def sidePlaced (wh wv : BinaryWord) (T : CellTile) (s : Side) : List GInt :=
-  match lowerLeftList T.toList with
+  match lowerLeftList T.vertices.toList with
   | none => []
   | some c => placedSites (sideString wh wv c s)
 
 /-- `T'` is a partial tile of `T` on side `s` (`def:partial_tile`): `T'` is a tile (`IsSimpleTile`, Section 4) and
 `T' ∩ T` contains the side string of `T` on `s` (the case set `T^{h±/v±} ∩ T ⊃ …`). -/
 def IsPartialTile (T' T : CellTile) (wh wv : BinaryWord) (s : Side) : Prop :=
-  IsSimpleTile T' ∧ ∀ x ∈ sidePlaced wh wv T s, x ∈ T' ∧ x ∈ T
+  IsSimpleTile T' ∧ ∀ x ∈ sidePlaced wh wv T s, x ∈ T'.vertices ∧ x ∈ T.vertices
 
 /-- `T'` is a boundary tile of `T`: it contains the four side strings of `T` (`T^b ∩ T ⊃ w_h ∪ rev w_h ∪ w_v ∪ rev w_v`). -/
 def IsBoundaryTile (T' T : CellTile) (wh wv : BinaryWord) : Prop :=
-  IsSimpleTile T' ∧ ∀ s : Side, ∀ x ∈ sidePlaced wh wv T s, x ∈ T' ∧ x ∈ T
+  IsSimpleTile T' ∧ ∀ s : Side, ∀ x ∈ sidePlaced wh wv T s, x ∈ T'.vertices ∧ x ∈ T.vertices
 
 /-- The doubled tile `T^{d,p,±} = T^b ∪ (T^{h±/v±} + v)` of `def:standard_odometer_doubling` (as a set of cells). -/
 def doubledTile (Tb Th : CellTile) (v : GInt) : CellTile :=

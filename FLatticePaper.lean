@@ -1162,5 +1162,6 @@ import FLatticePaper.Construction.LadderRotationTile
 import FLatticePaper.Construction.PropBaseCasesFG
 import FLatticePaper.Plane.Induction.FreeSelSat
 import FLatticePaper.Plane.Induction.FreeSelSquares
+import FLatticePaper.Tiles.SurgicalOdometers
 
 /-! Root import for the corrected F-lattice paper. -/
