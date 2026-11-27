@@ -261,25 +261,24 @@ theorem side_inside (T : Finset Site) (wh wv : BinaryWord) (S : GInt → ℤ) (h
   refine ⟨t, ?_, x, hx, rfl⟩
   cases s <;> simp only [sideString, List.mem_append] at ht ⊢ <;> tauto
 
-/-- **The odd weak node from the existence glue**, for the paper's data (Step 1 of `lemma:weak_standard_odometer_properties`):
-for a word `w` that is not a base word, with registers `u1`, `u2`, if the tile odometers of the registers have the standard tiles as
-domains, the even one respects its boundary strings, copies of different parents meet only in the marks (`MixedPiecesInMarksOdd`,
-claim (d)) and condition (C) holds for the placed subodometers (`ClosedPathOdd`), then the glued odometer on `T(p_0)` (the values of
-the subodometers on the kept parts, `glue_kept_pieces`) satisfies `OddNodeP`: the doubled pieces are the even register odometer on
-their first copy and its translate on the second. -/
-theorem oddNode_of_glue (w u1 u2 : Word) (hw : ¬ Standard.IsBase w) (hreg : regsAt w = (some u1, some u2))
+/-- **The odd weak node from glued values**, for the paper's data: for a word `w` that is not a base word, with registers `u1`,
+`u2`, if the tile odometers of the registers have the standard tiles as domains and the even one respects its boundary strings, an
+odometer on `T(p_0)` equal to the placed subodometers plus constants `κ` on the kept parts, the two copies of each doubled piece
+agreeing on their overlap, satisfies `OddNodeP`: the doubled pieces are the even register odometer on their first copy and its
+translate on the second. -/
+theorem oddNode_of_kept (w u1 u2 : Word) (hw : ¬ Standard.IsBase w) (hreg : regsAt w = (some u1, some u2))
     (tO tE : Word → PartialOdometer) (hdO : (tO u1).dom = oddTile u1) (hdE : (tE u2).dom = evenTile u2)
     (hRQ : RespectsAnchored (tE u2).dom (SiteStrings.hWordOf u2 true) (SiteStrings.vWordOf u2 true) (tE u2).val)
-    (hd : MixedPieces.MixedPiecesInMarksOdd w)
-    (hC : ChildGlue.ClosedPathOdd w u1 u2 (placedOdd w (tO u1).val (tE u2).val 0)) :
-    ∃ wo : PartialOdometer, wo.dom = oddTile w ∧ OddNodeP paperS wo tO tE w := by
+    (κ : ℕ → ℤ)
+    (hD : ChildGlue.DoubledAgreeOdd w u1 u2 (dblOdd w) (fun i z => placedOdd w (tO u1).val (tE u2).val 0 i z + κ i))
+    (g : Site → ℤ)
+    (hg : ∀ i < (oddP w).length + (oddQ w).length,
+      ∀ z ∈ keptSet (pieceSet (oddP w) (oddQ w) (tOddSet u1) (tEvenSet u2)) (pieceFlag (oddP w)) (dblOdd w) i,
+        g z = placedOdd w (tO u1).val (tE u2).val 0 i z + κ i) :
+    OddNodeP paperS ⟨oddTile w, g⟩ tO tE w := by
   obtain ⟨hr1, -, hr3, -⟩ := regsAt_tiles w
   have hT1 : (stateAt w).tOdd = oddTile u1 := hr1 u1 (by rw [hreg])
   have hT2 : (stateAt w).tEven = evenTile u2 := hr3 u2 (by rw [hreg])
-  obtain ⟨κ, hM, hD⟩ := hC
-  obtain ⟨g, hg⟩ := ChildGlue.glue_kept_pieces (oddP w) (oddQ w) (tOddSet u1) (tEvenSet u2) (SiteInduction.marksOdd u1)
-    (SiteInduction.marksEven u2) (dblOdd w) (fun i z => placedOdd w (tO u1).val (tE u2).val 0 i z + κ i)
-    (fun a ha b hb z h1 h2 => hd u1 u2 hT1 hT2 a ha b hb z h1 h2) hM hD
   have hlen : (oddP w).length + (oddQ w).length = 6 := by rw [ClosedPathCycle.oddP_length, ClosedPathCycle.oddQ_length]
   obtain ⟨o0, o1, o2, o3, o4, o5⟩ := oddOffsets w
   obtain ⟨a0, a1, a2, a3, a4, a5⟩ := oddAffs w
@@ -295,7 +294,6 @@ theorem oddNode_of_glue (w u1 u2 : Word) (hw : ¬ Standard.IsBase w) (hreg : reg
   have hcM := glue_cons w u1 u2 tO tE hdE κ hD 4 (Or.inr rfl) (by rw [show 4 + 1 - 2 = 3 from rfl, o5, o4])
     (by rw [a4, a5])
   have hin := side_inside _ _ _ _ hRQ
-  refine ⟨⟨oddTile w, g⟩, rfl, ?_⟩
   simp only [OddNodeP, hreg, regOdo, paperS, regTile, hdO]
   refine ⟨dblPiece (tE u2) (texV1Even (parentsAt w).even) (κ 3 - κ 2),
     dblPiece (tE u2) (texV1Even (parentsAt w).even) (κ 5 - κ 4), ?_, ?_, ?_, ?_, ?_, ?_⟩
@@ -369,5 +367,321 @@ theorem oddNode_of_glue (w u1 u2 : Word) (hw : ¬ Standard.IsBase w) (hreg : reg
           rw [add_sub_cancel_right] at this
           linarith
         · ring
+
+/-- **The odd weak node from the existence glue**, for the paper's data (Step 1 of `lemma:weak_standard_odometer_properties`):
+for a word `w` that is not a base word, with registers `u1`, `u2`, if the tile odometers of the registers have the standard tiles as
+domains, the even one respects its boundary strings, copies of different parents meet only in the marks (`MixedPiecesInMarksOdd`,
+claim (d)) and condition (C) holds for the placed subodometers (`ClosedPathOdd`), then the glued odometer on `T(p_0)` (the values of
+the subodometers on the kept parts, `glue_kept_pieces`) satisfies `OddNodeP` (`oddNode_of_kept`). -/
+theorem oddNode_of_glue (w u1 u2 : Word) (hw : ¬ Standard.IsBase w) (hreg : regsAt w = (some u1, some u2))
+    (tO tE : Word → PartialOdometer) (hdO : (tO u1).dom = oddTile u1) (hdE : (tE u2).dom = evenTile u2)
+    (hRQ : RespectsAnchored (tE u2).dom (SiteStrings.hWordOf u2 true) (SiteStrings.vWordOf u2 true) (tE u2).val)
+    (hd : MixedPieces.MixedPiecesInMarksOdd w)
+    (hC : ChildGlue.ClosedPathOdd w u1 u2 (placedOdd w (tO u1).val (tE u2).val 0)) :
+    ∃ wo : PartialOdometer, wo.dom = oddTile w ∧ OddNodeP paperS wo tO tE w := by
+  obtain ⟨hr1, -, hr3, -⟩ := regsAt_tiles w
+  obtain ⟨κ, hM, hD⟩ := hC
+  obtain ⟨g, hg⟩ := ChildGlue.glue_kept_pieces (oddP w) (oddQ w) (tOddSet u1) (tEvenSet u2) (SiteInduction.marksOdd u1)
+    (SiteInduction.marksEven u2) (dblOdd w) (fun i z => placedOdd w (tO u1).val (tE u2).val 0 i z + κ i)
+    (fun a ha b hb z h1 h2 => hd u1 u2 (hr1 u1 (by rw [hreg])) (hr3 u2 (by rw [hreg])) a ha b hb z h1 h2) hM hD
+  exact ⟨⟨oddTile w, g⟩, rfl, oddNode_of_kept w u1 u2 hw hreg tO tE hdO hdE hRQ κ hD g hg⟩
+
+/-! ### Doubled pieces with an affine factor (the even child) -/
+
+/-- A doubled piece with an affine factor on the second copy: `o` on the first copy and `o(y - v) + a^T y + k` on the second. -/
+def dblPieceA (o : PartialOdometer) (v a : Site) (k : ℤ) : PartialOdometer :=
+  ⟨o.dom ∪ o.dom.image (· + v), fun y => if y ∈ o.dom then o.val y else o.val (y - v) + (a.1 * y.1 + a.2 * y.2) + k⟩
+
+/-- The second copy of `dblPieceA`. -/
+def dblSecondA (o : PartialOdometer) (v a : Site) (k : ℤ) : PartialOdometer :=
+  ⟨o.dom.image (· + v), fun y => o.val (y - v) + (a.1 * y.1 + a.2 * y.2) + k⟩
+
+theorem dblA_on (o : PartialOdometer) (v a : Site) (k : ℤ)
+    (hcons : ∀ y ∈ o.dom, y - v ∈ o.dom → o.val y = o.val (y - v) + (a.1 * y.1 + a.2 * y.2) + k) :
+    IsWeakDoublingOn o.dom o.dom v o (dblPieceA o v a k) (dblSecondA o v a k) := by
+  refine ⟨rfl, rfl, rfl, fun x hx => by simp [dblPieceA, hx], fun x hx => ?_⟩
+  simp only [dblSecondA, Finset.mem_image] at hx
+  obtain ⟨y, hy, rfl⟩ := hx
+  simp only [dblPieceA, dblSecondA]
+  split_ifs with h
+  · exact hcons _ h (by simpa using hy)
+  · rfl
+
+theorem dblA_respects (n d : ℤ) (i : Bool) (wh wv : BinaryWord) (s : Side) (o : PartialOdometer) (v : Site) (k : ℤ)
+    (hin : ∀ t ∈ sideString wh wv (0, 0) s, ∀ x ∈ tileShape t.1, x + t.2 ∈ o.dom) :
+    DoublingRespect.RespectsSideTranslation n d i wh wv s v o (dblSecondA o v (offsetA n d i) k) := by
+  intro t ht
+  refine ⟨hin t ht, fun x hx => ?_, ?_⟩
+  · simp only [dblSecondA, Finset.mem_image]
+    exact ⟨x + t.2, hin t ht x hx, by abel⟩
+  · have hmap : (tileShape t.1).map (· + (t.2 + v)) = ((tileShape t.1).map (· + t.2)).map (· + v) := by
+      rw [List.map_map]; congr 1; funext y; simp [add_assoc]
+    have hne : unitSquares ((tileShape t.1).map (· + t.2)) ≠ [] := by
+      rw [chain_unitSquares_map_add]; simpa using unitSquares_tileShape_ne t.1
+    have hfun : (dblSecondA o v (offsetA n d i) k).val =
+        fun y => o.val (y - v) + (offsetA n d i).1 * y.1 + (offsetA n d i).2 * y.2 + k := by
+      funext y; simp only [dblSecondA]; ring
+    rw [hmap, hfun, slopeOf_translate_affine o.val _ v _ k hne]
+    simp
+
+theorem dblA_std (oddChild sideSign fp : Bool) (n d : ℤ) (i : Bool) (wh wv : BinaryWord) (o : PartialOdometer) (v : Site)
+    (k : ℤ) (hcons : ∀ y ∈ o.dom, y - v ∈ o.dom →
+      o.val y = o.val (y - v) + ((offsetA n d i).1 * y.1 + (offsetA n d i).2 * y.2) + k)
+    (hin : ∀ t ∈ sideString wh wv (0, 0) (DoublingRespect.doublingSide oddChild sideSign), ∀ x ∈ tileShape t.1,
+      x + t.2 ∈ o.dom) :
+    IsWeakDoublingStd oddChild sideSign fp n d i wh wv o.dom o.dom v o (dblPieceA o v (offsetA n d i) k) := by
+  cases fp
+  · exact ⟨dblSecondA o v _ k, by simpa using ⟨dblA_on o v _ k hcons, dblA_respects n d i wh wv _ o v k hin⟩⟩
+  · refine ⟨o, ?_⟩
+    simp only [if_true]
+    exact ⟨dblSecondA o v _ k, k, trivial, ⟨rfl, fun x _ => rfl⟩, dblA_on o v _ k hcons,
+      dblA_respects n d i wh wv _ o v k hin⟩
+
+/-! ### The copies of the even child -/
+
+open FLatticePaper.Tiles.ChildGlue (dblEven evenP evenQ)
+open FLatticePaper.Tiles.ClosedPathAssembly (placedEven affEven)
+open FLatticePaper.Tiles.SurgicalDict (offsetQ0)
+
+/-- The copies of the even child of the nodes are the pieces of `ChildGlue`. -/
+theorem evenCopies_eq (w u1 u2 : Word) (i : ℕ) (hi : i < 6) :
+    evenCopies w (oddTile u1) (oddTile u1) (oddTile u1) (evenTile u2) i =
+      pieceSet (evenP w) (evenQ w) (tOddSet u1) (tEvenSet u2) i := by
+  have hb : (phase w == 1) = true ∨ (phase w == 1) = false := by cases (phase w == 1) <;> simp
+  obtain _ | _ | _ | _ | _ | _ | i := i
+  rotate_left 6
+  · omega
+  all_goals rcases hb with hb | hb <;>
+    simp [evenCopies, pieceSet, evenP, evenQ, MixedPieces.pOffsetsEven, MixedPieces.qOffsetsEven, SurgicalDict.offsetQ0,
+      hb, SiteInduction.shiftS, Finset.coe_image, tOddSet, tEvenSet, add_comm, add_left_comm]
+
+/-- The kept parts of the copies of the even child are those of `ChildGlue`. -/
+theorem evenKept_eq (w u1 u2 : Word) (i : ℕ) (hi : i < 6) :
+    keptPart (evenCopies w (oddTile u1) (oddTile u1) (oddTile u1) (evenTile u2)) (fun i => decide (4 ≤ i))
+        (fun i j => (i = 0 ∧ j = 1) ∨ (i = 2 ∧ j = 3)) i =
+      keptSet (pieceSet (evenP w) (evenQ w) (tOddSet u1) (tEvenSet u2)) (pieceFlag (evenP w)) dblEven i := by
+  ext z
+  simp only [keptPart, keptSet, Set.mem_setOf_eq, pieceFlag, dblEven, ClosedPathCycle.evenP_length]
+  rw [evenCopies_eq w u1 u2 i hi]
+  constructor
+  · rintro ⟨h1, h2⟩
+    refine ⟨h1, fun ⟨j, hj, hf, hd, hz⟩ => h2 ⟨j, hj, hf, by omega, ?_⟩⟩
+    rw [evenCopies_eq w u1 u2 j (by omega)]; exact hz
+  · rintro ⟨h1, h2⟩
+    refine ⟨h1, fun ⟨j, hj, hf, hd, hz⟩ => h2 ⟨j, hj, hf, by omega, ?_⟩⟩
+    rw [← evenCopies_eq w u1 u2 j (by omega)]; exact hz
+
+/-- Every copy of the even child lies in the even tile. -/
+theorem evenCopy_sub (w u1 u2 : Word) (hw : ¬ Standard.IsBase w) (hT1 : (stateAt w).tOdd = oddTile u1)
+    (hT2 : (stateAt w).tEven = evenTile u2) (i : ℕ) (hi : i < 6) :
+    evenCopies w (oddTile u1) (oddTile u1) (oddTile u1) (evenTile u2) i ⊆ ↑(evenTile w) := by
+  intro z hz
+  have he : evenTile w = Standard.evenChildB (phase w == 1) (oddTile u1) (evenTile u2) (parentsAt w).odd
+      (parentsAt w).even := by
+    show (Standard.childTiles w (stateAt w)).2 = _
+    rw [SiteInduction.childTiles_nonbase w hw, hT1, hT2, Standard.stateAt_par]
+  rw [Finset.mem_coe, he]
+  have hb : (phase w == 1) = true ∨ (phase w == 1) = false := by cases (phase w == 1) <;> simp
+  obtain _ | _ | _ | _ | _ | _ | i := i
+  rotate_left 6
+  · omega
+  all_goals
+    rcases hb with hb | hb <;>
+    simp only [evenCopies, hb, SurgicalDict.offsetQ0, if_true, if_false, Bool.false_eq_true, Finset.coe_image,
+      Set.mem_image, Finset.mem_coe] at hz <;>
+    obtain ⟨y, hy, rfl⟩ := hz <;>
+    simp only [Standard.evenChildB, Finset.mem_union, Standard.mem_shift, hb] <;>
+    (try abel_nf) <;>
+    simp [hy]
+
+theorem evenOffsets (w : Word) :
+    (evenP w).getD 0 0 = offsetQ0 (phase w == 1) (texV1Odd (parentsAt w).odd) (texV2 (parentsAt w).odd) (texV1Even (parentsAt w).even)
+        (texV2 (parentsAt w).even) .p1DPlus ∧
+    (evenP w).getD 1 0 = texV2 (parentsAt w).odd + offsetQ0 (phase w == 1) (texV1Odd (parentsAt w).odd) (texV2 (parentsAt w).odd) (texV1Even (parentsAt w).even)
+        (texV2 (parentsAt w).even) .p1DPlus ∧
+    (evenP w).getD 2 0 = offsetQ0 (phase w == 1) (texV1Odd (parentsAt w).odd) (texV2 (parentsAt w).odd) (texV1Even (parentsAt w).even)
+        (texV2 (parentsAt w).even) .p1DMinus ∧
+    (evenP w).getD 3 0 = texV2 (parentsAt w).odd + offsetQ0 (phase w == 1) (texV1Odd (parentsAt w).odd) (texV2 (parentsAt w).odd) (texV1Even (parentsAt w).even)
+        (texV2 (parentsAt w).even) .p1DMinus ∧
+    (evenQ w).getD 0 0 = offsetQ0 (phase w == 1) (texV1Odd (parentsAt w).odd) (texV2 (parentsAt w).odd) (texV1Even (parentsAt w).even)
+        (texV2 (parentsAt w).even) .q1Plus ∧
+    (evenQ w).getD 1 0 = offsetQ0 (phase w == 1) (texV1Odd (parentsAt w).odd) (texV2 (parentsAt w).odd) (texV1Even (parentsAt w).even)
+        (texV2 (parentsAt w).even) .q1Minus := by
+  cases h : (phase w == 1) <;>
+    simp only [evenP, evenQ, MixedPieces.pOffsetsEven, MixedPieces.qOffsetsEven, SurgicalDict.offsetQ0, h, if_true,
+      if_false, Bool.false_eq_true, List.getD_cons_zero, List.getD_cons_succ] <;>
+    refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩ <;> first | trivial | abel
+
+theorem evenAffs (w : Word) :
+    affEven (parentsAt w).odd (parentsAt w).even 0 = q0AffTab (phase w == 1) (parentsAt w).odd.num (parentsAt w).odd.den
+        (parentsAt w).even.num (parentsAt w).even.den .p1DPlus ∧
+    affEven (parentsAt w).odd (parentsAt w).even 1 = offsetA (parentsAt w).odd.num (parentsAt w).odd.den true + q0AffTab (phase w == 1) (parentsAt w).odd.num (parentsAt w).odd.den
+        (parentsAt w).even.num (parentsAt w).even.den .p1DPlus ∧
+    affEven (parentsAt w).odd (parentsAt w).even 2 = q0AffTab (phase w == 1) (parentsAt w).odd.num (parentsAt w).odd.den
+        (parentsAt w).even.num (parentsAt w).even.den .p1DMinus ∧
+    affEven (parentsAt w).odd (parentsAt w).even 3 = offsetA (parentsAt w).odd.num (parentsAt w).odd.den true + q0AffTab (phase w == 1) (parentsAt w).odd.num (parentsAt w).odd.den
+        (parentsAt w).even.num (parentsAt w).even.den .p1DMinus ∧
+    affEven (parentsAt w).odd (parentsAt w).even 4 = q0AffTab (phase w == 1) (parentsAt w).odd.num (parentsAt w).odd.den
+        (parentsAt w).even.num (parentsAt w).even.den .q1Plus ∧
+    affEven (parentsAt w).odd (parentsAt w).even 5 = q0AffTab (phase w == 1) (parentsAt w).odd.num (parentsAt w).odd.den
+        (parentsAt w).even.num (parentsAt w).even.den .q1Minus := by
+  cases h : (phase w == 1) <;>
+    simp [affEven, q0AffTab, pairAffine, offsetA, Prod.ext_iff, two_mul]
+
+theorem mem_piece_p (w u1 u2 : Word) (j : ℕ) (hj : j < 4) (y : Site) (hy : y ∈ oddTile u1) :
+    y + (evenP w).getD j 0 ∈ pieceSet (evenP w) (evenQ w) (tOddSet u1) (tEvenSet u2) j := by
+  unfold pieceSet
+  rw [if_pos (by rw [ClosedPathCycle.evenP_length]; omega)]
+  exact ⟨y, by simpa [tOddSet] using hy, rfl⟩
+
+/-- The two copies of a doubled piece of the even glue agree on their overlap: the second is the translate of the first by
+`v_{p_1,2}` with the affine factor `a_{p_1,2}`, up to a constant. -/
+theorem glue_consE (w u1 u2 : Word) (tO tE : Word → PartialOdometer) (hdO : (tO u1).dom = oddTile u1) (κ : ℕ → ℤ)
+    (hD : ChildGlue.DoubledAgreeEven w u1 u2 dblEven (fun i z => placedEven w (tO u1).val (tE u2).val 0 i z + κ i))
+    (j : ℕ) (hj : j = 0 ∨ j = 2)
+    (hoff : (evenP w).getD (j + 1) 0 = texV2 (parentsAt w).odd + (evenP w).getD j 0)
+    (haff : affEven (parentsAt w).odd (parentsAt w).even (j + 1) =
+      offsetA (parentsAt w).odd.num (parentsAt w).odd.den true + affEven (parentsAt w).odd (parentsAt w).even j)
+    (y : Site) (hy : y ∈ (tO u1).dom) (hyv : y - texV2 (parentsAt w).odd ∈ (tO u1).dom) :
+    (tO u1).val y = (tO u1).val (y - texV2 (parentsAt w).odd) + ((offsetA (parentsAt w).odd.num (parentsAt w).odd.den true).1 * y.1 + (offsetA (parentsAt w).odd.num (parentsAt w).odd.den true).2 * y.2) +
+      (dot2 (offsetA (parentsAt w).odd.num (parentsAt w).odd.den true) ((evenP w).getD j 0) + κ (j + 1) - κ j) := by
+  have hP := ClosedPathCycle.evenP_length w
+  have hQ := ClosedPathCycle.evenQ_length w
+  have m1 := mem_piece_p w u1 u2 j (by omega) y (hdO ▸ hy)
+  have m2 := mem_piece_p w u1 u2 (j + 1) (by omega) (y - texV2 (parentsAt w).odd) (hdO ▸ hyv)
+  have e : y - texV2 (parentsAt w).odd + (evenP w).getD (j + 1) 0 = y + (evenP w).getD j 0 := by rw [hoff]; abel
+  rw [e] at m2
+  have h := hD j (j + 1) (by omega) (by omega) (by omega)
+    (by simp only [pieceFlag, hP, decide_eq_decide]; omega) ⟨rfl, hj⟩ _ m1 m2
+  simp only [placedEven, if_pos (show j < 4 by omega), if_pos (show j + 1 < 4 by omega), Pi.zero_apply, add_zero] at h
+  have e1 : y + (evenP w).getD j 0 - (evenP w).getD j 0 = y := by abel
+  have e2 : y + (evenP w).getD j 0 - (evenP w).getD (j + 1) 0 = y - texV2 (parentsAt w).odd := by rw [hoff]; abel
+  rw [e1, e2, haff] at h
+  simp only [dot2, Prod.fst_add, Prod.snd_add] at h ⊢
+  linear_combination h
+
+/-- **The even weak node from glued values**, for the paper's data: as `oddNode_of_kept`, for the even child. The doubled
+pieces are the odd register odometer on their first copy and its translate by `v_{p_1,2}`, with the affine factor
+`a_{p_1,2}`, on the second. -/
+theorem evenNode_of_kept (w u1 u2 : Word) (hw : ¬ Standard.IsBase w) (hreg : regsAt w = (some u1, some u2))
+    (tO tE : Word → PartialOdometer) (hdO : (tO u1).dom = oddTile u1) (hdE : (tE u2).dom = evenTile u2)
+    (hRP : RespectsAnchored (tO u1).dom (SiteStrings.hWordOf u1 false) (SiteStrings.vWordOf u1 false) (tO u1).val)
+    (κ : ℕ → ℤ)
+    (hD : ChildGlue.DoubledAgreeEven w u1 u2 dblEven (fun i z => placedEven w (tO u1).val (tE u2).val 0 i z + κ i))
+    (g : Site → ℤ)
+    (hg : ∀ i < (evenP w).length + (evenQ w).length,
+      ∀ z ∈ keptSet (pieceSet (evenP w) (evenQ w) (tOddSet u1) (tEvenSet u2)) (pieceFlag (evenP w)) dblEven i,
+        g z = placedEven w (tO u1).val (tE u2).val 0 i z + κ i) :
+    EvenNodeP paperS ⟨evenTile w, g⟩ tO tE w := by
+  obtain ⟨hr1, -, hr3, -⟩ := regsAt_tiles w
+  have hT1 : (stateAt w).tOdd = oddTile u1 := hr1 u1 (by rw [hreg])
+  have hT2 : (stateAt w).tEven = evenTile u2 := hr3 u2 (by rw [hreg])
+  have hlen : (evenP w).length + (evenQ w).length = 6 := by
+    rw [ClosedPathCycle.evenP_length, ClosedPathCycle.evenQ_length]
+  obtain ⟨o0, o1, o2, o3, o4, o5⟩ := evenOffsets w
+  obtain ⟨a0, a1, a2, a3, a4, a5⟩ := evenAffs w
+  have hgk : ∀ i, i < 6 → ∀ z ∈ keptPart (evenCopies w (oddTile u1) (oddTile u1) (oddTile u1) (evenTile u2))
+      (fun i => decide (4 ≤ i)) (fun i j => (i = 0 ∧ j = 1) ∨ (i = 2 ∧ j = 3)) i,
+      z ∈ evenTile w ∧ g z = placedEven w (tO u1).val (tE u2).val 0 i z + κ i := by
+    intro i hi z hz
+    refine ⟨evenCopy_sub w u1 u2 hw hT1 hT2 i hi hz.1, ?_⟩
+    rw [evenKept_eq w u1 u2 i hi] at hz
+    exact hg i (by rw [hlen]; exact hi) z hz
+  have hcP := glue_consE w u1 u2 tO tE hdO κ hD 0 (Or.inl rfl) (by rw [show (0 : ℕ) + 1 = 1 from rfl, o1, o0])
+    (by rw [show (0 : ℕ) + 1 = 1 from rfl, a1, a0])
+  have hcM := glue_consE w u1 u2 tO tE hdO κ hD 2 (Or.inr rfl) (by rw [show (2 : ℕ) + 1 = 3 from rfl, o3, o2])
+    (by rw [show (2 : ℕ) + 1 = 3 from rfl, a3, a2])
+  have hin := side_inside _ _ _ _ hRP
+  simp only [EvenNodeP, hreg, regOdo, paperS, regTile, hdE]
+  refine ⟨dblPieceA (tO u1) (texV2 (parentsAt w).odd) (offsetA (parentsAt w).odd.num (parentsAt w).odd.den true) (dot2 (offsetA (parentsAt w).odd.num (parentsAt w).odd.den true) ((evenP w).getD 0 0) + κ 1 - κ 0),
+    dblPieceA (tO u1) (texV2 (parentsAt w).odd) (offsetA (parentsAt w).odd.num (parentsAt w).odd.den true) (dot2 (offsetA (parentsAt w).odd.num (parentsAt w).odd.den true) ((evenP w).getD 2 0) + κ 3 - κ 2), ?_, ?_, ?_, ?_, ?_, ?_⟩
+  · have h := dblA_std false (!(phase w == 1)) false (parentsAt w).odd.num (parentsAt w).odd.den true _ _ (tO u1) _ _
+      (fun y hy hyv => hcP y hy hyv) (hin _)
+    rwa [hdO] at h
+  · have h := dblA_std false (phase w == 1) true (parentsAt w).odd.num (parentsAt w).odd.den true _ _ (tO u1) _ _
+      (fun y hy hyv => hcM y hy hyv) (hin _)
+    rwa [hdO] at h
+  · refine ⟨κ 0, fun x hx => ?_, fun x hx => ?_⟩
+    · rcases hx with hx | hx
+      · exact (hgk 0 (by omega) x hx).1
+      · exact (hgk 1 (by omega) x hx).1
+    · rcases hx with hx | hx
+      · have hc := hx.1
+        simp only [evenCopies, Finset.coe_image, Set.mem_image, Finset.mem_coe] at hc
+        obtain ⟨y, hy, rfl⟩ := hc
+        dsimp only
+        rw [(hgk 0 (by omega) _ hx).2]
+        simp only [placedEven, if_pos (show 0 < 4 by omega), o0, a0, dot2, Pi.zero_apply, add_zero,
+          add_sub_cancel_right, dblPieceA, hdO, hy, if_true]
+      · have hc := hx.1
+        simp only [evenCopies, Finset.coe_image, Set.mem_image, Finset.mem_coe] at hc
+        obtain ⟨y, hy, rfl⟩ := hc
+        dsimp only
+        rw [(hgk 1 (by omega) _ hx).2]
+        have e1 : y + (texV2 (parentsAt w).odd + offsetQ0 (phase w == 1) (texV1Odd (parentsAt w).odd) (texV2 (parentsAt w).odd) (texV1Even (parentsAt w).even)
+              (texV2 (parentsAt w).even) .p1DPlus) -
+            offsetQ0 (phase w == 1) (texV1Odd (parentsAt w).odd) (texV2 (parentsAt w).odd) (texV1Even (parentsAt w).even)
+              (texV2 (parentsAt w).even) .p1DPlus = y + texV2 (parentsAt w).odd := by abel
+        simp only [placedEven, if_pos (show 1 < 4 by omega), o1, o0, a1, dot2, Pi.zero_apply, add_zero,
+          add_sub_cancel_right, dblPieceA, e1, Prod.fst_add, Prod.snd_add]
+        split_ifs with hm
+        · have := hcP (y + texV2 (parentsAt w).odd) hm (by simpa using hdO ▸ hy)
+          rw [add_sub_cancel_right] at this
+          simp only [dot2, Prod.fst_add, Prod.snd_add, o0, Nat.reduceAdd] at this
+          linear_combination -this
+        · ring
+  · refine ⟨κ 2, fun x hx => ?_, fun x hx => ?_⟩
+    · rcases hx with hx | hx
+      · exact (hgk 2 (by omega) x hx).1
+      · exact (hgk 3 (by omega) x hx).1
+    · rcases hx with hx | hx
+      · have hc := hx.1
+        simp only [evenCopies, Finset.coe_image, Set.mem_image, Finset.mem_coe] at hc
+        obtain ⟨y, hy, rfl⟩ := hc
+        dsimp only
+        rw [(hgk 2 (by omega) _ hx).2]
+        simp only [placedEven, if_pos (show 2 < 4 by omega), o2, a2, dot2, Pi.zero_apply, add_zero,
+          add_sub_cancel_right, dblPieceA, hdO, hy, if_true]
+      · have hc := hx.1
+        simp only [evenCopies, Finset.coe_image, Set.mem_image, Finset.mem_coe] at hc
+        obtain ⟨y, hy, rfl⟩ := hc
+        dsimp only
+        rw [(hgk 3 (by omega) _ hx).2]
+        have e1 : y + (texV2 (parentsAt w).odd + offsetQ0 (phase w == 1) (texV1Odd (parentsAt w).odd) (texV2 (parentsAt w).odd) (texV1Even (parentsAt w).even)
+              (texV2 (parentsAt w).even) .p1DMinus) -
+            offsetQ0 (phase w == 1) (texV1Odd (parentsAt w).odd) (texV2 (parentsAt w).odd) (texV1Even (parentsAt w).even)
+              (texV2 (parentsAt w).even) .p1DMinus = y + texV2 (parentsAt w).odd := by abel
+        simp only [placedEven, if_pos (show 3 < 4 by omega), o3, o2, a3, dot2, Pi.zero_apply, add_zero,
+          add_sub_cancel_right, dblPieceA, e1, Prod.fst_add, Prod.snd_add]
+        split_ifs with hm
+        · have := hcM (y + texV2 (parentsAt w).odd) hm (by simpa using hdO ▸ hy)
+          rw [add_sub_cancel_right] at this
+          simp only [dot2, Prod.fst_add, Prod.snd_add, o2, Nat.reduceAdd] at this
+          linear_combination -this
+        · ring
+  · refine ⟨κ 4, fun x hx => (hgk 4 (by omega) x hx).1, fun x hx => ?_⟩
+    dsimp only
+    rw [(hgk 4 (by omega) x hx).2]
+    simp only [placedEven, if_neg (show ¬ 4 < 4 by omega), show 4 - 4 = 0 from rfl, o4, a4, dot2,
+      Pi.zero_apply, add_zero]
+  · refine ⟨κ 5, fun x hx => (hgk 5 (by omega) x hx).1, fun x hx => ?_⟩
+    dsimp only
+    rw [(hgk 5 (by omega) x hx).2]
+    simp only [placedEven, if_neg (show ¬ 5 < 4 by omega), show 5 - 4 = 1 from rfl, o5, a5, dot2,
+      Pi.zero_apply, add_zero]
+
+/-- **The even weak node from the existence glue**, for the paper's data: as `oddNode_of_glue`, for the even child. -/
+theorem evenNode_of_glue (w u1 u2 : Word) (hw : ¬ Standard.IsBase w) (hreg : regsAt w = (some u1, some u2))
+    (tO tE : Word → PartialOdometer) (hdO : (tO u1).dom = oddTile u1) (hdE : (tE u2).dom = evenTile u2)
+    (hRP : RespectsAnchored (tO u1).dom (SiteStrings.hWordOf u1 false) (SiteStrings.vWordOf u1 false) (tO u1).val)
+    (hd : MixedPieces.MixedPiecesInMarksEven w)
+    (hC : ChildGlue.ClosedPathEven w u1 u2 (placedEven w (tO u1).val (tE u2).val 0)) :
+    ∃ we : PartialOdometer, we.dom = evenTile w ∧ EvenNodeP paperS we tO tE w := by
+  obtain ⟨hr1, -, hr3, -⟩ := regsAt_tiles w
+  obtain ⟨κ, hM, hD⟩ := hC
+  obtain ⟨g, hg⟩ := ChildGlue.glue_kept_pieces (evenP w) (evenQ w) (tOddSet u1) (tEvenSet u2) (SiteInduction.marksOdd u1)
+    (SiteInduction.marksEven u2) dblEven (fun i z => placedEven w (tO u1).val (tE u2).val 0 i z + κ i)
+    (fun a ha b hb z h1 h2 => hd u1 u2 (hr1 u1 (by rw [hreg])) (hr3 u2 (by rw [hreg])) a ha b hb z h1 h2) hM hD
+  exact ⟨⟨evenTile w, g⟩, rfl, evenNode_of_kept w u1 u2 hw hreg tO tE hdO hdE hRP κ hD g hg⟩
 
 end FLatticePaper.Tiles.WeakStepPaper

@@ -543,7 +543,9 @@ def WeakAltPart (D : JointData) (g : Word → JSlice) (w : Word) (wao wae : Part
 
 /-- (3) The tile step at `w` (definition of tile odometers): at a base word the tile odometers are the weak ones; otherwise each
 is its decomposition from the tile parents and the L-corrected odometers of the parents; at an uncorrected child it is the weak
-odometer; and the tile odometers satisfy (a) of the weak lemma (`RespectsAnchored`, `RespectsHalfV`, `RespectsHalfH`). -/
+odometer; the tile odometers satisfy (a) of the weak lemma (`RespectsAnchored`, `RespectsHalfV`, `RespectsHalfH`); and the standard
+tile odometers are defined on the standard tiles (`lemma:tile-odometer-existence`; at a corrected child this is the identity of the
+corrected decomposition with the printed tile, `LCorrecProps.CorrectedCells`). -/
 def TilePart (D : JointData) (g : Word → JSlice) (w : Word) (wo we wao wae tod tev aod aev : PartialOdometer) : Prop :=
   (IsBase w → tod = wo ∧ tev = we ∧ aod = wao ∧ aev = wae) ∧
     (¬ IsBase w →
@@ -558,7 +560,8 @@ def TilePart (D : JointData) (g : Word → JSlice) (w : Word) (wo we wao wae tod
     RespectsAnchored tod.dom (hWordOf w false) (vWordOf w false) tod.val ∧
     RespectsAnchored tev.dom (hWordOf w true) (vWordOf w true) tev.val ∧
     RespectsHalfV (altRevVAnchor D.anc w) (vWordOf w false) aod.val ∧
-    RespectsHalfH (altFwdHAnchor D.anc w) (hWordOf w true) aev.val
+    RespectsHalfH (altFwdHAnchor D.anc w) (hWordOf w true) aev.val ∧
+    tod.dom = D.S.bdry (some w) true ∧ tev.dom = D.S.bdry (some w) false
 
 /-- (4) The L-corrected odometers at `w` (`lemma:l_correct_existence`): when the L-correction is defined, the decomposition from
 the tile odometers of the parents of `w_1 s` and the alternate tile odometers (`oddLPieces`, `evenLPieces`), and the agreement with

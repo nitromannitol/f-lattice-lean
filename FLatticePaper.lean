@@ -1289,6 +1289,8 @@ import FLatticePaper.Tiles.CornerValues
 import FLatticePaper.Tiles.LCorrecRecursion
 import FLatticePaper.Tiles.TileTranslationStd
 import FLatticePaper.Tiles.WeakStepPaper
+import FLatticePaper.Tiles.WeakStepAssembly
+import FLatticePaper.Tiles.LStepAssembly
 import FLatticePaper.Tiles.SurgicalOdometerStep
 import FLatticePaper.Tiles.SurgicalCorners
 import FLatticePaper.Tiles.SurgicalAffineChain
