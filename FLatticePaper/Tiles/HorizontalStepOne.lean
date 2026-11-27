@@ -450,13 +450,14 @@ theorem hAuxG_last_fst (D : HStr) : ∀ (prev : Option Letter) (w : BinaryWord) 
 
 /-- The bottom corner values of `eq:std_corner_values`: if `S` respects the forward horizontal string of a word from `q` to `p`
 whose last tile sits at `X - 1 - i`, then for the normalisation `(α, β)` of the formula (`S - α^T x - β = o_{1/1}` on the first
-tile at the origin), `S - α^T x - β` vanishes at `0`, `1`, `X - i` and `X`. -/
+tile at the origin), `S - α^T x - β` vanishes at `0`, `1`, `X - i` and `X`, and is `o_{0/1}` on the last tile. -/
 theorem bottom_corner_values (wh : BinaryWord) (S : GInt → ℤ) (X : GInt) (hhead : wh.head? = some Letter.q)
     (hlast : wh.getLast? = some Letter.p) (hX : lastPosOf (hStringAt wh 0) = X - (1, 1))
     (hR : RespectsTiles .horizontal false (hStringAt wh 0) S) :
     ∃ (α : GInt) (β : ℤ), (∀ x ∈ tileShape ZTile.one, S x - ptDot α x - β = zTileOdo ZTile.one x) ∧
       S 0 - ptDot α 0 - β = 0 ∧ S (1, 0) - ptDot α (1, 0) - β = 0 ∧
-      S (X - (0, 1)) - ptDot α (X - (0, 1)) - β = 0 ∧ S X - ptDot α X - β = 0 := by
+      S (X - (0, 1)) - ptDot α (X - (0, 1)) - β = 0 ∧ S X - ptDot α X - β = 0 ∧
+      ∀ y ∈ tileShape ZTile.zero, S (y + (X - (1, 1))) - ptDot α (y + (X - (1, 1))) - β = zTileOdo ZTile.zero y := by
   obtain ⟨α, β, h⟩ := horizontal_formula wh 0 S hR
   obtain ⟨rest, rfl⟩ : ∃ rest, wh = Letter.q :: rest := by
     cases wh with
@@ -496,7 +497,7 @@ theorem bottom_corner_values (wh : BinaryWord) (S : GInt → ℤ) (X : GInt) (hh
     have := h (L.length - 1) (by omega) (y + (X - (1, 1))) (by rw [mem_dom_iff, famOf_tile, hlastE]; simpa using hy)
     rw [this, hlastE]
     simp
-  refine ⟨α, β, fun x hx => by rw [v0 x hx]; ring, ?_, ?_, ?_, ?_⟩
+  refine ⟨α, β, fun x hx => by rw [v0 x hx]; ring, ?_, ?_, ?_, ?_, fun y hy => by rw [vL y hy]; ring⟩
   · have z : zTileOdo ZTile.one 0 = 0 := by decide
     rw [v0 0 (by decide), z]; ring
   · have z : zTileOdo ZTile.one (1, 0) = 0 := by decide
