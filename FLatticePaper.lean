@@ -420,6 +420,8 @@ import FLatticePaper.Tiles.ClosedPathCycle
 import FLatticePaper.Tiles.ClosedPathCorners
 import FLatticePaper.Tiles.ClosedPathSum
 import FLatticePaper.Tiles.ClosedPathContacts
+import FLatticePaper.Tiles.ClosedPathAssembly
+import FLatticePaper.Tiles.ClosedPathStandard
 import FLatticePaper.Tiles.MixedOverlapStrings
 import FLatticePaper.Tiles.ChildAssembly
 import FLatticePaper.Tiles.PTAffineTransport
