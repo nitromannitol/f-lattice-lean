@@ -155,12 +155,12 @@ Section 2 has no numbered statements; Section 9 is being rewritten and is not ma
 | lemma:pairwise_compatibility | 1119 | `Tiles.Gluing.exists_compatible_iff_walkSum_eq_zero`, `compatible_unique` | agrees; the closed-path condition (E03) is `walkSum = 0` |
 | lemma:almost_palindrome_offset | 1163 | `Tiles.BoundaryStrings.almost_palindrome_offset` | agrees |
 | lemma:zero-one-fixed-offsets | 1357 | `Tiles.BoundaryStrings.zeroOne_fixed_offsets_horizontal`, `_vertical`; `Tiles.StackFinalAssembly` | agrees (E04) |
-| lemma:stacked_zero_one_string | 1593 | `Tiles.ZeroOneStringPositions.zeroOneFirstSentence_all`; `Tiles.SurgicalSlopes`; `Tiles.StackedMoreover` | partial: the first sentence is proved with the older slope table, whose horizontal signs are exchanged (E05); the surgical table is `surgicalSlopeDiff`; the second sentence (E06) is stated for both strings (`HorizontalMoreover`, `VerticalMoreover`), with the non-overlap rule after the shared translation, and open |
+| lemma:stacked_zero_one_string | 1593 | `Tiles.ZeroOneStringPositions.zeroOneFirstSentence_all`; `Tiles.SurgicalSlopes`; `Tiles.StackedMoreover` | partial: the first sentence is proved with the older slope table, whose horizontal signs are exchanged (E05); the surgical table is `surgicalSlopeDiff`; the second sentence (E06) is stated for both strings, with the non-overlap rule after the shared translation; the horizontal half is proved (`Tiles.HorizontalMoreoverProof.horizontalMoreover_proof`), the vertical half is open |
 | def:tile_boundary_strings | 1647 | `Tiles.PseudoSquare.IsPseudoSquare`; `Tiles.PseudoSquareAnchored.IsPseudoSquareAnchored` | differs: the older predicates place the strings at fixed stacking offsets; the anchored predicate (E07) is defined |
 | boundary-word lemma (unlabelled) | 1704 | `Tiles.PseudoSquare.pseudoSquare_boundaryWord`, `pseudoSquare_halfTurn`, `pseudoSquare_quarterTurn` | partial: the identities of Table 1 are hypotheses (E10) |
 | lemma:common-extension-pseudo-square | 1731 | `Tiles.CommonExtension.common_extension_almost`, `common_extension_unique` | partial: (i) and (iii) agree; (ii) open (E12) |
 | def:partial_tile_boundary_strings | 1754 | `Tiles.PartialBoundary` | defined |
-| prop:base_cases | 1920 | `Construction.PropBaseCases.prop_base_cases_*`; `Construction.PropBaseCasesFG`; `Construction.PropBaseCasesOdo` | partial: (a)–(d) for the base families; (e), with the exception to the definition of c, open (E15); (f), (g): the tile inclusions and the first odometer equality are proved |
+| prop:base_cases | 1920 | `Construction.PropBaseCases.prop_base_cases_*`; `Construction.PropBaseCasesFG`; `Construction.PropBaseCasesOdo` | partial: (a)–(d) for the base families; (e), with the exception to the definition of c, open (E15); (f), (g): the tile inclusions and the odometer equalities on both copies, with the affine factors of the translations, are proved for k ≥ 1 |
 | prop:recurrence | 2032 | — | cited, as in the text (E16) |
 | lemma:checkerboard_recurrence | 2042 | `Endpoint.zeroEndpoint` | agrees (E17) |
 | lemma:basecase_3k_even_std | 2101 | `Construction.BaseCaseRecurrence.paperStairTile`, `paperStairValue`, `staircase_recurrent` | agrees |
@@ -183,7 +183,7 @@ Section 2 has no numbered statements; Section 9 is being rewritten and is not ma
 | lemma:standard_tile_properties | 3254 | `Tiles.StandardPacking`; `Tiles.StringCorners`; `Tiles.InterfaceStacked` | partial: (a), (b) and the horizontal part of (c); the vertical part of (c) and (d) open (E29) |
 | def:partial_tile | 3317 | `Tiles.SurgicalPartial.IsPartialTile` | defined |
 | def:standard_odometer_doubling | 3377 | `Tiles.SurgicalPartial.doubledTile`; `Tiles.SurgicalDict` | defined |
-| def:weak_standard_odometers | 3399 | — | open |
+| def:weak_standard_odometers | 3399 | `Tiles.SurgicalOdometerStep`; `Tiles.SurgicalWeakOdometers` | defined, with the base odometers of Section 6 |
 | lemma:weak_standard_odometer_properties | 3421 | — | open |
 | def:alternate_tiles | 3458 | `Tiles.AlternateTiles`; `Tiles.AlternateConstructor` | differs (E30) |
 | lemma:alternate_tile_properties | 3593 | — | open (E31–E34) |
