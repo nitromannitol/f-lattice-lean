@@ -91,35 +91,37 @@ def IsWeakDoublingAlt (firstPartial : Bool) (meet : FLatticePaper.Tiles.Side) (n
 
 /-- The alternate odd child `T̂(p_0)` of the word `w` (`eq:alt_decomp`, first line): the shifted doublings `ds(o)_{p_1}^±`
 of the odd register (shift `S_p`), the plain pieces `o_{q_1}^±` of the even register, and the parent piece `ô(q_1)` of the even
-alternate register (when the type of `w` is not `two`). -/
-def AltOddNode (S : WeakData) (oddO evenO altOdd altEven : Word → PartialOdometer) (w : Word) : Prop :=
+alternate register (when the type of `w` is not `two`). `child` is the alternate odometer of the child; the standard registers come from `pOdd`,
+`pEven` and the alternate registers from `aOdd`, `aEven` (the tile odometers in the joint family). -/
+def AltOddNodeP (S : WeakData) (child : PartialOdometer) (pOdd pEven aOdd aEven : Word → PartialOdometer) (w : Word) :
+    Prop :=
   ∃ dsp dsm : PartialOdometer,
     IsWeakDoublingAlt false FLatticePaper.Tiles.Side.hMinus (parentsAt w).odd.num (parentsAt w).odd.den true
         (FLatticePaper.Tiles.DoublingRespect.regWords true (regsAt w).1).1 (FLatticePaper.Tiles.DoublingRespect.regWords true (regsAt w).1).2
         (S.bdry (regsAt w).1 true) (altPartial S (regsAt w).1 true (altTypeOf w == some Digit.two) false)
         (altShifts (phase w == 1) (texV2 (parentsAt w).odd) (texV1Even (parentsAt w).even)).1
-        (regOdo S oddO evenO (regsAt w).1 true) dsp ∧
+        (regOdo S pOdd pEven (regsAt w).1 true) dsp ∧
     IsWeakDoublingAlt true FLatticePaper.Tiles.Side.hMinus (parentsAt w).odd.num (parentsAt w).odd.den true
         (FLatticePaper.Tiles.DoublingRespect.regWords true (regsAt w).1).1 (FLatticePaper.Tiles.DoublingRespect.regWords true (regsAt w).1).2
         (S.bdry (regsAt w).1 true) (altPartial S (regsAt w).1 true (altTypeOf w == some Digit.two) true)
         (altShifts (phase w == 1) (texV2 (parentsAt w).odd) (texV1Even (parentsAt w).even)).1
-        (regOdo S oddO evenO (regsAt w).1 true) dsm ∧
-    PlacedPiece (altOdd w) dsp
+        (regOdo S pOdd pEven (regsAt w).1 true) dsm ∧
+    PlacedPiece child dsp
       (coeffOff (texV1Odd (parentsAt w).odd) (texV2 (parentsAt w).odd)
         (texV1Even (parentsAt w).even) (texV2 (parentsAt w).even) (altP0Coeff (phase w == 1) .dsP1Plus))
       (coeffAffine (parentsAt w).odd.num (parentsAt w).odd.den (parentsAt w).even.num (parentsAt w).even.den
         (altP0Coeff (phase w == 1) .dsP1Plus)) ∧
-    PlacedPiece (altOdd w) dsm
+    PlacedPiece child dsm
       (coeffOff (texV1Odd (parentsAt w).odd) (texV2 (parentsAt w).odd)
         (texV1Even (parentsAt w).even) (texV2 (parentsAt w).even) (altP0Coeff (phase w == 1) .dsP1Minus))
       (coeffAffine (parentsAt w).odd.num (parentsAt w).odd.den (parentsAt w).even.num (parentsAt w).even.den
         (altP0Coeff (phase w == 1) .dsP1Minus)) ∧
-    PlacedPiece (altOdd w) (regOdo S oddO evenO (regsAt w).2 false)
+    PlacedPiece child (regOdo S pOdd pEven (regsAt w).2 false)
       (coeffOff (texV1Odd (parentsAt w).odd) (texV2 (parentsAt w).odd)
         (texV1Even (parentsAt w).even) (texV2 (parentsAt w).even) (altP0Coeff (phase w == 1) .q1Plus))
       (coeffAffine (parentsAt w).odd.num (parentsAt w).odd.den (parentsAt w).even.num (parentsAt w).even.den
         (altP0Coeff (phase w == 1) .q1Plus)) ∧
-    PlacedPiece (altOdd w) (regOdo S oddO evenO (regsAt w).2 false)
+    PlacedPiece child (regOdo S pOdd pEven (regsAt w).2 false)
       (coeffOff (texV1Odd (parentsAt w).odd) (texV2 (parentsAt w).odd)
         (texV1Even (parentsAt w).even) (texV2 (parentsAt w).even) (altP0Coeff (phase w == 1) .q1Minus))
       (coeffAffine (parentsAt w).odd.num (parentsAt w).odd.den (parentsAt w).even.num (parentsAt w).even.den
@@ -127,44 +129,49 @@ def AltOddNode (S : WeakData) (oddO evenO altOdd altEven : Word → PartialOdome
     (match altTypeOf w with
       | none => True
       | some ty =>
-        ParentPieceOk (altOdd w) (regOdo S altOdd altEven (regsAt w).2 false)
+        ParentPieceOk child (regOdo S aOdd aEven (regsAt w).2 false)
           (texV1Odd (parentsAt w).odd) (texV2 (parentsAt w).odd) (texV1Even (parentsAt w).even)
           (texV2 (parentsAt w).even) (parentsAt w).odd.num (parentsAt w).odd.den
           (parentsAt w).even.num (parentsAt w).even.den (altQ1Coeff (phase w == 1) ty))
 
+/-- The alternate node of a family whose parents are its own odometers (the self-contained weak recursion). -/
+def AltOddNode (S : WeakData) (oddO evenO altOdd altEven : Word → PartialOdometer) (w : Word) : Prop :=
+  AltOddNodeP S (altOdd w) oddO evenO altOdd altEven w
+
 /-- The alternate even child `T̂(q_0)` of the word `w` (`eq:alt_decomp`, second line): the plain pieces `o_{p_1}^±` of the
 odd register, the shifted doublings `ds(o)_{q_1}^±` of the even register (shift `S_q`), and the parent piece `ô(p_1)` of the
-odd alternate register (when the type of `w` is not `three`). -/
-def AltEvenNode (S : WeakData) (oddO evenO altOdd altEven : Word → PartialOdometer) (w : Word) : Prop :=
+odd alternate register (when the type of `w` is not `three`). The arguments are as in `AltOddNodeP`. -/
+def AltEvenNodeP (S : WeakData) (child : PartialOdometer) (pOdd pEven aOdd aEven : Word → PartialOdometer) (w : Word) :
+    Prop :=
   ∃ dsp dsm : PartialOdometer,
     IsWeakDoublingAlt true (FLatticePaper.Tiles.DoublingRespect.doublingSide false (phase w == 1))
         (parentsAt w).odd.num (parentsAt w).odd.den true
         (FLatticePaper.Tiles.DoublingRespect.regWords false (regsAt w).2).1 (FLatticePaper.Tiles.DoublingRespect.regWords false (regsAt w).2).2
         (S.bdry (regsAt w).2 false) (altPartial S (regsAt w).2 false (altTypeOf w == some Digit.three) true)
         (altShifts (phase w == 1) (texV2 (parentsAt w).odd) (texV1Even (parentsAt w).even)).2
-        (regOdo S oddO evenO (regsAt w).2 false) dsp ∧
+        (regOdo S pOdd pEven (regsAt w).2 false) dsp ∧
     IsWeakDoublingAlt false (FLatticePaper.Tiles.DoublingRespect.doublingSide false (phase w == 1))
         (parentsAt w).odd.num (parentsAt w).odd.den true
         (FLatticePaper.Tiles.DoublingRespect.regWords false (regsAt w).2).1 (FLatticePaper.Tiles.DoublingRespect.regWords false (regsAt w).2).2
         (S.bdry (regsAt w).2 false) (altPartial S (regsAt w).2 false (altTypeOf w == some Digit.three) false)
         (altShifts (phase w == 1) (texV2 (parentsAt w).odd) (texV1Even (parentsAt w).even)).2
-        (regOdo S oddO evenO (regsAt w).2 false) dsm ∧
-    PlacedPiece (altEven w) dsp
+        (regOdo S pOdd pEven (regsAt w).2 false) dsm ∧
+    PlacedPiece child dsp
       (coeffOff (texV1Odd (parentsAt w).odd) (texV2 (parentsAt w).odd)
         (texV1Even (parentsAt w).even) (texV2 (parentsAt w).even) (altQ0Coeff (phase w == 1) .dsQ1Plus))
       (coeffAffine (parentsAt w).odd.num (parentsAt w).odd.den (parentsAt w).even.num (parentsAt w).even.den
         (altQ0Coeff (phase w == 1) .dsQ1Plus)) ∧
-    PlacedPiece (altEven w) dsm
+    PlacedPiece child dsm
       (coeffOff (texV1Odd (parentsAt w).odd) (texV2 (parentsAt w).odd)
         (texV1Even (parentsAt w).even) (texV2 (parentsAt w).even) (altQ0Coeff (phase w == 1) .dsQ1Minus))
       (coeffAffine (parentsAt w).odd.num (parentsAt w).odd.den (parentsAt w).even.num (parentsAt w).even.den
         (altQ0Coeff (phase w == 1) .dsQ1Minus)) ∧
-    PlacedPiece (altEven w) (regOdo S oddO evenO (regsAt w).1 true)
+    PlacedPiece child (regOdo S pOdd pEven (regsAt w).1 true)
       (coeffOff (texV1Odd (parentsAt w).odd) (texV2 (parentsAt w).odd)
         (texV1Even (parentsAt w).even) (texV2 (parentsAt w).even) (altQ0Coeff (phase w == 1) .p1Plus))
       (coeffAffine (parentsAt w).odd.num (parentsAt w).odd.den (parentsAt w).even.num (parentsAt w).even.den
         (altQ0Coeff (phase w == 1) .p1Plus)) ∧
-    PlacedPiece (altEven w) (regOdo S oddO evenO (regsAt w).1 true)
+    PlacedPiece child (regOdo S pOdd pEven (regsAt w).1 true)
       (coeffOff (texV1Odd (parentsAt w).odd) (texV2 (parentsAt w).odd)
         (texV1Even (parentsAt w).even) (texV2 (parentsAt w).even) (altQ0Coeff (phase w == 1) .p1Minus))
       (coeffAffine (parentsAt w).odd.num (parentsAt w).odd.den (parentsAt w).even.num (parentsAt w).even.den
@@ -172,10 +179,14 @@ def AltEvenNode (S : WeakData) (oddO evenO altOdd altEven : Word → PartialOdom
     (match altTypeOf w with
       | none => True
       | some ty =>
-        ParentPieceOk (altEven w) (regOdo S altOdd altEven (regsAt w).1 true)
+        ParentPieceOk child (regOdo S aOdd aEven (regsAt w).1 true)
           (texV1Odd (parentsAt w).odd) (texV2 (parentsAt w).odd) (texV1Even (parentsAt w).even)
           (texV2 (parentsAt w).even) (parentsAt w).odd.num (parentsAt w).odd.den
           (parentsAt w).even.num (parentsAt w).even.den (altP1Coeff (phase w == 1) ty))
+
+/-- The alternate node of a family whose parents are its own odometers (the self-contained weak recursion). -/
+def AltEvenNode (S : WeakData) (oddO evenO altOdd altEven : Word → PartialOdometer) (w : Word) : Prop :=
+  AltEvenNodeP S (altEven w) oddO evenO altOdd altEven w
 
 /-- The lower-left anchors of the alternate tiles: `cHat w par` is `c(T̂)` of the alternate child of `w` (the lower-left vertex of
 the tile, `def:alternate_tiles` and the corner convention of `lemma:alternate_tile_properties`). It is a parameter here: the

@@ -1242,6 +1242,7 @@ import FLatticePaper.Plane.Induction.FreeSelSquares
 import FLatticePaper.Tiles.NearBaseBridges
 import FLatticePaper.Tiles.SurgicalWeakOdometers
 import FLatticePaper.Tiles.JointFamily
+import FLatticePaper.Tiles.JointInduction
 import FLatticePaper.Tiles.SurgicalOdometerStep
 import FLatticePaper.Tiles.SurgicalCorners
 import FLatticePaper.Tiles.SurgicalAffineChain

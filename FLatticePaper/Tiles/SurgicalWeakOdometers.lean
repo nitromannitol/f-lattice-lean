@@ -117,52 +117,63 @@ def IsStdStepQ0W1Even (vp1 vp2 vq1 vq2 : Site) (np dp nq dq : ℤ)
 
 /-- The odd child `o_{p_0}` of the word `w` (`eq:std_odometer_decomposition`, first line). The parents are
 `(parentsAt w).odd` (register `P`, plain pieces) and `(parentsAt w).even` (register `Q`, doubled pieces). The doubled
-pieces `d(o)_{q_1}^±` are weak doublings of `Q` with shift `v_{q_1,1}` (`texV1Even`) on the partial tiles `T^{h±/v±}`. -/
-def OddNode (S : WeakData) (oddO evenO : Word → PartialOdometer) (w : Word) : Prop :=
+pieces `d(o)_{q_1}^±` are weak doublings of `Q` with shift `v_{q_1,1}` (`texV1Even`) on the partial tiles `T^{h±/v±}`.
+`child` is the odometer of the child; the register odometers come from `pOdd`, `pEven` (in the joint family of Sections 7-8,
+the tile odometers of the parent words, surgical 274ad18). -/
+def OddNodeP (S : WeakData) (child : PartialOdometer) (pOdd pEven : Word → PartialOdometer) (w : Word) : Prop :=
   ∃ dqp dqm : PartialOdometer,
     IsWeakDoublingStd true true (phase w == 1) (parentsAt w).even.num (parentsAt w).even.den false
         (FLatticePaper.Tiles.DoublingRespect.regWords false (regsAt w).2).1 (FLatticePaper.Tiles.DoublingRespect.regWords false (regsAt w).2).2
         (S.bdry (regsAt w).2 false) (S.partialT (regsAt w).2 false true)
-        (texV1Even (parentsAt w).even) (regOdo S oddO evenO (regsAt w).2 false) dqp ∧
+        (texV1Even (parentsAt w).even) (regOdo S pOdd pEven (regsAt w).2 false) dqp ∧
     IsWeakDoublingStd true false (!(phase w == 1)) (parentsAt w).even.num (parentsAt w).even.den false
         (FLatticePaper.Tiles.DoublingRespect.regWords false (regsAt w).2).1 (FLatticePaper.Tiles.DoublingRespect.regWords false (regsAt w).2).2
         (S.bdry (regsAt w).2 false) (S.partialT (regsAt w).2 false false)
-        (texV1Even (parentsAt w).even) (regOdo S oddO evenO (regsAt w).2 false) dqm ∧
+        (texV1Even (parentsAt w).even) (regOdo S pOdd pEven (regsAt w).2 false) dqm ∧
     (phase w = 1 →
       IsStdStepP0W1Odd (texV1Odd (parentsAt w).odd) (texV2 (parentsAt w).odd)
         (texV1Even (parentsAt w).even) (texV2 (parentsAt w).even)
         (parentsAt w).odd.num (parentsAt w).odd.den (parentsAt w).even.num (parentsAt w).even.den
-        (oddO w) (regOdo S oddO evenO (regsAt w).1 true) (regOdo S oddO evenO (regsAt w).1 true) dqp dqm) ∧
+        child (regOdo S pOdd pEven (regsAt w).1 true) (regOdo S pOdd pEven (regsAt w).1 true) dqp dqm) ∧
     (phase w ≠ 1 →
       IsStdStepP0W1Even (texV1Odd (parentsAt w).odd) (texV2 (parentsAt w).odd)
         (texV1Even (parentsAt w).even) (texV2 (parentsAt w).even)
         (parentsAt w).odd.num (parentsAt w).odd.den (parentsAt w).even.num (parentsAt w).even.den
-        (oddO w) (regOdo S oddO evenO (regsAt w).1 true) (regOdo S oddO evenO (regsAt w).1 true) dqp dqm)
+        child (regOdo S pOdd pEven (regsAt w).1 true) (regOdo S pOdd pEven (regsAt w).1 true) dqp dqm)
+
+/-- The odd node of a family whose parents are its own odometers (the self-contained weak recursion). -/
+def OddNode (S : WeakData) (oddO evenO : Word → PartialOdometer) (w : Word) : Prop :=
+  OddNodeP S (oddO w) oddO evenO w
 
 /-- The even child `o_{q_0}` of the word `w` (`eq:std_odometer_decomposition`, second line): the doubled pieces
 `d(o)_{p_1}^±` (weak doublings of the odd register with shift `v_{p_1,2}`) and the plain pieces `o_{q_1}^±`.
 The doubled `+` piece has its partial tile on the second copy with the side `v^+` for `W_1` even, `v^-` for `W_1` odd (the L-correction
-`T^{L,-}(p_1)`); the doubled `-` piece has it on the first copy with the side `v^-` for `W_1` even, `v^+` for `W_1` odd (`T^{L,+}(p_1)`). -/
-def EvenNode (S : WeakData) (oddO evenO : Word → PartialOdometer) (w : Word) : Prop :=
+`T^{L,-}(p_1)`); the doubled `-` piece has it on the first copy with the side `v^-` for `W_1` even, `v^+` for `W_1` odd (`T^{L,+}(p_1)`). `child` is the odometer of the child; the
+register odometers come from `pOdd`, `pEven`, as in `OddNodeP`. -/
+def EvenNodeP (S : WeakData) (child : PartialOdometer) (pOdd pEven : Word → PartialOdometer) (w : Word) : Prop :=
   ∃ dpp dpm : PartialOdometer,
     IsWeakDoublingStd false (!(phase w == 1)) false (parentsAt w).odd.num (parentsAt w).odd.den true
         (FLatticePaper.Tiles.DoublingRespect.regWords true (regsAt w).1).1 (FLatticePaper.Tiles.DoublingRespect.regWords true (regsAt w).1).2
         (S.bdry (regsAt w).1 true) (S.partialT (regsAt w).1 true false)
-        (texV2 (parentsAt w).odd) (regOdo S oddO evenO (regsAt w).1 true) dpp ∧
+        (texV2 (parentsAt w).odd) (regOdo S pOdd pEven (regsAt w).1 true) dpp ∧
     IsWeakDoublingStd false (phase w == 1) true (parentsAt w).odd.num (parentsAt w).odd.den true
         (FLatticePaper.Tiles.DoublingRespect.regWords true (regsAt w).1).1 (FLatticePaper.Tiles.DoublingRespect.regWords true (regsAt w).1).2
         (S.bdry (regsAt w).1 true) (S.partialT (regsAt w).1 true true)
-        (texV2 (parentsAt w).odd) (regOdo S oddO evenO (regsAt w).1 true) dpm ∧
+        (texV2 (parentsAt w).odd) (regOdo S pOdd pEven (regsAt w).1 true) dpm ∧
     (phase w = 1 →
       IsStdStepQ0W1Odd (texV1Odd (parentsAt w).odd) (texV2 (parentsAt w).odd)
         (texV1Even (parentsAt w).even) (texV2 (parentsAt w).even)
         (parentsAt w).odd.num (parentsAt w).odd.den (parentsAt w).even.num (parentsAt w).even.den
-        (evenO w) dpp dpm (regOdo S oddO evenO (regsAt w).2 false) (regOdo S oddO evenO (regsAt w).2 false)) ∧
+        child dpp dpm (regOdo S pOdd pEven (regsAt w).2 false) (regOdo S pOdd pEven (regsAt w).2 false)) ∧
     (phase w ≠ 1 →
       IsStdStepQ0W1Even (texV1Odd (parentsAt w).odd) (texV2 (parentsAt w).odd)
         (texV1Even (parentsAt w).even) (texV2 (parentsAt w).even)
         (parentsAt w).odd.num (parentsAt w).odd.den (parentsAt w).even.num (parentsAt w).even.den
-        (evenO w) dpp dpm (regOdo S oddO evenO (regsAt w).2 false) (regOdo S oddO evenO (regsAt w).2 false))
+        child dpp dpm (regOdo S pOdd pEven (regsAt w).2 false) (regOdo S pOdd pEven (regsAt w).2 false))
+
+/-- The even node of a family whose parents are its own odometers (the self-contained weak recursion). -/
+def EvenNode (S : WeakData) (oddO evenO : Word → PartialOdometer) (w : Word) : Prop :=
+  EvenNodeP S (evenO w) oddO evenO w
 
 /-- `o` respects `(w_h, w_v)` (`def:tile_boundary_strings`, with `c(T) = 0`, the normalisation of the standard tiles, and
 the anchors of `anchoredStrings`): the domain contains the four boundary strings, and the restrictions of `o` to the forward
