@@ -282,6 +282,7 @@ import FLatticePaper.Plane.SurgicalGlobalOdometers
 import FLatticePaper.Plane.SurgicalGlueOdd
 import FLatticePaper.Plane.SurgicalGlueEven
 import FLatticePaper.Plane.SurgicalStandardOdometer
+import FLatticePaper.Plane.SurgicalStandardOdometerV
 import FLatticePaper.Plane.SurgicalH0
 import FLatticePaper.Plane.OddPhaseAlternate
 import FLatticePaper.Construction.BaseCaseRecurrence
@@ -438,6 +439,7 @@ import FLatticePaper.Tiles.StringCover
 import FLatticePaper.Tiles.HorizontalSides
 import FLatticePaper.Tiles.ReflectedCover
 import FLatticePaper.Tiles.HorizontalTop
+import FLatticePaper.Tiles.OverlapSides
 import FLatticePaper.Tiles.VerticalZeroOne
 import FLatticePaper.Tiles.SiteBaseDischarge
 import FLatticePaper.Tiles.SitePairScope
