@@ -6,17 +6,15 @@ import FLatticePaper.Tiles.SiteLowLeft
 import FLatticePaper.Tiles.StandardBoundary
 import FLatticePaper.Tiles.HBottom
 
-/-! The horizontal pair of the walk form of H2 (the bottom side and the top side of the boundary walk of a tile lie in the marked
-sites `markedSites`).
+/-! The horizontal pair of the walk form of H2: the top side of the boundary walk of each standard tile lies in the marked sites
+`markedSites`, for both children (`top_marks_odd_all`, `top_marks_even`).
 
 The top side of the walk from `0` is the reflection of the bottom side through the corner `Σw1 + Σw2` (`WalkDecomp.walk_decomp`).
-The marked sites contain the half-turn `halfTurn T` of the horizontal string sites. So the top side lies in the marks as soon as:
-* the bottom side lies in the horizontal string sites (input `hB`: the bottom walk of `w1` from `0` is a horizontal string site;
-  numerically true for the bottom of every standard tile of length ≤ 4, 0 failures, and for the control shifted by `(1,0)` the
-  check is pending); and
-* the corner `Σw1 + Σw2` is the half-turn centre `halfTurnCentre T` of the tile (input `hP`: the bounding-box identity; numerically,
-  every standard tile of length ≤ 4 is centrally symmetric about its bounding-box centre, 448/448, which is the shape of this
-  identity; that the corner equals the centre is not yet checked). -/
+The marked sites contain the half-turn `halfTurn T` of the horizontal string sites. So the top side lies in the marks once:
+* the bottom side lies in the horizontal string sites: `HBottom.hB_odd` and `HBottom.hB_even`, proved by telescoping the `gH` walk
+  tile by tile (`HBottom.gH_walk_mem`); and
+* the corner `Σw1 + Σw2` is the half-turn centre `halfTurnCentre T`: `hP_odd` and `hP_even`, from the sum identities and the centre
+  formulas `SiteHullOdd.centre_odd` and `SiteHullEven.centre_even`. -/
 
 namespace FLatticePaper.Tiles.HorizontalPair
 
