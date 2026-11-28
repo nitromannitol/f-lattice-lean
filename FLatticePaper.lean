@@ -1334,6 +1334,10 @@ import FLatticePaper.Tiles.CorrectedColumnRuns
 import FLatticePaper.Tiles.CorrectedHeadColumn
 import FLatticePaper.Tiles.CorrectedChildColumns
 import FLatticePaper.Tiles.CorrectedFaceBounds
+import FLatticePaper.Tiles.CorrectedCellsBands
+import FLatticePaper.Tiles.CorrectedBaseBands
+import FLatticePaper.Tiles.CorrectedDomainLattice
+import FLatticePaper.Tiles.CorrectedBandFaces
 import FLatticePaper.Tiles.CorrectedCellsNear
 import FLatticePaper.Tiles.CorrectedCellsStair
 import FLatticePaper.Tiles.LHeadCompatNear
