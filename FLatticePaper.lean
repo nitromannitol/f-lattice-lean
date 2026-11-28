@@ -434,6 +434,10 @@ import FLatticePaper.Tiles.ClosedPathTriEven
 import FLatticePaper.Tiles.ClosedPathAltSum
 import FLatticePaper.Tiles.ClosedPathAlt
 import FLatticePaper.Tiles.LatticeOfRespects
+import FLatticePaper.Tiles.StringAppend
+import FLatticePaper.Tiles.GlueWords
+import FLatticePaper.Tiles.GlueStringDecomp
+import FLatticePaper.Tiles.GlueChain
 import FLatticePaper.Tiles.AltMixedCompat
 import FLatticePaper.Tiles.MixedOverlapStrings
 import FLatticePaper.Tiles.ChildAssembly
