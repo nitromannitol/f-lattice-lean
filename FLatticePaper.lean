@@ -1337,6 +1337,12 @@ import FLatticePaper.Tiles.JointRot
 import FLatticePaper.Tiles.LStemCompat
 import FLatticePaper.Tiles.AltItem3
 import FLatticePaper.Tiles.AltBounds
+import FLatticePaper.Tiles.AltItem4Defs
+import FLatticePaper.Tiles.AltItem4Special
+import FLatticePaper.Tiles.AltItem4PairsEvenFalse
+import FLatticePaper.Tiles.AltItem4PairsEvenTrue
+import FLatticePaper.Tiles.AltItem4PairsOddFalse
+import FLatticePaper.Tiles.AltItem4PairsOddTrue
 import FLatticePaper.Tiles.BaseTileProps
 import FLatticePaper.Tiles.BaseWeakDomains
 import FLatticePaper.Tiles.BaseWeakLattice
