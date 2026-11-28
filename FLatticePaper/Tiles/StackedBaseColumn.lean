@@ -67,7 +67,7 @@ theorem cell_above_end (P : Finset GInt) (w1 w2 : F2Word) (u : F2Word)
   have hN' : (F2Word.sum (u ++ [Unit4.one])).1 - 1 < Nrow (0, 0) (u ++ [Unit4.one]) w2 y := by
     simpa using hN
   by_contra hlt
-  push_neg at hlt
+  push Not at hlt
   have hlt' : y < cntI (u ++ [Unit4.one]) := by omega
   rw [OverlapSides.nrow_lo hlt'] at hN'
   have hcol := col_on_bottom (u ++ [Unit4.one]) h1 y hy0' hlt'.le
