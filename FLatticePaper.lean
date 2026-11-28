@@ -461,6 +461,7 @@ import FLatticePaper.Tiles.TileSlopeZeroPaper
 import FLatticePaper.Tiles.CorrectedLatticePaper
 import FLatticePaper.Tiles.LSidesOddV
 import FLatticePaper.Tiles.LSidesOddTriple
+import FLatticePaper.Tiles.AltStdBottom
 import FLatticePaper.Tiles.StdPairCompatPaper
 import FLatticePaper.Tiles.TileHalfTurnGlue
 import FLatticePaper.Tiles.TileHalfTurnStd
