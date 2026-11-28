@@ -1,5 +1,6 @@
 import FLatticePaper.Tiles.WeakStepAssembly
 import FLatticePaper.Tiles.TileCompatInputs
+import FLatticePaper.Tiles.SameParentStd
 
 /-! # The glued weak odometers on the full copies (uncorrected children)
 
@@ -169,14 +170,14 @@ theorem odd_alg (w : Word) (k : ℕ) (hk : k < 6) :
     simp only [offO, σO, oddP, oddQ, MixedPieces.pOffsetsOdd, MixedPieces.qOffsetsOdd, h, cenO, cenE, affOdd,
       Parents.current, Parents.combine, offsetA, if_true, if_false, Bool.false_eq_true, List.getD_cons_zero,
       List.getD_cons_succ, Nat.reduceSub, Nat.lt_irrefl, Nat.one_lt_ofNat, Nat.zero_lt_two, Nat.reduceLT, Nat.reduceEqDiff,
-      or_self, or_true, true_or, OfNat.ofNat_ne_one, one_ne_zero, zero_ne_one] <;>
+      or_self, or_true, true_or, OfNat.ofNat_ne_one, zero_ne_one] <;>
     refine ⟨?_, ?_⟩ <;> ext <;>
     simp [texV1Odd, texV1Even, texV2] <;> ring
 
 theorem σO_lt (k : ℕ) (hk : k < 6) : σO k < 6 ∧ σO (σO k) = k ∧ (k < 2 ↔ σO k < 2) := by
   interval_cases k <;> simp [σO]
 
-theorem memC_odd (w : Word) (T1 T2 : Set Site) (k : ℕ) (hk : k < 6) (x : Site) :
+theorem memC_odd (w : Word) (T1 T2 : Set Site) (k : ℕ) (_hk : k < 6) (x : Site) :
     x ∈ pieceSet (oddP w) (oddQ w) T1 T2 k ↔ x - offO w k ∈ (if k < 2 then T1 else T2) := by
   unfold pieceSet offO
   rw [ClosedPathCycle.oddP_length]
@@ -245,7 +246,7 @@ theorem offO_eq (w : Word) :
   cases h : (phase w == 1) <;>
     refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩ <;>
     simp [p0Off, offO, oddP, oddQ, MixedPieces.pOffsetsOdd, MixedPieces.qOffsetsOdd, SurgicalDict.offsetP0, W1Odd,
-      vP1, vP2, vQ1, vQ2, h] <;> abel
+      vP1, vP2, vQ1, vQ2, h]
 
 theorem affO_eq (w : Word) :
     p0Aff w .p1Plus = affOdd (parentsAt w).odd (parentsAt w).even 0 ∧
@@ -446,7 +447,7 @@ theorem oddTile_union (w u1 u2 : Word) (hw : ¬ IsBase w) (hT1 : (Standard.state
   · rintro ⟨k, hk, hx⟩
     cases h : (phase w == 1)
     · obtain ⟨o0, o1, o2, o3, o4, o5⟩ := hE h
-      simp only [h, Standard.oddChildB, Finset.mem_union, Standard.mem_shift]
+      simp only [Standard.oddChildB, Finset.mem_union, Standard.mem_shift]
       interval_cases k
       · rw [o0] at hx; simp at hx; tauto
       · rw [o1] at hx; simp at hx; tauto
@@ -455,7 +456,7 @@ theorem oddTile_union (w u1 u2 : Word) (hw : ¬ IsBase w) (hT1 : (Standard.state
       · rw [o4] at hx; simp at hx; tauto
       · rw [o5] at hx; simp at hx; tauto
     · obtain ⟨o0, o1, o2, o3, o4, o5⟩ := hO h
-      simp only [h, Standard.oddChildB, Finset.mem_union, Standard.mem_shift]
+      simp only [Standard.oddChildB, Finset.mem_union, Standard.mem_shift]
       interval_cases k
       · rw [o0] at hx; simp at hx; tauto
       · rw [o1] at hx; simp at hx; tauto
@@ -669,15 +670,15 @@ theorem even_alg (w : Word) (k : ℕ) (hk : k < 6) :
   interval_cases k <;> cases h : (phase w == 1) <;>
     simp only [offE, σE, evenP, evenQ, MixedPieces.pOffsetsEven, MixedPieces.qOffsetsEven, h, cenO, cenE, affEven,
       Parents.current, Parents.combine, offsetA, if_true, if_false, Bool.false_eq_true, List.getD_cons_zero,
-      List.getD_cons_succ, Nat.reduceSub, Nat.lt_irrefl, Nat.reduceLT, Nat.reduceEqDiff, or_self, or_true, true_or,
-      OfNat.ofNat_ne_one, one_ne_zero, zero_ne_one] <;>
+      List.getD_cons_succ, Nat.reduceSub, Nat.lt_irrefl, Nat.reduceLT, Nat.reduceEqDiff,
+      OfNat.ofNat_ne_one, zero_ne_one] <;>
     refine ⟨?_, ?_⟩ <;> ext <;>
     simp [texV1Odd, texV1Even, texV2] <;> ring
 
 theorem σE_lt (k : ℕ) (hk : k < 6) : σE k < 6 ∧ σE (σE k) = k ∧ (k < 4 ↔ σE k < 4) := by
   interval_cases k <;> simp [σE]
 
-theorem memC_even (w : Word) (T1 T2 : Set Site) (k : ℕ) (hk : k < 6) (x : Site) :
+theorem memC_even (w : Word) (T1 T2 : Set Site) (k : ℕ) (_hk : k < 6) (x : Site) :
     x ∈ pieceSet (evenP w) (evenQ w) T1 T2 k ↔ x - offE w k ∈ (if k < 4 then T1 else T2) := by
   unfold pieceSet offE
   rw [ClosedPathCycle.evenP_length]
@@ -813,7 +814,7 @@ theorem evenK (w : Word) (F : ℕ → Site → ℤ) (PT QT : Finset Site) (Dc a 
     have e24 := const_eq hK (k := 2) (l := 4) (by omega) (by omega)
       (texV1Even (parentsAt w).even + texV2 (parentsAt w).even + (texV1Odd (parentsAt w).odd - ((0 : ℤ), (1 : ℤ))))
       (mP 2 _ (by omega) (by rw [o2]; convert c2 using 1; abel))
-      (mQ 4 _ (by omega) (by omega) (by rw [o4]; convert d7 using 1; ext <;> simp <;> ring))
+      (mQ 4 _ (by omega) (by omega) (by rw [o4]; convert d7 using 1; ext <;> (simp; try ring)))
       (hmix 2 4 (by omega) (by omega) (by omega)) (hmix 1 5 (by omega) (by omega) (by omega))
     have e23 := const_eq hK (k := 2) (l := 3) (by omega) (by omega)
       (texV1Even (parentsAt w).even + texV2 (parentsAt w).even + (texV2 (parentsAt w).odd + ((1 : ℤ), (0 : ℤ))))
@@ -827,8 +828,8 @@ theorem offE_eq (w : Word) :
       q0Off w .p1DMinus + vP2 w = offE w 3 ∧ q0Off w .q1Plus = offE w 4 ∧ q0Off w .q1Minus = offE w 5 := by
   cases h : (phase w == 1) <;>
     refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩ <;>
-    simp [q0Off, offE, evenP, evenQ, MixedPieces.pOffsetsEven, MixedPieces.qOffsetsEven, SurgicalDict.offsetQ0, W1Odd,
-      vP1, vP2, vQ1, vQ2, h] <;> abel
+    (simp [q0Off, offE, evenP, evenQ, MixedPieces.pOffsetsEven, MixedPieces.qOffsetsEven, SurgicalDict.offsetQ0, W1Odd,
+      vP1, vP2, vQ1, vQ2, h]; try abel)
 
 theorem affE_eq (w : Word) :
     q0Aff w .p1DPlus = affEven (parentsAt w).odd (parentsAt w).even 0 ∧
@@ -900,7 +901,7 @@ theorem evenTile_union (w u1 u2 : Word) (hw : ¬ IsBase w) (hT1 : (Standard.stat
   · rintro ⟨k, hk, hx⟩
     cases h : (phase w == 1)
     · obtain ⟨o0, o1, o2, o3, o4, o5⟩ := hE h
-      simp only [h, Standard.evenChildB, Finset.mem_union, Standard.mem_shift]
+      simp only [Standard.evenChildB, Finset.mem_union, Standard.mem_shift]
       interval_cases k
       · rw [o0] at hx; simp at hx; tauto
       · rw [o1] at hx; simp at hx; tauto
@@ -909,7 +910,7 @@ theorem evenTile_union (w u1 u2 : Word) (hw : ¬ IsBase w) (hT1 : (Standard.stat
       · rw [o4] at hx; simp at hx; tauto
       · rw [o5] at hx; simp at hx; tauto
     · obtain ⟨o0, o1, o2, o3, o4, o5⟩ := hO h
-      simp only [h, Standard.evenChildB, Finset.mem_union, Standard.mem_shift]
+      simp only [Standard.evenChildB, Finset.mem_union, Standard.mem_shift]
       interval_cases k
       · rw [o0] at hx; simp at hx; tauto
       · rw [o1] at hx; simp at hx; tauto
@@ -1252,5 +1253,48 @@ theorem sameParent_of (D : JointData) (hS : D.S = paperS) (hdis : SameDisjointIn
       · exact b2 hb
       · exact pairCompat_of_swap _ 4 5 _ _ (hRE hb) (oQ 4 (by omega) (by omega)) (oQ 5 (by omega) (by omega)) (c2 hb)
     exact ⟨d02, d13, h03.1, h03.2, h45⟩
+
+/-- **`SameDisjointInput` for the paper data**, from the strip-functional separation of `SameParentStd`
+(`stdOdd_same_disjoint`, `stdEven_same_disjoint`) on the six copies of the children. -/
+theorem sameDisjoint_paper (D : JointData) : SameDisjointInput D := by
+  intro hS f w hgood hw
+  obtain ⟨u1, u2, hreg⟩ := WeakStepAssembly.regsAt_nonbase w hw
+  have hl1 : u1.length < w.length := JointInduction.regsAt_lt w u1 (Or.inl (by rw [hreg]))
+  have hl2 : u2.length < w.length := JointInduction.regsAt_lt w u2 (Or.inr (by rw [hreg]))
+  have hp := (WeakStepAssembly.regsAt_parents w).1 u1 (by rw [hreg])
+  have hq := (WeakStepAssembly.regsAt_parents w).2 u2 (by rw [hreg])
+  obtain ⟨hS1, -⟩ := hgood u1 hl1
+  obtain ⟨hS2, -⟩ := hgood u2 hl2
+  have hdO : (f u1).tOdd.dom = Standard.oddTile u1 := by rw [(WeakStepAssembly.slice_domains D f u1 hS1).1, hS]; rfl
+  have hdE : (f u2).tEven.dom = Standard.evenTile u2 := by rw [(WeakStepAssembly.slice_domains D f u2 hS2).2, hS]; rfl
+  refine ⟨fun hc => ?_, fun hc => ?_⟩
+  · have hd : w.getLast? ≠ some Digit.three := fun h => hc ⟨hw, h⟩
+    have hget := oddFull_get f w u1 u2 hw hreg hc hl1 hl2
+    have memC := memC_full w u1 u2 (f u1).tOdd (f u2).tEven hdO hdE
+    have disj : ∀ i j, i < 6 → j < 6 →
+        ((i = 2 ∧ j = 4) ∨ (i = 4 ∧ j = 2) ∨ (i = 3 ∧ j = 5) ∨ (i = 5 ∧ j = 3)) → PairDisjoint (oddFull f w) i j := by
+      intro i j hi hj hij p q hpi hqj
+      rw [hget i hi] at hpi
+      rw [hget j hj] at hqj
+      cases hpi
+      cases hqj
+      refine Finset.disjoint_left.2 fun x hxp hxq => ?_
+      rw [mem_placed_std] at hxp hxq
+      exact SameParentStd.stdOdd_same_disjoint w u1 u2 hw hp hq hd i j hij x ((memC i hi x).2 hxp) ((memC j hj x).2 hxq)
+    exact ⟨disj 2 4 (by omega) (by omega) (Or.inl ⟨rfl, rfl⟩), disj 3 5 (by omega) (by omega) (Or.inr (Or.inr (Or.inl ⟨rfl, rfl⟩)))⟩
+  · have hd : w.getLast? ≠ some Digit.two := fun h => hc ⟨hw, h⟩
+    have hget := evenFull_get f w u1 u2 hw hreg hc hl1 hl2
+    have memC := memC_fullE w u1 u2 (f u1).tOdd (f u2).tEven hdO hdE
+    have disj : ∀ i j, i < 6 → j < 6 →
+        ((i = 0 ∧ j = 2) ∨ (i = 2 ∧ j = 0) ∨ (i = 1 ∧ j = 3) ∨ (i = 3 ∧ j = 1)) → PairDisjoint (evenFull f w) i j := by
+      intro i j hi hj hij p q hpi hqj
+      rw [hget i hi] at hpi
+      rw [hget j hj] at hqj
+      cases hpi
+      cases hqj
+      refine Finset.disjoint_left.2 fun x hxp hxq => ?_
+      rw [mem_placed_std] at hxp hxq
+      exact SameParentStd.stdEven_same_disjoint w u1 u2 hw hp hq hd i j hij x ((memC i hi x).2 hxp) ((memC j hj x).2 hxq)
+    exact ⟨disj 0 2 (by omega) (by omega) (Or.inl ⟨rfl, rfl⟩), disj 1 3 (by omega) (by omega) (Or.inr (Or.inr (Or.inl ⟨rfl, rfl⟩)))⟩
 
 end FLatticePaper.Tiles.GlueFull
