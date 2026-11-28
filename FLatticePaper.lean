@@ -1706,5 +1706,7 @@ import FLatticePaper.Tiles.BaseAltEmpty
 import FLatticePaper.Tiles.BaseAltThree
 import FLatticePaper.Tiles.BaseAltTwo
 import FLatticePaper.Tiles.BaseWeakAltInputPaper
+import FLatticePaper.Tiles.AltCorrectedGlueOdd
+import FLatticePaper.Tiles.AltCorrectedGlueEven
 
 /-! Root import for the corrected F-lattice paper. -/
