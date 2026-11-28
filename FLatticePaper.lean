@@ -1567,6 +1567,8 @@ import FLatticePaper.Tiles.GlueFull
 import FLatticePaper.Tiles.LSidesEvenK
 import FLatticePaper.Tiles.WeakAltStepAssembly
 import FLatticePaper.Tiles.JointAltV1
+import FLatticePaper.Tiles.AltLatticeInputPaper
+import FLatticePaper.Tiles.WeakAltNode
 import FLatticePaper.Tiles.AltParentBase
 import FLatticePaper.Tiles.AltParentReflection
 import FLatticePaper.Tiles.AltParentStair
