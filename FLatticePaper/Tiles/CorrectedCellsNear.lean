@@ -1,4 +1,4 @@
-import FLatticePaper.Tiles.CorrectedCellsColumn
+import FLatticePaper.Tiles.CorrectedCellsEnds
 import FLatticePaper.Tiles.JointRot
 import FLatticePaper.Tiles.BaseTileProps
 import FLatticePaper.Tiles.CorrectedCellsOrdinary
@@ -358,5 +358,142 @@ theorem common_heads (k : ℕ) (z : Site) :
   dsimp only [a,b] at h
   ring_nf at h ⊢
   exact h
+
+private abbrev sep (d : ℤ) : Site := (-d-3,0)
+private abbrev farEnd (d : ℤ) : Site := (-3,2*d-1)
+private abbrev middle (d : ℤ) : Site := (-1,d+2)
+
+private theorem long_columns (k : ℕ) :
+    let v := twos (k+1)
+    let d := denom k
+    evenLCells v true true = plusColumn d ∪ shift (head d) (middle d) ∧
+      evenLCells v false true = minusColumn d ∪ shift (head d) (2,3-d) := by
+  have et : twos (k+1) = twos k++[.two] := List.replicate_succ'
+  have hs : stripTrailing .three (twos (k+1)) = twos (k+1) := by rw [et,JointRot.stripTrailing_snoc]; rfl
+  have ht : trailingCount .three (twos (k+1)) = 0 := by rw [et,JointRot.trailingCount_snoc]; rfl
+  have ho : W1Odd (twos (k+1)) = false := by simp [W1Odd,twos,BaseTileProps.phase_two]
+  dsimp only
+  constructor <;> rw [CorrectedCellsEnds.even_long, hs, ht, pos_last, ho, (prefix_pieces k).2.2]
+  · rw [(two_column k).1]
+    congr 2
+    ext <;> simp [CorrectedCellsEnds.endCoeff,evenLInitOff,q0Off,SurgicalDict.offsetQ0,ho,evenKCoeff,
+      altOff,coeffOff,vP1,vP2,vQ1,vQ2,twos,BaseTileProps.parents_two,texV1Odd,texV1Even,texV2,denom]
+    all_goals ring
+  · rw [(two_column k).2]
+    congr 2
+    ext <;> simp [CorrectedCellsEnds.endCoeff,evenLInitOff,q0Off,SurgicalDict.offsetQ0,ho,evenKCoeff,
+      altOff,coeffOff,vP1,vP2,vQ1,vQ2,twos,BaseTileProps.parents_two,texV1Odd,texV1Even,texV2,denom]
+    all_goals ring
+
+private theorem middle_subset (d : ℤ) (hd : 3 ≤ d) :
+    shift (head d) (middle d) ⊆ ladder d ∪ shift (ladder d) (farEnd d) := by
+  rintro ⟨x,y⟩ ht
+  simp only [mem_shift,middle,Prod.mk_sub_mk,head_mem _ _ _ hd] at ht
+  simp only [Finset.mem_union,mem_shift,farEnd,Prod.mk_sub_mk,ladder_mem _ _ _ hd]
+  unfold inHead at ht
+  unfold inLadder
+  by_cases h : y-x ≤ 2*d
+  · left; omega
+  · right; omega
+
+private theorem long_exchange (d : ℤ) (hd : 3 ≤ d) :
+    ((plusColumn d ∪ shift (minusColumn d) (farEnd d)) ∪ shift (head d) (middle d)) ∪
+      (shift (ladder d) (sep d) ∪ shift (ladder d) (B d)) =
+    (ladder d ∪ shift (ladder d) (farEnd d)) ∪ (shift (ladder d) (sep d) ∪ shift (ladder d) (B d)) := by
+  obtain ⟨sp,sm⟩ := columns_sub d hd
+  ext z
+  simp only [Finset.mem_union]
+  constructor
+  · rintro (((hp|hm)|hh)|hr)
+    · exact Or.inl (Or.inl (sp hp))
+    · exact Or.inl (Or.inr (mem_shift.mpr (sm (mem_shift.mp hm))))
+    · exact Or.inl (Finset.mem_union.mp (middle_subset d hd hh))
+    · exact Or.inr hr
+  · obtain ⟨x,y⟩ := z
+    rintro ((hp|hm)|hr)
+    · rcases plus_cover d _ _ hd ((ladder_mem _ _ _ hd).1 hp) with (h|h)|h
+      · exact Or.inl (Or.inl (Or.inl h))
+      · apply Or.inl; apply Or.inr; apply mem_shift.mpr; apply (head_mem _ _ _ hd).2
+        convert h using 1; dsimp [middle]; ring
+      · exact Or.inr (Or.inr (mem_shift.mpr ((ladder_mem _ _ _ hd).2 h)))
+    · have hloc := (ladder_mem _ _ _ hd).1 (mem_shift.mp hm)
+      rcases minus_cover d _ _ hd hloc with (h|h)|h
+      · exact Or.inl (Or.inl (Or.inr (mem_shift.mpr h)))
+      · apply Or.inl; apply Or.inr; apply mem_shift.mpr; apply (head_mem _ _ _ hd).2
+        convert h using 1 <;> dsimp [farEnd,middle] <;> ring
+      · apply Or.inr; apply Or.inl; apply mem_shift.mpr; apply (ladder_mem _ _ _ hd).2
+        convert h using 1 <;> dsimp [farEnd,sep] <;> ring
+    · exact Or.inr hr
+
+private abbrev AO (w : Word) := domOdo (altOddT w)
+private abbrev AE (w : Word) := domOdo (altEvenT w)
+
+private theorem regroup (hp hm h l r p q : Tile) :
+    (hp ∪ h) ∪ (l ∪ (r ∪ ((hm ∪ h) ∪ (p ∪ q)))) =
+      (p ∪ q) ∪ (((hp ∪ hm) ∪ h) ∪ (l ∪ r)) := by
+  ext z
+  simp only [Finset.mem_union]
+  tauto
+
+set_option maxHeartbeats 400000 in
+/-- The elongated corrections give exactly the printed even alternate tile after every positive pure-two run followed by three. -/
+theorem alt_even_two_run_three (k : ℕ) :
+    let w := twos (k+1) ++ [.three]
+    pieceUnion (tileAltEvenPieces cellData O E AO AE LE w) = altEvenT w := by
+  let v := twos (k+1)
+  let w := v++[.three]
+  let d := denom k
+  change pieceUnion (tileAltEvenPieces cellData O E AO AE LE w) = altEvenT w
+  have hn : ¬ IsBase w := by simp [w,v,twos,IsBase,List.mem_replicate,List.append_eq_nil_iff]
+  have ho : W1Odd w = false := by simp [w,v,twos,W1Odd,phase,List.count_replicate]
+  have R : regsAt w = (some (twos k), some v) := by
+    change regsAt (twos (k+1) ++ [.three]) = _
+    rw [WeakStepPaper.regsAt_snoc,two_regs]; rfl
+  have Ro : (regsAt w).1 = some (twos k) := congrArg Prod.fst R
+  have Re : (regsAt w).2 = some v := congrArg Prod.snd R
+  have hp := (WeakStepPaper.regsAt_tiles w).1 _ Ro
+  have hq := (WeakStepPaper.regsAt_tiles w).2.2.1 _ Re
+  have p : (parentsAt w).odd = ⟨(k : ℤ)+1,(k : ℤ)+2⟩ := by
+    change (parentsAt (v++[.three])).odd = _
+    rw [parentsAt_append_singleton]; change (parentsAt v).odd = _
+    simp [v,twos,BaseTileProps.parents_two,add_assoc]
+  have q : (parentsAt w).even = ⟨2*((k+1 : ℕ) : ℤ)+1,2*((k+1 : ℕ) : ℤ)+3⟩ := by
+    change (parentsAt (v++[.three])).even = _
+    rw [parentsAt_append_singleton]; exact BaseTileProps.cur_even_two (k+1)
+  have b : vP1 w + vP2 w = B d := by ext <;> simp [vP1,vP2,p,texV1Odd,texV2,d,denom] <;> ring
+  have s : -vQ1 w + vP2 w = sep d := by ext <;> simp [vP2,vQ1,p,q,texV2,texV1Even,d,denom] <;> ring
+  have bs : B d + sep d = farEnd d := by ext <;> dsimp [B,sep,farEnd] <;> ring
+  have far : ((2,3-d):Site) + farEnd d = middle d := by ext <;> dsimp [farEnd,middle]; ring
+  have last : w.getLast? = some Digit.three := by simp [w]
+  have drop : w.dropLast = v := by simp [w]
+  unfold altEvenT
+  rw [AltRotStep.altEvenTile_of_not_base _ hn]
+  simp only [tileAltEvenPieces,SurgicalAltTiles.altEvenPieces,altTypeOf,last,ho,show (phase w == 1) = false from ho,
+    decide_true,if_true,Bool.false_eq_true,if_false,altP1Coeff,altQ0Coeff,reduceCtorEq,Option.bind_some,
+    SurgicalDict.altShifts,Ro,Re,regOdo,LE,E,O,domOdo,drop,hp,hq,List.append_nil,cons_union,std_shift,
+    show pieceUnion [] = ∅ from rfl,Finset.union_empty,SurgicalDict.doubled,shift_union,shift_shift]
+  let P := oddTile (twos k)
+  let p₁ := altOff w (0,0,1,0)
+  let p₂ := altOff w (0,1,-1,1)
+  have ca : altOff w (0,0,0,0) = 0 := by ext <;> simp [altOff,coeffOff]
+  have cb : altOff w (1,1,0,0) = B d := by
+    rw [← b]; ext <;> simp [altOff,coeffOff]
+  change shift (evenLCells v true true) (altOff w (0,0,0,0)) ∪
+      (shift (evenTile v) (altOff w (0,0,0,0) + (-vQ1 w+vP2 w)) ∪
+      (shift (evenTile v) (altOff w (1,1,0,0)) ∪
+      (shift (evenLCells v false true) (altOff w (1,1,0,0)+(-vQ1 w+vP2 w)) ∪
+      (shift P p₁ ∪ shift P p₂)))) =
+    shift P p₁ ∪ shift P p₂ ∪ (shift (evenTile v) (altOff w (0,0,0,0)) ∪
+      shift (evenTile v) ((-vQ1 w+vP2 w)+altOff w (0,0,0,0))) ∪
+      (shift (evenTile v) (altOff w (1,1,0,0)) ∪ shift (evenTile v) ((-vQ1 w+vP2 w)+altOff w (1,1,0,0)))
+  rw [ca,cb,s,zero_add,add_zero,bs,add_comm (sep d) (B d),bs,AltRotStep.shift_zero,AltRotStep.shift_zero,
+    show evenTile v = _ from prefix_ladder k, show evenLCells v true true = _ from (long_columns k).1,
+    show evenLCells v false true = _ from (long_columns k).2,shift_union,shift_shift (head d) (2,3-d) (farEnd d),far]
+  have hx := long_exchange d (by unfold d denom; omega)
+  calc
+    _ = (shift P p₁ ∪ shift P p₂) ∪ (((plusColumn d ∪ shift (minusColumn d) (farEnd d)) ∪ shift (head d) (middle d)) ∪
+      (shift (ladder d) (sep d) ∪ shift (ladder d) (B d))) :=
+        regroup _ _ _ _ _ _ _
+    _ = _ := by rw [hx]; ac_rfl
 
 end FLatticePaper.Tiles.CorrectedCellsNear
