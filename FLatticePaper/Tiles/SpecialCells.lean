@@ -5,6 +5,8 @@ import FLatticePaper.Tiles.AltRotStep
 import FLatticePaper.Tiles.BaseVertPiece
 import FLatticePaper.Tiles.ReflectedCover
 import FLatticePaper.Tiles.VerticalStepOne
+import FLatticePaper.Tiles.BaseTileProps
+import FLatticePaper.Tiles.BaseInvariant
 
 /-! # The cells of the special prefixes (towards `JointRot.SpecialCells`)
 
@@ -755,6 +757,361 @@ theorem cells_O_O_minus_short (S : WeakData) (hone : S.oneO.dom = oneTile) (pO p
     · exact mem_of_tile ht (0, 0) (by simp [tileShape]) _ (by pt_eq)
     · exact absurd rfl htip
 
+/-! ### The exceptional points of the first heads
+
+The first head of each L-correction at a special prefix carries two exceptional points: the points of its set `A` (of
+`lemma:basecase_3k_even_alt` for the odd L-correction, of `lemma:basecase_2k_odd_alt` for the even one) that lie in the last
+stem. The rotation maps the set `A` of the rotated first head onto that of the other, and the last stems are the base tiles
+`T_{1/d}`-type staircases of `2^j` and `3^j`; the two lemmas below are the resulting finite check, for `d = 2j + 3`. -/
+
+open FLatticePaper.Construction (paperStairAltA paperNearStairAltA)
+open FLatticePaper.Tiles.Standard (stairF nstairN shift mem_shift)
+
+theorem mem_nstairN_ab (d a b : ℤ) : (a, b) ∈ nstairN d ↔ (a, b + 1) ∈ Standard.nstairF d := by
+  unfold nstairN
+  rw [mem_shift]
+  have h : ((a, b) : Site) - ((0 : ℤ), (-1 : ℤ)) = (a, b + 1) := by
+    refine Prod.ext ?_ ?_ <;> simp
+  rw [h]
+
+/-- The even kind: a point `x` of the rotated (odd) first head whose image is exceptional in the even first head is
+exceptional. -/
+theorem exc_transfer_E (d : ℤ) (hd : 3 ≤ d) (oO sO oR sR c G F x : Site)
+    (hE1 : Farey.mulI oR + c = oO + (d, 2 * d - 4)) (hG : oO = sO + G) (hF : oR = sR + F)
+    (hGF : (G = ((-1 : ℤ), (1 : ℤ)) ∧ F = (d - 1, (2 : ℤ))) ∨ (G = ((2 : ℤ), 1 - d) ∧ F = ((-1 : ℤ), (-1 : ℤ))))
+    (h1 : Farey.mulI x + c - oO + ((0 : ℤ), (1 : ℤ)) ∈ paperNearStairAltA d)
+    (h2 : Farey.mulI x + c ∈ shift (nstairN d) sO) :
+    x - oR ∈ paperStairAltA d ∧ x ∈ shift (stairF d) sR := by
+  obtain ⟨x1, x2⟩ := x
+  obtain ⟨o1, o2⟩ := oO
+  obtain ⟨s1, s2⟩ := sO
+  obtain ⟨r1, r2⟩ := oR
+  obtain ⟨t1, t2⟩ := sR
+  obtain ⟨c1, c2⟩ := c
+  obtain ⟨g1, g2⟩ := G
+  obtain ⟨f1, f2⟩ := F
+  simp only [Farey.mulI, Prod.mk_add_mk, Prod.mk.injEq] at hE1 hG hF hGF
+  rw [mem_shift] at h2 ⊢
+  simp only [Farey.mulI, Prod.mk_add_mk, Prod.mk_sub_mk] at h1 h2 ⊢
+  rw [mem_nstairN_ab, BaseTileProps.mem_nstairF_ab d hd] at h2
+  rw [BaseTileProps.mem_stairF_ab d hd]
+  simp only [paperNearStairAltA, paperStairAltA, Set.mem_union, Set.mem_setOf_eq] at h1 ⊢
+  omega
+
+/-- The odd kind: a point `x` of the rotated (even) first head whose image is exceptional in the odd first head is
+exceptional. -/
+theorem exc_transfer_O (d : ℤ) (hd : 3 ≤ d) (oO sO oR sR c G F x : Site)
+    (hE1 : Farey.mulI oR + c = oO + (d, (0 : ℤ))) (hG : oO = sO + G) (hF : oR = sR + F)
+    (hGF : (G = (d - 1, (2 : ℤ)) ∧ F = ((2 : ℤ), 1 - d)) ∨ (G = ((-1 : ℤ), (-1 : ℤ)) ∧ F = ((-1 : ℤ), (1 : ℤ))))
+    (h1 : Farey.mulI x + c - oO ∈ paperStairAltA d)
+    (h2 : Farey.mulI x + c ∈ shift (stairF d) sO) :
+    x - oR + ((0 : ℤ), (1 : ℤ)) ∈ paperNearStairAltA d ∧ x ∈ shift (nstairN d) sR := by
+  obtain ⟨x1, x2⟩ := x
+  obtain ⟨o1, o2⟩ := oO
+  obtain ⟨s1, s2⟩ := sO
+  obtain ⟨r1, r2⟩ := oR
+  obtain ⟨t1, t2⟩ := sR
+  obtain ⟨c1, c2⟩ := c
+  obtain ⟨g1, g2⟩ := G
+  obtain ⟨f1, f2⟩ := F
+  simp only [Farey.mulI, Prod.mk_add_mk, Prod.mk.injEq] at hE1 hG hF hGF
+  rw [mem_shift] at h2 ⊢
+  simp only [Farey.mulI, Prod.mk_add_mk, Prod.mk_sub_mk] at h1 h2 ⊢
+  rw [BaseTileProps.mem_stairF_ab d hd] at h2
+  rw [mem_nstairN_ab, BaseTileProps.mem_nstairF_ab d hd]
+  simp only [paperNearStairAltA, paperStairAltA, Set.mem_union, Set.mem_setOf_eq] at h1 ⊢
+  omega
+
+theorem regs_twos_fst' (j : ℕ) : (regsAt (List.replicate (j + 1) Digit.two)).1 = some (List.replicate j Digit.two) := by
+  have h := regs_twos_threes j 0
+  rw [List.replicate_zero, List.append_nil] at h
+  rw [h]
+
+theorem regs_threes_snd' (j : ℕ) : (regsAt (List.replicate (j + 1) Digit.three)).2 = some (List.replicate j Digit.three) := by
+  have h := regs_threes_twos j 0
+  rw [List.replicate_zero, List.append_nil] at h
+  rw [h]
+
+theorem len_d (d : Digit) (j : ℕ) : 2 * ((List.replicate (j + 1) d).length : ℤ) + 1 = 2 * (j : ℤ) + 3 := by
+  simp; ring
+
+theorem getLast_rep (d : Digit) (j : ℕ) : (List.replicate (j + 1) d).getLast? = some d := by
+  rw [List.replicate_succ']
+  simp
+
+set_option hygiene false in
+/-- The positions at the two special words of a pair (`hW2`, `hW3`, `htr2`, `htr3` in context). -/
+macro "sp_pos2" : tactic => `(tactic| (
+  simp only [Farey.mulI, oK, eK, oddLInitOff, evenLInitOff, p0Off, q0Off, offsetP0, offsetQ0, JointFamily.altOff,
+    coeffOff, JointFamily.oddKCoeff, JointFamily.evenKCoeff, vP1, vP2, vQ1, vQ2, texV1Odd,
+    texV1Even, texV2, fracOdd, fracEven, Parents.current, Parents.combine, JointRot.parents_append_twos,
+    JointRot.parents_append_threes, parents_threes, parents_twos, hW2, hW3, htr2, htr3, hst2, hst3, getLast_rep, ↓reduceIte, Bool.false_eq_true,
+    Bool.not_false, Bool.not_true, Bool.and_true, Bool.true_and, Bool.and_false, Bool.false_and, Prod.smul_mk, smul_eq_mul]
+  refine Prod.ext ?_ ?_ <;> simp <;> push_cast <;> ring))
+
+/-- (E) The exceptional points of the first heads correspond. -/
+theorem exc_E (S : WeakData) (pO pE aO aE : Word → PartialOdometer) (j k : ℕ) (plus : Bool)
+    (hdO : (pO (List.replicate j Digit.two)).dom = nstairN (2 * (j : ℤ) + 3))
+    (hdR : (pE (List.replicate j Digit.three)).dom = stairF (2 * (j : ℤ) + 3)) (x : Site)
+    (hx : x ∉ (oHead S pO pE aO aE (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) plus 0).exc) :
+    Farey.mulI x + (texV1Even ((parentsAt (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three)).current .even) - ((0 : ℤ), (1 : ℤ))) ∉
+      (eHead S pO pE aO aE (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) plus 0).exc := by
+  intro hz
+  apply hx
+  obtain ⟨-, hst2⟩ := trailing_special Digit.three Digit.two (by decide) j k
+  obtain ⟨-, hst3⟩ := trailing_special Digit.two Digit.three (by decide) j k
+  have hTD2 : (!(List.replicate (j + 1) Digit.two).isEmpty &&
+      (List.replicate (j + 1) Digit.two).all (fun d => decide (d = Digit.two))) = true := by simp
+  have hTD3 : (!(List.replicate (j + 1) Digit.three).isEmpty &&
+      (List.replicate (j + 1) Digit.three).all (fun d => decide (d = Digit.three))) = true := by simp
+  simp only [eHead, hst2, hTD2, regs_twos_fst', regOdo, hdO, len_d, Bool.true_and, beq_self_eq_true, ↓reduceIte,
+    Set.mem_setOf_eq] at hz
+  simp only [oHead, hst3, hTD3, regs_threes_snd', regOdo, hdR, len_d, Bool.true_and, beq_self_eq_true, ↓reduceIte,
+    Set.mem_setOf_eq]
+  have hW2 := W1Odd_special (j + 1) k Digit.two Digit.three (by decide) (by decide)
+  have hW3 := W1Odd_special (j + 1) k Digit.three Digit.two (by decide) (by decide)
+  obtain ⟨htr2, -⟩ := trailing_special Digit.three Digit.two (by decide) j k
+  obtain ⟨htr3, -⟩ := trailing_special Digit.two Digit.three (by decide) j k
+  cases plus
+  · refine exc_transfer_E (2 * (j : ℤ) + 3) (by omega) _ _ _ _ _ _ _ _ ?_ ?_ ?_ (Or.inr ⟨rfl, rfl⟩) hz.1 hz.2
+    all_goals sp_pos2
+  · refine exc_transfer_E (2 * (j : ℤ) + 3) (by omega) _ _ _ _ _ _ _ _ ?_ ?_ ?_ (Or.inl ⟨rfl, rfl⟩) hz.1 hz.2
+    all_goals sp_pos2
+
+/-- (O) The exceptional points of the first heads correspond. -/
+theorem exc_O (S : WeakData) (pO pE aO aE : Word → PartialOdometer) (j k : ℕ) (plus : Bool)
+    (hdO : (pE (List.replicate j Digit.three)).dom = stairF (2 * (j : ℤ) + 3))
+    (hdR : (pO (List.replicate j Digit.two)).dom = nstairN (2 * (j : ℤ) + 3)) (x : Site)
+    (hx : x ∉ (eHead S pO pE aO aE (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) (!plus) 0).exc) :
+    Farey.mulI x + (texV1Odd ((parentsAt (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two)).current .odd) - ((0 : ℤ), (1 : ℤ))) ∉
+      (oHead S pO pE aO aE (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) plus 0).exc := by
+  intro hz
+  apply hx
+  obtain ⟨htr2, hst2⟩ := trailing_special Digit.three Digit.two (by decide) j k
+  obtain ⟨htr3, hst3⟩ := trailing_special Digit.two Digit.three (by decide) j k
+  have hTD2 : (!(List.replicate (j + 1) Digit.two).isEmpty &&
+      (List.replicate (j + 1) Digit.two).all (fun d => decide (d = Digit.two))) = true := by simp
+  have hTD3 : (!(List.replicate (j + 1) Digit.three).isEmpty &&
+      (List.replicate (j + 1) Digit.three).all (fun d => decide (d = Digit.three))) = true := by simp
+  have hW2 := W1Odd_special (j + 1) k Digit.two Digit.three (by decide) (by decide)
+  have hW3 := W1Odd_special (j + 1) k Digit.three Digit.two (by decide) (by decide)
+  simp only [oHead, hst3, hTD3, regs_threes_snd', regOdo, hdO, len_d, Bool.true_and, beq_self_eq_true, ↓reduceIte,
+    Set.mem_setOf_eq] at hz
+  simp only [eHead, hst2, hTD2, regs_twos_fst', regOdo, hdR, len_d, Bool.true_and, beq_self_eq_true, ↓reduceIte,
+    Set.mem_setOf_eq]
+  cases plus
+  · refine exc_transfer_O (2 * (j : ℤ) + 3) (by omega) _ _ _ _ _ _ _ _ ?_ ?_ ?_ (Or.inr ⟨rfl, rfl⟩) hz.1 hz.2
+    all_goals sp_pos2
+  · refine exc_transfer_O (2 * (j : ℤ) + 3) (by omega) _ _ _ _ _ _ _ _ ?_ ?_ ?_ (Or.inl ⟨rfl, rfl⟩) hz.1 hz.2
+    all_goals sp_pos2
+
+/-! ### The tip of the short odd case
+
+In the short case the image of one tip of the copy of `T^d_{1/1}` in the even L-correction at `2^(j+1) 3^k` is off the kept
+side of the odd child of `3^(j+1) 2^k`. The tip lies in the first head of that L-correction (the alternate odd tile of `2^j`,
+`lemma:basecase_2k_odd_alt`), which has a neighbouring point on both kept sides. -/
+
+open FLatticePaper.Construction (paperNearStairAltTile)
+open FLatticePaper.Tiles.JointRot (OnSides)
+open FLatticePaper.Tiles.JointFamily (paperLSides printedEvenSides)
+
+theorem vAux_append (rev : Bool) : ∀ (w : BinaryWord) (c : GInt) (x y : Letter), w.getLast? = some y →
+    VerticalStepOne.vAux rev (w ++ [x]) c =
+      VerticalStepOne.vAux rev w c ++ [(letterZTile x, lastPosOf (VerticalStepOne.vAux rev w c) + stepV rev y x)]
+  | [], _, _, _, h => by simp at h
+  | [a], c, x, y, h => by
+    simp only [List.getLast?_singleton, Option.some.injEq] at h
+    subst h
+    simp [VerticalStepOne.vAux, lastPosOf]
+  | a :: b :: rest, c, x, y, h => by
+    have ih := vAux_append rev (b :: rest) (c + stepV rev a b) x y (by simpa [List.getLast?_cons_cons] using h)
+    have hne : VerticalStepOne.vAux rev (b :: rest) (c + stepV rev a b) ≠ [] := by
+      cases rest <;> simp [VerticalStepOne.vAux]
+    rw [show (a :: b :: rest) ++ [x] = a :: b :: (rest ++ [x]) from rfl, VerticalStepOne.vAux,
+      show b :: (rest ++ [x]) = (b :: rest) ++ [x] from rfl, ih, VerticalStepOne.vAux, lastPos_cons_of_ne _ _ hne]
+    simp
+
+/-- The second-to-last tile of a reversed vertical string. -/
+theorem vRev_last2 (r : BinaryWord) (a b : Letter) (c : GInt) :
+    (letterZTile a, lastPosOf (vRevStringAt (r ++ [a, b]) c) - vRevOffset a b) ∈ vRevStringAt (r ++ [a, b]) c := by
+  rw [VerticalStepOne.vRevStringAt_eq, show r ++ [a, b] = (r ++ [a]) ++ [b] by simp,
+    vAux_append true (r ++ [a]) c b a (by simp), lastPos_append_single]
+  have hlast := CornerValues.vAux_last_fst true (r ++ [a]) c
+  simp only [List.getLast?_append, List.getLast?_singleton, Option.some_or, Option.map_some] at hlast
+  have hm := JointRot.last_mem_lastPos _ _ hlast
+  simp only [stepV, ↓reduceIte, add_sub_cancel_right]
+  exact List.mem_append_left _ hm
+
+/-- (s = +) The first head of the even L-correction at `2^(j+1) 3^k` starts at the tip of the copy of `T^d_{1/1}`. -/
+theorem pos_tip_T (S : WeakData) (pO pE aO aE : Word → PartialOdometer) (j k : ℕ) :
+    (eHead S pO pE aO aE (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true 0).off = (evenLInitOff (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true + JointFamily.altOff (JointFamily.stripTrailing Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three)) ((JointFamily.trailingCount Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) : ℤ) • (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true).1 + (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true).2.1)) + ((1 : ℤ), (1 : ℤ)) + ((-1 : ℤ), (1 : ℤ)) := by
+  have hW2 := W1Odd_special (j + 1) k Digit.two Digit.three (by decide) (by decide)
+  have hW3 := W1Odd_special (j + 1) k Digit.three Digit.two (by decide) (by decide)
+  obtain ⟨htr2, hst2⟩ := trailing_special Digit.three Digit.two (by decide) j k
+  obtain ⟨htr3, hst3⟩ := trailing_special Digit.two Digit.three (by decide) j k
+  simp only [eHead]
+  sp_pos2
+
+/-- (s = -) The tip of the copy of `T^d_{1/1}` is the point `(d, 3d - 4)` of the first head, `d = 2j + 3`. -/
+theorem pos_tip_F (S : WeakData) (pO pE aO aE : Word → PartialOdometer) (j k : ℕ) :
+    (eHead S pO pE aO aE (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false 0).off + (2 * (j : ℤ) + 3, 6 * (j : ℤ) + 5) =
+      (evenLInitOff (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false + JointFamily.altOff (JointFamily.stripTrailing Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three)) ((JointFamily.trailingCount Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) : ℤ) • (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false).1 + (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false).2.1)) + ((1 : ℤ), (1 : ℤ)) + ((1 : ℤ), (-1 : ℤ)) := by
+  have hW2 := W1Odd_special (j + 1) k Digit.two Digit.three (by decide) (by decide)
+  have hW3 := W1Odd_special (j + 1) k Digit.three Digit.two (by decide) (by decide)
+  obtain ⟨htr2, hst2⟩ := trailing_special Digit.three Digit.two (by decide) j k
+  obtain ⟨htr3, hst3⟩ := trailing_special Digit.two Digit.three (by decide) j k
+  simp only [eHead]
+  sp_pos2
+
+theorem eHead0_exc (S : WeakData) (pO pE aO aE : Word → PartialOdometer) (w : Word) (plus : Bool) (x : Site)
+    (hx : x ∈ (eHead S pO pE aO aE w plus 0).exc) :
+    x - (eHead S pO pE aO aE w plus 0).off + ((0 : ℤ), (1 : ℤ)) ∈
+      paperNearStairAltA (2 * ((JointFamily.stripTrailing Digit.three w).length : ℤ) + 1) := by
+  simp only [eHead] at hx ⊢
+  split_ifs at hx
+  · exact hx.1
+  · simp at hx
+
+theorem eHead0_odo (S : WeakData) (pO pE aO aE : Word → PartialOdometer) (j k : ℕ) (sg : Bool) :
+    (eHead S pO pE aO aE (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) sg 0).odo = aO (List.replicate j Digit.two) := by
+  obtain ⟨-, hst2⟩ := trailing_special Digit.three Digit.two (by decide) j k
+  simp only [eHead, hst2, regs_twos_fst', regOdo]
+
+theorem near_mem (d a b : ℤ) (h : 0 ≤ a ∧ a ≤ d ∧ 1 ≤ b ∧ b ≤ 3 * d - 3 ∧ -1 ≤ b - a ∧ b - a ≤ 2 * d - 1) :
+    ((a, b) : Site) ∈ paperNearStairAltTile d := by
+  simp only [paperNearStairAltTile, Set.mem_union]
+  exact Or.inr h
+
+theorem near_A (d a b : ℤ) (h : ((a, b) : Site) ∈ paperNearStairAltA d) :
+    (-1 ≤ a ∧ a ≤ 0 ∧ b = 2 * d) ∨ (d ≤ a ∧ a ≤ d + 1 ∧ b = d - 2) := by
+  simpa [paperNearStairAltA] using h
+
+/-- (s = +, short) The tip `(-1, 1)` of the copy of `T^d_{1/1}` lies in the first head of the even L-correction at
+`2^(j+1) 3^k`, with the neighbouring point `(0, 1)` of the copy on both kept sides. -/
+theorem tip_F (S : WeakData) (hone : S.oneO.dom = oneTile) (pO pE aO aE : Word → PartialOdometer) (j k : ℕ)
+    (hA : ∀ x : Site, x ∈ (aO (List.replicate j Digit.two)).dom ↔ x + ((0 : ℤ), (1 : ℤ)) ∈ paperNearStairAltTile (2 * (j : ℤ) + 3)) (B : Piece) (hB : B ∈ eMid S pO pE (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true) (x : Site) (hx : x ∈ B.placed)
+    (hoff : ¬ OnSides (hWordOf (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) false) (vWordOf (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) false) (paperLSides true false false false)
+      (Farey.mulI x + (texV1Odd ((parentsAt (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two)).current .odd) - ((0 : ℤ), (1 : ℤ))))) :
+    x ∈ (eHead S pO pE aO aE (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true 0).placed ∧ x ∉ (eHead S pO pE aO aE (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true 0).exc ∧
+      ∃ y ∈ (eHead S pO pE aO aE (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true 0).placed, y ∉ (eHead S pO pE aO aE (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true 0).exc ∧
+        OnSides (hWordOf (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true) (vWordOf (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true) (paperLSides false false true false) y ∧
+        OnSides (hWordOf (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) false) (vWordOf (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) false) (paperLSides true false false false) (Farey.mulI y + (texV1Odd ((parentsAt (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two)).current .odd) - ((0 : ℤ), (1 : ℤ)))) := by
+  obtain ⟨-, hst2⟩ := trailing_special Digit.three Digit.two (by decide) j k
+  have hside : ∀ y ∈ B.placed, y ≠ (evenLInitOff (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true + JointFamily.altOff (JointFamily.stripTrailing Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three)) ((JointFamily.trailingCount Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) : ℤ) • (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true).1 + (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true).2.1)) + ((1 : ℤ), (1 : ℤ)) + ((-1 : ℤ), (1 : ℤ)) →
+      OnSides (hWordOf (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) false) (vWordOf (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) false) (paperLSides true false false false) (Farey.mulI y + (texV1Odd ((parentsAt (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two)).current .odd) - ((0 : ℤ), (1 : ℤ)))) :=
+    fun y hy hne => ⟨.vPlus, by simp [paperLSides], cells_O_O_plus_short S hone pO pE j k B hB y hy hne⟩
+  have hxt : x = (evenLInitOff (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true + JointFamily.altOff (JointFamily.stripTrailing Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three)) ((JointFamily.trailingCount Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) : ℤ) • (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true).1 + (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true).2.1)) + ((1 : ℤ), (1 : ℤ)) + ((-1 : ℤ), (1 : ℤ)) := by
+    by_contra h; exact hoff (hside x hx h)
+  have hpl : ∀ y : Site, y - (evenLInitOff (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true + JointFamily.altOff (JointFamily.stripTrailing Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three)) ((JointFamily.trailingCount Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) : ℤ) • (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true).1 + (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true).2.1)) - ((1 : ℤ), (1 : ℤ)) - ((-1 : ℤ), (1 : ℤ)) + ((0 : ℤ), (1 : ℤ)) ∈
+      paperNearStairAltTile (2 * (j : ℤ) + 3) → y ∈ (eHead S pO pE aO aE (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true 0).placed := by
+    intro y hy
+    rw [JointRot.mem_placed, eHead0_odo, hA, pos_tip_T]
+    simpa only [sub_add_eq_sub_sub] using hy
+  have hex : ∀ y : Site, y ∈ (eHead S pO pE aO aE (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true 0).exc →
+      y - (evenLInitOff (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true + JointFamily.altOff (JointFamily.stripTrailing Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three)) ((JointFamily.trailingCount Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) : ℤ) • (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true).1 + (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true).2.1)) - ((1 : ℤ), (1 : ℤ)) - ((-1 : ℤ), (1 : ℤ)) + ((0 : ℤ), (1 : ℤ)) ∈
+        paperNearStairAltA (2 * (j : ℤ) + 3) := by
+    intro y hy
+    have h := eHead0_exc S pO pE aO aE _ true y hy
+    have hd : 2 * ((JointFamily.stripTrailing Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three)).length : ℤ) + 1 = 2 * (j : ℤ) + 3 := by
+      rw [hst2, len_d]
+    rw [pos_tip_T, hd] at h
+    simpa only [sub_add_eq_sub_sub] using h
+  rcases mid_mem S pO pE j k true B hB with ⟨-, hob, hoffB⟩ | ⟨hob, hoffB⟩
+  · exfalso
+    rw [JointRot.mem_placed, hob, hone, hoffB, hxt, mem_oneTile_iff,
+      show ∀ m : Site, m + ((1 : ℤ), (1 : ℤ)) + ((-1 : ℤ), (1 : ℤ)) - m = ((0 : ℤ), (2 : ℤ)) from fun m => by pt_eq] at hx
+    simp [tileShape] at hx
+  · have hy : (evenLInitOff (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true + JointFamily.altOff (JointFamily.stripTrailing Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three)) ((JointFamily.trailingCount Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) : ℤ) • (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true).1 + (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true).2.1)) + ((1 : ℤ), (1 : ℤ)) + ((0 : ℤ), (1 : ℤ)) ∈ B.placed := by
+      rw [JointRot.mem_placed, hob, hoffB, add_sub_cancel_left]
+      simp [JointFamily.enlOdo, tileShape]
+    have hne : (evenLInitOff (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true + JointFamily.altOff (JointFamily.stripTrailing Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three)) ((JointFamily.trailingCount Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) : ℤ) • (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true).1 + (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true).2.1)) + ((1 : ℤ), (1 : ℤ)) + ((0 : ℤ), (1 : ℤ)) ≠
+        (evenLInitOff (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true + JointFamily.altOff (JointFamily.stripTrailing Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three)) ((JointFamily.trailingCount Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) : ℤ) • (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true).1 + (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true).2.1)) + ((1 : ℤ), (1 : ℤ)) + ((-1 : ℤ), (1 : ℤ)) := by
+      intro h; have := congrArg Prod.fst h; simp at this
+    subst hxt
+    refine ⟨hpl _ ?_, fun h => ?_, _, hpl _ ?_, fun h => ?_,
+      ⟨.hPlus, by simp [paperLSides], cells_O_R_plus S hone pO pE j k B hB _ hy⟩, hside _ hy hne⟩
+    · rw [show ∀ m : Site, m + ((1 : ℤ), (1 : ℤ)) + ((-1 : ℤ), (1 : ℤ)) - m - ((1 : ℤ), (1 : ℤ)) - ((-1 : ℤ), (1 : ℤ)) +
+        ((0 : ℤ), (1 : ℤ)) = ((0 : ℤ), (1 : ℤ)) from fun m => by pt_eq]
+      exact near_mem _ _ _ (by omega)
+    · have h' := hex _ h
+      rw [show ∀ m : Site, m + ((1 : ℤ), (1 : ℤ)) + ((-1 : ℤ), (1 : ℤ)) - m - ((1 : ℤ), (1 : ℤ)) - ((-1 : ℤ), (1 : ℤ)) +
+        ((0 : ℤ), (1 : ℤ)) = ((0 : ℤ), (1 : ℤ)) from fun m => by pt_eq] at h'
+      have := near_A _ _ _ h'; omega
+    · rw [show ∀ m : Site, m + ((1 : ℤ), (1 : ℤ)) + ((0 : ℤ), (1 : ℤ)) - m - ((1 : ℤ), (1 : ℤ)) - ((-1 : ℤ), (1 : ℤ)) +
+        ((0 : ℤ), (1 : ℤ)) = ((1 : ℤ), (1 : ℤ)) from fun m => by pt_eq]
+      exact near_mem _ _ _ (by omega)
+    · have h' := hex _ h
+      rw [show ∀ m : Site, m + ((1 : ℤ), (1 : ℤ)) + ((0 : ℤ), (1 : ℤ)) - m - ((1 : ℤ), (1 : ℤ)) - ((-1 : ℤ), (1 : ℤ)) +
+        ((0 : ℤ), (1 : ℤ)) = ((1 : ℤ), (1 : ℤ)) from fun m => by pt_eq] at h'
+      have := near_A _ _ _ h'; omega
+
+/-- (s = -, short) The tip `(1, -1)` of the copy of `T^d_{1/1}` is the point `(d, 3d - 4)` of the first head of the even
+L-correction at `2^(j+1) 3^k`, and its left neighbour in the head lies on the second-to-last tiles of both kept sides. -/
+theorem tip_T (S : WeakData) (hone : S.oneO.dom = oneTile) (pO pE aO aE : Word → PartialOdometer) (j k : ℕ)
+    (hA : ∀ x : Site, x ∈ (aO (List.replicate j Digit.two)).dom ↔ x + ((0 : ℤ), (1 : ℤ)) ∈ paperNearStairAltTile (2 * (j : ℤ) + 3)) (B : Piece) (hB : B ∈ eMid S pO pE (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false) (x : Site) (hx : x ∈ B.placed)
+    (hoff : ¬ OnSides (hWordOf (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) false) (vWordOf (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) false) (paperLSides true false true false)
+      (Farey.mulI x + (texV1Odd ((parentsAt (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two)).current .odd) - ((0 : ℤ), (1 : ℤ))))) :
+    x ∈ (eHead S pO pE aO aE (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false 0).placed ∧ x ∉ (eHead S pO pE aO aE (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false 0).exc ∧
+      ∃ y ∈ (eHead S pO pE aO aE (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false 0).placed, y ∉ (eHead S pO pE aO aE (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false 0).exc ∧
+        OnSides (hWordOf (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true) (vWordOf (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true) (paperLSides false false false false) y ∧
+        OnSides (hWordOf (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) false) (vWordOf (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) false) (paperLSides true false true false) (Farey.mulI y + (texV1Odd ((parentsAt (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two)).current .odd) - ((0 : ℤ), (1 : ℤ)))) := by
+  obtain ⟨-, hst2⟩ := trailing_special Digit.three Digit.two (by decide) j k
+  have hxt : x = (evenLInitOff (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false + JointFamily.altOff (JointFamily.stripTrailing Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three)) ((JointFamily.trailingCount Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) : ℤ) • (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false).1 + (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false).2.1)) + ((1 : ℤ), (1 : ℤ)) + ((1 : ℤ), (-1 : ℤ)) := by
+    by_contra h
+    exact hoff ⟨.vMinus, by simp [paperLSides], cells_O_O_minus_short S hone pO pE j k B hB x hx h⟩
+  have hoff0 : (eHead S pO pE aO aE (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false 0).off = (evenLInitOff (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false + JointFamily.altOff (JointFamily.stripTrailing Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three)) ((JointFamily.trailingCount Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) : ℤ) • (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false).1 + (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false).2.1)) + ((1 : ℤ), (1 : ℤ)) + ((1 : ℤ), (-1 : ℤ)) - (2 * (j : ℤ) + 3, 6 * (j : ℤ) + 5) :=
+    eq_sub_of_add_eq (pos_tip_F S pO pE aO aE j k)
+  have hpl : ∀ y : Site, y - ((evenLInitOff (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false + JointFamily.altOff (JointFamily.stripTrailing Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three)) ((JointFamily.trailingCount Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) : ℤ) • (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false).1 + (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false).2.1)) + ((1 : ℤ), (1 : ℤ)) + ((1 : ℤ), (-1 : ℤ)) - (2 * (j : ℤ) + 3, 6 * (j : ℤ) + 5)) + ((0 : ℤ), (1 : ℤ)) ∈
+      paperNearStairAltTile (2 * (j : ℤ) + 3) → y ∈ (eHead S pO pE aO aE (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false 0).placed := by
+    intro y hy
+    rw [JointRot.mem_placed, eHead0_odo, hA, hoff0]
+    exact hy
+  have hex : ∀ y : Site, y ∈ (eHead S pO pE aO aE (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false 0).exc →
+      y - ((evenLInitOff (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false + JointFamily.altOff (JointFamily.stripTrailing Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three)) ((JointFamily.trailingCount Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) : ℤ) • (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false).1 + (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false).2.1)) + ((1 : ℤ), (1 : ℤ)) + ((1 : ℤ), (-1 : ℤ)) - (2 * (j : ℤ) + 3, 6 * (j : ℤ) + 5)) + ((0 : ℤ), (1 : ℤ)) ∈ paperNearStairAltA (2 * (j : ℤ) + 3) := by
+    intro y hy
+    have h := eHead0_exc S pO pE aO aE _ false y hy
+    have hd : 2 * ((JointFamily.stripTrailing Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three)).length : ℤ) + 1 = 2 * (j : ℤ) + 3 := by
+      rw [hst2, len_d]
+    rw [hoff0, hd] at h
+    exact h
+  have e1 : ∀ m : Site, m + ((1 : ℤ), (1 : ℤ)) + ((1 : ℤ), (-1 : ℤ)) -
+      (m + ((1 : ℤ), (1 : ℤ)) + ((1 : ℤ), (-1 : ℤ)) - (2 * (j : ℤ) + 3, 6 * (j : ℤ) + 5)) + ((0 : ℤ), (1 : ℤ)) =
+      (2 * (j : ℤ) + 3, 6 * (j : ℤ) + 6) := fun m => by pt_eq
+  have e2 : ∀ m : Site, m + ((1 : ℤ), (1 : ℤ)) + ((1 : ℤ), (-1 : ℤ)) + ((-1 : ℤ), (0 : ℤ)) -
+      (m + ((1 : ℤ), (1 : ℤ)) + ((1 : ℤ), (-1 : ℤ)) - (2 * (j : ℤ) + 3, 6 * (j : ℤ) + 5)) + ((0 : ℤ), (1 : ℤ)) =
+      (2 * (j : ℤ) + 2, 6 * (j : ℤ) + 6) := fun m => by pt_eq
+  subst hxt
+  refine ⟨hpl _ ?_, fun h => ?_, (evenLInitOff (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false + JointFamily.altOff (JointFamily.stripTrailing Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three)) ((JointFamily.trailingCount Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) : ℤ) • (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false).1 + (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false).2.1)) + ((1 : ℤ), (1 : ℤ)) + ((1 : ℤ), (-1 : ℤ)) + ((-1 : ℤ), (0 : ℤ)), hpl _ ?_, fun h => ?_, ?_, ?_⟩
+  · rw [e1]; exact near_mem _ _ _ (by omega)
+  · have h' := hex _ h
+    rw [e1] at h'
+    have := near_A _ _ _ h'; omega
+  · rw [e2]; exact near_mem _ _ _ (by omega)
+  · have h' := hex _ h
+    rw [e2] at h'
+    have := near_A _ _ _ h'; omega
+  · -- the second-to-last tile of the reversed horizontal string
+    refine ⟨.hMinus, by simp [paperLSides], ?_⟩
+    show _ ∈ placedSites (hRevStringAt (hWordOf (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true).reverse (lastPosOf (vRevStringAt (vWordOf (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true).reverse 0)))
+    obtain ⟨r, hr⟩ := (ends_twos_threes j k).2.2.1
+    have hrev : (hWordOf (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true).reverse = r.reverse ++ [Letter.q, Letter.q] := by rw [hr]; simp
+    rw [StdCornerAnchors.stdAnchorY_even]
+    obtain ⟨-, pr, h0⟩ := hRev_last r.reverse Letter.q Letter.q (texV2 (fracEven (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three)) + ((1 : ℤ), (-2 : ℤ)))
+    rw [← hrev, GlueStringDecomp.lp_top_even] at h0
+    simp only [hRevOffset] at h0
+    rw [pos_O_R_minus]
+    exact mem_of_tile h0 (1, 0) (ReflectedCover.R2_sub pr _ (by simp [tileShape])) _ (by pt_eq)
+  · -- the second-to-last tile of the reversed vertical string
+    refine ⟨.vMinus, by simp [paperLSides], ?_⟩
+    show _ ∈ placedSites (vRevStringAt (vWordOf (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) false).reverse 0)
+    obtain ⟨r, hr⟩ := (ends_threes_twos j k).2.2.2.2.1
+    have hrev : (vWordOf (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) false).reverse = r.reverse ++ [Letter.p, Letter.p] := by rw [hr]; simp
+    have h2 := vRev_last2 r.reverse Letter.p Letter.p 0
+    rw [← hrev, StdCornerAnchors.stdAnchorY_odd] at h2
+    simp only [letterZTile, vRevOffset] at h2
+    rw [z_add, z_add, pos_O_O_minus]
+    exact mem_of_tile h2 (1, 2) (by simp [tileShape]) _ (by pt_eq)
+
 /-! ### Assembling `SpecialCells` -/
 
 open FLatticePaper.Tiles.JointFamily (JointData JSlice below EvenLDefined OddLDefined stripTrailing trailingCount paperLSides
@@ -811,6 +1168,80 @@ def SpecialRest (D : JointData) (f : Word → JSlice) (n : ℕ) : Prop :=
         Farey.mulI x + c ∉ (oHead D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).aOdd)
           (fun u => (g u).aEven) w plus 0).exc))
 
+/-- `SpecialRest` from the base tiles below the level: the last stems are the standard tiles of `2^j` and `3^j`, and the first
+heads of the even L-corrections the alternate odd tile of `2^j`. -/
+theorem specialRest_of (D : JointData) (hone : D.S.oneO.dom = oneTile) (hlS : D.lSides = paperLSides)
+    (f : Word → JSlice) (n : ℕ)
+    (hdO : ∀ j : ℕ, j < n → (f (List.replicate j Digit.two)).tOdd.dom = nstairN (2 * (j : ℤ) + 3))
+    (hdE : ∀ j : ℕ, j < n → (f (List.replicate j Digit.three)).tEven.dom = stairF (2 * (j : ℤ) + 3))
+    (hdA : ∀ j : ℕ, j < n → ∀ x : Site, x ∈ (f (List.replicate j Digit.two)).aOdd.dom ↔
+      x + ((0 : ℤ), (1 : ℤ)) ∈ paperNearStairAltTile (2 * (j : ℤ) + 3)) :
+    SpecialRest D f n := by
+  intro w hw
+  refine ⟨fun hdef hsp plus => ?_, fun hdef hsp plus elong => ?_⟩
+  · obtain ⟨j, k, rfl⟩ := special_form Digit.three Digit.two w hsp
+    have hW := W1Odd_special (j + 1) k Digit.two Digit.three (by decide) (by decide)
+    have hsw := swap_twos_threes (j + 1) k
+    have hj : j < n := by rw [← hw]; simp; omega
+    have hbel : ∀ u : Word, u.length = j → below f (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) u = f u := fun u hu => if_pos (by simp [hu]; omega)
+    simp only [hW, hsw, Bool.bne_false]
+    intro x _ hx
+    refine exc_E D.S _ _ _ _ j k plus ?_ ?_ x hx
+    · show (below f _ _).tOdd.dom = _
+      rw [hbel _ (by simp)]; exact hdO j hj
+    · show (below f _ _).tEven.dom = _
+      rw [hbel _ (by simp)]; exact hdE j hj
+  · obtain ⟨j, k, rfl⟩ := special_form Digit.two Digit.three w hsp
+    have hW := W1Odd_special (j + 1) k Digit.three Digit.two (by decide) (by decide)
+    have hW' := W1Odd_special (j + 1) k Digit.two Digit.three (by decide) (by decide)
+    have hsw := swap_threes_twos (j + 1) k
+    have hj : j < n := by rw [← hw]; simp; omega
+    have hbel : ∀ u : Word, u.length = j → below f (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) u = f u := fun u hu => if_pos (by simp [hu]; omega)
+    have hO : ((fun u => (below f (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) u).tOdd) (List.replicate j Digit.two)).dom = nstairN (2 * (j : ℤ) + 3) := by
+      show (below f _ _).tOdd.dom = _
+      rw [hbel _ (by simp)]; exact hdO j hj
+    have hE : ((fun u => (below f (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) u).tEven) (List.replicate j Digit.three)).dom = stairF (2 * (j : ℤ) + 3) := by
+      show (below f _ _).tEven.dom = _
+      rw [hbel _ (by simp)]; exact hdE j hj
+    have hA : ∀ x : Site, x ∈ ((fun u => (below f (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) u).aOdd) (List.replicate j Digit.two)).dom ↔
+        x + ((0 : ℤ), (1 : ℤ)) ∈ paperNearStairAltTile (2 * (j : ℤ) + 3) := by
+      show ∀ x : Site, x ∈ (below f _ _).aOdd.dom ↔ _
+      rw [hbel _ (by simp)]; exact hdA j hj
+    have h0 : 0 ∈ List.range (2 * (JointFamily.trailingCount Digit.two (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) + 1) - (if elong then 0 else 1)) := by
+      rw [List.mem_range]; split_ifs <;> omega
+    cases plus <;> cases elong <;>
+      simp only [hW, hW', hsw, hlS, beq_self_eq_true, beq_false, Bool.not_true] at h0 ⊢
+    · refine ⟨fun B hB x hx _ hoff => ⟨_, List.mem_map.mpr ⟨0, h0, rfl⟩,
+        tip_F D.S hone _ _ _ _ j k hA B hB x hx hoff⟩, fun x _ hx => exc_O D.S _ _ _ _ j k false hE hO x hx⟩
+    · refine ⟨fun B hB x hx _ hoff => absurd ⟨.hPlus, by simp [paperLSides],
+        cells_O_O_plus_elong D.S hone _ _ j k B hB x hx⟩ hoff, fun x _ hx => exc_O D.S _ _ _ _ j k false hE hO x hx⟩
+    · refine ⟨fun B hB x hx _ hoff => ⟨_, List.mem_map.mpr ⟨0, h0, rfl⟩,
+        tip_T D.S hone _ _ _ _ j k hA B hB x hx hoff⟩, fun x _ hx => exc_O D.S _ _ _ _ j k true hE hO x hx⟩
+    · refine ⟨fun B hB x hx _ hoff => absurd ⟨.hMinus, by simp [paperLSides],
+        cells_O_O_minus_elong D.S hone _ _ j k B hB x hx⟩ hoff, fun x _ hx => exc_O D.S _ _ _ _ j k true hE hO x hx⟩
+
+/-- The base tiles below the level for the paper data: from the joint slices of the words shorter than `n`. -/
+theorem base_doms (D : JointData) (hS : D.S = WeakStepPaper.paperS) (hA : D.altBase = SurgicalAlt.PaperAltBaseCond)
+    (f : Word → JSlice) (n : ℕ) (hG : JointInduction.GoodBelow D f n) (j : ℕ) (hj : j < n) :
+    (f (List.replicate j Digit.two)).tOdd.dom = nstairN (2 * (j : ℤ) + 3) ∧
+      (f (List.replicate j Digit.three)).tEven.dom = stairF (2 * (j : ℤ) + 3) ∧
+      ∀ x : Site, x ∈ (f (List.replicate j Digit.two)).aOdd.dom ↔
+        x + ((0 : ℤ), (1 : ℤ)) ∈ paperNearStairAltTile (2 * (j : ℤ) + 3) := by
+  obtain ⟨-, hWA2, hTP2, -⟩ := (hG (List.replicate j Digit.two) (by simpa using hj)).1
+  obtain ⟨-, -, hTP3, -⟩ := (hG (List.replicate j Digit.three) (by simpa using hj)).1
+  have hb2 : Standard.IsBase (List.replicate j Digit.two) := Or.inr (Or.inr fun d hd => List.eq_of_mem_replicate hd)
+  refine ⟨?_, ?_, ?_⟩
+  · rw [hTP2.2.2.2.2.2.2.2.2.1, hS]
+    exact BaseInvariant.oddTile_two j
+  · rw [hTP3.2.2.2.2.2.2.2.2.2, hS]
+    exact BaseInvariant.evenTile_three j
+  · rw [(hTP2.1 hb2).2.2.1]
+    have hc := hWA2.2.2.1 hb2
+    rw [hA] at hc
+    rcases Nat.eq_zero_or_pos j with rfl | hpos
+    · simpa using (hc.1 rfl).1
+    · exact (hc.2.2 j hpos rfl).1
+
 /-- **`SpecialCells` for the paper data**, given `SpecialRest`: the cells of the middle pieces lie on the kept sides (the cell
 lemmas above). -/
 theorem specialCells_of (D : JointData) (hz : D.S.zeroO.dom = zeroTile) (hone : D.S.oneO.dom = oneTile)
@@ -848,5 +1279,24 @@ theorem specialCells_of (D : JointData) (hz : D.S.zeroO.dom = zeroTile) (hone : 
       · exact ⟨.hPlus, by cases elong <;> simp [paperLSides, printedEvenSides], cells_O_R_plus _ hone _ _ j k B hB x hx⟩
       · exact ⟨.hMinus, by cases elong <;> simp [paperLSides, printedEvenSides], cells_O_R_minus _ hone _ _ j k B hB x hx⟩
     · exact Or.inr (htip B hB x hx hxe hon)
+
+/-- **`SpecialCells` for the paper data** at every level of the induction. -/
+theorem specialCells_paper (D : JointData) (hS : D.S = WeakStepPaper.paperS) (hA : D.altBase = SurgicalAlt.PaperAltBaseCond)
+    (hlS : D.lSides = paperLSides) (f : Word → JSlice) (n : ℕ) (hL : JointRot.LevelHyp D f n) : SpecialCells D f n :=
+  specialCells_of D (by rw [hS]; rfl) (by rw [hS]; rfl) hlS f n
+    (specialRest_of D (by rw [hS]; rfl) hlS f n (fun j hj => (base_doms D hS hA f n hL.1 j hj).1)
+      (fun j hj => (base_doms D hS hA f n hL.1 j hj).2.1) (fun j hj => (base_doms D hS hA f n hL.1 j hj).2.2))
+
+/-- The rotation step of the joint induction for the paper data, from the base rotations and the connectivity of the
+alternate and L decompositions. -/
+theorem rotStepInput_paper (D : JointData) (hS : D.S = WeakStepPaper.paperS) (hA : D.altBase = SurgicalAlt.PaperAltBaseCond)
+    (hlS : D.lSides = paperLSides) (hBR : JointRot.BaseRot D)
+    (hconnA : ∀ (f : Word → JSlice) (n : ℕ), JointRot.LevelHyp D f n →
+      ∀ w : Word, w.length = n → ¬ Standard.IsBase w → JointRot.ConnectedAlt D (below f w) w)
+    (hconnL : ∀ (f : Word → JSlice) (n : ℕ), JointRot.LevelHyp D f n → ∀ w : Word, w.length = n →
+      JointRot.ConnectedL D (below f w) w) :
+    JointInduction.RotStepInput D :=
+  JointRot.rotStepInput_of_cells D (JointRot.baseSlopes_paper D hS hA) hBR hlS hconnA hconnL
+    (fun f n hL => specialCells_paper D hS hA hlS f n hL)
 
 end FLatticePaper.Tiles.SpecialCells
