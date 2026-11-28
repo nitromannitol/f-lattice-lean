@@ -1328,5 +1328,7 @@ import FLatticePaper.Tiles.BaseTileAssembly
 import FLatticePaper.Tiles.BaseRespectsHorizontal
 import FLatticePaper.Tiles.BaseHpLadder
 import FLatticePaper.Tiles.BaseHpStair
+import FLatticePaper.Tiles.BaseHpNear
+import FLatticePaper.Tiles.BaseHpNearEven
 
 /-! Root import for the corrected F-lattice paper. -/
