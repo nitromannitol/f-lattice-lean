@@ -440,6 +440,7 @@ import FLatticePaper.Tiles.LatticeOfRespects
 import FLatticePaper.Tiles.StringAppend
 import FLatticePaper.Tiles.GlueWords
 import FLatticePaper.Tiles.GlueStringDecomp
+import FLatticePaper.Tiles.SpecialCells
 import FLatticePaper.Tiles.GlueChain
 import FLatticePaper.Tiles.GlueSeams
 import FLatticePaper.Tiles.GlueCorners
