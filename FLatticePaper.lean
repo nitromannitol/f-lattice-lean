@@ -450,6 +450,13 @@ import FLatticePaper.Tiles.TileStepAssembly
 import FLatticePaper.Tiles.SameParentCopies
 import FLatticePaper.Tiles.SameParentAlt
 import FLatticePaper.Tiles.SameParentStd
+import FLatticePaper.Tiles.SwapDisjoint
+import FLatticePaper.Tiles.SwapContainCore
+import FLatticePaper.Tiles.SwapContainPairs
+import FLatticePaper.Tiles.SwapContainBox
+import FLatticePaper.Tiles.SwapContainNested
+import FLatticePaper.Tiles.SwapContainMain
+import FLatticePaper.Tiles.SwapContainPaper
 import FLatticePaper.Tiles.StdPairCompatPaper
 import FLatticePaper.Tiles.TileHalfTurnGlue
 import FLatticePaper.Tiles.TileHalfTurnStd
