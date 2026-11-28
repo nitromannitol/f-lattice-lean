@@ -1418,6 +1418,8 @@ import FLatticePaper.Tiles.StackedWalkPattern
 import FLatticePaper.Tiles.StackedTopCell
 import FLatticePaper.Tiles.StackedDBound
 import FLatticePaper.Tiles.StackedEvenBound
+import FLatticePaper.Tiles.StackedClass
+import FLatticePaper.Tiles.StackedOverlapWalks
 import FLatticePaper.Tiles.BaseHmAnchor
 import FLatticePaper.Tiles.RevStringList
 import FLatticePaper.Tiles.BaseHmOddValues
@@ -1431,6 +1433,5 @@ import FLatticePaper.Tiles.BaseWalkSums
 import FLatticePaper.Tiles.BaseInsideAlong
 import FLatticePaper.Tiles.BaseInsideTile
 import FLatticePaper.Tiles.BaseRespectsAnchoredOdd
-import FLatticePaper.Tiles.StackedClass
 
 /-! Root import for the corrected F-lattice paper. -/
