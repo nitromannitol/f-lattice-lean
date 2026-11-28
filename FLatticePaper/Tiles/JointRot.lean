@@ -44,7 +44,13 @@ The L-rotation (`evenL_rawRot`, `oddL_rawRot`, `lRotProps_step`): when the prefi
 with the same offset and affine rules (the heads with `altCf` of the register, `altParP`, `altParQ`). The special prefixes are a
 named input (`SpecialLRot`), as is the connectivity of the overlap graphs of the L decompositions (`ConnectedL`).
 
-The step (`rotStepInput_of`): `RotStepInput D` from `BaseSlopes D`, `BaseRot D`, the connectivity and the special prefixes. -/
+The step (`rotStepInput_of`): `RotStepInput D` from `BaseSlopes D`, `BaseRot D`, the connectivity and the special prefixes.
+
+Connectivity of the standard decompositions (`std_connected`): the six copies are joined by a spanning tree of overlaps, each
+witnessed by a common corner point (`eq:std_corner_values`) of the two copies; the parents have all eight corner points in their
+domains (`TileTranslationStd.stdCorners_odd`, `_even`), and an L-corrected copy has the end points of its kept side
+(`LSidesAgree` with `paperLSides`; `side_hPlus`, `side_hMinus`, `side_vMinus`, `side_vPlus`). With it, `rotStepInput_of_alt`
+leaves the connectivity of the alternate decompositions (`ConnectedAlt`) and of the L decompositions (`ConnectedL`) named. -/
 
 namespace FLatticePaper.Tiles.JointRot
 
@@ -2751,5 +2757,812 @@ theorem rotStepInput_of (D : JointData) (hB : BaseSlopes D) (hBR : BaseRot D)
   have hL : LevelHyp D f n := ⟨hg, hlev⟩
   exact ⟨rotProps_step D f n hg (fun w hw => (hlev w hw).1) hB hBR (hconn f n hL) w hw,
     lRotProps_step D f n hg (fun w hw => (hlev w hw).1) hB (hconnL f n hL) (hspec f n hL) w hw⟩
+
+/-! ### Connectivity of the standard decompositions -/
+
+/-- The eight corner points of `eq:std_corner_values` lie in the domain. -/
+structure StdCorners (o : PartialOdometer) (X Y : Site) : Prop where
+  c0 : ((0 : ℤ), (0 : ℤ)) ∈ o.dom
+  c1 : ((1 : ℤ), (0 : ℤ)) ∈ o.dom
+  cXi : X - ((0 : ℤ), (1 : ℤ)) ∈ o.dom
+  cX : X ∈ o.dom
+  cY1 : Y + ((1 : ℤ), (0 : ℤ)) ∈ o.dom
+  cY1i : Y + ((1 : ℤ), (-1 : ℤ)) ∈ o.dom
+  cD : X + Y + ((1 : ℤ), (-1 : ℤ)) ∈ o.dom
+  cD1 : X + Y + ((0 : ℤ), (-1 : ℤ)) ∈ o.dom
+
+theorem adj_of_mem (ps : List Piece) (i j : Fin ps.length) (hij : i.1 ≠ j.1) (x : Site)
+    (hi : x ∈ (ps.get i).placed) (hj : x ∈ (ps.get j).placed) (hei : x ∉ (ps.get i).exc) (hej : x ∉ (ps.get j).exc) :
+    (overlapGraph (goodPart ps)).Adj i j :=
+  ⟨fun h => hij (by rw [h]), ⟨⟨x, mem_pieceUnion.mpr ⟨_, List.get_mem _ _, hi⟩⟩, ⟨hi, hei⟩, ⟨hj, hej⟩⟩⟩
+
+theorem connected_of_reach (ps : List Piece) (h0 : 0 < ps.length)
+    (h : ∀ k : Fin ps.length, (overlapGraph (goodPart ps)).Reachable ⟨0, h0⟩ k) :
+    (overlapGraph (goodPart ps)).Connected := by
+  haveI : Nonempty (Fin ps.length) := ⟨⟨0, h0⟩⟩
+  exact ⟨fun u v => (h u).symm.trans (h v)⟩
+
+set_option hygiene false in
+/-- The odometer of a piece of a standard decomposition, with the phase and the last letter fixed. -/
+macro "conn_odo" : tactic => `(tactic| (
+  simp only [tileOddPieces, tileEvenPieces, List.get_eq_getElem, List.getElem_cons_succ, List.getElem_cons_zero, stdPiece,
+    hWo, hc, decide_true, decide_false, Bool.and_true, Bool.and_false, Bool.true_and, Bool.false_and, Bool.not_true,
+    Bool.not_false, ↓reduceIte, Bool.false_eq_true]))
+
+set_option hygiene false in
+/-- The offset identity of a witness. -/
+macro "conn_id" : tactic => `(tactic| (
+  simp only [tileOddPieces, tileEvenPieces, List.get_eq_getElem, List.getElem_cons_succ, List.getElem_cons_zero, stdPiece,
+    p0Off, q0Off, offsetP0, offsetQ0, hWo, ↓reduceIte, Bool.false_eq_true]
+  refine Prod.ext ?_ ?_ <;> simp only [Prod.fst_add, Prod.snd_add, Prod.fst_sub, Prod.snd_sub, Prod.fst_zero,
+    Prod.snd_zero, vP1, vP2, vQ1, vQ2, texV1Odd, texV1Even, texV2] <;> omega))
+
+set_option hygiene false in
+macro "conn_exc" : tactic => `(tactic| (simp [tileOddPieces, tileEvenPieces, stdPiece]))
+
+/-- The overlap graph of the odd standard decomposition is connected: a spanning tree of overlaps witnessed by corner points of
+the parents (`StdCorners`) and, for the L-corrected copies, by points of the kept side of the child of the parent word. -/
+theorem tileOddPieces_connected (S : WeakData) (pO pE : Word → PartialOdometer) (lE : Word → Bool → Bool → PartialOdometer)
+    (w : Word)
+    (hP : StdCorners (regOdo S pO pE (regsAt w).1 true) (vP1 w) (vP2 w))
+    (hQ : StdCorners (regOdo S pO pE (regsAt w).2 false) (vQ1 w) (vQ2 w))
+    (hL : w.getLast? = some Digit.three →
+      ((((0 : ℤ), (0 : ℤ)) ∈ (lE w.dropLast true false).dom ∧ vQ1 w ∈ (lE w.dropLast true false).dom) ∧
+        vQ2 w + ((1 : ℤ), (-1 : ℤ)) ∈ (lE w.dropLast false false).dom)) :
+    (overlapGraph (goodPart (tileOddPieces S pO pE lE w))).Connected := by
+  have h0 : 0 < (tileOddPieces S pO pE lE w).length := by simp [tileOddPieces]
+  refine connected_of_reach _ h0 (fun k => ?_)
+  cases hWo : W1Odd w <;> by_cases hc : w.getLast? = some Digit.three
+  · -- W1Odd = False, corrected = True
+    have a03 : (overlapGraph (goodPart (tileOddPieces S pO pE lE w))).Adj ⟨0, by simp [tileOddPieces]⟩ ⟨3, by simp [tileOddPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileOddPieces S pO pE lE w).get ⟨0, by simp [tileOddPieces]⟩).off + (((0 : ℤ), (0 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.c0
+      · rw [mem_placed, show (((tileOddPieces S pO pE lE w).get ⟨0, by simp [tileOddPieces]⟩).off + (((0 : ℤ), (0 : ℤ)))) - ((tileOddPieces S pO pE lE w).get ⟨3, by simp [tileOddPieces]⟩).off = vQ1 w by conn_id]
+        conn_odo
+        exact (hL hc).1.2
+      · conn_exc
+      · conn_exc
+    have a05 : (overlapGraph (goodPart (tileOddPieces S pO pE lE w))).Adj ⟨0, by simp [tileOddPieces]⟩ ⟨5, by simp [tileOddPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileOddPieces S pO pE lE w).get ⟨0, by simp [tileOddPieces]⟩).off + (vP1 w + vP2 w + ((0 : ℤ), (-1 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.cD1
+      · rw [mem_placed, show (((tileOddPieces S pO pE lE w).get ⟨0, by simp [tileOddPieces]⟩).off + (vP1 w + vP2 w + ((0 : ℤ), (-1 : ℤ)))) - ((tileOddPieces S pO pE lE w).get ⟨5, by simp [tileOddPieces]⟩).off = vQ1 w - ((0 : ℤ), (1 : ℤ)) by conn_id]
+        conn_odo
+        exact hQ.cXi
+      · conn_exc
+      · conn_exc
+    have a23 : (overlapGraph (goodPart (tileOddPieces S pO pE lE w))).Adj ⟨2, by simp [tileOddPieces]⟩ ⟨3, by simp [tileOddPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileOddPieces S pO pE lE w).get ⟨2, by simp [tileOddPieces]⟩).off + (vQ1 w)) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hQ.cX
+      · rw [mem_placed, show (((tileOddPieces S pO pE lE w).get ⟨2, by simp [tileOddPieces]⟩).off + (vQ1 w)) - ((tileOddPieces S pO pE lE w).get ⟨3, by simp [tileOddPieces]⟩).off = ((0 : ℤ), (0 : ℤ)) by conn_id]
+        conn_odo
+        exact (hL hc).1.1
+      · conn_exc
+      · conn_exc
+    have a12 : (overlapGraph (goodPart (tileOddPieces S pO pE lE w))).Adj ⟨1, by simp [tileOddPieces]⟩ ⟨2, by simp [tileOddPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileOddPieces S pO pE lE w).get ⟨1, by simp [tileOddPieces]⟩).off + (((1 : ℤ), (0 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.c1
+      · rw [mem_placed, show (((tileOddPieces S pO pE lE w).get ⟨1, by simp [tileOddPieces]⟩).off + (((1 : ℤ), (0 : ℤ)))) - ((tileOddPieces S pO pE lE w).get ⟨2, by simp [tileOddPieces]⟩).off = vQ2 w + ((1 : ℤ), (0 : ℤ)) by conn_id]
+        conn_odo
+        exact hQ.cY1
+      · conn_exc
+      · conn_exc
+    have a14 : (overlapGraph (goodPart (tileOddPieces S pO pE lE w))).Adj ⟨1, by simp [tileOddPieces]⟩ ⟨4, by simp [tileOddPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileOddPieces S pO pE lE w).get ⟨1, by simp [tileOddPieces]⟩).off + (vP1 w + vP2 w + ((1 : ℤ), (-1 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.cD
+      · rw [mem_placed, show (((tileOddPieces S pO pE lE w).get ⟨1, by simp [tileOddPieces]⟩).off + (vP1 w + vP2 w + ((1 : ℤ), (-1 : ℤ)))) - ((tileOddPieces S pO pE lE w).get ⟨4, by simp [tileOddPieces]⟩).off = vQ2 w + ((1 : ℤ), (-1 : ℤ)) by conn_id]
+        conn_odo
+        exact (hL hc).2
+      · conn_exc
+      · conn_exc
+    obtain ⟨kv, hk⟩ := k
+    rcases kv with _ | _ | _ | _ | _ | _ | kv
+    · exact SimpleGraph.Reachable.refl _
+    · exact (((SimpleGraph.Reachable.refl _).trans (a03).reachable).trans (a23.symm).reachable).trans (a12.symm).reachable
+    · exact ((SimpleGraph.Reachable.refl _).trans (a03).reachable).trans (a23.symm).reachable
+    · exact (SimpleGraph.Reachable.refl _).trans (a03).reachable
+    · exact ((((SimpleGraph.Reachable.refl _).trans (a03).reachable).trans (a23.symm).reachable).trans (a12.symm).reachable).trans (a14).reachable
+    · exact (SimpleGraph.Reachable.refl _).trans (a05).reachable
+    · simp [tileOddPieces] at hk; omega
+  · -- W1Odd = False, corrected = False
+    have a03 : (overlapGraph (goodPart (tileOddPieces S pO pE lE w))).Adj ⟨0, by simp [tileOddPieces]⟩ ⟨3, by simp [tileOddPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileOddPieces S pO pE lE w).get ⟨0, by simp [tileOddPieces]⟩).off + (((0 : ℤ), (0 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.c0
+      · rw [mem_placed, show (((tileOddPieces S pO pE lE w).get ⟨0, by simp [tileOddPieces]⟩).off + (((0 : ℤ), (0 : ℤ)))) - ((tileOddPieces S pO pE lE w).get ⟨3, by simp [tileOddPieces]⟩).off = vQ1 w by conn_id]
+        conn_odo
+        exact hQ.cX
+      · conn_exc
+      · conn_exc
+    have a05 : (overlapGraph (goodPart (tileOddPieces S pO pE lE w))).Adj ⟨0, by simp [tileOddPieces]⟩ ⟨5, by simp [tileOddPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileOddPieces S pO pE lE w).get ⟨0, by simp [tileOddPieces]⟩).off + (vP1 w + vP2 w + ((0 : ℤ), (-1 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.cD1
+      · rw [mem_placed, show (((tileOddPieces S pO pE lE w).get ⟨0, by simp [tileOddPieces]⟩).off + (vP1 w + vP2 w + ((0 : ℤ), (-1 : ℤ)))) - ((tileOddPieces S pO pE lE w).get ⟨5, by simp [tileOddPieces]⟩).off = vQ1 w - ((0 : ℤ), (1 : ℤ)) by conn_id]
+        conn_odo
+        exact hQ.cXi
+      · conn_exc
+      · conn_exc
+    have a23 : (overlapGraph (goodPart (tileOddPieces S pO pE lE w))).Adj ⟨2, by simp [tileOddPieces]⟩ ⟨3, by simp [tileOddPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileOddPieces S pO pE lE w).get ⟨2, by simp [tileOddPieces]⟩).off + (vQ1 w + vQ2 w + ((1 : ℤ), (-1 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hQ.cD
+      · rw [mem_placed, show (((tileOddPieces S pO pE lE w).get ⟨2, by simp [tileOddPieces]⟩).off + (vQ1 w + vQ2 w + ((1 : ℤ), (-1 : ℤ)))) - ((tileOddPieces S pO pE lE w).get ⟨3, by simp [tileOddPieces]⟩).off = vQ2 w + ((1 : ℤ), (-1 : ℤ)) by conn_id]
+        conn_odo
+        exact hQ.cY1i
+      · conn_exc
+      · conn_exc
+    have a45 : (overlapGraph (goodPart (tileOddPieces S pO pE lE w))).Adj ⟨4, by simp [tileOddPieces]⟩ ⟨5, by simp [tileOddPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileOddPieces S pO pE lE w).get ⟨4, by simp [tileOddPieces]⟩).off + (vQ1 w + vQ2 w + ((1 : ℤ), (-1 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hQ.cD
+      · rw [mem_placed, show (((tileOddPieces S pO pE lE w).get ⟨4, by simp [tileOddPieces]⟩).off + (vQ1 w + vQ2 w + ((1 : ℤ), (-1 : ℤ)))) - ((tileOddPieces S pO pE lE w).get ⟨5, by simp [tileOddPieces]⟩).off = vQ2 w + ((1 : ℤ), (-1 : ℤ)) by conn_id]
+        conn_odo
+        exact hQ.cY1i
+      · conn_exc
+      · conn_exc
+    have a12 : (overlapGraph (goodPart (tileOddPieces S pO pE lE w))).Adj ⟨1, by simp [tileOddPieces]⟩ ⟨2, by simp [tileOddPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileOddPieces S pO pE lE w).get ⟨1, by simp [tileOddPieces]⟩).off + (((1 : ℤ), (0 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.c1
+      · rw [mem_placed, show (((tileOddPieces S pO pE lE w).get ⟨1, by simp [tileOddPieces]⟩).off + (((1 : ℤ), (0 : ℤ)))) - ((tileOddPieces S pO pE lE w).get ⟨2, by simp [tileOddPieces]⟩).off = vQ2 w + ((1 : ℤ), (0 : ℤ)) by conn_id]
+        conn_odo
+        exact hQ.cY1
+      · conn_exc
+      · conn_exc
+    obtain ⟨kv, hk⟩ := k
+    rcases kv with _ | _ | _ | _ | _ | _ | kv
+    · exact SimpleGraph.Reachable.refl _
+    · exact (((SimpleGraph.Reachable.refl _).trans (a03).reachable).trans (a23.symm).reachable).trans (a12.symm).reachable
+    · exact ((SimpleGraph.Reachable.refl _).trans (a03).reachable).trans (a23.symm).reachable
+    · exact (SimpleGraph.Reachable.refl _).trans (a03).reachable
+    · exact ((SimpleGraph.Reachable.refl _).trans (a05).reachable).trans (a45.symm).reachable
+    · exact (SimpleGraph.Reachable.refl _).trans (a05).reachable
+    · simp [tileOddPieces] at hk; omega
+  · -- W1Odd = True, corrected = True
+    have a02 : (overlapGraph (goodPart (tileOddPieces S pO pE lE w))).Adj ⟨0, by simp [tileOddPieces]⟩ ⟨2, by simp [tileOddPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileOddPieces S pO pE lE w).get ⟨0, by simp [tileOddPieces]⟩).off + (vP1 w)) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.cX
+      · rw [mem_placed, show (((tileOddPieces S pO pE lE w).get ⟨0, by simp [tileOddPieces]⟩).off + (vP1 w)) - ((tileOddPieces S pO pE lE w).get ⟨2, by simp [tileOddPieces]⟩).off = ((0 : ℤ), (0 : ℤ)) by conn_id]
+        conn_odo
+        exact (hL hc).1.1
+      · conn_exc
+      · conn_exc
+    have a04 : (overlapGraph (goodPart (tileOddPieces S pO pE lE w))).Adj ⟨0, by simp [tileOddPieces]⟩ ⟨4, by simp [tileOddPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileOddPieces S pO pE lE w).get ⟨0, by simp [tileOddPieces]⟩).off + (vP2 w + ((1 : ℤ), (0 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.cY1
+      · rw [mem_placed, show (((tileOddPieces S pO pE lE w).get ⟨0, by simp [tileOddPieces]⟩).off + (vP2 w + ((1 : ℤ), (0 : ℤ)))) - ((tileOddPieces S pO pE lE w).get ⟨4, by simp [tileOddPieces]⟩).off = ((1 : ℤ), (0 : ℤ)) by conn_id]
+        conn_odo
+        exact hQ.c1
+      · conn_exc
+      · conn_exc
+    have a23 : (overlapGraph (goodPart (tileOddPieces S pO pE lE w))).Adj ⟨2, by simp [tileOddPieces]⟩ ⟨3, by simp [tileOddPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileOddPieces S pO pE lE w).get ⟨2, by simp [tileOddPieces]⟩).off + (vQ1 w)) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact (hL hc).1.2
+      · rw [mem_placed, show (((tileOddPieces S pO pE lE w).get ⟨2, by simp [tileOddPieces]⟩).off + (vQ1 w)) - ((tileOddPieces S pO pE lE w).get ⟨3, by simp [tileOddPieces]⟩).off = ((0 : ℤ), (0 : ℤ)) by conn_id]
+        conn_odo
+        exact hQ.c0
+      · conn_exc
+      · conn_exc
+    have a45 : (overlapGraph (goodPart (tileOddPieces S pO pE lE w))).Adj ⟨4, by simp [tileOddPieces]⟩ ⟨5, by simp [tileOddPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileOddPieces S pO pE lE w).get ⟨4, by simp [tileOddPieces]⟩).off + (vQ1 w + vQ2 w + ((1 : ℤ), (-1 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hQ.cD
+      · rw [mem_placed, show (((tileOddPieces S pO pE lE w).get ⟨4, by simp [tileOddPieces]⟩).off + (vQ1 w + vQ2 w + ((1 : ℤ), (-1 : ℤ)))) - ((tileOddPieces S pO pE lE w).get ⟨5, by simp [tileOddPieces]⟩).off = vQ2 w + ((1 : ℤ), (-1 : ℤ)) by conn_id]
+        conn_odo
+        exact (hL hc).2
+      · conn_exc
+      · conn_exc
+    have a13 : (overlapGraph (goodPart (tileOddPieces S pO pE lE w))).Adj ⟨1, by simp [tileOddPieces]⟩ ⟨3, by simp [tileOddPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileOddPieces S pO pE lE w).get ⟨1, by simp [tileOddPieces]⟩).off + (vP1 w - ((0 : ℤ), (1 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.cXi
+      · rw [mem_placed, show (((tileOddPieces S pO pE lE w).get ⟨1, by simp [tileOddPieces]⟩).off + (vP1 w - ((0 : ℤ), (1 : ℤ)))) - ((tileOddPieces S pO pE lE w).get ⟨3, by simp [tileOddPieces]⟩).off = vQ1 w + vQ2 w + ((0 : ℤ), (-1 : ℤ)) by conn_id]
+        conn_odo
+        exact hQ.cD1
+      · conn_exc
+      · conn_exc
+    obtain ⟨kv, hk⟩ := k
+    rcases kv with _ | _ | _ | _ | _ | _ | kv
+    · exact SimpleGraph.Reachable.refl _
+    · exact (((SimpleGraph.Reachable.refl _).trans (a02).reachable).trans (a23).reachable).trans (a13.symm).reachable
+    · exact (SimpleGraph.Reachable.refl _).trans (a02).reachable
+    · exact ((SimpleGraph.Reachable.refl _).trans (a02).reachable).trans (a23).reachable
+    · exact (SimpleGraph.Reachable.refl _).trans (a04).reachable
+    · exact ((SimpleGraph.Reachable.refl _).trans (a04).reachable).trans (a45).reachable
+    · simp [tileOddPieces] at hk; omega
+  · -- W1Odd = True, corrected = False
+    have a02 : (overlapGraph (goodPart (tileOddPieces S pO pE lE w))).Adj ⟨0, by simp [tileOddPieces]⟩ ⟨2, by simp [tileOddPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileOddPieces S pO pE lE w).get ⟨0, by simp [tileOddPieces]⟩).off + (vP1 w)) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.cX
+      · rw [mem_placed, show (((tileOddPieces S pO pE lE w).get ⟨0, by simp [tileOddPieces]⟩).off + (vP1 w)) - ((tileOddPieces S pO pE lE w).get ⟨2, by simp [tileOddPieces]⟩).off = ((0 : ℤ), (0 : ℤ)) by conn_id]
+        conn_odo
+        exact hQ.c0
+      · conn_exc
+      · conn_exc
+    have a04 : (overlapGraph (goodPart (tileOddPieces S pO pE lE w))).Adj ⟨0, by simp [tileOddPieces]⟩ ⟨4, by simp [tileOddPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileOddPieces S pO pE lE w).get ⟨0, by simp [tileOddPieces]⟩).off + (vP2 w + ((1 : ℤ), (0 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.cY1
+      · rw [mem_placed, show (((tileOddPieces S pO pE lE w).get ⟨0, by simp [tileOddPieces]⟩).off + (vP2 w + ((1 : ℤ), (0 : ℤ)))) - ((tileOddPieces S pO pE lE w).get ⟨4, by simp [tileOddPieces]⟩).off = ((1 : ℤ), (0 : ℤ)) by conn_id]
+        conn_odo
+        exact hQ.c1
+      · conn_exc
+      · conn_exc
+    have a23 : (overlapGraph (goodPart (tileOddPieces S pO pE lE w))).Adj ⟨2, by simp [tileOddPieces]⟩ ⟨3, by simp [tileOddPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileOddPieces S pO pE lE w).get ⟨2, by simp [tileOddPieces]⟩).off + (vQ1 w + vQ2 w + ((1 : ℤ), (-1 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hQ.cD
+      · rw [mem_placed, show (((tileOddPieces S pO pE lE w).get ⟨2, by simp [tileOddPieces]⟩).off + (vQ1 w + vQ2 w + ((1 : ℤ), (-1 : ℤ)))) - ((tileOddPieces S pO pE lE w).get ⟨3, by simp [tileOddPieces]⟩).off = vQ2 w + ((1 : ℤ), (-1 : ℤ)) by conn_id]
+        conn_odo
+        exact hQ.cY1i
+      · conn_exc
+      · conn_exc
+    have a45 : (overlapGraph (goodPart (tileOddPieces S pO pE lE w))).Adj ⟨4, by simp [tileOddPieces]⟩ ⟨5, by simp [tileOddPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileOddPieces S pO pE lE w).get ⟨4, by simp [tileOddPieces]⟩).off + (vQ1 w + vQ2 w + ((1 : ℤ), (-1 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hQ.cD
+      · rw [mem_placed, show (((tileOddPieces S pO pE lE w).get ⟨4, by simp [tileOddPieces]⟩).off + (vQ1 w + vQ2 w + ((1 : ℤ), (-1 : ℤ)))) - ((tileOddPieces S pO pE lE w).get ⟨5, by simp [tileOddPieces]⟩).off = vQ2 w + ((1 : ℤ), (-1 : ℤ)) by conn_id]
+        conn_odo
+        exact hQ.cY1i
+      · conn_exc
+      · conn_exc
+    have a13 : (overlapGraph (goodPart (tileOddPieces S pO pE lE w))).Adj ⟨1, by simp [tileOddPieces]⟩ ⟨3, by simp [tileOddPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileOddPieces S pO pE lE w).get ⟨1, by simp [tileOddPieces]⟩).off + (vP1 w - ((0 : ℤ), (1 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.cXi
+      · rw [mem_placed, show (((tileOddPieces S pO pE lE w).get ⟨1, by simp [tileOddPieces]⟩).off + (vP1 w - ((0 : ℤ), (1 : ℤ)))) - ((tileOddPieces S pO pE lE w).get ⟨3, by simp [tileOddPieces]⟩).off = vQ1 w + vQ2 w + ((0 : ℤ), (-1 : ℤ)) by conn_id]
+        conn_odo
+        exact hQ.cD1
+      · conn_exc
+      · conn_exc
+    obtain ⟨kv, hk⟩ := k
+    rcases kv with _ | _ | _ | _ | _ | _ | kv
+    · exact SimpleGraph.Reachable.refl _
+    · exact (((SimpleGraph.Reachable.refl _).trans (a02).reachable).trans (a23).reachable).trans (a13.symm).reachable
+    · exact (SimpleGraph.Reachable.refl _).trans (a02).reachable
+    · exact ((SimpleGraph.Reachable.refl _).trans (a02).reachable).trans (a23).reachable
+    · exact (SimpleGraph.Reachable.refl _).trans (a04).reachable
+    · exact ((SimpleGraph.Reachable.refl _).trans (a04).reachable).trans (a45).reachable
+    · simp [tileOddPieces] at hk; omega
+
+/-- The overlap graph of the even standard decomposition is connected: a spanning tree of overlaps witnessed by corner points of
+the parents (`StdCorners`) and, for the L-corrected copies, by points of the kept side of the child of the parent word. -/
+theorem tileEvenPieces_connected (S : WeakData) (pO pE : Word → PartialOdometer) (lO : Word → Bool → Bool → PartialOdometer)
+    (w : Word)
+    (hP : StdCorners (regOdo S pO pE (regsAt w).1 true) (vP1 w) (vP2 w))
+    (hQ : StdCorners (regOdo S pO pE (regsAt w).2 false) (vQ1 w) (vQ2 w))
+    (hL : w.getLast? = some Digit.two → ∀ plus : Bool,
+      (((plus == W1Odd w) = false) → ((1 : ℤ), (0 : ℤ)) ∈ (lO w.dropLast plus false).dom ∧
+        vP2 w + ((1 : ℤ), (0 : ℤ)) ∈ (lO w.dropLast plus false).dom) ∧
+      (((plus == W1Odd w) = true) → vP1 w - ((0 : ℤ), (1 : ℤ)) ∈ (lO w.dropLast plus false).dom)) :
+    (overlapGraph (goodPart (tileEvenPieces S pO pE lO w))).Connected := by
+  have h0 : 0 < (tileEvenPieces S pO pE lO w).length := by simp [tileEvenPieces]
+  refine connected_of_reach _ h0 (fun k => ?_)
+  cases hWo : W1Odd w <;> by_cases hc : w.getLast? = some Digit.two
+  · -- W1Odd = False, corrected = True
+    have a04 : (overlapGraph (goodPart (tileEvenPieces S pO pE lO w))).Adj ⟨0, by simp [tileEvenPieces]⟩ ⟨4, by simp [tileEvenPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileEvenPieces S pO pE lO w).get ⟨0, by simp [tileEvenPieces]⟩).off + (((0 : ℤ), (0 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.c0
+      · rw [mem_placed, show (((tileEvenPieces S pO pE lO w).get ⟨0, by simp [tileEvenPieces]⟩).off + (((0 : ℤ), (0 : ℤ)))) - ((tileEvenPieces S pO pE lO w).get ⟨4, by simp [tileEvenPieces]⟩).off = vQ1 w by conn_id]
+        conn_odo
+        exact hQ.cX
+      · conn_exc
+      · conn_exc
+    have a01 : (overlapGraph (goodPart (tileEvenPieces S pO pE lO w))).Adj ⟨0, by simp [tileEvenPieces]⟩ ⟨1, by simp [tileEvenPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileEvenPieces S pO pE lO w).get ⟨0, by simp [tileEvenPieces]⟩).off + (vP1 w + vP2 w + ((0 : ℤ), (-1 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.cD1
+      · rw [mem_placed, show (((tileEvenPieces S pO pE lO w).get ⟨0, by simp [tileEvenPieces]⟩).off + (vP1 w + vP2 w + ((0 : ℤ), (-1 : ℤ)))) - ((tileEvenPieces S pO pE lO w).get ⟨1, by simp [tileEvenPieces]⟩).off = vP1 w - ((0 : ℤ), (1 : ℤ)) by conn_id]
+        conn_odo
+        exact ((hL hc false).2 (by simp [hWo]))
+      · conn_exc
+      · conn_exc
+    have a24 : (overlapGraph (goodPart (tileEvenPieces S pO pE lO w))).Adj ⟨2, by simp [tileEvenPieces]⟩ ⟨4, by simp [tileEvenPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileEvenPieces S pO pE lO w).get ⟨2, by simp [tileEvenPieces]⟩).off + (((1 : ℤ), (0 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact (((hL hc true).1 (by simp [hWo])).1)
+      · rw [mem_placed, show (((tileEvenPieces S pO pE lO w).get ⟨2, by simp [tileEvenPieces]⟩).off + (((1 : ℤ), (0 : ℤ)))) - ((tileEvenPieces S pO pE lO w).get ⟨4, by simp [tileEvenPieces]⟩).off = vQ2 w + ((1 : ℤ), (0 : ℤ)) by conn_id]
+        conn_odo
+        exact hQ.cY1
+      · conn_exc
+      · conn_exc
+    have a23 : (overlapGraph (goodPart (tileEvenPieces S pO pE lO w))).Adj ⟨2, by simp [tileEvenPieces]⟩ ⟨3, by simp [tileEvenPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileEvenPieces S pO pE lO w).get ⟨2, by simp [tileEvenPieces]⟩).off + (vP2 w + ((1 : ℤ), (0 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact (((hL hc true).1 (by simp [hWo])).2)
+      · rw [mem_placed, show (((tileEvenPieces S pO pE lO w).get ⟨2, by simp [tileEvenPieces]⟩).off + (vP2 w + ((1 : ℤ), (0 : ℤ)))) - ((tileEvenPieces S pO pE lO w).get ⟨3, by simp [tileEvenPieces]⟩).off = ((1 : ℤ), (0 : ℤ)) by conn_id]
+        conn_odo
+        exact hP.c1
+      · conn_exc
+      · conn_exc
+    have a35 : (overlapGraph (goodPart (tileEvenPieces S pO pE lO w))).Adj ⟨3, by simp [tileEvenPieces]⟩ ⟨5, by simp [tileEvenPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileEvenPieces S pO pE lO w).get ⟨3, by simp [tileEvenPieces]⟩).off + (vP1 w + vP2 w + ((1 : ℤ), (-1 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.cD
+      · rw [mem_placed, show (((tileEvenPieces S pO pE lO w).get ⟨3, by simp [tileEvenPieces]⟩).off + (vP1 w + vP2 w + ((1 : ℤ), (-1 : ℤ)))) - ((tileEvenPieces S pO pE lO w).get ⟨5, by simp [tileEvenPieces]⟩).off = vQ2 w + ((1 : ℤ), (-1 : ℤ)) by conn_id]
+        conn_odo
+        exact hQ.cY1i
+      · conn_exc
+      · conn_exc
+    obtain ⟨kv, hk⟩ := k
+    rcases kv with _ | _ | _ | _ | _ | _ | kv
+    · exact SimpleGraph.Reachable.refl _
+    · exact (SimpleGraph.Reachable.refl _).trans (a01).reachable
+    · exact ((SimpleGraph.Reachable.refl _).trans (a04).reachable).trans (a24.symm).reachable
+    · exact (((SimpleGraph.Reachable.refl _).trans (a04).reachable).trans (a24.symm).reachable).trans (a23).reachable
+    · exact (SimpleGraph.Reachable.refl _).trans (a04).reachable
+    · exact ((((SimpleGraph.Reachable.refl _).trans (a04).reachable).trans (a24.symm).reachable).trans (a23).reachable).trans (a35).reachable
+    · simp [tileEvenPieces] at hk; omega
+  · -- W1Odd = False, corrected = False
+    have a04 : (overlapGraph (goodPart (tileEvenPieces S pO pE lO w))).Adj ⟨0, by simp [tileEvenPieces]⟩ ⟨4, by simp [tileEvenPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileEvenPieces S pO pE lO w).get ⟨0, by simp [tileEvenPieces]⟩).off + (((0 : ℤ), (0 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.c0
+      · rw [mem_placed, show (((tileEvenPieces S pO pE lO w).get ⟨0, by simp [tileEvenPieces]⟩).off + (((0 : ℤ), (0 : ℤ)))) - ((tileEvenPieces S pO pE lO w).get ⟨4, by simp [tileEvenPieces]⟩).off = vQ1 w by conn_id]
+        conn_odo
+        exact hQ.cX
+      · conn_exc
+      · conn_exc
+    have a01 : (overlapGraph (goodPart (tileEvenPieces S pO pE lO w))).Adj ⟨0, by simp [tileEvenPieces]⟩ ⟨1, by simp [tileEvenPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileEvenPieces S pO pE lO w).get ⟨0, by simp [tileEvenPieces]⟩).off + (vP1 w + vP2 w + ((0 : ℤ), (-1 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.cD1
+      · rw [mem_placed, show (((tileEvenPieces S pO pE lO w).get ⟨0, by simp [tileEvenPieces]⟩).off + (vP1 w + vP2 w + ((0 : ℤ), (-1 : ℤ)))) - ((tileEvenPieces S pO pE lO w).get ⟨1, by simp [tileEvenPieces]⟩).off = vP1 w - ((0 : ℤ), (1 : ℤ)) by conn_id]
+        conn_odo
+        exact hP.cXi
+      · conn_exc
+      · conn_exc
+    have a15 : (overlapGraph (goodPart (tileEvenPieces S pO pE lO w))).Adj ⟨1, by simp [tileEvenPieces]⟩ ⟨5, by simp [tileEvenPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileEvenPieces S pO pE lO w).get ⟨1, by simp [tileEvenPieces]⟩).off + (vP1 w + vP2 w + ((0 : ℤ), (-1 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.cD1
+      · rw [mem_placed, show (((tileEvenPieces S pO pE lO w).get ⟨1, by simp [tileEvenPieces]⟩).off + (vP1 w + vP2 w + ((0 : ℤ), (-1 : ℤ)))) - ((tileEvenPieces S pO pE lO w).get ⟨5, by simp [tileEvenPieces]⟩).off = vQ1 w - ((0 : ℤ), (1 : ℤ)) by conn_id]
+        conn_odo
+        exact hQ.cXi
+      · conn_exc
+      · conn_exc
+    have a24 : (overlapGraph (goodPart (tileEvenPieces S pO pE lO w))).Adj ⟨2, by simp [tileEvenPieces]⟩ ⟨4, by simp [tileEvenPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileEvenPieces S pO pE lO w).get ⟨2, by simp [tileEvenPieces]⟩).off + (((1 : ℤ), (0 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.c1
+      · rw [mem_placed, show (((tileEvenPieces S pO pE lO w).get ⟨2, by simp [tileEvenPieces]⟩).off + (((1 : ℤ), (0 : ℤ)))) - ((tileEvenPieces S pO pE lO w).get ⟨4, by simp [tileEvenPieces]⟩).off = vQ2 w + ((1 : ℤ), (0 : ℤ)) by conn_id]
+        conn_odo
+        exact hQ.cY1
+      · conn_exc
+      · conn_exc
+    have a23 : (overlapGraph (goodPart (tileEvenPieces S pO pE lO w))).Adj ⟨2, by simp [tileEvenPieces]⟩ ⟨3, by simp [tileEvenPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileEvenPieces S pO pE lO w).get ⟨2, by simp [tileEvenPieces]⟩).off + (vP1 w + vP2 w + ((0 : ℤ), (-1 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.cD1
+      · rw [mem_placed, show (((tileEvenPieces S pO pE lO w).get ⟨2, by simp [tileEvenPieces]⟩).off + (vP1 w + vP2 w + ((0 : ℤ), (-1 : ℤ)))) - ((tileEvenPieces S pO pE lO w).get ⟨3, by simp [tileEvenPieces]⟩).off = vP1 w - ((0 : ℤ), (1 : ℤ)) by conn_id]
+        conn_odo
+        exact hP.cXi
+      · conn_exc
+      · conn_exc
+    obtain ⟨kv, hk⟩ := k
+    rcases kv with _ | _ | _ | _ | _ | _ | kv
+    · exact SimpleGraph.Reachable.refl _
+    · exact (SimpleGraph.Reachable.refl _).trans (a01).reachable
+    · exact ((SimpleGraph.Reachable.refl _).trans (a04).reachable).trans (a24.symm).reachable
+    · exact (((SimpleGraph.Reachable.refl _).trans (a04).reachable).trans (a24.symm).reachable).trans (a23).reachable
+    · exact (SimpleGraph.Reachable.refl _).trans (a04).reachable
+    · exact ((SimpleGraph.Reachable.refl _).trans (a01).reachable).trans (a15).reachable
+    · simp [tileEvenPieces] at hk; omega
+  · -- W1Odd = True, corrected = True
+    have a04 : (overlapGraph (goodPart (tileEvenPieces S pO pE lO w))).Adj ⟨0, by simp [tileEvenPieces]⟩ ⟨4, by simp [tileEvenPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileEvenPieces S pO pE lO w).get ⟨0, by simp [tileEvenPieces]⟩).off + (vP1 w)) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.cX
+      · rw [mem_placed, show (((tileEvenPieces S pO pE lO w).get ⟨0, by simp [tileEvenPieces]⟩).off + (vP1 w)) - ((tileEvenPieces S pO pE lO w).get ⟨4, by simp [tileEvenPieces]⟩).off = ((0 : ℤ), (0 : ℤ)) by conn_id]
+        conn_odo
+        exact hQ.c0
+      · conn_exc
+      · conn_exc
+    have a01 : (overlapGraph (goodPart (tileEvenPieces S pO pE lO w))).Adj ⟨0, by simp [tileEvenPieces]⟩ ⟨1, by simp [tileEvenPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileEvenPieces S pO pE lO w).get ⟨0, by simp [tileEvenPieces]⟩).off + (vP2 w + ((1 : ℤ), (0 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.cY1
+      · rw [mem_placed, show (((tileEvenPieces S pO pE lO w).get ⟨0, by simp [tileEvenPieces]⟩).off + (vP2 w + ((1 : ℤ), (0 : ℤ)))) - ((tileEvenPieces S pO pE lO w).get ⟨1, by simp [tileEvenPieces]⟩).off = ((1 : ℤ), (0 : ℤ)) by conn_id]
+        conn_odo
+        exact (((hL hc false).1 (by simp [hWo])).1)
+      · conn_exc
+      · conn_exc
+    have a15 : (overlapGraph (goodPart (tileEvenPieces S pO pE lO w))).Adj ⟨1, by simp [tileEvenPieces]⟩ ⟨5, by simp [tileEvenPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileEvenPieces S pO pE lO w).get ⟨1, by simp [tileEvenPieces]⟩).off + (vP2 w + ((1 : ℤ), (0 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact (((hL hc false).1 (by simp [hWo])).2)
+      · rw [mem_placed, show (((tileEvenPieces S pO pE lO w).get ⟨1, by simp [tileEvenPieces]⟩).off + (vP2 w + ((1 : ℤ), (0 : ℤ)))) - ((tileEvenPieces S pO pE lO w).get ⟨5, by simp [tileEvenPieces]⟩).off = ((1 : ℤ), (0 : ℤ)) by conn_id]
+        conn_odo
+        exact hQ.c1
+      · conn_exc
+      · conn_exc
+    have a24 : (overlapGraph (goodPart (tileEvenPieces S pO pE lO w))).Adj ⟨2, by simp [tileEvenPieces]⟩ ⟨4, by simp [tileEvenPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileEvenPieces S pO pE lO w).get ⟨2, by simp [tileEvenPieces]⟩).off + (vP1 w - ((0 : ℤ), (1 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact ((hL hc true).2 (by simp [hWo]))
+      · rw [mem_placed, show (((tileEvenPieces S pO pE lO w).get ⟨2, by simp [tileEvenPieces]⟩).off + (vP1 w - ((0 : ℤ), (1 : ℤ)))) - ((tileEvenPieces S pO pE lO w).get ⟨4, by simp [tileEvenPieces]⟩).off = vQ1 w + vQ2 w + ((0 : ℤ), (-1 : ℤ)) by conn_id]
+        conn_odo
+        exact hQ.cD1
+      · conn_exc
+      · conn_exc
+    have a35 : (overlapGraph (goodPart (tileEvenPieces S pO pE lO w))).Adj ⟨3, by simp [tileEvenPieces]⟩ ⟨5, by simp [tileEvenPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileEvenPieces S pO pE lO w).get ⟨3, by simp [tileEvenPieces]⟩).off + (vP2 w + ((1 : ℤ), (-1 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.cY1i
+      · rw [mem_placed, show (((tileEvenPieces S pO pE lO w).get ⟨3, by simp [tileEvenPieces]⟩).off + (vP2 w + ((1 : ℤ), (-1 : ℤ)))) - ((tileEvenPieces S pO pE lO w).get ⟨5, by simp [tileEvenPieces]⟩).off = vQ1 w + vQ2 w + ((1 : ℤ), (-1 : ℤ)) by conn_id]
+        conn_odo
+        exact hQ.cD
+      · conn_exc
+      · conn_exc
+    obtain ⟨kv, hk⟩ := k
+    rcases kv with _ | _ | _ | _ | _ | _ | kv
+    · exact SimpleGraph.Reachable.refl _
+    · exact (SimpleGraph.Reachable.refl _).trans (a01).reachable
+    · exact ((SimpleGraph.Reachable.refl _).trans (a04).reachable).trans (a24.symm).reachable
+    · exact (((SimpleGraph.Reachable.refl _).trans (a01).reachable).trans (a15).reachable).trans (a35.symm).reachable
+    · exact (SimpleGraph.Reachable.refl _).trans (a04).reachable
+    · exact ((SimpleGraph.Reachable.refl _).trans (a01).reachable).trans (a15).reachable
+    · simp [tileEvenPieces] at hk; omega
+  · -- W1Odd = True, corrected = False
+    have a01 : (overlapGraph (goodPart (tileEvenPieces S pO pE lO w))).Adj ⟨0, by simp [tileEvenPieces]⟩ ⟨1, by simp [tileEvenPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileEvenPieces S pO pE lO w).get ⟨0, by simp [tileEvenPieces]⟩).off + (vP1 w + vP2 w + ((0 : ℤ), (-1 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.cD1
+      · rw [mem_placed, show (((tileEvenPieces S pO pE lO w).get ⟨0, by simp [tileEvenPieces]⟩).off + (vP1 w + vP2 w + ((0 : ℤ), (-1 : ℤ)))) - ((tileEvenPieces S pO pE lO w).get ⟨1, by simp [tileEvenPieces]⟩).off = vP1 w - ((0 : ℤ), (1 : ℤ)) by conn_id]
+        conn_odo
+        exact hP.cXi
+      · conn_exc
+      · conn_exc
+    have a04 : (overlapGraph (goodPart (tileEvenPieces S pO pE lO w))).Adj ⟨0, by simp [tileEvenPieces]⟩ ⟨4, by simp [tileEvenPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileEvenPieces S pO pE lO w).get ⟨0, by simp [tileEvenPieces]⟩).off + (vP1 w)) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.cX
+      · rw [mem_placed, show (((tileEvenPieces S pO pE lO w).get ⟨0, by simp [tileEvenPieces]⟩).off + (vP1 w)) - ((tileEvenPieces S pO pE lO w).get ⟨4, by simp [tileEvenPieces]⟩).off = ((0 : ℤ), (0 : ℤ)) by conn_id]
+        conn_odo
+        exact hQ.c0
+      · conn_exc
+      · conn_exc
+    have a15 : (overlapGraph (goodPart (tileEvenPieces S pO pE lO w))).Adj ⟨1, by simp [tileEvenPieces]⟩ ⟨5, by simp [tileEvenPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileEvenPieces S pO pE lO w).get ⟨1, by simp [tileEvenPieces]⟩).off + (vP2 w + ((1 : ℤ), (0 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.cY1
+      · rw [mem_placed, show (((tileEvenPieces S pO pE lO w).get ⟨1, by simp [tileEvenPieces]⟩).off + (vP2 w + ((1 : ℤ), (0 : ℤ)))) - ((tileEvenPieces S pO pE lO w).get ⟨5, by simp [tileEvenPieces]⟩).off = ((1 : ℤ), (0 : ℤ)) by conn_id]
+        conn_odo
+        exact hQ.c1
+      · conn_exc
+      · conn_exc
+    have a24 : (overlapGraph (goodPart (tileEvenPieces S pO pE lO w))).Adj ⟨2, by simp [tileEvenPieces]⟩ ⟨4, by simp [tileEvenPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileEvenPieces S pO pE lO w).get ⟨2, by simp [tileEvenPieces]⟩).off + (vP1 w - ((0 : ℤ), (1 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.cXi
+      · rw [mem_placed, show (((tileEvenPieces S pO pE lO w).get ⟨2, by simp [tileEvenPieces]⟩).off + (vP1 w - ((0 : ℤ), (1 : ℤ)))) - ((tileEvenPieces S pO pE lO w).get ⟨4, by simp [tileEvenPieces]⟩).off = vQ1 w + vQ2 w + ((0 : ℤ), (-1 : ℤ)) by conn_id]
+        conn_odo
+        exact hQ.cD1
+      · conn_exc
+      · conn_exc
+    have a23 : (overlapGraph (goodPart (tileEvenPieces S pO pE lO w))).Adj ⟨2, by simp [tileEvenPieces]⟩ ⟨3, by simp [tileEvenPieces]⟩ := by
+      refine adj_of_mem _ _ _ (by simp) (((tileEvenPieces S pO pE lO w).get ⟨2, by simp [tileEvenPieces]⟩).off + (vP2 w + ((1 : ℤ), (0 : ℤ)))) ?_ ?_ ?_ ?_
+      · rw [mem_placed, add_sub_cancel_left]
+        conn_odo
+        exact hP.cY1
+      · rw [mem_placed, show (((tileEvenPieces S pO pE lO w).get ⟨2, by simp [tileEvenPieces]⟩).off + (vP2 w + ((1 : ℤ), (0 : ℤ)))) - ((tileEvenPieces S pO pE lO w).get ⟨3, by simp [tileEvenPieces]⟩).off = ((1 : ℤ), (0 : ℤ)) by conn_id]
+        conn_odo
+        exact hP.c1
+      · conn_exc
+      · conn_exc
+    obtain ⟨kv, hk⟩ := k
+    rcases kv with _ | _ | _ | _ | _ | _ | kv
+    · exact SimpleGraph.Reachable.refl _
+    · exact (SimpleGraph.Reachable.refl _).trans (a01).reachable
+    · exact ((SimpleGraph.Reachable.refl _).trans (a04).reachable).trans (a24.symm).reachable
+    · exact (((SimpleGraph.Reachable.refl _).trans (a04).reachable).trans (a24.symm).reachable).trans (a23).reachable
+    · exact (SimpleGraph.Reachable.refl _).trans (a04).reachable
+    · exact ((SimpleGraph.Reachable.refl _).trans (a01).reachable).trans (a15).reachable
+    · simp [tileEvenPieces] at hk; omega
+
+/-! ### The corner points from the family -/
+
+open FLatticePaper.Tiles.SiteStrings (hWordOf vWordOf)
+open FLatticePaper.Tiles.StandardClause (fracOdd fracEven)
+
+theorem stdCorners_of_values (o : PartialOdometer) (α : Site) (β : ℤ) (X Y e : Site)
+    (h : TileTranslation.StdCornerValues o α β X Y e) : StdCorners o X Y := by
+  obtain ⟨⟨h0, -⟩, ⟨h1, -⟩, ⟨hXi, -⟩, ⟨hX, -⟩, ⟨hY1, -⟩, ⟨hY1i, -⟩, ⟨hD, -⟩, ⟨hD1, -⟩⟩ := h
+  refine ⟨h0, h1, hXi, hX, hY1, hY1i, hD, ?_⟩
+  have e : X + Y + ((1 : ℤ), (-1 : ℤ)) - ((1 : ℤ), (0 : ℤ)) = X + Y + ((0 : ℤ), (-1 : ℤ)) := by
+    refine Prod.ext ?_ ?_ <;> simp
+  rw [← e]
+  exact hD1
+
+theorem mem_placedSites_of {ts : List (ZTile × GInt)} {t : ZTile × GInt} (ht : t ∈ ts) {u : GInt}
+    (hu : u ∈ tileShape t.1) : t.2 + u ∈ placedSites ts := by
+  unfold placedSites
+  simp only [List.mem_flatMap, List.mem_map]
+  exact ⟨t, ht, u, hu, add_comm u t.2⟩
+
+theorem shape_00 (t : ZTile) : ((0 : ℤ), (0 : ℤ)) ∈ tileShape t := by cases t <;> simp [tileShape]
+theorem shape_10 (t : ZTile) : ((1 : ℤ), (0 : ℤ)) ∈ tileShape t := by cases t <;> simp [tileShape]
+theorem shape_01 (t : ZTile) : ((0 : ℤ), (1 : ℤ)) ∈ tileShape t := by cases t <;> simp [tileShape]
+
+theorem last_mem_lastPos (L : List (ZTile × GInt)) (t : ZTile) (ht : L.getLast?.map (·.1) = some t) :
+    (t, lastPosOf L) ∈ L := by
+  cases he : L.getLast? with
+  | none => rw [he] at ht; simp at ht
+  | some e =>
+    rw [he] at ht
+    simp only [Option.map_some, Option.some.injEq] at ht
+    have hl : lastPosOf L = e.2 := by unfold lastPosOf; rw [he]; rfl
+    rw [hl, ← ht]
+    exact List.mem_of_getLast? he
+
+/-- The forward horizontal string contains `0` (first tile) and `X` (last tile `T_{0/1}` at `X - 1 - i`). -/
+theorem side_hPlus (wh : BinaryWord) (X : GInt) (hhh : wh.head? = some Letter.q) (hhl : wh.getLast? = some Letter.p)
+    (hX : lastPosOf (hStringAt wh 0) = X - (1, 1)) :
+    ((0 : ℤ), (0 : ℤ)) ∈ placedSites (hStringAt wh 0) ∧ X ∈ placedSites (hStringAt wh 0) := by
+  obtain ⟨rest, rfl⟩ : ∃ rest, wh = Letter.q :: rest := by
+    cases wh with
+    | nil => simp at hhh
+    | cons a rest => simp only [List.head?_cons, Option.some.injEq] at hhh; exact ⟨rest, by rw [hhh]⟩
+  refine ⟨?_, ?_⟩
+  · have hm : (HorizontalStepOne.tileFor none Letter.q, (0 : GInt)) ∈ hStringAt (Letter.q :: rest) 0 := by
+      rw [HorizontalStepOne.hStringAt_eq]
+      cases rest <;> simp [HorizontalStepOne.hAuxG]
+    have := mem_placedSites_of hm (shape_00 _)
+    simpa using this
+  · have hlast := HorizontalStepOne.hAuxG_last_fst HorizontalStepOne.fwdStr none (Letter.q :: rest) 0 hhl
+    rw [← HorizontalStepOne.hStringAt_eq] at hlast
+    have hm := last_mem_lastPos _ _ hlast
+    rw [hX] at hm
+    have := mem_placedSites_of hm (u := ((1 : ℤ), (1 : ℤ))) (by simp [tileShape])
+    simpa using this
+
+/-- The reversed horizontal string at `c` contains `c + i` (first tile). -/
+theorem side_hMinus (u : BinaryWord) (hne : u ≠ []) (c : GInt) :
+    c + ((0 : ℤ), (1 : ℤ)) ∈ placedSites (hRevStringAt u c) := by
+  obtain ⟨a, rest, rfl⟩ : ∃ a rest, u = a :: rest := by
+    cases u with
+    | nil => exact absurd rfl hne
+    | cons a rest => exact ⟨a, rest, rfl⟩
+  have hm : (HorizontalStepOne.tileFor none a, c) ∈ hRevStringAt (a :: rest) c := by
+    rw [HorizontalStepOne.hRevStringAt_eq]
+    cases rest <;> simp [HorizontalStepOne.hAuxG]
+  exact mem_placedSites_of hm (shape_01 _)
+
+/-- The reversed vertical string at `0` contains `1` (first tile) and `Y + 1` (last tile `T_{0/1}` at `Y + 1 - 2i`). -/
+theorem side_vMinus (wv : BinaryWord) (Y : GInt) (hvh : wv.head? = some Letter.p) (hvl : wv.getLast? = some Letter.q)
+    (hY : lastPosOf (vRevStringAt wv.reverse 0) = Y + (1, -2)) :
+    ((1 : ℤ), (0 : ℤ)) ∈ placedSites (vRevStringAt wv.reverse 0) ∧
+      Y + ((1 : ℤ), (0 : ℤ)) ∈ placedSites (vRevStringAt wv.reverse 0) := by
+  have hne : wv.reverse ≠ [] := by intro h; rw [List.reverse_eq_nil_iff] at h; subst h; simp at hvh
+  obtain ⟨a, rest, hr⟩ : ∃ a rest, wv.reverse = a :: rest := by
+    cases h : wv.reverse with
+    | nil => exact absurd h hne
+    | cons a rest => exact ⟨a, rest, rfl⟩
+  refine ⟨?_, ?_⟩
+  · have hm : (letterZTile a, (0 : GInt)) ∈ vRevStringAt wv.reverse 0 := by
+      rw [hr, VerticalStepOne.vRevStringAt_eq]
+      cases rest <;> simp [VerticalStepOne.vAux]
+    have := mem_placedSites_of hm (shape_10 _)
+    simpa using this
+  · have hlast := CornerValues.vAux_last_fst true wv.reverse 0
+    rw [← VerticalStepOne.vRevStringAt_eq, List.getLast?_reverse, hvh] at hlast
+    have hm := last_mem_lastPos _ _ hlast
+    rw [hY] at hm
+    have := mem_placedSites_of hm (u := ((0 : ℤ), (2 : ℤ))) (by simp [letterZTile, tileShape])
+    have e : Y + ((1 : ℤ), (-2 : ℤ)) + ((0 : ℤ), (2 : ℤ)) = Y + ((1 : ℤ), (0 : ℤ)) := by
+      refine Prod.ext ?_ ?_ <;> simp
+    rw [e] at this
+    exact this
+
+/-- The forward vertical string at `c` contains `c + 1` (first tile). -/
+theorem side_vPlus (wv : BinaryWord) (hne : wv ≠ []) (c : GInt) :
+    c + ((1 : ℤ), (0 : ℤ)) ∈ placedSites (vStringAt wv c) := by
+  obtain ⟨a, rest, rfl⟩ : ∃ a rest, wv = a :: rest := by
+    cases wv with
+    | nil => exact absurd rfl hne
+    | cons a rest => exact ⟨a, rest, rfl⟩
+  have hm : (letterZTile a, c) ∈ vStringAt (a :: rest) c := by
+    rw [VerticalStepOne.vStringAt_eq]
+    cases rest <;> simp [VerticalStepOne.vAux]
+  exact mem_placedSites_of hm (shape_10 _)
+
+theorem beq_comm_bool (a b : Bool) : (a == b) = (b == a) := by cases a <;> cases b <;> rfl
+
+/-- The standard tile odometer of a register word has the eight corner points of its fraction in its domain. -/
+theorem stdCorners_reg (D : JointData) (f : Word → JSlice) (w : Word) (hb : ¬ IsBase w)
+    (hJ : ∀ u : Word, u.length < w.length → IsJointSlice D f u) :
+    StdCorners (regOdo D.S (fun u => (below f w u).tOdd) (fun u => (below f w u).tEven) (regsAt w).1 true) (vP1 w) (vP2 w) ∧
+    StdCorners (regOdo D.S (fun u => (below f w u).tOdd) (fun u => (below f w u).tEven) (regsAt w).2 false) (vQ1 w) (vQ2 w) := by
+  obtain ⟨⟨u1, h1⟩, ⟨u2, h2⟩⟩ := regs_some w hb
+  have l1 := FLatticePaper.Tiles.JointInduction.regsAt_lt w u1 (Or.inl h1)
+  have l2 := FLatticePaper.Tiles.JointInduction.regsAt_lt w u2 (Or.inr h2)
+  obtain ⟨pr1, pr2⟩ := parents_of_regs w
+  refine ⟨?_, ?_⟩
+  · rw [h1]
+    show StdCorners (below f w u1).tOdd _ _
+    rw [below_of_lt f w u1 l1]
+    obtain ⟨α, β, -, hV⟩ := TileTranslationStd.stdCorners_odd u1 (f u1).tOdd (hJ u1 l1).2.2.1.2.2.2.2.1
+    have h := stdCorners_of_values _ _ _ _ _ _ hV
+    rw [pr1 u1 h1] at h
+    exact h
+  · rw [h2]
+    show StdCorners (below f w u2).tEven _ _
+    rw [below_of_lt f w u2 l2]
+    obtain ⟨α, β, -, hV⟩ := TileTranslationStd.stdCorners_even u2 (f u2).tEven (hJ u2 l2).2.2.1.2.2.2.2.2.1
+    have h := stdCorners_of_values _ _ _ _ _ _ hV
+    rw [pr2 u2 h2] at h
+    exact h
+
+/-- The kept sides of the short even L-corrections of the even parent (after a `3`): `0` and `X` on `h+`, `Y + 1 - i` on `h-`. -/
+theorem lPoints_three (D : JointData) (hlS : D.lSides = paperLSides) (f : Word → JSlice) (w : Word) (hb : ¬ IsBase w)
+    (hJ : ∀ u : Word, u.length < w.length → IsJointSlice D f u) (hl : w.getLast? = some Digit.three) :
+    ((((0 : ℤ), (0 : ℤ)) ∈ (((below f w) w.dropLast).lEven true false).dom ∧
+      vQ1 w ∈ (((below f w) w.dropLast).lEven true false).dom) ∧
+      vQ2 w + ((1 : ℤ), (-1 : ℤ)) ∈ (((below f w) w.dropLast).lEven false false).dom) := by
+  have hlen := dropLast_length_lt hl
+  rw [below_of_lt f w _ hlen]
+  have hdef := evenLDefined_dropLast hb hl
+  have hw := eq_dropLast_append hl
+  have hLP := (hJ _ hlen).2.2.2
+  have hX : texV1Even (fracEven w.dropLast) = vQ1 w := by
+    unfold vQ1 fracEven
+    conv_rhs => rw [hw]
+    rw [parentsAt_append_singleton]
+    rfl
+  have hY : texV2 (fracEven w.dropLast) = vQ2 w := by
+    unfold vQ2 fracEven
+    conv_rhs => rw [hw]
+    rw [parentsAt_append_singleton]
+    rfl
+  obtain ⟨-, c, hc⟩ := (hLP.2 true false hdef).2
+  obtain ⟨-, c', hc'⟩ := (hLP.2 false false hdef).2
+  rw [hlS] at hc hc'
+  have hP := side_hPlus (hWordOf w.dropLast true) (texV1Even (fracEven w.dropLast))
+    (hWordOf_head_last w.dropLast true).1 (hWordOf_head_last w.dropLast true).2
+    (StdCornerAnchors.stdAnchorX_even w.dropLast)
+  have hM := side_hMinus (hWordOf w.dropLast true).reverse (by
+      intro h; rw [List.reverse_eq_nil_iff] at h; have := (hWordOf_head_last w.dropLast true).1; rw [h] at this
+      simp at this)
+    (lastPosOf (vRevStringAt (vWordOf w.dropLast true).reverse 0))
+  rw [hX] at hP
+  refine ⟨⟨(hc .hPlus (by simp [paperLSides]) _ hP.1).1, (hc .hPlus (by simp [paperLSides]) _ hP.2).1⟩, ?_⟩
+  have e : lastPosOf (vRevStringAt (vWordOf w.dropLast true).reverse 0) + ((0 : ℤ), (1 : ℤ)) =
+      vQ2 w + ((1 : ℤ), (-1 : ℤ)) := by
+    rw [StdCornerAnchors.stdAnchorY_even w.dropLast, hY]; refine Prod.ext ?_ ?_ <;> simp only [Prod.fst_add, Prod.snd_add] <;> omega
+  rw [e] at hM
+  exact (hc' .hMinus (by simp [paperLSides]) _ hM).1
+
+/-- The kept sides of the short odd L-corrections of the odd parent (after a `2`): `1` and `Y + 1` on `v-`, `X - i` on `v+`. -/
+theorem lPoints_two (D : JointData) (hlS : D.lSides = paperLSides) (f : Word → JSlice) (w : Word) (hb : ¬ IsBase w)
+    (hJ : ∀ u : Word, u.length < w.length → IsJointSlice D f u) (hl : w.getLast? = some Digit.two) (plus : Bool) :
+    (((plus == W1Odd w) = false) → ((1 : ℤ), (0 : ℤ)) ∈ (((below f w) w.dropLast).lOdd plus false).dom ∧
+        vP2 w + ((1 : ℤ), (0 : ℤ)) ∈ (((below f w) w.dropLast).lOdd plus false).dom) ∧
+      (((plus == W1Odd w) = true) → vP1 w - ((0 : ℤ), (1 : ℤ)) ∈ (((below f w) w.dropLast).lOdd plus false).dom) := by
+  have hlen := dropLast_length_lt hl
+  rw [below_of_lt f w _ hlen]
+  have hdef := oddLDefined_dropLast hb hl
+  have hw := eq_dropLast_append hl
+  have hLP := (hJ _ hlen).2.2.2
+  have hph : W1Odd w.dropLast = W1Odd w := by
+    unfold W1Odd
+    conv_rhs => rw [hw]
+    rw [phase_snoc_two]
+  have hX : texV1Odd (fracOdd w.dropLast) = vP1 w := by
+    unfold vP1 fracOdd
+    conv_rhs => rw [hw]
+    rw [parentsAt_append_singleton]
+    rfl
+  have hY : texV2 (fracOdd w.dropLast) = vP2 w := by
+    unfold vP2 fracOdd
+    conv_rhs => rw [hw]
+    rw [parentsAt_append_singleton]
+    rfl
+  obtain ⟨-, c, hc⟩ := (hLP.1 plus false hdef).2
+  rw [hlS] at hc
+  simp only [paperLSides, ↓reduceIte, Bool.false_eq_true, List.nil_append, List.mem_singleton, hph,
+    beq_comm_bool (W1Odd w) plus] at hc
+  refine ⟨fun hpf => ?_, fun hpt => ?_⟩
+  · rw [hpf] at hc
+    simp only [Bool.false_eq_true, ↓reduceIte, forall_eq] at hc
+    have hV := side_vMinus (vWordOf w.dropLast false) (texV2 (fracOdd w.dropLast))
+      (StringCorners.vertWord_head_last w.dropLast).1 (StringCorners.vertWord_head_last w.dropLast).2
+      (StdCornerAnchors.stdAnchorY_odd w.dropLast)
+    rw [hY] at hV
+    exact ⟨(hc _ hV.1).1, (hc _ hV.2).1⟩
+  · rw [hpt] at hc
+    simp only [↓reduceIte, forall_eq] at hc
+    have hV := side_vPlus (vWordOf w.dropLast false) (by
+        intro h; have := (StringCorners.vertWord_head_last w.dropLast).1
+        change (vWordOf w.dropLast false).head? = some Letter.p at this
+        rw [h] at this; simp at this)
+      (lastPosOf (hStringAt (hWordOf w.dropLast false) 0))
+    have hA := StdCornerAnchors.stdAnchorX_odd w.dropLast
+    have e : lastPosOf (hStringAt (hWordOf w.dropLast false) 0) + ((1 : ℤ), (0 : ℤ)) = vP1 w - ((0 : ℤ), (1 : ℤ)) := by
+      rw [show (0 : GInt) = ((0 : ℤ), (0 : ℤ)) from rfl, hA, hX]; refine Prod.ext ?_ ?_ <;> simp
+    rw [e] at hV
+    exact (hc _ hV).1
+
+/-- The two standard decompositions of a word that is not a base word have connected overlap graphs. -/
+theorem std_connected (D : JointData) (hlS : D.lSides = paperLSides) (f : Word → JSlice) (w : Word) (hb : ¬ IsBase w)
+    (hJ : ∀ u : Word, u.length < w.length → IsJointSlice D f u) :
+    (overlapGraph (goodPart (tileOddPieces D.S (fun u => (below f w u).tOdd) (fun u => (below f w u).tEven)
+      (fun u => (below f w u).lEven) w))).Connected ∧
+    (overlapGraph (goodPart (tileEvenPieces D.S (fun u => (below f w u).tOdd) (fun u => (below f w u).tEven)
+      (fun u => (below f w u).lOdd) w))).Connected := by
+  obtain ⟨hP, hQ⟩ := stdCorners_reg D f w hb hJ
+  exact ⟨tileOddPieces_connected D.S _ _ _ w hP hQ (lPoints_three D hlS f w hb hJ),
+    tileEvenPieces_connected D.S _ _ _ w hP hQ (lPoints_two D hlS f w hb hJ)⟩
+
+/-- The overlap graphs of the two alternate decompositions of the children of `w` are connected. -/
+def ConnectedAlt (D : JointData) (g : Word → JSlice) (w : Word) : Prop :=
+  (overlapGraph (goodPart (tileAltOddPieces D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).aOdd)
+    (fun u => (g u).aEven) (fun u => (g u).lOdd) w))).Connected ∧
+  (overlapGraph (goodPart (tileAltEvenPieces D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).aOdd)
+    (fun u => (g u).aEven) (fun u => (g u).lEven) w))).Connected
+
+/-- With the paper sides of the L-corrections, the standard half of `Connected4` holds (`std_connected`). -/
+theorem connected4_of (D : JointData) (hlS : D.lSides = paperLSides) (f : Word → JSlice) (n : ℕ) (hgood : GoodBelow D f n)
+    (w : Word) (hw : w.length = n) (hb : ¬ IsBase w) (hA : ConnectedAlt D (below f w) w) : Connected4 D (below f w) w := by
+  have hs := std_connected D hlS f w hb (fun u hu => (hgood u (by omega)).1)
+  exact ⟨hs.1, hs.2, hA.1, hA.2⟩
+
+/-- The rotation step with the standard connectivity proved: the named inputs left are the base slopes and rotations, the
+connectivity of the alternate and L decompositions, and the special prefixes. -/
+theorem rotStepInput_of_alt (D : JointData) (hB : BaseSlopes D) (hBR : BaseRot D) (hlS : D.lSides = paperLSides)
+    (hconnA : ∀ (f : Word → JSlice) (n : ℕ), LevelHyp D f n →
+      ∀ w : Word, w.length = n → ¬ IsBase w → ConnectedAlt D (below f w) w)
+    (hconnL : ∀ (f : Word → JSlice) (n : ℕ), LevelHyp D f n → ∀ w : Word, w.length = n → ConnectedL D (below f w) w)
+    (hspec : ∀ (f : Word → JSlice) (n : ℕ), LevelHyp D f n → SpecialLRot f n) :
+    RotStepInput D :=
+  rotStepInput_of D hB hBR (fun f n hL w hw hb => connected4_of D hlS f n hL.1 w hw hb (hconnA f n hL w hw hb)) hconnL hspec
 
 end FLatticePaper.Tiles.JointRot
