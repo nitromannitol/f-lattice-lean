@@ -4,7 +4,7 @@ This file states what the repository proves and which named hypotheses the headl
 The Lean sources are the authority; each link points to the declaration.
 
 **Target.** The target is the surgical edition of the October 2023 manuscript: the author's arXiv text with minimal
-corrections in its own language, pinned at commit b2a3607 of its source repository (Sections 1–9). The new Section 9 failed its
+corrections in its own language, pinned at commit 7712fe2 of its source repository (Sections 1–9). The new Section 9 failed its
 audit: its standard extension (lemma:global_odometers for standard tiles) and the periodicity and growth algebra are sound,
 while its proof of recurrence and of the alternate extension is not a proof, and the general recurrence is open. The standard extension is proved in Lean for both children with no remaining covering hypothesis (item (ii) of `lemma:common-extension-pseudo-square` is proved for both standard tiles); it is stated for the weak family, which is the tile family at the children Section 8 does not correct. Sections 1–8 are being mapped to the Lean statement by statement in [SOURCE-MAP.md](SOURCE-MAP.md), and the
 statements corrected in Sections 5–8 are restated and proved in their surgical form. The corrected edition pinned in
