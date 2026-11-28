@@ -457,6 +457,8 @@ import FLatticePaper.Tiles.SwapContainBox
 import FLatticePaper.Tiles.SwapContainNested
 import FLatticePaper.Tiles.SwapContainMain
 import FLatticePaper.Tiles.SwapContainPaper
+import FLatticePaper.Tiles.TileSlopeZeroPaper
+import FLatticePaper.Tiles.CorrectedLatticePaper
 import FLatticePaper.Tiles.StdPairCompatPaper
 import FLatticePaper.Tiles.TileHalfTurnGlue
 import FLatticePaper.Tiles.TileHalfTurnStd
