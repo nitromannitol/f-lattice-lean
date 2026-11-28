@@ -452,6 +452,7 @@ import FLatticePaper.Tiles.GlueRegister
 import FLatticePaper.Tiles.GlueRespectsAll
 import FLatticePaper.Tiles.GlueBlockExcl
 import FLatticePaper.Tiles.GlueColumns
+import FLatticePaper.Tiles.AltParentConstants
 import FLatticePaper.Tiles.GlueBlockBounds
 import FLatticePaper.Tiles.GlueRespectsStd
 import FLatticePaper.Tiles.AltMixedCompat
