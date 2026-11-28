@@ -6,6 +6,8 @@ import FLatticePaper.Tiles.AltLSides
 import FLatticePaper.Tiles.TileHalfTurnLRot
 import FLatticePaper.Tiles.OddPtVMinus
 import FLatticePaper.Tiles.EvenMidVMinus
+import FLatticePaper.Tiles.VPlusReflect
+import FLatticePaper.Tiles.AltShiftFamily
 
 open FLatticePaper.Farey FLatticePaper.Construction FLatticePaper.Tiles FLatticePaper.Tiles.JointFamily
 open FLatticePaper.Tiles.JointInduction (GoodBelow)
@@ -28,7 +30,7 @@ constants:
 * each L-correction agrees with its doubled partner and with the mixed copy next to it at one point of its kept sides: corners of
   the standard tile, and for the doubled partners the points of the vertical sides of `T(q_1)` found by w3: `V - B + (1, -1)` for
   `W_1` odd (`OddPtVMinus.pt_vMinus_odd`), the midpoint `m = (B + V + (1, -1)) / 2` of the doubled pair and its half-turn image
-  `D - m` for `W_1` even (`EvenMidVMinus.mid_vMinus`, and `hmp`);
+  `D - m` for `W_1` even (`EvenMidVMinus.mid_vMinus`, `VPlusReflect.mid_vPlus`);
 * the two L-corrections have the constant `κ 3 - κ 0` on their overlap: the cross half-turn of `L^+` and `L^-` about the centre of
   `T(q_1)` (`TileHalfTurnInput.crossEven`), with its two constants read at the corners `0` and `D` of the kept sides, gives the
   overlap constant through `CorrectedWalkZero.off_of_halfTurn` (the text's `c = -c`).
@@ -131,13 +133,23 @@ theorem marks_mix (w u1 u2 : Word) (hb : ¬ IsBase w) (hT1 : (Standard.stateAt w
   exact ⟨by simp only [mAE, pieceSet, hlD, if_pos hi]; exact m2,
     by simp only [mAE, pieceSet, hlD, if_neg (show ¬ j < 4 by omega)]; exact m1⟩
 
+/-- The doubled-shift constant of the even register (the shift `S_q`, affine factor `a_{p,2}`), from the shift compatibility of
+the registers at every word that is not a base word (`AltShiftFamily.shift_compat_family`). -/
+theorem hk_of (D : JointData) (hS : D.S = WeakStepPaper.paperS) (hA : D.altBase = SurgicalAlt.PaperAltBaseCond)
+    (f : Word → JSlice) (w u1 u2 : Word) (hG : GoodBelow D f w.length) (hb : ¬ IsBase w)
+    (hr : regsAt w = (some u1, some u2)) (hdE : (f u2).tEven.dom = evenTile u2) :
+    ∃ k : ℤ, ∀ x, x ∈ tEvenSet u2 → x + shiftQ w ∈ tEvenSet u2 →
+      (f u2).tEven.val (x + shiftQ w) - (f u2).tEven.val x - ClosedPathSum.dot2 (affS w) x = k := by
+  obtain ⟨c, hc⟩ := (AltShiftFamily.shift_compat_family D hS hA f w u1 u2 hG hb hr).2
+  refine ⟨c, fun x hx hx' => ?_⟩
+  have h := hc x (by rw [hdE]; exact hx) (by rw [hdE]; exact hx')
+  simpa [ClosedPathSum.dot2, dotS] using h
+
 set_option maxHeartbeats 400000 in
 /-- **The boundary of the corrected even alternate decomposition, and the overlap of its two L-corrections, `W_1` odd.** -/
 theorem aEP_boundary_of (D : JointData) (hS : D.S = WeakStepPaper.paperS) (hA : D.altBase = SurgicalAlt.PaperAltBaseCond)
     (hlS : D.lSides = paperLSides) (f : Word → JSlice) (w : Word) (hG : GoodBelow D f w.length) (hb : ¬ IsBase w)
-    (h3 : w.getLast? = some Digit.three) (hph : phase w = 1)
-    (hk : ∃ k : ℤ, ∀ x, x ∈ tEvenSet w.dropLast → x + shiftQ w ∈ tEvenSet w.dropLast →
-      (f w.dropLast).tEven.val (x + shiftQ w) - (f w.dropLast).tEven.val x - ClosedPathSum.dot2 (affS w) x = k) :
+    (h3 : w.getLast? = some Digit.three) (hph : phase w = 1) :
     ∃ κ : ℕ → ℤ, CorrectedWalkZero.AgreeAll (aEP D f w) κ 1 4 ∧ CorrectedWalkZero.AgreeAll (aEP D f w) κ 1 5 ∧
       CorrectedWalkZero.AgreeAll (aEP D f w) κ 2 4 ∧ CorrectedWalkZero.AgreeAll (aEP D f w) κ 2 5 ∧
       CorrectedWalkZero.EdgeWitness (aEP D f w) κ 0 1 ∧ CorrectedWalkZero.EdgeWitness (aEP D f w) κ 0 4 ∧
@@ -164,6 +176,7 @@ theorem aEP_boundary_of (D : JointData) (hS : D.S = WeakStepPaper.paperS) (hA : 
   rw [← hq] at hcQ hhQ
   rw [hdQ] at hhQ
   have hcompat := (MixedCompatGeneral.alt_mixed D hS hA f w u1 w.dropLast hG hb hr 0).2
+  have hk := hk_of D hS hA f w u1 w.dropLast hG hb hr hdE
   obtain ⟨hmix, hdbl⟩ := AltSixEvenOF.sixEven_of w u1 w.dropLast hph hp hq (f u1).tOdd (f w.dropLast).tEven βP βQ hcP hcQ hhQ hk hcompat
   -- the entries with their offsets in the form of `altEvenD`, `altEvenR`
   have g0' : (aEP D f w)[0]? = some (stdPiece ((f w.dropLast).lEven true true) ((altEvenD w).getD 0 0) ((altEvenAff w).getD 0 0)) := g0
@@ -339,15 +352,10 @@ theorem aEP_boundary_of (D : JointData) (hS : D.S = WeakStepPaper.paperS) (hA : 
 
 set_option maxHeartbeats 400000 in
 /-- **The boundary of the corrected even alternate decomposition, and the overlap of its two L-corrections, `W_1` even.** The
-doubled partner of `L^-` is read at the half-turn image `D - m` of the midpoint `m` on the right side (`hmp`). -/
+doubled partner of `L^-` is read at the half-turn image `D - m` of the midpoint `m` on the right side (`VPlusReflect.mid_vPlus`). -/
 theorem aEP_boundary_ef (D : JointData) (hS : D.S = WeakStepPaper.paperS) (hA : D.altBase = SurgicalAlt.PaperAltBaseCond)
     (hlS : D.lSides = paperLSides) (f : Word → JSlice) (w : Word) (hG : GoodBelow D f w.length) (hb : ¬ IsBase w)
-    (h3 : w.getLast? = some Digit.three) (hph : phase w ≠ 1)
-    (hk : ∃ k : ℤ, ∀ x, x ∈ tEvenSet w.dropLast → x + shiftQ w ∈ tEvenSet w.dropLast →
-      (f w.dropLast).tEven.val (x + shiftQ w) - (f w.dropLast).tEven.val x - ClosedPathSum.dot2 (affS w) x = k)
-    (hmp : ∀ m : ℤ × ℤ, (2 : ℤ) • m = texV2 (parentsAt w).odd + texV2 (parentsAt w).even + ((1 : ℤ), (-1 : ℤ)) →
-      texV1Even (parentsAt w).even + texV2 (parentsAt w).even + ((1 : ℤ), (-1 : ℤ)) - m ∈
-        placedSites (sideString (hWordOf w.dropLast true) (vWordOf w.dropLast true) 0 .vPlus)) :
+    (h3 : w.getLast? = some Digit.three) (hph : phase w ≠ 1) :
     ∃ κ : ℕ → ℤ, CorrectedWalkZero.AgreeAll (aEP D f w) κ 1 4 ∧ CorrectedWalkZero.AgreeAll (aEP D f w) κ 1 5 ∧
       CorrectedWalkZero.AgreeAll (aEP D f w) κ 2 4 ∧ CorrectedWalkZero.AgreeAll (aEP D f w) κ 2 5 ∧
       CorrectedWalkZero.EdgeWitness (aEP D f w) κ 0 1 ∧ CorrectedWalkZero.EdgeWitness (aEP D f w) κ 0 4 ∧
@@ -374,6 +382,7 @@ theorem aEP_boundary_ef (D : JointData) (hS : D.S = WeakStepPaper.paperS) (hA : 
   rw [← hq] at hcQ hhQ
   rw [hdQ] at hhQ
   have hcompat := (MixedCompatGeneral.alt_mixed D hS hA f w u1 w.dropLast hG hb hr 0).2
+  have hk := hk_of D hS hA f w u1 w.dropLast hG hb hr hdE
   obtain ⟨hmix, hdbl⟩ := AltSixEven.sixEven_ef w u1 w.dropLast hph hp hq (f u1).tOdd (f w.dropLast).tEven βP βQ hcP hcQ hhQ hk hcompat
   -- the entries with their offsets in the form of `altEvenD`, `altEvenR`
   have g0' : (aEP D f w)[0]? = some (stdPiece ((f w.dropLast).lEven true true) ((altEvenD w).getD 0 0) ((altEvenAff w).getD 0 0)) := g0
@@ -463,7 +472,12 @@ theorem aEP_boundary_ef (D : JointData) (hS : D.S = WeakStepPaper.paperS) (hA : 
     have h := EvenMidVMinus.mid_vMinus w.dropLast (by rw [← hw]; exact hb)
       (by rw [← hw]; exact StdPairCompatPaper.w1Odd_ef hph) m (by rw [← hw]; exact hm2)
     exact h
-  have hmR := hmp m hm2
+  have hmR : texV1Even (parentsAt w).even + texV2 (parentsAt w).even + ((1 : ℤ), (-1 : ℤ)) - m ∈
+      placedSites (sideString (hWordOf w.dropLast true) (vWordOf w.dropLast true) 0 .vPlus) := by
+    have h := VPlusReflect.mid_vPlus w.dropLast (by rw [← hw]; exact hb)
+      (by rw [← hw]; exact StdPairCompatPaper.w1Odd_ef hph) m (by rw [← hw]; exact hm2)
+    rw [← hw] at h
+    exact h
   have dQm : m ∈ evenTile w.dropLast := by rw [← hdE]; exact (k0v _ hmL).2.1
   have hDm : texV1Even (parentsAt w).even + texV2 (parentsAt w).even + ((1 : ℤ), (-1 : ℤ)) - m =
       m - shiftQ w := by
