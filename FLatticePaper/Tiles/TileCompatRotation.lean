@@ -10,11 +10,11 @@ open FLatticePaper FLatticePaper.Farey FLatticePaper.Construction FLatticePaper.
 open Standard SurgicalDict SurgicalWeak SurgicalAlt JointFamily JointInduction JointGlue JointRot TileCompatInputs
 
 /-- Row `i` of the rotated list against row `j` of the original, in a common coordinate system. -/
-private def Row (ps qs : List Piece) (i j : ℕ) (c γ : Site) : Prop :=
+def Row (ps qs : List Piece) (i j : ℕ) (c γ : Site) : Prop :=
   ∀ q, qs[i]? = some q → ∃ p, ps[j]? = some p ∧ ∃ b : ℤ, ∀ x ∈ q.placed, x ∉ q.exc →
     mulI x+c ∈ p.placed ∧ mulI x+c ∉ p.exc ∧ pieceVal q x = pieceVal p (mulI x+c) - h0 x + dotS γ x + b
 
-private theorem two_rows {ps qs : List Piece} {i j a b : ℕ} {c γ : Site}
+theorem two_rows {ps qs : List Piece} {i j a b : ℕ} {c γ : Site}
     (ri : Row ps qs i a c γ) (rj : Row ps qs j b c γ) (h : PairCompat ps a b) : PairCompat qs i j := by
   intro p q hp hq
   obtain ⟨p',hp',u,hu⟩ := ri p hp
@@ -41,13 +41,13 @@ private theorem row_of_get {ps qs : List Piece} {i j : ℕ} {c γ : Site} (cr γ
     (fun _ _ _ => (add_zero _).symm) (fun _ _ _ => (add_zero _).symm) hr he hv ha hx
   exact ⟨p,List.getElem?_eq_getElem hj,b, fun x hm hxe => ⟨(h x hm hxe).1,hx x hm hxe,(h x hm hxe).2⟩⟩
 
-private def stdIndex (o : Bool) (i : ℕ) : ℕ :=
+def stdIndex (o : Bool) (i : ℕ) : ℕ :=
   (if o then [3,2,5,4,1,0] else [5,4,3,2,0,1])[i]?.getD i
 
-private def altIndex (o : Bool) (i : ℕ) : ℕ :=
+def altIndex (o : Bool) (i : ℕ) : ℕ :=
   (if o then [1,0,3,2,5,4] else [2,3,0,1,4,5])[i]?.getD i
 
-private abbrev C (w : Word) := texV1Odd ((parentsAt w).current .odd) - ((0 : ℤ),(1 : ℤ))
+abbrev C (w : Word) := texV1Odd ((parentsAt w).current .odd) - ((0 : ℤ),(1 : ℤ))
 
 section
 variable (S : WeakData) (pO pE aO aE : Word → PartialOdometer)
@@ -73,7 +73,7 @@ local macro "alt_parent" : tactic => `(tactic| (alt_lists; first | exact hP | ex
 
 include hl hP hQ hL
 set_option maxHeartbeats 400000 in
-private theorem standard_rows (i : ℕ) (hi : i < 6) :
+theorem standard_rows (i : ℕ) (hi : i < 6) :
     Row (tileOddPieces S pO pE lE w) (tileEvenPieces S pO pE lO (swapW w)) i (stdIndex (W1Odd w) i) (C w) 0 := by
   have lp := hL false hl true
   have lm := hL false hl false
@@ -91,7 +91,7 @@ private theorem standard_rows (i : ℕ) (hi : i < 6) :
     | (apply row_of_get (vP1 w - ((0 : ℤ),(1 : ℤ))) 0 (by simp [tileEvenPieces]) (by simp [tileOddPieces]) <;>
        first | std_parent | rot_id)
 set_option maxHeartbeats 400000 in
-private theorem alternate_rows (i : ℕ) (hi : i < 6) :
+theorem alternate_rows (i : ℕ) (hi : i < 6) :
     Row (tileAltEvenPieces S pO pE aO aE lE w) (tileAltOddPieces S pO pE aO aE lO (swapW w)) i
       (altIndex (W1Odd w) i) (altCf w false).1 (altCf w false).2 := by
   have lp := hL true hl true
@@ -112,21 +112,21 @@ private theorem alternate_rows (i : ℕ) (hi : i < 6) :
 
 end
 
-private abbrev O (f : Word → JSlice) (w u : Word) := (below f w u).tOdd
-private abbrev E (f : Word → JSlice) (w u : Word) := (below f w u).tEven
-private abbrev AO (f : Word → JSlice) (w u : Word) := (below f w u).aOdd
-private abbrev AE (f : Word → JSlice) (w u : Word) := (below f w u).aEven
-private abbrev LO (f : Word → JSlice) (w u : Word) := (below f w u).lOdd
-private abbrev LE (f : Word → JSlice) (w u : Word) := (below f w u).lEven
+abbrev O (f : Word → JSlice) (w u : Word) := (below f w u).tOdd
+abbrev E (f : Word → JSlice) (w u : Word) := (below f w u).tEven
+abbrev AO (f : Word → JSlice) (w u : Word) := (below f w u).aOdd
+abbrev AE (f : Word → JSlice) (w u : Word) := (below f w u).aEven
+abbrev LO (f : Word → JSlice) (w u : Word) := (below f w u).lOdd
+abbrev LE (f : Word → JSlice) (w u : Word) := (below f w u).lEven
 
-private abbrev oddPs (D : JointData) (f : Word → JSlice) (w : Word) := tileOddPieces D.S (O f w) (E f w) (LE f w) w
-private abbrev evenPs (D : JointData) (f : Word → JSlice) (w : Word) := tileEvenPieces D.S (O f w) (E f w) (LO f w) w
-private abbrev altOddPs (D : JointData) (f : Word → JSlice) (w : Word) :=
+abbrev oddPs (D : JointData) (f : Word → JSlice) (w : Word) := tileOddPieces D.S (O f w) (E f w) (LE f w) w
+abbrev evenPs (D : JointData) (f : Word → JSlice) (w : Word) := tileEvenPieces D.S (O f w) (E f w) (LO f w) w
+abbrev altOddPs (D : JointData) (f : Word → JSlice) (w : Word) :=
   tileAltOddPieces D.S (O f w) (E f w) (AO f w) (AE f w) (LO f w) w
-private abbrev altEvenPs (D : JointData) (f : Word → JSlice) (w : Word) :=
+abbrev altEvenPs (D : JointData) (f : Word → JSlice) (w : Word) :=
   tileAltEvenPieces D.S (O f w) (E f w) (AO f w) (AE f w) (LE f w) w
 
-private theorem parent_rotations (D : JointData) (hS : D.S = WeakStepPaper.paperS) (hA : D.altBase = PaperAltBaseCond)
+theorem parent_rotations (D : JointData) (hS : D.S = WeakStepPaper.paperS) (hA : D.altBase = PaperAltBaseCond)
     (f : Word → JSlice) (w : Word) (hg : GoodBelow D f w.length) (hn : ¬ IsBase w) :
     RawRot (regOdo D.S (O f w) (E f w) (regsAt w).1 true) (regOdo D.S (O f w) (E f w) (regsAt (swapW w)).2 false)
       (vP1 w - ((0 : ℤ),(1 : ℤ))) 0 ∧
@@ -149,7 +149,7 @@ private theorem parent_rotations (D : JointData) (hS : D.S = WeakStepPaper.paper
   exact ⟨rawRot_of_tileRotation_slopes _ _ _ hj (sl u lu).1 (sl _ (ls u lu)).2.1,
     rawRot_of_tileRotation_slopes _ _ _ hk (sl v lv).2.1 (sl _ (ls v lv)).1⟩
 
-private abbrev Rows (ps : List Piece) (is : List ℕ) :=
+abbrev Rows (ps : List Piece) (is : List ℕ) :=
   ∀ i ∈ is, ∀ j < 6, j ≠ i → PairCompat ps i j
 
 private theorem indices (o : Bool) (i j : ℕ) (hi : i ∈ [1,2]) (hj : j < 6) (hne : j ≠ i) :
