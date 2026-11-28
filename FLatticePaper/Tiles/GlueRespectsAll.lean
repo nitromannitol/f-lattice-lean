@@ -7,10 +7,10 @@ import FLatticePaper.Tiles.LatticeOfRespects
 The glued odometer of a standard child (`WeakStepAssembly.GluedChildren`) is, on the kept part of each copy, the placed
 subodometer of that copy plus its constant. A site of a block of the child's boundary strings (`GlueStringDecomp`) lies in its
 copy (the register strings lie in the register tile), and it lies in the kept part of the copy as soon as it lies in no earlier
-copy of the same register other than the doubled partner. `SameParentOffStringsOdd`, `SameParentOffStringsEven` state that no site
-of the child's boundary strings lies in two copies of the same register other than a doubled pair (numerically true at every
-uncorrected child, `tmp-w4/c_glue_same.py`; it fails at the corrected odd children `w = 2 3^k`); with it the glued odometer has
-the block values of `GlueRespectsStd`, so it respects the strings of the child (`odd_glue_respects`, `even_glue_respects`). -/
+copy of the same register other than the doubled partner. `BlockExclOdd`, `BlockExclEven` state this for the sites of every
+block (`blockSitesOdd`, `blockSitesEven`; checked numerically at every uncorrected child of length at most 6, and false at
+the corrected odd children `w = 2 3^k`); with it the glued odometer has the block values of `GlueRespectsStd`, so it respects the
+strings of the child (`odd_ef_glue`, ..., `even_of_glue`), and `GlueRespectsInput`, `GlueLatticeInput` follow. -/
 
 namespace FLatticePaper.Tiles.GlueRespectsAll
 
@@ -28,19 +28,60 @@ def fourStrings (wh wv : BinaryWord) : List (ZTile × GInt) :=
   hStringAt wh 0 ++ hRevStringAt wh.reverse (lastPosOf (vRevStringAt wv.reverse 0)) ++ vRevStringAt wv.reverse 0 ++
     vStringAt wv (lastPosOf (hStringAt wh 0))
 
-/-- **No site of the boundary strings of the odd child lies in two copies of the same register other than a doubled pair.** -/
-def SameParentOffStringsOdd (w u1 u2 : Word) : Prop :=
-  ∀ x ∈ placedSites (fourStrings (hWordOf w false) (vWordOf w false)), ∀ i j, j < i → i < 6 →
-    pieceFlag (oddP w) j = pieceFlag (oddP w) i → ¬ dblOdd w j i →
-    x ∈ pieceSet (oddP w) (oddQ w) (tOddSet u1) (tEvenSet u2) i → x ∈ pieceSet (oddP w) (oddQ w) (tOddSet u1) (tEvenSet u2) j →
-    False
+/-- The sites of the blocks of copy `i` on the boundary strings of the odd child (`GlueStringDecomp`). -/
+def blockSitesOdd (w u1 u2 : Word) (i : ℕ) : List GInt :=
+  if phase w = 1 then
+    match i with
+    | 0 => placedSites (hStringAt (hWordOf u1 false) (0)) ++ placedSites (vRevStringAt (vWordOf u1 false).reverse (0))
+    | 1 => placedSites (hRevStringAt (hWordOf u1 false).reverse (texV1Even (fracEven u2) + texV1Even (fracEven u2) + texV2 (fracEven u2) + (texV2 (fracOdd u1) + (1, -2)))) ++ placedSites (vStringAt (vWordOf u1 false) (texV1Even (fracEven u2) + texV1Even (fracEven u2) + texV2 (fracEven u2) + (texV1Odd (fracOdd u1) - (1, 1))))
+    | 2 => placedSites (hStringAt (hWordOf u2 true) (texV1Odd (fracOdd u1)))
+    | 3 => placedSites (hStringAt (hWordOf u2 true) (texV1Odd (fracOdd u1) + texV1Even (fracEven u2))) ++ placedSites (vStringAt (vWordOf u2 true) (texV1Odd (fracOdd u1) + texV1Even (fracEven u2) + (texV1Even (fracEven u2) - (1, 1))))
+    | 4 => placedSites (hRevStringAt (hWordOf u2 true).reverse (texV2 (fracOdd u1) + (texV2 (fracEven u2) + (1, -2)))) ++ placedSites (vRevStringAt (vWordOf u2 true).reverse (texV2 (fracOdd u1)))
+    | 5 => placedSites (hRevStringAt (hWordOf u2 true).reverse (texV2 (fracOdd u1) + texV1Even (fracEven u2) + (texV2 (fracEven u2) + (1, -2))))
+    | _ => []
+  else
+    match i with
+    | 0 => placedSites (hStringAt (hWordOf u1 false) (texV1Even (fracEven u2) + texV1Even (fracEven u2))) ++ placedSites (vStringAt (vWordOf u1 false) (texV1Even (fracEven u2) + texV1Even (fracEven u2) + (texV1Odd (fracOdd u1) - (1, 1))))
+    | 1 => placedSites (hRevStringAt (hWordOf u1 false).reverse (texV2 (fracEven u2) + (texV2 (fracOdd u1) + (1, -2)))) ++ placedSites (vRevStringAt (vWordOf u1 false).reverse (texV2 (fracEven u2)))
+    | 2 => placedSites (hStringAt (hWordOf u2 true) (0)) ++ placedSites (vRevStringAt (vWordOf u2 true).reverse (0))
+    | 3 => placedSites (hStringAt (hWordOf u2 true) (texV1Even (fracEven u2)))
+    | 4 => placedSites (hRevStringAt (hWordOf u2 true).reverse (texV1Odd (fracOdd u1) + texV2 (fracOdd u1) + (texV2 (fracEven u2) + (1, -2))))
+    | 5 => placedSites (hRevStringAt (hWordOf u2 true).reverse (texV1Odd (fracOdd u1) + texV2 (fracOdd u1) + texV1Even (fracEven u2) + (texV2 (fracEven u2) + (1, -2)))) ++ placedSites (vStringAt (vWordOf u2 true) (texV1Odd (fracOdd u1) + texV2 (fracOdd u1) + texV1Even (fracEven u2) + (texV1Even (fracEven u2) - (1, 1))))
+    | _ => []
 
-/-- **The same for the even child.** -/
-def SameParentOffStringsEven (w u1 u2 : Word) : Prop :=
-  ∀ x ∈ placedSites (fourStrings (hWordOf w true) (vWordOf w true)), ∀ i j, j < i → i < 6 →
-    pieceFlag (evenP w) j = pieceFlag (evenP w) i → ¬ dblEven j i →
-    x ∈ pieceSet (evenP w) (evenQ w) (tOddSet u1) (tEvenSet u2) i →
-    x ∈ pieceSet (evenP w) (evenQ w) (tOddSet u1) (tEvenSet u2) j → False
+/-- **The block exclusions of the odd child**: the sites of the blocks of a copy lie in no earlier copy of the same
+register other than its doubled partner (checked numerically at every uncorrected child of length at most 6). -/
+def BlockExclOdd (w u1 u2 : Word) : Prop :=
+  ∀ i j, j < i → i < 6 → pieceFlag (oddP w) j = pieceFlag (oddP w) i → ¬ dblOdd w j i →
+    ∀ x ∈ blockSitesOdd w u1 u2 i, x ∈ pieceSet (oddP w) (oddQ w) (tOddSet u1) (tEvenSet u2) j → False
+
+/-- The sites of the blocks of copy `i` on the boundary strings of the even child (`GlueStringDecomp`). -/
+def blockSitesEven (w u1 u2 : Word) (i : ℕ) : List GInt :=
+  if phase w = 1 then
+    match i with
+    | 0 => placedSites (hStringAt (hWordOf u1 false) (0)) ++ placedSites (vRevStringAt (vWordOf u1 false).reverse (0))
+    | 1 => placedSites (vRevStringAt (vWordOf u1 false).reverse (texV2 (fracOdd u1)))
+    | 2 => placedSites (vStringAt (vWordOf u1 false) (texV1Even (fracEven u2) + texV2 (fracEven u2) + (texV1Odd (fracOdd u1) - (1, 1))))
+    | 3 => placedSites (hRevStringAt (hWordOf u1 false).reverse (texV1Even (fracEven u2) + texV2 (fracEven u2) + texV2 (fracOdd u1) + (texV2 (fracOdd u1) + (1, -2)))) ++ placedSites (vStringAt (vWordOf u1 false) (texV1Even (fracEven u2) + texV2 (fracEven u2) + texV2 (fracOdd u1) + (texV1Odd (fracOdd u1) - (1, 1))))
+    | 4 => placedSites (hStringAt (hWordOf u2 true) (texV1Odd (fracOdd u1))) ++ placedSites (vStringAt (vWordOf u2 true) (texV1Odd (fracOdd u1) + (texV1Even (fracEven u2) - (1, 1))))
+    | 5 => placedSites (hRevStringAt (hWordOf u2 true).reverse (texV2 (fracOdd u1) + texV2 (fracOdd u1) + (texV2 (fracEven u2) + (1, -2)))) ++ placedSites (vRevStringAt (vWordOf u2 true).reverse (texV2 (fracOdd u1) + texV2 (fracOdd u1)))
+    | _ => []
+  else
+    match i with
+    | 0 => placedSites (hStringAt (hWordOf u1 false) (texV1Even (fracEven u2))) ++ placedSites (vStringAt (vWordOf u1 false) (texV1Even (fracEven u2) + (texV1Odd (fracOdd u1) - (1, 1))))
+    | 1 => placedSites (vStringAt (vWordOf u1 false) (texV1Even (fracEven u2) + texV2 (fracOdd u1) + (texV1Odd (fracOdd u1) - (1, 1))))
+    | 2 => placedSites (vRevStringAt (vWordOf u1 false).reverse (texV2 (fracEven u2)))
+    | 3 => placedSites (hRevStringAt (hWordOf u1 false).reverse (texV2 (fracEven u2) + texV2 (fracOdd u1) + (texV2 (fracOdd u1) + (1, -2)))) ++ placedSites (vRevStringAt (vWordOf u1 false).reverse (texV2 (fracEven u2) + texV2 (fracOdd u1)))
+    | 4 => placedSites (hStringAt (hWordOf u2 true) (0)) ++ placedSites (vRevStringAt (vWordOf u2 true).reverse (0))
+    | 5 => placedSites (hRevStringAt (hWordOf u2 true).reverse (texV1Odd (fracOdd u1) + texV2 (fracOdd u1) + texV2 (fracOdd u1) + (texV2 (fracEven u2) + (1, -2)))) ++ placedSites (vStringAt (vWordOf u2 true) (texV1Odd (fracOdd u1) + texV2 (fracOdd u1) + texV2 (fracOdd u1) + (texV1Even (fracEven u2) - (1, 1))))
+    | _ => []
+
+/-- **The block exclusions of the even child**: the sites of the blocks of a copy lie in no earlier copy of the same
+register other than its doubled partner (checked numerically at every uncorrected child of length at most 6). -/
+def BlockExclEven (w u1 u2 : Word) : Prop :=
+  ∀ i j, j < i → i < 6 → pieceFlag (evenP w) j = pieceFlag (evenP w) i → ¬ dblEven j i →
+    ∀ x ∈ blockSitesEven w u1 u2 i, x ∈ pieceSet (evenP w) (evenQ w) (tOddSet u1) (tEvenSet u2) j → False
+
 
 theorem ps_append (l1 l2 : List (ZTile × GInt)) : placedSites (l1 ++ l2) = placedSites l1 ++ placedSites l2 := by
   unfold placedSites; rw [List.flatMap_append]
@@ -95,7 +136,7 @@ theorem odd_ef_glue (w u1 u2 : Word) (hw : ¬ Standard.IsBase w) (hreg : regsAt 
     (hNQ : ∀ x ∈ tileShape ZTile.one, oQ x = zTileOdo ZTile.one x + βQ) (g : GInt → ℤ) (κ : ℕ → ℤ)
     (hg : ∀ i < (oddP w).length + (oddQ w).length, ∀ z ∈ keptSet (pieceSet (oddP w) (oddQ w) (tOddSet u1) (tEvenSet u2)) (pieceFlag (oddP w)) (dblOdd w) i,
       g z = placedOdd w oP oQ 0 i z + κ i)
-    (hex : SameParentOffStringsOdd w u1 u2) :
+    (hex : BlockExclOdd w u1 u2) :
     RespectsAnchored (Standard.oddTile w) (hWordOf w false) (vWordOf w false) g := by
   have hP := ClosedPathAssembly.oddP_ef w hph
   have hQ := ClosedPathAssembly.oddQ_ef w hph
@@ -164,38 +205,38 @@ theorem odd_ef_glue (w u1 u2 : Word) (hw : ¬ Standard.IsBase w) (hreg : regsAt 
     simp only [ps_append, List.mem_append, or_assoc]
   obtain ⟨hbot, htop, hleft, hright⟩ := odd_ef_respects w u1 u2 hreg hph _ _ oP oQ hRP βP hNP hRQ βQ hNQ g κ
     (fun x hx => by
-      rw [hg 2 (by simp [hP, hQ]) x (kept_of _ _ _ 2 x (m2b x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inl hx)) 2 j hj (by norm_num) hf hd (m2b x hx) hxj))]
+      rw [hg 2 (by simp [hP, hQ]) x (kept_of _ _ _ 2 x (m2b x hx) (fun j hj hf hd hxj => hex 2 j hj (by norm_num) hf hd x (by simp only [blockSitesOdd, if_neg hph, List.mem_append]; tauto) hxj))]
       simp [placedOdd, pl, ClosedPathSum.dot2, affOdd, hQ, hp, hq])
     (fun x hx => by
-      rw [hg 3 (by simp [hP, hQ]) x (kept_of _ _ _ 3 x (m3b x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inl hx))) 3 j hj (by norm_num) hf hd (m3b x hx) hxj))]
+      rw [hg 3 (by simp [hP, hQ]) x (kept_of _ _ _ 3 x (m3b x hx) (fun j hj hf hd hxj => hex 3 j hj (by norm_num) hf hd x (by simp only [blockSitesOdd, if_neg hph]; tauto) hxj))]
       simp [placedOdd, pl, ClosedPathSum.dot2, affOdd, hQ, hp, hq])
     (fun x hx => by
-      rw [hg 0 (by simp [hP, hQ]) x (kept_of _ _ _ 0 x (m0b x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inl hx)))) 0 j hj (by norm_num) hf hd (m0b x hx) hxj))]
+      rw [hg 0 (by simp [hP, hQ]) x (kept_of _ _ _ 0 x (m0b x hx) (fun j hj hf hd hxj => hex 0 j hj (by norm_num) hf hd x (by simp only [blockSitesOdd, if_neg hph, List.mem_append]; tauto) hxj))]
       simp [placedOdd, pl, ClosedPathSum.dot2, affOdd, hP, hq])
     (fun x hx => by
-      rw [hg 1 (by simp [hP, hQ]) x (kept_of _ _ _ 1 x (m1t x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inr (Or.inl hx))))) 1 j hj (by norm_num) hf hd (m1t x hx) hxj))]
+      rw [hg 1 (by simp [hP, hQ]) x (kept_of _ _ _ 1 x (m1t x hx) (fun j hj hf hd hxj => hex 1 j hj (by norm_num) hf hd x (by simp only [blockSitesOdd, if_neg hph, List.mem_append]; tauto) hxj))]
       simp [placedOdd, pl, ClosedPathSum.dot2, affOdd, hP, hq]
       ring)
     (fun x hx => by
-      rw [hg 4 (by simp [hP, hQ]) x (kept_of _ _ _ 4 x (m4t x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl hx)))))) 4 j hj (by norm_num) hf hd (m4t x hx) hxj))]
+      rw [hg 4 (by simp [hP, hQ]) x (kept_of _ _ _ 4 x (m4t x hx) (fun j hj hf hd hxj => hex 4 j hj (by norm_num) hf hd x (by simp only [blockSitesOdd, if_neg hph]; tauto) hxj))]
       simp [placedOdd, pl, ClosedPathSum.dot2, affOdd, hQ, hp, hq]
       ring)
     (fun x hx => by
-      rw [hg 5 (by simp [hP, hQ]) x (kept_of _ _ _ 5 x (m5t x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl hx))))))) 5 j hj (by norm_num) hf hd (m5t x hx) hxj))]
+      rw [hg 5 (by simp [hP, hQ]) x (kept_of _ _ _ 5 x (m5t x hx) (fun j hj hf hd hxj => hex 5 j hj (by norm_num) hf hd x (by simp only [blockSitesOdd, if_neg hph, List.mem_append]; tauto) hxj))]
       simp [placedOdd, pl, ClosedPathSum.dot2, affOdd, hQ, hp, hq]
       ring)
     (fun x hx => by
-      rw [hg 2 (by simp [hP, hQ]) x (kept_of _ _ _ 2 x (m2l x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl hx)))))))) 2 j hj (by norm_num) hf hd (m2l x hx) hxj))]
+      rw [hg 2 (by simp [hP, hQ]) x (kept_of _ _ _ 2 x (m2l x hx) (fun j hj hf hd hxj => hex 2 j hj (by norm_num) hf hd x (by simp only [blockSitesOdd, if_neg hph, List.mem_append]; tauto) hxj))]
       simp [placedOdd, pl, ClosedPathSum.dot2, affOdd, hQ, hp, hq])
     (fun x hx => by
-      rw [hg 1 (by simp [hP, hQ]) x (kept_of _ _ _ 1 x (m1l x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl hx))))))))) 1 j hj (by norm_num) hf hd (m1l x hx) hxj))]
+      rw [hg 1 (by simp [hP, hQ]) x (kept_of _ _ _ 1 x (m1l x hx) (fun j hj hf hd hxj => hex 1 j hj (by norm_num) hf hd x (by simp only [blockSitesOdd, if_neg hph, List.mem_append]; tauto) hxj))]
       simp [placedOdd, pl, ClosedPathSum.dot2, affOdd, hP, hq]
       ring)
     (fun x hx => by
-      rw [hg 0 (by simp [hP, hQ]) x (kept_of _ _ _ 0 x (m0r x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl hx)))))))))) 0 j hj (by norm_num) hf hd (m0r x hx) hxj))]
+      rw [hg 0 (by simp [hP, hQ]) x (kept_of _ _ _ 0 x (m0r x hx) (fun j hj hf hd hxj => hex 0 j hj (by norm_num) hf hd x (by simp only [blockSitesOdd, if_neg hph, List.mem_append]; tauto) hxj))]
       simp [placedOdd, pl, ClosedPathSum.dot2, affOdd, hP, hq])
     (fun x hx => by
-      rw [hg 5 (by simp [hP, hQ]) x (kept_of _ _ _ 5 x (m5r x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (hx))))))))))) 5 j hj (by norm_num) hf hd (m5r x hx) hxj))]
+      rw [hg 5 (by simp [hP, hQ]) x (kept_of _ _ _ 5 x (m5r x hx) (fun j hj hf hd hxj => hex 5 j hj (by norm_num) hf hd x (by simp only [blockSitesOdd, if_neg hph, List.mem_append]; tauto) hxj))]
       simp [placedOdd, pl, ClosedPathSum.dot2, affOdd, hQ, hp, hq]
       ring)
   refine ⟨fun x hx => ?_, hbot, htop, hleft, hright⟩
@@ -220,7 +261,7 @@ theorem odd_of_glue (w u1 u2 : Word) (hw : ¬ Standard.IsBase w) (hreg : regsAt 
     (hNQ : ∀ x ∈ tileShape ZTile.one, oQ x = zTileOdo ZTile.one x + βQ) (g : GInt → ℤ) (κ : ℕ → ℤ)
     (hg : ∀ i < (oddP w).length + (oddQ w).length, ∀ z ∈ keptSet (pieceSet (oddP w) (oddQ w) (tOddSet u1) (tEvenSet u2)) (pieceFlag (oddP w)) (dblOdd w) i,
       g z = placedOdd w oP oQ 0 i z + κ i)
-    (hex : SameParentOffStringsOdd w u1 u2) :
+    (hex : BlockExclOdd w u1 u2) :
     RespectsAnchored (Standard.oddTile w) (hWordOf w false) (vWordOf w false) g := by
   have hP := ClosedPathAssembly.oddP_of w hph
   have hQ := ClosedPathAssembly.oddQ_of w hph
@@ -289,38 +330,38 @@ theorem odd_of_glue (w u1 u2 : Word) (hw : ¬ Standard.IsBase w) (hreg : regsAt 
     simp only [ps_append, List.mem_append, or_assoc]
   obtain ⟨hbot, htop, hleft, hright⟩ := odd_of_respects w u1 u2 hreg hph _ _ oP oQ hRP βP hNP hRQ βQ hNQ g κ
     (fun x hx => by
-      rw [hg 0 (by simp [hP, hQ]) x (kept_of _ _ _ 0 x (m0b x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inl hx)) 0 j hj (by norm_num) hf hd (m0b x hx) hxj))]
+      rw [hg 0 (by simp [hP, hQ]) x (kept_of _ _ _ 0 x (m0b x hx) (fun j hj hf hd hxj => hex 0 j hj (by norm_num) hf hd x (by simp only [blockSitesOdd, if_pos hph, List.mem_append]; tauto) hxj))]
       simp [placedOdd, pl, ClosedPathSum.dot2, affOdd, hP, hq])
     (fun x hx => by
-      rw [hg 2 (by simp [hP, hQ]) x (kept_of _ _ _ 2 x (m2b x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inl hx))) 2 j hj (by norm_num) hf hd (m2b x hx) hxj))]
+      rw [hg 2 (by simp [hP, hQ]) x (kept_of _ _ _ 2 x (m2b x hx) (fun j hj hf hd hxj => hex 2 j hj (by norm_num) hf hd x (by simp only [blockSitesOdd, if_pos hph]; tauto) hxj))]
       simp [placedOdd, pl, ClosedPathSum.dot2, affOdd, hQ, hp, hq])
     (fun x hx => by
-      rw [hg 3 (by simp [hP, hQ]) x (kept_of _ _ _ 3 x (m3b x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inl hx)))) 3 j hj (by norm_num) hf hd (m3b x hx) hxj))]
+      rw [hg 3 (by simp [hP, hQ]) x (kept_of _ _ _ 3 x (m3b x hx) (fun j hj hf hd hxj => hex 3 j hj (by norm_num) hf hd x (by simp only [blockSitesOdd, if_pos hph, List.mem_append]; tauto) hxj))]
       simp [placedOdd, pl, ClosedPathSum.dot2, affOdd, hQ, hp, hq])
     (fun x hx => by
-      rw [hg 4 (by simp [hP, hQ]) x (kept_of _ _ _ 4 x (m4t x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inr (Or.inl hx))))) 4 j hj (by norm_num) hf hd (m4t x hx) hxj))]
+      rw [hg 4 (by simp [hP, hQ]) x (kept_of _ _ _ 4 x (m4t x hx) (fun j hj hf hd hxj => hex 4 j hj (by norm_num) hf hd x (by simp only [blockSitesOdd, if_pos hph, List.mem_append]; tauto) hxj))]
       simp [placedOdd, pl, ClosedPathSum.dot2, affOdd, hQ, hp, hq]
       ring)
     (fun x hx => by
-      rw [hg 5 (by simp [hP, hQ]) x (kept_of _ _ _ 5 x (m5t x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl hx)))))) 5 j hj (by norm_num) hf hd (m5t x hx) hxj))]
+      rw [hg 5 (by simp [hP, hQ]) x (kept_of _ _ _ 5 x (m5t x hx) (fun j hj hf hd hxj => hex 5 j hj (by norm_num) hf hd x (by simp only [blockSitesOdd, if_pos hph]; tauto) hxj))]
       simp [placedOdd, pl, ClosedPathSum.dot2, affOdd, hQ, hp, hq]
       ring)
     (fun x hx => by
-      rw [hg 1 (by simp [hP, hQ]) x (kept_of _ _ _ 1 x (m1t x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl hx))))))) 1 j hj (by norm_num) hf hd (m1t x hx) hxj))]
+      rw [hg 1 (by simp [hP, hQ]) x (kept_of _ _ _ 1 x (m1t x hx) (fun j hj hf hd hxj => hex 1 j hj (by norm_num) hf hd x (by simp only [blockSitesOdd, if_pos hph, List.mem_append]; tauto) hxj))]
       simp [placedOdd, pl, ClosedPathSum.dot2, affOdd, hP, hq]
       ring)
     (fun x hx => by
-      rw [hg 0 (by simp [hP, hQ]) x (kept_of _ _ _ 0 x (m0l x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl hx)))))))) 0 j hj (by norm_num) hf hd (m0l x hx) hxj))]
+      rw [hg 0 (by simp [hP, hQ]) x (kept_of _ _ _ 0 x (m0l x hx) (fun j hj hf hd hxj => hex 0 j hj (by norm_num) hf hd x (by simp only [blockSitesOdd, if_pos hph, List.mem_append]; tauto) hxj))]
       simp [placedOdd, pl, ClosedPathSum.dot2, affOdd, hP, hq])
     (fun x hx => by
-      rw [hg 4 (by simp [hP, hQ]) x (kept_of _ _ _ 4 x (m4l x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl hx))))))))) 4 j hj (by norm_num) hf hd (m4l x hx) hxj))]
+      rw [hg 4 (by simp [hP, hQ]) x (kept_of _ _ _ 4 x (m4l x hx) (fun j hj hf hd hxj => hex 4 j hj (by norm_num) hf hd x (by simp only [blockSitesOdd, if_pos hph, List.mem_append]; tauto) hxj))]
       simp [placedOdd, pl, ClosedPathSum.dot2, affOdd, hQ, hp, hq]
       ring)
     (fun x hx => by
-      rw [hg 3 (by simp [hP, hQ]) x (kept_of _ _ _ 3 x (m3r x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl hx)))))))))) 3 j hj (by norm_num) hf hd (m3r x hx) hxj))]
+      rw [hg 3 (by simp [hP, hQ]) x (kept_of _ _ _ 3 x (m3r x hx) (fun j hj hf hd hxj => hex 3 j hj (by norm_num) hf hd x (by simp only [blockSitesOdd, if_pos hph, List.mem_append]; tauto) hxj))]
       simp [placedOdd, pl, ClosedPathSum.dot2, affOdd, hQ, hp, hq])
     (fun x hx => by
-      rw [hg 1 (by simp [hP, hQ]) x (kept_of _ _ _ 1 x (m1r x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (hx))))))))))) 1 j hj (by norm_num) hf hd (m1r x hx) hxj))]
+      rw [hg 1 (by simp [hP, hQ]) x (kept_of _ _ _ 1 x (m1r x hx) (fun j hj hf hd hxj => hex 1 j hj (by norm_num) hf hd x (by simp only [blockSitesOdd, if_pos hph, List.mem_append]; tauto) hxj))]
       simp [placedOdd, pl, ClosedPathSum.dot2, affOdd, hP, hq]
       ring)
   refine ⟨fun x hx => ?_, hbot, htop, hleft, hright⟩
@@ -345,7 +386,7 @@ theorem even_ef_glue (w u1 u2 : Word) (hw : ¬ Standard.IsBase w) (hreg : regsAt
     (hNQ : ∀ x ∈ tileShape ZTile.one, oQ x = zTileOdo ZTile.one x + βQ) (g : GInt → ℤ) (κ : ℕ → ℤ)
     (hg : ∀ i < (evenP w).length + (evenQ w).length, ∀ z ∈ keptSet (pieceSet (evenP w) (evenQ w) (tOddSet u1) (tEvenSet u2)) (pieceFlag (evenP w)) dblEven i,
       g z = placedEven w oP oQ 0 i z + κ i)
-    (hex : SameParentOffStringsEven w u1 u2) :
+    (hex : BlockExclEven w u1 u2) :
     RespectsAnchored (Standard.evenTile w) (hWordOf w true) (vWordOf w true) g := by
   have hP := ClosedPathAssembly.evenP_ef w hph
   have hQ := ClosedPathAssembly.evenQ_ef w hph
@@ -414,39 +455,39 @@ theorem even_ef_glue (w u1 u2 : Word) (hw : ¬ Standard.IsBase w) (hreg : regsAt
     simp only [ps_append, List.mem_append, or_assoc]
   obtain ⟨hbot, htop, hleft, hright⟩ := even_ef_respects w u1 u2 hreg hph _ _ oP oQ hRP βP hNP hRQ βQ hNQ g κ
     (fun x hx => by
-      rw [hg 4 (by simp [hP, hQ]) x (kept_of _ _ _ 4 x (m4b x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inl hx)) 4 j hj (by norm_num) hf hd (m4b x hx) hxj))]
+      rw [hg 4 (by simp [hP, hQ]) x (kept_of _ _ _ 4 x (m4b x hx) (fun j hj hf hd hxj => hex 4 j hj (by norm_num) hf hd x (by simp only [blockSitesEven, if_neg hph, List.mem_append]; tauto) hxj))]
       simp [placedEven, pl, ClosedPathSum.dot2, affEven, hQ, hp])
     (fun x hx => by
-      rw [hg 0 (by simp [hP, hQ]) x (kept_of _ _ _ 0 x (m0b x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inl hx))) 0 j hj (by norm_num) hf hd (m0b x hx) hxj))]
+      rw [hg 0 (by simp [hP, hQ]) x (kept_of _ _ _ 0 x (m0b x hx) (fun j hj hf hd hxj => hex 0 j hj (by norm_num) hf hd x (by simp only [blockSitesEven, if_neg hph, List.mem_append]; tauto) hxj))]
       simp [placedEven, pl, ClosedPathSum.dot2, affEven, hP, hp, hq])
     (fun x hx => by
-      rw [hg 3 (by simp [hP, hQ]) x (kept_of _ _ _ 3 x (m3t x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inl hx)))) 3 j hj (by norm_num) hf hd (m3t x hx) hxj))]
+      rw [hg 3 (by simp [hP, hQ]) x (kept_of _ _ _ 3 x (m3t x hx) (fun j hj hf hd hxj => hex 3 j hj (by norm_num) hf hd x (by simp only [blockSitesEven, if_neg hph, List.mem_append]; tauto) hxj))]
       simp [placedEven, pl, ClosedPathSum.dot2, affEven, hP, hp, hq]
       ring)
     (fun x hx => by
-      rw [hg 5 (by simp [hP, hQ]) x (kept_of _ _ _ 5 x (m5t x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inr (Or.inl hx))))) 5 j hj (by norm_num) hf hd (m5t x hx) hxj))]
+      rw [hg 5 (by simp [hP, hQ]) x (kept_of _ _ _ 5 x (m5t x hx) (fun j hj hf hd hxj => hex 5 j hj (by norm_num) hf hd x (by simp only [blockSitesEven, if_neg hph, List.mem_append]; tauto) hxj))]
       simp [placedEven, pl, ClosedPathSum.dot2, affEven, hQ, hp]
       ring)
     (fun x hx => by
-      rw [hg 4 (by simp [hP, hQ]) x (kept_of _ _ _ 4 x (m4l x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl hx)))))) 4 j hj (by norm_num) hf hd (m4l x hx) hxj))]
+      rw [hg 4 (by simp [hP, hQ]) x (kept_of _ _ _ 4 x (m4l x hx) (fun j hj hf hd hxj => hex 4 j hj (by norm_num) hf hd x (by simp only [blockSitesEven, if_neg hph, List.mem_append]; tauto) hxj))]
       simp [placedEven, pl, ClosedPathSum.dot2, affEven, hQ, hp])
     (fun x hx => by
-      rw [hg 2 (by simp [hP, hQ]) x (kept_of _ _ _ 2 x (m2l x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl hx))))))) 2 j hj (by norm_num) hf hd (m2l x hx) hxj))]
+      rw [hg 2 (by simp [hP, hQ]) x (kept_of _ _ _ 2 x (m2l x hx) (fun j hj hf hd hxj => hex 2 j hj (by norm_num) hf hd x (by simp only [blockSitesEven, if_neg hph]; tauto) hxj))]
       simp [placedEven, pl, ClosedPathSum.dot2, affEven, hP, hp, hq]
       ring)
     (fun x hx => by
-      rw [hg 3 (by simp [hP, hQ]) x (kept_of _ _ _ 3 x (m3l x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl hx)))))))) 3 j hj (by norm_num) hf hd (m3l x hx) hxj))]
+      rw [hg 3 (by simp [hP, hQ]) x (kept_of _ _ _ 3 x (m3l x hx) (fun j hj hf hd hxj => hex 3 j hj (by norm_num) hf hd x (by simp only [blockSitesEven, if_neg hph, List.mem_append]; tauto) hxj))]
       simp [placedEven, pl, ClosedPathSum.dot2, affEven, hP, hp, hq]
       ring)
     (fun x hx => by
-      rw [hg 0 (by simp [hP, hQ]) x (kept_of _ _ _ 0 x (m0r x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl hx))))))))) 0 j hj (by norm_num) hf hd (m0r x hx) hxj))]
+      rw [hg 0 (by simp [hP, hQ]) x (kept_of _ _ _ 0 x (m0r x hx) (fun j hj hf hd hxj => hex 0 j hj (by norm_num) hf hd x (by simp only [blockSitesEven, if_neg hph, List.mem_append]; tauto) hxj))]
       simp [placedEven, pl, ClosedPathSum.dot2, affEven, hP, hp, hq])
     (fun x hx => by
-      rw [hg 1 (by simp [hP, hQ]) x (kept_of _ _ _ 1 x (m1r x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl hx)))))))))) 1 j hj (by norm_num) hf hd (m1r x hx) hxj))]
+      rw [hg 1 (by simp [hP, hQ]) x (kept_of _ _ _ 1 x (m1r x hx) (fun j hj hf hd hxj => hex 1 j hj (by norm_num) hf hd x (by simp only [blockSitesEven, if_neg hph]; tauto) hxj))]
       simp [placedEven, pl, ClosedPathSum.dot2, affEven, hP, hp, hq]
       ring)
     (fun x hx => by
-      rw [hg 5 (by simp [hP, hQ]) x (kept_of _ _ _ 5 x (m5r x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (hx))))))))))) 5 j hj (by norm_num) hf hd (m5r x hx) hxj))]
+      rw [hg 5 (by simp [hP, hQ]) x (kept_of _ _ _ 5 x (m5r x hx) (fun j hj hf hd hxj => hex 5 j hj (by norm_num) hf hd x (by simp only [blockSitesEven, if_neg hph, List.mem_append]; tauto) hxj))]
       simp [placedEven, pl, ClosedPathSum.dot2, affEven, hQ, hp]
       ring)
   refine ⟨fun x hx => ?_, hbot, htop, hleft, hright⟩
@@ -471,7 +512,7 @@ theorem even_of_glue (w u1 u2 : Word) (hw : ¬ Standard.IsBase w) (hreg : regsAt
     (hNQ : ∀ x ∈ tileShape ZTile.one, oQ x = zTileOdo ZTile.one x + βQ) (g : GInt → ℤ) (κ : ℕ → ℤ)
     (hg : ∀ i < (evenP w).length + (evenQ w).length, ∀ z ∈ keptSet (pieceSet (evenP w) (evenQ w) (tOddSet u1) (tEvenSet u2)) (pieceFlag (evenP w)) dblEven i,
       g z = placedEven w oP oQ 0 i z + κ i)
-    (hex : SameParentOffStringsEven w u1 u2) :
+    (hex : BlockExclEven w u1 u2) :
     RespectsAnchored (Standard.evenTile w) (hWordOf w true) (vWordOf w true) g := by
   have hP := ClosedPathAssembly.evenP_of w hph
   have hQ := ClosedPathAssembly.evenQ_of w hph
@@ -540,39 +581,39 @@ theorem even_of_glue (w u1 u2 : Word) (hw : ¬ Standard.IsBase w) (hreg : regsAt
     simp only [ps_append, List.mem_append, or_assoc]
   obtain ⟨hbot, htop, hleft, hright⟩ := even_of_respects w u1 u2 hreg hph _ _ oP oQ hRP βP hNP hRQ βQ hNQ g κ
     (fun x hx => by
-      rw [hg 0 (by simp [hP, hQ]) x (kept_of _ _ _ 0 x (m0b x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inl hx)) 0 j hj (by norm_num) hf hd (m0b x hx) hxj))]
+      rw [hg 0 (by simp [hP, hQ]) x (kept_of _ _ _ 0 x (m0b x hx) (fun j hj hf hd hxj => hex 0 j hj (by norm_num) hf hd x (by simp only [blockSitesEven, if_pos hph, List.mem_append]; tauto) hxj))]
       simp [placedEven, pl, ClosedPathSum.dot2, affEven, hP, hp, hq])
     (fun x hx => by
-      rw [hg 4 (by simp [hP, hQ]) x (kept_of _ _ _ 4 x (m4b x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inl hx))) 4 j hj (by norm_num) hf hd (m4b x hx) hxj))]
+      rw [hg 4 (by simp [hP, hQ]) x (kept_of _ _ _ 4 x (m4b x hx) (fun j hj hf hd hxj => hex 4 j hj (by norm_num) hf hd x (by simp only [blockSitesEven, if_pos hph, List.mem_append]; tauto) hxj))]
       simp [placedEven, pl, ClosedPathSum.dot2, affEven, hQ, hp])
     (fun x hx => by
-      rw [hg 5 (by simp [hP, hQ]) x (kept_of _ _ _ 5 x (m5t x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inl hx)))) 5 j hj (by norm_num) hf hd (m5t x hx) hxj))]
+      rw [hg 5 (by simp [hP, hQ]) x (kept_of _ _ _ 5 x (m5t x hx) (fun j hj hf hd hxj => hex 5 j hj (by norm_num) hf hd x (by simp only [blockSitesEven, if_pos hph, List.mem_append]; tauto) hxj))]
       simp [placedEven, pl, ClosedPathSum.dot2, affEven, hQ, hp]
       ring)
     (fun x hx => by
-      rw [hg 3 (by simp [hP, hQ]) x (kept_of _ _ _ 3 x (m3t x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inr (Or.inl hx))))) 3 j hj (by norm_num) hf hd (m3t x hx) hxj))]
+      rw [hg 3 (by simp [hP, hQ]) x (kept_of _ _ _ 3 x (m3t x hx) (fun j hj hf hd hxj => hex 3 j hj (by norm_num) hf hd x (by simp only [blockSitesEven, if_pos hph, List.mem_append]; tauto) hxj))]
       simp [placedEven, pl, ClosedPathSum.dot2, affEven, hP, hp, hq]
       ring)
     (fun x hx => by
-      rw [hg 0 (by simp [hP, hQ]) x (kept_of _ _ _ 0 x (m0l x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl hx)))))) 0 j hj (by norm_num) hf hd (m0l x hx) hxj))]
+      rw [hg 0 (by simp [hP, hQ]) x (kept_of _ _ _ 0 x (m0l x hx) (fun j hj hf hd hxj => hex 0 j hj (by norm_num) hf hd x (by simp only [blockSitesEven, if_pos hph, List.mem_append]; tauto) hxj))]
       simp [placedEven, pl, ClosedPathSum.dot2, affEven, hP, hp, hq])
     (fun x hx => by
-      rw [hg 1 (by simp [hP, hQ]) x (kept_of _ _ _ 1 x (m1l x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl hx))))))) 1 j hj (by norm_num) hf hd (m1l x hx) hxj))]
+      rw [hg 1 (by simp [hP, hQ]) x (kept_of _ _ _ 1 x (m1l x hx) (fun j hj hf hd hxj => hex 1 j hj (by norm_num) hf hd x (by simp only [blockSitesEven, if_pos hph]; tauto) hxj))]
       simp [placedEven, pl, ClosedPathSum.dot2, affEven, hP, hp, hq]
       ring)
     (fun x hx => by
-      rw [hg 5 (by simp [hP, hQ]) x (kept_of _ _ _ 5 x (m5l x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl hx)))))))) 5 j hj (by norm_num) hf hd (m5l x hx) hxj))]
+      rw [hg 5 (by simp [hP, hQ]) x (kept_of _ _ _ 5 x (m5l x hx) (fun j hj hf hd hxj => hex 5 j hj (by norm_num) hf hd x (by simp only [blockSitesEven, if_pos hph, List.mem_append]; tauto) hxj))]
       simp [placedEven, pl, ClosedPathSum.dot2, affEven, hQ, hp]
       ring)
     (fun x hx => by
-      rw [hg 4 (by simp [hP, hQ]) x (kept_of _ _ _ 4 x (m4r x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl hx))))))))) 4 j hj (by norm_num) hf hd (m4r x hx) hxj))]
+      rw [hg 4 (by simp [hP, hQ]) x (kept_of _ _ _ 4 x (m4r x hx) (fun j hj hf hd hxj => hex 4 j hj (by norm_num) hf hd x (by simp only [blockSitesEven, if_pos hph, List.mem_append]; tauto) hxj))]
       simp [placedEven, pl, ClosedPathSum.dot2, affEven, hQ, hp])
     (fun x hx => by
-      rw [hg 2 (by simp [hP, hQ]) x (kept_of _ _ _ 2 x (m2r x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inl hx)))))))))) 2 j hj (by norm_num) hf hd (m2r x hx) hxj))]
+      rw [hg 2 (by simp [hP, hQ]) x (kept_of _ _ _ 2 x (m2r x hx) (fun j hj hf hd hxj => hex 2 j hj (by norm_num) hf hd x (by simp only [blockSitesEven, if_pos hph]; tauto) hxj))]
       simp [placedEven, pl, ClosedPathSum.dot2, affEven, hP, hp, hq]
       ring)
     (fun x hx => by
-      rw [hg 3 (by simp [hP, hQ]) x (kept_of _ _ _ 3 x (m3r x hx) (fun j hj hf hd hxj => hex x ((hch x).2 (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (Or.inr (hx))))))))))) 3 j hj (by norm_num) hf hd (m3r x hx) hxj))]
+      rw [hg 3 (by simp [hP, hQ]) x (kept_of _ _ _ 3 x (m3r x hx) (fun j hj hf hd hxj => hex 3 j hj (by norm_num) hf hd x (by simp only [blockSitesEven, if_pos hph, List.mem_append]; tauto) hxj))]
       simp [placedEven, pl, ClosedPathSum.dot2, affEven, hP, hp, hq]
       ring)
   refine ⟨fun x hx => ?_, hbot, htop, hleft, hright⟩
@@ -598,11 +639,11 @@ theorem normal_of (o : PartialOdometer) (β : ℤ) (h : JointFamily.FirstTileNor
   linarith
 
 /-- **`GlueRespectsInput` for the paper's data**, from the same-parent exclusions on the strings of the uncorrected
-children (`SameParentOffStringsOdd`, `SameParentOffStringsEven`, the remaining geometric input). -/
+children (`BlockExclOdd`, `BlockExclEven`, the remaining geometric input). -/
 theorem glueRespectsInput (D : JointFamily.JointData) (hS : D.S = WeakStepPaper.paperS)
     (hex : ∀ w u1 u2 : Word, ¬ Standard.IsBase w → regsAt w = (some u1, some u2) →
-      (¬ JointFamily.CorrectedAfterThree w → SameParentOffStringsOdd w u1 u2) ∧
-        (¬ JointFamily.CorrectedAfterTwo w → SameParentOffStringsEven w u1 u2)) :
+      (¬ JointFamily.CorrectedAfterThree w → BlockExclOdd w u1 u2) ∧
+        (¬ JointFamily.CorrectedAfterTwo w → BlockExclEven w u1 u2)) :
     WeakStepAssembly.GlueRespectsInput D := by
   intro f w u1 u2 hgood hw hreg hnorm κo κe go ge hglue
   obtain ⟨-, -, hgo, -, -, hge⟩ := hglue
@@ -640,8 +681,8 @@ theorem glueRespectsInput (D : JointFamily.JointData) (hS : D.S = WeakStepPaper.
 theorem glueLatticeInput (D : JointFamily.JointData) (hS : D.S = WeakStepPaper.paperS)
     (hsl : WeakStepAssembly.TileSlopeZero D)
     (hex : ∀ w u1 u2 : Word, ¬ Standard.IsBase w → regsAt w = (some u1, some u2) →
-      (¬ JointFamily.CorrectedAfterThree w → SameParentOffStringsOdd w u1 u2) ∧
-        (¬ JointFamily.CorrectedAfterTwo w → SameParentOffStringsEven w u1 u2)) :
+      (¬ JointFamily.CorrectedAfterThree w → BlockExclOdd w u1 u2) ∧
+        (¬ JointFamily.CorrectedAfterTwo w → BlockExclEven w u1 u2)) :
     WeakStepAssembly.GlueLatticeInput D := by
   intro f w u1 u2 hgood hw hreg κo κe go ge hglue
   have hr := glueRespectsInput D hS hex f w u1 u2 hgood hw hreg (fun u hu => hsl f w.length hgood u hu) κo κe go ge
