@@ -426,6 +426,7 @@ import FLatticePaper.Tiles.MixedCompatStair
 import FLatticePaper.Tiles.MixedCompatNear
 import FLatticePaper.Tiles.MixedCompatBaseStep
 import FLatticePaper.Tiles.MixedCompatEdges
+import FLatticePaper.Tiles.MixedCompatWalks
 import FLatticePaper.Tiles.ClosedPathStandard
 import FLatticePaper.Tiles.ClosedPathExcluded
 import FLatticePaper.Tiles.ClosedPathDiagonal
@@ -1335,6 +1336,7 @@ import FLatticePaper.Tiles.AltPieces
 import FLatticePaper.Tiles.AltItem5
 import FLatticePaper.Tiles.JointRot
 import FLatticePaper.Tiles.LStemCompat
+import FLatticePaper.Tiles.LRetainedSides
 import FLatticePaper.Tiles.AltItem3
 import FLatticePaper.Tiles.AltBounds
 import FLatticePaper.Tiles.AltItem4Defs
