@@ -1696,5 +1696,10 @@ import FLatticePaper.Tiles.EvenMidVMinus
 import FLatticePaper.Tiles.OddPtVMinus
 import FLatticePaper.Tiles.RespectsTranslate
 import FLatticePaper.Tiles.VPlusReflect
+import FLatticePaper.Tiles.BaseAltLattice
+import FLatticePaper.Tiles.BaseAltEmpty
+import FLatticePaper.Tiles.BaseAltThree
+import FLatticePaper.Tiles.BaseAltTwo
+import FLatticePaper.Tiles.BaseWeakAltInputPaper
 
 /-! Root import for the corrected F-lattice paper. -/
