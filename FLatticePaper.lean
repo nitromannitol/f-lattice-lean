@@ -1318,6 +1318,7 @@ import FLatticePaper.Tiles.AltPieces
 import FLatticePaper.Tiles.AltItem5
 import FLatticePaper.Tiles.JointRot
 import FLatticePaper.Tiles.AltItem3
+import FLatticePaper.Tiles.AltBounds
 import FLatticePaper.Tiles.BaseTileProps
 import FLatticePaper.Tiles.BaseWeakDomains
 import FLatticePaper.Tiles.BaseWeakLattice
