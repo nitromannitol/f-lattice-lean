@@ -455,6 +455,17 @@ import FLatticePaper.Tiles.GlueRegister
 import FLatticePaper.Tiles.GlueRespectsAll
 import FLatticePaper.Tiles.GlueBlockExcl
 import FLatticePaper.Tiles.GlueColumns
+import FLatticePaper.Tiles.AltSevenC
+import FLatticePaper.Tiles.AltParentOO3c
+import FLatticePaper.Tiles.AltParentOE3c
+import FLatticePaper.Tiles.AltParentOF2c
+import FLatticePaper.Tiles.AltParentEF2c
+import FLatticePaper.Tiles.AltLConstants
+import FLatticePaper.Tiles.AltLSides
+import FLatticePaper.Tiles.AltSixOverlaps
+import FLatticePaper.Tiles.AltSevenFamily
+import FLatticePaper.Tiles.AltSeven
+import FLatticePaper.Tiles.AltPiecesAgree
 import FLatticePaper.Tiles.AltParentOO3
 import FLatticePaper.Tiles.AltParentOE3
 import FLatticePaper.Tiles.AltParentOO1

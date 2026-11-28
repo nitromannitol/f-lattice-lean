@@ -161,4 +161,105 @@ theorem evenPieces_of (np dp nq dq : ℤ) (hpar : (np + dp) % 2 = 1) (hqe : (nq 
   simp only [dotS, Prod.fst_add, Prod.snd_add, Prod.smul_fst, Prod.smul_snd, smul_eq_mul, Prod.fst_zero, Prod.snd_zero] at hs3 hs1 hs5
   refine ⟨hb0, ?_, hb2, ?_, hb4, ?_⟩ <;> linarith
 
+/-- **The constants of the subtiles `1, 2, 4, 5` of an even alternate tile odometer, `W_1` even.** The even register `Q` at
+`0, ((np - dp, np + dp) - (dq, nq)), ((2 * dp, 2 * np) + (np - dp, np + dp)), ((2 * dp, 2 * np) + (2 : ℤ) • (np - dp, np + dp) - (dq, nq))` and the odd register `P` at `(dq, nq), ((np - dp, np + dp) - (dq, nq) + (nq - dq, nq + dq))`, affine factors `0, a, a, 2a, 0, a + b`; the half-turn is
+about `D̂ = (2 * dp, 2 * np) + (2 : ℤ) • (np - dp, np + dp) + (nq - dq, nq + dq) + ((1 : ℤ), (-1 : ℤ))` with `Ê = 2a + b`. From the origin piece, two corner contacts and the half-turn. -/
+theorem evenPieces1245EF_of (np dp nq dq : ℤ) (hpar : (np + dp) % 2 = 1) (hqe : (nq + dq) % 2 = 0)
+    (oH oP oQ : PartialOdometer) (βH βP βQ b1 b2 b4 b5 : ℤ)
+    (hcP : TileTranslation.StdCornerValues oP 0 βP (2 * dp, 2 * np) (np - dp, np + dp) (np, -dp))
+    (hcQ : TileTranslation.StdCornerValues oQ 0 βQ (dq, nq) (nq - dq, nq + dq) (nq, -dq))
+    (hhP : ∀ y ∈ (↑oP.dom : Set (ℤ × ℤ)), (2 * dp, 2 * np) + (np - dp, np + dp) + ((1 : ℤ), (-1 : ℤ)) - y ∈ (↑oP.dom : Set _) ∧
+      2 * (oP.val ((2 * dp, 2 * np) + (np - dp, np + dp) + ((1 : ℤ), (-1 : ℤ)) - y) - oP.val y) = dotS (np, -dp) ((2 * dp, 2 * np) + (np - dp, np + dp) + ((1 : ℤ), (-1 : ℤ))) - 2 * dotS (np, -dp) y)
+    (hhQ : ∀ y ∈ (↑oQ.dom : Set (ℤ × ℤ)), (dq, nq) + (nq - dq, nq + dq) + ((1 : ℤ), (-1 : ℤ)) - y ∈ (↑oQ.dom : Set _) ∧
+      2 * (oQ.val ((dq, nq) + (nq - dq, nq + dq) + ((1 : ℤ), (-1 : ℤ)) - y) - oQ.val y) = dotS (nq, -dq) ((dq, nq) + (nq - dq, nq + dq) + ((1 : ℤ), (-1 : ℤ))) - 2 * dotS (nq, -dq) y)
+    (hhH : ∀ x ∈ (↑oH.dom : Set (ℤ × ℤ)), 2 * (oH.val ((2 * dp, 2 * np) + (2 : ℤ) • (np - dp, np + dp) + (nq - dq, nq + dq) + ((1 : ℤ), (-1 : ℤ)) - x) - oH.val x) =
+      dotS ((2 : ℤ) • (np, -dp) + (nq, -dq)) ((2 * dp, 2 * np) + (2 : ℤ) • (np - dp, np + dp) + (nq - dq, nq + dq) + ((1 : ℤ), (-1 : ℤ))) - 2 * dotS ((2 : ℤ) • (np, -dp) + (nq, -dq)) x)
+    (hd2 : ∀ x, x - ((2 * dp, 2 * np) + (np - dp, np + dp)) ∈ (↑oQ.dom : Set (ℤ × ℤ)) → x ∈ (↑oH.dom : Set (ℤ × ℤ)))
+    (hd4 : ∀ x, x - (dq, nq) ∈ (↑oP.dom : Set (ℤ × ℤ)) → x ∈ (↑oH.dom : Set (ℤ × ℤ)))
+    (h1p : ∀ x, x - ((np - dp, np + dp) - (dq, nq)) ∈ (↑oQ.dom : Set (ℤ × ℤ)) → oH.val x = oQ.val (x - ((np - dp, np + dp) - (dq, nq))) + dotS (np, -dp) x + b1)
+    (h2p : ∀ x, x - ((2 * dp, 2 * np) + (np - dp, np + dp)) ∈ (↑oQ.dom : Set (ℤ × ℤ)) → oH.val x = oQ.val (x - ((2 * dp, 2 * np) + (np - dp, np + dp))) + dotS (np, -dp) x + b2)
+    (h4p : ∀ x, x - (dq, nq) ∈ (↑oP.dom : Set (ℤ × ℤ)) → oH.val x = oP.val (x - (dq, nq)) + dotS 0 x + b4)
+    (h5p : ∀ x, x - ((np - dp, np + dp) - (dq, nq) + (nq - dq, nq + dq)) ∈ (↑oP.dom : Set (ℤ × ℤ)) → oH.val x = oP.val (x - ((np - dp, np + dp) - (dq, nq) + (nq - dq, nq + dq))) + dotS ((np, -dp) + (nq, -dq)) x + b5)
+    (hb4 : b4 = βH - βP) :
+    b1 = -h0 (np - dp, np + dp) + (dp ^ 2 + 2 * dp * np - np ^ 2) + βH - βQ ∧ b2 = -h0 (np - dp, np + dp) + (dp ^ 2 + 2 * dp * np + dp * nq - dq * np - np ^ 2) + βH - βQ ∧
+      b5 = -h0 (np - dp, np + dp) -h0 (nq - dq, nq + dq) + (dp ^ 2 + dp * dq + 2 * dp * np + dp * nq + dq ^ 2 + dq * np + 2 * dq * nq - np ^ 2 - np * nq - nq ^ 2) + βH - βP := by
+  have hcP' := hcP
+  have hcQ' := hcQ
+  obtain ⟨⟨m0, -⟩, -, -, -, -, -, -, ⟨mD1, -⟩⟩ := hcP'
+  obtain ⟨⟨n0, -⟩, -, ⟨nXi, -⟩, -, -, -, -, -⟩ := hcQ'
+  obtain ⟨-, -, -, -, -, -, -, vPD1⟩ := corner_raw oP βP _ _ _ hcP
+  obtain ⟨-, -, vQXi, -, -, -, -, -⟩ := corner_raw oQ βQ _ _ _ hcQ
+  have hB4 := h0_even (np - dp, np + dp) (by simp only; omega)
+  have hV4 := h0_even (nq - dq, nq + dq) (by simp only; omega)
+  have z3 : (2 * dp, 2 * np) + (np - dp, np + dp) + ((dq, nq) - ((0 : ℤ), (1 : ℤ))) - ((2 * dp, 2 * np) + (np - dp, np + dp)) =
+      (dq, nq) - ((0 : ℤ), (1 : ℤ)) := by abel
+  have z4 : (2 * dp, 2 * np) + (np - dp, np + dp) + ((dq, nq) - ((0 : ℤ), (1 : ℤ))) - (dq, nq) =
+      (2 * dp, 2 * np) + (np - dp, np + dp) + ((1 : ℤ), (-1 : ℤ)) - ((1 : ℤ), (0 : ℤ)) := by ext <;> simp; ring
+  have e3 := h2p _ (by rw [z3]; exact nXi)
+  have e4 := h4p _ (by rw [z4]; exact mD1)
+  rw [z3, vQXi] at e3
+  rw [z4, vPD1] at e4
+  have hb2 : b2 = -h0 (np - dp, np + dp) + (dp ^ 2 + 2 * dp * np + dp * nq - dq * np - np ^ 2) + βH - βQ := by
+    simp only [dotS, Prod.fst_add, Prod.snd_add, Prod.fst_sub, Prod.snd_sub, Prod.fst_zero, Prod.snd_zero] at e3 e4
+    linarith
+  have hs1 := sigma_pair oH.val oQ.val (↑oQ.dom) _ _ _ _ ((2 * dp, 2 * np) + (np - dp, np + dp)) (np, -dp) (np, -dp) b2 b1
+    (fun x hx => hhH x (hd2 x hx)) hhQ h2p
+    (by intro x hx; rw [show (2 * dp, 2 * np) + (2 : ℤ) • (np - dp, np + dp) + (nq - dq, nq + dq) + ((1 : ℤ), (-1 : ℤ)) - ((dq, nq) + (nq - dq, nq + dq) + ((1 : ℤ), (-1 : ℤ))) - ((2 * dp, 2 * np) + (np - dp, np + dp)) = ((np - dp, np + dp) - (dq, nq)) by ext <;> simp <;> ring] at hx ⊢; exact h1p x hx)
+    (by ext <;> simp <;> ring) ((2 * dp, 2 * np) + (np - dp, np + dp)) (by simpa using n0)
+  have hs5 := sigma_pair oH.val oP.val (↑oP.dom) _ _ _ _ (dq, nq) 0 ((np, -dp) + (nq, -dq)) b4 b5
+    (fun x hx => hhH x (hd4 x hx)) hhP h4p
+    (by intro x hx; rw [show (2 * dp, 2 * np) + (2 : ℤ) • (np - dp, np + dp) + (nq - dq, nq + dq) + ((1 : ℤ), (-1 : ℤ)) - ((2 * dp, 2 * np) + (np - dp, np + dp) + ((1 : ℤ), (-1 : ℤ))) - (dq, nq) = ((np - dp, np + dp) - (dq, nq) + (nq - dq, nq + dq)) by ext <;> simp <;> ring] at hx ⊢; exact h5p x hx)
+    (by ext <;> simp <;> ring) (dq, nq) (by simpa using m0)
+  simp only [dotS, Prod.fst_add, Prod.snd_add, Prod.smul_fst, Prod.smul_snd, smul_eq_mul] at hs1 hs5
+  refine ⟨?_, hb2, ?_⟩ <;> linarith
+
+/-- **The constants of the subtiles `1, 2, 4, 5` of an even alternate tile odometer, `W_1` odd.** The even register `Q` at
+`(2 * dp, 2 * np), ((2 * dp, 2 * np) + (np - dp, np + dp) + (dq, nq)), (np - dp, np + dp), ((2 : ℤ) • (np - dp, np + dp) + (dq, nq))` and the odd register `P` at `0, ((np - dp, np + dp) + (2 : ℤ) • (dq, nq) + (nq - dq, nq + dq))`, affine factors `0, a, a, 2a, 0, a + b`; the half-turn is
+about `D̂ = (2 * dp, 2 * np) + (2 : ℤ) • (np - dp, np + dp) + (2 : ℤ) • (dq, nq) + (nq - dq, nq + dq) + ((1 : ℤ), (-1 : ℤ))` with `Ê = 2a + b`. From the origin piece, two corner contacts and the half-turn. -/
+theorem evenPieces1245_of (np dp nq dq : ℤ) (hpar : (np + dp) % 2 = 1) (hqe : (nq + dq) % 2 = 0)
+    (oH oP oQ : PartialOdometer) (βH βP βQ b1 b2 b4 b5 : ℤ)
+    (hcP : TileTranslation.StdCornerValues oP 0 βP (2 * dp, 2 * np) (np - dp, np + dp) (np, -dp))
+    (hcQ : TileTranslation.StdCornerValues oQ 0 βQ (dq, nq) (nq - dq, nq + dq) (nq, -dq))
+    (hhP : ∀ y ∈ (↑oP.dom : Set (ℤ × ℤ)), (2 * dp, 2 * np) + (np - dp, np + dp) + ((1 : ℤ), (-1 : ℤ)) - y ∈ (↑oP.dom : Set _) ∧
+      2 * (oP.val ((2 * dp, 2 * np) + (np - dp, np + dp) + ((1 : ℤ), (-1 : ℤ)) - y) - oP.val y) = dotS (np, -dp) ((2 * dp, 2 * np) + (np - dp, np + dp) + ((1 : ℤ), (-1 : ℤ))) - 2 * dotS (np, -dp) y)
+    (hhQ : ∀ y ∈ (↑oQ.dom : Set (ℤ × ℤ)), (dq, nq) + (nq - dq, nq + dq) + ((1 : ℤ), (-1 : ℤ)) - y ∈ (↑oQ.dom : Set _) ∧
+      2 * (oQ.val ((dq, nq) + (nq - dq, nq + dq) + ((1 : ℤ), (-1 : ℤ)) - y) - oQ.val y) = dotS (nq, -dq) ((dq, nq) + (nq - dq, nq + dq) + ((1 : ℤ), (-1 : ℤ))) - 2 * dotS (nq, -dq) y)
+    (hhH : ∀ x ∈ (↑oH.dom : Set (ℤ × ℤ)), 2 * (oH.val ((2 * dp, 2 * np) + (2 : ℤ) • (np - dp, np + dp) + (2 : ℤ) • (dq, nq) + (nq - dq, nq + dq) + ((1 : ℤ), (-1 : ℤ)) - x) - oH.val x) =
+      dotS ((2 : ℤ) • (np, -dp) + (nq, -dq)) ((2 * dp, 2 * np) + (2 : ℤ) • (np - dp, np + dp) + (2 : ℤ) • (dq, nq) + (nq - dq, nq + dq) + ((1 : ℤ), (-1 : ℤ))) - 2 * dotS ((2 : ℤ) • (np, -dp) + (nq, -dq)) x)
+    (hd2 : ∀ x, x - (np - dp, np + dp) ∈ (↑oQ.dom : Set (ℤ × ℤ)) → x ∈ (↑oH.dom : Set (ℤ × ℤ)))
+    (hd4 : ∀ x, x - 0 ∈ (↑oP.dom : Set (ℤ × ℤ)) → x ∈ (↑oH.dom : Set (ℤ × ℤ)))
+    (h1p : ∀ x, x - ((2 * dp, 2 * np) + (np - dp, np + dp) + (dq, nq)) ∈ (↑oQ.dom : Set (ℤ × ℤ)) → oH.val x = oQ.val (x - ((2 * dp, 2 * np) + (np - dp, np + dp) + (dq, nq))) + dotS (np, -dp) x + b1)
+    (h2p : ∀ x, x - (np - dp, np + dp) ∈ (↑oQ.dom : Set (ℤ × ℤ)) → oH.val x = oQ.val (x - (np - dp, np + dp)) + dotS (np, -dp) x + b2)
+    (h4p : ∀ x, x - 0 ∈ (↑oP.dom : Set (ℤ × ℤ)) → oH.val x = oP.val (x - 0) + dotS 0 x + b4)
+    (h5p : ∀ x, x - ((np - dp, np + dp) + (2 : ℤ) • (dq, nq) + (nq - dq, nq + dq)) ∈ (↑oP.dom : Set (ℤ × ℤ)) → oH.val x = oP.val (x - ((np - dp, np + dp) + (2 : ℤ) • (dq, nq) + (nq - dq, nq + dq))) + dotS ((np, -dp) + (nq, -dq)) x + b5)
+    (hb4 : b4 = βH - βP) :
+    b1 = -h0 (np - dp, np + dp) + (dp ^ 2 + 2 * dp * np + dp * nq - dq * np - np ^ 2) + βH - βQ ∧ b2 = -h0 (np - dp, np + dp) + (dp ^ 2 + 2 * dp * np - np ^ 2) + βH - βQ ∧
+      b5 = -h0 (np - dp, np + dp) -h0 (nq - dq, nq + dq) + (dp ^ 2 + dp * dq + 2 * dp * np + dq ^ 2 + 2 * dq * np + 2 * dq * nq - np ^ 2 - np * nq - nq ^ 2) + βH - βP := by
+  have hcP' := hcP
+  have hcQ' := hcQ
+  obtain ⟨⟨m0, -⟩, -, -, -, ⟨mY1, -⟩, -, -, -⟩ := hcP'
+  obtain ⟨⟨n0, -⟩, ⟨n1, -⟩, -, -, -, -, -, -⟩ := hcQ'
+  obtain ⟨-, -, -, -, vPY1, -, -, -⟩ := corner_raw oP βP _ _ _ hcP
+  obtain ⟨-, vQ1, -, -, -, -, -, -⟩ := corner_raw oQ βQ _ _ _ hcQ
+  have hB4 := h0_even (np - dp, np + dp) (by simp only; omega)
+  have hV4 := h0_even (nq - dq, nq + dq) (by simp only; omega)
+  have z3 : (np - dp, np + dp) + ((1 : ℤ), (0 : ℤ)) - (np - dp, np + dp) = ((1 : ℤ), (0 : ℤ)) := by abel
+  have e3 := h2p _ (by rw [z3]; exact n1)
+  have e4 := h4p ((np - dp, np + dp) + ((1 : ℤ), (0 : ℤ))) (by simpa using mY1)
+  rw [z3, vQ1] at e3
+  rw [sub_zero, vPY1] at e4
+  have hb2 : b2 = -h0 (np - dp, np + dp) + (dp ^ 2 + 2 * dp * np - np ^ 2) + βH - βQ := by
+    simp only [dotS, Prod.fst_add, Prod.snd_add, Prod.fst_zero, Prod.snd_zero] at e3 e4
+    linarith
+  have hs1 := sigma_pair oH.val oQ.val (↑oQ.dom) _ _ _ _ (np - dp, np + dp) (np, -dp) (np, -dp) b2 b1
+    (fun x hx => hhH x (hd2 x hx)) hhQ h2p
+    (by intro x hx; rw [show (2 * dp, 2 * np) + (2 : ℤ) • (np - dp, np + dp) + (2 : ℤ) • (dq, nq) + (nq - dq, nq + dq) + ((1 : ℤ), (-1 : ℤ)) - ((dq, nq) + (nq - dq, nq + dq) + ((1 : ℤ), (-1 : ℤ))) - (np - dp, np + dp) = ((2 * dp, 2 * np) + (np - dp, np + dp) + (dq, nq)) by ext <;> simp <;> ring] at hx ⊢; exact h1p x hx)
+    (by ext <;> simp <;> ring) (np - dp, np + dp) (by simpa using n0)
+  have hs5 := sigma_pair oH.val oP.val (↑oP.dom) _ _ _ _ 0 0 ((np, -dp) + (nq, -dq)) b4 b5
+    (fun x hx => hhH x (hd4 x hx)) hhP h4p
+    (by intro x hx; rw [show (2 * dp, 2 * np) + (2 : ℤ) • (np - dp, np + dp) + (2 : ℤ) • (dq, nq) + (nq - dq, nq + dq) + ((1 : ℤ), (-1 : ℤ)) - ((2 * dp, 2 * np) + (np - dp, np + dp) + ((1 : ℤ), (-1 : ℤ))) - 0 = ((np - dp, np + dp) + (2 : ℤ) • (dq, nq) + (nq - dq, nq + dq)) by ext <;> simp <;> ring] at hx ⊢; exact h5p x hx)
+    (by ext <;> simp <;> ring) 0 (by simpa using m0)
+  simp only [dotS, Prod.fst_add, Prod.snd_add, Prod.smul_fst, Prod.smul_snd, smul_eq_mul, Prod.fst_zero, Prod.snd_zero] at hs1 hs5
+  refine ⟨?_, hb2, ?_⟩ <;> linarith
+
 end FLatticePaper.Tiles.AltEvenTilePieces
