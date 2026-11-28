@@ -1676,5 +1676,7 @@ import FLatticePaper.Tiles.SwapBaseClauses
 import FLatticePaper.Tiles.SwapOffsets
 import FLatticePaper.Tiles.SwapRegions
 import FLatticePaper.Tiles.SwapNonvac
+import FLatticePaper.Tiles.EvenMidVMinus
+import FLatticePaper.Tiles.OddPtVMinus
 
 /-! Root import for the corrected F-lattice paper. -/
