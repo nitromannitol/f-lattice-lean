@@ -1562,6 +1562,8 @@ import FLatticePaper.Tiles.TileCompatInputs
 import FLatticePaper.Tiles.PaperAltDomains
 import FLatticePaper.Tiles.GlueFull
 import FLatticePaper.Tiles.LSidesEvenK
+import FLatticePaper.Tiles.WeakAltStepAssembly
+import FLatticePaper.Tiles.JointAltV1
 import FLatticePaper.Tiles.AltParentBase
 import FLatticePaper.Tiles.AltParentReflection
 import FLatticePaper.Tiles.AltParentStair
@@ -1602,6 +1604,13 @@ import FLatticePaper.Tiles.AltLatticeEvenVWrap
 import FLatticePaper.Tiles.AltLatticeCorrArith
 import FLatticePaper.Tiles.AltLatticeCorrE
 import FLatticePaper.Tiles.AltLatticeCorrEWrap
+import FLatticePaper.Tiles.AltLatticeCorrO
+import FLatticePaper.Tiles.AltLatticeCorrOMain
+import FLatticePaper.Tiles.AltLatticeCorrOWrap
+import FLatticePaper.Tiles.AltShiftGeom
+import FLatticePaper.Tiles.AltShiftValues
+import FLatticePaper.Tiles.AltShiftFamily
+import FLatticePaper.Tiles.UncorrectedPieces
 import FLatticePaper.Tiles.AltBounds
 import FLatticePaper.Tiles.AltItem4Defs
 import FLatticePaper.Tiles.AltItem4Special

@@ -182,15 +182,18 @@ def HalfTurnInput (D : JointData) : Prop :=
         (offsetA ((parentsAt w).current .even).num ((parentsAt w).current .even).den true) ∧
       AltHalfTurn aod (altD w true) (altE w) ∧ AltHalfTurn aev (altD w false) (altE w)
 
-/-- (b) of `lemma:weak_alternate_odometer_properties` for the alternate tile odometers of the corrected alternate children. -/
+/-- (b) of `lemma:weak_alternate_odometer_properties` for the alternate tile odometers of the corrected alternate children,
+second-lattice-vector half (the first half follows after the rotation step, `JointAltV1`), given the half-turns of the alternate
+tile odometers at `w`. -/
 def AltLatticeInput (D : JointData) : Prop :=
   ∀ (f : Word → JSlice) (w : Word) (wo we wao wae tod tev aod aev : PartialOdometer), GoodBelow D f w.length →
     TilePart D (below f w) w wo we wao wae tod tev aod aev →
-    (CorrectedAfterTwo w → AltLatticeOdd w aod) ∧ (CorrectedAfterThree w → AltLatticeEven w aev)
+    AltHalfTurn aod (altD w true) (altE w) → AltHalfTurn aev (altD w false) (altE w) →
+    (CorrectedAfterTwo w → AltLatticeOddV2 w aod) ∧ (CorrectedAfterThree w → AltLatticeEvenV2 w aev)
 
 /-! ### From the tile part to the tile properties -/
 
-/-- (a), (b) and (b) of the alternate weak lemma from the tile part: (a) from the respects and (c) (the weak (c) at the children
+/-- (a), (b) and the second-vector half of (b) of the alternate weak lemma from the tile part: (a) from the respects and (c) (the weak (c) at the children
 that are not corrected, `CorrectedLatticeInput` at the corrected ones), (b) given. -/
 theorem props_of_part (D : JointData) (g : Word → JSlice) (w : Word) (wo we wao wae tod tev aod aev : PartialOdometer)
     (hP : TilePart D g w wo we wao wae tod tev aod aev) (hWU : WeakPropsU w wo we) (hWAU : WeakAltPropsU w wao wae)
@@ -207,8 +210,8 @@ theorem props_of_part (D : JointData) (g : Word → JSlice) (w : Word) (wo we wa
       TileHalfTurn tev (texV1Even ((parentsAt w).current .even)) (texV2 ((parentsAt w).current .even))
         (offsetA ((parentsAt w).current .even).num ((parentsAt w).current .even).den true) ∧
       AltHalfTurn aod (altD w true) (altE w) ∧ AltHalfTurn aev (altD w false) (altE w))
-    (hal : (CorrectedAfterTwo w → AltLatticeOdd w aod) ∧ (CorrectedAfterThree w → AltLatticeEven w aev)) :
-    TileProps w tod tev aod aev ∧ AltLatticeSelfCompat w aod aev := by
+    (hal : (CorrectedAfterTwo w → AltLatticeOddV2 w aod) ∧ (CorrectedAfterThree w → AltLatticeEvenV2 w aev)) :
+    TileProps w tod tev aod aev ∧ AltLatticeV2 w aod aev := by
   obtain ⟨-, -, h3, h2, rO, rE, -⟩ := hP
   have lo : LatticeSelfCompatible tod (texV1Odd ((parentsAt w).current .odd)) 0 ∧
       LatticeSelfCompatible tod (texV2 ((parentsAt w).current .odd))
@@ -256,10 +259,11 @@ theorem tileStep_paper (D : JointData) (hS : D.S = WeakStepPaper.paperS) (hA : D
       hWAU.1 (fun h => h.1 hb), hWAU.2 (fun h => h.1 hb)⟩
   have finish : ∀ tod tev aod aev : PartialOdometer, TilePart D (below f w) w wo we wao wae tod tev aod aev →
       ∃ tod tev aod aev : PartialOdometer, TilePart D (below f w) w wo we wao wae tod tev aod aev ∧
-        TileProps w tod tev aod aev ∧ AltLatticeSelfCompat w aod aev := fun tod tev aod aev hP =>
-    ⟨tod, tev, aod, aev, hP, props_of_part D (below f w) w wo we wao wae tod tev aod aev hP hWU hWAU
-      (hlat f w wo we wao wae tod tev aod aev hG hP) (hht f w wo we wao wae tod tev aod aev hG hb hWP hWA hP)
-      (hal f w wo we wao wae tod tev aod aev hG hP)⟩
+        TileProps w tod tev aod aev ∧ AltLatticeV2 w aod aev := fun tod tev aod aev hP => by
+    have hH := hht f w wo we wao wae tod tev aod aev hG hb hWP hWA hP
+    exact ⟨tod, tev, aod, aev, hP, props_of_part D (below f w) w wo we wao wae tod tev aod aev hP hWU hWAU
+      (hlat f w wo we wao wae tod tev aod aev hG hP) hH
+      (hal f w wo we wao wae tod tev aod aev hG hP hH.2.2.1 hH.2.2.2)⟩
   have n1 := hN1 f w wo we wao wae hG hb hWP hWA
   obtain ⟨cO, cE⟩ := JointRot.std_connected D hlS f w hb hJ
   obtain ⟨cAO, cAE⟩ := ConnectedAltL.connectedAlt_of D hlS f w hb hJ hT

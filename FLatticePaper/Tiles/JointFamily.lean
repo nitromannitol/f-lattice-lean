@@ -684,11 +684,27 @@ corrected alternate child the alternate tile odometer is the L-decomposition (th
 def AltLatticeSelfCompat (w : Word) (ao ae : PartialOdometer) : Prop :=
   AltLatticeOdd w ao ∧ AltLatticeEven w ae
 
-/-- (b) of `lemma:weak_alternate_odometer_properties` at `w` for the weak alternate odometers, at the alternate children that are
-not corrected, where they are the alternate tile odometers (`TilePart`): the odd alternate child unless `w` ends in a `2`, the
-even alternate child unless it ends in a `3`. -/
+/-- The second-lattice-vector half of `AltLatticeOdd`: compatibility along `v_{p_0,2}` with affine factor `a_{p_0,2}`. The first
+half (along `v_{p_0,1}`) follows from the second half of the rotated child after the rotation step (`JointAltV1`). -/
+def AltLatticeOddV2 (w : Word) (ao : PartialOdometer) : Prop :=
+  let p0 := (parentsAt w).current .odd
+  LatticeSelfCompatible ao (texV2 p0) (offsetA p0.num p0.den true)
+
+/-- The second-lattice-vector half of `AltLatticeEven`. -/
+def AltLatticeEvenV2 (w : Word) (ae : PartialOdometer) : Prop :=
+  let q0 := (parentsAt w).current .even
+  LatticeSelfCompatible ae (texV2 q0) (offsetA q0.num q0.den true)
+
+/-- The second-lattice-vector halves for both alternate children of `w`. -/
+def AltLatticeV2 (w : Word) (ao ae : PartialOdometer) : Prop :=
+  AltLatticeOddV2 w ao ∧ AltLatticeEvenV2 w ae
+
+/-- (b) of `lemma:weak_alternate_odometer_properties` at `w` for the weak alternate odometers, second-lattice-vector half, at the
+alternate children that are not corrected, where they are the alternate tile odometers (`TilePart`): the odd alternate child
+unless `w` ends in a `2`, the even alternate child unless it ends in a `3`. The first half of the alternate tile odometers is
+derived after the rotation step (`JointAltV1`). -/
 def WeakAltPropsU (w : Word) (wao wae : PartialOdometer) : Prop :=
-  (¬ CorrectedAfterTwo w → AltLatticeOdd w wao) ∧ (¬ CorrectedAfterThree w → AltLatticeEven w wae)
+  (¬ CorrectedAfterTwo w → AltLatticeOddV2 w wao) ∧ (¬ CorrectedAfterThree w → AltLatticeEvenV2 w wae)
 
 /-- (a) and (b) of `lemma:tile-odometer-existence` at `w`. -/
 def TileProps (w : Word) (tod tev aod aev : PartialOdometer) : Prop :=
