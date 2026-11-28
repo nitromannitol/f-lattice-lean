@@ -93,7 +93,8 @@ private theorem o_at (v : Word) (plus : Bool) (i : ℕ) : (oHead v plus i).off =
   simp only [altOff_add,altOff_smul,Nat.cast_zero,zero_add,add_smul,one_smul,o_stride]
   abel
 
-private theorem three_periods (w : Word) (k : ℕ) :
+/-- The four parent periods after a run of threes. -/
+theorem three_periods (w : Word) (k : ℕ) :
     let v := w++List.replicate k Digit.three
     vP1 v = vP1 w ∧ vP2 v = vP2 w ∧ vQ1 v = vQ1 w + (k : ℤ) • vP1 w ∧
       vQ2 v = vQ2 w + (2*(k : ℤ)) • vP2 w := by
@@ -101,7 +102,8 @@ private theorem three_periods (w : Word) (k : ℕ) :
   simp only [vP1,vP2,vQ1,vQ2,JointRot.parents_append_threes,texV1Odd,texV1Even,texV2]
   refine ⟨trivial,trivial,?_,?_⟩ <;> ext <;> dsimp <;> ring
 
-private theorem two_periods (w : Word) (k : ℕ) :
+/-- The four parent periods after a run of twos. -/
+theorem two_periods (w : Word) (k : ℕ) :
     let v := w++List.replicate k Digit.two
     vP1 v = vP1 w + (2*(k : ℤ)) • vQ1 w ∧ vP2 v = vP2 w + (k : ℤ) • vQ2 w ∧
       vQ1 v = vQ1 w ∧ vQ2 v = vQ2 w := by

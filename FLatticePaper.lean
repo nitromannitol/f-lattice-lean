@@ -1333,7 +1333,14 @@ import FLatticePaper.Tiles.CorrectedCellsEnds
 import FLatticePaper.Tiles.CorrectedColumnRuns
 import FLatticePaper.Tiles.CorrectedHeadColumn
 import FLatticePaper.Tiles.CorrectedChildColumns
+import FLatticePaper.Tiles.CorrectedEvenRows
 import FLatticePaper.Tiles.CorrectedFaceBounds
+import FLatticePaper.Tiles.CorrectedLevelTests
+import FLatticePaper.Tiles.CorrectedRegisterDiagram
+import FLatticePaper.Tiles.CorrectedRegisterShortOneDirectLowEven
+import FLatticePaper.Tiles.CorrectedRegisterWords
+import FLatticePaper.Tiles.CorrectedRegisterLattice
+import FLatticePaper.Tiles.CorrectedRegisterLongOneDirectLowEven
 import FLatticePaper.Tiles.CorrectedCellsBands
 import FLatticePaper.Tiles.CorrectedBaseBands
 import FLatticePaper.Tiles.CorrectedDomainLattice
