@@ -7,7 +7,7 @@ The four marked strings of a standard tile `T` with words `wh`, `vw` are, in the
 horizontal string `Sh` (index 0), the reversed vertical string `Sv` (index 1), and the half-turn images `Sh.map halfTurn`
 (index 2, the reversed horizontal string) and `Sv.map halfTurn` (index 3, the vertical string).
 
-Numerically (all words of length at most 4, both children, every pair of copies of different parents; the script
+Numerically (all 3,772 nonempty mixed interfaces through length 5, both children, every pair of copies of different parents; the script
 `verify_rule.py`), the overlap `X ∩ Y` of a copy `X` of the odd register at offset `a` and a copy `Y` of the even register at
 offset `b` equals `S_k(X) ∩ S_{k'}(Y)` for the pair `(k, k')` given by `chooseOdd`/`chooseEven` below, which depend only on the
 child, the parity flag `phase w = 1`, and the two piece indices.
@@ -94,39 +94,39 @@ theorem easy_odd (u1 u2 : Word) (k k' : Fin 4) (a b : ℤ × ℤ) :
   exact ⟨⟨s, oddStr_sub_tile u1 k hs, hsz⟩, ⟨t, evenStr_sub_tile u2 k' ht, htz⟩⟩
 
 /-- The string pair `(k, k')` of the odd child, by the flag `phase w = 1` and the indices `i` (odd copies), `j` (even
-copies). The table is the one checked on all words of length at most 4 (`verify_rule.py`). Pairs that do not overlap get the
+copies). The table is the one checked on all words of length at most 5. Pairs that do not overlap get the
 value `(0, 0)`; for them the hard inclusion is trivial. Index 0 is the first entry of `oddP`, etc. -/
 def chooseOdd (flag : Bool) (i j : ℕ) : Fin 4 × Fin 4 :=
   if flag then
-    (if i = 0 ∧ j = 0 then (3, 2)
-     else if i = 0 ∧ (j = 2 ∨ j = 3) then (1, 0)
-     else if i = 1 ∧ (j = 0 ∨ j = 1) then (0, 1)
-     else if i = 1 ∧ j = 3 then (2, 3)
+    (if i = 0 ∧ j = 0 then (3, 1)
+     else if i = 0 ∧ (j = 2 ∨ j = 3) then (2, 0)
+     else if i = 1 ∧ (j = 0 ∨ j = 1) then (0, 2)
+     else if i = 1 ∧ j = 3 then (1, 3)
      else (0, 0))
   else
-    (if i = 0 ∧ j = 1 then (2, 3)
-     else if i = 0 ∧ (j = 2 ∨ j = 3) then (1, 0)
-     else if i = 1 ∧ (j = 0 ∨ j = 1) then (0, 1)
-     else if i = 1 ∧ j = 2 then (3, 2)
+    (if i = 0 ∧ j = 1 then (1, 3)
+     else if i = 0 ∧ (j = 2 ∨ j = 3) then (2, 0)
+     else if i = 1 ∧ (j = 0 ∨ j = 1) then (0, 2)
+     else if i = 1 ∧ j = 2 then (3, 1)
      else (0, 0))
 
 /-- The string pair `(k, k')` of the even child, same convention as `chooseOdd`. -/
 def chooseEven (flag : Bool) (i j : ℕ) : Fin 4 × Fin 4 :=
   if flag then
-    (if i = 0 ∧ j = 0 then (3, 2)
-     else if i = 1 ∧ j = 0 then (3, 2)
-     else if i = 1 ∧ j = 1 then (1, 0)
-     else if i = 2 ∧ j = 0 then (0, 1)
-     else if i = 2 ∧ j = 1 then (2, 3)
-     else if i = 3 ∧ j = 1 then (2, 3)
+    (if i = 0 ∧ j = 0 then (3, 1)
+     else if i = 1 ∧ j = 0 then (3, 1)
+     else if i = 1 ∧ j = 1 then (2, 0)
+     else if i = 2 ∧ j = 0 then (0, 2)
+     else if i = 2 ∧ j = 1 then (1, 3)
+     else if i = 3 ∧ j = 1 then (1, 3)
      else (0, 0))
   else
-    (if i = 0 ∧ j = 0 then (2, 3)
-     else if i = 1 ∧ j = 0 then (2, 3)
-     else if i = 1 ∧ j = 1 then (1, 0)
-     else if i = 2 ∧ j = 0 then (0, 1)
-     else if i = 2 ∧ j = 1 then (3, 2)
-     else if i = 3 ∧ j = 1 then (3, 2)
+    (if i = 0 ∧ j = 0 then (1, 3)
+     else if i = 1 ∧ j = 0 then (1, 3)
+     else if i = 1 ∧ j = 1 then (2, 0)
+     else if i = 2 ∧ j = 0 then (0, 2)
+     else if i = 2 ∧ j = 1 then (3, 1)
+     else if i = 3 ∧ j = 1 then (3, 1)
      else (0, 0))
 
 /-- **Sharpened claim (d), odd child, the hard inclusion (OPEN, the packing across the interface).** For the registers
