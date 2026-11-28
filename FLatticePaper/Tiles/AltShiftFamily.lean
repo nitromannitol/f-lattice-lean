@@ -1,5 +1,6 @@
 import FLatticePaper.Tiles.AltShiftValues
 import FLatticePaper.Tiles.AltItem4Rot
+import FLatticePaper.Tiles.WeakAltStepAssembly
 
 /-! # The compatibility of the registers with their translates by the alternate shifts, from the family
 
@@ -137,5 +138,9 @@ theorem shift_compat_family (D : JointData) (hS : D.S = WeakStepPaper.paperS) (h
       simp only [JointFamily.normed, dotS, Prod.fst_zero, Prod.snd_zero, zero_mul, add_zero, sub_zero] at e
       change (f u2).tEven.val (z + texV1Even (fracEven u2)) - β = (f u2).tEven.val z - β at e
       linarith
+
+/-- **`AltShiftCompatInput`** of the weak alternate step, for every joint data. -/
+theorem altShiftCompatInput_paper (D : JointData) : WeakAltStepAssembly.AltShiftCompatInput D :=
+  fun hS hA f w u1 u2 hg hw hr => shift_compat_family D hS hA f w u1 u2 hg hw hr
 
 end FLatticePaper.Tiles.AltShiftFamily

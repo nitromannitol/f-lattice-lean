@@ -1619,6 +1619,8 @@ import FLatticePaper.Tiles.AltShiftGeom
 import FLatticePaper.Tiles.AltShiftValues
 import FLatticePaper.Tiles.AltShiftFamily
 import FLatticePaper.Tiles.UncorrectedPieces
+import FLatticePaper.Tiles.LTransport
+import FLatticePaper.Tiles.LTriangle
 import FLatticePaper.Tiles.AltBounds
 import FLatticePaper.Tiles.AltItem4Defs
 import FLatticePaper.Tiles.AltItem4Special
