@@ -382,6 +382,7 @@ theorem regs_twos_snd (j : ℕ) : (regsAt (List.replicate j Digit.two)).2 = none
 /-! ### The positions of the special pieces -/
 
 open FLatticePaper.Tiles.JointRot (oBridge eMid eHead oHead oK eK)
+open FLatticePaper.Tiles.JointFamily (Piece)
 open FLatticePaper.Tiles.JointFamily (oddLInitOff evenLInitOff p0Off q0Off vP1 vP2 vQ1 vQ2 W1Odd)
 open FLatticePaper.Tiles.SurgicalDict (offsetP0 offsetQ0)
 open FLatticePaper.Tiles.SurgicalAlt (coeffOff)
@@ -578,5 +579,274 @@ theorem cells_E_O_minus (S : WeakData) (hz : S.zeroO.dom = zeroTile) (pO pE : Wo
   · exact mem_of_tile h1 (1, 1) (by simp [tileShape]) _ (by pt_eq)
   · exact mem_of_tile h1 (0, 1) (by simp [tileShape]) _ (by pt_eq)
   · exact mem_of_tile h1 (-1, 1) (by simp [tileShape]) _ (by pt_eq)
+
+/-! ### The odd kind: the middle pieces of the even L-correction at `2^(j+1) 3^k` -/
+
+theorem mem_oneTile_iff (s : Site) : s ∈ oneTile ↔ s ∈ tileShape ZTile.one := by
+  simp [oneTile, tileShape]
+
+/-- The middle pieces: the bridge `S.oneO` at `B` (for `s = +`) and the copy of `T^d_{1/1}` at `B + (1, 1)`. -/
+theorem mid_mem (S : WeakData) (pO pE : Word → PartialOdometer) (j k : ℕ) (sg : Bool)
+    (P : Piece) (hP : P ∈ eMid S pO pE (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) sg) :
+    (sg = true ∧ P.odo = S.oneO ∧ P.off = (evenLInitOff (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) sg + JointFamily.altOff (JointFamily.stripTrailing Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three)) ((JointFamily.trailingCount Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) : ℤ) • (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) sg).1 + (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) sg).2.1))) ∨
+      (P.odo = JointFamily.enlOdo ∧ P.off = (evenLInitOff (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) sg + JointFamily.altOff (JointFamily.stripTrailing Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three)) ((JointFamily.trailingCount Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) : ℤ) • (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) sg).1 + (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) sg).2.1)) + ((1 : ℤ), (1 : ℤ))) := by
+  have hW := W1Odd_special (j + 1) k Digit.two Digit.three (by decide) (by decide)
+  obtain ⟨-, hst⟩ := trailing_special Digit.three Digit.two (by decide) j k
+  have hTD : (!(List.replicate (j + 1) Digit.two).isEmpty &&
+      (List.replicate (j + 1) Digit.two).all (fun d => decide (d = Digit.two))) = true := by simp
+  unfold eMid at hP
+  simp only [hst, hTD, hW] at hP
+  cases sg <;> simp at hP
+  · subst hP
+    right
+    exact ⟨rfl, by simp [JointFamily.stdPiece, hst]⟩
+  · rcases hP with rfl | rfl
+    · left
+      refine ⟨rfl, ?_, by simp [JointFamily.stdPiece, hst]⟩
+      simp only [JointFamily.stdPiece, regs_twos_snd]
+      rfl
+    · right
+      exact ⟨rfl, by simp [JointFamily.stdPiece, hst]⟩
+
+/-- The points of the middle pieces. -/
+theorem mid_points (S : WeakData) (hone : S.oneO.dom = oneTile) (pO pE : Word → PartialOdometer) (j k : ℕ) (sg : Bool)
+    (P : Piece) (hP : P ∈ eMid S pO pE (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) sg) (x : Site) (hx : x ∈ P.placed) :
+    (sg = true ∧ ∃ u ∈ tileShape ZTile.one, x = (evenLInitOff (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) sg + JointFamily.altOff (JointFamily.stripTrailing Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three)) ((JointFamily.trailingCount Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) : ℤ) • (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) sg).1 + (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) sg).2.1)) + u) ∨
+      ∃ u ∈ tileShape ZTile.oneD, x = (evenLInitOff (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) sg + JointFamily.altOff (JointFamily.stripTrailing Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three)) ((JointFamily.trailingCount Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) : ℤ) • (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) sg).1 + (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) sg).2.1)) + ((1 : ℤ), (1 : ℤ)) + u := by
+  rw [JointRot.mem_placed] at hx
+  rcases mid_mem S pO pE j k sg P hP with ⟨hs, ho, hoff⟩ | ⟨ho, hoff⟩
+  · rw [ho, hone, mem_oneTile_iff, hoff] at hx
+    exact Or.inl ⟨hs, _, hx, by abel⟩
+  · rw [ho, hoff] at hx
+    simp only [JointFamily.enlOdo, List.mem_toFinset] at hx
+    exact Or.inr ⟨_, hx, by abel⟩
+
+/-- (O, `s = +`, R) The middle pieces lie on the first two tiles of the forward horizontal string of the even child of
+`2^(j+1) 3^k`. -/
+theorem cells_O_R_plus (S : WeakData) (hone : S.oneO.dom = oneTile) (pO pE : Word → PartialOdometer) (j k : ℕ)
+    (P : Piece) (hP : P ∈ eMid S pO pE (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true) (x : Site) (hx : x ∈ P.placed) :
+    x ∈ placedSites (hStringAt (hWordOf (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true) 0) := by
+  obtain ⟨r, hr⟩ := (ends_twos_threes j k).2.2.1
+  obtain ⟨h0, h1⟩ := hStr_head Letter.q Letter.q r 0
+  simp only [zTileOf, hOffset] at h0 h1
+  rw [hr]
+  rcases mid_points S hone pO pE j k true P hP x hx with ⟨-, u, hu, rfl⟩ | ⟨u, hu, rfl⟩
+  · rw [pos_O_R_plus]
+    exact mem_of_tile h0 u hu _ (by abel)
+  · rw [pos_O_R_plus]
+    exact mem_of_tile h1 u hu _ (by pt_eq)
+
+/-- (O, `s = -`, R) The copy of `T^d_{1/1}` is the last tile of the reversed horizontal string of the even child of
+`2^(j+1) 3^k`. -/
+theorem cells_O_R_minus (S : WeakData) (hone : S.oneO.dom = oneTile) (pO pE : Word → PartialOdometer) (j k : ℕ)
+    (P : Piece) (hP : P ∈ eMid S pO pE (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false) (x : Site) (hx : x ∈ P.placed) :
+    x ∈ placedSites (hRevStringAt (hWordOf (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true).reverse (lastPosOf (vRevStringAt (vWordOf (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true).reverse 0))) := by
+  obtain ⟨r, hr⟩ := (ends_twos_threes j k).2.2.1
+  have hrev : (hWordOf (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true).reverse = r.reverse ++ [Letter.q, Letter.q] := by rw [hr]; simp
+  rw [StdCornerAnchors.stdAnchorY_even]
+  obtain ⟨h1, -, -⟩ := hRev_last r.reverse Letter.q Letter.q (texV2 (fracEven (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three)) + ((1 : ℤ), (-2 : ℤ)))
+  rw [← hrev, GlueStringDecomp.lp_top_even] at h1
+  simp only [zTileOf] at h1
+  rcases mid_points S hone pO pE j k false P hP x hx with ⟨h, -⟩ | ⟨u, hu, rfl⟩
+  · exact absurd h (by decide)
+  · rw [pos_O_R_minus]
+    exact mem_of_tile h1 u hu _ rfl
+
+/-- (O, `s = +`, image, elongated) The images lie on the last two tiles of the forward horizontal string of the odd child of
+`3^(j+1) 2^k`. -/
+theorem cells_O_O_plus_elong (S : WeakData) (hone : S.oneO.dom = oneTile) (pO pE : Word → PartialOdometer) (j k : ℕ)
+    (P : Piece) (hP : P ∈ eMid S pO pE (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true) (x : Site) (hx : x ∈ P.placed) :
+    Farey.mulI x + (texV1Odd ((parentsAt (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two)).current .odd) - ((0 : ℤ), (1 : ℤ))) ∈ placedSites (hStringAt (hWordOf (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) false) 0) := by
+  obtain ⟨r, hr⟩ := (ends_threes_twos j k).2.1
+  obtain ⟨h1, pr, h0⟩ := hStr_last r Letter.p Letter.p 0
+  rw [← hr, show (0 : GInt) = ((0 : ℤ), (0 : ℤ)) from rfl, StdCornerAnchors.stdAnchorX_odd] at h1 h0
+  simp only [zTileOf, hOffset] at h1 h0
+  rw [show (0 : GInt) = ((0 : ℤ), (0 : ℤ)) from rfl]
+  rcases mid_points S hone pO pE j k true P hP x hx with ⟨-, u, hu, rfl⟩ | ⟨u, hu, rfl⟩
+  · rw [z_add, pos_O_O_plus]
+    simp only [tileShape, List.mem_cons, List.not_mem_nil, or_false] at hu
+    rcases hu with rfl | rfl | rfl | rfl
+    · exact mem_of_tile h1 (1, 0) (by simp [tileShape]) _ (by pt_eq)
+    · exact mem_of_tile h1 (0, 0) (by simp [tileShape]) _ (by pt_eq)
+    · exact mem_of_tile h1 (1, 1) (by simp [tileShape]) _ (by pt_eq)
+    · exact mem_of_tile h1 (0, 1) (by simp [tileShape]) _ (by pt_eq)
+  · rw [z_add, z_add, pos_O_O_plus]
+    simp only [tileShape, List.mem_cons, List.not_mem_nil, or_false] at hu
+    rcases hu with rfl | rfl | rfl | rfl | rfl | rfl
+    · exact mem_of_tile h1 (0, 1) (by simp [tileShape]) _ (by pt_eq)
+    · exact mem_of_tile h0 (1, 1) (by simp [tileShape]) _ (by pt_eq)
+    · exact mem_of_tile h1 (0, 2) (by simp [tileShape]) _ (by pt_eq)
+    · exact mem_of_tile h0 (1, 2) (by simp [tileShape]) _ (by pt_eq)
+    · exact mem_of_tile h0 (1, 0) (by simp [tileShape]) _ (by pt_eq)
+    · exact mem_of_tile h1 (1, 2) (by simp [tileShape]) _ (by pt_eq)
+
+/-- (O, `s = +`, image, short) The images lie on the first two tiles of the forward vertical string of the odd child of
+`3^(j+1) 2^k`, except the tip `(-1, 1)` of the copy of `T^d_{1/1}`. -/
+theorem cells_O_O_plus_short (S : WeakData) (hone : S.oneO.dom = oneTile) (pO pE : Word → PartialOdometer) (j k : ℕ)
+    (P : Piece) (hP : P ∈ eMid S pO pE (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true) (x : Site) (hx : x ∈ P.placed)
+    (htip : x ≠ (evenLInitOff (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true + JointFamily.altOff (JointFamily.stripTrailing Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three)) ((JointFamily.trailingCount Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) : ℤ) • (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true).1 + (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) true).2.1)) + ((1 : ℤ), (1 : ℤ)) + ((-1 : ℤ), (1 : ℤ))) :
+    Farey.mulI x + (texV1Odd ((parentsAt (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two)).current .odd) - ((0 : ℤ), (1 : ℤ))) ∈
+      placedSites (vStringAt (vWordOf (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) false) (lastPosOf (hStringAt (hWordOf (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) false) 0))) := by
+  obtain ⟨r, hr⟩ := (ends_threes_twos j k).2.2.2.2.1
+  rw [show (0 : GInt) = ((0 : ℤ), (0 : ℤ)) from rfl, StdCornerAnchors.stdAnchorX_odd, hr]
+  obtain ⟨h0, h1⟩ := vStr_head Letter.p Letter.p r (texV1Odd (fracOdd (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two)) - ((1 : ℤ), (1 : ℤ)))
+  simp only [letterZTile, vOffset] at h0 h1
+  rcases mid_points S hone pO pE j k true P hP x hx with ⟨-, u, hu, rfl⟩ | ⟨u, hu, rfl⟩
+  · rw [z_add, pos_O_O_plus]
+    simp only [tileShape, List.mem_cons, List.not_mem_nil, or_false] at hu
+    rcases hu with rfl | rfl | rfl | rfl
+    · exact mem_of_tile h0 (1, 0) (by simp [tileShape]) _ (by pt_eq)
+    · exact mem_of_tile h0 (0, 0) (by simp [tileShape]) _ (by pt_eq)
+    · exact mem_of_tile h0 (1, 1) (by simp [tileShape]) _ (by pt_eq)
+    · exact mem_of_tile h0 (0, 1) (by simp [tileShape]) _ (by pt_eq)
+  · rw [z_add, z_add, pos_O_O_plus]
+    simp only [tileShape, List.mem_cons, List.not_mem_nil, or_false] at hu
+    rcases hu with rfl | rfl | rfl | rfl | rfl | rfl
+    · exact mem_of_tile h0 (0, 1) (by simp [tileShape]) _ (by pt_eq)
+    · exact mem_of_tile h1 (0, 0) (by simp [tileShape]) _ (by pt_eq)
+    · exact mem_of_tile h0 (0, 2) (by simp [tileShape]) _ (by pt_eq)
+    · exact mem_of_tile h1 (0, 1) (by simp [tileShape]) _ (by pt_eq)
+    · exact absurd rfl htip
+    · exact mem_of_tile h0 (1, 2) (by simp [tileShape]) _ (by pt_eq)
+
+/-- (O, `s = -`, image, elongated) The images lie on the first two tiles of the reversed horizontal string of the odd child of
+`3^(j+1) 2^k`. -/
+theorem cells_O_O_minus_elong (S : WeakData) (hone : S.oneO.dom = oneTile) (pO pE : Word → PartialOdometer) (j k : ℕ)
+    (P : Piece) (hP : P ∈ eMid S pO pE (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false) (x : Site) (hx : x ∈ P.placed) :
+    Farey.mulI x + (texV1Odd ((parentsAt (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two)).current .odd) - ((0 : ℤ), (1 : ℤ))) ∈
+      placedSites (hRevStringAt (hWordOf (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) false).reverse (lastPosOf (vRevStringAt (vWordOf (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) false).reverse 0))) := by
+  obtain ⟨r, hr⟩ := (ends_threes_twos j k).2.1
+  have hrev : (hWordOf (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) false).reverse = Letter.p :: Letter.p :: r.reverse := by rw [hr]; simp
+  rw [StdCornerAnchors.stdAnchorY_odd, hrev]
+  obtain ⟨h0, h1⟩ := hRev_head Letter.p Letter.p r.reverse (texV2 (fracOdd (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two)) + ((1 : ℤ), (-2 : ℤ)))
+  simp only [zTileOf, hRevOffset] at h0 h1
+  rcases mid_points S hone pO pE j k false P hP x hx with ⟨h, -⟩ | ⟨u, hu, rfl⟩
+  · exact absurd h (by decide)
+  · rw [z_add, pos_O_O_minus]
+    simp only [tileShape, List.mem_cons, List.not_mem_nil, or_false] at hu
+    rcases hu with rfl | rfl | rfl | rfl | rfl | rfl
+    · exact mem_of_tile h0 (1, 1) (by simp [tileShape]) _ (by pt_eq)
+    · exact mem_of_tile h0 (0, 1) (by simp [tileShape]) _ (by pt_eq)
+    · exact mem_of_tile h0 (1, 2) (by simp [tileShape]) _ (by pt_eq)
+    · exact mem_of_tile h0 (0, 2) (by simp [tileShape]) _ (by pt_eq)
+    · exact mem_of_tile h0 (0, 0) (by simp [tileShape]) _ (by pt_eq)
+    · exact mem_of_tile h1 (0, 2) (by simp [tileShape]) _ (by pt_eq)
+
+/-- (O, `s = -`, image, short) The images lie on the last tile of the reversed vertical string of the odd child of
+`3^(j+1) 2^k`, except the tip `(1, -1)` of the copy of `T^d_{1/1}`. -/
+theorem cells_O_O_minus_short (S : WeakData) (hone : S.oneO.dom = oneTile) (pO pE : Word → PartialOdometer) (j k : ℕ)
+    (P : Piece) (hP : P ∈ eMid S pO pE (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false) (x : Site) (hx : x ∈ P.placed)
+    (htip : x ≠ (evenLInitOff (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false + JointFamily.altOff (JointFamily.stripTrailing Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three)) ((JointFamily.trailingCount Digit.three (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) : ℤ) • (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false).1 + (eK (List.replicate (j + 1) Digit.two ++ List.replicate k Digit.three) false).2.1)) + ((1 : ℤ), (1 : ℤ)) + ((1 : ℤ), (-1 : ℤ))) :
+    Farey.mulI x + (texV1Odd ((parentsAt (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two)).current .odd) - ((0 : ℤ), (1 : ℤ))) ∈ placedSites (vRevStringAt (vWordOf (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) false).reverse 0) := by
+  have hl : (vWordOf (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) false).reverse.getLast? = some Letter.p := by
+    rw [List.getLast?_reverse]; exact GlueStringDecomp.vp_head _
+  have ht := vRev_last _ _ hl 0
+  rw [StdCornerAnchors.stdAnchorY_odd] at ht
+  simp only [letterZTile] at ht
+  rcases mid_points S hone pO pE j k false P hP x hx with ⟨h, -⟩ | ⟨u, hu, rfl⟩
+  · exact absurd h (by decide)
+  · rw [z_add, pos_O_O_minus]
+    simp only [tileShape, List.mem_cons, List.not_mem_nil, or_false] at hu
+    rcases hu with rfl | rfl | rfl | rfl | rfl | rfl
+    · exact mem_of_tile ht (1, 1) (by simp [tileShape]) _ (by pt_eq)
+    · exact mem_of_tile ht (0, 1) (by simp [tileShape]) _ (by pt_eq)
+    · exact mem_of_tile ht (1, 2) (by simp [tileShape]) _ (by pt_eq)
+    · exact mem_of_tile ht (0, 2) (by simp [tileShape]) _ (by pt_eq)
+    · exact mem_of_tile ht (0, 0) (by simp [tileShape]) _ (by pt_eq)
+    · exact absurd rfl htip
+
+/-! ### Assembling `SpecialCells` -/
+
+open FLatticePaper.Tiles.JointFamily (JointData JSlice below EvenLDefined OddLDefined stripTrailing trailingCount paperLSides
+  printedEvenSides)
+open FLatticePaper.Tiles.JointRot (OnSides SpecialCells)
+
+theorem special_form (d e : Digit) (w : Word) (hsp : stripTrailing d w ≠ [] ∧ ∀ x ∈ stripTrailing d w, x = e) :
+    ∃ j k : ℕ, w = List.replicate (j + 1) e ++ List.replicate k d := by
+  have hw := JointRot.strip_append_replicate d w
+  have hrep : stripTrailing d w = List.replicate (stripTrailing d w).length e := List.eq_replicate_iff.mpr ⟨rfl, hsp.2⟩
+  obtain ⟨j, hj⟩ : ∃ j, (stripTrailing d w).length = j + 1 :=
+    ⟨(stripTrailing d w).length - 1, by have := List.length_pos_of_ne_nil hsp.1; omega⟩
+  refine ⟨j, trailingCount d w, ?_⟩
+  rw [hj] at hrep
+  rw [← hrep]
+  exact hw.symm
+
+/-- What `SpecialCells` needs beyond the cells of the middle pieces: the correspondence of the exceptional points of the first
+heads, and, for a point of a middle piece of the odd kind whose image is off the kept sides (the tip in the short case), a head of
+the rotated correction through it with a point on both kept sides. -/
+def SpecialRest (D : JointData) (f : Word → JSlice) (n : ℕ) : Prop :=
+  ∀ w : Word, w.length = n →
+    (EvenLDefined w → (stripTrailing Digit.three w ≠ [] ∧ ∀ d ∈ stripTrailing Digit.three w, d = Digit.two) →
+      ∀ plus : Bool,
+      let g := below f w
+      let c := texV1Even ((parentsAt w).current .even) - ((0 : ℤ), (1 : ℤ))
+      let s := plus != W1Odd w
+      ∀ x ∈ (oHead D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).aOdd) (fun u => (g u).aEven)
+          (swapW w) s 0).placed,
+        x ∉ (oHead D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).aOdd) (fun u => (g u).aEven)
+          (swapW w) s 0).exc →
+        Farey.mulI x + c ∉ (eHead D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).aOdd)
+          (fun u => (g u).aEven) w plus 0).exc) ∧
+    (OddLDefined w → (stripTrailing Digit.two w ≠ [] ∧ ∀ d ∈ stripTrailing Digit.two w, d = Digit.three) →
+      ∀ plus elong : Bool,
+      let g := below f w
+      let c := texV1Odd ((parentsAt w).current .odd) - ((0 : ℤ), (1 : ℤ))
+      let s := plus == W1Odd w
+      let Rs := hWordOf (swapW w) true
+      let Rv := vWordOf (swapW w) true
+      let sR := D.lSides false (W1Odd (swapW w)) s elong
+      let sO := D.lSides true (W1Odd w) plus elong
+      (∀ B ∈ eMid D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (swapW w) s, ∀ x ∈ B.placed, x ∉ B.exc →
+        ¬ OnSides (hWordOf w false) (vWordOf w false) sO (Farey.mulI x + c) →
+        ∃ r ∈ (List.range (2 * (trailingCount Digit.two w + 1) - (if elong then 0 else 1))).map
+            (eHead D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).aOdd) (fun u => (g u).aEven)
+              (swapW w) s),
+          x ∈ r.placed ∧ x ∉ r.exc ∧ ∃ y ∈ r.placed, y ∉ r.exc ∧
+            OnSides Rs Rv sR y ∧ OnSides (hWordOf w false) (vWordOf w false) sO (Farey.mulI y + c)) ∧
+      (∀ x ∈ (eHead D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).aOdd) (fun u => (g u).aEven)
+          (swapW w) s 0).placed,
+        x ∉ (eHead D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).aOdd) (fun u => (g u).aEven)
+          (swapW w) s 0).exc →
+        Farey.mulI x + c ∉ (oHead D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).aOdd)
+          (fun u => (g u).aEven) w plus 0).exc))
+
+/-- **`SpecialCells` for the paper data**, given `SpecialRest`: the cells of the middle pieces lie on the kept sides (the cell
+lemmas above). -/
+theorem specialCells_of (D : JointData) (hz : D.S.zeroO.dom = zeroTile) (hone : D.S.oneO.dom = oneTile)
+    (hlS : D.lSides = paperLSides) (f : Word → JSlice) (n : ℕ) (hrest : SpecialRest D f n) : SpecialCells D f n := by
+  intro w hw
+  refine ⟨fun hdef hsp plus elong => ?_, fun hdef hsp plus elong => ?_⟩
+  · have hexc := (hrest w hw).1 hdef hsp plus
+    obtain ⟨j, k, rfl⟩ := special_form Digit.three Digit.two w hsp
+    have hW := W1Odd_special (j + 1) k Digit.two Digit.three (by decide) (by decide)
+    have hW' := W1Odd_special (j + 1) k Digit.three Digit.two (by decide) (by decide)
+    have hsw := swap_twos_threes (j + 1) k
+    simp only [hW, hW', hsw, hlS, Bool.bne_false] at hexc ⊢
+    refine ⟨fun x hx => ⟨?_, ?_⟩, hexc⟩
+    · cases plus
+      · exact ⟨.vPlus, by cases elong <;> simp [paperLSides], cells_E_R_minus _ hz _ _ j k x hx⟩
+      · exact ⟨.vMinus, by cases elong <;> simp [paperLSides], cells_E_R_plus _ hz _ _ j k x hx⟩
+    · cases plus
+      · exact ⟨.hMinus, by cases elong <;> simp [paperLSides, printedEvenSides], cells_E_O_minus _ hz _ _ j k x hx⟩
+      · exact ⟨.hPlus, by cases elong <;> simp [paperLSides, printedEvenSides], cells_E_O_plus _ hz _ _ j k x hx⟩
+  · have hr := (hrest w hw).2 hdef hsp plus elong
+    obtain ⟨j, k, rfl⟩ := special_form Digit.two Digit.three w hsp
+    have hW := W1Odd_special (j + 1) k Digit.three Digit.two (by decide) (by decide)
+    have hW' := W1Odd_special (j + 1) k Digit.two Digit.three (by decide) (by decide)
+    have hsw := swap_threes_twos (j + 1) k
+    simp only [hW, hW', hsw, hlS, beq_false] at hr ⊢
+    obtain ⟨htip, hexc⟩ := hr
+    refine ⟨fun B hB x hx hxe => ?_, hexc⟩
+    by_cases hon : OnSides (hWordOf (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) false)
+      (vWordOf (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two) false)
+      (paperLSides true false plus elong)
+      (Farey.mulI x + (texV1Odd ((parentsAt (List.replicate (j + 1) Digit.three ++ List.replicate k Digit.two)).current .odd) -
+        ((0 : ℤ), (1 : ℤ))))
+    · refine Or.inl ⟨?_, hon⟩
+      cases plus
+      · exact ⟨.hPlus, by cases elong <;> simp [paperLSides, printedEvenSides], cells_O_R_plus _ hone _ _ j k B hB x hx⟩
+      · exact ⟨.hMinus, by cases elong <;> simp [paperLSides, printedEvenSides], cells_O_R_minus _ hone _ _ j k B hB x hx⟩
+    · exact Or.inr (htip B hB x hx hxe hon)
 
 end FLatticePaper.Tiles.SpecialCells
