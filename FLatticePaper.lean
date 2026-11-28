@@ -1315,5 +1315,6 @@ import FLatticePaper.Tiles.JointRot
 import FLatticePaper.Tiles.AltItem3
 import FLatticePaper.Tiles.BaseTileProps
 import FLatticePaper.Tiles.BaseWeakDomains
+import FLatticePaper.Tiles.BaseWeakLattice
 
 /-! Root import for the corrected F-lattice paper. -/
