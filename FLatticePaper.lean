@@ -1417,5 +1417,6 @@ import FLatticePaper.Tiles.BaseHmOddFull
 import FLatticePaper.Tiles.BaseWalkSums
 import FLatticePaper.Tiles.BaseInsideAlong
 import FLatticePaper.Tiles.BaseInsideTile
+import FLatticePaper.Tiles.BaseRespectsAnchoredOdd
 
 /-! Root import for the corrected F-lattice paper. -/
