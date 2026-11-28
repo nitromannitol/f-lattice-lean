@@ -1313,6 +1313,7 @@ import FLatticePaper.Tiles.BaseVertOdo
 import FLatticePaper.Tiles.BaseVertOdoFamily
 import FLatticePaper.Tiles.BaseVertVp
 import FLatticePaper.Tiles.BaseTwoOdd
+import FLatticePaper.Tiles.BaseThreeEven
 import FLatticePaper.Tiles.RespectsTransfer
 import FLatticePaper.Tiles.JointInduction
 import FLatticePaper.Tiles.JointGlue
