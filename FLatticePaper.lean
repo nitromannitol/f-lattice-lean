@@ -1355,6 +1355,7 @@ import FLatticePaper.Tiles.BaseRespectsHorizontal
 import FLatticePaper.Tiles.BaseHpLadder
 import FLatticePaper.Tiles.BaseHpStair
 import FLatticePaper.Tiles.BaseHpNear
+import FLatticePaper.Tiles.BaseHmOdd
 import FLatticePaper.Tiles.BaseHpNearEven
 import FLatticePaper.Tiles.StackedEvenColumns
 import FLatticePaper.Tiles.StackedBaseOrder
