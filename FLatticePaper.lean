@@ -423,6 +423,8 @@ import FLatticePaper.Tiles.ClosedPathContacts
 import FLatticePaper.Tiles.ClosedPathAssembly
 import FLatticePaper.Tiles.MixedCompatBase
 import FLatticePaper.Tiles.MixedCompatStair
+import FLatticePaper.Tiles.MixedCompatNear
+import FLatticePaper.Tiles.MixedCompatBaseStep
 import FLatticePaper.Tiles.ClosedPathStandard
 import FLatticePaper.Tiles.ClosedPathExcluded
 import FLatticePaper.Tiles.ClosedPathDiagonal
@@ -1303,6 +1305,7 @@ import FLatticePaper.Tiles.WeakStepAssembly
 import FLatticePaper.Tiles.LStepAssembly
 import FLatticePaper.Tiles.LSidesEven
 import FLatticePaper.Tiles.TileCompatInputs
+import FLatticePaper.Tiles.AltParentBase
 import FLatticePaper.Tiles.SurgicalOdometerStep
 import FLatticePaper.Tiles.SurgicalCorners
 import FLatticePaper.Tiles.SurgicalAffineChain
