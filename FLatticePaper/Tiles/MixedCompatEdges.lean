@@ -131,13 +131,17 @@ private theorem h0_flip (x : GInt) : h0 (((1, -1) : GInt) - x) = h0 x := by
   unfold h0
   nlinarith only [h, h']
 
+/-- Four sides obtained from two sets of bottom points by the half turn and the quarter turn. -/
+def onSide (S SR : GInt → Prop) (X Y : GInt) (s : Side) (z : GInt) : Prop :=
+  match s with
+  | .hPlus => S z
+  | .hMinus => S (X + Y + ((1,-1) : GInt) - z)
+  | .vPlus => ∃ y, SR y ∧ z = mulI y + (X - (0,1))
+  | .vMinus => ∃ y, SR y ∧ X + Y + ((1,-1) : GInt) - z = mulI y + (X - (0,1))
+
 /-- The four boundary walks, with the right walk obtained by turning the bottom walk of the rotated tile. -/
 def edge (w wr : BinaryWord) (X Y : GInt) (s : Side) (z : GInt) : Prop :=
-  match s with
-  | .hPlus => z ∈ F2Word.walk 0 (gH w)
-  | .hMinus => X + Y + ((1,-1) : GInt) - z ∈ F2Word.walk 0 (gH w)
-  | .vPlus => ∃ y ∈ F2Word.walk 0 (gH wr), z = mulI y + (X - (0,1))
-  | .vMinus => ∃ y ∈ F2Word.walk 0 (gH wr), X + Y + ((1,-1) : GInt) - z = mulI y + (X - (0,1))
+  onSide (fun y => y ∈ F2Word.walk 0 (gH w)) (fun y => y ∈ F2Word.walk 0 (gH wr)) X Y s z
 
 /-- The function to subtract from the odometer on each walk. -/
 def edgeHeight (X a : GInt) (s : Side) (z : GInt) : ℤ :=
@@ -147,19 +151,14 @@ def edgeHeight (X a : GInt) (s : Side) (z : GInt) : ℤ :=
   | .vPlus => -h0 (z-X)
   | .vMinus => -h0 z
 
-/-- The normalized height on each entire walk of a standard parent. -/
-theorem four_edges (o oR : PartialOdometer) (w v wr vr : BinaryWord) (X : GInt) (n d : ℤ)
-    (hh : w.head? = some .q) (ht : w.getLast? = some .p)
-    (hhr : wr.head? = some .q) (htr : wr.getLast? = some .p)
-    (ho : RespectsAnchored o.dom w v o.val) (hor : RespectsAnchored oR.dom wr vr oR.val)
-    (hz : JointRot.SlopeZero o) (hzr : JointRot.SlopeZero oR)
+/-- Transport constant bottom heights on two sets of sites to their four sides. -/
+theorem four_traces (o oR : PartialOdometer) (S SR : GInt → Prop) (X : GInt) (n d β βr : ℤ)
+    (hβ : FirstTileNormal o 0 β) (hβr : FirstTileNormal oR 0 βr)
+    (bot : ∀ z, S z → o.val z = β) (botR : ∀ z, SR z → oR.val z = βr)
+    (inside : ∀ z, SR z → z ∈ oR.dom)
     (hf : TileHalfTurn o X (n-d,n+d) (n,-d)) (hr : TileRotation o oR X) (s : Side) :
-    ∃ k : ℤ, ∀ z ∈ o.dom, edge w wr X (n-d,n+d) s z →
+    ∃ k : ℤ, ∀ z ∈ o.dom, onSide S SR X (n-d,n+d) s z →
       o.val z - edgeHeight X (n,-d) s z = k := by
-  obtain ⟨β, hβ⟩ := hz
-  obtain ⟨βr, hβr⟩ := hzr
-  have bot := bottom o w hh ht ho.2.1 β hβ
-  have botR := bottom oR wr hhr htr hor.2.1 βr hβr
   obtain ⟨α, β₀, hN, flip⟩ := hf
   obtain ⟨rfl, -⟩ := WeakStepAssembly.normal_unique o α 0 β₀ β hN hβ
   let Y : GInt := (n-d,n+d)
@@ -170,13 +169,9 @@ theorem four_edges (o oR : PartialOdometer) (w v wr vr : BinaryWord) (X : GInt) 
     have H := (flip z hd).2
     simpa [D, Y, a, normed, dotS, mul_sub] using H
   obtain ⟨K, R⟩ := JointRot.rawRot_of_tileRotation_slopes o oR X hr ⟨β,hβ⟩ ⟨βr,hβr⟩
-  have right (z : GInt) (he : edge w wr X Y .vPlus z) : o.val z + h0 (z-X) = βr-K := by
+  have right (z : GInt) (he : onSide S SR X Y .vPlus z) : o.val z + h0 (z-X) = βr-K := by
     obtain ⟨y, hy, rfl⟩ := he
-    obtain ⟨t, ht', hmem, -⟩ := walk_zero wr htr y hy
-    have hyD : y ∈ oR.dom := by
-      have h := WeakStepPaper.side_inside oR.dom wr vr oR.val hor .hPlus t ht' (y-t.2) hmem
-      simpa using h
-    have hv := (R y hyD).2
+    have hv := (R y (inside y hy)).2
     have e : mulI y + (X - (0, 1)) - X = mulI y - (0, 1) := by abel
     rw [e, h0_rot]
     simp [dotS] at hv
@@ -192,7 +187,7 @@ theorem four_edges (o oR : PartialOdometer) (w v wr vr : BinaryWord) (X : GInt) 
     linarith
   -- Comparing any two sites avoids dividing the half-turn constant.
   classical
-  by_cases h : ∃ z ∈ o.dom, edge w wr X Y s z
+  by_cases h : ∃ z ∈ o.dom, onSide S SR X Y s z
   · obtain ⟨z₀, h₀, e₀⟩ := h
     refine ⟨o.val z₀ - edgeHeight X a s z₀, fun z hD he => ?_⟩
     cases s with
@@ -209,5 +204,23 @@ theorem four_edges (o oR : PartialOdometer) (w v wr vr : BinaryWord) (X : GInt) 
       change o.val z - -h0 z = o.val z₀ - -h0 z₀
       linarith only [F z hD, F z₀ h₀, right (D-z) he, right (D-z₀) e₀, shift z, shift z₀]
   · exact ⟨0, fun z hd he => (h ⟨z,hd,he⟩).elim⟩
+
+/-- The normalized height on each entire walk of a standard parent. -/
+theorem four_edges (o oR : PartialOdometer) (w v wr vr : BinaryWord) (X : GInt) (n d : ℤ)
+    (hh : w.head? = some .q) (ht : w.getLast? = some .p)
+    (hhr : wr.head? = some .q) (htr : wr.getLast? = some .p)
+    (ho : RespectsAnchored o.dom w v o.val) (hor : RespectsAnchored oR.dom wr vr oR.val)
+    (hz : JointRot.SlopeZero o) (hzr : JointRot.SlopeZero oR)
+    (hf : TileHalfTurn o X (n-d,n+d) (n,-d)) (hr : TileRotation o oR X) (s : Side) :
+    ∃ k : ℤ, ∀ z ∈ o.dom, edge w wr X (n-d,n+d) s z →
+      o.val z - edgeHeight X (n,-d) s z = k := by
+  obtain ⟨β,hβ⟩ := hz
+  obtain ⟨βr,hβr⟩ := hzr
+  apply four_traces o oR _ _ X n d β βr hβ hβr
+    (bottom o w hh ht ho.2.1 β hβ) (bottom oR wr hhr htr hor.2.1 βr hβr) _ hf hr s
+  intro y hy
+  obtain ⟨t, ht', hmem, -⟩ := walk_zero wr htr y hy
+  have h := WeakStepPaper.side_inside oR.dom wr vr oR.val hor .hPlus t ht' (y-t.2) hmem
+  simpa using h
 
 end FLatticePaper.Tiles.MixedCompatEdges

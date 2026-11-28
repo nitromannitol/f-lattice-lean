@@ -427,6 +427,9 @@ import FLatticePaper.Tiles.MixedCompatNear
 import FLatticePaper.Tiles.MixedCompatBaseStep
 import FLatticePaper.Tiles.MixedCompatEdges
 import FLatticePaper.Tiles.MixedCompatWalks
+import FLatticePaper.Tiles.MixedStringGrade
+import FLatticePaper.Tiles.MixedGradeValues
+import FLatticePaper.Tiles.MixedCompatGeneral
 import FLatticePaper.Tiles.MixedCompatFirstStep
 import FLatticePaper.Tiles.ClosedPathStandard
 import FLatticePaper.Tiles.ClosedPathExcluded

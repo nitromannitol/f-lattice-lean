@@ -11,7 +11,8 @@ open FLatticePaper FLatticePaper.Farey FLatticePaper.Construction FLatticePaper.
 open StandardClause Standard SurgicalWeak SiteStrings JointFamily JointInduction MixedCompatEdges
 open ClosedPathAssembly ClosedPathCycle ClosedPathSum ChildGlue MixedPieces MixedOverlapStrings
 
-private def opposite : Side → Side
+/-- The facing side of the other parent. -/
+def opposite : Side → Side
   | .hPlus => .hMinus
   | .hMinus => .hPlus
   | .vPlus => .vMinus
@@ -180,9 +181,14 @@ private theorem parent_traces (D : JointData) (f : Word → JSlice) (w u v : Wor
       (res v hv).2 (res (swapW v) hrv).1 (sl v hv).2.1 (sl (swapW v) hrv).1
       (hg v hv).2.2.1.2.2.2.1 (hg v hv).2.2.2.1.2.1 side
 
-private theorem pair (w u v : Word) (P Q : PartialOdometer) (hp : traceOn w u false P) (hq : traceOn w v true Q)
+/-- The affine formula on the chosen sites of each side of an odometer. -/
+def SideTraces (P : PartialOdometer) (X a : Site) (F : Side → Site → Prop) : Prop :=
+  ∀ s, ∃ k : ℤ, ∀ z ∈ P.dom, F s z → P.val z - edgeHeight X a s z = k
+
+private theorem pair (w : Word) (P Q : PartialOdometer) (F G : Side → Site → Prop)
+    (hp : SideTraces P (A w) (ap w) F) (hq : SideTraces Q (U w) (aq w) G)
     (p q s t : Site) (side : Side) (fit : fits (A w) (U w) (ap w) (aq w) p q s t side) :
-    ∃ C : ℤ, ∀ z, z-p ∈ P.dom → z-q ∈ Q.dom → parentWalkPair w u v p q side z →
+    ∃ C : ℤ, ∀ z, z-p ∈ P.dom → z-q ∈ Q.dom → F side (z-p) ∧ G (opposite side) (z-q) →
       P.val (z-p) + dotS s z - (Q.val (z-q) + dotS t z) = C := by
   obtain ⟨C, hC⟩ := height_difference _ _ _ _ _ _ _ _ _ fit
   obtain ⟨K, hK⟩ := hp side
@@ -194,14 +200,21 @@ private theorem pair (w u v : Word) (P Q : PartialOdometer) (hp : traceOn w u fa
   change Q.val (z-q) - edgeHeight (U w) (aq w) (opposite side) (z-q) = L at eQ
   linarith only [eP,eQ,hC z]
 
-/-- Compare the two actual tile odometers on the mixed marks at a given child. -/
-theorem mixed_of_walks (D : JointData) (f : Word → JSlice) (w u v : Word)
-    (hS : D.S = WeakStepPaper.paperS) (hA : D.altBase = SurgicalAlt.PaperAltBaseCond)
-    (hg : GoodBelow D f w.length) (hr : regsAt w = (some u, some v)) (walks : OnParentWalks w u v) :
+/-- The common marks lie in the chosen side sets of their two parents. -/
+def OnParentSides (w u v : Word) (F G : Side → Site → Prop) : Prop :=
+  (∀ (i : Fin 2) (j : Fin 4) (z : Site), z ∈ mOdd w u v i → z ∈ mOdd w u v (j+2 : ℕ) →
+    F (sideO w i j) (z-(oddP w).getD i 0) ∧ G (opposite (sideO w i j)) (z-(oddQ w).getD j 0)) ∧
+  (∀ (i : Fin 4) (j : Fin 2) (z : Site), z ∈ mEven w u v i → z ∈ mEven w u v (j+4 : ℕ) →
+    F (sideE w i j) (z-(evenP w).getD i 0) ∧ G (opposite (sideE w i j)) (z-(evenQ w).getD j 0))
+
+/-- Mixed compatibility from two normalized side traces and the locations of the common sites. -/
+theorem mixed_of_traces (D : JointData) (f : Word → JSlice) (w u v : Word)
+    (hS : D.S = WeakStepPaper.paperS) (hg : GoodBelow D f w.length) (hr : regsAt w = (some u, some v))
+    (F G : Side → Site → Prop) (tP : SideTraces (f u).tOdd (A w) (ap w) F)
+    (tQ : SideTraces (f v).tEven (U w) (aq w) G) (sides : OnParentSides w u v F G) :
     MixedCompatOdd w u v (placedOdd w (f u).tOdd.val (f v).tEven.val 0) ∧
     MixedCompatEven w u v (placedEven w (f u).tOdd.val (f v).tEven.val 0) := by
-  obtain ⟨gO,gE⟩ := walks
-  obtain ⟨tP,tQ⟩ := parent_traces D f w u v hS hA hg hr
+  obtain ⟨gO,gE⟩ := sides
   have ru : (regsAt w).1 = some u := by rw [hr]
   have rv : (regsAt w).2 = some v := by rw [hr]
   have hP := (WeakStepAssembly.regsAt_parents w).1 u ru
@@ -216,7 +229,7 @@ theorem mixed_of_walks (D : JointData) (f : Word → JSlice) (w u v : Word)
     let J : Fin 4 := ⟨j-2,by omega⟩
     have ej : (J : ℕ)+2 = j := Nat.sub_add_cancel hj
     rcases odd_table w u v hP hQ I J with fit | ex
-    · obtain ⟨K,hK⟩ := pair w u v _ _ tP tQ _ _ _ _ _ fit
+    · obtain ⟨K,hK⟩ := pair w _ _ F G tP tQ _ _ _ _ _ fit
       refine ⟨K, fun z hz hz' => ?_⟩
       have hm := gO I J z hz (ej.symm ▸ hz')
       have p := mOdd_sub w u v i hz
@@ -231,7 +244,7 @@ theorem mixed_of_walks (D : JointData) (f : Word → JSlice) (w u v : Word)
     let J : Fin 2 := ⟨j-4,by omega⟩
     have ej : (J : ℕ)+4 = j := Nat.sub_add_cancel hj
     rcases even_table w u v hP hQ I J with fit | ex
-    · obtain ⟨K,hK⟩ := pair w u v _ _ tP tQ _ _ _ _ _ fit
+    · obtain ⟨K,hK⟩ := pair w _ _ F G tP tQ _ _ _ _ _ fit
       refine ⟨K, fun z hz hz' => ?_⟩
       have hm := gE I J z hz (ej.symm ▸ hz')
       have p := mEven_sub w u v i hz
@@ -241,6 +254,15 @@ theorem mixed_of_walks (D : JointData) (f : Word → JSlice) (w u v : Word)
       rw [ej] at h
       simpa only [placedEven, if_pos hi, if_neg (by omega : ¬ j < 4), Pi.zero_apply, add_zero, I, J, dot2, dotS] using h
     · exact ⟨0, fun z hz hz' => (ex z (mEven_sub _ _ _ _ hz) (ej.symm ▸ mEven_sub _ _ _ _ hz')).elim⟩
+
+/-- Compare the two actual tile odometers on the mixed marks at a given child. -/
+theorem mixed_of_walks (D : JointData) (f : Word → JSlice) (w u v : Word)
+    (hS : D.S = WeakStepPaper.paperS) (hA : D.altBase = SurgicalAlt.PaperAltBaseCond)
+    (hg : GoodBelow D f w.length) (hr : regsAt w = (some u, some v)) (walks : OnParentWalks w u v) :
+    MixedCompatOdd w u v (placedOdd w (f u).tOdd.val (f v).tEven.val 0) ∧
+    MixedCompatEven w u v (placedEven w (f u).tOdd.val (f v).tEven.val 0) := by
+  obtain ⟨tP,tQ⟩ := parent_traces D f w u v hS hA hg hr
+  exact mixed_of_traces D f w u v hS hg hr _ _ tP tQ walks
 
 /-- The exact local input of the standard step, from the location of the common vertices on the
 parent walks at non-base prefixes. Base prefixes include their exceptional end vertices. -/
