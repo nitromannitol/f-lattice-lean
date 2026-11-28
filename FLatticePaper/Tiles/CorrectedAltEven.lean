@@ -4,6 +4,8 @@ import FLatticePaper.Tiles.AltSixEvenOF
 import FLatticePaper.Tiles.AltSevenFamilyC
 import FLatticePaper.Tiles.AltLSides
 import FLatticePaper.Tiles.TileHalfTurnLRot
+import FLatticePaper.Tiles.OddPtVMinus
+import FLatticePaper.Tiles.EvenMidVMinus
 
 open FLatticePaper.Farey FLatticePaper.Construction FLatticePaper.Tiles FLatticePaper.Tiles.JointFamily
 open FLatticePaper.Tiles.JointInduction (GoodBelow)
@@ -24,12 +26,15 @@ constant of the copy it replaces minus its own constant on its kept sides (`LSid
 constants:
 * the four mixed pairs of full copies agree at every common point (their common points lie in the marks, item (5));
 * each L-correction agrees with its doubled partner and with the mixed copy next to it at one point of its kept sides: corners of
-  the standard tile, and for the doubled partner of `L^+` the point `V - B + (1, -1)` of the left side of `T(q_1)` (`hy`).
+  the standard tile, and for the doubled partners the points of the vertical sides of `T(q_1)` found by w3: `V - B + (1, -1)` for
+  `W_1` odd (`OddPtVMinus.pt_vMinus_odd`), the midpoint `m = (B + V + (1, -1)) / 2` of the doubled pair and its half-turn image
+  `D - m` for `W_1` even (`EvenMidVMinus.mid_vMinus`, and `hmp`);
 * the two L-corrections have the constant `κ 3 - κ 0` on their overlap: the cross half-turn of `L^+` and `L^-` about the centre of
   `T(q_1)` (`TileHalfTurnInput.crossEven`), with its two constants read at the corners `0` and `D` of the kept sides, gives the
   overlap constant through `CorrectedWalkZero.off_of_halfTurn` (the text's `c = -c`).
 These are the six interfaces along the boundary of the decomposition in Cases 2 and 4 of the text, and the interface of the two
-L-corrections; the two interfaces of an L-correction with the copy opposite to it are treated separately. Orientation `W_1` odd. -/
+L-corrections; the two interfaces of an L-correction with the copy opposite to it are treated separately. Both orientations:
+`aEP_boundary_of` (`W_1` odd) and `aEP_boundary_ef` (`W_1` even). -/
 
 namespace FLatticePaper.Tiles.CorrectedAltEven
 
@@ -132,8 +137,7 @@ theorem aEP_boundary_of (D : JointData) (hS : D.S = WeakStepPaper.paperS) (hA : 
     (hlS : D.lSides = paperLSides) (f : Word → JSlice) (w : Word) (hG : GoodBelow D f w.length) (hb : ¬ IsBase w)
     (h3 : w.getLast? = some Digit.three) (hph : phase w = 1)
     (hk : ∃ k : ℤ, ∀ x, x ∈ tEvenSet w.dropLast → x + shiftQ w ∈ tEvenSet w.dropLast →
-      (f w.dropLast).tEven.val (x + shiftQ w) - (f w.dropLast).tEven.val x - ClosedPathSum.dot2 (affS w) x = k)
-    (hy : texV2 (parentsAt w).even - texV2 (parentsAt w).odd + ((1 : ℤ), (-1 : ℤ)) ∈ evenTile w.dropLast) :
+      (f w.dropLast).tEven.val (x + shiftQ w) - (f w.dropLast).tEven.val x - ClosedPathSum.dot2 (affS w) x = k) :
     ∃ κ : ℕ → ℤ, CorrectedWalkZero.AgreeAll (aEP D f w) κ 1 4 ∧ CorrectedWalkZero.AgreeAll (aEP D f w) κ 1 5 ∧
       CorrectedWalkZero.AgreeAll (aEP D f w) κ 2 4 ∧ CorrectedWalkZero.AgreeAll (aEP D f w) κ 2 5 ∧
       CorrectedWalkZero.EdgeWitness (aEP D f w) κ 0 1 ∧ CorrectedWalkZero.EdgeWitness (aEP D f w) κ 0 4 ∧
@@ -191,6 +195,12 @@ theorem aEP_boundary_of (D : JointData) (hS : D.S = WeakStepPaper.paperS) (hA : 
   have k0v := hc0 .vPlus (by simp [paperLSides, printedEvenSides, hWd])
   have k3h := hc3 .hMinus (by simp [paperLSides, printedEvenSides, hWd])
   have k3v := hc3 .vMinus (by simp [paperLSides, printedEvenSides, hWd])
+  -- the point `V - B + (1, -1)` of the left side (`OddPtVMinus.pt_vMinus_odd`), a kept side of `L^-`, hence in `T(q_1)`
+  have hy : texV2 (parentsAt w).even - texV2 (parentsAt w).odd + ((1 : ℤ), (-1 : ℤ)) ∈ evenTile w.dropLast := by
+    have h := OddPtVMinus.pt_vMinus_odd w.dropLast (by rw [← hw]; exact hb)
+      (by rw [← hw]; exact StdPairCompatPaper.w1Odd_of hph)
+    rw [← hw] at h
+    rw [← hdE]; exact (k3v _ h).2.1
   have esc := ConnectedAltL.even_side_corners w.dropLast
   have esm := AltLSides.even_side_more w.dropLast
   rw [← hw] at esc esm
@@ -326,5 +336,229 @@ theorem aEP_boundary_of (D : JointData) (hS : D.S = WeakStepPaper.paperS) (hA : 
       TileHalfTurnStd.aF, offsetA, dotS, texV1Odd, texV1Even, texV2, Prod.fst_add, Prod.snd_add, Prod.fst_sub,
       Prod.snd_sub, Prod.fst_zero, Prod.snd_zero, hcur]
     linear_combination pK' - pK
+
+set_option maxHeartbeats 400000 in
+/-- **The boundary of the corrected even alternate decomposition, and the overlap of its two L-corrections, `W_1` even.** The
+doubled partner of `L^-` is read at the half-turn image `D - m` of the midpoint `m` on the right side (`hmp`). -/
+theorem aEP_boundary_ef (D : JointData) (hS : D.S = WeakStepPaper.paperS) (hA : D.altBase = SurgicalAlt.PaperAltBaseCond)
+    (hlS : D.lSides = paperLSides) (f : Word → JSlice) (w : Word) (hG : GoodBelow D f w.length) (hb : ¬ IsBase w)
+    (h3 : w.getLast? = some Digit.three) (hph : phase w ≠ 1)
+    (hk : ∃ k : ℤ, ∀ x, x ∈ tEvenSet w.dropLast → x + shiftQ w ∈ tEvenSet w.dropLast →
+      (f w.dropLast).tEven.val (x + shiftQ w) - (f w.dropLast).tEven.val x - ClosedPathSum.dot2 (affS w) x = k)
+    (hmp : ∀ m : ℤ × ℤ, (2 : ℤ) • m = texV2 (parentsAt w).odd + texV2 (parentsAt w).even + ((1 : ℤ), (-1 : ℤ)) →
+      texV1Even (parentsAt w).even + texV2 (parentsAt w).even + ((1 : ℤ), (-1 : ℤ)) - m ∈
+        placedSites (sideString (hWordOf w.dropLast true) (vWordOf w.dropLast true) 0 .vPlus)) :
+    ∃ κ : ℕ → ℤ, CorrectedWalkZero.AgreeAll (aEP D f w) κ 1 4 ∧ CorrectedWalkZero.AgreeAll (aEP D f w) κ 1 5 ∧
+      CorrectedWalkZero.AgreeAll (aEP D f w) κ 2 4 ∧ CorrectedWalkZero.AgreeAll (aEP D f w) κ 2 5 ∧
+      CorrectedWalkZero.EdgeWitness (aEP D f w) κ 0 1 ∧ CorrectedWalkZero.EdgeWitness (aEP D f w) κ 0 4 ∧
+      CorrectedWalkZero.EdgeWitness (aEP D f w) κ 3 2 ∧ CorrectedWalkZero.EdgeWitness (aEP D f w) κ 3 5 ∧
+      ∀ off, CorrectedWalkZero.OffMatch (aEP D f w) off → ∀ (hi : 0 < (aEP D f w).length) (hj : 3 < (aEP D f w).length),
+        (∃ x ∈ ((aEP D f w).get ⟨0, hi⟩).placed, x ∈ ((aEP D f w).get ⟨3, hj⟩).placed ∧
+          x ∉ ((aEP D f w).get ⟨0, hi⟩).exc ∧ x ∉ ((aEP D f w).get ⟨3, hj⟩).exc) → off ⟨0, hi⟩ ⟨3, hj⟩ = κ 3 - κ 0 := by
+  obtain ⟨u1, u2, hr, hl1, hl2, hdO, hdE, hU1, hU2, hT1, hT2⟩ := StdPairCompatPaper.regs_data D hS f w hG hb
+  have hw : w = w.dropLast ++ [Digit.three] := by
+    have := List.dropLast_append_getLast? (l := w) (a := Digit.three) h3
+    exact this.symm
+  have hu2 : u2 = w.dropLast := by
+    have e := ConnectedAltL.regs_pre_snd w.dropLast Digit.three (by decide)
+    rw [← hw, hr] at e
+    exact Option.some.inj e
+  subst hu2
+  obtain ⟨g1, g2, g4, g5, hlen⟩ := StdPairCompatPaper.aEP_get D f w u1 w.dropLast hr hl1 hl2 h3
+  obtain ⟨g0, g3⟩ := aEP_getL D f w hl2 h3
+  have hp := (WeakStepAssembly.regsAt_parents w).1 u1 (by rw [hr])
+  have hq := (WeakStepAssembly.regsAt_parents w).2 w.dropLast (by rw [hr])
+  obtain ⟨βP, hdP, hcP, hhP⟩ := AltSevenFamily.regOdd_data D hS hA f _ hG u1 hl1
+  obtain ⟨βQ, hdQ, hcQ, hhQ⟩ := AltSevenFamily.regEven_data D hS hA f _ hG w.dropLast hl2
+  rw [← hp] at hcP hhP
+  rw [← hq] at hcQ hhQ
+  rw [hdQ] at hhQ
+  have hcompat := (MixedCompatGeneral.alt_mixed D hS hA f w u1 w.dropLast hG hb hr 0).2
+  obtain ⟨hmix, hdbl⟩ := AltSixEven.sixEven_ef w u1 w.dropLast hph hp hq (f u1).tOdd (f w.dropLast).tEven βP βQ hcP hcQ hhQ hk hcompat
+  -- the entries with their offsets in the form of `altEvenD`, `altEvenR`
+  have g0' : (aEP D f w)[0]? = some (stdPiece ((f w.dropLast).lEven true true) ((altEvenD w).getD 0 0) ((altEvenAff w).getD 0 0)) := g0
+  have g3' : (aEP D f w)[3]? = some (stdPiece ((f w.dropLast).lEven false true) ((altEvenD w).getD 3 0) ((altEvenAff w).getD 3 0)) := by
+    rw [g3]; congr 2; exact add_comm _ _
+  have g1' : (aEP D f w)[1]? = some (stdPiece (f w.dropLast).tEven ((altEvenD w).getD 1 0) ((altEvenAff w).getD 1 0)) := by
+    rw [g1]; congr 2; exact add_comm _ _
+  have g2' : (aEP D f w)[2]? = some (stdPiece (f w.dropLast).tEven ((altEvenD w).getD 2 0) ((altEvenAff w).getD 2 0)) := g2
+  have g4' : (aEP D f w)[4]? = some (stdPiece (f u1).tOdd ((altEvenR w).getD (4 - 4) 0) ((altEvenAff w).getD 4 0)) := g4
+  have g5' : (aEP D f w)[5]? = some (stdPiece (f u1).tOdd ((altEvenR w).getD (5 - 4) 0) ((altEvenAff w).getD 5 0)) := g5
+  -- the kept sides of the two L-corrections
+  have hdef : EvenLDefined w.dropLast := JointRot.evenLDefined_of_mem _ (by
+    by_contra hc
+    simp only [not_exists, not_and, not_not] at hc
+    exact hb (Or.inr (Or.inl fun d hd => by
+      rw [hw] at hd; simp only [List.mem_append, List.mem_singleton] at hd
+      rcases hd with hd | rfl; exacts [hc d hd, rfl])))
+  have hJl := (hG w.dropLast hl2).1.2.2.2
+  obtain ⟨-, c0, hc0⟩ := (hJl.2 true true hdef).2
+  obtain ⟨-, c3, hc3⟩ := (hJl.2 false true hdef).2
+  rw [hlS] at hc0 hc3
+  have hWd : W1Odd w.dropLast = false := by
+    have h := hph
+    rw [hw] at h
+    simp only [W1Odd, phase, List.count_append] at h ⊢
+    simp at h ⊢
+    omega
+  have k0h := hc0 .hPlus (by simp [paperLSides, printedEvenSides, hWd])
+  have k0v := hc0 .vMinus (by simp [paperLSides, printedEvenSides, hWd])
+  have k3h := hc3 .hMinus (by simp [paperLSides, printedEvenSides, hWd])
+  have k3v := hc3 .vPlus (by simp [paperLSides, printedEvenSides, hWd])
+  have esc := ConnectedAltL.even_side_corners w.dropLast
+  have esm := AltLSides.even_side_more w.dropLast
+  rw [← hw] at esc esm
+  -- the offsets, `W_1` odd
+  obtain ⟨hD, hR, hAf, hSh⟩ := ClosedPathAlt.altEven_ef w hph
+  have cmE := ClosedPathContacts.corner_marks_even w.dropLast
+  have cmO := ClosedPathContacts.corner_marks_odd u1
+  rw [← hq] at cmE
+  rw [← hp] at cmO
+  have hlD : (altEvenD w).length = 4 := rfl
+  have hlR : (altEvenR w).length = 2 := rfl
+  set κ6 := AltSixEven.kEvenEF (parentsAt w).odd.num (parentsAt w).odd.den (parentsAt w).even.num
+    (parentsAt w).even.den (h0 (texV2 (parentsAt w).odd)) (h0 (texV2 (parentsAt w).even)) βP βQ with hκ6
+  set F := placedAltEven w (f u1).tOdd.val (f w.dropLast).tEven.val κ6 with hF
+  let κ : ℕ → ℤ := fun i => if i = 0 then κ6 0 - c0 else if i = 3 then κ6 3 - c3 else κ6 i
+  have κ0 : κ 0 = κ6 0 - c0 := rfl
+  have κ1 : κ 1 = κ6 1 := rfl
+  have κ2 : κ 2 = κ6 2 := rfl
+  have κ3 : κ 3 = κ6 3 - c3 := rfl
+  have κ4 : κ 4 = κ6 4 := rfl
+  have κ5 : κ 5 = κ6 5 := rfl
+  have mix : ∀ i j, i < 4 → 4 ≤ j → j < 6 → ∀ x, x - (altEvenD w).getD i 0 ∈ evenTile w.dropLast →
+      x - (altEvenR w).getD (j - 4) 0 ∈ oddTile u1 → F i x = F j x := fun i j hi hj4 hj6 x hx hx' => by
+    obtain ⟨m1, m2⟩ := marks_mix w u1 w.dropLast hb hT1 hT2 i j hi hj4 hj6 x hx hx'
+    exact hmix i j (by rw [hlD, hlR]; omega) (by rw [hlD, hlR]; omega)
+      (by simp only [pieceFlag, hlD]; intro h; simp at h; omega) x m1 m2
+  have std_mix : ∀ i j, i < 4 → 4 ≤ j → j < 6 → κ i = κ6 i → κ j = κ6 j →
+      (aEP D f w)[i]? = some (stdPiece (f w.dropLast).tEven ((altEvenD w).getD i 0) ((altEvenAff w).getD i 0)) →
+      (aEP D f w)[j]? = some (stdPiece (f u1).tOdd ((altEvenR w).getD (j - 4) 0) ((altEvenAff w).getD j 0)) →
+      CorrectedWalkZero.AgreeAll (aEP D f w) κ i j := fun i j hi hj4 hj6 ei ej gi gj =>
+    agreeAll_of gi gj F (fun x _ => by rw [ei]; exact pv_lt w (f u1).tOdd _ κ6 i hi x)
+      (fun x _ => by rw [ej]; exact pv_ge w (f u1).tOdd (f w.dropLast).tEven κ6 j (by omega) x)
+      (fun x hx hx' => mix i j hi hj4 hj6 x (by rw [← hdE]; exact JointRot.mem_placed.1 hx)
+        (by rw [← hdO]; exact JointRot.mem_placed.1 hx'))
+  -- corner memberships
+  have dQ0 : (0 : ℤ × ℤ) ∈ evenTile w.dropLast := hdQ ▸ hcQ.1.1
+  have dQD : texV1Even (parentsAt w).even + texV2 (parentsAt w).even + ((1 : ℤ), (-1 : ℤ)) ∈ evenTile w.dropLast :=
+    hdQ ▸ hcQ.2.2.2.2.2.2.1.1
+  have dQX : texV1Even (parentsAt w).even ∈ evenTile w.dropLast := hdQ ▸ hcQ.2.2.2.1.1
+  have dQY : texV2 (parentsAt w).even + ((1 : ℤ), (-1 : ℤ)) ∈ evenTile w.dropLast := hdQ ▸ hcQ.2.2.2.2.2.1.1
+  have dP0 : (0 : ℤ × ℤ) ∈ oddTile u1 := hdP ▸ hcP.1.1
+  have dPD : texV1Odd (parentsAt w).odd + texV2 (parentsAt w).odd + ((1 : ℤ), (-1 : ℤ)) ∈ oddTile u1 :=
+    hdP ▸ hcP.2.2.2.2.2.2.1.1
+  have pt : ∀ (S : Set (ℤ × ℤ)) (a z : ℤ × ℤ), z - a ∈ S → z ∈ SiteInduction.shiftS S a :=
+    fun S a z h => (AltPiecesAgree.mem_shiftS_iff S a z).2 h
+  -- the midpoint `m` of the doubled pair, on the left side
+  have hpar := (parentsAt_valid w).odd_parity
+  have hpe := (parentsAt_valid w).even_parity
+  unfold Fraction.Odd at hpar
+  unfold Fraction.Even at hpe
+  set m : ℤ × ℤ := (((parentsAt w).odd.num - (parentsAt w).odd.den + ((parentsAt w).even.num - (parentsAt w).even.den) + 1) / 2,
+    ((parentsAt w).odd.num + (parentsAt w).odd.den + ((parentsAt w).even.num + (parentsAt w).even.den) - 1) / 2) with hmdef
+  have hm2 : (2 : ℤ) • m = texV2 (parentsAt w).odd + texV2 (parentsAt w).even + ((1 : ℤ), (-1 : ℤ)) := by
+    rw [hmdef]; ext <;> simp [texV2] <;> omega
+  have hmL : m ∈ placedSites (sideString (hWordOf w.dropLast true) (vWordOf w.dropLast true) 0 .vMinus) := by
+    have h := EvenMidVMinus.mid_vMinus w.dropLast (by rw [← hw]; exact hb)
+      (by rw [← hw]; exact StdPairCompatPaper.w1Odd_ef hph) m (by rw [← hw]; exact hm2)
+    exact h
+  have hmR := hmp m hm2
+  have dQm : m ∈ evenTile w.dropLast := by rw [← hdE]; exact (k0v _ hmL).2.1
+  have hDm : texV1Even (parentsAt w).even + texV2 (parentsAt w).even + ((1 : ℤ), (-1 : ℤ)) - m =
+      m - shiftQ w := by
+    rw [hSh]
+    have h2 := hm2
+    ext
+    · have := congrArg Prod.fst h2; simp [texV2, texV1Even] at this ⊢; linarith
+    · have := congrArg Prod.snd h2; simp [texV2, texV1Even] at this ⊢; linarith
+  have dQm' : m - shiftQ w ∈ evenTile w.dropLast := by
+    rw [← hDm]; have h := (hhQ _ dQm).1; exact h
+  refine ⟨κ, std_mix 1 4 (by norm_num) le_rfl (by norm_num) κ1 κ4 g1' g4',
+    std_mix 1 5 (by norm_num) (by norm_num) (by norm_num) κ1 κ5 g1' g5',
+    std_mix 2 4 (by norm_num) le_rfl (by norm_num) κ2 κ4 g2' g4',
+    std_mix 2 5 (by norm_num) (by norm_num) (by norm_num) κ2 κ5 g2' g5', ?_, ?_, ?_, ?_, ?_⟩
+  · -- `(0, 1)`: the midpoint `m` on the left side of `L^+`, inside the doubled partner
+    set x := (altEvenD w).getD 0 0 + m with hx
+    have e0 : x - (altEvenD w).getD 0 0 = m := by rw [hx]; abel
+    have e1 : x - (altEvenD w).getD 1 0 = m - shiftQ w := by
+      rw [hx]; simp only [hD, List.getD_cons_succ, List.getD_cons_zero]; abel
+    have km := k0v _ hmL
+    refine witness_of g0' g1' F x (by rw [e0]; exact km.1) (by rw [e1, hdE]; exact dQm') ?_ ?_ ?_
+    · rw [κ0]; exact pv_L w (f u1).tOdd _ _ κ6 0 (by norm_num) c0 x (by rw [e0]; exact km.2.2)
+    · rw [κ1]; exact pv_lt w (f u1).tOdd _ κ6 1 (by norm_num) x
+    · exact hdbl 0 1 (by rw [hlD, hlR]; omega) (by rw [hlD, hlR]; omega) (by norm_num)
+        (by simp [pieceFlag, hlD]) ⟨rfl, Or.inl rfl⟩ x
+        (by simp only [pieceSet, hlD, if_pos (show 0 < 4 by norm_num)]; exact pt _ _ _ (by rw [e0]; exact dQm))
+        (by simp only [pieceSet, hlD, if_pos (show 1 < 4 by norm_num)]; exact pt _ _ _ (by rw [e1]; exact dQm'))
+  · -- `(0, 4)`: the corner `X` of `L^+` on its bottom side, the corner `0` of the copy of the odd parent
+    set x := (altEvenD w).getD 0 0 + texV1Even (parentsAt w).even with hx
+    have e0 : x - (altEvenD w).getD 0 0 = texV1Even (parentsAt w).even := by rw [hx]; abel
+    have e4 : x - (altEvenR w).getD (4 - 4) 0 = 0 := by
+      rw [hx]; simp only [hD, hR, List.getD_cons_zero, Nat.sub_self]; abel
+    have k := k0h _ esc.2.1
+    refine witness_of g0' g4' F x (by rw [e0]; exact k.1) (by rw [e4, hdO]; exact dP0) ?_ ?_ ?_
+    · rw [κ0]; exact pv_L w (f u1).tOdd _ _ κ6 0 (by norm_num) c0 x (by rw [e0]; exact k.2.2)
+    · rw [κ4]; exact pv_ge w (f u1).tOdd _ κ6 4 (by norm_num) x
+    · exact mix 0 4 (by norm_num) le_rfl (by norm_num) x (by rw [e0]; exact dQX) (by rw [e4]; exact dP0)
+  · -- `(3, 2)`: the point `D - m` on the right side of `L^-`, inside the doubled partner
+    set x := (altEvenD w).getD 3 0 + (texV1Even (parentsAt w).even + texV2 (parentsAt w).even + ((1 : ℤ), (-1 : ℤ)) - m) with hx
+    have e3 : x - (altEvenD w).getD 3 0 = texV1Even (parentsAt w).even + texV2 (parentsAt w).even + ((1 : ℤ), (-1 : ℤ)) - m := by
+      rw [hx]; abel
+    have e2 : x - (altEvenD w).getD 2 0 = m := by
+      rw [hx, hDm]; simp only [hD, List.getD_cons_succ, List.getD_cons_zero]; abel
+    have k := k3v _ hmR
+    refine witness_of g3' g2' F x (by rw [e3]; exact k.1) (by rw [e2, hdE]; exact dQm) ?_ ?_ ?_
+    · rw [κ3]; exact pv_L w (f u1).tOdd _ _ κ6 3 (by norm_num) c3 x (by rw [e3]; exact k.2.2)
+    · rw [κ2]; exact pv_lt w (f u1).tOdd _ κ6 2 (by norm_num) x
+    · exact (hdbl 2 3 (by rw [hlD, hlR]; omega) (by rw [hlD, hlR]; omega) (by norm_num)
+        (by simp [pieceFlag, hlD]) ⟨rfl, Or.inr rfl⟩ x
+        (by simp only [pieceSet, hlD, if_pos (show 2 < 4 by norm_num)]; exact pt _ _ _ (by rw [e2]; exact dQm))
+        (by simp only [pieceSet, hlD, if_pos (show 3 < 4 by norm_num)]; exact pt _ _ _ (by rw [e3, hDm]; exact dQm'))).symm
+  · -- `(3, 5)`: the corner `Y + 1 - i` of `L^-` on its top side, the corner `D` of the copy of the odd parent
+    set x := (altEvenD w).getD 3 0 + (texV2 (parentsAt w).even + ((1 : ℤ), (-1 : ℤ))) with hx
+    have e3 : x - (altEvenD w).getD 3 0 = texV2 (parentsAt w).even + ((1 : ℤ), (-1 : ℤ)) := by rw [hx]; abel
+    have e5 : x - (altEvenR w).getD (5 - 4) 0 = texV1Odd (parentsAt w).odd + texV2 (parentsAt w).odd + ((1 : ℤ), (-1 : ℤ)) := by
+      rw [hx]; simp only [hD, hR, hSh, List.getD_cons_succ, List.getD_cons_zero, show 5 - 4 = 1 from rfl]
+      ext <;> simp <;> ring
+    have kD := k3h _ esc.2.2
+    refine witness_of g3' g5' F x (by rw [e3]; exact kD.1) (by rw [e5, hdO]; exact dPD) ?_ ?_ ?_
+    · rw [κ3]; exact pv_L w (f u1).tOdd _ _ κ6 3 (by norm_num) c3 x (by rw [e3]; exact kD.2.2)
+    · rw [κ5]; exact pv_ge w (f u1).tOdd _ κ6 5 (by norm_num) x
+    · exact mix 3 5 (by norm_num) (by norm_num) (by norm_num) x (by rw [e3]; exact dQY) (by rw [e5]; exact dPD)
+  · -- `(0, 3)`: the cross half-turn of `L^+` and `L^-` about the centre of `T(q_1)`, pinned at the corners `0` and `D` of their
+    -- kept sides
+    intro off hoff hi hj hx
+    have hwl : w.dropLast.length + 1 = w.length := by
+      have : w ≠ [] := by rintro rfl; simp at h3
+      rw [List.length_dropLast]; have := List.length_pos_of_ne_nil this; omega
+    have hG' : GoodBelow D f (w.dropLast.length + 1) := hwl ▸ hG
+    have hspec := FLatticePaper.Tiles.TileHalfTurnLRot.specialLHalfTurn_of_rot D
+    obtain ⟨K, hK⟩ := FLatticePaper.Tiles.TileHalfTurnInput.crossEven D hS hA hspec f w.dropLast hG' hdef true true
+    obtain ⟨K', hK'⟩ := FLatticePaper.Tiles.TileHalfTurnInput.crossEven D hS hA hspec f w.dropLast hG' hdef false true
+    have hC : TileHalfTurnStd.cEven ((parentsAt w.dropLast).current .even) =
+        texV1Even (parentsAt w).even + texV2 (parentsAt w).even + ((1 : ℤ), (-1 : ℤ)) := by
+      rw [hq]; rfl
+    have k00 := k0h _ esc.1
+    have k3D := k3h _ esm.2.2.2.2.2
+    simp only [vQ1, vQ2] at k3D
+    have pK := (hK _ k00.1).2
+    have pK' := (hK' _ k3D.1).2
+    have e00 : ∀ v : ℤ × ℤ, v - ((0 : ℤ), (0 : ℤ)) = v := fun v => by ext <;> simp
+    have eDD : ∀ v : ℤ × ℤ, v - v = ((0 : ℤ), (0 : ℤ)) := fun v => by ext <;> simp
+    simp only [Bool.not_true, Bool.not_false, e00, hC, eDD] at pK pK'
+    rw [k3D.2.2, k00.2.2] at pK
+    rw [k00.2.2, k3D.2.2] at pK'
+    have hT0 := (hhQ _ (show (0 : ℤ × ℤ) ∈ tEvenSet w.dropLast from dQ0)).2
+    simp only [sub_zero] at hT0
+    simp only [dotS, mul_zero, add_zero] at pK pK' hT0
+    refine CorrectedWalkZero.off_of_halfTurn hoff (i := 0) (j := 3) g0' g3' hK hK' ?_ hi hj hx
+    rw [hC, κ0, κ3]
+    have hcur : (parentsAt w.dropLast).current .even = (parentsAt w).even := by rw [hq]; rfl
+    simp only [hκ6, AltSixEven.kEvenEF, hD, hAf, hSh, List.getD_cons_zero, List.getD_cons_succ,
+      TileHalfTurnStd.aF, offsetA, dotS, texV1Odd, texV1Even, texV2, Prod.fst_add, Prod.snd_add, Prod.fst_sub,
+      Prod.snd_sub, Prod.fst_zero, Prod.snd_zero, Prod.fst_neg, Prod.snd_neg, Prod.smul_mk, smul_eq_mul,
+      Prod.mk_zero_zero, hcur] at pK pK' hT0 ⊢
+    linear_combination pK' - pK + 2 * hT0
 
 end FLatticePaper.Tiles.CorrectedAltEven
