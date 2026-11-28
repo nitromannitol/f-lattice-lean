@@ -1459,6 +1459,7 @@ import FLatticePaper.Tiles.BaseHmOddLast
 import FLatticePaper.Tiles.BaseHmOddRespects
 import FLatticePaper.Tiles.BaseHmOddFull
 import FLatticePaper.Tiles.BaseHmTwoOdd
+import FLatticePaper.Tiles.BaseHmTwoOddOdo
 import FLatticePaper.Tiles.BaseWalkSums
 import FLatticePaper.Tiles.BaseInsideAlong
 import FLatticePaper.Tiles.BaseInsideTile
