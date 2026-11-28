@@ -422,6 +422,7 @@ import FLatticePaper.Tiles.ClosedPathSum
 import FLatticePaper.Tiles.ClosedPathContacts
 import FLatticePaper.Tiles.ClosedPathAssembly
 import FLatticePaper.Tiles.MixedCompatBase
+import FLatticePaper.Tiles.MixedCompatStair
 import FLatticePaper.Tiles.ClosedPathStandard
 import FLatticePaper.Tiles.ClosedPathExcluded
 import FLatticePaper.Tiles.ClosedPathDiagonal
@@ -1317,6 +1318,7 @@ import FLatticePaper.Tiles.AltRotStep
 import FLatticePaper.Tiles.AltPieces
 import FLatticePaper.Tiles.AltItem5
 import FLatticePaper.Tiles.JointRot
+import FLatticePaper.Tiles.LStemCompat
 import FLatticePaper.Tiles.AltItem3
 import FLatticePaper.Tiles.AltBounds
 import FLatticePaper.Tiles.BaseTileProps
