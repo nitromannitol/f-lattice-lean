@@ -523,6 +523,12 @@ def PaperAltBdry (D : JointData) : Prop :=
   ∀ w : Word, D.altBdry (some w) true = SurgicalAltTiles.altOddTile PaperAltBase.paperAltBaseTiles w ∧
     D.altBdry (some w) false = SurgicalAltTiles.altEvenTile PaperAltBase.paperAltBaseTiles w
 
+/-- The anchors of the alternate tiles of the text: `c(T̂) = 0` for both alternate children of every word (the normalisation of
+`lemma:tile-odometer-existence`, and of `lemma:alternate_tile_properties` (3): the alternate tiles `PaperAltBdry` are placed
+with `c(T̂) = 0`). The anchors are free data of `JointData`, so this is a property of the data, not a definition. -/
+def PaperAltAnc (D : JointData) : Prop :=
+  ∀ w : Word, D.anc.cHat w true = 0 ∧ D.anc.cHat w false = 0
+
 /-- The family restricted to the words shorter than `w` (empty elsewhere): every node at `w` reads its parents through it. -/
 def below (f : Word → JSlice) (w : Word) : Word → JSlice :=
   fun u => if u.length < w.length then f u else default
@@ -531,17 +537,36 @@ def below (f : Word → JSlice) (w : Word) : Word → JSlice :=
 base word satisfies `S.base`; any other word has the standard decompositions from the TILE parents (`OddNodeP`, `EvenNodeP`);
 (a) of `lemma:weak_standard_odometer_properties` (`RespectsAnchored`) at the children that are not corrected. At a corrected child
 the tile odometer is the L-decomposition, which carries (a) itself (`TilePart`), and the weak child need not respect the strings:
-the glue on the kept parts fails it at `w = 2 3^k`. -/
+the glue on the kept parts fails it at `w = 2 3^k`. At a child that is not corrected (and not a base word) the weak odometer
+respects its full tile decomposition (`tileOddPieces`, `tileEvenPieces`, the six full copies): the text's
+`o_{p_0} = o_{p_1}^+ ∪ o_{p_1}^- ∪ d(o)_{q_1}^+ ∪ d(o)_{q_1}^-` with each doubled piece the union of two lattice adjacent copies, the
+overlaps removed by `keptPart` included. -/
 def WeakPart (D : JointData) (g : Word → JSlice) (w : Word) (wo we : PartialOdometer) : Prop :=
   wo.dom = D.S.bdry (some w) true ∧ we.dom = D.S.bdry (some w) false ∧
     (IsBase w → D.S.base w wo we) ∧
     (¬ IsBase w → OddNodeP D.S wo (fun u => (g u).tOdd) (fun u => (g u).tEven) w ∧
       EvenNodeP D.S we (fun u => (g u).tOdd) (fun u => (g u).tEven) w) ∧
     (¬ CorrectedAfterThree w → RespectsAnchored wo.dom (hWordOf w false) (vWordOf w false) wo.val) ∧
-    (¬ CorrectedAfterTwo w → RespectsAnchored we.dom (hWordOf w true) (vWordOf w true) we.val)
+    (¬ CorrectedAfterTwo w → RespectsAnchored we.dom (hWordOf w true) (vWordOf w true) we.val) ∧
+    (¬ IsBase w → ¬ CorrectedAfterThree w →
+      RespectsPieces wo (tileOddPieces D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).lEven) w)) ∧
+    (¬ IsBase w → ¬ CorrectedAfterTwo w →
+      RespectsPieces we (tileEvenPieces D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).lOdd) w))
+
+/-- At a child that is not corrected, the weak odometer respects the full tile decomposition (the last clauses of `WeakPart`). -/
+theorem weakPart_full {D : JointData} {g : Word → JSlice} {w : Word} {wo we : PartialOdometer} (h : WeakPart D g w wo we)
+    (hw : ¬ IsBase w) :
+    (¬ CorrectedAfterThree w →
+        RespectsPieces wo (tileOddPieces D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).lEven) w)) ∧
+      (¬ CorrectedAfterTwo w →
+        RespectsPieces we (tileEvenPieces D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).lOdd) w)) :=
+  ⟨h.2.2.2.2.2.2.1 hw, h.2.2.2.2.2.2.2 hw⟩
 
 /-- (2) The weak alternate step at `w`: the alternate decompositions from the tile parents and the alternate tile parents
-(`AltOddNodeP`, `AltEvenNodeP`; base words: `altBase`), and (a) of `lemma:weak_alternate_odometer_properties`. -/
+(`AltOddNodeP`, `AltEvenNodeP`; base words: `altBase`), and (a) of `lemma:weak_alternate_odometer_properties`. At an alternate
+child that is not corrected (and not a base word) the weak alternate odometer respects its full alternate decomposition
+(`tileAltOddPieces`, `tileAltEvenPieces`: the copies of the registers, each shifted doubling the register and its translate, and
+the alternate parent piece when the type keeps it), the text's `ds(o) = o ∪ o*` with `o*` the translate of the register. -/
 def WeakAltPart (D : JointData) (g : Word → JSlice) (w : Word) (wao wae : PartialOdometer) : Prop :=
   wao.dom = D.altBdry (some w) true ∧ wae.dom = D.altBdry (some w) false ∧
     (IsBase w → D.altBase w wao wae) ∧
@@ -549,7 +574,25 @@ def WeakAltPart (D : JointData) (g : Word → JSlice) (w : Word) (wao wae : Part
       AltOddNodeP D.S wao (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).aOdd) (fun u => (g u).aEven) w ∧
       AltEvenNodeP D.S wae (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).aOdd) (fun u => (g u).aEven) w) ∧
     RespectsHalfV (altRevVAnchor D.anc w) (vWordOf w false) wao.val ∧
-    RespectsHalfH (altFwdHAnchor D.anc w) (hWordOf w true) wae.val
+    RespectsHalfH (altFwdHAnchor D.anc w) (hWordOf w true) wae.val ∧
+    (¬ IsBase w → ¬ CorrectedAfterTwo w →
+      RespectsPieces wao (tileAltOddPieces D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).aOdd)
+        (fun u => (g u).aEven) (fun u => (g u).lOdd) w)) ∧
+    (¬ IsBase w → ¬ CorrectedAfterThree w →
+      RespectsPieces wae (tileAltEvenPieces D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).aOdd)
+        (fun u => (g u).aEven) (fun u => (g u).lEven) w))
+
+/-- At an alternate child that is not corrected, the weak alternate odometer respects the full alternate decomposition (the last
+clauses of `WeakAltPart`). -/
+theorem weakAltPart_full {D : JointData} {g : Word → JSlice} {w : Word} {wao wae : PartialOdometer}
+    (h : WeakAltPart D g w wao wae) (hw : ¬ IsBase w) :
+    (¬ CorrectedAfterTwo w →
+        RespectsPieces wao (tileAltOddPieces D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).aOdd)
+          (fun u => (g u).aEven) (fun u => (g u).lOdd) w)) ∧
+      (¬ CorrectedAfterThree w →
+        RespectsPieces wae (tileAltEvenPieces D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).aOdd)
+          (fun u => (g u).aEven) (fun u => (g u).lEven) w)) :=
+  ⟨h.2.2.2.2.2.2.1 hw, h.2.2.2.2.2.2.2 hw⟩
 
 /-- (3) The tile step at `w` (definition of tile odometers): at a base word the tile odometers are the weak ones; otherwise each
 is its decomposition from the tile parents and the L-corrected odometers of the parents; at an uncorrected child it is the weak

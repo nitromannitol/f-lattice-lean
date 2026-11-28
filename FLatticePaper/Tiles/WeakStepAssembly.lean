@@ -178,6 +178,18 @@ def GlueRespectsInput (D : JointData) : Prop :=
     (¬ CorrectedAfterThree w → RespectsAnchored (oddTile w) (hWordOf w false) (vWordOf w false) go) ∧
       (¬ CorrectedAfterTwo w → RespectsAnchored (evenTile w) (hWordOf w true) (vWordOf w true) ge)
 
+/-- At the children that are not corrected, the glued children respect their full tile decompositions (the six full copies of
+`tileOddPieces`, `tileEvenPieces`): the glue is given on the kept parts, and the overlaps of two copies of the same parent that
+`keptPart` removes carry the same values (the end of the proof of (b) of `lemma:tile-odometer-existence`: the two copies are
+exchanged by the half-turn `x ↦ D - x`, so their difference `c` satisfies `c = -c`). -/
+def GlueFullInput (D : JointData) : Prop :=
+  ∀ (f : Word → JSlice) (w u1 u2 : Word), GoodBelow D f w.length → ¬ IsBase w → regsAt w = (some u1, some u2) →
+  ∀ (κo κe : ℕ → ℤ) (go ge : Site → ℤ), GluedChildren f w u1 u2 κo κe go ge →
+    (¬ CorrectedAfterThree w → RespectsPieces ⟨oddTile w, go⟩
+      (tileOddPieces paperS (fun u => (below f w u).tOdd) (fun u => (below f w u).tEven) (fun u => (below f w u).lEven) w)) ∧
+    (¬ CorrectedAfterTwo w → RespectsPieces ⟨evenTile w, ge⟩
+      (tileEvenPieces paperS (fun u => (below f w u).tOdd) (fun u => (below f w u).tEven) (fun u => (below f w u).lOdd) w))
+
 /-- (c) of `lemma:weak_standard_odometer_properties` for the glued children (Step 2 of its proof), at the children that are not
 corrected: each is compatible with its lattice adjacent translates. It follows from (a) (`LatticeOfRespects.weakProps_of_respects`),
 so it has no route at the corrected children, where (a) fails at `w = 2 3^k`. -/
@@ -191,13 +203,13 @@ def GlueLatticeInput (D : JointData) : Prop :=
 /-- **The weak step of the joint induction for the paper's data**: `WeakStepInput D` when the weak data of `D` are `paperS`,
 from the named inputs `BaseWeakInput`, `TileSlopeZero`, `MixedCompatInput`, `GlueRespectsInput` and `GlueLatticeInput`. -/
 theorem weakStep_paper (D : JointData) (hS : D.S = paperS) (hB : BaseWeakInput) (hsl : TileSlopeZero D)
-    (hmc : MixedCompatInput D) (hgr : GlueRespectsInput D) (hgl : GlueLatticeInput D) :
+    (hmc : MixedCompatInput D) (hgr : GlueRespectsInput D) (hgl : GlueLatticeInput D) (hgf : GlueFullInput D) :
     WeakStepInput D := by
   intro f w hgood
   by_cases hw : IsBase w
   · obtain ⟨wo, we, hdo, hde, hbc, hro, hre, hwp⟩ := hB w hw
-    refine ⟨wo, we, ⟨?_, ?_, fun _ => ?_, fun h => absurd hw h, fun _ => hro, fun _ => hre⟩,
-      weakPropsU_of_weakProps w wo we hwp⟩
+    refine ⟨wo, we, ⟨?_, ?_, fun _ => ?_, fun h => absurd hw h, fun _ => hro, fun _ => hre, fun h => absurd hw h,
+      fun h => absurd hw h⟩, weakPropsU_of_weakProps w wo we hwp⟩
     · rw [hS]; exact hdo
     · rw [hS]; exact hde
     · rw [hS]; exact hbc
@@ -254,7 +266,9 @@ theorem weakStep_paper (D : JointData) (hS : D.S = paperS) (hB : BaseWeakInput) 
   have hglue : GluedChildren f w u1 u2 κo κe go ge := ⟨hMo, hDo, hgo, hMe, hDe, hge⟩
   obtain ⟨hRo, hRe⟩ := hgr f w u1 u2 hgood hw hreg (hsl f w.length hgood) κo κe go ge hglue
   have hWp := hgl f w u1 u2 hgood hw hreg κo κe go ge hglue
-  refine ⟨⟨oddTile w, go⟩, ⟨evenTile w, ge⟩, ⟨?_, ?_, fun h => absurd h hw, fun _ => ⟨?_, ?_⟩, hRo, hRe⟩, hWp⟩
+  obtain ⟨hFo, hFe⟩ := hgf f w u1 u2 hgood hw hreg κo κe go ge hglue
+  refine ⟨⟨oddTile w, go⟩, ⟨evenTile w, ge⟩, ⟨?_, ?_, fun h => absurd h hw, fun _ => ⟨?_, ?_⟩, hRo, hRe,
+    fun _ h => by rw [hS]; exact hFo h, fun _ h => by rw [hS]; exact hFe h⟩, hWp⟩
   · rw [hS]; rfl
   · rw [hS]; rfl
   · rw [hS]

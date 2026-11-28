@@ -246,7 +246,7 @@ theorem tileStep_paper (D : JointData) (hS : D.S = WeakStepPaper.paperS) (hA : D
   by_cases hb : IsBase w
   · have hP : TilePart D (below f w) w wo we wao wae wo we wao wae :=
       ⟨fun _ => ⟨rfl, rfl, rfl, rfl⟩, fun h => absurd hb h, fun _ => ⟨rfl, rfl⟩, fun _ => ⟨rfl, rfl⟩,
-        hWP.2.2.2.2.1 (fun h => h.1 hb), hWP.2.2.2.2.2 (fun h => h.1 hb), hWA.2.2.2.2.1, hWA.2.2.2.2.2,
+        hWP.2.2.2.2.1 (fun h => h.1 hb), hWP.2.2.2.2.2.1 (fun h => h.1 hb), hWA.2.2.2.2.1, hWA.2.2.2.2.2.1,
         hWP.1, hWP.2.1, hWA.1, hWA.2.1⟩
     have hbc := hWP.2.2.1 hb
     rw [hS] at hbc
@@ -272,7 +272,7 @@ theorem tileStep_paper (D : JointData) (hS : D.S = WeakStepPaper.paperS) (hA : D
   · have nc3 : ¬ CorrectedAfterThree (wd ++ [Digit.one]) := fun h => by simp [CorrectedAfterThree] at h
     have nc2 : ¬ CorrectedAfterTwo (wd ++ [Digit.one]) := fun h => by simp [CorrectedAfterTwo] at h
     exact finish wo we wao wae ⟨fun h => absurd h hb, fun _ => ⟨(n1.1 nc3).1, (n1.2 nc2).1, (n1.2 nc2).2, (n1.1 nc3).2⟩,
-      fun _ => ⟨rfl, rfl⟩, fun _ => ⟨rfl, rfl⟩, hWP.2.2.2.2.1 nc3, hWP.2.2.2.2.2 nc2, hWA.2.2.2.2.1, hWA.2.2.2.2.2,
+      fun _ => ⟨rfl, rfl⟩, fun _ => ⟨rfl, rfl⟩, hWP.2.2.2.2.1 nc3, hWP.2.2.2.2.2.1 nc2, hWA.2.2.2.2.1, hWA.2.2.2.2.2.1,
       hWP.1, hWP.2.1, hWA.1, hWA.2.1⟩
   · -- after a `2`: the even child and the odd alternate child are corrected
     have c2 : CorrectedAfterTwo (wd ++ [Digit.two]) := ⟨hb, hl⟩
@@ -293,7 +293,7 @@ theorem tileStep_paper (D : JointData) (hS : D.S = WeakStepPaper.paperS) (hA : D
     exact finish wo (gluedOdo _ κ) (gluedOdo _ κ') wae
       ⟨fun h => absurd h hb, fun _ => ⟨(n1.1 nc3).1, JointGlue.respectsPieces_glued _ κ covE hκ,
         JointGlue.respectsPieces_glued _ κ' covA hκ', (n1.1 nc3).2⟩,
-        fun _ => ⟨rfl, rfl⟩, fun h => absurd c2 h, hWP.2.2.2.2.1 nc3, rE, rA, hWA.2.2.2.2.2,
+        fun _ => ⟨rfl, rfl⟩, fun h => absurd c2 h, hWP.2.2.2.2.1 nc3, rE, rA, hWA.2.2.2.2.2.1,
         hWP.1, by show pieceUnion _ = _; rw [dE, hS]; rfl, by show pieceUnion _ = _; rw [dA, (hAB _).1], hWA.2.1⟩
   · -- after a `3`: the odd child and the even alternate child are corrected
     have c3 : CorrectedAfterThree (wd ++ [Digit.three]) := ⟨hb, hl⟩
@@ -315,7 +315,7 @@ theorem tileStep_paper (D : JointData) (hS : D.S = WeakStepPaper.paperS) (hA : D
     exact finish (gluedOdo _ κ) we wao (gluedOdo _ κ')
       ⟨fun h => absurd h hb, fun _ => ⟨JointGlue.respectsPieces_glued _ κ covO hκ, (n1.2 nc2).1, (n1.2 nc2).2,
         JointGlue.respectsPieces_glued _ κ' covA hκ'⟩,
-        fun h => absurd c3 h, fun _ => ⟨rfl, rfl⟩, rO, hWP.2.2.2.2.2 nc2, hWA.2.2.2.2.1, rA,
+        fun h => absurd c3 h, fun _ => ⟨rfl, rfl⟩, rO, hWP.2.2.2.2.2.1 nc2, hWA.2.2.2.2.1, rA,
         by show pieceUnion _ = _; rw [dO, hS]; rfl, hWP.2.1, hWA.1, by show pieceUnion _ = _; rw [dA, (hAB _).2]⟩
 
 end FLatticePaper.Tiles.TileStepAssembly
