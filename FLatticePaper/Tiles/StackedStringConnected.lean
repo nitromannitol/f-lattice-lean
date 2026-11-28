@@ -432,6 +432,13 @@ theorem small_horizontal_rows : ∀ w ∈ wordsUpTo 6, almostPalB w = true → w
   · exact small_horizontal_rows_qqppqp
   · exact small_horizontal_rows_qqqqqp
 
+/-- The horizontal stacked string of an almost palindrome `w = q … p` of length at most six is simply connected. -/
+theorem stacked_horizontal_simply_connected_short {w : BinaryWord} (hw : w.length ≤ 6)
+    (hA : IsAlmostPalindrome w) (h1 : w.head? = some Letter.q) (h2 : w.getLast? = some Letter.p) :
+    SimplyConnectedCells (stackedSites .horizontal w) := by
+  obtain ⟨hR, hL⟩ := small_horizontal_rows w (mem_wordsUpTo hw) (almostPalB_of hA) h1 h2
+  exact simplyConnectedCells_of_rows hR hL
+
 set_option maxHeartbeats 400000 in
 /-- The almost palindromes of length at most six with head `p` and last letter `q` (the words the vertical row check runs on). -/
 theorem vertical_words_filter : ∀ w ∈ wordsUpTo 6, almostPalB w = true → w.head? = some Letter.p →
