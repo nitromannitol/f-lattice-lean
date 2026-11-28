@@ -50,7 +50,15 @@ Connectivity of the standard decompositions (`std_connected`): the six copies ar
 witnessed by a common corner point (`eq:std_corner_values`) of the two copies; the parents have all eight corner points in their
 domains (`TileTranslationStd.stdCorners_odd`, `_even`), and an L-corrected copy has the end points of its kept side
 (`LSidesAgree` with `paperLSides`; `side_hPlus`, `side_hMinus`, `side_vMinus`, `side_vPlus`). With it, `rotStepInput_of_alt`
-leaves the connectivity of the alternate decompositions (`ConnectedAlt`) and of the L decompositions (`ConnectedL`) named. -/
+leaves the connectivity of the alternate decompositions (`ConnectedAlt`) and of the L decompositions (`ConnectedL`) named.
+
+The special prefixes (`evenL_special_rawRot`, `oddL_special_rawRot`, `specialLRot_of_cells`): at the prefixes `2^j` (even L) and
+`3^j` (odd L) the stems and heads still pair (the pieces named `eStem`, `eMid`, `eHead`, `oStem`, `oBridge`, `oHead`), while the
+middle pieces of the rotated L-correction (the bridge `T_{0/1}`, or the bridge `T_{1/1}` and the copy of `T^d_{1/1}`) lie across
+several pieces of the other side. Their points lie on the kept sides of both L-corrections, where each agrees with its child
+(`LSidesAgree`) and the children rotate (`RotProps` at the same level), so they carry the constant of the sides
+(`good_of_sides`); a tip in the short odd case lies in a head that has such a point (`rawRot_of_splitL`). The cell facts are the
+named input `SpecialCells`. `rotStepInput_of_cells` is the step with these inputs. -/
 
 namespace FLatticePaper.Tiles.JointRot
 
@@ -3795,14 +3803,24 @@ theorem evenL_special_rawRot (S : WeakData) (pO pE aO aE : Word → PartialOdome
     all_goals unfold oHead eHead oK eK; simp only [hsw1, hsw2]
     all_goals cases plus <;> l_unfold <;> simp only [hdq] <;> simp only [hA, hB'] <;> l_ring
 
-/-- `rawRot_of_split` with a list of middle pieces of `oR`, each with its own constant. -/
+/-- `rawRot_of_split` with a list of middle pieces of `oR` and one constant `C` for all of them: each point of a middle piece has the
+raw rotation with `C`, or lies in a piece of `HR` that has a point with the raw rotation with `C`. -/
 theorem rawRot_of_splitL (o oR : PartialOdometer) (A X H AR Bs HR : List Piece) (c γ : Site)
     (ho : RespectsPieces o (A ++ X ++ H)) (hoR : RespectsPieces oR (AR ++ Bs ++ HR))
     (hcov : PiecesCovered (AR ++ Bs ++ HR)) (hconn : (overlapGraph (goodPart (AR ++ Bs ++ HR))).Connected)
     (hA : List.Forall₂ (PairCond c γ) AR A) (hH : List.Forall₂ (PairCond c γ) HR H)
-    (hB : ∀ B ∈ Bs, ∃ C : ℤ, ∀ x ∈ B.placed, x ∉ B.exc →
-      mulI x + c ∈ o.dom ∧ oR.val x = o.val (mulI x + c) - h0 x + dotS γ x + C) :
+    (hB : ∃ C : ℤ, ∀ B ∈ Bs, ∀ x ∈ B.placed, x ∉ B.exc →
+      (mulI x + c ∈ o.dom ∧ oR.val x = o.val (mulI x + c) - h0 x + dotS γ x + C) ∨
+      ∃ r ∈ HR, x ∈ r.placed ∧ x ∉ r.exc ∧ ∃ y ∈ r.placed, y ∉ r.exc ∧
+        mulI y + c ∈ o.dom ∧ oR.val y = o.val (mulI y + c) - h0 y + dotS γ y + C) :
     RawRot o oR c γ := by
+  have hHp : ∀ r ∈ HR, ∃ C : ℤ, ∀ x ∈ r.placed, x ∉ r.exc →
+      mulI x + c ∈ o.dom ∧ oR.val x = o.val (mulI x + c) - h0 x + dotS γ x + C := by
+    intro r hr
+    obtain ⟨i, hi, rfl⟩ := List.getElem_of_mem hr
+    have hi' : i < H.length := hH.length_eq ▸ hi
+    exact piece_of_pairCond o oR _ _ c γ ho hoR H[i] HR[i] (by simp [List.getElem_mem])
+      (by simp [List.getElem_mem]) (hH.get hi hi')
   refine rawRot_of_mem o oR _ c γ hoR.1 hcov hconn (fun pR hpR => ?_)
   simp only [List.mem_append] at hpR
   rcases hpR with (h | h) | h
@@ -3810,11 +3828,17 @@ theorem rawRot_of_splitL (o oR : PartialOdometer) (A X H AR Bs HR : List Piece) 
     have hi' : i < A.length := hA.length_eq ▸ hi
     exact piece_of_pairCond o oR _ _ c γ ho hoR A[i] AR[i] (by simp [List.getElem_mem])
       (by simp [List.getElem_mem]) (hA.get hi hi')
-  · exact hB pR h
-  · obtain ⟨i, hi, rfl⟩ := List.getElem_of_mem h
-    have hi' : i < H.length := hH.length_eq ▸ hi
-    exact piece_of_pairCond o oR _ _ c γ ho hoR H[i] HR[i] (by simp [List.getElem_mem])
-      (by simp [List.getElem_mem]) (hH.get hi hi')
+  · obtain ⟨C, hC⟩ := hB
+    refine ⟨C, fun x hx hxe => ?_⟩
+    rcases hC pR h x hx hxe with k | ⟨r, hr, hxr, hxre, y, hyr, hyre, hyd, hyv⟩
+    · exact k
+    · obtain ⟨Cr, hCr⟩ := hHp r hr
+      have e1 := (hCr y hyr hyre).2
+      have e2 := hCr x hxr hxre
+      refine ⟨e2.1, ?_⟩
+      rw [e2.2]
+      linarith
+  · exact hHp pR h
 
 set_option maxHeartbeats 400000 in
 /-- The odd L-correction of `w` against the even L-correction of `swapW w` when the prefix is `3^j`: the stems and the heads pair
@@ -3830,8 +3854,14 @@ theorem oddL_special_rawRot (S : WeakData) (pO pE aO aE : Word → PartialOdomet
       (vQ1 (stripTrailing Digit.two w) - ((0 : ℤ), (1 : ℤ))) 0)
     (hH : RawRot (regOdo S aO aE (regsAt (stripTrailing Digit.two w)).2 false) (regOdo S aO aE (regsAt (swapW (stripTrailing Digit.two w))).1 true)
       (altParQ (stripTrailing Digit.two w)).1 (altParQ (stripTrailing Digit.two w)).2)
-    (hside : ∀ B ∈ eMid S pO pE (swapW w) (plus == W1Odd w), ∃ C : ℤ, ∀ x ∈ B.placed, x ∉ B.exc →
-      mulI x + (texV1Odd ((parentsAt w).current .odd) - ((0 : ℤ), (1 : ℤ))) ∈ o.dom ∧ oR.val x = o.val (mulI x + (texV1Odd ((parentsAt w).current .odd) - ((0 : ℤ), (1 : ℤ)))) - h0 x + dotS 0 x + C)
+    (hside : ∃ C : ℤ, ∀ B ∈ eMid S pO pE (swapW w) (plus == W1Odd w), ∀ x ∈ B.placed, x ∉ B.exc →
+      (mulI x + (texV1Odd ((parentsAt w).current .odd) - ((0 : ℤ), (1 : ℤ))) ∈ o.dom ∧
+        oR.val x = o.val (mulI x + (texV1Odd ((parentsAt w).current .odd) - ((0 : ℤ), (1 : ℤ)))) - h0 x + dotS 0 x + C) ∨
+      ∃ r ∈ (List.range (2 * (trailingCount Digit.two w + 1) - (if elong then 0 else 1))).map
+          (eHead S pO pE aO aE (swapW w) (plus == W1Odd w)),
+        x ∈ r.placed ∧ x ∉ r.exc ∧ ∃ y ∈ r.placed, y ∉ r.exc ∧
+          mulI y + (texV1Odd ((parentsAt w).current .odd) - ((0 : ℤ), (1 : ℤ))) ∈ o.dom ∧
+          oR.val y = o.val (mulI y + (texV1Odd ((parentsAt w).current .odd) - ((0 : ℤ), (1 : ℤ)))) - h0 y + dotS 0 y + C)
     (hexc0 : ∀ x ∈ (eHead S pO pE aO aE (swapW w) (plus == W1Odd w) 0).placed,
       x ∉ (eHead S pO pE aO aE (swapW w) (plus == W1Odd w) 0).exc → mulI x + (texV1Odd ((parentsAt w).current .odd) - ((0 : ℤ), (1 : ℤ))) ∉ (oHead S pO pE aO aE w plus 0).exc) :
     RawRot o oR (texV1Odd ((parentsAt w).current .odd) - ((0 : ℤ), (1 : ℤ))) 0 := by
@@ -3888,5 +3918,205 @@ theorem oddL_special_rawRot (S : WeakData) (pO pE aO aE : Word → PartialOdomet
         simp [oHead, hi0]
     all_goals unfold oHead eHead oK eK; simp only [hsw1, hsw2]
     all_goals cases plus <;> l_unfold <;> simp only [hdq] <;> simp only [hA, hB'] <;> l_ring
+
+/-! ### The special prefixes from their cells -/
+
+/-- A point lies on one of the given side strings of the child (anchored at `c(T) = 0`). -/
+def OnSides (wh wv : BinaryWord) (sides : List Side) (x : Site) : Prop :=
+  ∃ sd ∈ sides, x ∈ placedSites (sideString wh wv 0 sd)
+
+/-- **The cells of the special prefixes** (a named input, numerically `tmp-w5/special_sides2.py`, `special_bad.py`,
+`special_exc.py`). For a word of length `n` whose prefix is `2^j` (even L) or `3^j` (odd L): every point of a middle piece of the
+rotated L-correction lies on its kept sides and its image under `z` on the kept sides of the L-correction of `w`, or (a tip in the
+short odd case) lies in a head of the rotated L-correction that has such a point; and the exceptional points of the first heads
+correspond. -/
+def SpecialCells (D : JointData) (f : Word → JSlice) (n : ℕ) : Prop :=
+  ∀ w : Word, w.length = n →
+    (EvenLDefined w → (stripTrailing Digit.three w ≠ [] ∧ ∀ d ∈ stripTrailing Digit.three w, d = Digit.two) →
+      ∀ plus elong : Bool,
+      let g := below f w
+      let c := texV1Even ((parentsAt w).current .even) - ((0 : ℤ), (1 : ℤ))
+      let s := plus != W1Odd w
+      (∀ x ∈ (oBridge D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (swapW w) s).placed,
+        OnSides (hWordOf (swapW w) false) (vWordOf (swapW w) false) (D.lSides true (W1Odd (swapW w)) s elong) x ∧
+        OnSides (hWordOf w true) (vWordOf w true) (D.lSides false (W1Odd w) plus elong) (mulI x + c)) ∧
+      (∀ x ∈ (oHead D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).aOdd) (fun u => (g u).aEven)
+          (swapW w) s 0).placed,
+        x ∉ (oHead D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).aOdd) (fun u => (g u).aEven)
+          (swapW w) s 0).exc →
+        mulI x + c ∉ (eHead D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).aOdd) (fun u => (g u).aEven)
+          w plus 0).exc)) ∧
+    (OddLDefined w → (stripTrailing Digit.two w ≠ [] ∧ ∀ d ∈ stripTrailing Digit.two w, d = Digit.three) →
+      ∀ plus elong : Bool,
+      let g := below f w
+      let c := texV1Odd ((parentsAt w).current .odd) - ((0 : ℤ), (1 : ℤ))
+      let s := plus == W1Odd w
+      let Rs := hWordOf (swapW w) true
+      let Rv := vWordOf (swapW w) true
+      let sR := D.lSides false (W1Odd (swapW w)) s elong
+      let sO := D.lSides true (W1Odd w) plus elong
+      (∀ B ∈ eMid D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (swapW w) s, ∀ x ∈ B.placed, x ∉ B.exc →
+        (OnSides Rs Rv sR x ∧ OnSides (hWordOf w false) (vWordOf w false) sO (mulI x + c)) ∨
+        ∃ r ∈ (List.range (2 * (trailingCount Digit.two w + 1) - (if elong then 0 else 1))).map
+            (eHead D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).aOdd) (fun u => (g u).aEven)
+              (swapW w) s),
+          x ∈ r.placed ∧ x ∉ r.exc ∧ ∃ y ∈ r.placed, y ∉ r.exc ∧
+            OnSides Rs Rv sR y ∧ OnSides (hWordOf w false) (vWordOf w false) sO (mulI y + c)) ∧
+      (∀ x ∈ (eHead D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).aOdd) (fun u => (g u).aEven)
+          (swapW w) s 0).placed,
+        x ∉ (eHead D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).aOdd) (fun u => (g u).aEven)
+          (swapW w) s 0).exc →
+        mulI x + c ∉ (oHead D.S (fun u => (g u).tOdd) (fun u => (g u).tEven) (fun u => (g u).aOdd) (fun u => (g u).aEven)
+          w plus 0).exc))
+
+/-- On the kept sides of both L-corrections, the rotation of the L-corrections is that of the children. -/
+theorem good_of_sides (o oR T TR : PartialOdometer) (c : Site) (whO wvO whR wvR : BinaryWord) (sO sR : List Side)
+    (hT : RawRot T TR c 0) (hLO : LSidesAgree o T whO wvO sO) (hLR : LSidesAgree oR TR whR wvR sR) :
+    ∃ C : ℤ, ∀ x, OnSides whR wvR sR x → OnSides whO wvO sO (mulI x + c) →
+      mulI x + c ∈ o.dom ∧ oR.val x = o.val (mulI x + c) - h0 x + dotS 0 x + C := by
+  obtain ⟨-, cO, hcO⟩ := hLO
+  obtain ⟨-, cR, hcR⟩ := hLR
+  obtain ⟨CT, hCT⟩ := hT
+  refine ⟨CT + cR - cO, fun x ⟨sd, hsd, hx⟩ ⟨sd', hsd', hx'⟩ => ?_⟩
+  obtain ⟨-, hxT, hv⟩ := hcR sd hsd x hx
+  obtain ⟨hzo, -, hv'⟩ := hcO sd' hsd' _ hx'
+  obtain ⟨-, ht⟩ := hCT x hxT
+  refine ⟨hzo, ?_⟩
+  rw [hv, ht, hv']
+  simp [dotS]
+  ring
+
+/-- The L-rotation at the special prefixes from their cells (`SpecialCells`), the rotation of the children at the same level, the
+sides of the L-corrections and the connectivity of the L decompositions. -/
+theorem specialLRot_of_cells (D : JointData) (f : Word → JSlice) (n : ℕ) (hgood : GoodBelow D f n)
+    (hlev : ∀ w : Word, w.length = n → IsJointSlice D f w) (hB : BaseSlopes D)
+    (hconn : ∀ w : Word, w.length = n → ConnectedL D (below f w) w) (hcells : SpecialCells D f n)
+    (hrot : ∀ w : Word, w.length = n → RotProps w (f w) (f (swapW w))) : SpecialLRot f n := by
+  have hJ : ∀ u : Word, u.length ≤ n → IsJointSlice D f u := fun u hu => by
+    rcases lt_or_eq_of_le hu with h | h
+    · exact (hgood u h).1
+    · exact hlev u h
+  have hsl := family_slopes D f n hJ hB
+  intro w hw
+  have hsw : (swapW w).length = n := by rw [length_swapW, hw]
+  obtain ⟨-, -, -, hLp⟩ := hlev w hw
+  obtain ⟨-, -, -, hLp'⟩ := hlev (swapW w) hsw
+  obtain ⟨hcO, hcE⟩ := hconn (swapW w) hsw
+  rw [below_swapW] at hLp' hcO hcE
+  refine ⟨fun hdef hsp plus elong => ?_, fun hdef hsp plus elong => ?_⟩
+  · -- the even L-correction at a prefix `2^j`
+    obtain ⟨hB1, hE1⟩ := (hcells w hw).1 hdef hsp plus elong
+    have hd : (!(stripTrailing Digit.three w).isEmpty &&
+        (stripTrailing Digit.three w).all (fun d => decide (d = Digit.two))) = true := by
+      simp only [Bool.and_eq_true, Bool.not_eq_true', List.isEmpty_eq_false_iff, List.all_eq_true, decide_eq_true_eq]
+      exact hsp
+    obtain ⟨v, sd, k, hs, hwv⟩ := hdef
+    have hdef' : EvenLDefined w := ⟨v, sd, k, hs, hwv⟩
+    have hpre : stripTrailing Digit.three w = v ++ [sd] := by rw [hwv]; exact strip_of_defined _ _ hs v k
+    have hsd : sd = Digit.two := hsp.2 sd (by rw [hpre]; simp)
+    subst hsd
+    have hlen : (v ++ [Digit.two]).length ≤ w.length := by rw [← hpre]; exact stripTrailing_length_le _ _
+    have hvlen : v.length < w.length := by simp at hlen; omega
+    have hr1 : (regsAt (stripTrailing Digit.three w)).1 = some v := by
+      rw [hpre, regsAt_append_singleton]; rfl
+    obtain ⟨pr1, -⟩ := parents_of_regs (stripTrailing Digit.three w)
+    have J1 := (hgood v (by omega)).2.2.2.1
+    have hS : RawRot (regOdo D.S (fun u => (below f w u).tOdd) (fun u => (below f w u).tEven)
+        (regsAt (stripTrailing Digit.three w)).1 true) (regOdo D.S (fun u => (below f w u).tOdd)
+        (fun u => (below f w u).tEven) (regsAt (swapW (stripTrailing Digit.three w))).2 false)
+        (vP1 (stripTrailing Digit.three w) - ((0 : ℤ), (1 : ℤ))) 0 := by
+      rw [regsAt_swapW, hr1]
+      show RawRot (below f w v).tOdd (below f w (swapW v)).tEven _ _
+      rw [below_of_lt f w v hvlen, below_of_lt f w (swapW v) (by rw [length_swapW]; exact hvlen)]
+      have h := J1.1
+      rw [pr1 v hr1] at h
+      exact rawRot_of_tileRotation_slopes _ _ _ h (hsl v (by omega)).1 (hsl (swapW v) (by rw [length_swapW]; omega)).2.1
+    have hH : RawRot (regOdo D.S (fun u => (below f w u).aOdd) (fun u => (below f w u).aEven)
+        (regsAt (stripTrailing Digit.three w)).1 true) (regOdo D.S (fun u => (below f w u).aOdd)
+        (fun u => (below f w u).aEven) (regsAt (swapW (stripTrailing Digit.three w))).2 false)
+        (altParP (stripTrailing Digit.three w)).1 (altParP (stripTrailing Digit.three w)).2 := by
+      rw [regsAt_swapW, hr1]
+      show RawRot (below f w v).aOdd (below f w (swapW v)).aEven _ _
+      rw [below_of_lt f w v hvlen, below_of_lt f w (swapW v) (by rw [length_swapW]; exact hvlen)]
+      have h := J1.2.2.1
+      have hcf := altCf_odd_reg v Digit.two (Or.inr rfl)
+      rw [← hpre] at hcf
+      rw [hcf] at h
+      exact rawRot_of_altRotation_slopes _ _ _ _ h (hsl v (by omega)).2.2.1
+        (hsl (swapW v) (by rw [length_swapW]; omega)).2.2.2
+    have ho := (hLp.2 plus elong hdef').1
+    have hoR := (hLp'.1 (plus != W1Odd w) elong (oddLDefined_swapW hdef')).1
+    have hT := rawRot_of_tileRotation_slopes _ _ _ (hrot w hw).2.1 (hsl w (by omega)).2.1 (hsl (swapW w) (by omega)).1
+    obtain ⟨C, hC⟩ := good_of_sides _ _ _ _ _ _ _ _ _ _ _ hT (hLp.2 plus elong hdef').2
+      (hLp'.1 (plus != W1Odd w) elong (oddLDefined_swapW hdef')).2
+    exact lRotation_of_rawRot _ _ _ (evenL_special_rawRot D.S _ _ _ _ w plus elong _ _ ho hoR
+      (hcO (plus != W1Odd w) elong (oddLDefined_swapW hdef')) hd hS hH
+      ⟨C, fun x hx _ => hC x (hB1 x hx).1 (hB1 x hx).2⟩ hE1)
+  · -- the odd L-correction at a prefix `3^j`
+    obtain ⟨hB1, hE1⟩ := (hcells w hw).2 hdef hsp plus elong
+    have hd : (!(stripTrailing Digit.two w).isEmpty &&
+        (stripTrailing Digit.two w).all (fun d => decide (d = Digit.three))) = true := by
+      simp only [Bool.and_eq_true, Bool.not_eq_true', List.isEmpty_eq_false_iff, List.all_eq_true, decide_eq_true_eq]
+      exact hsp
+    obtain ⟨v, sd, k, hs, hwv⟩ := hdef
+    have hdef' : OddLDefined w := ⟨v, sd, k, hs, hwv⟩
+    have hpre : stripTrailing Digit.two w = v ++ [sd] := by rw [hwv]; exact strip_of_defined _ _ hs v k
+    have hsd : sd = Digit.three := hsp.2 sd (by rw [hpre]; simp)
+    subst hsd
+    have hlen : (v ++ [Digit.three]).length ≤ w.length := by rw [← hpre]; exact stripTrailing_length_le _ _
+    have hvlen : v.length < w.length := by simp at hlen; omega
+    have hr2 : (regsAt (stripTrailing Digit.two w)).2 = some v := by
+      rw [hpre, regsAt_append_singleton]; rfl
+    obtain ⟨-, pr2⟩ := parents_of_regs (stripTrailing Digit.two w)
+    have J2 := (hgood v (by omega)).2.2.2.1
+    have hS : RawRot (regOdo D.S (fun u => (below f w u).tOdd) (fun u => (below f w u).tEven)
+        (regsAt (stripTrailing Digit.two w)).2 false) (regOdo D.S (fun u => (below f w u).tOdd)
+        (fun u => (below f w u).tEven) (regsAt (swapW (stripTrailing Digit.two w))).1 true)
+        (vQ1 (stripTrailing Digit.two w) - ((0 : ℤ), (1 : ℤ))) 0 := by
+      rw [regsAt_swapW, hr2]
+      show RawRot (below f w v).tEven (below f w (swapW v)).tOdd _ _
+      rw [below_of_lt f w v hvlen, below_of_lt f w (swapW v) (by rw [length_swapW]; exact hvlen)]
+      have h := J2.2.1
+      rw [pr2 v hr2] at h
+      exact rawRot_of_tileRotation_slopes _ _ _ h (hsl v (by omega)).2.1 (hsl (swapW v) (by rw [length_swapW]; omega)).1
+    have hH : RawRot (regOdo D.S (fun u => (below f w u).aOdd) (fun u => (below f w u).aEven)
+        (regsAt (stripTrailing Digit.two w)).2 false) (regOdo D.S (fun u => (below f w u).aOdd)
+        (fun u => (below f w u).aEven) (regsAt (swapW (stripTrailing Digit.two w))).1 true)
+        (altParQ (stripTrailing Digit.two w)).1 (altParQ (stripTrailing Digit.two w)).2 := by
+      rw [regsAt_swapW, hr2]
+      show RawRot (below f w v).aEven (below f w (swapW v)).aOdd _ _
+      rw [below_of_lt f w v hvlen, below_of_lt f w (swapW v) (by rw [length_swapW]; exact hvlen)]
+      have h := J2.2.2.2
+      have hcf := altCf_even_reg v Digit.three (Or.inr rfl)
+      rw [← hpre] at hcf
+      rw [hcf] at h
+      exact rawRot_of_altRotation_slopes _ _ _ _ h (hsl v (by omega)).2.2.2
+        (hsl (swapW v) (by rw [length_swapW]; omega)).2.2.1
+    have ho := (hLp.1 plus elong hdef').1
+    have hoR := (hLp'.2 (plus == W1Odd w) elong (evenLDefined_swapW hdef')).1
+    have hT := rawRot_of_tileRotation_slopes _ _ _ (hrot w hw).1 (hsl w (by omega)).1 (hsl (swapW w) (by omega)).2.1
+    obtain ⟨C, hC⟩ := good_of_sides _ _ _ _ _ _ _ _ _ _ _ hT (hLp.1 plus elong hdef').2
+      (hLp'.2 (plus == W1Odd w) elong (evenLDefined_swapW hdef')).2
+    refine lRotation_of_rawRot _ _ _ (oddL_special_rawRot D.S _ _ _ _ w plus elong _ _ ho hoR
+      (hcE (plus == W1Odd w) elong (evenLDefined_swapW hdef')) hd hS hH ⟨C, fun B hB x hx hxe => ?_⟩ hE1)
+    rcases hB1 B hB x hx hxe with h | ⟨r, hr, hxr, hxre, y, hyr, hyre, hy1, hy2⟩
+    · exact Or.inl (hC x h.1 h.2)
+    · exact Or.inr ⟨r, hr, hxr, hxre, y, hyr, hyre, hC y hy1 hy2⟩
+
+/-- **The rotation step**, with the special prefixes from their cells: `RotStepInput D` from the base slopes and rotations, the
+paper sides of the L-corrections, the connectivity of the alternate and L decompositions, and `SpecialCells`. -/
+theorem rotStepInput_of_cells (D : JointData) (hB : BaseSlopes D) (hBR : BaseRot D) (hlS : D.lSides = paperLSides)
+    (hconnA : ∀ (f : Word → JSlice) (n : ℕ), LevelHyp D f n →
+      ∀ w : Word, w.length = n → ¬ IsBase w → ConnectedAlt D (below f w) w)
+    (hconnL : ∀ (f : Word → JSlice) (n : ℕ), LevelHyp D f n → ∀ w : Word, w.length = n → ConnectedL D (below f w) w)
+    (hcells : ∀ (f : Word → JSlice) (n : ℕ), LevelHyp D f n → SpecialCells D f n) :
+    RotStepInput D := by
+  intro f n hg hlev w hw
+  have hL : LevelHyp D f n := ⟨hg, hlev⟩
+  have hrot : ∀ w : Word, w.length = n → RotProps w (f w) (f (swapW w)) := fun w hw =>
+    rotProps_step D f n hg (fun w hw => (hlev w hw).1) hB hBR
+      (fun w hw hb => connected4_of D hlS f n hg w hw hb (hconnA f n hL w hw hb)) w hw
+  exact ⟨hrot w hw, lRotProps_step D f n hg (fun w hw => (hlev w hw).1) hB (hconnL f n hL)
+    (specialLRot_of_cells D f n hg (fun w hw => (hlev w hw).1) hB (hconnL f n hL) (hcells f n hL) hrot) w hw⟩
 
 end FLatticePaper.Tiles.JointRot
