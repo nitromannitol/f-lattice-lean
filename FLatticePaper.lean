@@ -1337,6 +1337,7 @@ import FLatticePaper.Tiles.TileCompatInputs
 import FLatticePaper.Tiles.AltParentBase
 import FLatticePaper.Tiles.AltParentReflection
 import FLatticePaper.Tiles.AltParentStair
+import FLatticePaper.Tiles.TileCompatRotation
 import FLatticePaper.Tiles.SurgicalOdometerStep
 import FLatticePaper.Tiles.SurgicalCorners
 import FLatticePaper.Tiles.SurgicalAffineChain
