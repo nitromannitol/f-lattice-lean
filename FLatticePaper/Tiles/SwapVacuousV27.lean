@@ -453,7 +453,7 @@ theorem parents_three_one7 (a m : ℕ) :
     simp only [Parents.step, Parents.current, Parents.combine]
     congr 2 <;> ring
   rw [parentsAt_append_rep_three, hX, walk_three_iter]
-  congr 2 <;> ring
+  congr 2; ring
 
 theorem parents_three_two7 (a m : ℕ) :
     parentsAt (List.replicate a Digit.three ++ [Digit.two] ++ List.replicate m Digit.three) =
@@ -461,9 +461,9 @@ theorem parents_three_two7 (a m : ℕ) :
   have hX : parentsAt (List.replicate a Digit.three ++ [Digit.two]) = ⟨⟨1, 2 * (a : ℤ) + 2⟩, ⟨1, 2 * (a : ℤ) + 1⟩⟩ := by
     rw [parentsAt_append_singleton, FLatticePaper.Tiles.BaseTileProps.parents_three]
     simp only [Parents.step, Parents.current, Parents.combine]
-    congr 2 <;> ring
+    congr 2; ring
   rw [parentsAt_append_rep_three, hX, walk_three_iter]
-  congr 2 <;> ring
+  congr 2; ring
 
 theorem parents_two_one7 (b m : ℕ) :
     parentsAt (List.replicate b Digit.two ++ [Digit.one] ++ List.replicate m Digit.three) =

@@ -4,6 +4,7 @@ import FLatticePaper.Tiles.TileSlopeZeroPaper
 import FLatticePaper.Tiles.MixedCompatGeneral
 import FLatticePaper.Tiles.GlueColumns
 import FLatticePaper.Tiles.SwapContainPaper
+import FLatticePaper.Tiles.SwapVacuousTerm
 
 /-! # The weak step for the text data, from the vacuous families
 
@@ -31,5 +32,11 @@ theorem weakStepInput_paper_of (V : SwapVacuousSpec.SwapVacuous) (D : JointData)
       (SwapBaseInputAssembly.swapBaseInput_of V D)
   have hgf : WeakStepAssembly.GlueFullInput D := GlueFull.glueFullInput_of D hS hsl hsp
   exact WeakStepAssembly.weakStep_paper D hS BaseWeakInputPaper.baseWeakInput_paper hsl hmc hgr hgl hgf
+
+/-- **The weak step for the paper data, with no vacuity input.** The vacuous families are `SwapVacuousTerm.swapVacuous_term`
+(the seven vacuity fields, proved in `SwapVacuousTerm` and `SwapVacuousV27`). -/
+theorem weakStepInput_paper (D : JointData) (hS : D.S = WeakStepPaper.paperS)
+    (hA : D.altBase = SurgicalAlt.PaperAltBaseCond) : JointInduction.WeakStepInput D :=
+  weakStepInput_paper_of SwapVacuousTerm.swapVacuous_term D hS hA
 
 end FLatticePaper.Tiles.SwapWeakStepPaper

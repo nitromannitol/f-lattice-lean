@@ -1693,6 +1693,7 @@ import FLatticePaper.Tiles.SwapRegionClauses
 import FLatticePaper.Tiles.SwapVacuousSpec
 import FLatticePaper.Tiles.SwapBaseInputAssembly
 import FLatticePaper.Tiles.SwapWeakStepPaper
+import FLatticePaper.Tiles.SwapVacuousTerm
 import FLatticePaper.Tiles.SwapVacuousV27
 import FLatticePaper.Tiles.SwapVacuity
 import FLatticePaper.Tiles.SwapNonvac
