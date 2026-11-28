@@ -1683,5 +1683,7 @@ import FLatticePaper.Tiles.SwapRegions
 import FLatticePaper.Tiles.SwapNonvac
 import FLatticePaper.Tiles.EvenMidVMinus
 import FLatticePaper.Tiles.OddPtVMinus
+import FLatticePaper.Tiles.RespectsTranslate
+import FLatticePaper.Tiles.VPlusReflect
 
 /-! Root import for the corrected F-lattice paper. -/
