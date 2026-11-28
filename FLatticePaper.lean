@@ -1399,5 +1399,11 @@ import FLatticePaper.Tiles.StackedEvenBound
 import FLatticePaper.Tiles.BaseHmAnchor
 import FLatticePaper.Tiles.RevStringList
 import FLatticePaper.Tiles.BaseHmOddValues
+import FLatticePaper.Tiles.BaseHmOddClass1
+import FLatticePaper.Tiles.BaseHmOddClass3
+import FLatticePaper.Tiles.BaseHmOddClass2
+import FLatticePaper.Tiles.BaseHmOddLast
+import FLatticePaper.Tiles.BaseHmOddRespects
+import FLatticePaper.Tiles.BaseHmOddFull
 
 /-! Root import for the corrected F-lattice paper. -/
