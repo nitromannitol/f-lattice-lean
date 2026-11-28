@@ -445,6 +445,8 @@ import FLatticePaper.Tiles.GlueWords
 import FLatticePaper.Tiles.GlueStringDecomp
 import FLatticePaper.Tiles.SpecialCells
 import FLatticePaper.Tiles.ConnectedAltL
+import FLatticePaper.Tiles.ConnectedL
+import FLatticePaper.Tiles.TileStepAssembly
 import FLatticePaper.Tiles.GlueChain
 import FLatticePaper.Tiles.GlueSeams
 import FLatticePaper.Tiles.GlueCorners
