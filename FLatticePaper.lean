@@ -1632,6 +1632,8 @@ import FLatticePaper.Tiles.BaseHmOddRespects
 import FLatticePaper.Tiles.BaseHmOddFull
 import FLatticePaper.Tiles.BaseHmTwoOdd
 import FLatticePaper.Tiles.BaseHmTwoOddOdo
+import FLatticePaper.Tiles.DoubleBottomBase
+import FLatticePaper.Tiles.BaseHmTwoAnchor
 import FLatticePaper.Tiles.BaseWalkSums
 import FLatticePaper.Tiles.BaseInsideAlong
 import FLatticePaper.Tiles.BaseInsideTile
