@@ -1,4 +1,5 @@
 import FLatticePaper.Tiles.JointRot
+import FLatticePaper.Tiles.TileTranslation
 
 /-! # Constants of the pieces of a tile decomposition from local identities
 
@@ -102,5 +103,29 @@ theorem altHalfTurn_raw (o : PartialOdometer) (Dh E : Site) (h : AltHalfTurn o D
   refine ⟨h1, ?_⟩
   rw [normed_diff] at h2
   simpa [dotS] using h2
+
+/-- **A doubled pair, in the form of the shift constant**: if `o(x + S) - o(x) - a^T x = k` wherever `x, x + S` lie in the tile,
+and the tile meets its translate by `S`, then `2 k = e^T S + a^T S - a^T D`. -/
+theorem tau_shift (o : Site → ℤ) (T : Set Site) (D e S a : Site)
+    (hT : ∀ y ∈ T, D - y ∈ T ∧ 2 * (o (D - y) - o y) = dotS e D - 2 * dotS e y) (k : ℤ)
+    (hk : ∀ x, x ∈ T → x + S ∈ T → o (x + S) - o x - dotS a x = k) (x : Site) (hx : x ∈ T) (hxS : x + S ∈ T) :
+    2 * k = dotS e S + dotS a S - dotS a D := by
+  have h1 := hT x hx
+  have h2 := hT (x + S) hxS
+  have ey : D - (x + S) + S = D - x := by abel
+  have hy := hk (D - (x + S)) h2.1 (by rw [ey]; exact h1.1)
+  rw [ey] at hy
+  have hx' := hk x hx hxS
+  simp only [dotS, Prod.fst_add, Prod.snd_add, Prod.fst_sub, Prod.snd_sub] at h1 h2 hy hx' ⊢
+  nlinarith [h1.2, h2.2, hy, hx']
+
+/-- The corner values of `StdCornerValues` at slope zero, for the odometer itself. -/
+theorem corner_raw (o : PartialOdometer) (β : ℤ) (X Y e : Site) (h : TileTranslation.StdCornerValues o 0 β X Y e) :
+    o.val 0 = β ∧ o.val (1, 0) = β ∧ o.val (X - (0, 1)) = β ∧ o.val X = β ∧
+      o.val (Y + (1, 0)) = -h0 Y + e.1 + β ∧ o.val (Y + (1, -1)) = -h0 Y + e.1 - e.2 + β ∧
+      o.val (X + Y + (1, -1)) = -h0 Y + e.1 - e.2 + β ∧ o.val (X + Y + (1, -1) - (1, 0)) = -h0 Y - e.2 + β := by
+  obtain ⟨⟨-, h1⟩, ⟨-, h2⟩, ⟨-, h3⟩, ⟨-, h4⟩, ⟨-, h5⟩, ⟨-, h6⟩, ⟨-, h7⟩, ⟨-, h8⟩⟩ := h
+  simp only [normed, dotS, Prod.fst_zero, Prod.snd_zero, zero_mul, add_zero] at h1 h2 h3 h4 h5 h6 h7 h8
+  refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩ <;> linarith
 
 end FLatticePaper.Tiles.AltParentConstants
