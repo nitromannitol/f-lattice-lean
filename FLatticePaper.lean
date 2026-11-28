@@ -447,6 +447,8 @@ import FLatticePaper.Tiles.GlueCorners
 import FLatticePaper.Tiles.GlueEnds
 import FLatticePaper.Tiles.GlueRegister
 import FLatticePaper.Tiles.GlueRespectsAll
+import FLatticePaper.Tiles.GlueBlockExcl
+import FLatticePaper.Tiles.GlueBlockBounds
 import FLatticePaper.Tiles.GlueRespectsStd
 import FLatticePaper.Tiles.AltMixedCompat
 import FLatticePaper.Tiles.MixedOverlapStrings
