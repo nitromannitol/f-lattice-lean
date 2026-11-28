@@ -1325,6 +1325,7 @@ import FLatticePaper.Tiles.LCorrecProps
 import FLatticePaper.Tiles.CorrectedCellsOrdinary
 import FLatticePaper.Tiles.CorrectedCellsColumn
 import FLatticePaper.Tiles.CorrectedCellsNear
+import FLatticePaper.Tiles.LHeadCompatNear
 import FLatticePaper.Tiles.CorrectedCellsFirstExit
 import FLatticePaper.Tiles.TileTranslation
 import FLatticePaper.Tiles.HorizontalStepOne

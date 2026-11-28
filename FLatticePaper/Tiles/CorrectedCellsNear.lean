@@ -274,4 +274,89 @@ theorem odd_two_run_three (k : ℕ) :
       ((shift (plusColumn d) (U d) ∪ shift (minusColumn d) (B d)) ∪ (ladder d ∪ shift (ladder d) (B d + U d))) := by ac_rfl
     _ = _ := by rw [hx]; ac_rfl
 
+private def upFoot (d x y : ℤ) := inStair d (x-1) (y+1) ∨ inSquare x (y+2) ∨ inEnlarged (x-1) (y+1)
+private def downFoot (d x y : ℤ) := inStair d (x+3) (y-2*d+1) ∨ inEnlarged (x+2-d) (y+3-4*d)
+
+private theorem foot_disjoint (d x y : ℤ) (hd : 3 ≤ d) (p : upFoot d x y) (m : downFoot d x y) : False := by
+  unfold upFoot downFoot inEnlarged inStair inSquare at *
+  omega
+
+private theorem upper_pivot (d x y : ℤ) (hd : 3 ≤ d) (p : upFoot d x y) (m : inHead d (x+1) (y-d)) :
+    x = d ∧ y = 2*d-3 := by
+  unfold upFoot inHead inEnlarged inStair inSquare at *
+  omega
+
+private theorem lower_pivot (d x y : ℤ) (hd : 3 ≤ d) (p : inHead d x y) (m : downFoot d x y) :
+    x = -1 ∧ y = 2*d-1 := by
+  unfold downFoot inHead inEnlarged inStair inSquare at *
+  omega
+
+private theorem footprints (d x y : ℤ) (hd : 3 ≤ d)
+    (p : upFoot d x y ∨ inHead d x y) (m : downFoot d x y ∨ inHead d (x+1) (y-d)) :
+    inHead d x y ∧ inHead d (x+1) (y-d) := by
+  rcases p with p|p <;> rcases m with m|m
+  · exact (foot_disjoint _ _ _ hd p m).elim
+  · obtain ⟨rfl,rfl⟩ := upper_pivot _ _ _ hd p m
+    exact ⟨by unfold inHead;omega,m⟩
+  · obtain ⟨rfl,rfl⟩ := lower_pivot _ _ _ hd p m
+    exact ⟨p,by unfold inHead;omega⟩
+  · exact ⟨p,m⟩
+
+private theorem good_pair (d x y : ℤ) (hd : 3 ≤ d) (p : inHead d x y) (m : inHead d (x+1) (y-d)) :
+    ((x,y+1) ∈ paperNearStairAltTile d ∧ ¬((x,y+1) ∈ paperNearStairAltA d ∧ inStair d (x-1) (y+1))) ∧
+    ((x+1,y-d+1) ∈ paperNearStairAltTile d ∧ ¬((x+1,y-d+1) ∈ paperNearStairAltA d ∧ inStair d (x+3) (y-2*d+1))) := by
+  simp only [BaseTileProps.mem_nsAlt,paperNearStairAltA,Set.mem_union,Set.mem_setOf_eq,inStair]
+  unfold inHead at p m
+  iterate 2 constructor
+  all_goals first | constructor <;> omega | omega
+
+/-- The common domain of the ordinary corrections at a pure-two exit lies on both adjacent alternate heads.
+Each marked exceptional set is avoided there, including the endpoint of the enlarged square. -/
+theorem common_heads (k : ℕ) (z : Site) :
+    let d := denom k
+    let v := twos (k+1)
+    let up : Site := (d+2,d+2)
+    let down : Site := (d+1,2*d+2)
+    z ∈ shift (evenLCells v true false) (U d) → z ∈ shift (evenLCells v false false) (B d) →
+    (z-up+(0,1) ∈ paperNearStairAltTile d ∧ ¬(z-up+(0,1) ∈ paperNearStairAltA d ∧
+       z-(U d+(1,1)) ∈ stair d)) ∧
+    (z-down+(0,1) ∈ paperNearStairAltTile d ∧ ¬(z-down+(0,1) ∈ paperNearStairAltA d ∧
+       z-(B d+(-1,d+2)) ∈ stair d)) := by
+  dsimp only
+  let d := denom k
+  have hd : 3 ≤ d := by unfold d denom; omega
+  obtain ⟨x,y⟩ := z
+  intro p m
+  rw [(two_column k).1, mem_shift] at p
+  rw [(two_column k).2, mem_shift] at m
+  change (x-(d+2),y-d) ∈ plusColumn d at p
+  change (x-d,y-(2*d-1)) ∈ minusColumn d at m
+  rw [plus_mem _ _ _ hd] at p
+  rw [minus_mem _ _ _ hd] at m
+  let a := x-(d+2)
+  let b := y-(d+2)
+  have h₁ : upFoot d a b ∨ inHead d a b := by
+    unfold upFoot a b
+    rcases p with p|p|p|p
+    · left;left; convert p using 1; ring
+    · left;right;left;convert p using 1; ring
+    · left;right;right;convert p using 1; ring
+    · right;convert p using 1; ring
+  have h₂ : downFoot d a b ∨ inHead d (a+1) (b-d) := by
+    unfold downFoot a b
+    rcases m with m|m|m
+    · left;left;convert m using 1 <;> ring
+    · left;right;convert m using 1 <;> ring
+    · right;convert m using 1 <;> ring
+  obtain ⟨p',m'⟩ := footprints d a b hd h₁ h₂
+  have h := good_pair d a b hd p' m'
+  change (((x,y)-(d+2,d+2)+((0,1):Site) ∈ paperNearStairAltTile d) ∧
+    ¬((x,y)-(d+2,d+2)+((0,1):Site) ∈ paperNearStairAltA d ∧ (x,y)-(U d+(1,1)) ∈ stair d)) ∧
+    (((x,y)-(d+1,2*d+2)+((0,1):Site) ∈ paperNearStairAltTile d) ∧
+    ¬((x,y)-(d+1,2*d+2)+((0,1):Site) ∈ paperNearStairAltA d ∧ (x,y)-(B d+(-1,d+2)) ∈ stair d))
+  simp only [U,B,Prod.mk_sub_mk,Prod.mk_add_mk,stair_mem _ _ _ hd,add_zero]
+  dsimp only [a,b] at h
+  ring_nf at h ⊢
+  exact h
+
 end FLatticePaper.Tiles.CorrectedCellsNear
