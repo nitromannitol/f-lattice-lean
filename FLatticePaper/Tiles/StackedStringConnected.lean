@@ -335,10 +335,176 @@ theorem almostPalB_of {w : BinaryWord} (h : IsAlmostPalindrome w) : almostPalB w
   simp [almostPalB, hm]
 
 set_option maxHeartbeats 400000 in
+/-- The almost palindromes of length at most six with head `q` and last letter `p` (the words the horizontal row check runs on). -/
+theorem horizontal_words_filter : ∀ w ∈ wordsUpTo 6, almostPalB w = true → w.head? = some Letter.q →
+    w.getLast? = some Letter.p →
+      w ∈ [[Letter.q, Letter.p], [Letter.q, Letter.p, Letter.p], [Letter.q, Letter.q, Letter.p], [Letter.q, Letter.p, Letter.p, Letter.p],
+        [Letter.q, Letter.q, Letter.q, Letter.p], [Letter.q, Letter.p, Letter.p, Letter.p, Letter.p], [Letter.q, Letter.p, Letter.q, Letter.p, Letter.p], [Letter.q, Letter.q, Letter.p, Letter.q, Letter.p],
+        [Letter.q, Letter.q, Letter.q, Letter.q, Letter.p], [Letter.q, Letter.p, Letter.p, Letter.p, Letter.p, Letter.p], [Letter.q, Letter.p, Letter.q, Letter.q, Letter.p, Letter.p], [Letter.q, Letter.q, Letter.p, Letter.p, Letter.q, Letter.p],
+        [Letter.q, Letter.q, Letter.q, Letter.q, Letter.q, Letter.p]] := by
+  decide +kernel
+
+set_option maxHeartbeats 400000 in
+theorem small_horizontal_rows_qp :
+    RowConvex (stackedSites .horizontal [Letter.q, Letter.p]) ∧ RowsLinked (stackedSites .horizontal [Letter.q, Letter.p]) := by
+  decide +kernel
+
+set_option maxHeartbeats 400000 in
+theorem small_horizontal_rows_qpp :
+    RowConvex (stackedSites .horizontal [Letter.q, Letter.p, Letter.p]) ∧ RowsLinked (stackedSites .horizontal [Letter.q, Letter.p, Letter.p]) := by
+  decide +kernel
+
+set_option maxHeartbeats 400000 in
+theorem small_horizontal_rows_qqp :
+    RowConvex (stackedSites .horizontal [Letter.q, Letter.q, Letter.p]) ∧ RowsLinked (stackedSites .horizontal [Letter.q, Letter.q, Letter.p]) := by
+  decide +kernel
+
+set_option maxHeartbeats 400000 in
+theorem small_horizontal_rows_qppp :
+    RowConvex (stackedSites .horizontal [Letter.q, Letter.p, Letter.p, Letter.p]) ∧ RowsLinked (stackedSites .horizontal [Letter.q, Letter.p, Letter.p, Letter.p]) := by
+  decide +kernel
+
+set_option maxHeartbeats 400000 in
+theorem small_horizontal_rows_qqqp :
+    RowConvex (stackedSites .horizontal [Letter.q, Letter.q, Letter.q, Letter.p]) ∧ RowsLinked (stackedSites .horizontal [Letter.q, Letter.q, Letter.q, Letter.p]) := by
+  decide +kernel
+
+set_option maxHeartbeats 400000 in
+theorem small_horizontal_rows_qpppp :
+    RowConvex (stackedSites .horizontal [Letter.q, Letter.p, Letter.p, Letter.p, Letter.p]) ∧ RowsLinked (stackedSites .horizontal [Letter.q, Letter.p, Letter.p, Letter.p, Letter.p]) := by
+  decide +kernel
+
+set_option maxHeartbeats 400000 in
+theorem small_horizontal_rows_qpqpp :
+    RowConvex (stackedSites .horizontal [Letter.q, Letter.p, Letter.q, Letter.p, Letter.p]) ∧ RowsLinked (stackedSites .horizontal [Letter.q, Letter.p, Letter.q, Letter.p, Letter.p]) := by
+  decide +kernel
+
+set_option maxHeartbeats 400000 in
+theorem small_horizontal_rows_qqpqp :
+    RowConvex (stackedSites .horizontal [Letter.q, Letter.q, Letter.p, Letter.q, Letter.p]) ∧ RowsLinked (stackedSites .horizontal [Letter.q, Letter.q, Letter.p, Letter.q, Letter.p]) := by
+  decide +kernel
+
+set_option maxHeartbeats 400000 in
+theorem small_horizontal_rows_qqqqp :
+    RowConvex (stackedSites .horizontal [Letter.q, Letter.q, Letter.q, Letter.q, Letter.p]) ∧ RowsLinked (stackedSites .horizontal [Letter.q, Letter.q, Letter.q, Letter.q, Letter.p]) := by
+  decide +kernel
+
+set_option maxHeartbeats 400000 in
+theorem small_horizontal_rows_qppppp :
+    RowConvex (stackedSites .horizontal [Letter.q, Letter.p, Letter.p, Letter.p, Letter.p, Letter.p]) ∧ RowsLinked (stackedSites .horizontal [Letter.q, Letter.p, Letter.p, Letter.p, Letter.p, Letter.p]) := by
+  decide +kernel
+
+set_option maxHeartbeats 400000 in
+theorem small_horizontal_rows_qpqqpp :
+    RowConvex (stackedSites .horizontal [Letter.q, Letter.p, Letter.q, Letter.q, Letter.p, Letter.p]) ∧ RowsLinked (stackedSites .horizontal [Letter.q, Letter.p, Letter.q, Letter.q, Letter.p, Letter.p]) := by
+  decide +kernel
+
+set_option maxHeartbeats 400000 in
+theorem small_horizontal_rows_qqppqp :
+    RowConvex (stackedSites .horizontal [Letter.q, Letter.q, Letter.p, Letter.p, Letter.q, Letter.p]) ∧ RowsLinked (stackedSites .horizontal [Letter.q, Letter.q, Letter.p, Letter.p, Letter.q, Letter.p]) := by
+  decide +kernel
+
+set_option maxHeartbeats 400000 in
+theorem small_horizontal_rows_qqqqqp :
+    RowConvex (stackedSites .horizontal [Letter.q, Letter.q, Letter.q, Letter.q, Letter.q, Letter.p]) ∧ RowsLinked (stackedSites .horizontal [Letter.q, Letter.q, Letter.q, Letter.q, Letter.q, Letter.p]) := by
+  decide +kernel
+
+set_option maxHeartbeats 400000 in
 /-- Horizontal stacked strings of almost palindromes of length at most six: row convexity and row linking, decided. -/
 theorem small_horizontal_rows : ∀ w ∈ wordsUpTo 6, almostPalB w = true → w.head? = some Letter.q →
     w.getLast? = some Letter.p →
       RowConvex (stackedSites .horizontal w) ∧ RowsLinked (stackedSites .horizontal w) := by
+  intro w hw hA h1 h2
+  have hmem := horizontal_words_filter w hw hA h1 h2
+  simp only [List.mem_cons, List.mem_nil_iff, or_false] at hmem
+  rcases hmem with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
+  · exact small_horizontal_rows_qp
+  · exact small_horizontal_rows_qpp
+  · exact small_horizontal_rows_qqp
+  · exact small_horizontal_rows_qppp
+  · exact small_horizontal_rows_qqqp
+  · exact small_horizontal_rows_qpppp
+  · exact small_horizontal_rows_qpqpp
+  · exact small_horizontal_rows_qqpqp
+  · exact small_horizontal_rows_qqqqp
+  · exact small_horizontal_rows_qppppp
+  · exact small_horizontal_rows_qpqqpp
+  · exact small_horizontal_rows_qqppqp
+  · exact small_horizontal_rows_qqqqqp
+
+set_option maxHeartbeats 400000 in
+/-- The almost palindromes of length at most six with head `p` and last letter `q` (the words the vertical row check runs on). -/
+theorem vertical_words_filter : ∀ w ∈ wordsUpTo 6, almostPalB w = true → w.head? = some Letter.p →
+    w.getLast? = some Letter.q →
+      w ∈ [[Letter.p, Letter.q], [Letter.p, Letter.p, Letter.q], [Letter.p, Letter.q, Letter.q], [Letter.p, Letter.p, Letter.p, Letter.q],
+        [Letter.p, Letter.q, Letter.q, Letter.q], [Letter.p, Letter.p, Letter.p, Letter.p, Letter.q], [Letter.p, Letter.p, Letter.q, Letter.p, Letter.q], [Letter.p, Letter.q, Letter.p, Letter.q, Letter.q],
+        [Letter.p, Letter.q, Letter.q, Letter.q, Letter.q], [Letter.p, Letter.p, Letter.p, Letter.p, Letter.p, Letter.q], [Letter.p, Letter.p, Letter.q, Letter.q, Letter.p, Letter.q], [Letter.p, Letter.q, Letter.p, Letter.p, Letter.q, Letter.q],
+        [Letter.p, Letter.q, Letter.q, Letter.q, Letter.q, Letter.q]] := by
+  decide +kernel
+
+set_option maxHeartbeats 400000 in
+theorem small_vertical_rows_pq :
+    RowConvex (stackedSites .vertical [Letter.p, Letter.q]) ∧ RowsLinked (stackedSites .vertical [Letter.p, Letter.q]) := by
+  decide +kernel
+
+set_option maxHeartbeats 400000 in
+theorem small_vertical_rows_ppq :
+    RowConvex (stackedSites .vertical [Letter.p, Letter.p, Letter.q]) ∧ RowsLinked (stackedSites .vertical [Letter.p, Letter.p, Letter.q]) := by
+  decide +kernel
+
+set_option maxHeartbeats 400000 in
+theorem small_vertical_rows_pqq :
+    RowConvex (stackedSites .vertical [Letter.p, Letter.q, Letter.q]) ∧ RowsLinked (stackedSites .vertical [Letter.p, Letter.q, Letter.q]) := by
+  decide +kernel
+
+set_option maxHeartbeats 400000 in
+theorem small_vertical_rows_pppq :
+    RowConvex (stackedSites .vertical [Letter.p, Letter.p, Letter.p, Letter.q]) ∧ RowsLinked (stackedSites .vertical [Letter.p, Letter.p, Letter.p, Letter.q]) := by
+  decide +kernel
+
+set_option maxHeartbeats 400000 in
+theorem small_vertical_rows_pqqq :
+    RowConvex (stackedSites .vertical [Letter.p, Letter.q, Letter.q, Letter.q]) ∧ RowsLinked (stackedSites .vertical [Letter.p, Letter.q, Letter.q, Letter.q]) := by
+  decide +kernel
+
+set_option maxHeartbeats 400000 in
+theorem small_vertical_rows_ppppq :
+    RowConvex (stackedSites .vertical [Letter.p, Letter.p, Letter.p, Letter.p, Letter.q]) ∧ RowsLinked (stackedSites .vertical [Letter.p, Letter.p, Letter.p, Letter.p, Letter.q]) := by
+  decide +kernel
+
+set_option maxHeartbeats 400000 in
+theorem small_vertical_rows_ppqpq :
+    RowConvex (stackedSites .vertical [Letter.p, Letter.p, Letter.q, Letter.p, Letter.q]) ∧ RowsLinked (stackedSites .vertical [Letter.p, Letter.p, Letter.q, Letter.p, Letter.q]) := by
+  decide +kernel
+
+set_option maxHeartbeats 400000 in
+theorem small_vertical_rows_pqpqq :
+    RowConvex (stackedSites .vertical [Letter.p, Letter.q, Letter.p, Letter.q, Letter.q]) ∧ RowsLinked (stackedSites .vertical [Letter.p, Letter.q, Letter.p, Letter.q, Letter.q]) := by
+  decide +kernel
+
+set_option maxHeartbeats 400000 in
+theorem small_vertical_rows_pqqqq :
+    RowConvex (stackedSites .vertical [Letter.p, Letter.q, Letter.q, Letter.q, Letter.q]) ∧ RowsLinked (stackedSites .vertical [Letter.p, Letter.q, Letter.q, Letter.q, Letter.q]) := by
+  decide +kernel
+
+set_option maxHeartbeats 400000 in
+theorem small_vertical_rows_pppppq :
+    RowConvex (stackedSites .vertical [Letter.p, Letter.p, Letter.p, Letter.p, Letter.p, Letter.q]) ∧ RowsLinked (stackedSites .vertical [Letter.p, Letter.p, Letter.p, Letter.p, Letter.p, Letter.q]) := by
+  decide +kernel
+
+set_option maxHeartbeats 400000 in
+theorem small_vertical_rows_ppqqpq :
+    RowConvex (stackedSites .vertical [Letter.p, Letter.p, Letter.q, Letter.q, Letter.p, Letter.q]) ∧ RowsLinked (stackedSites .vertical [Letter.p, Letter.p, Letter.q, Letter.q, Letter.p, Letter.q]) := by
+  decide +kernel
+
+set_option maxHeartbeats 400000 in
+theorem small_vertical_rows_pqppqq :
+    RowConvex (stackedSites .vertical [Letter.p, Letter.q, Letter.p, Letter.p, Letter.q, Letter.q]) ∧ RowsLinked (stackedSites .vertical [Letter.p, Letter.q, Letter.p, Letter.p, Letter.q, Letter.q]) := by
+  decide +kernel
+
+set_option maxHeartbeats 400000 in
+theorem small_vertical_rows_pqqqqq :
+    RowConvex (stackedSites .vertical [Letter.p, Letter.q, Letter.q, Letter.q, Letter.q, Letter.q]) ∧ RowsLinked (stackedSites .vertical [Letter.p, Letter.q, Letter.q, Letter.q, Letter.q, Letter.q]) := by
   decide +kernel
 
 set_option maxHeartbeats 400000 in
@@ -346,14 +512,23 @@ set_option maxHeartbeats 400000 in
 theorem small_vertical_rows : ∀ w ∈ wordsUpTo 6, almostPalB w = true → w.head? = some Letter.p →
     w.getLast? = some Letter.q →
       RowConvex (stackedSites .vertical w) ∧ RowsLinked (stackedSites .vertical w) := by
-  decide +kernel
-
-/-- The horizontal stacked string of an almost palindrome `w = q … p` of length at most six is simply connected. -/
-theorem stacked_horizontal_simply_connected_short {w : BinaryWord} (hw : w.length ≤ 6)
-    (hA : IsAlmostPalindrome w) (h1 : w.head? = some Letter.q) (h2 : w.getLast? = some Letter.p) :
-    SimplyConnectedCells (stackedSites .horizontal w) := by
-  obtain ⟨hR, hL⟩ := small_horizontal_rows w (mem_wordsUpTo hw) (almostPalB_of hA) h1 h2
-  exact simplyConnectedCells_of_rows hR hL
+  intro w hw hA h1 h2
+  have hmem := vertical_words_filter w hw hA h1 h2
+  simp only [List.mem_cons, List.mem_nil_iff, or_false] at hmem
+  rcases hmem with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl
+  · exact small_vertical_rows_pq
+  · exact small_vertical_rows_ppq
+  · exact small_vertical_rows_pqq
+  · exact small_vertical_rows_pppq
+  · exact small_vertical_rows_pqqq
+  · exact small_vertical_rows_ppppq
+  · exact small_vertical_rows_ppqpq
+  · exact small_vertical_rows_pqpqq
+  · exact small_vertical_rows_pqqqq
+  · exact small_vertical_rows_pppppq
+  · exact small_vertical_rows_ppqqpq
+  · exact small_vertical_rows_pqppqq
+  · exact small_vertical_rows_pqqqqq
 
 /-- The vertical stacked string of an almost palindrome `w = p … q` of length at most six is simply connected. -/
 theorem stacked_vertical_simply_connected_short {w : BinaryWord} (hw : w.length ≤ 6)
