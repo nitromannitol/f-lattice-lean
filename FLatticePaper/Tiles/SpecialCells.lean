@@ -1233,7 +1233,7 @@ theorem base_doms (D : JointData) (hS : D.S = WeakStepPaper.paperS) (hA : D.altB
   refine ⟨?_, ?_, ?_⟩
   · rw [hTP2.2.2.2.2.2.2.2.2.1, hS]
     exact BaseInvariant.oddTile_two j
-  · rw [hTP3.2.2.2.2.2.2.2.2.2, hS]
+  · rw [hTP3.2.2.2.2.2.2.2.2.2.1, hS]
     exact BaseInvariant.evenTile_three j
   · rw [(hTP2.1 hb2).2.2.1]
     have hc := hWA2.2.2.1 hb2

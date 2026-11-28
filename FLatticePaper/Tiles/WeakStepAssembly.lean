@@ -84,7 +84,7 @@ theorem regsAt_parents (w : Word) :
 /-- The tile odometers of the slice are defined on the boundary tiles of the weak data (the domain clause of `TilePart`). -/
 theorem slice_domains (D : JointData) (f : Word → JSlice) (u : Word) (h : IsJointSlice D f u) :
     (f u).tOdd.dom = D.S.bdry (some u) true ∧ (f u).tEven.dom = D.S.bdry (some u) false := by
-  obtain ⟨-, -, ⟨-, -, -, -, -, -, -, -, h1, h2⟩, -⟩ := h
+  obtain ⟨-, -, ⟨-, -, -, -, -, -, -, -, h1, h2, -⟩, -⟩ := h
   exact ⟨h1, h2⟩
 
 theorem slice_respects (D : JointData) (f : Word → JSlice) (u : Word) (h : IsJointSlice D f u) :
