@@ -16,7 +16,13 @@ that edition, and their named hypotheses belong to the supplement's route. That 
 subodometers around closed paths (condition (C)) for every decomposition, standard, alternate and corrected. In the Lean the
 packing is proved for both children (`Tiles.H3Pairs`), and condition (C) is proved for both
 standard children from named local inputs (`Tiles.ClosedPathStandard`). The weak odometers of Section 7 are built from the tile odometers of the parents (Section 8), so Sections 7 and 8
-are formalised as one induction over the recursion word. Every numbered statement of Sections 5–8 is now proved in the text, except `prop:recurrence`, which is cited as in the original;
+are formalised as one induction over the recursion word (`Tiles.JointInduction.joint_family_exists`), from five step inputs. For the
+text's data the rotation step is proved with no remaining input; the weak step is proved except the base cases of its
+same-parent input; the weak alternate, tile and L steps are assembled or being assembled from named inputs, of which the
+compatibility of copies with L-corrections, condition (C) and the domains of the corrected decompositions, the sides and the
+piece agreement of the L-corrections, and the existence of the weak alternate odometers remain open (see `SOURCE-MAP.md`,
+`lemma:tile-odometer-existence`). Item (d) of `prop:base_cases`, that the base odometers respect their strings in the sense of
+Section 5, is proved for every base word. Every numbered statement of Sections 5–8 is now proved in the text, except `prop:recurrence`, which is cited as in the original;
 the last two items, the local compatibility of overlapping copies and the covering of the standard tiles by the corrected decompositions, landed at 430ec83 and a280515.
 
 ## Headline theorems
