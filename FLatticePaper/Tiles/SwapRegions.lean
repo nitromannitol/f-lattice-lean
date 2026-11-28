@@ -60,7 +60,7 @@ theorem ladder_core (k : ℤ) (z1 z2 y1 y2 : ℤ) (hz1 : z1 = y1 + (2 * k + 2)) 
   split_ifs <;> omega
 
 /-- The special point `x = (1, 2k+5)`: `y = (0,0)` (indicator on) and `z = (2k+2, 2)` (indicator on). -/
-theorem ladder_P1 (k : ℤ) (hk : 1 ≤ k) (x1 x2 : ℤ) (h1 : x1 = 1) (h2 : x2 = 2 * k + 5) :
+theorem ladder_P1 (k : ℤ) (_hk : 1 ≤ k) (x1 x2 : ℤ) (h1 : x1 = 1) (h2 : x2 = 2 * k + 5) :
     paperLadderValue (2 * k + 2) (x1 + (2 * k + 1), x2 - (2 * k + 3)) -
       paperLadderValue (2 * k + 2) (x1 - 1, x2 - (2 * k + 5)) + ((1 - 1) * x1 + (-(2 * k + 2) - -(2 * k + 3)) * x2) =
       2 * k + 5 := by
@@ -121,5 +121,113 @@ theorem ladder_region (k : ℤ) (hk : 1 ≤ k) (x : Site)
     | (have key := ladder_core k (x1 + (2 * k + 1)) (x2 - (2 * k + 3)) (x1 - 1) (x2 - (2 * k + 5)) (by ring) (by ring)
           hC' hC
        linarith)
+
+/-- The near-ladder value as a function of the two coordinates, with the indicator as linear conditions. -/
+theorem nl_value_formula (d a b : ℤ) : paperNearLadderValue d (a, b) =
+    -((b - a) ^ 2 / 4) + min 0 (d - b) + min 0 (2 * d - b) + max (b - a - d) 0 +
+      (if (a = -1 ∧ b = 2 * d + 1) ∨ (a = d + 1 ∧ b = d - 1) ∨ (b - a = d ∧ 0 < a ∧ a < d) then 1 else 0) := by
+  unfold paperNearLadderValue
+  simp only [Set.indicator_apply, paperNearLadderA, paperNearLadderB, Set.mem_union, Set.mem_insert_iff,
+    Set.mem_singleton_iff, Set.mem_setOf_eq, Prod.ext_iff, or_assoc]
+
+/-- The shift of a square by an even multiple: `((D - 2m)^2)/4 = D^2/4 - mD + m^2`. -/
+theorem sq_shift_half (D m : ℤ) : (D - 2 * m) ^ 2 / 4 = D ^ 2 / 4 - m * D + m ^ 2 := by
+  have h : (D - 2 * m) ^ 2 = D ^ 2 + 4 * (m ^ 2 - m * D) := by ring
+  rw [h]
+  omega
+
+/-- The linear part of the near-ladder region: for `p = (a,b)` and `p' = (a+2, b-d)` (`d = 2k+2`) both in the linear part of the
+near-ladder tile, the value difference is `(k+1)a - (k+2)b + (k+2)^2`. -/
+theorem nladder_core (k a b : ℤ) (_hk : 1 ≤ k)
+    (hpC : -1 ≤ a ∧ a ≤ 2 * k + 2 + 1 ∧ 1 ≤ b ∧ b ≤ 3 * (2 * k + 2) - 1 ∧ -1 ≤ b - a ∧ b - a ≤ 2 * (2 * k + 2) + 1)
+    (hqC : -1 ≤ a + 2 ∧ a + 2 ≤ 2 * k + 2 + 1 ∧ 1 ≤ b - (2 * k + 2) ∧ b - (2 * k + 2) ≤ 3 * (2 * k + 2) - 1 ∧
+      -1 ≤ b - (2 * k + 2) - (a + 2) ∧ b - (2 * k + 2) - (a + 2) ≤ 2 * (2 * k + 2) + 1) :
+    paperNearLadderValue (2 * k + 2) (a, b) - paperNearLadderValue (2 * k + 2) (a + 2, b - (2 * k + 2)) =
+      (k + 1) * a - (k + 2) * b + (k + 2) ^ 2 := by
+  rw [nl_value_formula, nl_value_formula]
+  have hsq : (b - (2 * k + 2) - (a + 2)) ^ 2 / 4 = (b - a) ^ 2 / 4 - (k + 2) * (b - a) + (k + 2) ^ 2 := by
+    have e : b - (2 * k + 2) - (a + 2) = (b - a) - 2 * (k + 2) := by ring
+    rw [e, sq_shift_half]
+  have F1 : min 0 (2 * k + 2 - b) = 2 * k + 2 - b := min_eq_right (by omega)
+  have F2 : min 0 (2 * k + 2 - (b - (2 * k + 2))) = min 0 (2 * (2 * k + 2) - b) := by
+    congr 1
+    ring
+  have F3 : min 0 (2 * (2 * k + 2) - (b - (2 * k + 2))) = 0 := min_eq_left (by omega)
+  have F4 : max (b - a - (2 * k + 2)) 0 = b - a - (2 * k + 2) := max_eq_left (by omega)
+  have F5 : max (b - (2 * k + 2) - (a + 2) - (2 * k + 2)) 0 = 0 := max_eq_right (by omega)
+  split_ifs with hA hB <;> first | (exfalso; omega) | linarith
+
+/-- Membership in the near-ladder tile as linear conditions (the exclusion `D` is kept as one conjunct). -/
+theorem nl_tile_mem (d a b : ℤ) : (a, b) ∈ paperNearLadderTile d ↔
+    (((a = -1 ∧ b = 2 * d + 1) ∨ (a = d + 1 ∧ b = d - 1) ∨ (b - a = d ∧ 0 < a ∧ a < d) ∨
+      (-1 ≤ a ∧ a ≤ d + 1 ∧ 1 ≤ b ∧ b ≤ 3 * d - 1 ∧ -1 ≤ b - a ∧ b - a ≤ 2 * d + 1)) ∧
+      ¬((a = -1 ∧ b ≤ d + 1) ∨ (a = d + 1 ∧ 2 * d - 1 ≤ b))) := by
+  unfold paperNearLadderTile paperNearLadderA paperNearLadderB paperNearLadderC paperNearLadderD
+  simp only [Set.mem_sdiff, Set.mem_union, Set.mem_insert_iff, Set.mem_singleton_iff, Set.mem_setOf_eq, Prod.ext_iff]
+  tauto
+
+/-- The near-ladder special point `(a, b) = (2k+1, 4k+3)`: `(a,b)` in `B` and `(a+2, b-d)` the point `(d+1, d-1)` of `A`. -/
+theorem nladder_S1 (k a b : ℤ) (hk : 1 ≤ k) (ha : a = 2 * k + 1) (hb : b = 4 * k + 3) :
+    paperNearLadderValue (2 * k + 2) (a, b) - paperNearLadderValue (2 * k + 2) (a + 2, b - (2 * k + 2)) =
+      (k + 1) * a - (k + 2) * b + (k + 2) ^ 2 := by
+  subst ha hb
+  rw [nl_value_formula, nl_value_formula]
+  have q1 : (4 * k + 3 - (2 * k + 1)) ^ 2 / 4 = (k + 1) ^ 2 := by
+    rw [show 4 * k + 3 - (2 * k + 1) = 2 * (k + 1) by ring, show (2 * (k + 1)) ^ 2 = 4 * (k + 1) ^ 2 by ring]
+    omega
+  have q2 : (4 * k + 3 - (2 * k + 2) - (2 * k + 1 + 2)) ^ 2 / 4 = 1 := by
+    rw [show 4 * k + 3 - (2 * k + 2) - (2 * k + 1 + 2) = -2 by ring]
+    norm_num
+  rw [q1, q2]
+  simp only [min_def, max_def]
+  split_ifs <;> first | (exfalso; omega) | ring
+
+/-- The near-ladder special point `(a, b) = (-1, 4k+5)`: `(a,b)` in `A` and `(a+2, b-d)` in `B`. -/
+theorem nladder_S2 (k a b : ℤ) (hk : 1 ≤ k) (ha : a = -1) (hb : b = 4 * k + 5) :
+    paperNearLadderValue (2 * k + 2) (a, b) - paperNearLadderValue (2 * k + 2) (a + 2, b - (2 * k + 2)) =
+      (k + 1) * a - (k + 2) * b + (k + 2) ^ 2 := by
+  subst ha hb
+  rw [nl_value_formula, nl_value_formula]
+  have q1 : (4 * k + 5 - -1) ^ 2 / 4 = (2 * k + 3) ^ 2 := by
+    rw [show 4 * k + 5 - -1 = 2 * (2 * k + 3) by ring, show (2 * (2 * k + 3)) ^ 2 = 4 * (2 * k + 3) ^ 2 by ring]
+    omega
+  have q2 : (4 * k + 5 - (2 * k + 2) - (-1 + 2)) ^ 2 / 4 = (k + 1) ^ 2 := by
+    rw [show 4 * k + 5 - (2 * k + 2) - (-1 + 2) = 2 * (k + 1) by ring,
+      show (2 * (k + 1)) ^ 2 = 4 * (k + 1) ^ 2 by ring]
+    omega
+  rw [q1, q2]
+  simp only [min_def, max_def]
+  split_ifs <;> first | (exfalso; (try simp only [true_and] at *); omega) | ring
+
+
+/-- The near-ladder region (`u2 = 2^k`, word `2^k 1`, the pair (2,5)): on the overlap of the two translates of the near-ladder
+tile at the offsets `(2k+4, 2k+2)` and `(2k+2, 4k+4)`, the value difference plus the affine part is the constant `(k+1)(k+2)`.
+The overlap is the linear part (`nladder_core`) and the two special points (`nladder_S1`, `nladder_S2`). -/
+theorem nladder_region (k : ℤ) (hk : 1 ≤ k) (x1 x2 : ℤ)
+    (h0 : (x1 - (2 * k + 4), x2 - (2 * k + 2) + 1) ∈ paperNearLadderTile (2 * k + 2))
+    (h1 : (x1 - (2 * k + 2), x2 - (4 * k + 4) + 1) ∈ paperNearLadderTile (2 * k + 2)) :
+    paperNearLadderValue (2 * k + 2) (x1 - (2 * k + 4), x2 - (2 * k + 2) + 1) -
+      paperNearLadderValue (2 * k + 2) (x1 - (2 * k + 2), x2 - (4 * k + 4) + 1) +
+      ((0 - (k + 1)) * x1 + (0 - -(k + 2)) * x2) = (k + 1) * (k + 2) := by
+  rw [nl_tile_mem] at h0 h1
+  obtain ⟨hz, -⟩ := h0
+  obtain ⟨hy, -⟩ := h1
+  have e : (x1 - (2 * k + 4) + 2, x2 - (2 * k + 2) + 1 - (2 * k + 2)) = (x1 - (2 * k + 2), x2 - (4 * k + 4) + 1) :=
+    Prod.ext (by ring) (by ring)
+  rcases hz with hA0 | hA1 | hB | hC <;> rcases hy with hA0' | hA1' | hB' | hC'
+  all_goals first
+    | (exfalso; omega)
+    | (have key := nladder_S1 k (x1 - (2 * k + 4)) (x2 - (2 * k + 2) + 1) hk (by omega) (by omega)
+       rw [e] at key
+       linear_combination key)
+    | (have key := nladder_S2 k (x1 - (2 * k + 4)) (x2 - (2 * k + 2) + 1) hk (by omega) (by omega)
+       rw [e] at key
+       linear_combination key)
+    | (have key := nladder_core k (x1 - (2 * k + 4)) (x2 - (2 * k + 2) + 1) hk
+         ⟨by omega, by omega, by omega, by omega, by omega, by omega⟩
+         ⟨by omega, by omega, by omega, by omega, by omega, by omega⟩
+       rw [e] at key
+       linear_combination key)
+
 
 end FLatticePaper.Tiles.SwapRegions
