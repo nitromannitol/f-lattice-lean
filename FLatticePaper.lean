@@ -1289,6 +1289,7 @@ import FLatticePaper.Tiles.JointGlue
 import FLatticePaper.Tiles.PaperAltBase
 import FLatticePaper.Tiles.LCorrecProps
 import FLatticePaper.Tiles.CorrectedCellsOrdinary
+import FLatticePaper.Tiles.CorrectedCellsColumn
 import FLatticePaper.Tiles.TileTranslation
 import FLatticePaper.Tiles.HorizontalStepOne
 import FLatticePaper.Tiles.VerticalStepOne
