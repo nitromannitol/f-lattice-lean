@@ -476,6 +476,7 @@ import FLatticePaper.Tiles.GlueRespectsAll
 import FLatticePaper.Tiles.GlueBlockExcl
 import FLatticePaper.Tiles.GlueColumns
 import FLatticePaper.Tiles.CorrectedWalkZero
+import FLatticePaper.Tiles.CorrectedAltEven
 import FLatticePaper.Tiles.AltSevenFamilyB
 import FLatticePaper.Tiles.AltSevenBase
 import FLatticePaper.Tiles.AltBaseContacts
