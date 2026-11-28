@@ -1135,4 +1135,34 @@ theorem evenL_bottom_double (D : JointData) (hS : D.S = paperS) (hDB : DoubleBot
           have := j1.2.symm.trans j3.2
           linarith
 
+/-! ### The double case `pre = 2^j`: the base fact for the top side -/
+
+/-- **The top string of the even base tile of `2^j`** (`j ≥ 1`), in its own frame, for the `-` even L-correction (which has no
+bridge there): its last stem (the odd tile of `2^{j-1}` at `s_T = (-1, 2j+3)`, affine factor `(j+1, -(j+2))`) and its enlarged
+piece (`T^d_{1/1}` at `s_E = (2j+1, 6j+3)`, affine factor `(2j, -(2j+2))`) cover the top string; `s_E` lies on it; the base
+odometer of `2^j` equals each of them, with its affine factor, up to one constant there; and at `J = (-1, 4j+1)`, where
+consecutive stems meet on the top string of `2^j 3^k` (in the base tile, not on its top string), the base odometer equals the
+stem as well. A statement about the base formulas of `prop:base_cases`, not proved here (numerics `tmp-w6/chk21.py`; w2,
+`j ≤ 6`). -/
+def DoubleTopBaseInput : Prop :=
+  ∀ (j : ℕ), 1 ≤ j → ∀ (O E O' E' : PartialOdometer), SurgicalWeak.PaperBaseCond (List.replicate j Digit.two) O E →
+    SurgicalWeak.PaperBaseCond (List.replicate (j - 1) Digit.two) O' E' →
+    (∀ x ∈ placedSites (sideString (hWordOf (List.replicate j Digit.two) true)
+        (vWordOf (List.replicate j Digit.two) true) 0 .hMinus),
+      x - ((-1 : ℤ), 2 * (j : ℤ) + 3) ∈ O'.dom ∨ x - (2 * (j : ℤ) + 1, 6 * (j : ℤ) + 3) ∈ enlOdo.dom) ∧
+    (2 * (j : ℤ) + 1, 6 * (j : ℤ) + 3) ∈ placedSites (sideString (hWordOf (List.replicate j Digit.two) true)
+        (vWordOf (List.replicate j Digit.two) true) 0 .hMinus) ∧
+    ∃ c1 c3 : ℤ,
+      (∀ x ∈ placedSites (sideString (hWordOf (List.replicate j Digit.two) true)
+          (vWordOf (List.replicate j Digit.two) true) 0 .hMinus),
+        x ∈ E.dom ∧
+        (x - ((-1 : ℤ), 2 * (j : ℤ) + 3) ∈ O'.dom →
+          E.val x = O'.val (x - ((-1 : ℤ), 2 * (j : ℤ) + 3)) + dotS ((j : ℤ) + 1, -((j : ℤ) + 2)) x + c1) ∧
+        (x - (2 * (j : ℤ) + 1, 6 * (j : ℤ) + 3) ∈ enlOdo.dom →
+          E.val x = enlOdo.val (x - (2 * (j : ℤ) + 1, 6 * (j : ℤ) + 3)) + dotS (2 * (j : ℤ), -(2 * (j : ℤ) + 2)) x + c3)) ∧
+      ((-1 : ℤ), 4 * (j : ℤ) + 1) ∈ E.dom ∧
+      E.val ((-1 : ℤ), 4 * (j : ℤ) + 1) =
+        O'.val (((-1 : ℤ), 4 * (j : ℤ) + 1) - ((-1 : ℤ), 2 * (j : ℤ) + 3)) +
+          dotS ((j : ℤ) + 1, -((j : ℤ) + 2)) ((-1 : ℤ), 4 * (j : ℤ) + 1) + c1
+
 end FLatticePaper.Tiles.LSidesEvenK
