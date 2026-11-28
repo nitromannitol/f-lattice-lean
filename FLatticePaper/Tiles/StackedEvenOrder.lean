@@ -190,7 +190,7 @@ theorem even_order (w : Word) (a : GInt) (hrot : rot (evenTile w) = shift (oddTi
     intro t ht1 ht2
     obtain ⟨hA, hC⟩ := hrange t ht1 ht2
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     obtain ⟨c1, c2⟩ := hcon
     have hne1 := evCol_nonempty w a t hA
     have hne2 := evCol_nonempty w a (t + (texV2 (fracEven w)).1) hC

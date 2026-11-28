@@ -173,7 +173,7 @@ theorem odd_order (w : Word) (a : GInt) (hrot : rot (oddTile w) = shift (evenTil
     intro t ht1 ht2
     obtain ⟨hA, hC⟩ := hrange t ht1 ht2
     by_contra hcon
-    push_neg at hcon
+    push Not at hcon
     obtain ⟨c1, c2⟩ := hcon
     have hne1 := ordCol_nonempty w a t hA
     have hne2 := ordCol_nonempty w a (t + (texV2 (fracOdd w)).1) hC
