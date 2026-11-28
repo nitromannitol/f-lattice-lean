@@ -171,7 +171,7 @@ theorem after_two_of_after_three (D : JointData) (hS : D.S = WeakStepPaper.paper
         (vQ1 w - ((0 : ℤ),(1 : ℤ))) 0 := by
     have lt := dropLast_length_lt hl
     simp only [LE,LO,below_of_lt f w w.dropLast lt,below_of_lt f w _ (by rwa [length_swapW] : (swapW w.dropLast).length < w.length)]
-    exact lrot_three f w hw.1 hl (hg _ lt).2.2.2.2 elong plus
+    exact lrot_three f w hw.1 hl (hg _ lt).2.2.2.2.1 elong plus
   constructor <;> intro i hi j hj hne
   all_goals have hin : i ∈ [1,2] := hi
   all_goals have il : i < 6 := by simp only [List.mem_cons,List.not_mem_nil,or_false] at hin; omega

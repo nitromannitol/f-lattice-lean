@@ -2250,14 +2250,14 @@ theorem rotProps_step (D : JointData) (f : Word → JSlice) (n : ℕ) (hgood : G
     intro elong hl plus
     have hlen := dropLast_length_lt hl
     rw [below_of_lt f w _ hlen, below_of_lt f w _ (by rw [length_swapW]; exact hlen)]
-    exact lrot_three f w hb hl (hgood w.dropLast (by omega)).2.2.2.2 elong plus
+    exact lrot_three f w hb hl (hgood w.dropLast (by omega)).2.2.2.2.1 elong plus
   have hL2 : ∀ elong : Bool, w.getLast? = some Digit.two → ∀ plus : Bool,
       RawRot ((below f w w.dropLast).lOdd plus elong) ((below f w (swapW w.dropLast)).lEven (plus == W1Odd w) elong)
         (vP1 w - ((0 : ℤ), (1 : ℤ))) 0 := by
     intro elong hl plus
     have hlen := dropLast_length_lt hl
     rw [below_of_lt f w _ hlen, below_of_lt f w _ (by rw [length_swapW]; exact hlen)]
-    exact lrot_two f w hb hl (hgood w.dropLast (by omega)).2.2.2.2 elong plus
+    exact lrot_two f w hb hl (hgood w.dropLast (by omega)).2.2.2.2.1 elong plus
   -- the four children
   have R1 := tileOdd_rawRot D.S _ _ _ _ w _ _ hto hte' hc2 hP hQ (hL3 false)
   have R2 := tileEven_rawRot D.S _ _ _ _ w _ _ hte hto' hc1 hP hQ (hL2 false)

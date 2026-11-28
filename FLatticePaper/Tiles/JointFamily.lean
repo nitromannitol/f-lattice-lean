@@ -610,6 +610,33 @@ theorem weakPropsU_of_weakProps (w : Word) (wo we : PartialOdometer) (h : WeakPr
   obtain ⟨h1, h2, h3, h4⟩ := h
   exact ⟨fun _ => ⟨h1, h2⟩, fun _ => ⟨h3, h4⟩⟩
 
+/-- (b) of `lemma:weak_alternate_odometer_properties` for an odometer `ao` of the odd alternate child `p_0` of `w`: `ao` is
+compatible with its lattice adjacent translates along both generators of `L'(p_0)`, `v_{p_0,1}` with affine factor `0` and
+`v_{p_0,2}` with affine factor `a_{p_0,2}`. -/
+def AltLatticeOdd (w : Word) (ao : PartialOdometer) : Prop :=
+  let p0 := (parentsAt w).current .odd
+  LatticeSelfCompatible ao (texV1Odd p0) 0 ∧ LatticeSelfCompatible ao (texV2 p0) (offsetA p0.num p0.den true)
+
+/-- (b) of `lemma:weak_alternate_odometer_properties` for an odometer `ae` of the even alternate child `q_0` of `w`, along
+`v_{q_0,1}` (affine factor `0`) and `v_{q_0,2}` (affine factor `a_{q_0,2}`). -/
+def AltLatticeEven (w : Word) (ae : PartialOdometer) : Prop :=
+  let q0 := (parentsAt w).current .even
+  LatticeSelfCompatible ae (texV1Even q0) 0 ∧ LatticeSelfCompatible ae (texV2 q0) (offsetA q0.num q0.den true)
+
+/-- (b) of `lemma:weak_alternate_odometer_properties` at `w` for a pair of alternate odometers of the two alternate children of
+`w`: lattice adjacent alternate odometers are compatible. The joint family carries it for the alternate tile odometers
+(`JointProps`), which the tile decompositions read as the alternate parents (Case 3) and the L-corrections read as their heads; at a
+corrected alternate child the alternate tile odometer is the L-decomposition (the alternate parent of the odd alternate child of
+`133` is the even alternate tile odometer of `13`, corrected after a `3`). -/
+def AltLatticeSelfCompat (w : Word) (ao ae : PartialOdometer) : Prop :=
+  AltLatticeOdd w ao ∧ AltLatticeEven w ae
+
+/-- (b) of `lemma:weak_alternate_odometer_properties` at `w` for the weak alternate odometers, at the alternate children that are
+not corrected, where they are the alternate tile odometers (`TilePart`): the odd alternate child unless `w` ends in a `2`, the
+even alternate child unless it ends in a `3`. -/
+def WeakAltPropsU (w : Word) (wao wae : PartialOdometer) : Prop :=
+  (¬ CorrectedAfterTwo w → AltLatticeOdd w wao) ∧ (¬ CorrectedAfterThree w → AltLatticeEven w wae)
+
 /-- (a) and (b) of `lemma:tile-odometer-existence` at `w`. -/
 def TileProps (w : Word) (tod tev aod aev : PartialOdometer) : Prop :=
   let p0 := (parentsAt w).current .odd
@@ -644,10 +671,11 @@ def LRotProps (w : Word) (x r : JSlice) : Prop :=
   (OddLDefined w → ∀ plus elong : Bool,
     LRotation (x.lOdd plus elong) (r.lEven (plus == W1Odd w) elong) (texV1Odd ((parentsAt w).current .odd)))
 
-/-- The properties at `w` proved by the induction. -/
+/-- The properties at `w` proved by the induction. The last is (b) of `lemma:weak_alternate_odometer_properties` for the
+alternate tile odometers. -/
 def JointProps (f : Word → JSlice) (w : Word) : Prop :=
   WeakPropsU w (f w).wOdd (f w).wEven ∧ TileProps w (f w).tOdd (f w).tEven (f w).aOdd (f w).aEven ∧
-    RotProps w (f w) (f (swapW w)) ∧ LRotProps w (f w) (f (swapW w))
+    RotProps w (f w) (f (swapW w)) ∧ LRotProps w (f w) (f (swapW w)) ∧ AltLatticeSelfCompat w (f w).aOdd (f w).aEven
 
 /-- The joint family: the joint predicate and the properties at every word. -/
 def IsJointFamily (D : JointData) (f : Word → JSlice) : Prop :=

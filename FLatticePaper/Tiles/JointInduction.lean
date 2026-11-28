@@ -4,7 +4,8 @@ import FLatticePaper.Tiles.JointFamily
 
 Surgical edition 274ad18: the weak odometers, the weak alternate odometers, the tile odometers, the alternate tile odometers and
 the L-corrected odometers of a word are built from the tile odometers (and the alternate tile and L-corrected odometers) of
-strictly shorter words, and the properties (c) of the weak odometers and (a)-(c) of the tile odometers are proved along the way.
+strictly shorter words, and the properties (c) of the weak odometers, (b) of the weak alternate odometers and (a)-(c) of the tile
+odometers are proved along the way.
 The induction runs over the length of the word: the rotation identity (c) relates the children of `w` and of `swapW w`, which have
 the same length, so all the words of one length form one step.
 
@@ -137,18 +138,23 @@ def WeakStepInput (D : JointData) : Prop :=
   ∀ (f : Word → JSlice) (w : Word), GoodBelow D f w.length →
     ∃ wo we : PartialOdometer, WeakPart D (below f w) w wo we ∧ WeakPropsU w wo we
 
-/-- The weak alternate step (`lemma:weak_alternate_odometer_properties`, over the tile parents and the alternate tile parents). -/
+/-- The weak alternate step (`lemma:weak_alternate_odometer_properties`, over the tile parents and the alternate tile parents),
+with (b) at the alternate children that are not corrected. -/
 def WeakAltStepInput (D : JointData) : Prop :=
   ∀ (f : Word → JSlice) (w : Word), GoodBelow D f w.length →
-    ∃ wao wae : PartialOdometer, WeakAltPart D (below f w) w wao wae
+    ∃ wao wae : PartialOdometer, WeakAltPart D (below f w) w wao wae ∧ WeakAltPropsU w wao wae
 
 /-- The tile step (`lemma:tile-odometer-existence`, existence with (a) and (b), Cases 1-4 and the rotated children): from the
-family on the shorter words and the weak odometers at `w`, tile odometers at `w` with their part, (a) and (b). -/
+family on the shorter words and the weak odometers at `w`, tile odometers at `w` with their part, (a) and (b), and (b) of
+`lemma:weak_alternate_odometer_properties` for the alternate tile odometers (the weak alternate odometers at the children that are
+not corrected). -/
 def TileStepInput (D : JointData) : Prop :=
   ∀ (f : Word → JSlice) (w : Word) (wo we wao wae : PartialOdometer), GoodBelow D f w.length →
     WeakPart D (below f w) w wo we → WeakPropsU w wo we → WeakAltPart D (below f w) w wao wae →
+    WeakAltPropsU w wao wae →
     ∃ tod tev aod aev : PartialOdometer,
-      TilePart D (below f w) w wo we wao wae tod tev aod aev ∧ TileProps w tod tev aod aev
+      TilePart D (below f w) w wo we wao wae tod tev aod aev ∧ TileProps w tod tev aod aev ∧
+        AltLatticeSelfCompat w aod aev
 
 /-- The L step (`lemma:l_correct_existence`): from the family on the shorter words and the tile odometers at `w`, the L-corrected
 odometers of the children of `w`. -/
@@ -170,16 +176,17 @@ def RotStepInput (D : JointData) : Prop :=
 /-- The one induction of Sections 7-8: given the five per-step inputs, there is a joint family, with the weak, weak alternate,
 tile, alternate tile and L-corrected odometers of every word built over the tile odometers of the shorter words, and with (a) and
 (c) of `lemma:weak_standard_odometer_properties` and (a)-(c) of `lemma:tile-odometer-existence` at every word ((b) of the weak
-lemma follows from (a) by `corner_3_family` and the corner identities). -/
+lemma follows from (a) by `corner_3_family` and the corner identities), and (b) of
+`lemma:weak_alternate_odometer_properties` for the alternate tile odometers. -/
 theorem joint_family_exists (D : JointData) (hW : WeakStepInput D) (hWA : WeakAltStepInput D) (hT : TileStepInput D)
     (hL : LStepInput D) (hR : RotStepInput D) : ∃ f : Word → JSlice, IsJointFamily D f := by
   refine exists_family_by_length (fun f w => IsJointSlice D f w ∧ JointProps f w)
     (fun f g w h hf => good_congr D f g w h hf) (fun n f hf => ?_)
   have hfu : ∀ u : Word, u.length = n → GoodBelow D f u.length := fun u hu => hu ▸ hf
   choose wo we hWp hWq using fun u (hu : u.length = n) => hW f u (hfu u hu)
-  choose wao wae hAp using fun u (hu : u.length = n) => hWA f u (hfu u hu)
-  choose tod tev aod aev hTp hTq using fun u (hu : u.length = n) =>
-    hT f u (wo u hu) (we u hu) (wao u hu) (wae u hu) (hfu u hu) (hWp u hu) (hWq u hu) (hAp u hu)
+  choose wao wae hAp hAq using fun u (hu : u.length = n) => hWA f u (hfu u hu)
+  choose tod tev aod aev hTp hTq hTa using fun u (hu : u.length = n) =>
+    hT f u (wo u hu) (we u hu) (wao u hu) (wae u hu) (hfu u hu) (hWp u hu) (hWq u hu) (hAp u hu) (hAq u hu)
   choose lo le hLp using fun u (hu : u.length = n) =>
     hL f u (wo u hu) (we u hu) (wao u hu) (wae u hu) (tod u hu) (tev u hu) (aod u hu) (aev u hu) (hfu u hu) (hWp u hu)
       (hAp u hu) (hTp u hu) (hTq u hu)
@@ -205,6 +212,9 @@ theorem joint_family_exists (D : JointData) (hW : WeakStepInput D) (hWA : WeakAl
     exact ⟨⟨hWp u hu, hAp u hu, hTp u hu, hLp u hu⟩, hWq u hu, hTq u hu⟩
   refine ⟨g, hgf, fun u hu => ?_⟩
   obtain ⟨h1, h2, h3⟩ := hslice u hu
-  exact ⟨h1, h2, h3, hR g n hgood hslice u hu⟩
+  have h4 : AltLatticeSelfCompat u (g u).aOdd (g u).aEven := by
+    rw [hgu u hu]
+    exact hTa u hu
+  exact ⟨h1, h2, h3, (hR g n hgood hslice u hu).1, (hR g n hgood hslice u hu).2, h4⟩
 
 end FLatticePaper.Tiles.JointInduction
