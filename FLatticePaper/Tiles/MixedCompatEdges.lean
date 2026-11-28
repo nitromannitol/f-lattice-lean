@@ -139,6 +139,11 @@ def onSide (S SR : GInt → Prop) (X Y : GInt) (s : Side) (z : GInt) : Prop :=
   | .vPlus => ∃ y, SR y ∧ z = mulI y + (X - (0,1))
   | .vMinus => ∃ y, SR y ∧ X + Y + ((1,-1) : GInt) - z = mulI y + (X - (0,1))
 
+/-- Membership in the four sides built from two walks is decidable. -/
+instance onSide_walk_decidable (w wr : BinaryWord) (X Y : GInt) (s : Side) (z : GInt) :
+    Decidable (onSide (fun y => y ∈ F2Word.walk 0 (gH w)) (fun y => y ∈ F2Word.walk 0 (gH wr)) X Y s z) := by
+  cases s <;> unfold onSide <;> infer_instance
+
 /-- The four boundary walks, with the right walk obtained by turning the bottom walk of the rotated tile. -/
 def edge (w wr : BinaryWord) (X Y : GInt) (s : Side) (z : GInt) : Prop :=
   onSide (fun y => y ∈ F2Word.walk 0 (gH w)) (fun y => y ∈ F2Word.walk 0 (gH wr)) X Y s z
