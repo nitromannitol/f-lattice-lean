@@ -1,5 +1,7 @@
 import FLatticePaper.Tiles.AltPiecesAgree
 import FLatticePaper.Tiles.AltItem5
+import FLatticePaper.Tiles.SameParentAlt
+import FLatticePaper.Tiles.WeakStepAssembly
 
 /-! # The overlaps of the six standard copies of an alternate child
 
@@ -78,5 +80,22 @@ theorem sixOverlaps_odd (w u1 u2 : Word) (hw : ¬ IsBase w) (hr : regsAt w = (so
     have mD : (altOddD w).getD i 0 ∈ altOddD w := getD_mem _ _ (by omega)
     have key := hm ((altOddD w).getD i 0) mD ((altOddR w).getD (j - 4) 0) mR z (by rw [← coe_shift, hT1] at *; exact hzi) (by rw [← coe_shift, hT2] at *; exact hzj)
     exact ⟨key.1, key.2⟩
+
+/-- `SixOverlaps` for the even alternate child at every non-base word not ending in `3`, in the form of the `hov` input of
+`AltSevenFamily`. -/
+theorem sixOverlaps_even_all (w : Word) (hw : ¬ IsBase w) (hd : w.getLast? ≠ some Digit.three) :
+    ∀ u1 u2, regsAt w = (some u1, some u2) →
+      AltPiecesAgree.SixOverlaps (altEvenD w) (altEvenR w) (tEvenSet u2) (tOddSet u1) (marksEven u2) (marksOdd u1) dblEven :=
+  fun u1 u2 hr => sixOverlaps_even w u1 u2 hw hr (fun i j hi hj hij hs hnd z h1 h2 =>
+    SameParentAlt.altEven_same_disjoint w u1 u2 hw ((WeakStepAssembly.regsAt_parents w).1 u1 (by rw [hr]))
+      ((WeakStepAssembly.regsAt_parents w).2 u2 (by rw [hr])) hd i j hi hj hij hs hnd z h1 h2)
+
+/-- `SixOverlaps` for the odd alternate child at every non-base word not ending in `2`. -/
+theorem sixOverlaps_odd_all (w : Word) (hw : ¬ IsBase w) (hd : w.getLast? ≠ some Digit.two) :
+    ∀ u1 u2, regsAt w = (some u1, some u2) →
+      AltPiecesAgree.SixOverlaps (altOddD w) (altOddR w) (tOddSet u1) (tEvenSet u2) (marksOdd u1) (marksEven u2) dblEven :=
+  fun u1 u2 hr => sixOverlaps_odd w u1 u2 hw hr (fun i j hi hj hij hs hnd z h1 h2 =>
+    SameParentAlt.altOdd_same_disjoint w u1 u2 hw ((WeakStepAssembly.regsAt_parents w).1 u1 (by rw [hr]))
+      ((WeakStepAssembly.regsAt_parents w).2 u2 (by rw [hr])) hd i j hi hj hij hs hnd z h1 h2)
 
 end FLatticePaper.Tiles.AltSixOverlaps
