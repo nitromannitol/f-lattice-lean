@@ -1369,5 +1369,9 @@ import FLatticePaper.Tiles.StackedEvenColumns
 import FLatticePaper.Tiles.StackedBaseOrder
 import FLatticePaper.Tiles.StackedOrder
 import FLatticePaper.Tiles.StackedEvenOrder
+import FLatticePaper.Tiles.StackedWalkPattern
+import FLatticePaper.Tiles.StackedTopCell
+import FLatticePaper.Tiles.StackedDBound
+import FLatticePaper.Tiles.StackedEvenBound
 
 /-! Root import for the corrected F-lattice paper. -/
