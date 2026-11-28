@@ -1320,5 +1320,9 @@ import FLatticePaper.Tiles.AltItem3
 import FLatticePaper.Tiles.BaseTileProps
 import FLatticePaper.Tiles.BaseWeakDomains
 import FLatticePaper.Tiles.BaseWeakLattice
+import FLatticePaper.Tiles.BaseTileAssembly
+import FLatticePaper.Tiles.BaseRespectsHorizontal
+import FLatticePaper.Tiles.BaseHpLadder
+import FLatticePaper.Tiles.BaseHpStair
 
 /-! Root import for the corrected F-lattice paper. -/

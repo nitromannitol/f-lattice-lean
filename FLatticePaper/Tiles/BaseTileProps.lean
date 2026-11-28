@@ -1502,21 +1502,6 @@ theorem tileProps_two (k : ℕ) (hk : 1 ≤ k) (O E aO aE : PartialOdometer)
 
 
 
-/-- The base case of the tile properties (`lemma:tile-odometer-existence` (a), (b) at the base words, with the
-paper base conditions and the lattice compatibilities of `WeakProps` as hypotheses). -/
-theorem base_tileProps (w : Word) (hw : IsBase w) (O E aO aE : PartialOdometer) (hS : PaperBaseCond w O E)
-    (hA : PaperAltBaseCond w aO aE) (hW : WeakProps w O E) : TileProps w O E aO aE := by
-  rcases hw with rfl | h3 | h2
-  · exact tileProps_empty O E aO aE hS hA hW
-  · obtain ⟨k, rfl⟩ : ∃ k, w = List.replicate k Digit.three := ⟨w.length, List.eq_replicate_iff.mpr ⟨rfl, h3⟩⟩
-    rcases Nat.eq_zero_or_pos k with rfl | hk
-    · exact tileProps_empty O E aO aE hS hA hW
-    · exact tileProps_three k hk O E aO aE hS hA hW
-  · obtain ⟨k, rfl⟩ : ∃ k, w = List.replicate k Digit.two := ⟨w.length, List.eq_replicate_iff.mpr ⟨rfl, h2⟩⟩
-    rcases Nat.eq_zero_or_pos k with rfl | hk
-    · exact tileProps_empty O E aO aE hS hA hW
-    · exact tileProps_two k hk O E aO aE hS hA hW
-
 /-- The base odometers are normalised with slope `0` (`α = 0` on the tiles of the base families): the four odometers of a
 base word, the standard odd and even and the alternate odd and even, each with `FirstTileNormal _ 0 b` for some `b`. -/
 theorem base_slopes (w : Word) (hw : IsBase w) (O E aO aE : PartialOdometer) (hS : PaperBaseCond w O E)
