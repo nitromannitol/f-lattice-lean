@@ -1364,6 +1364,8 @@ import FLatticePaper.Tiles.JointRot
 import FLatticePaper.Tiles.LStemCompat
 import FLatticePaper.Tiles.LRetainedSides
 import FLatticePaper.Tiles.AltItem3
+import FLatticePaper.Tiles.AltItem3Strings
+import FLatticePaper.Tiles.AltItem3Exterior
 import FLatticePaper.Tiles.AltBounds
 import FLatticePaper.Tiles.AltItem4Defs
 import FLatticePaper.Tiles.AltItem4Special
