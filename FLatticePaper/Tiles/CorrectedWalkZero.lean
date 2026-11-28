@@ -145,6 +145,34 @@ theorem off_triple {ps : List Piece} {off : Fin ps.length → Fin ps.length → 
   rw [off_point hoff hp hq hxp hxq hep heq, off_point hoff hp hr hxp hxr hep her, off_point hoff hr hq hxr hxq her heq]
   ring
 
+/-- The constants `κ` sum the overlap constants along every edge: `κ j - κ i` on every edge of the overlap graph, for every
+choice of overlap constants matching the pieces (the hypothesis of `walkZero_of_edges`). -/
+def EdgeConst (ps : List Piece) (κ : ℕ → ℤ) : Prop :=
+  ∀ off : Fin ps.length → Fin ps.length → ℤ, OffMatch ps off →
+    ∀ i j, (overlapGraph (goodPart ps)).Adj i j → off i j = κ j.1 - κ i.1
+
+/-- The edge constants from a list of edges: every listed pair that meets has the constant `κ j - κ i` for every choice of
+overlap constants, and two pieces not listed (in either order) do not meet. -/
+theorem edgeConst_of_list (ps : List Piece) (κ : ℕ → ℤ) (E : List (ℕ × ℕ))
+    (hE : ∀ off, OffMatch ps off → ∀ e ∈ E, ∀ (hi : e.1 < ps.length) (hj : e.2 < ps.length),
+      (∃ x ∈ (ps.get ⟨e.1, hi⟩).placed, x ∈ (ps.get ⟨e.2, hj⟩).placed ∧ x ∉ (ps.get ⟨e.1, hi⟩).exc ∧
+        x ∉ (ps.get ⟨e.2, hj⟩).exc) → off ⟨e.1, hi⟩ ⟨e.2, hj⟩ = κ e.2 - κ e.1)
+    (hN : ∀ (i j : ℕ) (p q : Piece), ps[i]? = some p → ps[j]? = some q → i ≠ j → (i, j) ∉ E → (j, i) ∉ E →
+      ∀ x ∈ p.placed, x ∈ q.placed → x ∉ p.exc → x ∉ q.exc → False) : EdgeConst ps κ := by
+  intro off hoff u v hadj
+  obtain ⟨hne, x, hxu, hxv⟩ := hadj
+  have hu : ps[u.1]? = some (ps.get u) := by simp
+  have hv : ps[v.1]? = some (ps.get v) := by simp
+  by_cases h1 : (u.1, v.1) ∈ E
+  · exact hE off hoff _ h1 u.2 v.2 ⟨x.1, hxu.1, hxv.1, hxu.2, hxv.2⟩
+  by_cases h2 : (v.1, u.1) ∈ E
+  · have e2 := hE off hoff _ h2 v.2 u.2 ⟨x.1, hxv.1, hxu.1, hxv.2, hxu.2⟩
+    have a := off_point hoff hu hv hxu.1 hxv.1 hxu.2 hxv.2 u.2 v.2
+    have b := off_point hoff hv hu hxv.1 hxu.1 hxv.2 hxu.2 v.2 u.2
+    simp only [Fin.eta] at a b e2 ⊢
+    linarith
+  exact (hN u.1 v.1 _ _ hu hv (fun h => hne (Fin.ext h)) h1 h2 x.1 hxu.1 hxv.1 hxu.2 hxv.2).elim
+
 /-- **Condition (C) from a list of edges**: every listed pair that meets has the constant `κ j - κ i` for every choice of
 overlap constants, and two pieces not listed (in either order) do not meet. -/
 theorem walkZero_of_list (ps : List Piece) (κ : ℕ → ℤ) (E : List (ℕ × ℕ))
@@ -166,5 +194,36 @@ theorem walkZero_of_list (ps : List Piece) (κ : ℕ → ℤ) (E : List (ℕ × 
     simp only [Fin.eta] at a b e2 ⊢
     linarith
   exact (hN u.1 v.1 _ _ hu hv (fun h => hne (Fin.ext h)) h1 h2 x.1 hxu.1 hxv.1 hxu.2 hxv.2).elim
+
+/-- **Agreement from local compatibility and the edge constants.** If every two pieces differ by a constant on their overlap and
+the constants `κ` give every edge, the pieces agree with `κ` at every common point. -/
+theorem piecesAgree_of_edges (ps : List Piece) (κ : ℕ → ℤ)
+    (hc : ∀ i j, i < ps.length → j < ps.length → TileCompatInputs.PairCompat ps i j) (hE : EdgeConst ps κ) :
+    PiecesAgree ps κ := by
+  have hk : ∀ i j : Fin ps.length, ∃ k : ℤ, ∀ x ∈ goodPart ps i ∩ goodPart ps j,
+      pieceVal (ps.get i) x.1 - pieceVal (ps.get j) x.1 = k := by
+    intro i j
+    obtain ⟨k, hk⟩ := hc i.1 j.1 i.2 j.2 (ps.get i) (ps.get j) (by simp) (by simp)
+    exact ⟨k, fun x hx => hk x.1 hx.1.1 hx.2.1 hx.1.2 hx.2.2⟩
+  choose off hoff using hk
+  intro i j p q hp hq x hxp hxq hep heq
+  obtain ⟨hi, ep⟩ := get_of hp
+  obtain ⟨hj, eq⟩ := get_of hq
+  by_cases hij : i = j
+  · subst hij
+    rw [hp] at hq
+    cases hq
+    rfl
+  have hadj : (overlapGraph (goodPart ps)).Adj ⟨i, hi⟩ ⟨j, hj⟩ :=
+    ⟨fun h => hij (Fin.ext_iff.1 h), ⟨x, mem_union_of hp hxp⟩,
+      by simp only [goodPart, Set.mem_setOf_eq]; rw [ep]; exact ⟨hxp, hep⟩,
+      by simp only [goodPart, Set.mem_setOf_eq]; rw [eq]; exact ⟨hxq, heq⟩⟩
+  have e := hE off (fun a b y hy => hoff a b y hy) _ _ hadj
+  have h := hoff ⟨i, hi⟩ ⟨j, hj⟩ ⟨x, mem_union_of hp hxp⟩
+    ⟨by simp only [goodPart, Set.mem_setOf_eq]; rw [ep]; exact ⟨hxp, hep⟩,
+     by simp only [goodPart, Set.mem_setOf_eq]; rw [eq]; exact ⟨hxq, heq⟩⟩
+  rw [ep, eq] at h
+  simp only at e h
+  linarith
 
 end FLatticePaper.Tiles.CorrectedWalkZero

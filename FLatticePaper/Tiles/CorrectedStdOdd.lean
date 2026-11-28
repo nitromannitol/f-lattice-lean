@@ -557,4 +557,71 @@ theorem tOP_boundary_ef (D : JointData) (hS : D.S = WeakStepPaper.paperS) (hA : 
       Prod.snd_add, Prod.fst_sub, Prod.snd_sub, Prod.fst_zero, Prod.snd_zero, Prod.smul_mk,
       smul_eq_mul, Prod.mk_zero_zero, hcur] at r30 r05 r45 pK pK' hT0 hB4 ⊢
     linear_combination (4 : ℤ) * r45 + (-4 : ℤ) * r05 + 4 * r30 - pK + pK' + 2 * hT0 - hB4
+open FLatticePaper.Tiles.ClosedPathExcluded in
+/-- **The optional interfaces of the odd standard child do not occur after a `3`.** The full copies `(1, 2)`, `(0, 5)` for `W_1`
+odd and `(1, 3)`, `(0, 4)` for `W_1` even do not meet: if they did, the boxes of `ClosedPathExcluded` would give
+`n_q + 1 ≤ 2 n_p`, resp. `d_q + 1 ≤ 2 d_p` (as in `ClosedPathTriOdd`), while after a `3` the even parent is `2 p + q'`. -/
+
+theorem opt_disjoint_three (w u1 u2 : Word) (h3 : w.getLast? = some Digit.three)
+    (hp : (parentsAt w).odd = fracOdd u1) (hq : (parentsAt w).even = fracEven u2) :
+    (phase w = 1 → (∀ z, z ∈ dOdd w u1 u2 1 → z ∈ dOdd w u1 u2 2 → False) ∧
+      (∀ z, z ∈ dOdd w u1 u2 0 → z ∈ dOdd w u1 u2 5 → False)) ∧
+    (phase w ≠ 1 → (∀ z, z ∈ dOdd w u1 u2 1 → z ∈ dOdd w u1 u2 3 → False) ∧
+      (∀ z, z ∈ dOdd w u1 u2 0 → z ∈ dOdd w u1 u2 4 → False)) := by
+  have hs := SameParentCopies.parents_last w _ h3
+  have ho : (parentsAt w).odd = (parentsAt w.dropLast).odd := by rw [hs]; simp [Parents.step]
+  have he : (parentsAt w).even = ⟨2 * (parentsAt w.dropLast).odd.num + (parentsAt w.dropLast).even.num,
+      2 * (parentsAt w.dropLast).odd.den + (parentsAt w.dropLast).even.den⟩ := by
+    rw [hs]; simp [Parents.step, Parents.current, Parents.combine]
+  obtain ⟨hd0, hn0, -⟩ := (parentsAt_valid w.dropLast).even_bounds
+  have hnum : (parentsAt w).even.num = 2 * (parentsAt w).odd.num + (parentsAt w.dropLast).even.num := by
+    rw [he, ho]
+  have hden : (parentsAt w).even.den = 2 * (parentsAt w).odd.den + (parentsAt w.dropLast).even.den := by
+    rw [he, ho]
+  refine ⟨fun hph => ⟨fun z0 hd1 hd2 => ?_, fun z0 hd0' hd5 => ?_⟩, fun hph => ⟨fun z0 hd1 hd3 => ?_, fun z0 hd0' hd4 => ?_⟩⟩
+  · have hP := oddP_of w hph
+    have hQ := oddQ_of w hph
+    simp only [dOdd, pieceSet, hP, hQ] at hd1 hd2
+    simp at hd1 hd2
+    have b1 := box_shift_odd u1 _ z0 hd1
+    have b2 := box_shift_even u2 _ z0 hd2
+    rw [← hp] at b1
+    rw [← hq] at b2
+    simp only [texV2, texV1Even, texV1Odd, Prod.fst_add, Prod.snd_add] at b1 b2
+    have hov : (parentsAt w).even.num + 1 ≤ 2 * (parentsAt w).odd.num := by omega
+    omega
+  · have hP := oddP_of w hph
+    have hQ := oddQ_of w hph
+    simp only [dOdd, pieceSet, hP, hQ] at hd0' hd5
+    simp at hd0' hd5
+    have b0 := box_shift_odd u1 _ z0 hd0'
+    have b5 := box_shift_even u2 _ z0 hd5
+    rw [← hp] at b0
+    rw [← hq] at b5
+    simp only [texV2, texV1Even, Prod.fst_add, Prod.snd_add, Prod.fst_zero, Prod.snd_zero] at b0 b5
+    have hov : (parentsAt w).even.num + 1 ≤ 2 * (parentsAt w).odd.num := by omega
+    omega
+  · have hP := oddP_ef w hph
+    have hQ := oddQ_ef w hph
+    simp only [dOdd, pieceSet, hP, hQ] at hd1 hd3
+    simp at hd1 hd3
+    have b1 := box_shift_odd u1 _ z0 hd1
+    have b3 := box_shift_even u2 _ z0 hd3
+    rw [← hp] at b1
+    rw [← hq] at b3
+    simp only [texV2, texV1Even] at b1 b3
+    have hov : (parentsAt w).even.den + 1 ≤ 2 * (parentsAt w).odd.den := by omega
+    omega
+  · have hP := oddP_ef w hph
+    have hQ := oddQ_ef w hph
+    simp only [dOdd, pieceSet, hP, hQ] at hd0' hd4
+    simp at hd0' hd4
+    have b0 := box_shift_odd u1 _ z0 hd0'
+    have b4 := box_shift_even u2 _ z0 hd4
+    rw [← hp] at b0
+    rw [← hq] at b4
+    simp only [texV2, texV1Even, texV1Odd, Prod.fst_add, Prod.snd_add] at b0 b4
+    have hov : (parentsAt w).even.den + 1 ≤ 2 * (parentsAt w).odd.den := by omega
+    omega
+
 end FLatticePaper.Tiles.CorrectedStdOdd
