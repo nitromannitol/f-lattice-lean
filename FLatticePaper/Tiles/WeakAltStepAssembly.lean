@@ -1,5 +1,4 @@
 import FLatticePaper.Tiles.WeakStepAssembly
-import FLatticePaper.Tiles.TileCompatInputs
 
 /-! # The weak alternate step of the joint induction for the paper data
 
@@ -9,8 +8,7 @@ doubling of a register (shift `S_p` or `S_q`, `altShifts`, affine factor `a_{p,2
 respect the tile translations on their meeting string, and their overlap lies in that string, `lemma:alternate_tile_properties`).
 The base cases (`BaseWeakAltInput`), (a) of `lemma:weak_alternate_odometer_properties` for the glued weak alternates at the
 children that are not corrected (`AltGlueRespectsInput`), and the weak alternates at the corrected children
-(`AltCorrectedWeakInput`) are stated as well, and the local compatibility of the alternate parent piece with the six standard
-copies at the uncorrected alternate children (`AltPairCompatInput`). Stated, not proved here. -/
+(`AltCorrectedWeakInput`) are stated as well. Stated, not proved here. -/
 
 namespace FLatticePaper.Tiles.WeakAltStepAssembly
 
@@ -79,18 +77,5 @@ def AltCorrectedWeakInput (D : JointData) : Prop :=
       AltEvenNodeP D.S wae (fun u => (below f w u).tOdd) (fun u => (below f w u).tEven) (fun u => (below f w u).aOdd)
         (fun u => (below f w u).aEven) w ∧
       RespectsHalfH (altFwdHAnchor D.anc w) (hWordOf w true) wae.val)
-
-/-- **The alternate parent piece and the six standard copies** (Case 3 of `lemma:tile-odometer-existence` for the alternate
-decompositions): at an alternate child that is not corrected, the alternate parent piece (entry `6` of the full alternate
-decomposition, when the type of the word keeps it) is locally compatible with each of the six standard copies. -/
-def AltPairCompatInput (D : JointData) : Prop :=
-  D.S = paperS → D.altBase = SurgicalAlt.PaperAltBaseCond → ∀ (f : Word → JSlice) (w : Word), GoodBelow D f w.length →
-    ¬ IsBase w →
-    (¬ CorrectedAfterTwo w → ∀ j < 6, TileCompatInputs.PairCompat (tileAltOddPieces D.S (fun u => (below f w u).tOdd)
-      (fun u => (below f w u).tEven) (fun u => (below f w u).aOdd) (fun u => (below f w u).aEven)
-      (fun u => (below f w u).lOdd) w) 6 j) ∧
-    (¬ CorrectedAfterThree w → ∀ j < 6, TileCompatInputs.PairCompat (tileAltEvenPieces D.S (fun u => (below f w u).tOdd)
-      (fun u => (below f w u).tEven) (fun u => (below f w u).aOdd) (fun u => (below f w u).aEven)
-      (fun u => (below f w u).lEven) w) 6 j)
 
 end FLatticePaper.Tiles.WeakAltStepAssembly
