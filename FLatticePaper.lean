@@ -1682,6 +1682,9 @@ import FLatticePaper.Tiles.SwapBaseClauses
 import FLatticePaper.Tiles.SwapOffsets
 import FLatticePaper.Tiles.SwapRegions
 import FLatticePaper.Tiles.SwapRegionClauses
+import FLatticePaper.Tiles.SwapVacuousSpec
+import FLatticePaper.Tiles.SwapBaseInputAssembly
+import FLatticePaper.Tiles.SwapWeakStepPaper
 import FLatticePaper.Tiles.SwapNonvac
 import FLatticePaper.Tiles.EvenMidVMinus
 import FLatticePaper.Tiles.OddPtVMinus
