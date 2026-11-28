@@ -1343,6 +1343,8 @@ import FLatticePaper.Tiles.CorrectedPlacedDiagram
 import FLatticePaper.Tiles.CorrectedPlacedSources
 import FLatticePaper.Tiles.CorrectedAlternatePolygons
 import FLatticePaper.Tiles.CorrectedPlacedSectors
+import FLatticePaper.Tiles.CorrectedAlternateRotation
+import FLatticePaper.Tiles.CorrectedMixedPlacement
 import FLatticePaper.Tiles.CorrectedFaceBounds
 import FLatticePaper.Tiles.CorrectedLevelTests
 import FLatticePaper.Tiles.CorrectedFiniteFaces
@@ -1355,6 +1357,14 @@ import FLatticePaper.Tiles.CorrectedRegisterLongOneDirectMidOdd
 import FLatticePaper.Tiles.CorrectedRegisterShortOneDirectHighOdd
 import FLatticePaper.Tiles.CorrectedRegisterLongOneDirectHighOdd
 import FLatticePaper.Tiles.CorrectedRegisterOneDirect
+import FLatticePaper.Tiles.CorrectedRegisterShortTwoDirectLowEven
+import FLatticePaper.Tiles.CorrectedRegisterLongTwoDirectLowEven
+import FLatticePaper.Tiles.CorrectedRegisterShortTwoDirectLowOdd
+import FLatticePaper.Tiles.CorrectedRegisterLongTwoDirectLowOdd
+import FLatticePaper.Tiles.CorrectedRegisterShortTwoDirectHighEven
+import FLatticePaper.Tiles.CorrectedRegisterLongTwoDirectHighEven
+import FLatticePaper.Tiles.CorrectedRegisterShortTwoDirectHighOdd
+import FLatticePaper.Tiles.CorrectedRegisterLongTwoDirectHighOdd
 import FLatticePaper.Tiles.CorrectedPhysicalCoverage
 import FLatticePaper.Tiles.CorrectedRegisterWords
 import FLatticePaper.Tiles.CorrectedRegisterLattice
@@ -1373,6 +1383,8 @@ import FLatticePaper.Tiles.CorrectedRegisterShortOneDirectHighEven
 import FLatticePaper.Tiles.CorrectedRegisterLongOneDirectHighEven
 import FLatticePaper.Tiles.CorrectedCellsBands
 import FLatticePaper.Tiles.CorrectedBaseBands
+import FLatticePaper.Tiles.CorrectedBaseEnds
+import FLatticePaper.Tiles.CorrectedPureCorners
 import FLatticePaper.Tiles.CorrectedFirstPolygons
 import FLatticePaper.Tiles.CorrectedDomainLattice
 import FLatticePaper.Tiles.CorrectedBandFaces
