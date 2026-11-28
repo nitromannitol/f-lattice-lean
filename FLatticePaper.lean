@@ -447,6 +447,17 @@ import FLatticePaper.Tiles.SpecialCells
 import FLatticePaper.Tiles.ConnectedAltL
 import FLatticePaper.Tiles.ConnectedL
 import FLatticePaper.Tiles.TileStepAssembly
+import FLatticePaper.Tiles.SameParentCopies
+import FLatticePaper.Tiles.SameParentAlt
+import FLatticePaper.Tiles.SameParentStd
+import FLatticePaper.Tiles.StdPairCompatPaper
+import FLatticePaper.Tiles.TileHalfTurnGlue
+import FLatticePaper.Tiles.TileHalfTurnStd
+import FLatticePaper.Tiles.TileHalfTurnAlt
+import FLatticePaper.Tiles.TileHalfTurnL
+import FLatticePaper.Tiles.TileHalfTurnCorr
+import FLatticePaper.Tiles.TileHalfTurnInput
+import FLatticePaper.Tiles.TileHalfTurnLRot
 import FLatticePaper.Tiles.GlueChain
 import FLatticePaper.Tiles.GlueSeams
 import FLatticePaper.Tiles.GlueCorners
