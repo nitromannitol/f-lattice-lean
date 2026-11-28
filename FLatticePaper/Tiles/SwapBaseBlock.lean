@@ -144,7 +144,7 @@ theorem ladder_pairCompat (k : ℤ) (hk : 1 ≤ k) (ps : List Piece) (i j : ℕ)
 /-! ### The stair block: the pair (2,5) of the odd child at the register `u2 = 3^k`, word `3^k 1` -/
 
 /-- The stair value at the first point: `V(-2k-1+a, 2k+2+b) = a + b - q` when `(2k+2+b)(2k+3+b) = 2q`. -/
-theorem stair_value_t (k a b q : ℤ) (hk : 1 ≤ k) (ha0 : 0 ≤ a) (ha2 : a ≤ 2)
+theorem stair_value_t (k a b q : ℤ) (hk : 0 ≤ k) (ha0 : 0 ≤ a) (ha2 : a ≤ 2) (hb0 : 0 ≤ b) (hb2 : b ≤ 2)
     (hq : (2 * k + 2 + b) * (2 * k + 3 + b) = 2 * q) :
     paperStairValue (2 * k + 3) (-2 * k - 1 + a, 2 * k + 2 + b) = a + b - q := by
   unfold paperStairValue
@@ -163,7 +163,7 @@ theorem stair_value_t (k a b q : ℤ) (hk : 1 ≤ k) (ha0 : 0 ≤ a) (ha2 : a �
   ring
 
 /-- The stair value at the second point: `V(2k+1+a, b) = b - q` when `b(b+1) = 2q`. -/
-theorem stair_value_y (k a b q : ℤ) (hk : 1 ≤ k) (ha0 : 0 ≤ a) (ha2 : a ≤ 2)
+theorem stair_value_y (k a b q : ℤ) (hk : 0 ≤ k) (ha0 : 0 ≤ a) (ha2 : a ≤ 2) (hb0 : 0 ≤ b) (hb2 : b ≤ 2)
     (hq : b * (b + 1) = 2 * q) :
     paperStairValue (2 * k + 3) (2 * k + 1 + a, b) = b - q := by
   unfold paperStairValue
@@ -182,7 +182,7 @@ theorem stair_value_y (k a b q : ℤ) (hk : 1 ≤ k) (ha0 : 0 ≤ a) (ha2 : a �
   ring
 
 /-- The arithmetic of the stair block: on the overlap of the two translates, the difference is `2k²+5k+2`. -/
-theorem stair_diff (k : ℤ) (hk : 1 ≤ k) (x : Site)
+theorem stair_diff (k : ℤ) (hk : 0 ≤ k) (x : Site)
     (h0 : x - (4 * k + 4, 2) ∈ paperStairTile (2 * k + 3))
     (h1 : x - (2, 2 * k + 4) ∈ paperStairTile (2 * k + 3)) :
     paperStairValue (2 * k + 3) (x - (4 * k + 4, 2)) - paperStairValue (2 * k + 3) (x - (2, 2 * k + 4))
@@ -206,19 +206,19 @@ theorem stair_diff (k : ℤ) (hk : 1 ≤ k) (x : Site)
     constructor <;> ring
   rw [eA, eB]
   rcases (show b = 0 ∨ b = 1 ∨ b = 2 by omega) with rfl | rfl | rfl
-  · rw [stair_value_t k a 0 (2 * k ^ 2 + 5 * k + 3) hk ha0 ha2 (by ring),
-      stair_value_y k a 0 0 hk ha0 ha2 (by ring)]
+  · rw [stair_value_t k a 0 (2 * k ^ 2 + 5 * k + 3) hk ha0 ha2 (by norm_num) (by norm_num) (by ring),
+      stair_value_y k a 0 0 hk ha0 ha2 (by norm_num) (by norm_num) (by ring)]
     ring
-  · rw [stair_value_t k a 1 (2 * k ^ 2 + 7 * k + 6) hk ha0 ha2 (by ring),
-      stair_value_y k a 1 1 hk ha0 ha2 (by ring)]
+  · rw [stair_value_t k a 1 (2 * k ^ 2 + 7 * k + 6) hk ha0 ha2 (by norm_num) (by norm_num) (by ring),
+      stair_value_y k a 1 1 hk ha0 ha2 (by norm_num) (by norm_num) (by ring)]
     ring
-  · rw [stair_value_t k a 2 (2 * k ^ 2 + 9 * k + 10) hk ha0 ha2 (by ring),
-      stair_value_y k a 2 3 hk ha0 ha2 (by ring)]
+  · rw [stair_value_t k a 2 (2 * k ^ 2 + 9 * k + 10) hk ha0 ha2 (by norm_num) (by norm_num) (by ring),
+      stair_value_y k a 2 3 hk ha0 ha2 (by norm_num) (by norm_num) (by ring)]
     ring
 
 /-- The stair family (`u2 = 3^k`, `k ≥ 1`) at the word `3^k 1`: the two copies of the odometer `O` at the offsets
 `(4k+4, 2)` and `(2, 2k+4)`, with affine factors `0` and `(1, -(2k+2))`, are compatible. -/
-theorem stair_pairCompat (k : ℤ) (hk : 1 ≤ k) (ps : List Piece) (i j : ℕ) (O : PartialOdometer)
+theorem stair_pairCompat (k : ℤ) (hk : 0 ≤ k) (ps : List Piece) (i j : ℕ) (O : PartialOdometer)
     (hO : O.dom = stairF (2 * k + 3)) (hval : ∀ z ∈ O.dom, O.val z = paperStairValue (2 * k + 3) z)
     (hp : ps[i]? = some (stdPiece O (4 * k + 4, 2) (0, 0)))
     (hq : ps[j]? = some (stdPiece O (2, 2 * k + 4) (1, -(2 * k + 2)))) : PairCompat ps i j := by

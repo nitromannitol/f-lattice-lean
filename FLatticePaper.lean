@@ -1668,5 +1668,13 @@ import FLatticePaper.Tiles.BaseInsideAlongEven
 import FLatticePaper.Tiles.BaseNearContain
 import FLatticePaper.Tiles.BaseNearContainEven
 import FLatticePaper.Tiles.SwapBaseBlock
+import FLatticePaper.Tiles.BaseRespectsAnchoredFamilies
+import FLatticePaper.Tiles.BaseWeakInputPaper
+import FLatticePaper.Tiles.SwapRegsShape
+import FLatticePaper.Tiles.SwapBaseTiles
+import FLatticePaper.Tiles.SwapBaseClauses
+import FLatticePaper.Tiles.SwapOffsets
+import FLatticePaper.Tiles.SwapRegions
+import FLatticePaper.Tiles.SwapNonvac
 
 /-! Root import for the corrected F-lattice paper. -/
