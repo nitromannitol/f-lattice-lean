@@ -1356,5 +1356,7 @@ import FLatticePaper.Tiles.BaseHpNear
 import FLatticePaper.Tiles.BaseHpNearEven
 import FLatticePaper.Tiles.StackedEvenColumns
 import FLatticePaper.Tiles.StackedBaseOrder
+import FLatticePaper.Tiles.StackedOrder
+import FLatticePaper.Tiles.StackedEvenOrder
 
 /-! Root import for the corrected F-lattice paper. -/
