@@ -1,5 +1,6 @@
 import FLatticePaper.Tiles.AltGlueOdd
 import FLatticePaper.Tiles.AltItem3Exterior
+import FLatticePaper.Tiles.AltLatticeOddWArith
 
 /-! # Item (b) of `lemma:weak_alternate_odometer_properties`, the odd child along `W = v_{p₀,2}`: the self-overlap
 
@@ -179,5 +180,76 @@ theorem classify_W (u : Word) (x : Digit) (hx : x ≠ Digit.two) (hw : ¬ IsBase
       · exact (hJ4 hJ).elim
       · exact Or.inr (Or.inr (Or.inr (Or.inl ⟨hyH, hJ⟩)))
   · exact (AltItem4.sepq_H u x hx hw _ hzH (by rw [hzW]; exact hyH)).elim
+
+/-! ### The contacts are on the boundary walks: the closed-form facts -/
+
+/-- The parity of a point does not change under an even vector. -/
+theorem decide_par_add (z v : Site) (hv : (v.1 + v.2) % 2 = 0) :
+    decide (((z + v).1 + (z + v).2) % 2 = 0) = decide ((z.1 + z.2) % 2 = 0) := by
+  simp only [Prod.fst_add, Prod.snd_add, decide_eq_decide]
+  omega
+
+set_option maxHeartbeats 400000 in
+/-- **The closed-form facts of a mixed contact** (`f` the hypothesis tile, `g` the goal tile, `e = -1`): for `z` in `H_g` with
+`z + v_{f,2}` in `H_f`, also `z + v_{g,2}` in `H_g` and `z` in `H_f`. -/
+theorem contact_facts (n1 d1 n2 d2 : ℤ) (hf : 0 < n1 ∧ n1 < d1) (hg : 0 < n2 ∧ n2 < d2)
+    (he : n1 * d2 - n2 * d1 = -1) (z1 z2 : ℤ) (hzg : InH ⟨n2, d2⟩ (z1, z2))
+    (hzf : InH ⟨n1, d1⟩ ((z1, z2) + texV2 ⟨n1, d1⟩)) :
+    InH ⟨n2, d2⟩ ((z1, z2) + texV2 ⟨n2, d2⟩) ∧ InH ⟨n1, d1⟩ (z1, z2) := by
+  have pB : ((texV2 (⟨n1, d1⟩ : Fraction)).1 + (texV2 (⟨n1, d1⟩ : Fraction)).2) % 2 = 0 := by simp only [texV2]; omega
+  have pV : ((texV2 (⟨n2, d2⟩ : Fraction)).1 + (texV2 (⟨n2, d2⟩ : Fraction)).2) % 2 = 0 := by simp only [texV2]; omega
+  have hbox := (inH_box ⟨n2, d2⟩ hg.1 hg.2 (z1, z2) hzg).2.2.1
+  unfold InH at hzg hzf ⊢
+  rw [decide_par_add _ _ pB] at hzf
+  rw [decide_par_add _ _ pV]
+  obtain ⟨q1, q2, q3, q4⟩ := hzg
+  obtain ⟨p1, p2, p3, p4⟩ := hzf
+  simp only [SiteInduction.tCo, SiteInduction.sCo, SiteInduction.tOf, texV2, Prod.fst_add, Prod.snd_add] at q1 q2 q3 q4 p1 p2 p3 p4 hbox ⊢
+  rcases Bool.eq_false_or_eq_true (decide ((z1 + z2) % 2 = 0)) with hb | hb <;> rw [hb] at q1 q2 q3 q4 p1 p2 p3 p4 ⊢ <;>
+    simp only [SiteInduction.aOf, SiteInduction.lOf, if_true, if_false, Bool.false_eq_true] at q1 q2 q3 q4 p1 p2 p3 p4 ⊢
+  · -- even parity
+    have G1 := AltLatticeOddWArith.gq_even n1 d1 n2 d2 z1 z2 hf.1 hf.2 hg.1 hg.2 he (by linarith) (by linarith)
+    have G2 := AltLatticeOddWArith.gp_even n1 d1 n2 d2 z1 z2 hf.1 hf.2 hg.1 hg.2 he (by linarith) (by linarith) q2
+    exact ⟨⟨by linarith, by nlinarith, by linarith, by linarith⟩, ⟨by nlinarith, G2, by linarith, by linarith⟩⟩
+  · -- odd parity
+    have G1 := AltLatticeOddWArith.gq_odd n1 d1 n2 d2 z1 z2 hf.1 hf.2 hg.1 hg.2 he (by linarith) (by linarith)
+    have G2 := AltLatticeOddWArith.gp_odd n1 d1 n2 d2 z1 z2 hf.1 hf.2 hg.1 hg.2 he G1 hbox q3 (by linarith)
+    exact ⟨⟨by linarith, by nlinarith, by linarith, by linarith⟩, ⟨by nlinarith, by linarith, by linarith, by linarith⟩⟩
+
+set_option maxHeartbeats 400000 in
+/-- **The closed-form facts of the contact with the parent piece**: two points `y`, `z` of `H_q` with `t(z) = t(y) - T - 2`
+and the same parity: `y + v_{q,2}` and `C_q - z + v_{q,2}` are in `H_q`. -/
+theorem contact_c_facts (n2 d2 : ℤ) (hg : 0 < n2 ∧ n2 < d2) (hqe : (n2 + d2) % 2 = 0)
+    (hmg : SiteInduction.muOf ⟨n2, d2⟩ = 1) (y z : Site)
+    (hy : InH ⟨n2, d2⟩ y) (hz : InH ⟨n2, d2⟩ z)
+    (ht : SiteInduction.tCo ⟨n2, d2⟩ z = SiteInduction.tCo ⟨n2, d2⟩ y - SiteInduction.tOf ⟨n2, d2⟩ - 2)
+    (hpar : (z.1 + z.2) % 2 = (y.1 + y.2) % 2) :
+    InH ⟨n2, d2⟩ (y + texV2 ⟨n2, d2⟩) ∧
+      InH ⟨n2, d2⟩ (AltItem4.stdCentre ⟨n2, d2⟩ - z + texV2 ⟨n2, d2⟩) := by
+  have pV : ((texV2 (⟨n2, d2⟩ : Fraction)).1 + (texV2 (⟨n2, d2⟩ : Fraction)).2) % 2 = 0 := by simp only [texV2]; omega
+  have hz' := EncUpper.inH_refl _ _ hz
+  rw [AltItem4.refl_eq] at hz'
+  have pC : ((AltItem4.stdCentre ⟨n2, d2⟩ - z).1 + (AltItem4.stdCentre ⟨n2, d2⟩ - z).2) % 2 = (y.1 + y.2) % 2 := by
+    simp only [AltItem4.stdCentre, hmg, Prod.fst_sub, Prod.snd_sub]; omega
+  unfold InH at hy hz hz' ⊢
+  rw [decide_par_add _ _ pV, decide_par_add _ _ pV]
+  have e1 : decide ((z.1 + z.2) % 2 = 0) = decide ((y.1 + y.2) % 2 = 0) := by simp only [decide_eq_decide]; omega
+  have e2 : decide (((AltItem4.stdCentre ⟨n2, d2⟩ - z).1 + (AltItem4.stdCentre ⟨n2, d2⟩ - z).2) % 2 = 0) =
+      decide ((y.1 + y.2) % 2 = 0) := by simp only [decide_eq_decide]; omega
+  rw [e1] at hz
+  rw [e2] at hz' ⊢
+  obtain ⟨y1, y2, y3, y4⟩ := hy
+  obtain ⟨z1, z2, z3, z4⟩ := hz
+  obtain ⟨c1, c2, c3, c4⟩ := hz'
+  have hct : SiteInduction.tCo ⟨n2, d2⟩ (AltItem4.stdCentre ⟨n2, d2⟩ - z) =
+      d2 + n2 - SiteInduction.tOf ⟨n2, d2⟩ - SiteInduction.tCo ⟨n2, d2⟩ z := by
+    simp only [SiteInduction.tCo, SiteInduction.tOf, AltItem4.stdCentre, hmg, Prod.fst_sub, Prod.snd_sub]; ring
+  have htV : ∀ x : Site, SiteInduction.tCo ⟨n2, d2⟩ (x + texV2 ⟨n2, d2⟩) = SiteInduction.tCo ⟨n2, d2⟩ x - SiteInduction.tOf ⟨n2, d2⟩ := by
+    intro x; simp only [SiteInduction.tCo, SiteInduction.tOf, texV2, Prod.fst_add, Prod.snd_add]; ring
+  have hsV : ∀ x : Site, SiteInduction.sCo ⟨n2, d2⟩ (x + texV2 ⟨n2, d2⟩) = SiteInduction.sCo ⟨n2, d2⟩ x := by
+    intro x; simp only [SiteInduction.sCo, texV2, Prod.fst_add, Prod.snd_add]; ring
+  rw [htV, htV, hsV, hsV]
+  have hT : 0 < SiteInduction.tOf ⟨n2, d2⟩ := by simp only [SiteInduction.tOf]; nlinarith [hg.1, hg.2]
+  exact ⟨⟨by linarith, by linarith, y3, y4⟩, ⟨by linarith, by linarith, c3, c4⟩⟩
 
 end FLatticePaper.Tiles.AltLatticeOddW

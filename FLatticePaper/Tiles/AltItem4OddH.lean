@@ -266,37 +266,44 @@ theorem base_contact (u : Word) (hu : IsBase u) (x : Digit) (hx : x ≠ Digit.tw
     · exact base_contact_three 0 x hx hw z h1 h2
     · exact base_contact_two k hk x hx z h1 h2
 
+/-- A point of `T(q₁)^-` whose translate by `-W` lies in `H`: that translate lies in the copy `T(q₁) + h` of the standard
+tile inside `H`. -/
+theorem contact_mem (u : Word) (x : Digit) (hx : x ≠ Digit.two) (hw : ¬ IsBase (u ++ [x])) (y : Site)
+    (hJ : y ∈ shift (stateAt (u ++ [x])).tEven (AltRotStep.offP0 (phase (u ++ [x]) == 1) (parentsAt (u ++ [x])).odd (parentsAt (u ++ [x])).even .q1Minus))
+    (hK : y - latV (u ++ [x]) false 0 1 ∈ shift (altEvenTile AltRotStep.B u) (hOdd (phase (u ++ [x]) == 1) (parentsAt (u ++ [x])).odd (parentsAt (u ++ [x])).even)) :
+    y - latV (u ++ [x]) false 0 1 ∈ shift (stateAt (u ++ [x])).tEven (hOdd (phase (u ++ [x]) == 1) (parentsAt (u ++ [x])).odd (parentsAt (u ++ [x])).even) := by
+  rw [mem_shift] at hK ⊢
+  rw [(parent_odd_eq u x hx).2.2]
+  have hJ' : y - latV (u ++ [x]) false 0 1 - hOdd (phase (u ++ [x]) == 1) (parentsAt (u ++ [x])).odd (parentsAt (u ++ [x])).even ∈ shift (evenTile u) (AltRotStep.offP0 (phase (u ++ [x]) == 1) (parentsAt (u ++ [x])).odd (parentsAt (u ++ [x])).even .q1Minus - latV (u ++ [x]) false 0 1 - hOdd (phase (u ++ [x]) == 1) (parentsAt (u ++ [x])).odd (parentsAt (u ++ [x])).even) := by
+    rw [(parent_odd_eq u x hx).2.2] at hJ
+    rw [mem_shift] at hJ ⊢
+    convert hJ using 1; abel
+  by_cases hu : IsBase u
+  · exact base_contact u hu x hx hw _ hK hJ'
+  rcases even_far_points hu _ hK with h | h
+  · exact h
+  exfalso
+  have hq := (AltItem5.parent_hyps hw).2.1
+  have hl := lam_upper _ hq _ ((mem_qCopy_iff hw _ _).1 hJ)
+  have hQ : 5 ≤ (parentsAt (u ++ [x])).even.den + (parentsAt (u ++ [x])).even.num := by
+    rw [(parent_odd_eq u x hx).2.1]
+    obtain ⟨a1, a2, a3, a4, -⟩ := parents_facts hu
+    simp only [SiteInduction.curE, Parents.current, Parents.combine]; omega
+  rw [← (parent_odd_eq u x hx).2.1] at h
+  obtain ⟨-, -, -, -, -, -, hdet⟩ := parents_facts hw
+  rcases AltBounds.phase_cases (u ++ [x]) with ⟨ho, hph⟩ | ⟨ho, hph⟩ <;> rw [ho] at h hl <;>
+    rw [hph] at hdet <;> norm_num at hdet <;>
+    simp only [AltRotStep.offP0, SurgicalAlt.coeffOff, SurgicalAlt.altP0Coeff, texV1Odd, texV1Even, texV2, SiteInduction.curE, SiteInduction.curO, Parents.current, Parents.combine, hOdd, latV, latV1, fracOf, Prod.fst_sub, Prod.snd_sub, if_true, if_false, Bool.false_eq_true] at h hl <;>
+    generalize (parentsAt (u ++ [x])).odd.num = n1 at * <;> generalize (parentsAt (u ++ [x])).odd.den = d1 at * <;>
+  generalize (parentsAt (u ++ [x])).even.num = n2 at * <;> generalize (parentsAt (u ++ [x])).even.den = d2 at * <;>
+    nlinarith
+
 /-- **The contact**: a point of `T(q₁)^-` whose translate by `-W` lies in `H` lies in a stacked zero-one string, through the
 enclosure of `T(q₁) + h` and `T(q₁)^-` in `T(p₀) + c + W` and `T(p₀) + c`. -/
 theorem contact (u : Word) (x : Digit) (hx : x ≠ Digit.two) (hw : ¬ IsBase (u ++ [x])) (y : Site)
     (hJ : y ∈ shift (stateAt (u ++ [x])).tEven (AltRotStep.offP0 (phase (u ++ [x]) == 1) (parentsAt (u ++ [x])).odd (parentsAt (u ++ [x])).even .q1Minus))
     (hK : y - latV (u ++ [x]) false 0 1 ∈ shift (altEvenTile AltRotStep.B u) (hOdd (phase (u ++ [x]) == 1) (parentsAt (u ++ [x])).odd (parentsAt (u ++ [x])).even)) : StackedAt y := by
-  have hin : y - latV (u ++ [x]) false 0 1 ∈ shift (stateAt (u ++ [x])).tEven (hOdd (phase (u ++ [x]) == 1) (parentsAt (u ++ [x])).odd (parentsAt (u ++ [x])).even) := by
-    rw [mem_shift] at hK ⊢
-    rw [(parent_odd_eq u x hx).2.2]
-    have hJ' : y - latV (u ++ [x]) false 0 1 - hOdd (phase (u ++ [x]) == 1) (parentsAt (u ++ [x])).odd (parentsAt (u ++ [x])).even ∈ shift (evenTile u) (AltRotStep.offP0 (phase (u ++ [x]) == 1) (parentsAt (u ++ [x])).odd (parentsAt (u ++ [x])).even .q1Minus - latV (u ++ [x]) false 0 1 - hOdd (phase (u ++ [x]) == 1) (parentsAt (u ++ [x])).odd (parentsAt (u ++ [x])).even) := by
-      rw [(parent_odd_eq u x hx).2.2] at hJ
-      rw [mem_shift] at hJ ⊢
-      convert hJ using 1; abel
-    by_cases hu : IsBase u
-    · exact base_contact u hu x hx hw _ hK hJ'
-    rcases even_far_points hu _ hK with h | h
-    · exact h
-    exfalso
-    have hq := (AltItem5.parent_hyps hw).2.1
-    have hl := lam_upper _ hq _ ((mem_qCopy_iff hw _ _).1 hJ)
-    have hQ : 5 ≤ (parentsAt (u ++ [x])).even.den + (parentsAt (u ++ [x])).even.num := by
-      rw [(parent_odd_eq u x hx).2.1]
-      obtain ⟨a1, a2, a3, a4, -⟩ := parents_facts hu
-      simp only [SiteInduction.curE, Parents.current, Parents.combine]; omega
-    rw [← (parent_odd_eq u x hx).2.1] at h
-    obtain ⟨-, -, -, -, -, -, hdet⟩ := parents_facts hw
-    rcases AltBounds.phase_cases (u ++ [x]) with ⟨ho, hph⟩ | ⟨ho, hph⟩ <;> rw [ho] at h hl <;>
-      rw [hph] at hdet <;> norm_num at hdet <;>
-      simp only [AltRotStep.offP0, SurgicalAlt.coeffOff, SurgicalAlt.altP0Coeff, texV1Odd, texV1Even, texV2, SiteInduction.curE, SiteInduction.curO, Parents.current, Parents.combine, hOdd, latV, latV1, fracOf, Prod.fst_sub, Prod.snd_sub, if_true, if_false, Bool.false_eq_true] at h hl <;>
-      generalize (parentsAt (u ++ [x])).odd.num = n1 at * <;> generalize (parentsAt (u ++ [x])).odd.den = d1 at * <;>
-    generalize (parentsAt (u ++ [x])).even.num = n2 at * <;> generalize (parentsAt (u ++ [x])).even.den = d2 at * <;>
-      nlinarith
+  have hin := contact_mem u x hx hw y hJ hK
   rcases AltBounds.phase_cases (u ++ [x]) with ⟨ho, -⟩ | ⟨ho, -⟩
   · refine ⟨u ++ [x], false, texV2 (parentsAt (u ++ [x])).odd - texV1Even (parentsAt (u ++ [x])).even, 0, 1, Or.inr (Or.inr (Or.inl ⟨rfl, rfl⟩)), ?_, ?_⟩
     · simp only [SiteStrings.tileOf, Bool.false_eq_true, if_false]
