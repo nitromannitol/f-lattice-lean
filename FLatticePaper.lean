@@ -427,6 +427,7 @@ import FLatticePaper.Tiles.MixedCompatNear
 import FLatticePaper.Tiles.MixedCompatBaseStep
 import FLatticePaper.Tiles.MixedCompatEdges
 import FLatticePaper.Tiles.MixedCompatWalks
+import FLatticePaper.Tiles.MixedCompatFirstStep
 import FLatticePaper.Tiles.ClosedPathStandard
 import FLatticePaper.Tiles.ClosedPathExcluded
 import FLatticePaper.Tiles.ClosedPathDiagonal
@@ -1316,6 +1317,7 @@ import FLatticePaper.Tiles.PaperAltBase
 import FLatticePaper.Tiles.LCorrecProps
 import FLatticePaper.Tiles.CorrectedCellsOrdinary
 import FLatticePaper.Tiles.CorrectedCellsColumn
+import FLatticePaper.Tiles.CorrectedCellsNear
 import FLatticePaper.Tiles.CorrectedCellsFirstExit
 import FLatticePaper.Tiles.TileTranslation
 import FLatticePaper.Tiles.HorizontalStepOne
@@ -1330,6 +1332,7 @@ import FLatticePaper.Tiles.LSidesEven
 import FLatticePaper.Tiles.TileCompatInputs
 import FLatticePaper.Tiles.AltParentBase
 import FLatticePaper.Tiles.AltParentReflection
+import FLatticePaper.Tiles.AltParentStair
 import FLatticePaper.Tiles.SurgicalOdometerStep
 import FLatticePaper.Tiles.SurgicalCorners
 import FLatticePaper.Tiles.SurgicalAffineChain
