@@ -333,7 +333,7 @@ theorem inH_box (f : Fraction) (hn : 0 < f.num) (hnd : f.num < f.den) (z : GInt)
 /-! ### The half-turn of the alternate children (item (1)), with its centre
 
 Item (1) of `lemma:alternate_tile_properties` (`AltRotStep.altRot`) at `w` and at the swapped word gives `T̂ = D - T̂` for the
-alternate children of the paper base: composing the two rotations, `T̂(q₀) ↦ T̂(R(q₀))` and back, is `z ↦ τ₂ + i τ₁ - z`. In the
+alternate children of the paper base, for every word: composing the two rotations, `T̂(q₀) ↦ T̂(R(q₀))` and back, is `z ↦ τ₂ + i τ₁ - z`. In the
 frame `c(T̂) = 0` the centres are those of the proof of the text (Step 2): `D = A + 2B + V + 1 - i` for `T̂(q₀)` in the even-first
 orientation and `D = A + 2B + V + 2U + 1 - i` in the odd-first one; for `T̂(p₀)` the other way round. Here
 `(A, B, U, V) = (v_{p₁,1}, v_{p₁,2}, v_{q₁,1}, v_{q₁,2})`. -/
@@ -368,15 +368,16 @@ theorem parents_swapW (w : Word) :
   rw [AltRotStep.swapW_swapW] at h1 h2
   exact ⟨h1.symm, h2.symm⟩
 
-/-- **The half-turn of `T̂(q₀)`** about `centreEven` (non-base words, the paper base). -/
-theorem altEven_halfTurn {w : Word} (hw : ¬ IsBase w) (z : Site) :
+/-- **The half-turn of `T̂(q₀)`** about `centreEven` (every word, the paper base). -/
+theorem altEven_halfTurn (w : Word) (z : Site) :
     z ∈ altEvenTile AltRotStep.B w ↔
       centreEven (phase w == 1) (parentsAt w).odd (parentsAt w).even - z ∈ altEvenTile AltRotStep.B w := by
   have h1 := (AltRotStep.altRot w).2
   have h2 := (AltRotStep.altRot (swapW w)).1
   rw [AltRotStep.swapW_swapW] at h2
   rw [halfTurn_of_rots _ _ _ _ h1 h2 z]
-  obtain ⟨hp1, hp2, hq1, hq2, hpo, hqe, -⟩ := parents_facts hw
+  have hpo : ((parentsAt w).odd.num + (parentsAt w).odd.den) % 2 = 1 := (parentsAt_valid w).odd_parity
+  have hqe : ((parentsAt w).even.num + (parentsAt w).even.den) % 2 = 0 := (parentsAt_valid w).even_parity
   obtain ⟨hs1, hs2⟩ := parents_swapW w
   have hph : phase (swapW w) = phase w := Standard.phase_swapW w
   unfold AltRotStep.tauO AltRotStep.tauE AltRotStep.tauOdd AltRotStep.tauEven AltRotStep.tauShort AltRotStep.tauLong
@@ -384,15 +385,16 @@ theorem altEven_halfTurn {w : Word} (hw : ¬ IsBase w) (z : Site) :
   unfold centreEven
   constructor <;> intro h <;> convert h using 2 <;> cases (phase w == 1) <;> simp <;> omega
 
-/-- **The half-turn of `T̂(p₀)`** about `centreOdd` (non-base words, the paper base). -/
-theorem altOdd_halfTurn {w : Word} (hw : ¬ IsBase w) (z : Site) :
+/-- **The half-turn of `T̂(p₀)`** about `centreOdd` (every word, the paper base). -/
+theorem altOdd_halfTurn (w : Word) (z : Site) :
     z ∈ altOddTile AltRotStep.B w ↔
       centreOdd (phase w == 1) (parentsAt w).odd (parentsAt w).even - z ∈ altOddTile AltRotStep.B w := by
   have h1 := (AltRotStep.altRot w).1
   have h2 := (AltRotStep.altRot (swapW w)).2
   rw [AltRotStep.swapW_swapW] at h2
   rw [halfTurn_of_rots _ _ _ _ h1 h2 z]
-  obtain ⟨hp1, hp2, hq1, hq2, hpo, hqe, -⟩ := parents_facts hw
+  have hpo : ((parentsAt w).odd.num + (parentsAt w).odd.den) % 2 = 1 := (parentsAt_valid w).odd_parity
+  have hqe : ((parentsAt w).even.num + (parentsAt w).even.den) % 2 = 0 := (parentsAt_valid w).even_parity
   obtain ⟨hs1, hs2⟩ := parents_swapW w
   have hph : phase (swapW w) = phase w := Standard.phase_swapW w
   unfold AltRotStep.tauO AltRotStep.tauE AltRotStep.tauOdd AltRotStep.tauEven AltRotStep.tauShort AltRotStep.tauLong

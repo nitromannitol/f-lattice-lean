@@ -1363,6 +1363,11 @@ import FLatticePaper.Tiles.AltItem4PairsEvenFalse
 import FLatticePaper.Tiles.AltItem4PairsEvenTrue
 import FLatticePaper.Tiles.AltItem4PairsOddFalse
 import FLatticePaper.Tiles.AltItem4PairsOddTrue
+import FLatticePaper.Tiles.AltItem4H
+import FLatticePaper.Tiles.AltItem4EvenUp
+import FLatticePaper.Tiles.AltItem4Tools
+import FLatticePaper.Tiles.AltItem4OddH
+import FLatticePaper.Tiles.AltItem4OddUp
 import FLatticePaper.Tiles.BaseTileProps
 import FLatticePaper.Tiles.BaseWeakDomains
 import FLatticePaper.Tiles.BaseWeakLattice
