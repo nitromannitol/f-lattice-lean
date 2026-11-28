@@ -1632,5 +1632,6 @@ import FLatticePaper.Tiles.BaseRespectsAnchoredOdd
 import FLatticePaper.Tiles.BaseInsideAlongEven
 import FLatticePaper.Tiles.BaseNearContain
 import FLatticePaper.Tiles.BaseNearContainEven
+import FLatticePaper.Tiles.SwapBaseBlock
 
 /-! Root import for the corrected F-lattice paper. -/
