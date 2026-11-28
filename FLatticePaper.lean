@@ -1308,6 +1308,7 @@ import FLatticePaper.Tiles.BaseVertPilot
 import FLatticePaper.Tiles.BaseVertPiece
 import FLatticePaper.Tiles.BaseVertOdo
 import FLatticePaper.Tiles.BaseVertOdoFamily
+import FLatticePaper.Tiles.BaseVertVp
 import FLatticePaper.Tiles.JointInduction
 import FLatticePaper.Tiles.JointGlue
 import FLatticePaper.Tiles.PaperAltBase
