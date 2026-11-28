@@ -17,8 +17,7 @@ subodometers around closed paths (condition (C)) for every decomposition, standa
 packing is proved for both children (`Tiles.H3Pairs`), and condition (C) is proved for both
 standard children from named local inputs (`Tiles.ClosedPathStandard`). The weak odometers of Section 7 are built from the tile odometers of the parents (Section 8), so Sections 7 and 8
 are formalised as one induction over the recursion word (`Tiles.JointInduction.joint_family_exists`), from five step inputs. For the
-text's data the rotation step is proved with no remaining input; the weak step is proved except the base cases of its
-same-parent input; the weak alternate, tile and L steps are assembled or being assembled from named inputs, of which the
+text's data the rotation step is proved with no remaining input; the weak step is proved with no remaining input; the weak alternate, tile and L steps are assembled or being assembled from named inputs, of which the
 compatibility of copies with L-corrections, condition (C) and the domains of the corrected decompositions, the sides and the
 piece agreement of the L-corrections, and the existence of the weak alternate odometers remain open (see `SOURCE-MAP.md`,
 `lemma:tile-odometer-existence`). Item (d) of `prop:base_cases`, that the base odometers respect their strings in the sense of
