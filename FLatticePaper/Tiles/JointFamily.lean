@@ -595,6 +595,21 @@ def WeakProps (w : Word) (wo we : PartialOdometer) : Prop :=
   LatticeSelfCompatible wo (texV1Odd p0) 0 ∧ LatticeSelfCompatible wo (texV2 p0) (offsetA p0.num p0.den true) ∧
     LatticeSelfCompatible we (texV1Even q0) 0 ∧ LatticeSelfCompatible we (texV2 q0) (offsetA q0.num q0.den true)
 
+/-- (c) of `lemma:weak_standard_odometer_properties` at `w`, at the children that are not corrected (the property the joint family
+carries). At a corrected child the tile odometer is the L-decomposition and (c) of the weak child is not used; it follows from (a)
+(`LatticeOfRespects.weakProps_of_respects`), which the glue on the kept parts fails at `w = 2 3^k`. -/
+def WeakPropsU (w : Word) (wo we : PartialOdometer) : Prop :=
+  let p0 := (parentsAt w).current .odd
+  let q0 := (parentsAt w).current .even
+  (¬ CorrectedAfterThree w →
+      LatticeSelfCompatible wo (texV1Odd p0) 0 ∧ LatticeSelfCompatible wo (texV2 p0) (offsetA p0.num p0.den true)) ∧
+    (¬ CorrectedAfterTwo w →
+      LatticeSelfCompatible we (texV1Even q0) 0 ∧ LatticeSelfCompatible we (texV2 q0) (offsetA q0.num q0.den true))
+
+theorem weakPropsU_of_weakProps (w : Word) (wo we : PartialOdometer) (h : WeakProps w wo we) : WeakPropsU w wo we := by
+  obtain ⟨h1, h2, h3, h4⟩ := h
+  exact ⟨fun _ => ⟨h1, h2⟩, fun _ => ⟨h3, h4⟩⟩
+
 /-- (a) and (b) of `lemma:tile-odometer-existence` at `w`. -/
 def TileProps (w : Word) (tod tev aod aev : PartialOdometer) : Prop :=
   let p0 := (parentsAt w).current .odd
@@ -631,7 +646,7 @@ def LRotProps (w : Word) (x r : JSlice) : Prop :=
 
 /-- The properties at `w` proved by the induction. -/
 def JointProps (f : Word → JSlice) (w : Word) : Prop :=
-  WeakProps w (f w).wOdd (f w).wEven ∧ TileProps w (f w).tOdd (f w).tEven (f w).aOdd (f w).aEven ∧
+  WeakPropsU w (f w).wOdd (f w).wEven ∧ TileProps w (f w).tOdd (f w).tEven (f w).aOdd (f w).aEven ∧
     RotProps w (f w) (f (swapW w)) ∧ LRotProps w (f w) (f (swapW w))
 
 /-- The joint family: the joint predicate and the properties at every word. -/

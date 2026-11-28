@@ -135,7 +135,7 @@ def GoodBelow (D : JointData) (f : Word → JSlice) (n : ℕ) : Prop :=
 family on the words shorter than `w`, weak odometers at `w` with their part and (c). -/
 def WeakStepInput (D : JointData) : Prop :=
   ∀ (f : Word → JSlice) (w : Word), GoodBelow D f w.length →
-    ∃ wo we : PartialOdometer, WeakPart D (below f w) w wo we ∧ WeakProps w wo we
+    ∃ wo we : PartialOdometer, WeakPart D (below f w) w wo we ∧ WeakPropsU w wo we
 
 /-- The weak alternate step (`lemma:weak_alternate_odometer_properties`, over the tile parents and the alternate tile parents). -/
 def WeakAltStepInput (D : JointData) : Prop :=
@@ -146,7 +146,7 @@ def WeakAltStepInput (D : JointData) : Prop :=
 family on the shorter words and the weak odometers at `w`, tile odometers at `w` with their part, (a) and (b). -/
 def TileStepInput (D : JointData) : Prop :=
   ∀ (f : Word → JSlice) (w : Word) (wo we wao wae : PartialOdometer), GoodBelow D f w.length →
-    WeakPart D (below f w) w wo we → WeakProps w wo we → WeakAltPart D (below f w) w wao wae →
+    WeakPart D (below f w) w wo we → WeakPropsU w wo we → WeakAltPart D (below f w) w wao wae →
     ∃ tod tev aod aev : PartialOdometer,
       TilePart D (below f w) w wo we wao wae tod tev aod aev ∧ TileProps w tod tev aod aev
 
@@ -164,7 +164,7 @@ tile odometers and for the L-corrected odometers. -/
 def RotStepInput (D : JointData) : Prop :=
   ∀ (f : Word → JSlice) (n : ℕ), GoodBelow D f n →
     (∀ w : Word, w.length = n →
-      IsJointSlice D f w ∧ WeakProps w (f w).wOdd (f w).wEven ∧ TileProps w (f w).tOdd (f w).tEven (f w).aOdd (f w).aEven) →
+      IsJointSlice D f w ∧ WeakPropsU w (f w).wOdd (f w).wEven ∧ TileProps w (f w).tOdd (f w).tEven (f w).aOdd (f w).aEven) →
     ∀ w : Word, w.length = n → RotProps w (f w) (f (swapW w)) ∧ LRotProps w (f w) (f (swapW w))
 
 /-- The one induction of Sections 7-8: given the five per-step inputs, there is a joint family, with the weak, weak alternate,
@@ -197,7 +197,7 @@ theorem joint_family_exists (D : JointData) (hW : WeakStepInput D) (hWA : WeakAl
   have hgood : GoodBelow D g n := fun u hu =>
     good_congr D f g u (fun v hv => (hgf v (lt_of_le_of_lt hv hu)).symm) (hf u hu)
   have hslice : ∀ u : Word, u.length = n →
-      IsJointSlice D g u ∧ WeakProps u (g u).wOdd (g u).wEven ∧
+      IsJointSlice D g u ∧ WeakPropsU u (g u).wOdd (g u).wEven ∧
         TileProps u (g u).tOdd (g u).tEven (g u).aOdd (g u).aEven := by
     intro u hu
     unfold IsJointSlice

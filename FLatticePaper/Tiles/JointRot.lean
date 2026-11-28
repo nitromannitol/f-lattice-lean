@@ -2742,7 +2742,7 @@ theorem lRotProps_step (D : JointData) (f : Word → JSlice) (n : ℕ) (hgood : 
 of the tile odometers at level `n`. -/
 def LevelHyp (D : JointData) (f : Word → JSlice) (n : ℕ) : Prop :=
   GoodBelow D f n ∧ ∀ w : Word, w.length = n →
-    IsJointSlice D f w ∧ WeakProps w (f w).wOdd (f w).wEven ∧ TileProps w (f w).tOdd (f w).tEven (f w).aOdd (f w).aEven
+    IsJointSlice D f w ∧ WeakPropsU w (f w).wOdd (f w).wEven ∧ TileProps w (f w).tOdd (f w).tEven (f w).aOdd (f w).aEven
 
 /-- The rotation step of the joint induction ((c) of `lemma:tile-odometer-existence` and `lemma:l_correc_properties` (1) for the
 odometers), from the named inputs: the base slopes and base rotations (`baseSlopes_paper`, `base_rotProps` for the paper data),

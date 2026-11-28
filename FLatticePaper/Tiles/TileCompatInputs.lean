@@ -10,8 +10,8 @@ alternate children (`ClosedPathAlt.AltMixedCompatOdd/Even` quantify only the six
 inputs. Both are statements, not proved here:
 * `AltParentCompatInput` (Section 8, Case 3): the alternate parent piece, entry `6` of the alternate decompositions, against each
   of the six standard copies.
-* `CorrectedCompatInput` (Section 8, Cases 2 and 4): in a corrected tile decomposition, each L-correction entry against each full
-  copy. -/
+* `CorrectedCompatInput` (Section 8, Cases 2 and 4): in a corrected tile decomposition, each L-correction entry against every
+  other entry among the six. -/
 
 namespace FLatticePaper.Tiles.TileCompatInputs
 
@@ -49,20 +49,21 @@ def AltParentCompatInput (D : JointData) : Prop :=
       PairCompat (tileAltEvenPieces D.S (fun u => (below f w u).tOdd) (fun u => (below f w u).tEven)
         (fun u => (below f w u).aOdd) (fun u => (below f w u).aEven) (fun u => (below f w u).lEven) w) 6 j
 
-/-- **Section 8, Cases 2 and 4**: in a corrected tile decomposition, each L-correction entry is compatible with each full copy
-(the other entries among the six), over the family below `w`; for the standard and the alternate decompositions. -/
+/-- **Section 8, Cases 2 and 4**: in a corrected tile decomposition, each L-correction entry is compatible with every other entry
+among the six, the full copies and the other L-correction (the two L entries of a corrected standard decomposition always overlap,
+358 of 358 corrected words up to length 6), over the family below `w`; for the standard and the alternate decompositions. -/
 def CorrectedCompatInput (D : JointData) : Prop :=
   ∀ (f : Word → JSlice) (w : Word), GoodBelow D f w.length → ¬ IsBase w →
-    (CorrectedAfterThree w → ∀ i ∈ oddLIdx w, ∀ j < 6, j ∉ oddLIdx w →
+    (CorrectedAfterThree w → ∀ i ∈ oddLIdx w, ∀ j < 6, j ≠ i →
       PairCompat (tileOddPieces D.S (fun u => (below f w u).tOdd) (fun u => (below f w u).tEven)
         (fun u => (below f w u).lEven) w) i j) ∧
-    (CorrectedAfterTwo w → ∀ i ∈ evenLIdx, ∀ j < 6, j ∉ evenLIdx →
+    (CorrectedAfterTwo w → ∀ i ∈ evenLIdx, ∀ j < 6, j ≠ i →
       PairCompat (tileEvenPieces D.S (fun u => (below f w u).tOdd) (fun u => (below f w u).tEven)
         (fun u => (below f w u).lOdd) w) i j) ∧
-    (CorrectedAfterTwo w → ∀ i ∈ altOddLIdx, ∀ j < 6, j ∉ altOddLIdx →
+    (CorrectedAfterTwo w → ∀ i ∈ altOddLIdx, ∀ j < 6, j ≠ i →
       PairCompat (tileAltOddPieces D.S (fun u => (below f w u).tOdd) (fun u => (below f w u).tEven)
         (fun u => (below f w u).aOdd) (fun u => (below f w u).aEven) (fun u => (below f w u).lOdd) w) i j) ∧
-    (CorrectedAfterThree w → ∀ i ∈ altEvenLIdx, ∀ j < 6, j ∉ altEvenLIdx →
+    (CorrectedAfterThree w → ∀ i ∈ altEvenLIdx, ∀ j < 6, j ≠ i →
       PairCompat (tileAltEvenPieces D.S (fun u => (below f w u).tOdd) (fun u => (below f w u).tEven)
         (fun u => (below f w u).aOdd) (fun u => (below f w u).aEven) (fun u => (below f w u).lEven) w) i j)
 

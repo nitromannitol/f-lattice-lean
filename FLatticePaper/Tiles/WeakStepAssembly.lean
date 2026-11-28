@@ -178,12 +178,13 @@ def GlueRespectsInput (D : JointData) : Prop :=
     (¬ CorrectedAfterThree w → RespectsAnchored (oddTile w) (hWordOf w false) (vWordOf w false) go) ∧
       (¬ CorrectedAfterTwo w → RespectsAnchored (evenTile w) (hWordOf w true) (vWordOf w true) ge)
 
-/-- (c) of `lemma:weak_standard_odometer_properties` for the glued children (Step 2 of its proof): each is compatible with its
-lattice adjacent translates. -/
+/-- (c) of `lemma:weak_standard_odometer_properties` for the glued children (Step 2 of its proof), at the children that are not
+corrected: each is compatible with its lattice adjacent translates. It follows from (a) (`LatticeOfRespects.weakProps_of_respects`),
+so it has no route at the corrected children, where (a) fails at `w = 2 3^k`. -/
 def GlueLatticeInput (D : JointData) : Prop :=
   ∀ (f : Word → JSlice) (w u1 u2 : Word), GoodBelow D f w.length → ¬ IsBase w → regsAt w = (some u1, some u2) →
   ∀ (κo κe : ℕ → ℤ) (go ge : Site → ℤ), GluedChildren f w u1 u2 κo κe go ge →
-    WeakProps w ⟨oddTile w, go⟩ ⟨evenTile w, ge⟩
+    WeakPropsU w ⟨oddTile w, go⟩ ⟨evenTile w, ge⟩
 
 /-! ### The weak step -/
 
@@ -195,7 +196,8 @@ theorem weakStep_paper (D : JointData) (hS : D.S = paperS) (hB : BaseWeakInput) 
   intro f w hgood
   by_cases hw : IsBase w
   · obtain ⟨wo, we, hdo, hde, hbc, hro, hre, hwp⟩ := hB w hw
-    refine ⟨wo, we, ⟨?_, ?_, fun _ => ?_, fun h => absurd hw h, fun _ => hro, fun _ => hre⟩, hwp⟩
+    refine ⟨wo, we, ⟨?_, ?_, fun _ => ?_, fun h => absurd hw h, fun _ => hro, fun _ => hre⟩,
+      weakPropsU_of_weakProps w wo we hwp⟩
     · rw [hS]; exact hdo
     · rw [hS]; exact hde
     · rw [hS]; exact hbc
