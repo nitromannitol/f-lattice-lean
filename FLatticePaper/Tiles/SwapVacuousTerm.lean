@@ -3,6 +3,7 @@ import FLatticePaper.Tiles.SwapVacuity
 import FLatticePaper.Tiles.SwapNonvac
 import FLatticePaper.Tiles.SwapBaseTiles
 import FLatticePaper.Tiles.SwapBaseClauses
+import FLatticePaper.Tiles.SwapVacuousV27
 
 /-! # The fields V1, V3, V4, V5, V6 of `SwapVacuous`
 
@@ -229,5 +230,17 @@ theorem field_V6 : ∀ (D : JointData) (f : Word → JSlice) (m : ℕ) (w : Word
   · exact pairCompat_of_disjoint _ 1 2 _ _ _ _ _
       (vt_evenTOdd f _ _ _ hnb hreg hc hl1 hl2 1 (by norm_num))
       (vt_evenTOdd f _ _ _ hnb hreg hc hl1 hl2 2 (by norm_num)) c2
+
+/-! ### The structure `SwapVacuous`: the seven fields -/
+
+/-- The vacuous families of `SwapBaseInput`: all seven fields, with `V2` and `V7` from `SwapVacuousV27`. -/
+theorem swapVacuous_term : SwapVacuous where
+  V5 := field_V5
+  V3 := field_V3
+  V4 := field_V4
+  V1 := field_V1
+  V2 := FLatticePaper.Tiles.SwapVacuousV27.vac_V2
+  V6 := field_V6
+  V7 := FLatticePaper.Tiles.SwapVacuousV27.vac_V7
 
 end FLatticePaper.Tiles.SwapVacuousTerm
