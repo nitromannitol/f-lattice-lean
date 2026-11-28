@@ -167,13 +167,16 @@ def GluedChildren (f : Word → JSlice) (w u1 u2 : Word) (κo κe : ℕ → ℤ)
       ∀ z ∈ keptSet (pieceSet (evenP w) (evenQ w) (tOddSet u1) (tEvenSet u2)) (pieceFlag (evenP w)) dblEven i,
         ge z = placedEven w (f u1).tOdd.val (f u2).tEven.val 0 i z + κe i)
 
-/-- (a) of `lemma:weak_standard_odometer_properties` for the glued children (end of Step 1 of its proof): they respect the
-boundary words of the children. -/
+/-- (a) of `lemma:weak_standard_odometer_properties` for the glued children (end of Step 1 of its proof), at the children that are
+not corrected: they respect the boundary words of the children, when the tile odometers of the shorter words are normalised with
+zero slope (without it an affine change of one register keeps (C) but breaks the junction slopes of the child's strings). At a
+corrected child the glue on the kept parts fails (a) at `w = 2 3^k` (odd child). -/
 def GlueRespectsInput (D : JointData) : Prop :=
   ∀ (f : Word → JSlice) (w u1 u2 : Word), GoodBelow D f w.length → ¬ IsBase w → regsAt w = (some u1, some u2) →
+  (∀ u : Word, u.length < w.length → (∃ β, FirstTileNormal (f u).tOdd 0 β) ∧ (∃ β, FirstTileNormal (f u).tEven 0 β)) →
   ∀ (κo κe : ℕ → ℤ) (go ge : Site → ℤ), GluedChildren f w u1 u2 κo κe go ge →
-    RespectsAnchored (oddTile w) (hWordOf w false) (vWordOf w false) go ∧
-      RespectsAnchored (evenTile w) (hWordOf w true) (vWordOf w true) ge
+    (¬ CorrectedAfterThree w → RespectsAnchored (oddTile w) (hWordOf w false) (vWordOf w false) go) ∧
+      (¬ CorrectedAfterTwo w → RespectsAnchored (evenTile w) (hWordOf w true) (vWordOf w true) ge)
 
 /-- (c) of `lemma:weak_standard_odometer_properties` for the glued children (Step 2 of its proof): each is compatible with its
 lattice adjacent translates. -/
@@ -192,7 +195,7 @@ theorem weakStep_paper (D : JointData) (hS : D.S = paperS) (hB : BaseWeakInput) 
   intro f w hgood
   by_cases hw : IsBase w
   · obtain ⟨wo, we, hdo, hde, hbc, hro, hre, hwp⟩ := hB w hw
-    refine ⟨wo, we, ⟨?_, ?_, fun _ => ?_, fun h => absurd hw h, hro, hre⟩, hwp⟩
+    refine ⟨wo, we, ⟨?_, ?_, fun _ => ?_, fun h => absurd hw h, fun _ => hro, fun _ => hre⟩, hwp⟩
     · rw [hS]; exact hdo
     · rw [hS]; exact hde
     · rw [hS]; exact hbc
@@ -247,7 +250,7 @@ theorem weakStep_paper (D : JointData) (hS : D.S = paperS) (hB : BaseWeakInput) 
     (fun i z => placedEven w (f u1).tOdd.val (f u2).tEven.val 0 i z + κe i)
     (fun a ha b hb z h1 h2 => MixedFromCells.mixedEven_all w hw u1 u2 hT1 hT2 a ha b hb z h1 h2) hMe hDe
   have hglue : GluedChildren f w u1 u2 κo κe go ge := ⟨hMo, hDo, hgo, hMe, hDe, hge⟩
-  obtain ⟨hRo, hRe⟩ := hgr f w u1 u2 hgood hw hreg κo κe go ge hglue
+  obtain ⟨hRo, hRe⟩ := hgr f w u1 u2 hgood hw hreg (hsl f w.length hgood) κo κe go ge hglue
   have hWp := hgl f w u1 u2 hgood hw hreg κo κe go ge hglue
   refine ⟨⟨oddTile w, go⟩, ⟨evenTile w, ge⟩, ⟨?_, ?_, fun h => absurd h hw, fun _ => ⟨?_, ?_⟩, hRo, hRe⟩, hWp⟩
   · rw [hS]; rfl

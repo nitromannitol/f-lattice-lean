@@ -521,14 +521,16 @@ def below (f : Word → JSlice) (w : Word) : Word → JSlice :=
 
 /-- (1) The weak standard step at `w`, with the parent odometers `g` (the family below `w`): the domains are the boundary tiles; a
 base word satisfies `S.base`; any other word has the standard decompositions from the TILE parents (`OddNodeP`, `EvenNodeP`);
-(a) of `lemma:weak_standard_odometer_properties` (`RespectsAnchored`). -/
+(a) of `lemma:weak_standard_odometer_properties` (`RespectsAnchored`) at the children that are not corrected. At a corrected child
+the tile odometer is the L-decomposition, which carries (a) itself (`TilePart`), and the weak child need not respect the strings:
+the glue on the kept parts fails it at `w = 2 3^k`. -/
 def WeakPart (D : JointData) (g : Word → JSlice) (w : Word) (wo we : PartialOdometer) : Prop :=
   wo.dom = D.S.bdry (some w) true ∧ we.dom = D.S.bdry (some w) false ∧
     (IsBase w → D.S.base w wo we) ∧
     (¬ IsBase w → OddNodeP D.S wo (fun u => (g u).tOdd) (fun u => (g u).tEven) w ∧
       EvenNodeP D.S we (fun u => (g u).tOdd) (fun u => (g u).tEven) w) ∧
-    RespectsAnchored wo.dom (hWordOf w false) (vWordOf w false) wo.val ∧
-    RespectsAnchored we.dom (hWordOf w true) (vWordOf w true) we.val
+    (¬ CorrectedAfterThree w → RespectsAnchored wo.dom (hWordOf w false) (vWordOf w false) wo.val) ∧
+    (¬ CorrectedAfterTwo w → RespectsAnchored we.dom (hWordOf w true) (vWordOf w true) we.val)
 
 /-- (2) The weak alternate step at `w`: the alternate decompositions from the tile parents and the alternate tile parents
 (`AltOddNodeP`, `AltEvenNodeP`; base words: `altBase`), and (a) of `lemma:weak_alternate_odometer_properties`. -/
