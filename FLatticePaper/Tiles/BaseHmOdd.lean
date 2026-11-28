@@ -37,4 +37,31 @@ theorem tile_type_rev_wL (k j : ℕ) (hk : 1 ≤ k) (hj : j < 2 * k + 3) :
     split_ifs <;> simp_all [BaseHpLadder.hTt_xp, BaseHpLadder.hTt_pq]
     all_goals try omega
 
+/-- The affine factor of the reversed odd `3^k` piece: the letter factor `alphaH` plus the shift `σ = (1, -(2k+2))`. -/
+def aHm (k j : ℕ) : GInt :=
+  alphaH (lettersOf (wL k) true j) + ((1 : ℤ), -(2 * (k : ℤ) + 2))
+
+/-- The constant at the first tile of the reversed odd `3^k` piece. -/
+def c0Hm (k : ℕ) : ℤ := -(2 * (k : ℤ) + 1) * ((k : ℤ) + 1)
+
+/-- The index-dependent part of the constant (linear in `k` and `j`). -/
+def dHm (k j : ℕ) : ℤ :=
+  if j = 0 then 0
+  else if j ≤ k then 2 * (j : ℤ)
+  else if j ≤ k + 2 then 1
+  else if j ≤ 2 * k + 1 then 1 + 2 * ((j : ℤ) - (k : ℤ) - 2)
+  else 0
+
+/-- The centred constant of the reversed odd `3^k` piece: `c_j = c_0 + d_j`. -/
+def cHm (k j : ℕ) : ℤ := c0Hm k + dHm k j
+
+theorem cHm_succ (k j : ℕ) (hk : 1 ≤ k) (hj : j < 2 * k + 2) :
+    cHm k (j + 1) = cHm k j +
+      ptDot (aHm k j) (zeroOneHorizontalReversedStep (lettersOf (wL k) true j) (lettersOf (wL k) true (j + 1))) := by
+  unfold aHm cHm dHm
+  rw [letter_rev_wL k j (by omega), letter_rev_wL k (j + 1) (by omega)]
+  unfold ptDot zeroOneHorizontalReversedStep alphaH
+  simp only [Prod.fst_add, Prod.snd_add]
+  split_ifs <;> simp_all <;> omega
+
 end FLatticePaper.Tiles.BaseHmOdd
