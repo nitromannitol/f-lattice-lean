@@ -37,6 +37,20 @@ theorem tile_type_rev_wL (k j : ℕ) (hk : 1 ≤ k) (hj : j < 2 * k + 3) :
     split_ifs <;> simp_all [BaseHpLadder.hTt_xp, BaseHpLadder.hTt_pq]
     all_goals try omega
 
+/-- The positions of the reversed enlarged tiles of the odd `3^k`: the anchor `(-2k, 2k+1)` at index `0`. -/
+def posHm (k j : ℕ) : GInt :=
+  if j ≤ k then ((2 * (j : ℤ) - 2 * (k : ℤ)), 2 * (k : ℤ) + 1)
+  else if j = k + 1 then (2, 2 * (k : ℤ) + 2)
+  else if j ≤ 2 * k + 1 then (2 * (j : ℤ) - 2 * (k : ℤ) - 1, 2 * (k : ℤ) + 2)
+  else (2 * (k : ℤ) + 3, 2 * (k : ℤ) + 3)
+
+theorem posHm_succ (k j : ℕ) (hk : 1 ≤ k) (hj : j < 2 * k + 2) :
+    posHm k (j + 1) = posHm k j +
+      zeroOneHorizontalReversedStep (lettersOf (wL k) true j) (lettersOf (wL k) true (j + 1)) := by
+  rw [letter_rev_wL k j (by omega), letter_rev_wL k (j + 1) (by omega)]
+  unfold posHm zeroOneHorizontalReversedStep
+  split_ifs <;> simp [Prod.ext_iff] <;> omega
+
 /-- The affine factor of the reversed odd `3^k` piece: the letter factor `alphaH` plus the shift `σ = (1, -(2k+2))`. -/
 def aHm (k j : ℕ) : GInt :=
   alphaH (lettersOf (wL k) true j) + ((1 : ℤ), -(2 * (k : ℤ) + 2))

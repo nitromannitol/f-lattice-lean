@@ -1380,5 +1380,7 @@ import FLatticePaper.Tiles.StackedWalkPattern
 import FLatticePaper.Tiles.StackedTopCell
 import FLatticePaper.Tiles.StackedDBound
 import FLatticePaper.Tiles.StackedEvenBound
+import FLatticePaper.Tiles.BaseHmAnchor
+import FLatticePaper.Tiles.RevStringList
 
 /-! Root import for the corrected F-lattice paper. -/
