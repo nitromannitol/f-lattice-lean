@@ -440,6 +440,10 @@ import FLatticePaper.Tiles.StringAppend
 import FLatticePaper.Tiles.GlueWords
 import FLatticePaper.Tiles.GlueStringDecomp
 import FLatticePaper.Tiles.GlueChain
+import FLatticePaper.Tiles.GlueSeams
+import FLatticePaper.Tiles.GlueCorners
+import FLatticePaper.Tiles.GlueEnds
+import FLatticePaper.Tiles.GlueRegister
 import FLatticePaper.Tiles.AltMixedCompat
 import FLatticePaper.Tiles.MixedOverlapStrings
 import FLatticePaper.Tiles.ChildAssembly
