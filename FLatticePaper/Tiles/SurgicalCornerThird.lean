@@ -247,16 +247,16 @@ theorem corner_third (wh wv : BinaryWord) (k : ℕ) (S : GInt → ℤ)
 /-- The third identity of (b) for every odd child of a weak standard family, in the child fraction `n/d` of `oddTile w`
 (`(parentsAt w).current .odd`): the horizontal and vertical words of the odd child are `hWordOf w false` and `vWordOf w false`
 (`vWordOf w false = vertWord w`), with `#q(w_v) = n` and `|w_v| = d` (`vertWord_counts`). -/
-theorem corner_3_family (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
-    (oddO evenO : FLatticePaper.Farey.Word → PartialOdometer)
-    (h : FLatticePaper.Tiles.SurgicalWeak.IsWeakStdFamily S oddO evenO) (w : FLatticePaper.Farey.Word) :
-    tileAffine (oddO w).val (cornerTiles (FLatticePaper.Tiles.SiteStrings.hWordOf w false)
+theorem corner_3_family_of (w : FLatticePaper.Farey.Word) (T : Finset GInt) (g : GInt → ℤ)
+    (hR : FLatticePaper.Tiles.SurgicalWeak.RespectsAnchored T (FLatticePaper.Tiles.SiteStrings.hWordOf w false)
+      (FLatticePaper.Tiles.SiteStrings.vWordOf w false) g) :
+    tileAffine g (cornerTiles (FLatticePaper.Tiles.SiteStrings.hWordOf w false)
         (FLatticePaper.Tiles.SiteStrings.vWordOf w false) 0).2.2.1 -
-      tileAffine (oddO w).val (cornerTiles (FLatticePaper.Tiles.SiteStrings.hWordOf w false)
+      tileAffine g (cornerTiles (FLatticePaper.Tiles.SiteStrings.hWordOf w false)
         (FLatticePaper.Tiles.SiteStrings.vWordOf w false) 0).2.1 =
     ((((FLatticePaper.Farey.parentsAt w).current .odd).num : ℚ) - 1,
       (1 - (((FLatticePaper.Farey.parentsAt w).current .odd).den : ℚ))) := by
-  obtain ⟨_, hA, hC, hV, _⟩ := (h w).2.2.2.2.1
+  obtain ⟨_, hA, hC, hV, _⟩ := id hR
   have hwv : FLatticePaper.Tiles.SiteStrings.vWordOf w false = vertWord w := rfl
   obtain ⟨hvh, hvl⟩ := StringCorners.vertWord_head_last w
   have hcnt := vertWord_counts w
@@ -274,7 +274,7 @@ theorem corner_3_family (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
     ring
   rw [hwv]
   have key := corner_third (FLatticePaper.Tiles.SiteStrings.hWordOf w false) (vertWord w) k
-    (oddO w).val (hWordOf_head_last w false).1 (hWordOf_head_last w false).2 hvh hvl hk hA hC hV
+    g (hWordOf_head_last w false).1 (hWordOf_head_last w false).2 hvh hvl hk hA hC hV
   rw [key]
   have hq : ((vertWord w).count .q : ℚ) = ((((FLatticePaper.Farey.parentsAt w).current .odd).num : ℤ) : ℚ) := by
     exact_mod_cast hcnt.2
@@ -291,6 +291,18 @@ theorem corner_3_family (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
   apply Prod.ext
   · simp
   · simp
+
+/-- `corner_3_family_of` for the odometer of a weak standard family. -/
+theorem corner_3_family (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
+    (oddO evenO : FLatticePaper.Farey.Word → PartialOdometer)
+    (h : FLatticePaper.Tiles.SurgicalWeak.IsWeakStdFamily S oddO evenO) (w : FLatticePaper.Farey.Word) :
+    tileAffine (oddO w).val (cornerTiles (FLatticePaper.Tiles.SiteStrings.hWordOf w false)
+        (FLatticePaper.Tiles.SiteStrings.vWordOf w false) 0).2.2.1 -
+      tileAffine (oddO w).val (cornerTiles (FLatticePaper.Tiles.SiteStrings.hWordOf w false)
+        (FLatticePaper.Tiles.SiteStrings.vWordOf w false) 0).2.1 =
+    ((((FLatticePaper.Farey.parentsAt w).current .odd).num : ℚ) - 1,
+      (1 - (((FLatticePaper.Farey.parentsAt w).current .odd).den : ℚ))) :=
+  corner_3_family_of w (oddO w).dom (oddO w).val (h w).2.2.2.2.1
 
 /-- The first two identities of (b) for every even child of a weak standard family. -/
 theorem corner_12_family_even (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
@@ -309,16 +321,16 @@ theorem corner_12_family_even (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
 
 /-- The third identity of (b) for every even child of a weak standard family, in the fraction `n/d` of `evenTile w`
 (`(parentsAt w).current .even`): `#q(w_v) = n` and `|w_v| = d` (`vWord_even_counts`). -/
-theorem corner_3_family_even (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
-    (oddO evenO : FLatticePaper.Farey.Word → PartialOdometer)
-    (h : FLatticePaper.Tiles.SurgicalWeak.IsWeakStdFamily S oddO evenO) (w : FLatticePaper.Farey.Word) :
-    tileAffine (evenO w).val (cornerTiles (FLatticePaper.Tiles.SiteStrings.hWordOf w true)
+theorem corner_3_family_even_of (w : FLatticePaper.Farey.Word) (T : Finset GInt) (g : GInt → ℤ)
+    (hR : FLatticePaper.Tiles.SurgicalWeak.RespectsAnchored T (FLatticePaper.Tiles.SiteStrings.hWordOf w true)
+      (FLatticePaper.Tiles.SiteStrings.vWordOf w true) g) :
+    tileAffine g (cornerTiles (FLatticePaper.Tiles.SiteStrings.hWordOf w true)
         (FLatticePaper.Tiles.SiteStrings.vWordOf w true) 0).2.2.1 -
-      tileAffine (evenO w).val (cornerTiles (FLatticePaper.Tiles.SiteStrings.hWordOf w true)
+      tileAffine g (cornerTiles (FLatticePaper.Tiles.SiteStrings.hWordOf w true)
         (FLatticePaper.Tiles.SiteStrings.vWordOf w true) 0).2.1 =
     ((((FLatticePaper.Farey.parentsAt w).current .even).num : ℚ) - 1,
       (1 - (((FLatticePaper.Farey.parentsAt w).current .even).den : ℚ))) := by
-  obtain ⟨_, hA, hC, hV, _⟩ := (h w).2.2.2.2.2
+  obtain ⟨_, hA, hC, hV, _⟩ := id hR
   obtain ⟨hvh, hvl⟩ := StringCorners.vWord_even_head_last w
   have hcnt : ((FLatticePaper.Tiles.SiteStrings.vWordOf w true).count .p : ℤ) =
         ((FLatticePaper.Farey.parentsAt w).current .even).den -
@@ -344,7 +356,7 @@ theorem corner_3_family_even (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
     rw [h1, hcnt.1, hcnt.2]
     ring
   have key := corner_third (FLatticePaper.Tiles.SiteStrings.hWordOf w true)
-    (FLatticePaper.Tiles.SiteStrings.vWordOf w true) k (evenO w).val
+    (FLatticePaper.Tiles.SiteStrings.vWordOf w true) k g
     (hWordOf_head_last w true).1 (hWordOf_head_last w true).2 hvh hvl hk hA hC hV
   rw [key]
   have hq : ((FLatticePaper.Tiles.SiteStrings.vWordOf w true).count .q : ℚ) =
@@ -363,5 +375,17 @@ theorem corner_3_family_even (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
   apply Prod.ext
   · simp
   · simp
+
+/-- `corner_3_family_even_of` for the odometer of a weak standard family. -/
+theorem corner_3_family_even (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
+    (oddO evenO : FLatticePaper.Farey.Word → PartialOdometer)
+    (h : FLatticePaper.Tiles.SurgicalWeak.IsWeakStdFamily S oddO evenO) (w : FLatticePaper.Farey.Word) :
+    tileAffine (evenO w).val (cornerTiles (FLatticePaper.Tiles.SiteStrings.hWordOf w true)
+        (FLatticePaper.Tiles.SiteStrings.vWordOf w true) 0).2.2.1 -
+      tileAffine (evenO w).val (cornerTiles (FLatticePaper.Tiles.SiteStrings.hWordOf w true)
+        (FLatticePaper.Tiles.SiteStrings.vWordOf w true) 0).2.1 =
+    ((((FLatticePaper.Farey.parentsAt w).current .even).num : ℚ) - 1,
+      (1 - (((FLatticePaper.Farey.parentsAt w).current .even).den : ℚ))) :=
+  corner_3_family_even_of w (evenO w).dom (evenO w).val (h w).2.2.2.2.2
 
 end FLatticePaper.Tiles

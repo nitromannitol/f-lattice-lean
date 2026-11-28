@@ -26,20 +26,20 @@ theorem covers_iff_dom (F : PTFamily) (ts : List (ZTile × GInt)) (h : F.ts = ts
   unfold tileCovers PTFamily.dom PTFamily.tile PTFamily.n
   rw [h]
 
-theorem vertical_kappa (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
-    (oddO evenO : FLatticePaper.Farey.Word → PartialOdometer)
-    (h : FLatticePaper.Tiles.SurgicalWeak.IsWeakStdFamily S oddO evenO) (w : FLatticePaper.Farey.Word)
+theorem vertical_kappa_of (w : FLatticePaper.Farey.Word) (T : Finset GInt) (g : GInt → ℤ)
+    (hR : FLatticePaper.Tiles.SurgicalWeak.RespectsAnchored T (FLatticePaper.Tiles.SiteStrings.hWordOf w false)
+      (FLatticePaper.Tiles.SiteStrings.vWordOf w false) g)
     (H2X : ∀ z, BoundaryVertex (↑(cellTileOf (oddTile w)) : Set GInt) z → z - texV1Odd (fracOdd w) ∈ oddTile w →
       tileCovers (vStringAt (vWordOf w false) (lastPosOf (hStringAt (hWordOf w false) 0))) z)
     (H2Y : ∀ z, BoundaryVertex ({t : GInt | t - texV1Odd (fracOdd w) ∈ cellTileOf (oddTile w)} : Set GInt) z → z ∈ oddTile w →
       tileCovers (vRevStringAt (vWordOf w false).reverse (texV1Odd (fracOdd w))) z) :
     ∃ κ : ℤ, ∀ z : GInt, z ∈ (↑(oddTile w) : Set GInt) → z - texV1Odd (fracOdd w) ∈ (↑(oddTile w) : Set GInt) →
-      (oddO w).val z - (oddO w).val (z - texV1Odd (fracOdd w)) = κ := by
+      g z - g (z - texV1Odd (fracOdd w)) = κ := by
   obtain ⟨FA, P, M, FB, hFAodo, hFB, htsP, htsM, hPM, hFAts, hFBts, hFAR, hPR, hFBR, hMR, hWP, hWM, hCr, hlin⟩ :=
-    vlin_standard_vertical S oddO evenO h w
+    vlin_standard_vertical_of w T g hR
   rw [almostV1_oddBottom_eq] at hFB hFBts
   have hFB0 : ∀ k < FB.n, ∀ x ∈ FB.dom k,
-      (oddO w).val (x - texV1Odd (fracOdd w)) + (0 : GInt).1 * x.1 + (0 : GInt).2 * x.2 = FB.odo k x := by
+      g (x - texV1Odd (fracOdd w)) + (0 : GInt).1 * x.1 + (0 : GInt).2 * x.2 = FB.odo k x := by
     intro k hk x hx
     simp only [Prod.fst_zero, Prod.snd_zero, zero_mul, add_zero]
     exact hFB k hk x hx
@@ -57,10 +57,22 @@ theorem vertical_kappa (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
       (fun z' hz' hz'' => (covers_iff_dom FB _ hFBts z').2 (H2Y z' hz' hz''))
       z (Finset.mem_coe.1 hz.1) (Finset.mem_coe.1 hz.2)
     exact ⟨hO.1, hO.2⟩
-  obtain ⟨κ, hκ⟩ := PTFamily.hkappa_of_families (oddO w).val (texV1Odd (fracOdd w)) 0
+  obtain ⟨κ, hκ⟩ := PTFamily.hkappa_of_families g (texV1Odd (fracOdd w)) 0
     (fun z => z ∈ (↑(oddTile w) : Set GInt) ∧ z - texV1Odd (fracOdd w) ∈ (↑(oddTile w) : Set GInt))
     FA P M FB Orientation.vertical false true hFAodo hFB0 htsP htsM hFAR hPR hFBR hMR hWP hWM hadjP hadjM
     hCr hcov hlin
   exact ⟨κ, fun z hz1 hz2 => by simpa using hκ z ⟨hz1, hz2⟩⟩
+
+/-- `vertical_kappa_of` for the odometer of a weak standard family. -/
+theorem vertical_kappa (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
+    (oddO evenO : FLatticePaper.Farey.Word → PartialOdometer)
+    (h : FLatticePaper.Tiles.SurgicalWeak.IsWeakStdFamily S oddO evenO) (w : FLatticePaper.Farey.Word)
+    (H2X : ∀ z, BoundaryVertex (↑(cellTileOf (oddTile w)) : Set GInt) z → z - texV1Odd (fracOdd w) ∈ oddTile w →
+      tileCovers (vStringAt (vWordOf w false) (lastPosOf (hStringAt (hWordOf w false) 0))) z)
+    (H2Y : ∀ z, BoundaryVertex ({t : GInt | t - texV1Odd (fracOdd w) ∈ cellTileOf (oddTile w)} : Set GInt) z → z ∈ oddTile w →
+      tileCovers (vRevStringAt (vWordOf w false).reverse (texV1Odd (fracOdd w))) z) :
+    ∃ κ : ℤ, ∀ z : GInt, z ∈ (↑(oddTile w) : Set GInt) → z - texV1Odd (fracOdd w) ∈ (↑(oddTile w) : Set GInt) →
+      (oddO w).val z - (oddO w).val (z - texV1Odd (fracOdd w)) = κ :=
+  vertical_kappa_of w (oddO w).dom (oddO w).val (h w).2.2.2.2.1 H2X H2Y
 
 end FLatticePaper.Tiles

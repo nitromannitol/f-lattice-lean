@@ -22,20 +22,20 @@ open FLatticePaper FLatticePaper.Farey FLatticePaper.Construction FLatticePaper.
   FLatticePaper.Tiles.StandardAll FLatticePaper.Tiles.CommonExtFamily FLatticePaper.Tiles.CommonExtStandard
   FLatticePaper.Tiles.PointNonNeighbour FLatticePaper.Tiles.CommonExtWitness
 
-theorem vertical_kappa_even (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
-    (oddO evenO : FLatticePaper.Farey.Word → PartialOdometer)
-    (h : FLatticePaper.Tiles.SurgicalWeak.IsWeakStdFamily S oddO evenO) (w : FLatticePaper.Farey.Word)
+theorem vertical_kappa_even_of (w : FLatticePaper.Farey.Word) (T : Finset GInt) (g : GInt → ℤ)
+    (hR : FLatticePaper.Tiles.SurgicalWeak.RespectsAnchored T (FLatticePaper.Tiles.SiteStrings.hWordOf w true)
+      (FLatticePaper.Tiles.SiteStrings.vWordOf w true) g)
     (H2X : ∀ z, BoundaryVertex (↑(cellTileOf (evenTile w)) : Set GInt) z → z - texV1Even (fracEven w) ∈ evenTile w →
       tileCovers (vStringAt (vWordOf w true) (lastPosOf (hStringAt (hWordOf w true) 0))) z)
     (H2Y : ∀ z, BoundaryVertex ({t : GInt | t - texV1Even (fracEven w) ∈ cellTileOf (evenTile w)} : Set GInt) z → z ∈ evenTile w →
       tileCovers (vRevStringAt (vWordOf w true).reverse (texV1Even (fracEven w))) z) :
     ∃ κ : ℤ, ∀ z : GInt, z ∈ (↑(evenTile w) : Set GInt) → z - texV1Even (fracEven w) ∈ (↑(evenTile w) : Set GInt) →
-      (evenO w).val z - (evenO w).val (z - texV1Even (fracEven w)) = κ := by
+      g z - g (z - texV1Even (fracEven w)) = κ := by
   obtain ⟨FA, P, M, FB, hFAodo, hFB, htsP, htsM, hPM, hFAts, hFBts, hFAR, hPR, hFBR, hMR, hWP, hWM, hCr, hlin⟩ :=
-    vlin_standard_vertical_even S oddO evenO h w
+    vlin_standard_vertical_even_of w T g hR
   rw [almostV1_evenBottom_eq] at hFB hFBts
   have hFB0 : ∀ k < FB.n, ∀ x ∈ FB.dom k,
-      (evenO w).val (x - texV1Even (fracEven w)) + (0 : GInt).1 * x.1 + (0 : GInt).2 * x.2 = FB.odo k x := by
+      g (x - texV1Even (fracEven w)) + (0 : GInt).1 * x.1 + (0 : GInt).2 * x.2 = FB.odo k x := by
     intro k hk x hx
     simp only [Prod.fst_zero, Prod.snd_zero, zero_mul, add_zero]
     exact hFB k hk x hx
@@ -53,12 +53,23 @@ theorem vertical_kappa_even (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
       (fun z' hz' hz'' => (covers_iff_dom FB _ hFBts z').2 (H2Y z' hz' hz''))
       z (Finset.mem_coe.1 hz.1) (Finset.mem_coe.1 hz.2)
     exact ⟨hO.1, hO.2⟩
-  obtain ⟨κ, hκ⟩ := PTFamily.hkappa_of_families (evenO w).val (texV1Even (fracEven w)) 0
+  obtain ⟨κ, hκ⟩ := PTFamily.hkappa_of_families g (texV1Even (fracEven w)) 0
     (fun z => z ∈ (↑(evenTile w) : Set GInt) ∧ z - texV1Even (fracEven w) ∈ (↑(evenTile w) : Set GInt))
     FA P M FB Orientation.vertical false true hFAodo hFB0 htsP htsM hFAR hPR hFBR hMR hWP hWM hadjP hadjM
     hCr hcov hlin
   exact ⟨κ, fun z hz1 hz2 => by simpa using hκ z ⟨hz1, hz2⟩⟩
 
+/-- `vertical_kappa_even_of` for the odometer of a weak standard family. -/
+theorem vertical_kappa_even (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
+    (oddO evenO : FLatticePaper.Farey.Word → PartialOdometer)
+    (h : FLatticePaper.Tiles.SurgicalWeak.IsWeakStdFamily S oddO evenO) (w : FLatticePaper.Farey.Word)
+    (H2X : ∀ z, BoundaryVertex (↑(cellTileOf (evenTile w)) : Set GInt) z → z - texV1Even (fracEven w) ∈ evenTile w →
+      tileCovers (vStringAt (vWordOf w true) (lastPosOf (hStringAt (hWordOf w true) 0))) z)
+    (H2Y : ∀ z, BoundaryVertex ({t : GInt | t - texV1Even (fracEven w) ∈ cellTileOf (evenTile w)} : Set GInt) z → z ∈ evenTile w →
+      tileCovers (vRevStringAt (vWordOf w true).reverse (texV1Even (fracEven w))) z) :
+    ∃ κ : ℤ, ∀ z : GInt, z ∈ (↑(evenTile w) : Set GInt) → z - texV1Even (fracEven w) ∈ (↑(evenTile w) : Set GInt) →
+      (evenO w).val z - (evenO w).val (z - texV1Even (fracEven w)) = κ :=
+  vertical_kappa_even_of w (evenO w).dom (evenO w).val (h w).2.2.2.2.2 H2X H2Y
 
 theorem texV2_fracEven_ne_zero (w : FLatticePaper.Farey.Word) : texV2 (fracEven w) ≠ 0 := by
   intro h
@@ -80,18 +91,18 @@ theorem even_hdisj_neg2 (w : FLatticePaper.Farey.Word) :
   have h := huniq s 0 (zero_mem_lattice _ _) (-texV2 (fracEven w)) hmem (by rw [sub_zero]; exact hs) hsv
   exact texV2_fracEven_ne_zero w (neg_eq_zero.mp h.symm)
 
-theorem horizontal_kappa_even (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
-    (oddO evenO : FLatticePaper.Farey.Word → PartialOdometer)
-    (h : FLatticePaper.Tiles.SurgicalWeak.IsWeakStdFamily S oddO evenO) (w : FLatticePaper.Farey.Word)
+theorem horizontal_kappa_even_of (w : FLatticePaper.Farey.Word) (T : Finset GInt) (g : GInt → ℤ)
+    (hR : FLatticePaper.Tiles.SurgicalWeak.RespectsAnchored T (FLatticePaper.Tiles.SiteStrings.hWordOf w true)
+      (FLatticePaper.Tiles.SiteStrings.vWordOf w true) g)
     (H2X : ∀ z, BoundaryVertex (↑(cellTileOf (evenTile w)) : Set GInt) z → z - (-texV2 (fracEven w)) ∈ evenTile w →
       tileCovers (hStringAt (hWordOf w true) 0) z)
     (H2Y : ∀ z, BoundaryVertex ({t : GInt | t - (-texV2 (fracEven w)) ∈ cellTileOf (evenTile w)} : Set GInt) z → z ∈ evenTile w →
       tileCovers (hRevStringAt (hWordOf w true).reverse (1, -2)) z) :
     ∃ κ : ℤ, ∀ z : GInt, z ∈ (↑(evenTile w) : Set GInt) → z - (-texV2 (fracEven w)) ∈ (↑(evenTile w) : Set GInt) →
-      (evenO w).val z - (evenO w).val (z - (-texV2 (fracEven w))) -
+      g z - g (z - (-texV2 (fracEven w))) -
         ((-((fracEven w).num)) * z.1 + (fracEven w).den * z.2) = κ := by
   obtain ⟨v, a, FA, P, M, FB, hv, ha, hFAodo, hFB, htsP, htsM, hFAts, hPts, hMts, hFAR, hFBR, hPR, hMR,
-    hWP, hWM, hCr, hPa, hlin⟩ := hlin_standard_horizontal_even S oddO evenO h w
+    hWP, hWM, hCr, hPa, hlin⟩ := hlin_standard_horizontal_even_of w T g hR
   have hv2 : v = -texV2 (fracEven w) := by
     rw [hv]
     rfl
@@ -118,13 +129,25 @@ theorem horizontal_kappa_even (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
   have hadjM : ∀ k, k + 1 < M.n → (∃ x, x ∈ M.dom k ∧ x ∈ M.dom (k + 1)) ∨
       ∃ x, x ∈ M.dom k ∧ ∃ y, y ∈ M.dom (k + 1) ∧ unitApart x y :=
     fun k hk => adj_hRevStringAt (hWordOf w true).reverse (1, -2) M hMts k hk
-  obtain ⟨κ, hκ⟩ := PTFamily.hkappa_of_families (evenO w).val (-texV2 (fracEven w))
+  obtain ⟨κ, hκ⟩ := PTFamily.hkappa_of_families g (-texV2 (fracEven w))
     ((-((fracEven w).num)), (fracEven w).den)
     (fun z => z ∈ (↑(evenTile w) : Set GInt) ∧ z - (-texV2 (fracEven w)) ∈ (↑(evenTile w) : Set GInt))
     FA P M FB Orientation.horizontal false true hFAodo hFB htsP htsM hFAR hPR hFBR hMR hWP hWM hadjP hadjM
     hCr hcov hlin
   exact ⟨κ, fun z hz1 hz2 => hκ z ⟨hz1, hz2⟩⟩
 
+/-- `horizontal_kappa_even_of` for the odometer of a weak standard family. -/
+theorem horizontal_kappa_even (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
+    (oddO evenO : FLatticePaper.Farey.Word → PartialOdometer)
+    (h : FLatticePaper.Tiles.SurgicalWeak.IsWeakStdFamily S oddO evenO) (w : FLatticePaper.Farey.Word)
+    (H2X : ∀ z, BoundaryVertex (↑(cellTileOf (evenTile w)) : Set GInt) z → z - (-texV2 (fracEven w)) ∈ evenTile w →
+      tileCovers (hStringAt (hWordOf w true) 0) z)
+    (H2Y : ∀ z, BoundaryVertex ({t : GInt | t - (-texV2 (fracEven w)) ∈ cellTileOf (evenTile w)} : Set GInt) z → z ∈ evenTile w →
+      tileCovers (hRevStringAt (hWordOf w true).reverse (1, -2)) z) :
+    ∃ κ : ℤ, ∀ z : GInt, z ∈ (↑(evenTile w) : Set GInt) → z - (-texV2 (fracEven w)) ∈ (↑(evenTile w) : Set GInt) →
+      (evenO w).val z - (evenO w).val (z - (-texV2 (fracEven w))) -
+        ((-((fracEven w).num)) * z.1 + (fracEven w).den * z.2) = κ :=
+  horizontal_kappa_even_of w (evenO w).dom (evenO w).val (h w).2.2.2.2.2 H2X H2Y
 
 /-- The constants `κ` of the even tile at every lattice step, as a statement about the partial odometer: the
 differences of the translates are constant on the overlaps (the hypothesis of `family_closed_walks_zero_paper`). -/

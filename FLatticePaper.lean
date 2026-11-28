@@ -430,6 +430,7 @@ import FLatticePaper.Tiles.ClosedPathTriOdd
 import FLatticePaper.Tiles.ClosedPathTriEven
 import FLatticePaper.Tiles.ClosedPathAltSum
 import FLatticePaper.Tiles.ClosedPathAlt
+import FLatticePaper.Tiles.LatticeOfRespects
 import FLatticePaper.Tiles.AltMixedCompat
 import FLatticePaper.Tiles.MixedOverlapStrings
 import FLatticePaper.Tiles.ChildAssembly

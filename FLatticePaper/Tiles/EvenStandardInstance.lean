@@ -25,9 +25,9 @@ theorem vertical_B_eq_even (w : FLatticePaper.Farey.Word) :
   rw [key, sub_eq_add_neg]
   rfl
 
-theorem hlin_standard_horizontal_even (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
-    (oddO evenO : FLatticePaper.Farey.Word → PartialOdometer)
-    (h : FLatticePaper.Tiles.SurgicalWeak.IsWeakStdFamily S oddO evenO) (w : FLatticePaper.Farey.Word) :
+theorem hlin_standard_horizontal_even_of (w : FLatticePaper.Farey.Word) (T : Finset GInt) (g : GInt → ℤ)
+    (hR : FLatticePaper.Tiles.SurgicalWeak.RespectsAnchored T (FLatticePaper.Tiles.SiteStrings.hWordOf w true)
+      (FLatticePaper.Tiles.SiteStrings.vWordOf w true) g) :
     ∃ (v a : GInt) (FA P M FB : PTFamily),
       v = (-((((FLatticePaper.Farey.parentsAt w).current .even).num : ℤ) -
           ((FLatticePaper.Farey.parentsAt w).current .even).den),
@@ -35,8 +35,8 @@ theorem hlin_standard_horizontal_even (S : FLatticePaper.Tiles.SurgicalWeak.Weak
           ((FLatticePaper.Farey.parentsAt w).current .even).den)) ∧
       a = (-((((FLatticePaper.Farey.parentsAt w).current .even).num : ℤ)),
         ((FLatticePaper.Farey.parentsAt w).current .even).den) ∧
-      (∀ k < FA.n, ∀ x ∈ FA.dom k, (evenO w).val x = FA.odo k x) ∧
-      (∀ k < FB.n, ∀ x ∈ FB.dom k, (evenO w).val (x - v) + a.1 * x.1 + a.2 * x.2 = FB.odo k x) ∧
+      (∀ k < FA.n, ∀ x ∈ FA.dom k, g x = FA.odo k x) ∧
+      (∀ k < FB.n, ∀ x ∈ FB.dom k, g (x - v) + a.1 * x.1 + a.2 * x.2 = FB.odo k x) ∧
       P.ts = FA.ts ∧ M.ts = FB.ts ∧
       FA.ts = hStringAt (hWordOf w true) 0 ∧ P.ts = hStringAt (hWordOf w true) (0, 0) ∧
       M.ts = hRevStringAt (hWordOf w true).reverse (1, -2) ∧
@@ -48,7 +48,7 @@ theorem hlin_standard_horizontal_even (S : FLatticePaper.Tiles.SurgicalWeak.Weak
         (∀ k < P.n, ∀ x : GInt, FA.odo k x = P.odo k x + α.1 * x.1 + α.2 * x.2 + β) →
         (∀ j < M.n, ∀ x : GInt, FB.odo j x = M.odo j x + γ.1 * x.1 + γ.2 * x.2 + δ) →
         α = γ) := by
-  obtain ⟨-, hA, hC, -, -⟩ := (h w).2.2.2.2.2
+  obtain ⟨-, hA, hC, -, -⟩ := id hR
   obtain ⟨FA, hFAts, hFA, hFAR⟩ := hA
   obtain ⟨G, hGts, hGS, hGR⟩ := hC
   obtain ⟨num, hnum⟩ : ∃ n : ℤ, n = ((FLatticePaper.Farey.parentsAt w).current .even).num := ⟨_, rfl⟩
@@ -105,7 +105,7 @@ theorem hlin_standard_horizontal_even (S : FLatticePaper.Tiles.SurgicalWeak.Weak
     rw [hFB]
     exact PTFamily.affineAdd_respects _ _ _ _ _ (PTFamily.translate_respects G _ _ v hGR)
   have hFB' : ∀ k < FB.n, ∀ x ∈ FB.dom k,
-      (evenO w).val (x - v) + a.1 * x.1 + a.2 * x.2 = FB.odo k x := by
+      g (x - v) + a.1 * x.1 + a.2 * x.2 = FB.odo k x := by
     intro k hk x hx
     have hkG : k < G.n := by rw [← hFBn]; exact hk
     rw [hFBdom k hkG] at hx
@@ -123,25 +123,51 @@ theorem hlin_standard_horizontal_even (S : FLatticePaper.Tiles.SurgicalWeak.Weak
   have hMts0 : M.ts = hRevStringAt (hWordOf w true).reverse (1, -2) := by
     rw [hMts]
     exact zoReversedStackedE_eq _
-  have hC3 : tileAffine (evenO w).val (cornerTiles (hWordOf w true) (vWordOf w true) 0).2.2.1 -
-      tileAffine (evenO w).val (cornerTiles (hWordOf w true) (vWordOf w true) 0).2.1 =
+  have hC3 : tileAffine g (cornerTiles (hWordOf w true) (vWordOf w true) 0).2.2.1 -
+      tileAffine g (cornerTiles (hWordOf w true) (vWordOf w true) 0).2.1 =
       ((num : ℚ) - 1, 1 - (den : ℚ)) := by
-    rw [corner_3_family_even S oddO evenO h w, hnum, hden]
+    rw [corner_3_family_even_of w T g hR, hnum, hden]
   refine ⟨v, a, FA, P, M, FB, (by rw [hv, hnum, hden]), (by rw [ha, hnum, hden]), hFA,
     hFB', htsP, htsM, hFAts, hPts0, hMts0, hFAR, hFBR, hPR, hMR, hWP, hWM, hCr, hPa, ?_⟩
   intro α γ β δ hα hγ
-  exact hlin_horizontal (evenO w).val (hWordOf w true) (vWordOf w true) num den v a hhead hlast hvh hvl
+  exact hlin_horizontal g (hWordOf w true) (vWordOf w true) num den v a hhead hlast hvh hvl
     (by rw [hq]) (by rw [hlenZ]) (by rw [hv]) (by rw [ha]) FA P M FB hFA hFB' hPts htsP htsM hMts
     hFAR hFBR hPa hC3 α γ β δ hα hγ
 
-/-- The vertical instance for the even standard tile: the right side of the even tile and the left side of its translate by
-`v = almostV1 (evenBottom w)`, both carried by the vertical Moreover families translated by `B`. -/
-theorem vlin_standard_vertical_even (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
+/-- `hlin_standard_horizontal_even_of` for the odometer of a weak standard family. -/
+theorem hlin_standard_horizontal_even (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
     (oddO evenO : FLatticePaper.Farey.Word → PartialOdometer)
     (h : FLatticePaper.Tiles.SurgicalWeak.IsWeakStdFamily S oddO evenO) (w : FLatticePaper.Farey.Word) :
-    ∃ (FA P M FB : PTFamily),
+    ∃ (v a : GInt) (FA P M FB : PTFamily),
+      v = (-((((FLatticePaper.Farey.parentsAt w).current .even).num : ℤ) -
+          ((FLatticePaper.Farey.parentsAt w).current .even).den),
+        -((((FLatticePaper.Farey.parentsAt w).current .even).num : ℤ) +
+          ((FLatticePaper.Farey.parentsAt w).current .even).den)) ∧
+      a = (-((((FLatticePaper.Farey.parentsAt w).current .even).num : ℤ)),
+        ((FLatticePaper.Farey.parentsAt w).current .even).den) ∧
       (∀ k < FA.n, ∀ x ∈ FA.dom k, (evenO w).val x = FA.odo k x) ∧
-      (∀ k < FB.n, ∀ x ∈ FB.dom k, (evenO w).val (x - almostV₁ (evenBottom w)) = FB.odo k x) ∧
+      (∀ k < FB.n, ∀ x ∈ FB.dom k, (evenO w).val (x - v) + a.1 * x.1 + a.2 * x.2 = FB.odo k x) ∧
+      P.ts = FA.ts ∧ M.ts = FB.ts ∧
+      FA.ts = hStringAt (hWordOf w true) 0 ∧ P.ts = hStringAt (hWordOf w true) (0, 0) ∧
+      M.ts = hRevStringAt (hWordOf w true).reverse (1, -2) ∧
+      FA.Respects Orientation.horizontal false ∧ FB.Respects Orientation.horizontal true ∧
+      P.Respects Orientation.horizontal false ∧ M.Respects Orientation.horizontal true ∧
+      WithinCommon P ∧ WithinCommon M ∧ CrossCommon P M ∧
+      P.a 0 - M.a 0 = (0, -1) ∧
+      (∀ (α γ : GInt) (β δ : ℤ),
+        (∀ k < P.n, ∀ x : GInt, FA.odo k x = P.odo k x + α.1 * x.1 + α.2 * x.2 + β) →
+        (∀ j < M.n, ∀ x : GInt, FB.odo j x = M.odo j x + γ.1 * x.1 + γ.2 * x.2 + δ) →
+        α = γ) :=
+  hlin_standard_horizontal_even_of w (evenO w).dom (evenO w).val (h w).2.2.2.2.2
+
+/-- The vertical instance for the even standard tile: the right side of the even tile and the left side of its translate by
+`v = almostV1 (evenBottom w)`, both carried by the vertical Moreover families translated by `B`. -/
+theorem vlin_standard_vertical_even_of (w : FLatticePaper.Farey.Word) (T : Finset GInt) (g : GInt → ℤ)
+    (hR : FLatticePaper.Tiles.SurgicalWeak.RespectsAnchored T (FLatticePaper.Tiles.SiteStrings.hWordOf w true)
+      (FLatticePaper.Tiles.SiteStrings.vWordOf w true) g) :
+    ∃ (FA P M FB : PTFamily),
+      (∀ k < FA.n, ∀ x ∈ FA.dom k, g x = FA.odo k x) ∧
+      (∀ k < FB.n, ∀ x ∈ FB.dom k, g (x - almostV₁ (evenBottom w)) = FB.odo k x) ∧
       P.ts = FA.ts ∧ M.ts = FB.ts ∧ P.a 0 = M.a 0 ∧
       FA.ts = vStringAt (vWordOf w true) (lastPosOf (hStringAt (hWordOf w true) 0)) ∧
       FB.ts = vRevStringAt (vWordOf w true).reverse (almostV₁ (evenBottom w)) ∧
@@ -152,7 +178,7 @@ theorem vlin_standard_vertical_even (S : FLatticePaper.Tiles.SurgicalWeak.WeakDa
         (∀ k < P.n, ∀ x : GInt, FA.odo k x = P.odo k x + α.1 * x.1 + α.2 * x.2 + β) →
         (∀ j < M.n, ∀ x : GInt, FB.odo j x = M.odo j x + γ.1 * x.1 + γ.2 * x.2 + δ) →
         α = γ) := by
-  obtain ⟨-, hA, -, hVr, hVf⟩ := (h w).2.2.2.2.2
+  obtain ⟨-, hA, -, hVr, hVf⟩ := id hR
   obtain ⟨FA, hFAts, hFA, hFAR⟩ := hVf
   obtain ⟨G, hGts, hGS, hGR⟩ := hVr
   have hvh : (vWordOf w true).head? = some Letter.p := (StringCorners.vWord_even_head_last w).1
@@ -191,7 +217,7 @@ theorem vlin_standard_vertical_even (S : FLatticePaper.Tiles.SurgicalWeak.WeakDa
       omega
   have htsM : M.ts = FB.ts := by
     rw [hMts', hFBts, hBv, hsh]
-  have hFB' : ∀ k < FB.n, ∀ x ∈ FB.dom k, (evenO w).val (x - v) = FB.odo k x := by
+  have hFB' : ∀ k < FB.n, ∀ x ∈ FB.dom k, g (x - v) = FB.odo k x := by
     intro k hk x hx
     have hkG : k < G.n := by
       rw [hFBdef, PTFamily.translate_n] at hk
@@ -215,7 +241,26 @@ theorem vlin_standard_vertical_even (S : FLatticePaper.Tiles.SurgicalWeak.WeakDa
     (by rw [hM]; exact PTFamily.translate_within _ _ hW0M),
     (by rw [hP, hM]; exact crossCommon_translate P0 M0 B hC0), ?_⟩
   intro α γ β δ hα hγ
-  exact vlin_vertical (evenO w).val (hWordOf w true) (vWordOf w true) v hhead hlast hvh hvl hBv' hA
+  exact vlin_vertical g (hWordOf w true) (vWordOf w true) v hhead hlast hvh hvl hBv' hA
     FA P M FB hFA hFB' hFAts htsP htsM hFBts hPM α γ β δ hα hγ
+
+/-- `vlin_standard_vertical_even_of` for the odometer of a weak standard family. -/
+theorem vlin_standard_vertical_even (S : FLatticePaper.Tiles.SurgicalWeak.WeakData)
+    (oddO evenO : FLatticePaper.Farey.Word → PartialOdometer)
+    (h : FLatticePaper.Tiles.SurgicalWeak.IsWeakStdFamily S oddO evenO) (w : FLatticePaper.Farey.Word) :
+    ∃ (FA P M FB : PTFamily),
+      (∀ k < FA.n, ∀ x ∈ FA.dom k, (evenO w).val x = FA.odo k x) ∧
+      (∀ k < FB.n, ∀ x ∈ FB.dom k, (evenO w).val (x - almostV₁ (evenBottom w)) = FB.odo k x) ∧
+      P.ts = FA.ts ∧ M.ts = FB.ts ∧ P.a 0 = M.a 0 ∧
+      FA.ts = vStringAt (vWordOf w true) (lastPosOf (hStringAt (hWordOf w true) 0)) ∧
+      FB.ts = vRevStringAt (vWordOf w true).reverse (almostV₁ (evenBottom w)) ∧
+      FA.Respects Orientation.vertical false ∧ P.Respects Orientation.vertical false ∧
+      FB.Respects Orientation.vertical true ∧ M.Respects Orientation.vertical true ∧
+      WithinCommon P ∧ WithinCommon M ∧ CrossCommon P M ∧
+      (∀ (α γ : GInt) (β δ : ℤ),
+        (∀ k < P.n, ∀ x : GInt, FA.odo k x = P.odo k x + α.1 * x.1 + α.2 * x.2 + β) →
+        (∀ j < M.n, ∀ x : GInt, FB.odo j x = M.odo j x + γ.1 * x.1 + γ.2 * x.2 + δ) →
+        α = γ) :=
+  vlin_standard_vertical_even_of w (evenO w).dom (evenO w).val (h w).2.2.2.2.2
 
 end FLatticePaper.Tiles
