@@ -48,7 +48,7 @@ theorem bnd_pair (w : Word) (p q : GInt) (l1 l2 : List GInt)
       oddBottom w ++ (oddRight w ++ ((F2Word.rev (oddBottom w)).hat ++ (F2Word.rev (oddRight w)).hat)) := by
     simp [boundaryWordOf, List.append_assoc]
   rw [hw, WalkDecomp.walk_append, h]
-  simp only [List.append_assoc, List.singleton_append, List.cons_append, List.nil_append]
+  simp only [List.append_assoc, List.cons_append, List.nil_append]
   apply zip_mem_of_mid
   exact ⟨_, _, rfl⟩
 
@@ -113,10 +113,10 @@ theorem top_cell (w : Word) (t : ℤ) (ht0 : 0 ≤ t) (ht1 : t + 1 ≤ (F2Word.s
       ((t + 1, b.2) : GInt) he with ⟨-, hv, -⟩ | ⟨hb, -⟩ | ⟨hb, -⟩ | ⟨hb, -⟩
   · exact hv
   · have := congrArg Prod.fst hb
-    simp [gI] at this <;> omega
+    simp [gI] at this
   · have := congrArg Prod.fst hb
-    simp [gOne] at this <;> omega
+    simp [gOne] at this; omega
   · have := congrArg Prod.fst hb
-    simp [gI] at this <;> omega
+    simp [gI] at this
 
 end FLatticePaper.Tiles.StackedTopCell

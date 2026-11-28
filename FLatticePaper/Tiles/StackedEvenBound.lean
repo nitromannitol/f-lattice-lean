@@ -31,7 +31,7 @@ theorem bnd_pair_even (w : Word) (p q : GInt) (l1 l2 : List GInt)
       evenBottom w ++ (evenRight w ++ ((F2Word.rev (evenBottom w)).hat ++ (F2Word.rev (evenRight w)).hat)) := by
     simp [boundaryWordOf, List.append_assoc]
   rw [hw, WalkDecomp.walk_append, h]
-  simp only [List.append_assoc, List.singleton_append, List.cons_append, List.nil_append]
+  simp only [List.append_assoc, List.cons_append, List.nil_append]
   apply zip_mem_of_mid
   exact ⟨_, _, rfl⟩
 
@@ -83,11 +83,11 @@ theorem top_cell_even (w : Word) (t : ℤ) (ht0 : 0 ≤ t) (ht1 : t + 1 ≤ (F2W
       ⟨-, hv, -⟩ | ⟨hb, -⟩ | ⟨hb, -⟩ | ⟨hb, -⟩
   · exact hv
   · have := congrArg Prod.fst hb
-    simp [gI] at this <;> omega
+    simp [gI] at this
   · have := congrArg Prod.fst hb
-    simp [gOne] at this <;> omega
+    simp [gOne] at this; omega
   · have := congrArg Prod.fst hb
-    simp [gI] at this <;> omega
+    simp [gI] at this
 
 /-- **The upper bound of the even translate's top side.** A point `(E1 + 1 - t, y)` of the even bottom walk gives over `t` a point
 of the bottom walk at or above `E2 - y`. -/
