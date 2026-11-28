@@ -1289,6 +1289,8 @@ import FLatticePaper.Tiles.StdPseudoAnchoredSets
 import FLatticePaper.Tiles.ReflectedCoverConverse
 import FLatticePaper.Tiles.StdHalfTurnCentre
 import FLatticePaper.Tiles.VertStringReflect
+import FLatticePaper.Tiles.BaseVertPilot
+import FLatticePaper.Tiles.BaseVertPiece
 import FLatticePaper.Tiles.JointInduction
 import FLatticePaper.Tiles.JointGlue
 import FLatticePaper.Tiles.PaperAltBase
