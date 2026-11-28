@@ -1372,6 +1372,8 @@ import FLatticePaper.Tiles.AltItem4EvenUp
 import FLatticePaper.Tiles.AltItem4Tools
 import FLatticePaper.Tiles.AltItem4OddH
 import FLatticePaper.Tiles.AltItem4OddUp
+import FLatticePaper.Tiles.AltItem4Rot
+import FLatticePaper.Tiles.AltItem4Text
 import FLatticePaper.Tiles.BaseTileProps
 import FLatticePaper.Tiles.BaseWeakDomains
 import FLatticePaper.Tiles.BaseWeakLattice

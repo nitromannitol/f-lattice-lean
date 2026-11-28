@@ -181,31 +181,11 @@ def childVectors (f : Fraction) : GInt × GInt :=
 def nbrVec (v1 v2 : GInt) (k1 k2 : ℤ) : GInt :=
   (k1 * v1.1 + k2 * v2.1, k1 * v1.2 + k2 * v2.2)
 
-/-! ### Item (4): the reading is isolated in one definition (operator's answers, 8824170)
+/-! ### Items (4) and (5)
 
-Item (5) is stated and proved in `Tiles/AltItem5.lean` with the strings of the copies themselves (the earlier statement here took
-the stacked strings as a free parameter, which made it hold trivially). -/
-
-/-- Item (4) for one tile `T` with generators `v₁, v₂` and stacked strings `strings`, against the standard subtiles `std`: for
-each neighbour `v = k₁v₁ + k₂v₂` with `|k₁|, |k₂| ≤ 1` and `v ≠ 0`, every point of `T ∩ (T + v)` lies in the stacked strings, or
-in a whole standard subtile of one tile lying in the other (a subtile of `T` inside `T + v`, or a translate of a subtile of `T`
-inside `T`). -/
-def AltItem4Reading (T : Standard.Tile) (v1 v2 : GInt) (strings : Finset GInt) (std : List Standard.Tile) : Prop :=
-  ∀ k1 k2 : ℤ, -1 ≤ k1 → k1 ≤ 1 → -1 ≤ k2 → k2 ≤ 1 → (k1 ≠ 0 ∨ k2 ≠ 0) →
-    ∀ x ∈ T, x ∈ Standard.shift T (nbrVec v1 v2 k1 k2) →
-      x ∈ strings ∨
-      ∃ s ∈ std,
-        (x ∈ s ∧ ∀ y ∈ s, y ∈ T ∧ y ∈ Standard.shift T (nbrVec v1 v2 k1 k2)) ∨
-        (x ∈ Standard.shift s (nbrVec v1 v2 k1 k2) ∧
-          ∀ y ∈ Standard.shift s (nbrVec v1 v2 k1 k2), y ∈ T ∧ y ∈ Standard.shift T (nbrVec v1 v2 k1 k2))
-
-/-- Item (4) for the alternate children of the non-base words, with the stacked strings of each child as the parameter. -/
-def AltItem4 (base : Word → Standard.Tile × Standard.Tile) (strings : Word → Bool → Finset GInt) : Prop :=
-  ∀ w : Word, ¬ FLatticePaper.Tiles.Standard.IsBase w →
-    AltItem4Reading (altOddTile base w) (childVectors ((parentsAt w).current .odd)).1
-        (childVectors ((parentsAt w).current .odd)).2 (strings w false) (altOddPFam w ++ altOddQFam w) ∧
-    AltItem4Reading (altEvenTile base w) (childVectors ((parentsAt w).current .even)).1
-        (childVectors ((parentsAt w).current .even)).2 (strings w true) (altEvenPFam w ++ altEvenQFam w)
+Items (4) and (5) are stated and proved with the strings of the copies themselves: item (4) in `Tiles/AltItem4Text.lean`
+(`AltItem4.alt_item4_odd`, `alt_item4_even`), item (5) in `Tiles/AltItem5.lean`. The earlier statements here took the stacked
+strings as a free parameter, which made them hold trivially. -/
 
 /-- Item (1), symmetry: the tile is 180-degree symmetric as a set of cells (its lower-left vertices): for some integer `s`,
 `x ∈ T ↔ s - x ∈ T`. The reflection of a cell set through a point maps lower-left vertices by `x ↦ s - x` with `s ∈ ℤ²`
