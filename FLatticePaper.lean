@@ -1422,5 +1422,6 @@ import FLatticePaper.Tiles.BaseWalkSums
 import FLatticePaper.Tiles.BaseInsideAlong
 import FLatticePaper.Tiles.BaseInsideTile
 import FLatticePaper.Tiles.BaseRespectsAnchoredOdd
+import FLatticePaper.Tiles.StackedClass
 
 /-! Root import for the corrected F-lattice paper. -/
