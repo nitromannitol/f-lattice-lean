@@ -1286,6 +1286,7 @@ import FLatticePaper.Tiles.JointFamily
 import FLatticePaper.Tiles.AltDoubledTile
 import FLatticePaper.Tiles.StdCornerAnchors
 import FLatticePaper.Tiles.StdPseudoAnchoredSets
+import FLatticePaper.Tiles.ReflectedCoverConverse
 import FLatticePaper.Tiles.StdHalfTurnCentre
 import FLatticePaper.Tiles.VertStringReflect
 import FLatticePaper.Tiles.JointInduction
