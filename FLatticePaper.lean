@@ -1441,6 +1441,9 @@ import FLatticePaper.Tiles.AltItem3
 import FLatticePaper.Tiles.AltItem3Strings
 import FLatticePaper.Tiles.AltItem3Exterior
 import FLatticePaper.Tiles.AltLatticeCore
+import FLatticePaper.Tiles.AltGlueHalfTurn
+import FLatticePaper.Tiles.AltGlueOdd
+import FLatticePaper.Tiles.AltLatticeOddW
 import FLatticePaper.Tiles.AltBounds
 import FLatticePaper.Tiles.AltItem4Defs
 import FLatticePaper.Tiles.AltItem4Special
